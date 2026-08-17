@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import hashlib
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from io import BytesIO
 from typing import Iterable
 
@@ -53,7 +53,12 @@ def parquet_to_candles(payload: bytes) -> list[Candle]:
     except ImportError as exc:  # pragma: no cover - dependency guard
         raise RuntimeError("pyarrow is required for Parquet storage") from exc
 
-    table = pq.read_table(BytesIO(payload))
+    # Use ParquetFile directly and disable threaded decoding. GitHub's Linux
+    # runners exposed an intermittent PyArrow interpreter-shutdown SIGABRT
+    # after otherwise-successful tests when the higher-level dataset reader
+    # left background worker state alive at process teardown.
+    parquet_file = pq.ParquetFile(BytesIO(payload))
+    table = parquet_file.read(use_threads=False)
     rows = table.to_pylist()
     return [
         Candle(
