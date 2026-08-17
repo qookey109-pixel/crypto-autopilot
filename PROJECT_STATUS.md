@@ -12,7 +12,7 @@ Qookey Crypto Autopilot
 
 ## Current formal stage
 
-**V0.1 M1A PIONEX ACQUISITION PROOF COMPLETE / PAPER-ONLY**
+**V0.1 M1B R2 FOUNDATION READY / PAPER-ONLY**
 
 No live-money authorization exists.
 
@@ -51,33 +51,59 @@ Authoritative receipt: `research/receipts/2026-08-17-m1a-pionex.json`
 - Pionex runtime discrepancy found and frozen: singular `/bookTicker` returned 404; implementation uses plural `/bookTickers` with regression coverage.
 - An earlier exploratory run that admitted non-crypto instruments is explicitly non-authoritative.
 
+### M1B — Cloudflare R2 foundation
+
+- R2 S3-compatible storage adapter implemented; credentials are secret-manager only.
+- Deterministic R2 object-key contract implemented.
+- Parquet candle encoding/decoding implemented with Zstandard compression.
+- Partition policy established: monthly `15M`; annual `60M` / `4H` by default.
+- SHA-256 object receipt and verified download path implemented.
+- Real-bucket round-trip proof script added.
+- Storage layout is designed for approximately 250 markets and maximum available history capped at eight years.
+- Pionex-native histories and future external proxy histories are required to remain provenance-separated.
+
+## M1B not yet authoritative
+
+The Cloudflare R2 bucket has not yet been connected from this environment. M1B must not be marked COMPLETE until a real R2 round-trip proof passes against the project bucket.
+
+Required secret values, never committed:
+
+- `CLOUDFLARE_ACCOUNT_ID`
+- `R2_BUCKET_NAME`
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
+
 ## Not completed
 
-- Cloudflare R2 bucket/persistence is not connected.
-- Parquet partitioning is not implemented.
-- Long-horizon historical backfill is not yet materialized.
-- Technical indicator calculation (EMA/ATR/volume) is not implemented.
-- Real SState output ingestion is not implemented.
-- Full event-driven backtest engine is not implemented.
-- Fee/funding/slippage model is not implemented.
-- Paper position lifecycle and settlement are incomplete.
-- Cloudflare Worker/D1/Pages deployment is not configured.
-- Pionex private API permission verification is deferred.
-- Server-side protective-order verification is deferred.
-- Order/position reconciliation and restart recovery are deferred.
-- Shadow-live verification is deferred.
+- Real Cloudflare R2 bucket round-trip proof.
+- Upload of the bounded M1A dataset to R2.
+- Dataset-level R2 manifest/receipt freeze.
+- Long-horizon maximum-available historical backfill (target cap: eight years).
+- Dynamic historical-universe reconstruction for survivorship-bias-safe backtests.
+- Technical indicator calculation (EMA/ATR/volume).
+- Real SState output ingestion.
+- Full event-driven backtest engine.
+- Fee/funding/slippage model.
+- Paper position lifecycle and settlement.
+- Cloudflare Worker/D1/Pages deployment.
+- Pionex private API permission verification.
+- Server-side protective-order verification.
+- Order/position reconciliation and restart recovery.
+- Shadow-live verification.
 - Live trading is forbidden.
 
 ## Next milestone
 
-**M1B — Cloudflare R2 Historical Store**
+**M1B-PROOF — Real Cloudflare R2 Round Trip**
 
 1. Create/connect the Cloudflare account and R2 bucket for this project.
-2. Freeze the R2 object-key layout and provenance metadata contract.
-3. Add Parquet or equivalently compact partitioned storage for 15M / 60M / 4H candles.
-4. Upload a bounded proof dataset and verify round-trip hashes/row counts.
-5. Estimate the long-horizon backfill size and API request budget.
-6. Only after R2 proof passes, run the larger historical acquisition needed for backtesting.
+2. Create an R2 API token / S3 Access Key scoped to the project bucket.
+3. Store values only as GitHub/Cloudflare secrets.
+4. Run `scripts/r2_roundtrip_proof.py` against the real bucket.
+5. Require upload/download SHA-256 equality and row-count equality.
+6. Upload the bounded M1A proof dataset and freeze a dataset manifest.
+7. Measure actual Parquet compression, then estimate the 8-year / ~250-market storage and API budget.
+8. Begin resumable maximum-available historical acquisition only after the proof passes.
 
 ## Safety gates before any live trading
 
