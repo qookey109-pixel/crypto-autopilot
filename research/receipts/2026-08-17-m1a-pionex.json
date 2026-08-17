@@ -1,0 +1,178 @@
+{
+  "acquisition_summary": {
+    "artifact_size_bytes": 281025,
+    "candles_by_interval": {
+      "15M": 10080,
+      "4H": 630,
+      "60M": 2520
+    },
+    "estimated_total_public_api_requests": 63,
+    "extracted_json_size_approx_bytes": 2200000,
+    "kline_pages": 60,
+    "pages_by_interval": {
+      "15M": 30,
+      "4H": 15,
+      "60M": 15
+    },
+    "symbol_count": 15,
+    "total_candles": 13230,
+    "universe_requests": 3
+  },
+  "audit": {
+    "duplicate_timestamp_count": 0,
+    "gap_count": 0,
+    "invalid_candle_count": 0,
+    "pass": true,
+    "silent_interpolation_used": false
+  },
+  "authority": {
+    "artifact_id": 9281694821,
+    "artifact_name": "m1a-pionex-acquisition-32010845699",
+    "artifact_sha256": "2cc359fe5248329716e614ae1df4161347c1987a5b34a5b2087a3c97dadab3a4",
+    "branch": "run/m1a-acquisition",
+    "commit": "6f6f97ada779e2d2faaf1c4a6c3f82df1354ee9c",
+    "github_actions_run_id": 32010845699,
+    "repository": "qookey109-pixel/crypto-autopilot"
+  },
+  "forensic_notes": [
+    "An earlier exploratory M1A run (32010555174) passed candle integrity but admitted non-crypto USDT perpetual instruments when selection relied only on the symbol suffix. It is not authoritative for the crypto universe.",
+    "The live Pionex singular /api/v1/market/bookTicker route returned HTTP 404 in run 32010456006. The client was pinned to plural /api/v1/market/bookTickers and regression-tested before this authority run."
+  ],
+  "guardrails": {
+    "bulk_history_committed_to_git": false,
+    "crypto_only_allowlist": "config/crypto_universe_v0_1.json",
+    "live_trading_authorized": false,
+    "private_api_used": false
+  },
+  "observed_at_utc": "2026-08-17T08:32:45.247712+00:00",
+  "sample": {
+    "days": 7,
+    "intervals": [
+      "15M",
+      "60M",
+      "4H"
+    ],
+    "requested_end_utc": "2026-08-17T07:59:59.999Z",
+    "requested_start_utc": "2026-08-10T08:00:00Z"
+  },
+  "schema_version": 1,
+  "selected_universe": [
+    {
+      "close": 63414.4,
+      "quote_amount_24h": 1930961600.0098386,
+      "spread_bps": 0.015769301427601922,
+      "symbol": "BTC_USDT_PERP",
+      "trade_count_24h": 233220
+    },
+    {
+      "close": 1894.49,
+      "quote_amount_24h": 1582425411.8051987,
+      "spread_bps": 0.0527845151345921,
+      "symbol": "ETH_USDT_PERP",
+      "trade_count_24h": 247076
+    },
+    {
+      "close": 75.405,
+      "quote_amount_24h": 475317744.07893986,
+      "spread_bps": 1.3261720045077787,
+      "symbol": "SOL_USDT_PERP",
+      "trade_count_24h": 146381
+    },
+    {
+      "close": 59.307,
+      "quote_amount_24h": 9056517.03465999,
+      "spread_bps": 0.16861273869201523,
+      "symbol": "HYPE_USDT_PERP",
+      "trade_count_24h": 234160
+    },
+    {
+      "close": 0.1753,
+      "quote_amount_24h": 6119509.55239999,
+      "spread_bps": 5.702879954376332,
+      "symbol": "ADA_USDT_PERP",
+      "trade_count_24h": 88101
+    },
+    {
+      "close": 605.78,
+      "quote_amount_24h": 4367350.1234,
+      "spread_bps": 0.16507506788697154,
+      "symbol": "BNB_USDT_PERP",
+      "trade_count_24h": 118666
+    },
+    {
+      "close": 3.28,
+      "quote_amount_24h": 3730653.272,
+      "spread_bps": 3.04831580551847,
+      "symbol": "UNI_USDT_PERP",
+      "trade_count_24h": 87378
+    },
+    {
+      "close": 1.0006,
+      "quote_amount_24h": 2849009.0958,
+      "spread_bps": 0.9994503023336063,
+      "symbol": "XRP_USDT_PERP",
+      "trade_count_24h": 127853
+    },
+    {
+      "close": 43.89,
+      "quote_amount_24h": 1824876.47652,
+      "spread_bps": 2.2781637999767654,
+      "symbol": "LTC_USDT_PERP",
+      "trade_count_24h": 41188
+    },
+    {
+      "close": 9.406,
+      "quote_amount_24h": 1792076.34293,
+      "spread_bps": 1.0630946685796479,
+      "symbol": "LINK_USDT_PERP",
+      "trade_count_24h": 143942
+    },
+    {
+      "close": 0.07024,
+      "quote_amount_24h": 1095334.25806,
+      "spread_bps": 1.4235888675364794,
+      "symbol": "DOGE_USDT_PERP",
+      "trade_count_24h": 97999
+    },
+    {
+      "close": 85.78,
+      "quote_amount_24h": 1063008.4377,
+      "spread_bps": 1.1658408627228347,
+      "symbol": "AAVE_USDT_PERP",
+      "trade_count_24h": 81204
+    },
+    {
+      "close": 6.327,
+      "quote_amount_24h": 789323.0487,
+      "spread_bps": 1.5806528096108972,
+      "symbol": "AVAX_USDT_PERP",
+      "trade_count_24h": 88820
+    },
+    {
+      "close": 4.088,
+      "quote_amount_24h": 684608.5675,
+      "spread_bps": 2.445884798826792,
+      "symbol": "INJ_USDT_PERP",
+      "trade_count_24h": 47467
+    },
+    {
+      "close": 0.6772,
+      "quote_amount_24h": 568653.40351,
+      "spread_bps": 1.47677767112145,
+      "symbol": "SUI_USDT_PERP",
+      "trade_count_24h": 89438
+    }
+  ],
+  "source": "pionex_public_futures",
+  "stage": "M1A_COMPLETE",
+  "universe_selection": {
+    "allowed_base_asset_count": 32,
+    "base_allowlist_file": "config/crypto_universe_v0_1.json",
+    "crypto_only": true,
+    "max_spread_bps": 30.0,
+    "minimum_acceptable_size": 10,
+    "quote_suffix": "_USDT_PERP",
+    "ranking": "24h exchange-reported amount desc, spread asc, symbol asc",
+    "target_size": 15
+  }
+}

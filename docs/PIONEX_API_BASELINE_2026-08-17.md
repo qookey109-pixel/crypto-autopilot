@@ -16,9 +16,17 @@ Active perpetual symbols:
 
 `GET /api/v1/market/tickers?type=PERP`
 
-Best bid/ask futures quotes:
+Best bid/ask futures quotes used by the implementation:
+
+`GET /api/v1/market/bookTickers?type=PERP`
+
+### Runtime documentation discrepancy
+
+On 2026-08-17, a GitHub-hosted live acquisition called the singular route shown on the current Futures market page:
 
 `GET /api/v1/market/bookTicker?type=PERP`
+
+and received HTTP 404. Pionex's current API-key-permissions reference lists both `bookTickers` and `bookTicker`, while the Pionex changelog records `GET /api/v1/market/bookTickers` as the endpoint introduced for best market price/size. The V0.1 client therefore uses plural `bookTickers`, and a regression test freezes that choice. Re-verify if Pionex resolves the documentation discrepancy.
 
 Futures candles:
 
@@ -52,4 +60,6 @@ Before any future live milestone, re-verify:
 
 - https://www.pionex.com/docs/api-docs/futures-api/common
 - https://www.pionex.com/docs/api-docs/futures-api/market
+- https://www.pionex.com/docs/api-docs/references/api-key-permissions
+- https://www.pionex.com/docs/api-docs/readme/change-log
 - https://www.pionex.com/docs/api-docs/futures-api/general-info/basic-info

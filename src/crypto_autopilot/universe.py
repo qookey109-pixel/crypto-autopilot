@@ -23,6 +23,13 @@ def spread_bps(book: BookTicker) -> float | None:
     return (book.ask_price - book.bid_price) / mid * 10_000.0
 
 
+def base_asset_from_symbol(symbol: str, quote_suffix: str = "_USDT_PERP") -> str | None:
+    if not quote_suffix or not symbol.endswith(quote_suffix):
+        return None
+    base = symbol[: -len(quote_suffix)]
+    return base or None
+
+
 def rank_perpetual_universe(
     active_symbols: list[str] | tuple[str, ...],
     tickers: list[MarketTicker] | tuple[MarketTicker, ...],
@@ -31,18 +38,28 @@ def rank_perpetual_universe(
     target_size: int = 15,
     quote_suffix: str = "_USDT_PERP",
     max_spread_bps: float = 30.0,
+    allowed_base_assets: set[str] | frozenset[str] | None = None,
 ) -> tuple[UniverseCandidate, ...]:
     if not 1 <= target_size <= 20:
         raise ValueError("target_size must be between 1 and 20")
     if max_spread_bps <= 0:
         raise ValueError("max_spread_bps must be positive")
 
+    allowed = None
+    if allowed_base_assets is not None:
+        allowed = {str(item).upper() for item in allowed_base_assets if str(item).strip()}
+        if not allowed:
+            raise ValueError("allowed_base_assets must not be empty when supplied")
+
     ticker_by_symbol = {ticker.symbol: ticker for ticker in tickers}
     book_by_symbol = {book.symbol: book for book in books}
     candidates: list[UniverseCandidate] = []
 
     for symbol in sorted(set(active_symbols)):
-        if quote_suffix and not symbol.endswith(quote_suffix):
+        base_asset = base_asset_from_symbol(symbol, quote_suffix)
+        if base_asset is None:
+            continue
+        if allowed is not None and base_asset.upper() not in allowed:
             continue
         ticker = ticker_by_symbol.get(symbol)
         book = book_by_symbol.get(symbol)
