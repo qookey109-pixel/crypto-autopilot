@@ -1,0 +1,54 @@
+name: M1A Pionex Acquisition
+
+on:
+  workflow_dispatch:
+    inputs:
+      sample_days:
+        description: Bounded historical sample in days
+        required: false
+        default: "7"
+  push:
+    branches:
+      - run/m1a-acquisition
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install package
+        run: python -m pip install -e .
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Select live Pionex universe
+        run: |
+          mkdir -p artifacts
+          python scripts/select_pionex_universe.py \
+            --target-size 15 \
+            --min-size 10 \
+            --max-spread-bps 30 \
+            --output artifacts/universe.json
+      - name: Acquire bounded historical sample
+        run: |
+          SAMPLE_DAYS="${{ github.event.inputs.sample_days }}"
+          SAMPLE_DAYS="${SAMPLE_DAYS:-7}"
+          python scripts/acquire_pionex_sample.py \
+            --universe artifacts/universe.json \
+            --output-dir artifacts/acquisition \
+            --days "$SAMPLE_DAYS" \
+            --minimum-symbols 10
+      - name: Upload acquisition evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1a-pionex-acquisition-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 14
