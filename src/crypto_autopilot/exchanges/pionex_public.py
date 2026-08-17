@@ -66,7 +66,9 @@ class PionexPublicClient:
         return sorted(tickers, key=lambda item: item.symbol)
 
     def list_perpetual_book_tickers(self) -> list[BookTicker]:
-        payload = self._get_json("/api/v1/market/bookTicker", {"type": "PERP"})
+        # Runtime verification on 2026-08-17 found the singular /bookTicker route returning 404
+        # while Pionex's public-permission reference and changelog list /bookTickers.
+        payload = self._get_json("/api/v1/market/bookTickers", {"type": "PERP"})
         rows = payload.get("data", {}).get("tickers", [])
         books = []
         for row in rows:

@@ -36,9 +36,13 @@ class PionexPublicTests(unittest.TestCase):
             "result": True,
             "data": {"tickers": [{"symbol": "BTC_USDT_PERP", "bidPrice": "59999", "bidSize": "1", "askPrice": "60001", "askSize": "2", "timestamp": 123}]},
         }
-        with patch.object(client, "_get_json", side_effect=[ticker_fixture, book_fixture]):
+        with patch.object(client, "_get_json", return_value=ticker_fixture) as ticker_get:
             ticker = client.list_perpetual_tickers()[0]
+        ticker_get.assert_called_once_with("/api/v1/market/tickers", {"type": "PERP"})
+
+        with patch.object(client, "_get_json", return_value=book_fixture) as book_get:
             book = client.list_perpetual_book_tickers()[0]
+        book_get.assert_called_once_with("/api/v1/market/bookTickers", {"type": "PERP"})
         self.assertEqual(ticker.quote_amount, 120000.0)
         self.assertEqual(book.ask_price, 60001.0)
 
