@@ -9,7 +9,10 @@ description = "Paper-first, exchange-agnostic crypto trading research foundation
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{name = "Qookey"}]
-dependencies = []
+dependencies = [
+  "boto3>=1.35,<2",
+  "pyarrow>=18,<22",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
