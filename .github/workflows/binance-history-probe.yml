@@ -1,0 +1,26 @@
+name: Binance History Probe
+
+on:
+  push:
+    branches:
+      - research/binance-history-probe-v1-20260817
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Probe Binance public historical archives
+        run: python scripts/probe_binance_history.py --output binance-history-probe.json
+      - name: Upload proof artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-history-probe
+          path: binance-history-probe.json
