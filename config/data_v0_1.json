@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "universe": {
+    "target_size": 15,
+    "minimum_acceptable_size": 10,
+    "maximum_size": 20,
+    "quote_suffix": "_USDT_PERP",
+    "max_spread_bps": 30.0,
+    "ranking": "24h_exchange_reported_amount_desc_then_spread_asc"
+  },
+  "history": {
+    "intervals": [
+      "15M",
+      "60M",
+      "4H"
+    ],
+    "page_limit": 500,
+    "max_pages": 10000,
+    "bulk_store_target": "cloudflare_r2",
+    "repository_policy": "code_and_small_deterministic_fixtures_only"
+  }
+}

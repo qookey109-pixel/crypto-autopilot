@@ -26,6 +26,22 @@ class PionexPublicTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             client.get_klines("BTC_USDT_PERP", "17M")
 
+    def test_ticker_and_book_parsers(self) -> None:
+        client = PionexPublicClient()
+        ticker_fixture = {
+            "result": True,
+            "data": {"tickers": [{"symbol": "BTC_USDT_PERP", "close": "60000", "volume": "2", "amount": "120000", "count": 9}]},
+        }
+        book_fixture = {
+            "result": True,
+            "data": {"tickers": [{"symbol": "BTC_USDT_PERP", "bidPrice": "59999", "bidSize": "1", "askPrice": "60001", "askSize": "2", "timestamp": 123}]},
+        }
+        with patch.object(client, "_get_json", side_effect=[ticker_fixture, book_fixture]):
+            ticker = client.list_perpetual_tickers()[0]
+            book = client.list_perpetual_book_tickers()[0]
+        self.assertEqual(ticker.quote_amount, 120000.0)
+        self.assertEqual(book.ask_price, 60001.0)
+
 
 if __name__ == "__main__":
     unittest.main()
