@@ -4,7 +4,7 @@ import json
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from ..models import Candle
+from ..models import BookTicker, Candle, MarketTicker
 
 
 class PionexAPIError(RuntimeError):
@@ -45,6 +45,45 @@ class PionexPublicClient:
         )
         rows = payload.get("data", {}).get("symbols", [])
         return sorted({str(row["symbol"]) for row in rows if row.get("symbol")})
+
+    def list_perpetual_tickers(self) -> list[MarketTicker]:
+        payload = self._get_json("/api/v1/market/tickers", {"type": "PERP"})
+        rows = payload.get("data", {}).get("tickers", [])
+        tickers = []
+        for row in rows:
+            symbol = row.get("symbol")
+            if not symbol:
+                continue
+            tickers.append(
+                MarketTicker(
+                    symbol=str(symbol),
+                    close=float(row.get("close") or 0.0),
+                    base_volume=float(row.get("volume") or 0.0),
+                    quote_amount=float(row.get("amount") or 0.0),
+                    trade_count=int(row.get("count") or 0),
+                )
+            )
+        return sorted(tickers, key=lambda item: item.symbol)
+
+    def list_perpetual_book_tickers(self) -> list[BookTicker]:
+        payload = self._get_json("/api/v1/market/bookTicker", {"type": "PERP"})
+        rows = payload.get("data", {}).get("tickers", [])
+        books = []
+        for row in rows:
+            symbol = row.get("symbol")
+            if not symbol:
+                continue
+            books.append(
+                BookTicker(
+                    symbol=str(symbol),
+                    bid_price=float(row.get("bidPrice") or 0.0),
+                    bid_size=float(row.get("bidSize") or 0.0),
+                    ask_price=float(row.get("askPrice") or 0.0),
+                    ask_size=float(row.get("askSize") or 0.0),
+                    timestamp_ms=int(row.get("timestamp") or 0),
+                )
+            )
+        return sorted(books, key=lambda item: item.symbol)
 
     def get_klines(
         self,

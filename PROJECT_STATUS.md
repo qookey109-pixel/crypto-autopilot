@@ -6,17 +6,19 @@ Updated: 2026-08-17
 
 Qookey Crypto Autopilot
 
-## Repository target
+## Repository
 
 `qookey109-pixel/crypto-autopilot`
 
 ## Current formal stage
 
-**V0.1 FOUNDATION / PAPER-ONLY**
+**V0.1 M1 HISTORICAL DATA FOUNDATION / PAPER-ONLY**
 
 No live-money authorization exists.
 
-## Completed in bootstrap
+## Completed
+
+### V0.1 foundation
 
 - Exchange-agnostic adapter boundary established.
 - Pionex public futures market-data client scaffolded.
@@ -24,35 +26,51 @@ No live-money authorization exists.
 - SState adapter contract established without modifying SState core.
 - SState Intraday Wave V0.1 scoring gate implemented as a deterministic baseline.
 - Risk sizing and daily risk gates implemented.
-- Strategy/risk unit tests added.
-- CI workflow added.
+- Strategy/risk unit tests and CI added.
 - Secrets hygiene baseline added.
+
+### M1 implementation
+
+- Active Pionex `PERP` discovery retained as the universe authority input.
+- Public 24h futures ticker parser added.
+- Public best bid/ask futures parser added.
+- Deterministic USDT-PERP universe ranking added: 24h exchange-reported amount desc, spread asc.
+- Target universe fixed at 15, with 10–20 as the controlled operating range.
+- Historical `15M` / `60M` / `4H` backward pagination implemented.
+- Inclusive `endTime` handled with `earliest_time - 1 ms` pagination cursor.
+- Historical audit added for duplicates, ordering, gaps, interval alignment and OHLCV validity.
+- Deterministic JSON fixture writer added.
+- CLI tools added for universe selection and explicit-range backfill.
+- M1 unit tests added.
 
 ## Not completed
 
-- Historical backfill pagination and R2 persistence.
-- Universe ranking from liquidity/volume/spread.
-- Technical indicator calculation (EMA/ATR/volume).
-- Real SState output ingestion.
-- Full event-driven backtest engine.
-- Fee/funding/slippage model.
-- Paper position lifecycle and settlement.
-- Cloudflare Worker/D1/R2 deployment.
-- Pionex private API permission verification.
-- Server-side protective-order verification.
-- Order/position reconciliation and restart recovery.
-- Shadow-live verification.
-- Live trading.
+- Live Pionex universe snapshot has not yet been frozen as a research receipt.
+- Multi-symbol historical acquisition has not yet been executed for the selected universe.
+- Bulk historical persistence to Cloudflare R2 is not connected.
+- Parquet partitioning is not implemented.
+- Technical indicator calculation (EMA/ATR/volume) is not implemented.
+- Real SState output ingestion is not implemented.
+- Full event-driven backtest engine is not implemented.
+- Fee/funding/slippage model is not implemented.
+- Paper position lifecycle and settlement are incomplete.
+- Cloudflare Worker/D1/R2 deployment is not configured.
+- Pionex private API permission verification is deferred.
+- Server-side protective-order verification is deferred.
+- Order/position reconciliation and restart recovery are deferred.
+- Shadow-live verification is deferred.
+- Live trading is forbidden.
 
 ## Next milestone
 
-**M1 — Pionex Historical Data Foundation**
+**M1A — Live Pionex Acquisition Receipt**
 
-1. Discover active PERP symbols.
-2. Rank/select a controlled 10–20 symbol universe.
-3. Backfill 15M / 60M / 4H candles with provenance.
-4. Validate ordering, duplicates, gaps and candle schema.
-5. Store deterministic local fixtures first; R2 integration follows.
+1. Run the public universe selector against current Pionex data.
+2. Freeze the selected 10–20 USDT perpetual symbols and selection inputs as a dated receipt.
+3. Acquire a bounded historical sample for all selected symbols at 15M / 60M / 4H.
+4. Require audit PASS or explicitly record provider gaps; never interpolate silently.
+5. Measure data volume and request count before enabling R2 persistence.
+6. Only then establish the R2 bucket/layout and bulk backfill plan.
 
 ## Safety gates before any live trading
 

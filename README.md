@@ -58,6 +58,32 @@ Cloud target:
 - Cloudflare Pages: dashboard / Performance Center
 - Pionex: market data and, only after safety approval, execution
 
+## M1 historical data foundation
+
+M1 adds public-data-only tools for:
+
+- discovering active Pionex PERP symbols;
+- ranking a controlled USDT-PERP universe from 24h turnover + spread;
+- deterministic backward Kline pagination for `15M`, `60M`, `4H`;
+- duplicate, ordering, gap, alignment and OHLCV integrity audits.
+
+Select a current 15-symbol candidate universe:
+
+```bash
+python scripts/select_pionex_universe.py --target-size 15
+```
+
+Backfill an explicit historical range:
+
+```bash
+python scripts/backfill_pionex_history.py BTC_USDT_PERP 15M \
+  --start 2026-01-01T00:00:00Z \
+  --end 2026-08-01T00:00:00Z \
+  --output /tmp/BTC_USDT_PERP-15M.json
+```
+
+Bulk historical data is not stored in GitHub. Cloudflare R2 remains the target data lake after M1 acquisition behavior is proven.
+
 ## Safety boundary
 
 - Never commit Pionex API keys, secrets, Cloudflare tokens, or credentials.
@@ -83,4 +109,4 @@ python scripts/fetch_pionex_sample.py BTC_USDT_PERP 15M
 
 ## Status
 
-See [`PROJECT_STATUS.md`](PROJECT_STATUS.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), and [`docs/STRATEGY_V0_1.md`](docs/STRATEGY_V0_1.md).
+See [`PROJECT_STATUS.md`](PROJECT_STATUS.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/HISTORICAL_DATA_V0_1.md`](docs/HISTORICAL_DATA_V0_1.md), and [`docs/STRATEGY_V0_1.md`](docs/STRATEGY_V0_1.md).

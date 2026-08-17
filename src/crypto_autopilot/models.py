@@ -14,6 +14,25 @@ class Candle:
 
 
 @dataclass(frozen=True, slots=True)
+class MarketTicker:
+    symbol: str
+    close: float
+    base_volume: float
+    quote_amount: float
+    trade_count: int
+
+
+@dataclass(frozen=True, slots=True)
+class BookTicker:
+    symbol: str
+    bid_price: float
+    bid_size: float
+    ask_price: float
+    ask_size: float
+    timestamp_ms: int
+
+
+@dataclass(frozen=True, slots=True)
 class SStateContext:
     state: str
     probability: float | None

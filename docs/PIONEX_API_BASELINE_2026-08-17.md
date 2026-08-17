@@ -12,6 +12,14 @@ Active perpetual symbols:
 
 `GET /api/v1/common/symbols?type=PERP&status=TRADING`
 
+24-hour futures tickers:
+
+`GET /api/v1/market/tickers?type=PERP`
+
+Best bid/ask futures quotes:
+
+`GET /api/v1/market/bookTicker?type=PERP`
+
 Futures candles:
 
 `GET /api/v1/market/klines`
@@ -22,7 +30,9 @@ V0.1 timeframes are supported by the current official documentation:
 - `60M`
 - `4H`
 
-The documented futures kline request limit is 1–500 records per request. Historical backfill therefore requires deterministic pagination via `endTime` plus gap/duplicate validation.
+The documented futures kline request limit is 1–500 records per request. `endTime` is inclusive. Historical backfill therefore pages backward with the next cursor set to `earliest_time - 1 ms`, followed by gap/duplicate/schema validation.
+
+For V0.1 universe selection, the exchange-reported 24h ticker `amount` is used only among USDT perpetual contracts, with best-bid/ask spread as a liquidity sanity gate.
 
 ## Deferred private/live API
 
