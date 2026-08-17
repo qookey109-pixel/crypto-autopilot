@@ -1,0 +1,83 @@
+{
+  "proof": "PIONEX_BINANCE_30D_15SYMBOL_EQUIVALENCE_V3",
+  "created_at": "2026-08-17T09:51:14.604850+00:00",
+  "branch": "research/binance-history-probe-v1-20260817",
+  "source_commit": "11ed356d4a60e57e646cce437c4cfae2f3a23c15",
+  "github_actions_run": 32017202082,
+  "github_actions_job": 95349106601,
+  "github_actions_artifact_id": 9283992273,
+  "artifact_zip_sha256": "8a76d3373f8ae7f5166eea86801769cdf9dbb033e2356209c404131497f0e3e4",
+  "authentication": "none",
+  "scope": {
+    "start_day_utc": "2026-07-18",
+    "end_day_utc": "2026-08-16",
+    "window_days": 30,
+    "pionex_market": "PERP",
+    "binance_market": "USD-M Futures",
+    "binance_source": "official data.binance.vision daily 15m Kline archives with SHA-256 verification",
+    "higher_intervals": "Binance 1h/4h reconstructed from checksum-verified 15m; Pionex uses native 60M/4H",
+    "symbols": ["BTC","ETH","SOL","HYPE","ADA","BNB","UNI","XRP","LTC","LINK","DOGE","AAVE","AVAX","INJ","SUI"],
+    "intervals": ["15m","1h","4h"]
+  },
+  "summary": {
+    "requested_symbols": 15,
+    "binance_available_symbols": 15,
+    "binance_unavailable_symbols": [],
+    "binance_available_days_per_symbol": 30,
+    "comparable_interval_results": 45,
+    "near_same_passes": 40,
+    "near_same_reviews": 5,
+    "review_results": ["ADA:15m","ADA:1h","ADA:4h","LTC:15m","INJ:15m"],
+    "weighted_exact_close_ratio": 0.4291534391534392,
+    "weighted_exact_ohlc_ratio": 0.01671957671957672,
+    "all_observed_timestamp_overlap_ratio": 1.0,
+    "all_comparable_near_same": false
+  },
+  "selected_results": {
+    "BTC": {
+      "15m": {"mean_close_diff_bps":0.0647101052,"p95_close_diff_bps":0.4570073623,"max_close_diff_bps":2.6007191145,"return_correlation":0.9997265703,"direction_agreement":0.9909722222,"exact_close_ratio":0.4236111111,"near_same_gate":true},
+      "1h": {"mean_close_diff_bps":0.0701906317,"p95_close_diff_bps":0.5393403957,"max_close_diff_bps":2.0490721739,"return_correlation":0.9999280628,"near_same_gate":true},
+      "4h": {"mean_close_diff_bps":0.0976861366,"p95_close_diff_bps":0.7128657882,"max_close_diff_bps":2.0490721739,"return_correlation":0.9999580891,"near_same_gate":true}
+    },
+    "ETH": {
+      "15m": {"mean_close_diff_bps":0.1309940350,"p95_close_diff_bps":0.7908858176,"max_close_diff_bps":6.3293663985,"return_correlation":0.9995788688,"near_same_gate":true},
+      "1h": {"mean_close_diff_bps":0.1614792102,"p95_close_diff_bps":0.9413310852,"max_close_diff_bps":3.3609508435,"return_correlation":0.9998729075,"near_same_gate":true},
+      "4h": {"mean_close_diff_bps":0.1935301912,"p95_close_diff_bps":0.9183048850,"max_close_diff_bps":3.3371924970,"return_correlation":0.9999527999,"near_same_gate":true}
+    },
+    "SOL": {
+      "15m": {"mean_close_diff_bps":0.7141302035,"p95_close_diff_bps":1.3547565550,"max_close_diff_bps":4.6934191559,"return_correlation":0.9982577574,"near_same_gate":true},
+      "1h": {"mean_close_diff_bps":0.7118419319,"p95_close_diff_bps":1.3540319793,"max_close_diff_bps":3.4224306102,"return_correlation":0.9995910932,"near_same_gate":true},
+      "4h": {"mean_close_diff_bps":0.7439779355,"p95_close_diff_bps":1.3603527704,"max_close_diff_bps":2.6260504202,"return_correlation":0.9998701640,"near_same_gate":true}
+    },
+    "ADA": {
+      "15m": {"mean_close_diff_bps":2.9584709375,"p95_close_diff_bps":6.1406202026,"max_close_diff_bps":17.6211453744,"return_correlation":0.9874968654,"direction_agreement":0.8642361111,"near_same_gate":false},
+      "1h": {"mean_close_diff_bps":2.8109682709,"p95_close_diff_bps":6.1332761991,"max_close_diff_bps":12.5865324103,"return_correlation":0.9970409553,"near_same_gate":false},
+      "4h": {"mean_close_diff_bps":2.7596161422,"p95_close_diff_bps":6.1389372251,"max_close_diff_bps":12.5865324103,"return_correlation":0.9991244752,"near_same_gate":false}
+    },
+    "LTC": {
+      "15m": {"mean_close_diff_bps":1.2212826740,"p95_close_diff_bps":2.2678565409,"max_close_diff_bps":9.0293453725,"return_correlation":0.9910791202,"direction_agreement":0.8892361111,"near_same_gate":false},
+      "1h": {"mean_close_diff_bps":1.1791799231,"p95_close_diff_bps":2.2663146380,"max_close_diff_bps":6.7758328628,"return_correlation":0.9979925177,"near_same_gate":true},
+      "4h": {"mean_close_diff_bps":1.2410235707,"p95_close_diff_bps":2.3897978861,"max_close_diff_bps":6.7758328628,"return_correlation":0.9991996418,"near_same_gate":true}
+    },
+    "INJ": {
+      "15m": {"mean_close_diff_bps":1.6011126242,"p95_close_diff_bps":4.4268355179,"max_close_diff_bps":30.3920575423,"return_correlation":0.9954704330,"direction_agreement":0.9413194444,"near_same_gate":false},
+      "1h": {"mean_close_diff_bps":1.6276027089,"p95_close_diff_bps":4.5086171053,"max_close_diff_bps":11.1152278622,"return_correlation":0.9988321775,"near_same_gate":true},
+      "4h": {"mean_close_diff_bps":1.6196202128,"p95_close_diff_bps":4.5157993060,"max_close_diff_bps":7.7730275942,"return_correlation":0.9996800876,"near_same_gate":true}
+    }
+  },
+  "gate_definition": {
+    "timestamp_overlap_ratio_min": 0.999,
+    "close_log_return_correlation_min": 0.995,
+    "close_diff_p95_bps_max": 5.0,
+    "close_diff_max_bps_max": 20.0
+  },
+  "status": "REVIEW_REQUIRED",
+  "notes": [
+    "The venues are not byte-for-byte identical: weighted exact close equality is about 42.9%, and weighted exact full OHLC equality is about 1.67%.",
+    "All 15 Binance USD-M symbols were available for all 30 comparison days and observed timestamps aligned 100% in the 45 comparisons.",
+    "40 of 45 symbol/interval comparisons pass the near-same market gate; ADA at all intervals, LTC 15m, and INJ 15m require review.",
+    "Provider provenance must remain separate. Binance historical data must not be relabeled as Pionex-native data.",
+    "No Binance API key, private account data, order permission, or live trading was used.",
+    "This receipt does not authorize merging the research branch into main or changing the PAPER-ONLY boundary."
+  ]
+}
