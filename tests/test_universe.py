@@ -1,7 +1,7 @@
 import unittest
 
 from crypto_autopilot.models import BookTicker, MarketTicker
-from crypto_autopilot.universe import rank_perpetual_universe
+from crypto_autopilot.universe import base_asset_from_symbol, rank_perpetual_universe
 
 
 class UniverseTests(unittest.TestCase):
@@ -34,6 +34,30 @@ class UniverseTests(unittest.TestCase):
         ]
         ranked = rank_perpetual_universe(active, tickers, books, target_size=15, max_spread_bps=30)
         self.assertEqual([item.symbol for item in ranked], ["AAA_USDT_PERP"])
+
+    def test_crypto_allowlist_blocks_non_crypto_instruments(self) -> None:
+        active = ["BTC_USDT_PERP", "XAU_USDT_PERP", "SOXLX_USDT_PERP"]
+        tickers = [
+            MarketTicker(symbol, 10.0, 1.0, amount, 1)
+            for symbol, amount in [
+                ("BTC_USDT_PERP", 100.0),
+                ("XAU_USDT_PERP", 10_000.0),
+                ("SOXLX_USDT_PERP", 20_000.0),
+            ]
+        ]
+        books = [BookTicker(symbol, 9.99, 1.0, 10.01, 1.0, 1) for symbol in active]
+        ranked = rank_perpetual_universe(
+            active,
+            tickers,
+            books,
+            target_size=15,
+            allowed_base_assets={"BTC", "ETH"},
+        )
+        self.assertEqual([item.symbol for item in ranked], ["BTC_USDT_PERP"])
+
+    def test_base_asset_extraction_is_explicit(self) -> None:
+        self.assertEqual(base_asset_from_symbol("BTC_USDT_PERP"), "BTC")
+        self.assertIsNone(base_asset_from_symbol("BTC_USDC_PERP"))
 
 
 if __name__ == "__main__":

@@ -12,17 +12,20 @@ Inputs:
 
 1. Active `PERP` symbols with `status=TRADING`.
 2. Futures 24-hour tickers.
-3. Futures best bid/ask (`bookTicker`).
+3. Futures best bid/ask (`bookTickers`).
+4. The versioned crypto-only base-asset candidate pool in `config/crypto_universe_v0_1.json`.
 
-V0.1 keeps USDT perpetual contracts only, rejects missing/invalid quotes and spreads above the configured limit, then ranks by:
+V0.1 keeps USDT perpetual contracts only, requires the base asset to be explicitly present in the crypto-only candidate pool, rejects missing/invalid quotes and spreads above the configured limit, then ranks by:
 
 1. exchange-reported 24h `amount` descending;
 2. spread ascending;
 3. symbol ascending for deterministic ties.
 
+The allowlist is intentional. A first live exploratory acquisition on 2026-08-17 showed that filtering only by `_USDT_PERP` can admit non-crypto instruments such as commodity or tokenized-equity-style perpetuals. V0.1 must not silently expand into a different asset class when Pionex changes its catalog.
+
 `amount` is only compared inside the same USDT-quoted universe. It is an exchange-reported turnover field, not a cross-currency normalization layer.
 
-Target universe size is 15; acceptable operating range is 10–20.
+Target selected universe size is 15; acceptable operating range is 10–20. The candidate allowlist may be larger because it is a pool from which the live liquidity ranking selects the active 15.
 
 ## Historical pagination
 
@@ -77,7 +80,7 @@ R2/Parquet persistence is intentionally deferred until the public backfill/audit
 
 ## Commands
 
-Select the current universe:
+Select the current crypto-only universe:
 
 ```bash
 python scripts/select_pionex_universe.py --target-size 15

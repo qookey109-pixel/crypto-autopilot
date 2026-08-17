@@ -27,13 +27,14 @@ jobs:
         run: python -m pip install -e .
       - name: Unit tests
         run: python -m unittest discover -s tests -v
-      - name: Select live Pionex universe
+      - name: Select live crypto-only Pionex universe
         run: |
           mkdir -p artifacts
           python scripts/select_pionex_universe.py \
             --target-size 15 \
             --min-size 10 \
             --max-spread-bps 30 \
+            --base-allowlist config/crypto_universe_v0_1.json \
             --output artifacts/universe.json
       - name: Acquire bounded historical sample
         run: |

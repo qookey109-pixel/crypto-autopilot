@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "purpose": "Curated crypto-only candidate pool for V0.1 Pionex USDT perpetual ranking",
+  "base_assets": [
+    "BTC",
+    "ETH",
+    "SOL",
+    "BNB",
+    "XRP",
+    "DOGE",
+    "ADA",
+    "TRX",
+    "LINK",
+    "AVAX",
+    "SUI",
+    "LTC",
+    "BCH",
+    "DOT",
+    "UNI",
+    "AAVE",
+    "NEAR",
+    "HYPE",
+    "XLM",
+    "ETC",
+    "ATOM",
+    "FIL",
+    "OP",
+    "ARB",
+    "SEI",
+    "APT",
+    "PEPE",
+    "SHIB",
+    "INJ",
+    "CRV",
+    "RUNE",
+    "TON"
+  ],
+  "policy": {
+    "selected_universe_target": 15,
+    "reason": "Prevent non-crypto perpetual instruments such as tokenized equities or commodities from entering the trading universe solely because they share a USDT_PERP suffix.",
+    "review_required_for_changes": true
+  }
+}
