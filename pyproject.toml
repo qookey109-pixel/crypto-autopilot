@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qookey-crypto-autopilot"
+version = "0.1.0"
+description = "Paper-first, exchange-agnostic crypto trading research foundation"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{name = "Qookey"}]
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
