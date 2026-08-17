@@ -1,0 +1,28 @@
+name: Pionex Binance Compare V2
+
+on:
+  push:
+    branches:
+      - research/binance-history-probe-v1-20260817
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package
+        run: python -m pip install -e .
+      - name: Compare Pionex with Binance official daily archives
+        run: python scripts/compare_pionex_binance.py
+      - name: Upload comparison artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pionex-binance-comparison-v2
+          path: pionex-binance-comparison.json
