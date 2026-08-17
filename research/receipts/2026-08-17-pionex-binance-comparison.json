@@ -1,0 +1,36 @@
+{
+  "proof": "PIONEX_BINANCE_PUBLIC_MARKET_COMPARISON_V2",
+  "created_at": "2026-08-17T09:45:10.715114+00:00",
+  "comparison_day_utc": "2026-08-16",
+  "branch": "research/binance-history-probe-v1-20260817",
+  "source_commit": "4d6e4433e2fa9f6a3c4c31f155bda2b69ef0ab6c",
+  "github_actions_run": 32016766523,
+  "github_actions_artifact_id": 9283806478,
+  "authentication": "none",
+  "scope": {
+    "pionex_market": "PERP",
+    "binance_market": "USD-M Futures",
+    "binance_source": "official data.binance.vision daily Kline archives",
+    "symbols": ["BTC", "ETH", "SOL"],
+    "intervals": ["15m", "1h", "4h"],
+    "closed_candles_only": true
+  },
+  "results": [
+    {"symbol":"BTC","interval":"15m","rows":96,"timestamp_overlap_ratio":1.0,"close_diff_bps_mean":0.0100817033,"close_diff_bps_p95":0.0158991929,"close_diff_bps_max":0.0636187962,"direction_agreement":0.96875,"return_correlation":0.9999942753},
+    {"symbol":"BTC","interval":"1h","rows":24,"timestamp_overlap_ratio":1.0,"close_diff_bps_mean":0.0072735894,"close_diff_bps_p95":0.0158952396,"close_diff_bps_max":0.0159020561,"direction_agreement":1.0,"return_correlation":0.9999982273},
+    {"symbol":"BTC","interval":"4h","rows":6,"timestamp_overlap_ratio":1.0,"close_diff_bps_mean":0.0052870333,"close_diff_bps_p95":0.0158694458,"close_diff_bps_max":0.0158777918,"direction_agreement":1.0,"return_correlation":0.9999998288},
+    {"symbol":"ETH","interval":"15m","rows":96,"timestamp_overlap_ratio":1.0,"close_diff_bps_mean":0.0560125061,"close_diff_bps_p95":0.0533949869,"close_diff_bps_max":2.2945999525,"direction_agreement":1.0,"return_correlation":0.9989329436},
+    {"symbol":"ETH","interval":"1h","rows":24,"timestamp_overlap_ratio":1.0,"close_diff_bps_mean":0.0354567783,"close_diff_bps_p95":0.0533422102,"close_diff_bps_max":0.2126618889,"direction_agreement":1.0,"return_correlation":0.9999780757},
+    {"symbol":"ETH","interval":"4h","rows":6,"timestamp_overlap_ratio":1.0,"close_diff_bps_mean":0.0265947067,"close_diff_bps_p95":0.0532922606,"close_diff_bps_max":0.0533272185,"direction_agreement":1.0,"return_correlation":0.9999978617},
+    {"symbol":"SOL","interval":"15m","rows":96,"timestamp_overlap_ratio":1.0,"close_diff_bps_mean":0.7075831774,"close_diff_bps_p95":1.3274042610,"close_diff_bps_max":1.3438150910,"direction_agreement":0.9375,"return_correlation":0.9948383337},
+    {"symbol":"SOL","interval":"1h","rows":24,"timestamp_overlap_ratio":1.0,"close_diff_bps_mean":0.6482281657,"close_diff_bps_p95":1.1762976562,"close_diff_bps_max":1.3274042610,"direction_agreement":0.9166666667,"return_correlation":0.9992335914},
+    {"symbol":"SOL","interval":"4h","rows":6,"timestamp_overlap_ratio":1.0,"close_diff_bps_mean":0.6201176246,"close_diff_bps_p95":1.0621660015,"close_diff_bps_max":1.0631794381,"direction_agreement":1.0,"return_correlation":0.9997924312}
+  ],
+  "status": "PASS",
+  "notes": [
+    "All expected timestamps aligned for BTC, ETH, and SOL on the comparison day.",
+    "Prices are not byte-for-byte identical because Pionex PERP and Binance USD-M Futures are separate venues/order books.",
+    "Volume was intentionally excluded because venue-specific traded volume should differ.",
+    "The first REST-based attempt failed with Binance HTTP 451 from the GitHub runner region; V2 used Binance official daily archives and checksum verification instead."
+  ]
+}
