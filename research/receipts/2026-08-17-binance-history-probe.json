@@ -1,0 +1,36 @@
+{
+  "proof": "BINANCE_PUBLIC_HISTORY_DEPTH_PROBE_V1",
+  "created_at": "2026-08-17T09:36:48.269519+00:00",
+  "branch": "research/binance-history-probe-v1-20260817",
+  "source_commit": "76a63759d1b8cd528f06c06001a6d19807bd2337",
+  "github_actions_run": 32016107470,
+  "github_actions_artifact_id": 9283569875,
+  "ci_run": 32016107558,
+  "authentication": "none",
+  "scope": {
+    "method": "official Binance Public Data monthly Kline archives; earliest existing archive only",
+    "sources": ["binance_spot", "binance_usdm_futures"],
+    "symbols": ["BTCUSDT", "ETHUSDT"],
+    "intervals": ["15m", "1h", "4h"]
+  },
+  "results": [
+    {"source":"binance_spot","symbol":"BTCUSDT","interval":"15m","archive_month":"2017-08","first_open_time_utc":"2017-08-17T04:00:00+00:00","rows":1424,"checksum_verified":true},
+    {"source":"binance_spot","symbol":"BTCUSDT","interval":"1h","archive_month":"2017-08","first_open_time_utc":"2017-08-17T04:00:00+00:00","rows":356,"checksum_verified":true},
+    {"source":"binance_spot","symbol":"BTCUSDT","interval":"4h","archive_month":"2017-08","first_open_time_utc":"2017-08-17T04:00:00+00:00","rows":89,"checksum_verified":true},
+    {"source":"binance_spot","symbol":"ETHUSDT","interval":"15m","archive_month":"2017-08","first_open_time_utc":"2017-08-17T04:00:00+00:00","rows":1424,"checksum_verified":true},
+    {"source":"binance_spot","symbol":"ETHUSDT","interval":"1h","archive_month":"2017-08","first_open_time_utc":"2017-08-17T04:00:00+00:00","rows":356,"checksum_verified":true},
+    {"source":"binance_spot","symbol":"ETHUSDT","interval":"4h","archive_month":"2017-08","first_open_time_utc":"2017-08-17T04:00:00+00:00","rows":89,"checksum_verified":true},
+    {"source":"binance_usdm_futures","symbol":"BTCUSDT","interval":"15m","archive_month":"2020-01","first_open_time_utc":"2020-01-01T00:00:00+00:00","rows":2976,"checksum_verified":true},
+    {"source":"binance_usdm_futures","symbol":"BTCUSDT","interval":"1h","archive_month":"2020-01","first_open_time_utc":"2020-01-01T00:00:00+00:00","rows":744,"checksum_verified":true},
+    {"source":"binance_usdm_futures","symbol":"BTCUSDT","interval":"4h","archive_month":"2020-01","first_open_time_utc":"2020-01-01T00:00:00+00:00","rows":186,"checksum_verified":true},
+    {"source":"binance_usdm_futures","symbol":"ETHUSDT","interval":"15m","archive_month":"2020-01","first_open_time_utc":"2020-01-01T00:00:00+00:00","rows":2976,"checksum_verified":true},
+    {"source":"binance_usdm_futures","symbol":"ETHUSDT","interval":"1h","archive_month":"2020-01","first_open_time_utc":"2020-01-01T00:00:00+00:00","rows":744,"checksum_verified":true},
+    {"source":"binance_usdm_futures","symbol":"ETHUSDT","interval":"4h","archive_month":"2020-01","first_open_time_utc":"2020-01-01T00:00:00+00:00","rows":186,"checksum_verified":true}
+  ],
+  "status": "PASS",
+  "notes": [
+    "This proof does not merge Binance data into Pionex-native history.",
+    "USD-M Futures result is the earliest monthly archive found by this proof, not a claim about the absolute first possible Binance futures candle across every official interface.",
+    "No Binance API key or trading permission was used."
+  ]
+}
