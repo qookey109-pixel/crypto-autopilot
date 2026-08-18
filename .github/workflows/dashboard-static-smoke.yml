@@ -1,0 +1,66 @@
+name: Dashboard D1 Static Smoke
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "web/**"
+      - "scripts/validate_dashboard_static.py"
+      - ".github/workflows/dashboard-static-smoke.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-d1-static-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate dashboard safety and required views
+        run: python scripts/validate_dashboard_static.py
+
+      - name: Start static server
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 4173 -d web > /tmp/qookey-dashboard-http.log 2>&1 &
+          echo $! > /tmp/qookey-dashboard-http.pid
+
+      - name: Wait for static server readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent "http://127.0.0.1:4173/" >/dev/null; then
+              exit 0
+            fi
+            sleep 0.25
+          done
+          cat /tmp/qookey-dashboard-http.log || true
+          exit 1
+
+      - name: HTTP smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in / /styles.css /app.js /data/dashboard.json; do
+            curl --fail --silent --show-error "http://127.0.0.1:4173${path}" >/dev/null
+          done
+
+      - name: Stop static server
+        if: always()
+        shell: bash
+        run: |
+          if test -f /tmp/qookey-dashboard-http.pid; then
+            kill "$(cat /tmp/qookey-dashboard-http.pid)" || true
+          fi
