@@ -12,7 +12,7 @@ Qookey Crypto Autopilot
 
 ## Current formal stage
 
-**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / HISTORICAL UNIVERSE BACKTEST ADMISSION V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / HISTORICAL SSTATE EVIDENCE INGESTION V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / PARAMETER SWEEP FRAMEWORK V0.1 READY / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
+**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / HISTORICAL UNIVERSE BACKTEST ADMISSION V0.1 READY / HISTORICAL LIQUIDITY RANKING V0.1 READY / HISTORICAL LIQUIDITY BACKTEST ADMISSION V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / HISTORICAL SSTATE EVIDENCE INGESTION V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / PARAMETER SWEEP FRAMEWORK V0.1 READY / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
 
 No live-money authorization exists.
 
@@ -155,7 +155,7 @@ Implementation merge: PR #15 / commit `2cb299d44f75b66c374adf87ce0e83d0ccad4342`
 - Overlapping non-identical authority for the same identity is rejected rather than silently reconciled.
 - Deterministic snapshots freeze sorted eligible symbols and the authority references used by the query.
 - CI run `32102838532` passed all unit/regression tests plus the R2 cost/budget gate.
-- Exact listing/delisting discovery, historical liquidity ranking and full 8-year universe reconstruction remain future evidence work.
+- Exact listing/delisting discovery and full 8-year universe reconstruction remain future evidence work; point-in-time liquidity ranking now lives in the downstream Historical Liquidity V0.1 layer.
 
 ### Historical Universe → Backtest Admission V0.1
 
@@ -170,7 +170,39 @@ Implementation merge: PR #25 / commit `213addc9ce55cdd5b606b4c2ee501ff4ce92d05d`
 - Missing intervals, pre-listing/post-coverage timestamps and proxy-only evidence fail closed.
 - Duplicate plan ids are rejected before admission and repeated evaluation is deterministic.
 - CI run `32105245530` passed all unit/regression tests plus the R2 cost/budget gate.
-- This gate enforces existing evidence only; it does not create missing listing/history authority or historical liquidity rankings.
+- This gate enforces existing evidence only; it does not create missing listing/history authority or liquidity evidence.
+
+### Historical Liquidity Evidence / Ranking V0.1
+
+Primary document: `docs/HISTORICAL_LIQUIDITY_V0_1.md`
+Machine-readable policy: `config/historical_liquidity_v0_1.json`
+Implementation merge: PR #27 / commit `89a6eb25daf1e5d4559cb1ad6efde49dbb7000f1`.
+
+- Point-in-time provider-native 24h ticker + BBO liquidity batches are modeled with explicit snapshot time, true availability time, source reference, optional SHA-256 and native/proxy provenance.
+- A later snapshot cannot be backprojected into an earlier query and a stale snapshot is not silently carried forward.
+- Ranking is downstream of Historical Universe and can only consider symbols with evidence-bounded native `15M` / `60M` / `4H` coverage at the requested timestamp.
+- V0.1 requires complete liquidity coverage for the entire evidence-bounded Historical Universe before ranking; partial retained coverage fails closed instead of creating a biased candidate set.
+- Frozen baseline ranking preserves existing current-universe behavior where applicable: target 15, maximum spread 30 bps, 24h freshness ceiling, 24h quote turnover descending, spread ascending, symbol ascending.
+- The target remains a target rather than a quota; a spread gate may return fewer than 15 markets.
+- Extra liquidity symbols outside the Historical Universe are ignored and proxy snapshots cannot authorize Pionex-native ranking.
+- Returned snapshots retain Historical Universe authority refs plus liquidity batch source ref/SHA.
+- CI run `32105860143` passed all unit/regression tests plus the R2 cost/budget gate.
+- `config/historical_liquidity_v0_1.json` remains `FRAMEWORK_ONLY`: no real historical Pionex liquidity evidence series is yet frozen PASS.
+
+### Historical Liquidity → Backtest Admission V0.1
+
+Primary document: `docs/HISTORICAL_LIQUIDITY_BACKTEST_ADMISSION_V0_1.md`
+Implementation merge: PR #28 / commit `93f01e8192066145c6f414956d96071b2b9e9f2c`.
+
+- Every `LongTradePlan` is evaluated against the point-in-time Historical Liquidity ranking at its own `signal_time_ms`.
+- A plan must first be Historical Universe eligible and then be present in the ranked liquidity universe for that exact historical timestamp.
+- Later/latest liquidity snapshots are never substituted for an older plan.
+- Missing, stale, incomplete or wrong-provenance liquidity evidence is an evidence error and aborts admission instead of being misclassified as an ordinary strategy rejection.
+- Normal rejection distinguishes a historically absent symbol from a historically present symbol that did not rank into the liquid-market universe.
+- Decisions retain symbol-scoped Historical Universe refs, liquidity batch id, source ref/SHA and exact rank when admitted.
+- Duplicate plan ids fail before admission.
+- CI run `32106049209` passed all unit/regression tests plus the R2 cost/budget gate.
+- This gate is implementation-ready but cannot authorize real historical plans until a real historical liquidity evidence series is frozen PASS.
 
 ### Technical Features V0.1 foundation
 
@@ -256,7 +288,7 @@ Implementation merge: PR #21 / commit `69abd931b88950aae50780dc67f3d57d095c2db3`
 - Freeze of the one-year pilot dataset/partition authority after all three shards pass.
 - Long-horizon maximum-available historical backfill (target cap: eight years).
 - Automatic historical-universe source acquisition/reconstruction for survivorship-bias-safe 8-year backtests.
-- Historical liquidity reconstruction/ranking for each backtest date.
+- Real historical Pionex liquidity evidence acquisition/production and a frozen PASS series covering the historical backtest dates.
 - Funding-rate history acquisition; the backtest engine currently accepts supplied funding points only.
 - Mark-price history.
 - Open-interest history.
@@ -291,7 +323,7 @@ Implementation merge: PR #21 / commit `69abd931b88950aae50780dc67f3d57d095c2db3`
 
 - Prepare the real candidate-space semantics and evidence split for the six `UNDEFINED` strategy rules, but do not consume validation or freeze winning values before the data/split authority is reviewed.
 - Design/implement a real SState evidence producer/export workflow against the pinned SState authority; generated records must pass the Historical SState Evidence Ingestion V0.1 gate before replay use.
-- Build historical liquidity evidence/ranking contracts without projecting today's volume ranks into the past.
+- Acquire or produce real point-in-time Pionex liquidity evidence with source/SHA/availability provenance; do not project today's volume ranks into the past.
 - Prepare funding-rate/mark-price/open-interest acquisition design without changing Pionex-native Kline authority.
 - Do not authorize automatic historical trade plans until missing strategy semantics are versioned and independently validated.
 - Do not authorize the 8-year / approximately 250-market expansion until the one-year pilot authority is frozen PASS.
