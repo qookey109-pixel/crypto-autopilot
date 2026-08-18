@@ -12,7 +12,7 @@ Qookey Crypto Autopilot
 
 ## Current formal stage
 
-**V0.1 M1B COMPLETE / PAPER-ONLY**
+**V0.1 M1B COMPLETE / HISTORICAL BACKFILL PILOT READY TO RUN / PAPER-ONLY**
 
 No live-money authorization exists.
 
@@ -88,9 +88,29 @@ Machine-readable estimate: `research/estimates/2026-08-18-historical-capacity.js
 - Strict eight-year / 250-market / three-interval API-page upper design bound is approximately 184,750 Kline requests; actual usage should be lower because provider history differs by market.
 - Resumable design freezes deterministic work-item identity, staging before canonical finalize, checkpointed backward pagination, idempotent resume, quarantine-on-mismatch, and historical-universe provenance requirements.
 
+### Historical Backfill Pilot implementation
+
+Implementation merge: PR #10 / commit `12baaccd1d29254e15cd87dcbed35ec3c7afc7d5`.
+
+- R2-backed deterministic checkpoint, staging and per-partition receipt namespaces are implemented.
+- Work-item states are `PENDING -> ACQUIRING -> STAGED -> VERIFIED -> FINALIZED`.
+- Work identity is provider + market type + symbol + interval + partition.
+- Existing finalized work is verified and skipped on rerun.
+- A `STAGED` partition can be resumed in a later Python process without refetching its source candles.
+- Existing canonical data without matching authority is protected: the pilot refuses to overwrite it.
+- Pionex public Kline acquisition is wrapped with a 3 requests/second soft project pace and conservative HTTP 429 backoff.
+- The pilot uses the frozen 15-symbol M1A universe, native `15M` / `60M` / `4H`, and a bounded UTC calendar year (default 2025).
+- GitHub Actions workflow `.github/workflows/historical-backfill-pilot.yml` uses three 5-symbol shards with `max-parallel: 1`.
+- Shard 0 includes a planned interruption after a staged partition, followed by a second process that exercises R2-backed resume.
+- Unit/regression tests cover pacing, 429 handling, staged resume, finalized idempotent skips, canonical conflict protection and deterministic layout.
+- PR #10 CI run `32094937866` completed successfully.
+- No private API, account, position, order or live-trading path was introduced.
+
 ## Not completed
 
-- Resumable historical backfill pilot implementation and interruption/resume proof.
+- Real Historical Backfill Pilot execution against Pionex + Cloudflare R2.
+- Real interruption/resume evidence receipt for the pilot.
+- Freeze of the one-year pilot dataset/partition authority after all three shards pass.
 - Long-horizon maximum-available historical backfill (target cap: eight years).
 - Dynamic historical-universe reconstruction for survivorship-bias-safe backtests.
 - Funding-rate history.
@@ -110,17 +130,16 @@ Machine-readable estimate: `research/estimates/2026-08-18-historical-capacity.js
 
 ## Next milestone
 
-**Historical Backfill Pilot — resumable one-year proof**
+**Execute Historical Backfill Pilot — resumable one-year proof**
 
-1. Implement R2-backed work-item checkpoints with states `PENDING -> ACQUIRING -> STAGED -> VERIFIED -> FINALIZED`.
-2. Use deterministic identity: provider + market type + symbol + interval + partition.
-3. Keep native `15M`, `60M`, `4H` for the pilot.
-4. Use the current 15-symbol M1A universe and a bounded one-year acquisition window where provider history exists.
-5. Pace Pionex Kline acquisition at a 3 requests/second project soft target; back off at least 65 seconds plus jitter after HTTP 429.
-6. Use 5-symbol GitHub Actions shards with `max-parallel: 1` initially.
-7. Intentionally interrupt at least one shard and prove restart/resume creates no duplicate or lost candles.
-8. Finalize only complete/audited partitions; require SHA-256 R2 verification, Parquet decode, timestamp/gap/OHLCV audit and receipt generation.
-9. Freeze pilot evidence before authorizing maximum-available expansion toward the 8-year / approximately 250-market target.
+1. Run GitHub Actions workflow `Historical Backfill Pilot` from `main` with year `2025`.
+2. Require all three 5-symbol shard jobs to complete successfully.
+3. On a fresh run, require shard 0 to record the planned-stop phase and then resume from R2 staging in the subsequent process.
+4. Require all finalized partitions to pass candle audit, Parquet decode and R2 SHA-256 verification.
+5. Confirm no canonical-conflict guard fired and no authoritative M1B object was overwritten.
+6. Review each shard evidence artifact and aggregate the pilot object/row/page counts.
+7. Freeze a Repository authority receipt for the real pilot run.
+8. Only after the receipt is reviewed may maximum-available expansion toward the 8-year / approximately 250-market target be authorized.
 
 ## Safety gates before any live trading
 
