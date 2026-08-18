@@ -7,7 +7,8 @@
   "candidate_authority": "research/receipts/2026-08-17-m1a-pionex.json",
   "candidate_count": 15,
   "project_history_cap_years": 8,
-  "provider_archive_floor_month": "2020-01",
+  "scan_floor_policy": "PROJECT_HISTORY_CAP_ONLY",
+  "provider_earliest_month_assumption": null,
   "series": [
     {"dataset": "klines", "interval": "15m"},
     {"dataset": "klines", "interval": "1h"},
