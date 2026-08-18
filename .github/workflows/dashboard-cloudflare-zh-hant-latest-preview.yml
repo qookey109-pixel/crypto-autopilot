@@ -1,0 +1,81 @@
+name: Dashboard Cloudflare Zh-Hant Latest Temporary Preview
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "wrangler.preview.jsonc"
+      - ".github/workflows/dashboard-cloudflare-zh-hant-latest-preview.yml"
+      - "web/**"
+      - "scripts/build_dashboard_authority_snapshot.py"
+      - "scripts/validate_dashboard_static.py"
+      - "research/receipts/**"
+      - "PROJECT_STATUS.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-cloudflare-zh-hant-latest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build latest safe Traditional Chinese authority dashboard
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/validate_dashboard_static.py
+          mkdir -p artifacts/dashboard-site
+          cp -R web/. artifacts/dashboard-site/
+          python scripts/build_dashboard_authority_snapshot.py \
+            --output artifacts/dashboard-site/data/dashboard.json
+
+      - name: Assert latest Funding state is visible
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          html = Path('artifacts/dashboard-site/index.html').read_text(encoding='utf-8')
+          data = json.loads(Path('artifacts/dashboard-site/data/dashboard.json').read_text(encoding='utf-8'))
+          assert '總覽' in html
+          assert data['locale'] == 'zh-Hant-TW'
+          assert data['project']['fundingWriterState'] == 'READY'
+          assert data['project']['fundingFullPreflightPass'] is True
+          assert data['project']['fundingMaterializationComplete'] is False
+          assert data['project']['fundingMaterializationState'] == 'NOT_READY'
+          assert data['project']['mode'] == 'PAPER-ONLY'
+          assert data['project']['liveTradingAuthorized'] is False
+          PY
+
+      - name: Deploy temporary Workers Static Assets preview
+        shell: bash
+        env:
+          NO_COLOR: "1"
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@latest deploy \
+            --temporary \
+            --config wrangler.preview.jsonc \
+            2>&1 | tee artifacts/cloudflare-zh-hant-latest-deploy.log
+
+      - name: Upload preview evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-cloudflare-zh-hant-latest-${{ github.run_id }}
+          path: |
+            artifacts/dashboard-site
+            artifacts/cloudflare-zh-hant-latest-deploy.log
+          if-no-files-found: warn
+          retention-days: 1
