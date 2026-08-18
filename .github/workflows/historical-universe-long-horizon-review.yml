@@ -1,0 +1,58 @@
+name: Historical Universe Long Horizon Review
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/historical-universe-long-horizon-review.yml"
+      - "scripts/review_historical_universe_long_horizon.py"
+      - "src/crypto_autopilot/historical_universe_review.py"
+      - "src/crypto_autopilot/historical_universe.py"
+      - "src/crypto_autopilot/binance_expansion_plan.py"
+      - "tests/test_historical_universe_review.py"
+      - "config/historical_universe_long_horizon_review_v0_1.json"
+      - "research/receipts/2026-08-18-binance-max-coverage-discovery.json"
+      - "research/receipts/2026-08-18-binance-staged-expansion-plan.json"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/historical-universe-long-horizon-review.yml"
+      - "scripts/review_historical_universe_long_horizon.py"
+      - "src/crypto_autopilot/historical_universe_review.py"
+      - "config/historical_universe_long_horizon_review_v0_1.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: historical-universe-long-horizon-review-v0-1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Run read-only historical universe review
+        run: |
+          python scripts/review_historical_universe_long_horizon.py \
+            --config config/historical_universe_long_horizon_review_v0_1.json \
+            --output artifacts/historical-universe-long-horizon-review.json
+
+      - name: Upload historical universe review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: historical-universe-long-horizon-review-${{ github.run_id }}
+          path: artifacts/historical-universe-long-horizon-review.json
+          if-no-files-found: warn
+          retention-days: 90
