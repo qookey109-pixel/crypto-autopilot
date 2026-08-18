@@ -1,0 +1,68 @@
+{
+  "version": "0.1.0",
+  "status": "PROTOCOL_FROZEN_BEFORE_LIVE_EVIDENCE",
+  "providers": {
+    "left": "pionex",
+    "right": "binance_usdm",
+    "execution_target": "pionex"
+  },
+  "overlap_authority": "research/receipts/2026-08-17-m1a-pionex.json",
+  "overlap_window": {
+    "start_utc": "2026-08-10T08:00:00Z",
+    "end_utc": "2026-08-17T07:59:59.999Z",
+    "intervals": ["15M", "60M", "4H"],
+    "mapped_pair_count": 45,
+    "candidate_symbol_count": 15
+  },
+  "minimum_rows": {
+    "15M": 600,
+    "60M": 150,
+    "4H": 40
+  },
+  "price_metrics_bps": {
+    "median_ohlc": {"pass_max": 10.0, "review_max": 25.0},
+    "p95_open_close": {"pass_max": 25.0, "review_max": 75.0},
+    "p95_high_low": {"pass_max": 75.0, "review_max": 200.0}
+  },
+  "behavior_metrics": {
+    "close_to_close_direction_agreement": {"pass_min": 0.98, "review_min": 0.95},
+    "setup_60m_agreement": {
+      "pass_min": 0.98,
+      "review_min": 0.95,
+      "minimum_ready_bars": 100,
+      "state": ["ema20_gt_ema50", "ema20_slope_positive", "close_gt_ema20"]
+    }
+  },
+  "hard_requirements": {
+    "exact_timestamp_set_required": true,
+    "both_provider_candle_audits_required": true,
+    "silent_interpolation_forbidden": true,
+    "volume_equivalence_required": false,
+    "volume_reason": "Exchange volume is venue-specific and is not a price/source-equivalence criterion.",
+    "provider_splicing_forbidden": true
+  },
+  "aggregate": {
+    "expected_pair_count": 45,
+    "pass": "all 45 pairs PASS",
+    "review": "no FAIL pairs and REVIEW fraction <= 0.20",
+    "fail": "any FAIL pair, missing pair, or REVIEW fraction > 0.20"
+  },
+  "strategy_boundary": {
+    "full_strategy_signal_equivalence_evaluated": false,
+    "deferred_rules": [
+      "atr_normalized_overextension",
+      "ema20_pullback_proximity_and_semantics",
+      "ema20_reclaim_semantics",
+      "previous_high_break_semantics",
+      "volume_confirmation_threshold",
+      "structural_stop_atr_buffer"
+    ],
+    "source_switch_authorized_by_v0_1": false,
+    "trade_plan_authorized": false
+  },
+  "evidence_discipline": {
+    "thresholds_must_not_be_changed_after_live_overlap_result_without_new_version": true,
+    "pass_review_fail_results_must_all_be_retained": true,
+    "binance_data_must_not_be_relabelled_pionex_native": true
+  }
+}
