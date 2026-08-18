@@ -12,7 +12,7 @@ This phase is read-only. It does not materialize Funding to R2 and does not auth
 - Funding source proof: `research/receipts/2026-08-18-binance-funding-source-proof.json`
 - Protocol: `config/binance_funding_coverage_v0_1.json`
 
-The source proof establishes the monthly Funding archive path/schema/checksum contract and the bounded timestamp-jitter audit rule. It does not establish the 15-symbol long-horizon coverage span.
+The source proof establishes the monthly Funding archive path/schema/checksum contract and freezes a **10 ms default cadence-jitter tolerance for its Jan-2024 BTC/ETH/SOL proof scope**. It does not establish the 15-symbol long-horizon coverage span.
 
 ## Scan scope
 
@@ -45,11 +45,36 @@ The scan identifies:
 
 A pre-onset `NO_DATA` is not treated as an internal gap.
 
-## Edge content audit
+## Edge content audit and long-horizon timestamp semantics
 
-For every symbol with observed Funding coverage, the first and last available monthly archives are downloaded and passed through the frozen Funding source parser.
+For every symbol with observed Funding coverage, the first and last available monthly archives are downloaded and passed through the frozen Funding parser.
 
-The audit verifies:
+The initial coverage executions reused the source-proof 10 ms tolerance. Runs `32130262060` and `32130438024` were superseded before any Coverage PASS authority after a HYPEUSDT `2026-07` edge archive exposed source `calc_time` jitter of 12 ms around a valid declared 4-hour Funding cadence.
+
+The project did **not** simply raise the tolerance from that single example. A separate read-only all-edge diagnostic (`run 32130801751`, `job 95691293211`) scanned the same 1,440 monthly symbol-period checks and inspected all 30 first/last edge archives:
+
+- 1,440 monthly checks;
+- 1,010 `AVAILABLE`;
+- 430 `NO_DATA`;
+- 30 edge archives;
+- 8 edge archives exceeded the 10 ms source-proof tolerance;
+- maximum observed absolute cadence residual = **45 ms**;
+- no diagnostic edge showed a missing declared 4h/8h Funding event; the deviations remained millisecond-scale timestamp offsets around the declared interval.
+
+Observed edge maxima above 10 ms included:
+
+- SOLUSDT / UNIUSDT / AVAXUSDT `2020-09`: 45 ms;
+- SUIUSDT `2023-05`: 28 ms;
+- INJUSDT `2022-08`: 21 ms;
+- AAVEUSDT `2020-10`: 15 ms;
+- BNBUSDT `2020-02`: 15 ms;
+- HYPEUSDT `2026-07`: 12 ms.
+
+Before any Coverage PASS authority, the long-horizon edge-audit protocol was therefore re-frozen at **50 ms**. This 50 ms tolerance is authority-scoped to the long-horizon Coverage edge audit; the Source Proof default remains 10 ms.
+
+The tolerance is audit-only. The original source `calc_time` is always preserved exactly. The implementation never rounds, shifts, interpolates or synthesizes a Funding timestamp.
+
+The edge audit verifies:
 
 - official SHA-256 checksum;
 - exact CSV member;
@@ -57,9 +82,9 @@ The audit verifies:
 - finite rates;
 - strictly increasing unique raw timestamps;
 - source-declared Funding interval;
-- bounded cadence residual using the frozen `+/-10 ms` audit tolerance.
+- cadence residual within the explicitly selected authority-scoped tolerance.
 
-The original source timestamps are preserved. No rounding or interpolation is allowed.
+A residual larger than the selected tolerance still fails closed.
 
 Only edge archives are content-downloaded in this discovery phase; interior months are checksum-presence evidence only.
 
@@ -76,6 +101,8 @@ It does **not** prove:
 - Binance -> Pionex source equivalence;
 - Pionex-native Historical Universe membership;
 - backtest admission.
+
+The 50 ms Coverage edge tolerance does not retroactively alter the already-frozen 10 ms Funding Source Proof default.
 
 ## After PASS
 
