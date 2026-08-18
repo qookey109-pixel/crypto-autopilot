@@ -13,6 +13,7 @@ from urllib.request import Request, urlopen
 from crypto_autopilot.binance_coverage import month_periods
 from crypto_autopilot.binance_funding import BinanceVisionFundingArchiveKey, ingest_funding_archive
 from crypto_autopilot.binance_funding_coverage import (
+    COVERAGE_EDGE_CADENCE_JITTER_TOLERANCE_MS,
     attach_funding_boundaries,
     summarize_funding_presence,
     validate_funding_coverage_config,
@@ -129,19 +130,26 @@ def probe_many(
     return records
 
 
-def audit_archive(key: BinanceVisionFundingArchiveKey) -> dict[str, object]:
+def audit_archive(
+    key: BinanceVisionFundingArchiveKey,
+    *,
+    cadence_jitter_tolerance_ms: int,
+) -> dict[str, object]:
     try:
         checksum = fetch_bytes(key.checksum_url, allow_not_found=False)
         archive = fetch_bytes(key.url, allow_not_found=False)
         if checksum is None or archive is None:
             raise RuntimeError("archive disappeared after availability probe")
-        return asdict(
+        receipt = asdict(
             ingest_funding_archive(
                 key,
                 archive_bytes=archive,
                 checksum_payload=checksum,
+                cadence_jitter_tolerance_ms=cadence_jitter_tolerance_ms,
             ).receipt
         )
+        receipt["cadence_jitter_tolerance_ms_used"] = cadence_jitter_tolerance_ms
+        return receipt
     except Exception as exc:
         raise RuntimeError(
             f"Funding edge audit failed for symbol={key.symbol} period={key.period}: {exc}"
@@ -159,6 +167,13 @@ def main() -> int:
     validate_funding_coverage_config(config)
     source_proof_path = str(config["source_proof_authority"])
     validate_source_proof_authority(load_json(source_proof_path))
+
+    source_proof_tolerance_ms = int(config["source_proof_default_cadence_jitter_tolerance_ms"])
+    coverage_tolerance_ms = int(config["coverage_edge_cadence_jitter_tolerance_ms"])
+    if source_proof_tolerance_ms != 10:
+        raise RuntimeError("Funding source-proof default tolerance changed")
+    if coverage_tolerance_ms != COVERAGE_EDGE_CADENCE_JITTER_TOLERANCE_MS:
+        raise RuntimeError("Funding coverage tolerance config/code mismatch")
 
     candidate_path = str(config["candidate_authority"])
     pairs = load_candidate_universe(candidate_path)
@@ -203,7 +218,14 @@ def main() -> int:
 
     audited: dict[tuple[str, str], dict[str, object]] = {}
     with ThreadPoolExecutor(max_workers=min(workers, 8)) as executor:
-        futures = {executor.submit(audit_archive, key): key for key in audit_keys.values()}
+        futures = {
+            executor.submit(
+                audit_archive,
+                key,
+                cadence_jitter_tolerance_ms=coverage_tolerance_ms,
+            ): key
+            for key in audit_keys.values()
+        }
         for future in as_completed(futures):
             receipt = future.result()
             audited[(str(receipt["symbol"]), str(receipt["period"]))] = receipt
@@ -228,6 +250,7 @@ def main() -> int:
         for row in summaries
         if row["missing_periods_within_observed_span"]
     ]
+    diagnostic = config["coverage_edge_diagnostic"]
 
     payload = {
         "schema": "binance-funding-max-coverage-discovery-v0.1",
@@ -256,12 +279,26 @@ def main() -> int:
         "symbols_with_observed_funding_coverage": len(available_symbols),
         "symbols_without_observed_funding_coverage": len(summaries) - len(available_symbols),
         "symbols_with_internal_monthly_presence_gap": internal_gap_symbols,
+        "source_proof_default_cadence_jitter_tolerance_ms": source_proof_tolerance_ms,
+        "coverage_edge_cadence_jitter_tolerance_ms": coverage_tolerance_ms,
+        "coverage_edge_diagnostic_authority": {
+            "run_id": diagnostic["run_id"],
+            "job_id": diagnostic["job_id"],
+            "edge_archive_count": diagnostic["edge_archive_count"],
+            "observed_max_abs_residual_ms": diagnostic["observed_max_abs_residual_ms"],
+            "raw_timestamps_preserved": diagnostic["raw_timestamps_preserved"],
+            "missing_funding_event_gap_observed": diagnostic["missing_funding_event_gap_observed"],
+        },
         "symbol_summaries": summaries,
         "monthly_records": records,
         "interpretation_boundary": {
             "coverage_boundary_discovery_complete": True,
             "edge_archives_checksum_schema_and_cadence_audited": True,
             "interior_archive_presence_checksum_backed": True,
+            "source_proof_default_10ms_tolerance_changed": False,
+            "coverage_50ms_tolerance_is_authority_scoped_to_long_horizon_edge_audit": True,
+            "raw_source_timestamps_preserved": True,
+            "timestamps_rounded_shifted_or_interpolated": False,
             "full_interior_content_continuity_proven": False,
             "archive_presence_is_listing_or_delisting_proof": False,
             "funding_onset_inferred_from_trade_onset": False,
@@ -287,6 +324,7 @@ def main() -> int:
                 "no_data": payload["monthly_no_data_checks"],
                 "covered_symbols": payload["symbols_with_observed_funding_coverage"],
                 "internal_gap_symbols": internal_gap_symbols,
+                "coverage_edge_tolerance_ms": coverage_tolerance_ms,
                 "output": str(output),
             },
             sort_keys=True,
