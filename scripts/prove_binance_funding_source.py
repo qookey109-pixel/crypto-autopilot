@@ -14,6 +14,9 @@ from crypto_autopilot.binance_funding import (
 )
 
 
+PROTOCOL_STATUS = "PROTOCOL_FROZEN_AFTER_BOUNDED_SOURCE_DIAGNOSTIC_BEFORE_PASS_AUTHORITY"
+
+
 def fetch_bytes(url: str, *, attempts: int = 3, timeout_seconds: float = 30.0) -> bytes:
     last_error: Exception | None = None
     for attempt in range(attempts):
@@ -33,8 +36,8 @@ def fetch_bytes(url: str, *, attempts: int = 3, timeout_seconds: float = 30.0) -
 
 def load_config(path: str) -> dict[str, object]:
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    if payload.get("status") != "PROTOCOL_FROZEN_BEFORE_LIVE_PROOF":
-        raise RuntimeError("funding protocol must be frozen before live proof")
+    if payload.get("status") != PROTOCOL_STATUS:
+        raise RuntimeError("funding protocol state mismatch")
     if payload.get("provider") != "binance_usdm" or payload.get("delivery") != "binance_vision":
         raise RuntimeError("funding provider/delivery mismatch")
     if payload.get("dataset") != "fundingRate" or payload.get("archive_frequency") != "monthly":
@@ -122,6 +125,7 @@ def main() -> int:
         "schema": "binance-funding-source-proof-v0.1",
         "execution_status": "PASS",
         "stage": "BINANCE_FUNDING_SOURCE_PROOF_PASS",
+        "protocol_status": PROTOCOL_STATUS,
         "provider": "binance_usdm",
         "delivery": "binance_vision",
         "execution_exchange": "pionex",
@@ -137,6 +141,9 @@ def main() -> int:
         "proof_scope_max_abs_cadence_residual_ms": proof_max_jitter_ms,
         "raw_timestamps_preserved": True,
         "timestamps_rounded_or_interpolated": False,
+        "superseded_exact_millisecond_proof_run_id": config[
+            "superseded_exact_millisecond_proof_run_id"
+        ],
         "receipts": receipts,
         "interpretation_boundary": {
             "proves_monthly_funding_archive_path": True,
