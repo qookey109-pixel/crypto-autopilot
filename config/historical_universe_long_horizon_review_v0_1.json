@@ -1,0 +1,40 @@
+{
+  "version": "0.1.0",
+  "status": "PROTOCOL_FROZEN_BEFORE_REVIEW",
+  "execution_exchange": "pionex",
+  "research_provider": "binance_usdm",
+  "market_type": "perp",
+  "target_wave": "W1",
+  "target_year": 2024,
+  "required_intervals": ["15M", "60M", "4H"],
+  "coverage_authority": "research/receipts/2026-08-18-binance-max-coverage-discovery.json",
+  "staged_plan_authority": "research/receipts/2026-08-18-binance-staged-expansion-plan.json",
+  "historical_universe_policy": "docs/HISTORICAL_UNIVERSE_V0_1.md",
+  "historical_admission_policy": "docs/HISTORICAL_UNIVERSE_BACKTEST_ADMISSION_V0_1.md",
+  "review_policy": {
+    "coverage_receipt_is_backtest_membership_authority": false,
+    "first_observed_candle_is_listing_authority": false,
+    "future_binance_partition_records_native_to_pionex": false,
+    "pionex_current_universe_backprojection_allowed": false,
+    "provider_splicing_allowed": false,
+    "silent_interpolation_allowed": false,
+    "verified_partition_receipts_required_before_membership": true,
+    "all_three_intervals_required_before_default_membership": true,
+    "acquisition_scope_may_be_reviewed_before_partition_materialization": true
+  },
+  "post_materialization_record_policy": {
+    "provider": "binance_usdm",
+    "market_type": "perp",
+    "native": false,
+    "evidence_type": "verified_partition_receipt",
+    "audit_ok_required": true,
+    "actual_first_last_required": true,
+    "source_sha256_required": true
+  },
+  "source_switch_authorized": false,
+  "wave_materialization_authorized": false,
+  "backtest_admission_authorized": false,
+  "pionex_native_relabel_authorized": false,
+  "trade_plan_authorized": false,
+  "live_trading_authorized": false
+}
