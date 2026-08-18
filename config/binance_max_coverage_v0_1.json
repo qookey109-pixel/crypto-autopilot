@@ -1,0 +1,44 @@
+{
+  "version": "0.1.0",
+  "status": "PROTOCOL_FROZEN_BEFORE_DISCOVERY",
+  "provider": "binance_usdm",
+  "delivery": "binance_vision",
+  "execution_exchange": "pionex",
+  "candidate_authority": "research/receipts/2026-08-17-m1a-pionex.json",
+  "candidate_count": 15,
+  "project_history_cap_years": 8,
+  "scan_floor_policy": "PROJECT_HISTORY_CAP_ONLY",
+  "provider_earliest_month_assumption": null,
+  "series": [
+    {"dataset": "klines", "interval": "15m"},
+    {"dataset": "klines", "interval": "1h"},
+    {"dataset": "klines", "interval": "4h"},
+    {"dataset": "markPriceKlines", "interval": "1h"}
+  ],
+  "current_month_daily_extension": true,
+  "workers": 12,
+  "boundary_evidence": {
+    "monthly_presence_requires_official_checksum": true,
+    "first_available_archive_requires_content_audit": true,
+    "last_available_monthly_archive_requires_content_audit": true,
+    "latest_available_current_month_daily_archive_requires_content_audit": true,
+    "archive_sha256_required": true,
+    "strict_timestamp_order_required": true,
+    "duplicate_timestamps_forbidden": true,
+    "silent_interpolation_forbidden": true
+  },
+  "interpretation_boundary": {
+    "archive_presence_is_listing_or_delisting_proof": false,
+    "full_interior_content_continuity_proven_by_discovery": false,
+    "funding_coverage_in_scope": false,
+    "open_interest_coverage_in_scope": false,
+    "source_switch_authorized": false,
+    "large_scale_backfill_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "r2_writes_authorized": false,
+    "live_trading_authorized": false
+  },
+  "source_switch_authorized": false,
+  "large_scale_backfill_authorized": false,
+  "trade_plan_authorized": false
+}
