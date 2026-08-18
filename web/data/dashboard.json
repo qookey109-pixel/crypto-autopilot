@@ -1,0 +1,48 @@
+{
+  "schema": "qookey-dashboard-safe-fixture-v0.1",
+  "authority": false,
+  "snapshotLabel": "Safe fixture · repository-shaped demo",
+  "project": {
+    "name": "Qookey Crypto Autopilot",
+    "mode": "PAPER-ONLY",
+    "marketCount": 15,
+    "fundingMonths": 1010,
+    "tradePlanAuthorized": false,
+    "liveTradingAuthorized": false
+  },
+  "pipeline": [
+    {"name":"Pionex M1A Dataset","detail":"15-symbol / 15M / 60M / 4H frozen evidence","status":"PASS"},
+    {"name":"Binance 2025 R2 Pilot","detail":"206 canonical Trade-Kline objects frozen","status":"PASS"},
+    {"name":"Funding Source Proof","detail":"Checksum / schema / cadence source semantics","status":"PASS"},
+    {"name":"Funding Coverage","detail":"1,010 observed symbol-months across 15 symbols","status":"PASS"},
+    {"name":"Funding R2 Scope Authority","detail":"Storage-only exact scope is authorized","status":"AUTHORIZED"},
+    {"name":"Funding Full Preflight","detail":"1,010 archive row-level audit / 95 annual builds","status":"IN_PROGRESS"},
+    {"name":"Pionex ↔ Binance Equivalence","detail":"Frozen 45-pair gate waiting on source publication evidence","status":"PENDING"},
+    {"name":"Historical Universe Membership","detail":"Long-horizon review passed; membership evidence not ready","status":"NOT_READY"}
+  ],
+  "gates": [
+    {"name":"R2 Budget","detail":"Observed Trade + Funding budget remains below frozen block guardrails.","status":"PASS","tone":"pass","critical":false},
+    {"name":"Provider Equivalence","detail":"Pionex ↔ Binance source switch remains blocked until the frozen gate passes.","status":"PENDING","tone":"pending","critical":true},
+    {"name":"Historical Universe","detail":"Review PASS is not membership authority. Materialized provider-separated receipts are still required.","status":"NOT_READY","tone":"pending","critical":true},
+    {"name":"Strategy Replay","detail":"Readiness gate remains active; undefined strategy semantics are not silently filled.","status":"PENDING","tone":"pending","critical":false},
+    {"name":"Paper Broker","detail":"Production lifecycle and reconciliation are not complete yet.","status":"NOT_READY","tone":"pending","critical":true},
+    {"name":"Live Trading","detail":"No real-money order or private execution route is authorized.","status":"NOT_AUTHORIZED","tone":"blocked","critical":true}
+  ],
+  "markets": [
+    {"symbol":"BTCUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"ETHUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"SOLUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"HYPEUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"ADAUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"BNBUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"UNIUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"XRPUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"LTCUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"LINKUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"DOGEUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"AAVEUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"AVAXUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"INJUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
+    {"symbol":"SUIUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"}
+  ]
+}
