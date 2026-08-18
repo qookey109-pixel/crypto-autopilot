@@ -2,6 +2,11 @@ name: Binance Vision Live Proof
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/binance-vision-live-proof.yml"
+      - "scripts/prove_binance_vision_source.py"
+      - "src/crypto_autopilot/binance_vision.py"
   push:
     branches: [main]
     paths:
