@@ -4,6 +4,7 @@ import copy
 import unittest
 
 from crypto_autopilot.binance_funding_coverage import (
+    COVERAGE_EDGE_CADENCE_JITTER_TOLERANCE_MS,
     BinanceFundingCoverageError,
     attach_funding_boundaries,
     summarize_funding_presence,
@@ -17,7 +18,7 @@ PERIODS = ("2023-11", "2023-12", "2024-01", "2024-02")
 
 def config_payload() -> dict[str, object]:
     return {
-        "status": "PROTOCOL_FROZEN_BEFORE_DISCOVERY",
+        "status": "PROTOCOL_REFROZEN_AFTER_EDGE_DIAGNOSTIC_BEFORE_COVERAGE_PASS_AUTHORITY",
         "provider": "binance_usdm",
         "delivery": "binance_vision",
         "dataset": "fundingRate",
@@ -29,6 +30,14 @@ def config_payload() -> dict[str, object]:
         "current_incomplete_month_policy": "DEFER",
         "edge_content_audit_policy": "FIRST_AND_LAST_AVAILABLE_MONTH_PER_SYMBOL",
         "interior_policy": "CHECKSUM_PRESENCE_ONLY",
+        "source_proof_default_cadence_jitter_tolerance_ms": 10,
+        "coverage_edge_cadence_jitter_tolerance_ms": 50,
+        "coverage_edge_diagnostic": {
+            "observed_max_abs_residual_ms": 45,
+            "tolerance_refrozen_before_coverage_pass_authority": True,
+            "raw_timestamps_preserved": True,
+            "missing_funding_event_gap_observed": False,
+        },
         "funding_onset_may_be_inferred_from_trade_onset": False,
         "archive_presence_is_listing_authority": False,
         "source_switch_authorized": False,
@@ -50,6 +59,22 @@ def records(statuses: tuple[str, ...]) -> list[dict[str, object]]:
 
 
 class BinanceFundingCoverageTests(unittest.TestCase):
+    def test_config_freezes_source_proof_and_long_horizon_tolerances_separately(self) -> None:
+        self.assertEqual(COVERAGE_EDGE_CADENCE_JITTER_TOLERANCE_MS, 50)
+        validate_funding_coverage_config(config_payload())
+        changed = copy.deepcopy(config_payload())
+        changed["source_proof_default_cadence_jitter_tolerance_ms"] = 50
+        with self.assertRaises(BinanceFundingCoverageError):
+            validate_funding_coverage_config(changed)
+        changed = copy.deepcopy(config_payload())
+        changed["coverage_edge_cadence_jitter_tolerance_ms"] = 51
+        with self.assertRaises(BinanceFundingCoverageError):
+            validate_funding_coverage_config(changed)
+        changed = copy.deepcopy(config_payload())
+        changed["coverage_edge_diagnostic"]["observed_max_abs_residual_ms"] = 46
+        with self.assertRaises(BinanceFundingCoverageError):
+            validate_funding_coverage_config(changed)
+
     def test_config_fails_closed_on_any_materialization_or_onset_inference(self) -> None:
         validate_funding_coverage_config(config_payload())
         for field in (
