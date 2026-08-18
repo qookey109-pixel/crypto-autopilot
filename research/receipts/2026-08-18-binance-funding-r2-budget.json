@@ -1,0 +1,129 @@
+{
+  "schema": "binance-funding-r2-budget-authority-v0.1",
+  "status": "PASS",
+  "stage": "BINANCE_FUNDING_R2_BUDGET_NO_MATERIAL_CHANGE",
+  "date": "2026-08-18",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "provider": "binance_usdm",
+  "delivery": "binance_vision",
+  "dataset": "fundingRate",
+  "determination": "NO_MATERIAL_BUDGET_CHANGE",
+  "authorities": {
+    "coverage": "research/receipts/2026-08-18-binance-funding-coverage.json",
+    "source_proof": "research/receipts/2026-08-18-binance-funding-source-proof.json",
+    "existing_trade_budget": "research/receipts/2026-08-18-binance-observed-r2-budget.json",
+    "r2_policy": "config/r2_budget_v0_1.json",
+    "protocol": "config/binance_funding_r2_budget_v0_1.json",
+    "estimate": "research/estimates/2026-08-18-binance-funding-r2-budget.json"
+  },
+  "coverage_shape": {
+    "available_symbol_months": 1010,
+    "available_calendar_days": 30735,
+    "annual_canonical_objects": 95
+  },
+  "calibration": {
+    "policy": "MAX_OF_PROOF_SYMBOL_MONTH_PARQUET_BYTES_PER_ROW",
+    "period": "2024-01",
+    "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+    "max_bytes_per_row": 22.419354838709676,
+    "measurements": [
+      {
+        "symbol": "BTCUSDT",
+        "rows": 93,
+        "parquet_bytes": 2085,
+        "bytes_per_row": 22.419354838709676,
+        "parquet_sha256": "a3ff5dd1049fbd106d6689cd344cb5ee5fd140826d43932e05a6ec7942ecd50c",
+        "source_archive_sha256": "3e0d30870672aa8f0f937881056e3cfd55913ae5c780cd50b33f2763aa0ba58e"
+      },
+      {
+        "symbol": "ETHUSDT",
+        "rows": 93,
+        "parquet_bytes": 2069,
+        "bytes_per_row": 22.247311827956988,
+        "parquet_sha256": "96f2c50c40c28fe939e2ef1906e23231620486dfd54f1c5b0e231b6776513824",
+        "source_archive_sha256": "5a71469b0b363886df904e784dddefc484dd943334b1fb7454713ce4ed715a4b"
+      },
+      {
+        "symbol": "SOLUSDT",
+        "rows": 93,
+        "parquet_bytes": 2077,
+        "bytes_per_row": 22.333333333333332,
+        "parquet_sha256": "fa4aba45a882faa847353b62adb01c9a26603f38d08ce43ed6f9f3d71691d201",
+        "source_archive_sha256": "6b514b6c2bb67ff04df97d747efb9c6e4bb1bb27e889f1dc51a42ab1419a3d24"
+      }
+    ]
+  },
+  "projection": {
+    "row_projection_policy": "ASSUME_ONE_HOUR_FUNDING_FOR_EVERY_CALENDAR_HOUR_IN_EVERY_AVAILABLE_MONTH",
+    "minimum_budget_interval_hours": 1,
+    "projected_rows": 737640,
+    "canonical_bytes": 16537413,
+    "canonical_gb": 0.016537413,
+    "canonical_plus_retained_staging_gb": 0.033074826,
+    "three_x_capacity_stress_gb": 0.049612239,
+    "planned_class_a_requests": 194,
+    "planned_class_b_requests": 194,
+    "three_x_class_a_requests": 582,
+    "three_x_class_b_requests": 582
+  },
+  "combined_trade_plus_funding": {
+    "planned": {
+      "storage_gb": 5.1812988706,
+      "class_a_requests": 224194,
+      "class_b_requests": 140194,
+      "gate_status": "PASS",
+      "estimated_monthly_cost_usd_under_frozen_policy": 0.0
+    },
+    "three_x_stress": {
+      "storage_gb": 7.771948306,
+      "class_a_requests": 672582,
+      "class_b_requests": 420582,
+      "gate_status": "PASS",
+      "estimated_monthly_cost_usd_under_frozen_policy": 0.0
+    },
+    "guardrails": {
+      "storage_warn_gb": 8.0,
+      "storage_block_gb": 10.0,
+      "class_a_warn_requests": 750000,
+      "class_b_warn_requests": 7500000
+    },
+    "storage_headroom_to_warn_gb": 0.22805169400000036
+  },
+  "github_actions": {
+    "workflow": "Binance Funding R2 Budget Determination",
+    "run_id": 32133203050,
+    "job_id": 95698650232,
+    "workflow_head_branch": "plan/binance-funding-r2-budget-v0-1",
+    "workflow_head_sha": "85125139afdd87e60d27ab0a57277549ddfda1eb",
+    "conclusion": "success",
+    "ci_run_id": 32133202970,
+    "ci_conclusion": "success",
+    "tested_merge_ref_sha": "6dc01501da482216b423635058fbcfd52f79065f",
+    "tested_tree_sha": "358d799c36378e8ada1c82a55521eebfaf2c3901",
+    "implementation_merge_commit": "5e0984fbe8b7fab2379806e6063b173d49e3d209",
+    "implementation_main_tree_sha": "358d799c36378e8ada1c82a55521eebfaf2c3901",
+    "tested_and_merged_tree_identical": true
+  },
+  "artifact": {
+    "id": 9322964629,
+    "name": "binance-funding-r2-budget-32133203050",
+    "zip_size_bytes": 1767,
+    "zip_sha256": "e9ebe350483e5566b9f3cf2a034e0cc5b66471dd38b710cd3efddfe6c63b1a5b",
+    "budget_json_bytes": 5181,
+    "budget_json_sha256": "6f3a4c91247c0a1c60808b10d9c3ead832fc6ba56b461e42dd5e4ea9a9645d85"
+  },
+  "authority_boundary": {
+    "proves_funding_scope_is_no_material_change_to_frozen_r2_budget_under_conservative_one_hour_projection": true,
+    "proves_actual_source_funding_is_hourly": false,
+    "authorizes_funding_r2_materialization": false,
+    "authorizes_r2_writes": false,
+    "authorizes_source_switch": false,
+    "authorizes_provider_splicing": false,
+    "authorizes_pionex_native_relabeling": false,
+    "authorizes_historical_universe_membership": false,
+    "authorizes_backtest_admission": false,
+    "authorizes_automatic_trade_plans": false,
+    "authorizes_live_trading": false
+  },
+  "next_required_authority": "EXPLICIT_BINANCE_FUNDING_R2_MATERIALIZATION_AUTHORITY"
+}
