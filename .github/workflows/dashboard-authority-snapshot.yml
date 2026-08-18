@@ -1,4 +1,4 @@
-name: Dashboard D2 Authority Snapshot
+name: Dashboard Zh-Hant Authority Snapshot
 
 on:
   workflow_dispatch:
@@ -12,16 +12,15 @@ on:
       - "research/receipts/2026-08-18-binance-2025-r2-pilot.json"
       - "research/receipts/2026-08-18-binance-funding-source-proof.json"
       - "research/receipts/2026-08-18-binance-funding-coverage.json"
-      - "research/receipts/2026-08-18-binance-funding-materialization-authority.json"
-      - "research/receipts/2026-08-18-binance-funding-materialization-authority-amendment.json"
       - "research/receipts/2026-08-19-binance-funding-interior-continuity-review.json"
+      - "research/receipts/2026-08-19-binance-funding-materialization-authority-v0-2.json"
       - "research/receipts/2026-08-18-historical-universe-long-horizon-review.json"
 
 permissions:
   contents: read
 
 concurrency:
-  group: dashboard-d2-authority-snapshot-${{ github.ref }}
+  group: dashboard-zh-hant-authority-snapshot-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -38,7 +37,7 @@ jobs:
       - name: Validate static dashboard source
         run: python scripts/validate_dashboard_static.py
 
-      - name: Build deployable dashboard from frozen Repository authorities
+      - name: Build deployable Traditional Chinese dashboard from frozen authorities
         shell: bash
         run: |
           set -euo pipefail
@@ -47,7 +46,7 @@ jobs:
           python scripts/build_dashboard_authority_snapshot.py \
             --output artifacts/dashboard-site/data/dashboard.json
 
-      - name: Assert normalized snapshot stays fail-closed, paper-only and secret-free
+      - name: Assert Chinese snapshot stays fail-closed, paper-only and secret-free
         shell: bash
         run: |
           set -euo pipefail
@@ -58,16 +57,17 @@ jobs:
           path = Path('artifacts/dashboard-site/data/dashboard.json')
           data = json.loads(path.read_text(encoding='utf-8'))
           assert data['authority'] is False
+          assert data['locale'] == 'zh-Hant-TW'
           assert data['snapshotType'] == 'NORMALIZED_VIEW_OF_FROZEN_REPOSITORY_AUTHORITIES'
           assert data['project']['mode'] == 'PAPER-ONLY'
           assert data['project']['marketCount'] == 15
           assert data['project']['fundingMonthsObserved'] == 1010
-          assert data['project']['fundingStorageScopeAuthorized'] is True
-          assert data['project']['fundingMaterializationReady'] is False
-          assert data['project']['fundingMaterializationState'] == 'SCOPE_REDUCTION_REQUIRED'
-          assert data['project']['fundingV0_2PlannedSourceMonths'] == 1003
-          assert data['project']['fundingV0_2PlannedAnnualObjects'] == 94
-          assert data['project']['fundingV0_2PlannedR2Identities'] == 192
+          assert data['project']['fundingV0_2StorageAuthorized'] is True
+          assert data['project']['fundingWriterReady'] is False
+          assert data['project']['fundingWriterState'] == 'NOT_READY'
+          assert data['project']['fundingV0_2SourceMonths'] == 1003
+          assert data['project']['fundingV0_2AnnualObjects'] == 94
+          assert data['project']['fundingV0_2R2Identities'] == 192
           assert data['project']['tradePlanAuthorized'] is False
           assert data['project']['liveTradingAuthorized'] is False
           assert data['securityBoundary']['containsSecrets'] is False
@@ -81,15 +81,16 @@ jobs:
           assert hype['status'] == 'REVIEW_REQUIRED'
           assert hype['fundingContinuityReview']['deferredYear'] == 2026
           text = path.read_text(encoding='utf-8')
+          assert 'Repository 正式 Authority 狀態快照' in text
           for token in ('R2_SECRET_ACCESS_KEY', 'R2_ACCESS_KEY_ID', 'PIONEX_API_SECRET', 'BEGIN PRIVATE KEY'):
               assert token not in text
           PY
 
-      - name: HTTP smoke with real normalized authority snapshot
+      - name: HTTP smoke with real Chinese authority snapshot
         shell: bash
         run: |
           set -euo pipefail
-          python -m http.server 4173 -d artifacts/dashboard-site > /tmp/dashboard-d2-http.log 2>&1 &
+          python -m http.server 4173 -d artifacts/dashboard-site > /tmp/dashboard-zh-http.log 2>&1 &
           SERVER_PID=$!
           trap 'kill ${SERVER_PID} || true' EXIT
           for attempt in $(seq 1 20); do
@@ -98,19 +99,26 @@ jobs:
             fi
             sleep 0.25
           done
+          curl --fail --silent --show-error http://127.0.0.1:4173/ > /tmp/dashboard-index.html
           curl --fail --silent --show-error http://127.0.0.1:4173/data/dashboard.json > /tmp/dashboard.json
           python - <<'PY'
           import json
+          html = open('/tmp/dashboard-index.html', encoding='utf-8').read()
           data = json.load(open('/tmp/dashboard.json', encoding='utf-8'))
-          assert data['snapshotLabel'] == 'Repository authority snapshot'
+          assert '總覽' in html
+          assert '資料健康度' in html
+          assert '績效中心' in html
+          assert '風險與閘門' in html
+          assert data['snapshotLabel'] == 'Repository 正式 Authority 狀態快照'
           assert data['project']['mode'] == 'PAPER-ONLY'
-          assert data['project']['fundingMaterializationState'] == 'SCOPE_REDUCTION_REQUIRED'
+          assert data['project']['fundingV0_2StorageAuthorized'] is True
+          assert data['project']['fundingWriterState'] == 'NOT_READY'
           PY
 
-      - name: Upload deployable dashboard evidence
+      - name: Upload deployable Chinese dashboard evidence
         uses: actions/upload-artifact@v4
         with:
-          name: dashboard-d2-authority-snapshot-${{ github.run_id }}
+          name: dashboard-zh-hant-authority-snapshot-${{ github.run_id }}
           path: artifacts/dashboard-site
           if-no-files-found: error
           retention-days: 90
