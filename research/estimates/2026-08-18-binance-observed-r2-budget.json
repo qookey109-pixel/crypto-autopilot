@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "status": "BINANCE_OBSERVED_R2_BUDGET_ESTIMATE_READY",
+  "basis": {
+    "authority": "research/receipts/2026-08-18-binance-2025-r2-pilot.json",
+    "observed_year": 2025,
+    "observed_candidate_count": 15,
+    "observed_rows": 671022,
+    "observed_parquet_bytes": 18778928,
+    "rows_per_full_market_year": 45990,
+    "full_candidate_year_rows": 689850,
+    "missing_equivalent_rows": 18828,
+    "observed_bytes_per_row": 27.98556232135459,
+    "imputation_method": "Fill missing rows up to a full 15-market year at the observed bytes-per-row before target scaling, preventing HYPE partial-year coverage from lowering the estimate.",
+    "full_candidate_year_equivalent_bytes": 19305840.167386465,
+    "target_markets": 250,
+    "target_years": 8,
+    "target_scale_from_15_market_year": 133.33333333333334,
+    "market_data_partitions_upper_bound": 28000
+  },
+  "storage_scenarios": {
+    "canonical_only": {
+      "gb_month": 2.5741120223,
+      "estimated_monthly_cost_usd": 0.0
+    },
+    "canonical_plus_retained_staging": {
+      "gb_month": 5.1482240446,
+      "estimated_monthly_cost_usd": 0.0
+    },
+    "three_x_capacity_stress": {
+      "gb_month": 7.722336067,
+      "estimated_monthly_cost_usd": 0.0,
+      "gate_status": "PASS"
+    }
+  },
+  "operation_model": {
+    "source": "Conservatively retain the previously frozen 28,000-partition R2 operation envelope even though Binance Vision bulk delivery reduces source HTTP pagination and the current pilot path may use fewer R2 state operations.",
+    "fresh_full_target": {
+      "class_a": 224000,
+      "class_b": 140000
+    },
+    "three_x_transient_overhead": {
+      "class_a": 672000,
+      "class_b": 420000,
+      "estimated_monthly_cost_usd": 0.0
+    }
+  },
+  "planned_usage": {
+    "storage_gb_month": 5.1482240446,
+    "class_a_requests_per_month": 224000,
+    "class_b_requests_per_month": 140000
+  },
+  "stress_usage": {
+    "storage_gb_month": 7.722336067,
+    "class_a_requests_per_month": 672000,
+    "class_b_requests_per_month": 420000
+  },
+  "guardrail_policy": "config/r2_budget_v0_1.json",
+  "gate_expectation": {
+    "planned_usage": "PASS",
+    "three_x_capacity_and_operation_stress": "PASS",
+    "above_free_storage_envelope": "BLOCK"
+  },
+  "comparison_to_original_m1b_model": {
+    "original_canonical_gb": 2.9558812381,
+    "observed_recalibrated_canonical_gb": 2.5741120223,
+    "original_canonical_plus_staging_gb": 5.9117624762,
+    "observed_recalibrated_canonical_plus_staging_gb": 5.1482240446,
+    "original_three_x_stress_gb": 8.8676437143,
+    "observed_recalibrated_three_x_stress_gb": 7.722336067,
+    "interpretation": "The original M1B estimate remains a valid conservative frozen reference. The new estimate is based on a full-year-equivalent Binance pilot and is the preferred observed capacity calibration for Binance long-history planning."
+  },
+  "caveats": [
+    "This is a capacity model, not proof that 250 Binance USD-M markets have eight years of history.",
+    "Actual market listing and delisting coverage will reduce or change realized storage relative to a full-coverage envelope.",
+    "R2 free-tier usage is account-level; other buckets/projects can consume the same included usage.",
+    "Mark Price, Funding, Open Interest, SState evidence, reports and future derived datasets are not included in these trade-Kline bytes.",
+    "Cloudflare Workers, Workflows, Queues and D1 require separate cost gates."
+  ]
+}
