@@ -1,0 +1,64 @@
+name: Binance Funding R2 Materialization
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "config/binance_funding_r2_materialization_execution_v0_1.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binance-funding-r2-materialization-v0-1
+  cancel-in-progress: false
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Verify execution marker and R2 secret names
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f config/binance_funding_r2_materialization_execution_v0_1.json
+          test -n "${CLOUDFLARE_ACCOUNT_ID}"
+          test -n "${R2_BUCKET_NAME}"
+          test -n "${R2_ACCESS_KEY_ID}"
+          test -n "${R2_SECRET_ACCESS_KEY}"
+
+      - name: Re-run full preflight and materialize exact authorized Funding scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/materialize_binance_funding_r2.py \
+            --mode write \
+            --workers 12 \
+            --run-id "${GITHUB_RUN_ID}" \
+            --execution-marker config/binance_funding_r2_materialization_execution_v0_1.json \
+            --output-dir artifacts/binance-funding-r2-materialization
+
+      - name: Upload Funding materialization evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-funding-r2-materialization-${{ github.run_id }}
+          path: artifacts/binance-funding-r2-materialization/*.json
+          if-no-files-found: warn
+          retention-days: 90
