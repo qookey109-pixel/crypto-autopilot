@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from dataclasses import dataclass
 
 from .binance_funding import BinanceVisionFundingArchiveKey
@@ -9,7 +10,9 @@ from .binance_funding_materialization_plan_v0_2 import canonical_scope_sha256
 
 
 AUTHORITY_PATH = "research/receipts/2026-08-19-binance-funding-materialization-authority-v0-2.json"
+PREFLIGHT_AUTHORITY_PATH = "research/receipts/2026-08-19-binance-funding-r2-v0-2-full-preflight.json"
 CONFIG_PATH = "config/binance_funding_materialization_authority_v0_2.json"
+EXECUTION_MARKER_PATH = "config/binance_funding_r2_materialization_execution_v0_2.json"
 EXPECTED_SCOPE_SHA256 = "1e0ff54daeec8e5e47376fedb631c663687dd6fb6a4c297d269c33acdf99ad58"
 EXPECTED_CHECKSUM_SET_SHA256 = "881c14d3b3c780b8a0d56ca2f7fd57d2abff310fcd7cb4b13dc01f506b9b64f3"
 CADENCE_TOLERANCE_MS = 50
@@ -27,6 +30,31 @@ class FundingChecksumRecord:
 
     def canonical_line(self) -> bytes:
         return f"{self.symbol}\t{self.period}\t{self.archive_sha256}\n".encode("utf-8")
+
+
+@dataclass(frozen=True, slots=True)
+class FundingRunMetadataKeys:
+    source_manifest: str
+    canonical_manifest: str
+    preflight_receipt: str
+    result: str
+
+    @property
+    def all(self) -> tuple[str, str, str, str]:
+        return (
+            self.source_manifest,
+            self.canonical_manifest,
+            self.preflight_receipt,
+            self.result,
+        )
+
+
+def canonical_json_bytes(payload: object) -> bytes:
+    return (json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+
+
+def sha256_bytes(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
 
 
 def checksum_set_sha256(records: tuple[FundingChecksumRecord, ...]) -> str:
@@ -50,6 +78,23 @@ def source_keys_from_scope(scope: FundingMaterializationScope) -> tuple[BinanceV
         )
     if any(key.symbol == "HYPEUSDT" and key.period.startswith("2026-") for key in keys):
         raise BinanceFundingMaterializerV02Error("HYPEUSDT 2026 escaped V0.2 deferred scope")
+    return keys
+
+
+def run_metadata_keys(run_id: str) -> FundingRunMetadataKeys:
+    value = str(run_id).strip()
+    if not value or any(char not in "0123456789" for char in value):
+        raise BinanceFundingMaterializerV02Error("GitHub run id must be numeric")
+    root = f"manifests/historical/binance_usdm/funding/materialization-v0-2/run={value}"
+    receipt_root = f"receipts/historical/binance_usdm/funding/materialization-v0-2/run={value}"
+    keys = FundingRunMetadataKeys(
+        source_manifest=f"{root}/source-manifest.json",
+        canonical_manifest=f"{root}/canonical-manifest.json",
+        preflight_receipt=f"{receipt_root}/preflight.json",
+        result=f"{receipt_root}/result.json",
+    )
+    if len(set(keys.all)) != 4 or any("pionex" in key.lower() for key in keys.all):
+        raise BinanceFundingMaterializerV02Error("Funding V0.2 metadata keys must be four Binance-only identities")
     return keys
 
 
@@ -142,3 +187,67 @@ def validate_runtime_authority(
 
     source_keys_from_scope(scope)
     return scope_sha, EXPECTED_CHECKSUM_SET_SHA256
+
+
+def validate_preflight_authority(preflight: dict[str, object]) -> None:
+    if preflight.get("status") != "PASS":
+        raise BinanceFundingMaterializerV02Error("Funding V0.2 full preflight authority must PASS")
+    if preflight.get("stage") != "BINANCE_FUNDING_R2_V0_2_FULL_PREFLIGHT_PASS":
+        raise BinanceFundingMaterializerV02Error("Funding V0.2 full preflight stage changed")
+    if preflight.get("authority_type") != "PREWRITE_SOURCE_AND_SERIALIZATION_EVIDENCE_ONLY":
+        raise BinanceFundingMaterializerV02Error("Funding V0.2 full preflight authority type changed")
+    exact = preflight.get("exact_scope") or {}
+    boundary = preflight.get("execution_boundary") or {}
+    if not isinstance(exact, dict) or not isinstance(boundary, dict):
+        raise BinanceFundingMaterializerV02Error("Funding V0.2 preflight authority shape changed")
+    expected = {
+        "canonical_scope_sha256": EXPECTED_SCOPE_SHA256,
+        "source_checksum_set_sha256": EXPECTED_CHECKSUM_SET_SHA256,
+        "source_archive_count": 1003,
+        "annual_canonical_object_count": 94,
+        "annual_partition_receipt_count": 94,
+        "planned_run_metadata_objects": 4,
+        "planned_total_r2_object_identities": 192,
+        "total_funding_observations": 91747,
+        "total_local_parquet_bytes": 1138749,
+        "cadence_jitter_tolerance_ms": 50,
+    }
+    for field, value in expected.items():
+        if exact.get(field) != value:
+            raise BinanceFundingMaterializerV02Error(f"Funding V0.2 preflight field changed: {field}")
+    if boundary.get("r2_writes_performed") is not False:
+        raise BinanceFundingMaterializerV02Error("Funding preflight authority unexpectedly contains R2 writes")
+    if boundary.get("actual_r2_materialization_completed") is not False:
+        raise BinanceFundingMaterializerV02Error("Funding preflight authority unexpectedly marks materialization complete")
+    if boundary.get("actual_write_execution_must_repeat_full_preflight") is not True:
+        raise BinanceFundingMaterializerV02Error("Funding execution must repeat full preflight")
+
+
+def validate_execution_marker(marker: dict[str, object]) -> None:
+    if marker.get("status") != "EXECUTE_AUTHORIZED_FUNDING_R2_MATERIALIZATION_V0_2":
+        raise BinanceFundingMaterializerV02Error("Funding V0.2 execution marker status mismatch")
+    if marker.get("execute") is not True:
+        raise BinanceFundingMaterializerV02Error("Funding V0.2 execution marker must set execute=true")
+    if marker.get("provider") != "binance_usdm" or marker.get("dataset") != "fundingRate":
+        raise BinanceFundingMaterializerV02Error("Funding V0.2 execution marker provider/dataset changed")
+    if marker.get("canonical_scope_sha256") != EXPECTED_SCOPE_SHA256:
+        raise BinanceFundingMaterializerV02Error("Funding V0.2 execution marker scope SHA mismatch")
+    if marker.get("source_checksum_set_sha256") != EXPECTED_CHECKSUM_SET_SHA256:
+        raise BinanceFundingMaterializerV02Error("Funding V0.2 execution marker checksum-set SHA mismatch")
+    if marker.get("materialization_authority") != AUTHORITY_PATH:
+        raise BinanceFundingMaterializerV02Error("Funding V0.2 execution marker authority path mismatch")
+    if marker.get("preflight_authority") != PREFLIGHT_AUTHORITY_PATH:
+        raise BinanceFundingMaterializerV02Error("Funding V0.2 execution marker preflight path mismatch")
+    for field in (
+        "source_switch_authorized",
+        "provider_splicing_authorized",
+        "interpolation_authorized",
+        "pionex_native_relabel_authorized",
+        "historical_universe_membership_authorized",
+        "backtest_admission_authorized",
+        "trade_plan_authorized",
+        "real_money_order_authorized",
+        "live_trading_authorized",
+    ):
+        if marker.get(field) is not False:
+            raise BinanceFundingMaterializerV02Error(f"Funding V0.2 execution marker unexpectedly permits {field}")
