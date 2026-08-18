@@ -1,0 +1,51 @@
+{
+  "version": "0.1.0",
+  "status": "FRAMEWORK_ONLY",
+  "trade_plan_authorized": false,
+  "candidate_values_frozen": false,
+  "selection_policy_frozen": false,
+  "validation_split_frozen": false,
+  "protocol": {
+    "candidate_grid_must_be_frozen_before_evaluation": true,
+    "update_selection_source": "UPDATE_ONLY",
+    "complete_update_matrix_required": true,
+    "local_neighbor_stability_required": true,
+    "validation_mode": "SELECTED_CANDIDATE_ONLY",
+    "validation_reselection_forbidden": true,
+    "failed_validation_must_not_be_silently_reused": true,
+    "parameter_freeze_requires_validation_pass": true
+  },
+  "currently_undefined_rules": [
+    {
+      "name": "setup_atr_normalized_overextension_threshold",
+      "candidate_space": null,
+      "freeze_status": "UNDEFINED"
+    },
+    {
+      "name": "entry_pullback_toward_ema20",
+      "candidate_space": null,
+      "freeze_status": "UNDEFINED"
+    },
+    {
+      "name": "entry_reclaim_ema20",
+      "candidate_space": null,
+      "freeze_status": "UNDEFINED"
+    },
+    {
+      "name": "entry_break_previous_high",
+      "candidate_space": null,
+      "freeze_status": "UNDEFINED"
+    },
+    {
+      "name": "entry_volume_confirmation",
+      "candidate_space": null,
+      "freeze_status": "UNDEFINED"
+    },
+    {
+      "name": "stop_atr_buffer",
+      "candidate_space": null,
+      "freeze_status": "UNDEFINED"
+    }
+  ],
+  "authority_note": "No real strategy candidate values, production sweep thresholds, or validation split are frozen by this file."
+}
