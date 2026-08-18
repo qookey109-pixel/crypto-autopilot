@@ -91,7 +91,7 @@ class BinanceFundingTests(unittest.TestCase):
         self.assertEqual(result.observations[1].funding_time_ms, 1704412800003)
         self.assertEqual(result.receipt.cadence_anomalies, 0)
 
-    def test_jitter_beyond_frozen_tolerance_fails_closed(self) -> None:
+    def test_default_source_proof_tolerance_still_fails_above_10ms(self) -> None:
         key = BinanceVisionFundingArchiveKey("BTCUSDT", "2024-01")
         csv_text = "\n".join(
             [
@@ -102,6 +102,32 @@ class BinanceFundingTests(unittest.TestCase):
         payload, checksum = archive_payload(key, csv_text)
         with self.assertRaises(BinanceFundingEvidenceError):
             ingest_funding_archive(key, archive_bytes=payload, checksum_payload=checksum)
+
+    def test_authority_scoped_50ms_tolerance_accepts_45ms_but_rejects_51ms(self) -> None:
+        key = BinanceVisionFundingArchiveKey("BTCUSDT", "2024-01")
+        payload, checksum = archive_payload(
+            key,
+            "1704384000000,8,0.0001\n1704412800045,8,0.0002\n",
+        )
+        result = ingest_funding_archive(
+            key,
+            archive_bytes=payload,
+            checksum_payload=checksum,
+            cadence_jitter_tolerance_ms=50,
+        )
+        self.assertEqual(result.observations[1].funding_time_ms, 1704412800045)
+
+        payload, checksum = archive_payload(
+            key,
+            "1704384000000,8,0.0001\n1704412800051,8,0.0002\n",
+        )
+        with self.assertRaises(BinanceFundingEvidenceError):
+            ingest_funding_archive(
+                key,
+                archive_bytes=payload,
+                checksum_payload=checksum,
+                cadence_jitter_tolerance_ms=50,
+            )
 
     def test_unexplained_gap_fails_closed(self) -> None:
         key = BinanceVisionFundingArchiveKey("SOLUSDT", "2024-01")

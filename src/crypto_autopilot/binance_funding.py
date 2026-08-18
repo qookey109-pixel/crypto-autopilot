@@ -14,6 +14,7 @@ from .binance_vision import BINANCE_VISION_BASE_URL, parse_checksum, sha256_byte
 
 
 FUNDING_CADENCE_JITTER_TOLERANCE_MS = 10
+MAX_FUNDING_CADENCE_JITTER_TOLERANCE_MS = 1000
 
 
 class BinanceFundingEvidenceError(RuntimeError):
@@ -241,9 +242,24 @@ def _cadence_residual_ms(left: BinanceFundingObservation, right: BinanceFundingO
     return min((delta - item for item in expected), key=abs)
 
 
-def _cadence_anomalies(observations: tuple[BinanceFundingObservation, ...]) -> int:
+def _validate_cadence_tolerance_ms(value: int) -> int:
+    tolerance = int(value)
+    if tolerance < 0 or tolerance > MAX_FUNDING_CADENCE_JITTER_TOLERANCE_MS:
+        raise ValueError(
+            "funding cadence jitter tolerance must be between 0 and "
+            f"{MAX_FUNDING_CADENCE_JITTER_TOLERANCE_MS} ms"
+        )
+    return tolerance
+
+
+def _cadence_anomalies(
+    observations: tuple[BinanceFundingObservation, ...],
+    *,
+    cadence_jitter_tolerance_ms: int = FUNDING_CADENCE_JITTER_TOLERANCE_MS,
+) -> int:
+    tolerance = _validate_cadence_tolerance_ms(cadence_jitter_tolerance_ms)
     return sum(
-        abs(_cadence_residual_ms(left, right)) > FUNDING_CADENCE_JITTER_TOLERANCE_MS
+        abs(_cadence_residual_ms(left, right)) > tolerance
         for left, right in zip(observations, observations[1:])
     )
 
@@ -253,7 +269,9 @@ def ingest_funding_archive(
     *,
     archive_bytes: bytes,
     checksum_payload: bytes | str,
+    cadence_jitter_tolerance_ms: int = FUNDING_CADENCE_JITTER_TOLERANCE_MS,
 ) -> BinanceVisionFundingArchive:
+    tolerance = _validate_cadence_tolerance_ms(cadence_jitter_tolerance_ms)
     archive_sha256 = _verify_checksum(
         key,
         archive_bytes=archive_bytes,
@@ -263,9 +281,14 @@ def ingest_funding_archive(
     times = [point.funding_time_ms for point in observations]
     if times != sorted(times) or len(times) != len(set(times)):
         raise BinanceFundingEvidenceError("funding timestamps must be strictly increasing and unique")
-    anomalies = _cadence_anomalies(observations)
+    anomalies = _cadence_anomalies(
+        observations,
+        cadence_jitter_tolerance_ms=tolerance,
+    )
     if anomalies:
-        raise BinanceFundingEvidenceError(f"unexplained funding cadence gaps: {anomalies}")
+        raise BinanceFundingEvidenceError(
+            f"unexplained funding cadence gaps beyond {tolerance}ms tolerance: {anomalies}"
+        )
     rates = [point.rate for point in observations]
     intervals = tuple(sorted({point.funding_interval_hours for point in observations}))
     receipt = BinanceFundingArchiveReceipt(
@@ -292,7 +315,9 @@ def combine_funding_archives(
     *,
     symbol: str,
     year: int,
+    cadence_jitter_tolerance_ms: int = FUNDING_CADENCE_JITTER_TOLERANCE_MS,
 ) -> tuple[BinanceFundingObservation, ...]:
+    tolerance = _validate_cadence_tolerance_ms(cadence_jitter_tolerance_ms)
     selected = sorted(archives, key=lambda item: item.key.period)
     if not selected:
         raise BinanceFundingEvidenceError("annual funding aggregation requires archives")
@@ -305,9 +330,14 @@ def combine_funding_archives(
     times = [point.funding_time_ms for point in combined]
     if times != sorted(times) or len(times) != len(set(times)):
         raise BinanceFundingEvidenceError("annual funding timestamps must be strictly increasing and unique")
-    anomalies = _cadence_anomalies(combined)
+    anomalies = _cadence_anomalies(
+        combined,
+        cadence_jitter_tolerance_ms=tolerance,
+    )
     if anomalies:
-        raise BinanceFundingEvidenceError(f"annual funding cadence gaps: {anomalies}")
+        raise BinanceFundingEvidenceError(
+            f"annual funding cadence gaps beyond {tolerance}ms tolerance: {anomalies}"
+        )
     return combined
 
 
