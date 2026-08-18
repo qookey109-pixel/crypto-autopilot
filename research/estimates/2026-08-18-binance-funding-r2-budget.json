@@ -1,0 +1,71 @@
+{
+  "schema": "binance-funding-r2-budget-estimate-v0.1",
+  "date": "2026-08-18",
+  "provider": "binance_usdm",
+  "dataset": "fundingRate",
+  "determination": "NO_MATERIAL_BUDGET_CHANGE",
+  "coverage": {
+    "available_symbol_months": 1010,
+    "available_calendar_days": 30735,
+    "annual_canonical_objects": 95
+  },
+  "calibration": {
+    "policy": "MAX_OF_PROOF_SYMBOL_MONTH_PARQUET_BYTES_PER_ROW",
+    "period": "2024-01",
+    "measurements": [
+      {
+        "symbol": "BTCUSDT",
+        "rows": 93,
+        "parquet_bytes": 2085,
+        "bytes_per_row": 22.419354838709676,
+        "parquet_sha256": "a3ff5dd1049fbd106d6689cd344cb5ee5fd140826d43932e05a6ec7942ecd50c"
+      },
+      {
+        "symbol": "ETHUSDT",
+        "rows": 93,
+        "parquet_bytes": 2069,
+        "bytes_per_row": 22.247311827956988,
+        "parquet_sha256": "96f2c50c40c28fe939e2ef1906e23231620486dfd54f1c5b0e231b6776513824"
+      },
+      {
+        "symbol": "SOLUSDT",
+        "rows": 93,
+        "parquet_bytes": 2077,
+        "bytes_per_row": 22.333333333333332,
+        "parquet_sha256": "fa4aba45a882faa847353b62adb01c9a26603f38d08ce43ed6f9f3d71691d201"
+      }
+    ],
+    "max_bytes_per_row": 22.419354838709676
+  },
+  "conservative_projection": {
+    "budget_interval_hours": 1,
+    "projected_rows": 737640,
+    "canonical_bytes": 16537413,
+    "canonical_gb": 0.016537413,
+    "canonical_plus_retained_staging_gb": 0.033074826,
+    "three_x_capacity_stress_gb": 0.049612239,
+    "planned_class_a_requests": 194,
+    "planned_class_b_requests": 194,
+    "three_x_class_a_requests": 582,
+    "three_x_class_b_requests": 582
+  },
+  "combined_trade_plus_funding": {
+    "trade_three_x_storage_gb": 7.722336067,
+    "funding_three_x_storage_gb": 0.049612239,
+    "combined_three_x_storage_gb": 7.771948306,
+    "storage_warn_gb": 8.0,
+    "storage_headroom_to_warn_gb": 0.22805169400000036,
+    "combined_three_x_class_a_requests": 672582,
+    "class_a_warn_requests": 750000,
+    "combined_three_x_class_b_requests": 420582,
+    "class_b_warn_requests": 7500000,
+    "planned_gate": "PASS",
+    "three_x_stress_gate": "PASS",
+    "estimated_monthly_cost_usd_under_frozen_policy": 0.0
+  },
+  "interpretation": {
+    "one_hour_projection_is_budget_upper_bound_not_source_cadence_claim": true,
+    "no_r2_writes_performed": true,
+    "funding_materialization_authorized": false
+  }
+}
