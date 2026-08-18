@@ -35,7 +35,7 @@ Funding is not treated as a Kline interval. There is no artificial `1h` / `4h` a
 
 ## Frozen source schema
 
-V0.1 expects the published Funding archive to resolve to these canonical fields:
+V0.1 resolves the published Funding archive to these canonical fields:
 
 - `calc_time`
 - `funding_interval_hours`
@@ -45,7 +45,21 @@ The parser accepts either the explicit header or the exact three-column position
 
 The source-declared funding interval is retained. V0.1 never assumes funding must always be eight hours.
 
-## Audit rules
+## Timestamp and cadence audit
+
+The first live execution used exact millisecond equality between adjacent `calc_time` values and the declared Funding interval. Run `32128779729` was superseded before any PASS authority because the source data showed bounded millisecond jitter rather than a missing Funding observation.
+
+A separate read-only diagnostic measured BTCUSDT, ETHUSDT and SOLUSDT for `2024-01`:
+
+- 93 rows per symbol;
+- all declared intervals = 8 hours;
+- 28 non-zero residuals per symbol under exact-millisecond comparison;
+- residuals were only `+/-1`, `+/-2` or `+/-3` ms;
+- maximum absolute residual = **3 ms** for all three symbols.
+
+The protocol was then re-frozen **before a PASS authority** with a bounded `+/-10 ms` cadence-jitter tolerance.
+
+Important: this tolerance is audit-only. The original `calc_time` is preserved exactly. Timestamps are never rounded, shifted, interpolated or synthesized.
 
 For every source archive:
 
@@ -54,22 +68,22 @@ For every source archive:
 - timestamps must be strictly increasing and unique;
 - rate must be finite;
 - declared funding interval must be positive and bounded to 24 hours;
-- each observed timestamp delta must be explained by either the preceding or following source-declared interval;
-- unexplained cadence gaps fail closed;
+- each observed timestamp delta must match either the preceding or following source-declared interval within `+/-10 ms`;
+- a residual larger than 10 ms fails closed as an unexplained cadence gap;
 - a changed archive SHA or changed logical metadata requires explicit revision review.
 
 No interpolation or synthetic funding point is allowed.
 
 ## Proof scope
 
-The protocol is frozen before live evidence to:
+The source-proof scope remains:
 
 - BTCUSDT
 - ETHUSDT
 - SOLUSDT
 - period `2024-01`
 
-A PASS proves only that the frozen Binance Vision Funding path, checksum contract and archive schema work for this bounded source-proof scope.
+The valid proof execution confirms the Binance Vision Funding path, checksum contract, archive schema and bounded timestamp-jitter behavior for this scope.
 
 It does **not** prove all 15 symbols have the same long-horizon Funding availability.
 
@@ -90,7 +104,7 @@ Parquet fields:
 
 Compression: Zstd.
 
-Annual aggregation must preserve the original Funding timestamps/rates exactly and must re-run monotonicity, uniqueness and cadence audits across month boundaries.
+Annual aggregation must preserve the original Funding timestamps/rates exactly and must re-run monotonicity, uniqueness and bounded cadence audits across month boundaries.
 
 ## Required next evidence before long-horizon materialization
 
