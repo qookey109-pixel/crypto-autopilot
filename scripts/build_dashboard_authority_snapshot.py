@@ -11,6 +11,7 @@ FUNDING_SOURCE = Path("research/receipts/2026-08-18-binance-funding-source-proof
 FUNDING_COVERAGE = Path("research/receipts/2026-08-18-binance-funding-coverage.json")
 FUNDING_AUTHORITY = Path("research/receipts/2026-08-18-binance-funding-materialization-authority.json")
 FUNDING_AMENDMENT = Path("research/receipts/2026-08-18-binance-funding-materialization-authority-amendment.json")
+FUNDING_CONTINUITY_REVIEW = Path("research/receipts/2026-08-19-binance-funding-interior-continuity-review.json")
 HISTORICAL_UNIVERSE = Path("research/receipts/2026-08-18-historical-universe-long-horizon-review.json")
 PROJECT_STATUS = Path("PROJECT_STATUS.md")
 
@@ -55,6 +56,7 @@ def build_snapshot() -> dict[str, object]:
     funding_coverage = load_json(FUNDING_COVERAGE)
     funding_authority = load_json(FUNDING_AUTHORITY)
     funding_amendment = load_json(FUNDING_AMENDMENT)
+    continuity_review = load_json(FUNDING_CONTINUITY_REVIEW)
     universe_review = load_json(HISTORICAL_UNIVERSE)
     status_text = PROJECT_STATUS.read_text(encoding="utf-8")
 
@@ -64,6 +66,7 @@ def build_snapshot() -> dict[str, object]:
         (funding_coverage, FUNDING_COVERAGE),
         (funding_authority, FUNDING_AUTHORITY),
         (funding_amendment, FUNDING_AMENDMENT),
+        (continuity_review, FUNDING_CONTINUITY_REVIEW),
         (universe_review, HISTORICAL_UNIVERSE),
     ):
         require_pass(payload, path)
@@ -86,15 +89,31 @@ def build_snapshot() -> dict[str, object]:
     authorized_actions = funding_authority.get("authorized_actions") or {}
     if not isinstance(authorized_scope, dict) or not isinstance(authorized_actions, dict):
         raise RuntimeError("Funding materialization authority shape changed")
-    funding_storage_authorized = (
+    funding_storage_scope_authorized = (
         authorized_actions.get("funding_materialization_authorized") is True
         and authorized_actions.get("r2_writes_authorized") is True
     )
 
-    amendment_contract = funding_amendment.get("writer_runtime_contract") or funding_amendment.get("runtime_contract") or {}
     checksum_bound = "checksum" in json.dumps(funding_amendment, sort_keys=True).lower()
     if not checksum_bound:
         raise RuntimeError("Funding authority amendment no longer binds source checksums")
+
+    if continuity_review.get("review_outcome") != "SCOPE_REDUCTION_REQUIRED":
+        raise RuntimeError("Funding continuity review outcome changed")
+    materialization_effect = continuity_review.get("v0_1_materialization_effect") or {}
+    scope_change = continuity_review.get("required_scope_change") or {}
+    observed_gap = continuity_review.get("observed_gap") or {}
+    if not isinstance(materialization_effect, dict) or not isinstance(scope_change, dict) or not isinstance(observed_gap, dict):
+        raise RuntimeError("Funding continuity review shape changed")
+    if materialization_effect.get("v0_1_write_execution_must_remain_blocked") is not True:
+        raise RuntimeError("Funding V0.1 is no longer explicitly blocked by continuity review")
+    if scope_change.get("remaining_expected_source_months") != 1003:
+        raise RuntimeError("Funding V0.2 planning source-month target changed")
+    if scope_change.get("remaining_expected_annual_canonical_objects") != 94:
+        raise RuntimeError("Funding V0.2 annual-object target changed")
+
+    funding_materialization_ready = False
+    funding_materialization_state = "SCOPE_REDUCTION_REQUIRED"
 
     equivalence_pending = "PIONEX-BINANCE EQUIVALENCE GATE PENDING SOURCE PUBLICATION" in status_text
     equivalence_status = "PENDING" if equivalence_pending else "NOT_READY"
@@ -112,19 +131,22 @@ def build_snapshot() -> dict[str, object]:
     if set(candidate_symbols) != set(boundaries):
         raise RuntimeError("Pionex candidate universe and Funding boundary universe differ")
 
+    gap_symbol = str(observed_gap.get("symbol") or "")
     markets: list[dict[str, object]] = []
     for symbol in candidate_symbols:
         boundary = boundaries[symbol]
         if not isinstance(boundary, dict):
             raise RuntimeError(f"invalid Funding boundary row: {symbol}")
+        funding_status = "REVIEW_REQUIRED" if symbol == gap_symbol else "PASS"
+        row_status = "REVIEW_REQUIRED" if symbol == gap_symbol else "READY"
         markets.append(
             {
                 "symbol": symbol,
                 "trade": "PASS",
                 "mark": "PASS",
-                "funding": "PASS",
+                "funding": funding_status,
                 "provider": "BINANCE USD-M",
-                "status": "READY",
+                "status": row_status,
                 "fundingFirstPeriod": boundary.get("first_available_period"),
                 "fundingLastPeriod": boundary.get("last_available_period"),
                 "fundingFirstUtc": boundary.get("earliest_funding_time_utc"),
@@ -132,6 +154,16 @@ def build_snapshot() -> dict[str, object]:
                 "fundingAvailableMonths": boundary.get("available_months"),
                 "pionexSymbol": boundary.get("pionex_symbol"),
                 "nativeToExecutionExchange": False,
+                "fundingContinuityReview": (
+                    {
+                        "state": "SCOPE_REDUCTION_REQUIRED",
+                        "deferredYear": int(scope_change["deferred_year"]),
+                        "gapPeriod": observed_gap.get("period"),
+                        "gapExpectedSlotUtc": observed_gap.get("expected_cadence_slot_between_observed_rows_utc"),
+                    }
+                    if symbol == gap_symbol
+                    else None
+                ),
             }
         )
 
@@ -144,22 +176,24 @@ def build_snapshot() -> dict[str, object]:
             "name": "Qookey Crypto Autopilot",
             "mode": "PAPER-ONLY",
             "marketCount": len(candidate_symbols),
-            "fundingMonths": int(scan["monthly_available_checks"]),
+            "fundingMonthsObserved": int(scan["monthly_available_checks"]),
             "tradePlanAuthorized": False,
             "liveTradingAuthorized": False,
-            "fundingStorageAuthorized": funding_storage_authorized,
-            "fundingCanonicalScopeSha256": authorized_scope.get("canonical_scope_sha256"),
+            "fundingStorageScopeAuthorized": funding_storage_scope_authorized,
+            "fundingMaterializationReady": funding_materialization_ready,
+            "fundingMaterializationState": funding_materialization_state,
+            "fundingV0_1CanonicalScopeSha256": authorized_scope.get("canonical_scope_sha256"),
+            "fundingV0_2PlannedSourceMonths": int(scope_change["remaining_expected_source_months"]),
+            "fundingV0_2PlannedAnnualObjects": int(scope_change["remaining_expected_annual_canonical_objects"]),
+            "fundingV0_2PlannedR2Identities": int(scope_change["remaining_expected_total_r2_object_identities"]),
         },
         "pipeline": [
             pipeline_item("Pionex M1A Dataset", "15-symbol / 15M / 60M / 4H frozen evidence", "PASS"),
             pipeline_item("Binance 2025 R2 Pilot", "Provider-separated Trade-Kline materialization authority", "PASS"),
             pipeline_item("Funding Source Proof", "Checksum / schema / cadence source semantics", "PASS"),
             pipeline_item("Funding Coverage", f"{scan['monthly_available_checks']:,} observed symbol-months across 15 symbols", "PASS"),
-            pipeline_item(
-                "Funding R2 Storage Scope",
-                "Exact storage-only scope authorized and checksum-set bound",
-                "AUTHORIZED" if funding_storage_authorized else "NOT_AUTHORIZED",
-            ),
+            pipeline_item("Funding V0.1 Scope Authority", "Exact 1,010-month storage scope was authorized and checksum-set bound", "AUTHORIZED"),
+            pipeline_item("Funding Materialization Execution", "Full interior preflight found HYPEUSDT 2026-06 cadence discontinuity; V0.2 scope reduction required", funding_materialization_state),
             pipeline_item("Pionex ↔ Binance Equivalence", "Frozen 45-pair source gate", equivalence_status),
             pipeline_item("Historical Universe Membership", "Long-horizon review PASS; membership evidence still required", universe_status),
         ],
@@ -167,7 +201,7 @@ def build_snapshot() -> dict[str, object]:
             gate("R2 Budget", "Observed historical-data budget authorities remain PASS.", "PASS", "pass", False),
             gate("Provider Equivalence", "Source switch remains blocked until the frozen Pionex ↔ Binance gate resolves.", equivalence_status, "pending", True),
             gate("Historical Universe", "Review PASS is not membership authority.", universe_status, "pending", True),
-            gate("Funding Storage", "Only the exact provider-separated Funding R2 scope is storage-authorized.", "AUTHORIZED" if funding_storage_authorized else "NOT_AUTHORIZED", "pass" if funding_storage_authorized else "blocked", False),
+            gate("Funding Materialization", "V0.1 execution is blocked. HYPEUSDT 2026 is deferred and V0.2 exact scope must be re-frozen before writes.", "NOT_READY", "pending", True),
             gate("Paper Broker", "Production-grade lifecycle and reconciliation are not yet authority-complete.", "NOT_READY", "pending", True),
             gate("Live Trading", "No real-money order or private execution route is authorized.", "NOT_AUTHORIZED", "blocked", True),
         ],
@@ -179,6 +213,7 @@ def build_snapshot() -> dict[str, object]:
             str(FUNDING_COVERAGE),
             str(FUNDING_AUTHORITY),
             str(FUNDING_AMENDMENT),
+            str(FUNDING_CONTINUITY_REVIEW),
             str(HISTORICAL_UNIVERSE),
             str(PROJECT_STATUS),
         ],
@@ -207,7 +242,8 @@ def main() -> int:
                 "status": "PASS",
                 "stage": "DASHBOARD_D2_AUTHORITY_SNAPSHOT_PASS",
                 "market_count": snapshot["project"]["marketCount"],
-                "funding_months": snapshot["project"]["fundingMonths"],
+                "funding_months_observed": snapshot["project"]["fundingMonthsObserved"],
+                "funding_materialization_state": snapshot["project"]["fundingMaterializationState"],
                 "output": str(output),
             },
             sort_keys=True,
