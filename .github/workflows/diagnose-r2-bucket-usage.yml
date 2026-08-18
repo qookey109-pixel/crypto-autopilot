@@ -1,0 +1,109 @@
+name: Diagnose R2 Bucket Usage
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/diagnose-r2-bucket-usage.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify read-only inventory credentials exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_ACCOUNT_ID}"
+          test -n "${R2_BUCKET_NAME}"
+          test -n "${R2_ACCESS_KEY_ID}"
+          test -n "${R2_SECRET_ACCESS_KEY}"
+
+      - name: Install boto3
+        run: python -m pip install --quiet boto3
+
+      - name: Sum current R2 bucket objects and bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          python - <<'PY'
+          import json, os
+          from collections import defaultdict
+          import boto3
+
+          endpoint = f"https://{os.environ['CLOUDFLARE_ACCOUNT_ID']}.r2.cloudflarestorage.com"
+          client = boto3.client(
+              's3',
+              endpoint_url=endpoint,
+              aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],
+              aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'],
+              region_name='auto',
+          )
+          bucket = os.environ['R2_BUCKET_NAME']
+          total_objects = 0
+          total_bytes = 0
+          by_top = defaultdict(lambda: {'objects': 0, 'bytes': 0})
+          by_two = defaultdict(lambda: {'objects': 0, 'bytes': 0})
+          token = None
+          while True:
+              kwargs = {'Bucket': bucket, 'MaxKeys': 1000}
+              if token:
+                  kwargs['ContinuationToken'] = token
+              resp = client.list_objects_v2(**kwargs)
+              for obj in resp.get('Contents', []):
+                  key = str(obj['Key'])
+                  size = int(obj.get('Size') or 0)
+                  total_objects += 1
+                  total_bytes += size
+                  parts = key.split('/')
+                  top = parts[0] if parts else '(root)'
+                  two = '/'.join(parts[:2]) if len(parts) >= 2 else top
+                  by_top[top]['objects'] += 1
+                  by_top[top]['bytes'] += size
+                  by_two[two]['objects'] += 1
+                  by_two[two]['bytes'] += size
+              if not resp.get('IsTruncated'):
+                  break
+              token = resp.get('NextContinuationToken')
+          payload = {
+              'status': 'PASS',
+              'stage': 'R2_BUCKET_USAGE_READ_ONLY_INVENTORY_PASS',
+              'read_only': True,
+              'bucket_name_redacted': True,
+              'total_object_count': total_objects,
+              'total_bytes': total_bytes,
+              'total_MB_decimal': round(total_bytes / 1_000_000, 6),
+              'total_GB_decimal': round(total_bytes / 1_000_000_000, 9),
+              'total_MiB_binary': round(total_bytes / (1024**2), 6),
+              'total_GiB_binary': round(total_bytes / (1024**3), 9),
+              'by_top_level_prefix': dict(sorted(by_top.items())),
+              'by_two_level_prefix': dict(sorted(by_two.items())),
+              'writes_performed': False,
+              'deletes_performed': False,
+          }
+          with open('artifacts/r2-bucket-usage.json', 'w', encoding='utf-8') as f:
+              json.dump(payload, f, ensure_ascii=False, sort_keys=True, indent=2)
+              f.write('\n')
+          print(json.dumps(payload, ensure_ascii=False, sort_keys=True))
+          PY
+
+      - name: Upload usage evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-bucket-usage-${{ github.run_id }}
+          path: artifacts/r2-bucket-usage.json
+          if-no-files-found: error
+          retention-days: 1
