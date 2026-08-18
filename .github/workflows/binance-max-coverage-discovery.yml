@@ -24,7 +24,7 @@ permissions:
 
 concurrency:
   group: binance-max-coverage-discovery-v0-1-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   discovery:
