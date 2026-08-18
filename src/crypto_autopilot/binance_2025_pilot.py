@@ -175,7 +175,8 @@ def combine_and_audit_months(
     audit = audit_candles(combined, interval)
     if not audit.ok:
         raise Binance2025PilotAuthorityError(
-            f"aggregated annual candle audit failed for {interval}: gaps={audit.gaps}, duplicates={audit.duplicates}"
+            "aggregated annual candle audit failed for "
+            f"{interval}: gaps={audit.gaps}, duplicates={audit.duplicate_timestamps}"
         )
     return combined
 
