@@ -45,6 +45,10 @@ def main() -> int:
     windows = load_coverage_windows(coverage)
     rows_per_full_market_year, bytes_per_row, staging_multiplier, stress_multiplier = load_capacity_basis(capacity)
     validate_existing_2025(existing)
+    existing_scope = existing.get("scope") or {}
+    existing_parquet_bytes = int(existing_scope.get("total_parquet_bytes") or 0)
+    if existing_parquet_bytes <= 0:
+        raise RuntimeError("existing 2025 authority has no positive Parquet byte count")
 
     materialized_years = tuple(int(year) for year in config.get("already_materialized_years", []))
     waves = build_waves(
@@ -61,7 +65,7 @@ def main() -> int:
     if any(wave.year in materialized_years for wave in waves):
         raise RuntimeError("planner attempted to rewrite an already-materialized year")
 
-    running_bytes = int(existing.get("total_parquet_bytes") or 0)
+    running_bytes = existing_parquet_bytes
     wave_rows: list[dict[str, object]] = []
     for wave in waves:
         running_bytes += wave.estimated_parquet_bytes
@@ -110,7 +114,7 @@ def main() -> int:
     deferred_bytes = math.ceil(deferred_rows * bytes_per_row)
 
     incremental_bytes = sum(wave.estimated_parquet_bytes for wave in waves)
-    total_canonical_bytes = int(existing.get("total_parquet_bytes") or 0) + incremental_bytes
+    total_canonical_bytes = existing_parquet_bytes + incremental_bytes
     observed_projection_gb = float(
         (capacity.get("storage_projection") or {}).get("canonical_only_gb_month") or 0.0
     )
@@ -140,7 +144,7 @@ def main() -> int:
             "historical_increment_r2_objects": sum(wave.object_count for wave in waves),
             "historical_increment_estimated_rows": sum(wave.estimated_rows for wave in waves),
             "historical_increment_estimated_parquet_bytes": incremental_bytes,
-            "existing_2025_parquet_bytes": int(existing.get("total_parquet_bytes") or 0),
+            "existing_2025_parquet_bytes": existing_parquet_bytes,
             "projected_canonical_through_historical_waves_bytes": total_canonical_bytes,
             "projected_canonical_through_historical_waves_gb": total_canonical_bytes / 1_000_000_000,
             "projected_with_retained_staging_gb": total_canonical_bytes * staging_multiplier / 1_000_000_000,
