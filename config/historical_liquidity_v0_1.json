@@ -1,0 +1,19 @@
+{
+  "version": "0.1.0",
+  "authority_status": "FRAMEWORK_ONLY",
+  "provider": "pionex",
+  "market_type": "perp",
+  "target_size": 15,
+  "max_spread_bps": 30.0,
+  "max_snapshot_age_ms": 86400000,
+  "required_intervals": ["15M", "60M", "4H"],
+  "native_only": true,
+  "require_complete_universe": true,
+  "ranking": [
+    "quote_amount_24h_desc",
+    "spread_bps_asc",
+    "symbol_asc"
+  ],
+  "historical_liquidity_evidence_frozen": false,
+  "trade_plan_authorized": false
+}
