@@ -1,0 +1,70 @@
+name: Pionex Binance Equivalence Proof
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+  pull_request:
+    paths:
+      - ".github/workflows/pionex-binance-equivalence-proof.yml"
+      - "scripts/prove_pionex_binance_equivalence.py"
+      - "src/crypto_autopilot/provider_equivalence.py"
+      - "config/provider_equivalence_v0_1.json"
+      - "research/receipts/2026-08-17-m1a-pionex.json"
+      - "research/receipts/2026-08-18-m1b-r2.json"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/pionex-binance-equivalence-proof.yml"
+      - "scripts/prove_pionex_binance_equivalence.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pionex-binance-equivalence-v0-1
+  cancel-in-progress: false
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Verify R2 secret names are present
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_ACCOUNT_ID}"
+          test -n "${R2_BUCKET_NAME}"
+          test -n "${R2_ACCESS_KEY_ID}"
+          test -n "${R2_SECRET_ACCESS_KEY}"
+
+      - name: Run frozen Pionex Binance overlap protocol
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/prove_pionex_binance_equivalence.py \
+            --output artifacts/pionex-binance-equivalence.json
+
+      - name: Upload equivalence evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pionex-binance-equivalence-${{ github.run_id }}
+          path: artifacts/pionex-binance-equivalence.json
+          if-no-files-found: warn
+          retention-days: 90
