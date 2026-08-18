@@ -29,6 +29,10 @@ POLICY_PATH = Path("config/provider_equivalence_v0_1.json")
 BINANCE_INTERVAL = {"15M": "15m", "60M": "1h", "4H": "4h"}
 
 
+class SourcePublicationPending(RuntimeError):
+    """Required provider archive is not published yet; no gate result exists."""
+
+
 def load_json(path: Path) -> dict:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
@@ -108,7 +112,9 @@ def download(url: str, *, retries: int = 3, timeout_seconds: float = 30.0) -> by
         except HTTPError as exc:
             last_error = exc
             if exc.code == 404:
-                raise RuntimeError(f"required Binance Vision daily archive is missing: {url}") from exc
+                raise SourcePublicationPending(
+                    f"required Binance Vision daily archive is not published yet: {url}"
+                ) from exc
             if exc.code not in {408, 425, 429, 500, 502, 503, 504}:
                 break
         except (URLError, TimeoutError) as exc:
@@ -158,6 +164,72 @@ def fetch_binance_daily_evidence(
     return results
 
 
+def prior_attempts() -> list[dict[str, object]]:
+    return [
+        {
+            "run_id": 32112849706,
+            "result": "EXECUTION_FAILED_BEFORE_GATE_RESULT",
+            "cause": "Binance REST /fapi/v1/klines returned HTTP 451 from the GitHub hosted Azure runner region.",
+            "thresholds_changed_after_failure": False,
+        },
+        {
+            "run_id": 32113043035,
+            "result": "EXECUTION_PENDING_SOURCE_PUBLICATION_BEFORE_GATE_RESULT",
+            "cause": "A required 2026-08-17 Binance Vision daily archive returned HTTP 404 before publication.",
+            "thresholds_changed_after_failure": False,
+        },
+    ]
+
+
+def write_pending_output(
+    *,
+    output: Path,
+    policy_json: dict,
+    start_ms: int,
+    end_ms: int,
+    periods: tuple[str, ...],
+    cause: str,
+) -> None:
+    payload = {
+        "schema": "pionex-binance-equivalence-evidence-v0.1",
+        "execution_status": "PENDING_SOURCE_PUBLICATION",
+        "gate_status": "PENDING",
+        "source_switch_authorized": False,
+        "full_strategy_signal_equivalence_status": "DEFERRED_UNDEFINED_STRATEGY_RULES",
+        "left_provider": "pionex",
+        "right_provider": "binance_usdm",
+        "right_delivery": "binance_vision_daily",
+        "execution_target": "pionex",
+        "policy": str(POLICY_PATH),
+        "policy_status": policy_json["status"],
+        "pionex_authority": str(M1A_AUTHORITY),
+        "pionex_r2_authority": str(M1B_AUTHORITY),
+        "overlap_start_ms": start_ms,
+        "overlap_end_ms": end_ms,
+        "binance_daily_periods": list(periods),
+        "pending_cause": cause,
+        "pair_count": 0,
+        "pairs": [],
+        "prior_execution_attempts": prior_attempts(),
+        "thresholds_changed_after_evidence": False,
+        "private_api_used": False,
+        "live_trading_authorized": False,
+        "github_run_id": os.getenv("GITHUB_RUN_ID"),
+        "github_sha": os.getenv("GITHUB_SHA"),
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "authority_boundary": {
+            "gate_result_exists": False,
+            "binance_relabelled_as_pionex_native": False,
+            "provider_splicing_used": False,
+            "source_switch_authorized": False,
+            "automatic_trade_plans_authorized": False,
+            "live_trading_authorized": False,
+        },
+    }
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(payload, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default="artifacts/pionex-binance-equivalence.json")
@@ -197,11 +269,35 @@ def main() -> int:
     if len(selected_pairs) != 15 or len({pair[1] for pair in selected_pairs}) != 15:
         raise RuntimeError("M1A overlap must map to 15 unique Binance symbols")
     periods = date_periods(start_ms, end_ms)
-    binance_archives = fetch_binance_daily_evidence(
-        symbols=tuple(pair[1] for pair in selected_pairs),
-        periods=periods,
-        workers=args.workers,
-    )
+    output = Path(args.output)
+    try:
+        binance_archives = fetch_binance_daily_evidence(
+            symbols=tuple(pair[1] for pair in selected_pairs),
+            periods=periods,
+            workers=args.workers,
+        )
+    except SourcePublicationPending as exc:
+        write_pending_output(
+            output=output,
+            policy_json=policy_json,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            periods=periods,
+            cause=str(exc),
+        )
+        print(
+            json.dumps(
+                {
+                    "execution_status": "PENDING_SOURCE_PUBLICATION",
+                    "gate_status": "PENDING",
+                    "source_switch_authorized": False,
+                    "pending_cause": str(exc),
+                    "output": str(output),
+                },
+                sort_keys=True,
+            )
+        )
+        return 0
 
     store = R2Store(
         account_id=os.environ["CLOUDFLARE_ACCOUNT_ID"],
@@ -328,12 +424,7 @@ def main() -> int:
         "volume_equivalence_evaluated": False,
         "private_api_used": False,
         "live_trading_authorized": False,
-        "prior_execution_attempt": {
-            "run_id": 32112849706,
-            "result": "EXECUTION_FAILED_BEFORE_GATE_RESULT",
-            "cause": "Binance REST /fapi/v1/klines returned HTTP 451 from the GitHub hosted Azure runner region.",
-            "thresholds_changed_after_failure": False,
-        },
+        "prior_execution_attempts": prior_attempts(),
         "github_run_id": os.getenv("GITHUB_RUN_ID"),
         "github_sha": os.getenv("GITHUB_SHA"),
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -348,7 +439,6 @@ def main() -> int:
         },
     }
 
-    output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     print(
@@ -366,8 +456,8 @@ def main() -> int:
             sort_keys=True,
         )
     )
-    # REVIEW or FAIL are valid evidence outcomes. Only evidence-production errors
-    # raise and fail the workflow.
+    # REVIEW or FAIL are valid evidence outcomes. Only integrity/production errors
+    # raise and fail the workflow. Unpublished daily archives are PENDING above.
     return 0
 
 
