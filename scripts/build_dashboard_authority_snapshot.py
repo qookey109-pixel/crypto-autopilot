@@ -13,6 +13,9 @@ FUNDING_CONTINUITY_REVIEW = Path("research/receipts/2026-08-19-binance-funding-i
 FUNDING_AUTHORITY_V0_2 = Path(
     "research/receipts/2026-08-19-binance-funding-materialization-authority-v0-2.json"
 )
+FUNDING_PREFLIGHT_V0_2 = Path(
+    "research/receipts/2026-08-19-binance-funding-r2-v0-2-full-preflight.json"
+)
 HISTORICAL_UNIVERSE = Path("research/receipts/2026-08-18-historical-universe-long-horizon-review.json")
 PROJECT_STATUS = Path("PROJECT_STATUS.md")
 
@@ -60,6 +63,7 @@ def build_snapshot() -> dict[str, object]:
     funding_coverage = load_json(FUNDING_COVERAGE)
     continuity_review = load_json(FUNDING_CONTINUITY_REVIEW)
     funding_v0_2 = load_json(FUNDING_AUTHORITY_V0_2)
+    funding_preflight = load_json(FUNDING_PREFLIGHT_V0_2)
     universe_review = load_json(HISTORICAL_UNIVERSE)
     status_text = PROJECT_STATUS.read_text(encoding="utf-8")
 
@@ -69,6 +73,7 @@ def build_snapshot() -> dict[str, object]:
         (funding_coverage, FUNDING_COVERAGE),
         (continuity_review, FUNDING_CONTINUITY_REVIEW),
         (funding_v0_2, FUNDING_AUTHORITY_V0_2),
+        (funding_preflight, FUNDING_PREFLIGHT_V0_2),
         (universe_review, HISTORICAL_UNIVERSE),
     ):
         require_pass(payload, path)
@@ -128,6 +133,31 @@ def build_snapshot() -> dict[str, object]:
     if deferred_scope.get("symbol") != "HYPEUSDT" or deferred_scope.get("year") != 2026:
         raise RuntimeError("Funding deferred scope changed")
 
+    if funding_preflight.get("stage") != "BINANCE_FUNDING_R2_V0_2_FULL_PREFLIGHT_PASS":
+        raise RuntimeError("Funding V0.2 preflight stage changed")
+    if funding_preflight.get("authority_type") != "PREWRITE_SOURCE_AND_SERIALIZATION_EVIDENCE_ONLY":
+        raise RuntimeError("Funding V0.2 preflight authority type changed")
+    preflight_scope = funding_preflight.get("exact_scope") or {}
+    execution_boundary = funding_preflight.get("execution_boundary") or {}
+    if not isinstance(preflight_scope, dict) or not isinstance(execution_boundary, dict):
+        raise RuntimeError("Funding V0.2 preflight shape changed")
+    if preflight_scope.get("canonical_scope_sha256") != EXPECTED_V0_2_SCOPE_SHA:
+        raise RuntimeError("Funding V0.2 preflight scope SHA changed")
+    if preflight_scope.get("source_checksum_set_sha256") != EXPECTED_V0_2_CHECKSUM_SHA:
+        raise RuntimeError("Funding V0.2 preflight checksum SHA changed")
+    if preflight_scope.get("source_archive_count") != 1003:
+        raise RuntimeError("Funding V0.2 preflight source count changed")
+    if preflight_scope.get("annual_canonical_object_count") != 94:
+        raise RuntimeError("Funding V0.2 preflight annual count changed")
+    if preflight_scope.get("total_funding_observations") != 91747:
+        raise RuntimeError("Funding V0.2 preflight observation count changed")
+    if preflight_scope.get("total_local_parquet_bytes") != 1138749:
+        raise RuntimeError("Funding V0.2 preflight Parquet byte count changed")
+    if execution_boundary.get("r2_writes_performed") is not False:
+        raise RuntimeError("Dashboard cannot claim preflight-only authority after R2 writes")
+    if execution_boundary.get("actual_r2_materialization_completed") is not False:
+        raise RuntimeError("Dashboard preflight authority unexpectedly claims materialization complete")
+
     equivalence_pending = "PIONEX-BINANCE EQUIVALENCE GATE PENDING SOURCE PUBLICATION" in status_text
     equivalence_status = "PENDING" if equivalence_pending else "NOT_READY"
 
@@ -180,7 +210,7 @@ def build_snapshot() -> dict[str, object]:
         )
 
     return {
-        "schema": "qookey-dashboard-authority-snapshot-v0.2",
+        "schema": "qookey-dashboard-authority-snapshot-v0.3",
         "authority": False,
         "locale": "zh-Hant-TW",
         "snapshotType": "NORMALIZED_VIEW_OF_FROZEN_REPOSITORY_AUTHORITIES",
@@ -193,11 +223,16 @@ def build_snapshot() -> dict[str, object]:
             "tradePlanAuthorized": False,
             "liveTradingAuthorized": False,
             "fundingV0_2StorageAuthorized": True,
-            "fundingWriterReady": False,
-            "fundingWriterState": "NOT_READY",
+            "fundingWriterReady": True,
+            "fundingWriterState": "READY",
+            "fundingFullPreflightPass": True,
+            "fundingMaterializationComplete": False,
+            "fundingMaterializationState": "NOT_READY",
             "fundingV0_2SourceMonths": int(authorized_scope["source_archive_count"]),
             "fundingV0_2AnnualObjects": int(authorized_scope["annual_canonical_objects"]),
             "fundingV0_2R2Identities": int(authorized_scope["planned_total_r2_object_identities"]),
+            "fundingV0_2Observations": int(preflight_scope["total_funding_observations"]),
+            "fundingV0_2LocalParquetBytes": int(preflight_scope["total_local_parquet_bytes"]),
             "fundingV0_2CanonicalScopeSha256": EXPECTED_V0_2_SCOPE_SHA,
             "fundingV0_2ChecksumSetSha256": EXPECTED_V0_2_CHECKSUM_SHA,
         },
@@ -228,8 +263,13 @@ def build_snapshot() -> dict[str, object]:
                 "AUTHORIZED",
             ),
             pipeline_item(
-                "Funding V0.2 Writer / Full Preflight",
-                "Writer 尚未以新 V0.2 scope 完成 1,003 archive + 94 annual partition 全量 preflight",
+                "Funding V0.2 Full Preflight",
+                "1,003 個官方 archive、94 個年度 partition、91,747 筆 Funding observation 與 Parquet round-trip 全部通過",
+                "PASS",
+            ),
+            pipeline_item(
+                "Funding V0.2 實際 R2 Materialization",
+                "Full Preflight 已 PASS，但尚未執行 192 個 identities 的正式 R2 寫入與 post-write verification",
                 "NOT_READY",
             ),
             pipeline_item(
@@ -266,8 +306,15 @@ def build_snapshot() -> dict[str, object]:
                 True,
             ),
             gate(
-                "Funding Materialization",
-                "V0.2 儲存 scope 已授權，但 Writer / Full Preflight 尚未完成，因此尚未宣稱 R2 materialization PASS。",
+                "Funding Full Preflight",
+                "V0.2 的 1,003 個來源 archive 與 94 個年度 Parquet 已完成全量 prewrite 驗證。",
+                "PASS",
+                "pass",
+                False,
+            ),
+            gate(
+                "Funding R2 Materialization",
+                "Full Preflight 已 PASS，但正式 R2 寫入與 post-write verification 尚未執行，因此 materialization 仍為 NOT_READY。",
                 "NOT_READY",
                 "pending",
                 True,
@@ -302,6 +349,7 @@ def build_snapshot() -> dict[str, object]:
             str(FUNDING_COVERAGE),
             str(FUNDING_CONTINUITY_REVIEW),
             str(FUNDING_AUTHORITY_V0_2),
+            str(FUNDING_PREFLIGHT_V0_2),
             str(HISTORICAL_UNIVERSE),
             str(PROJECT_STATUS),
         ],
@@ -335,6 +383,8 @@ def main() -> int:
                     "fundingV0_2StorageAuthorized"
                 ],
                 "funding_writer_state": snapshot["project"]["fundingWriterState"],
+                "funding_full_preflight_pass": snapshot["project"]["fundingFullPreflightPass"],
+                "funding_materialization_state": snapshot["project"]["fundingMaterializationState"],
                 "output": str(output),
             },
             sort_keys=True,
