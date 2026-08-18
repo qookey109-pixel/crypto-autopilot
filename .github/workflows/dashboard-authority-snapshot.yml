@@ -1,0 +1,104 @@
+name: Dashboard D2 Authority Snapshot
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/build_dashboard_authority_snapshot.py"
+      - ".github/workflows/dashboard-authority-snapshot.yml"
+      - "web/**"
+      - "PROJECT_STATUS.md"
+      - "research/receipts/2026-08-17-m1a-pionex.json"
+      - "research/receipts/2026-08-18-binance-2025-r2-pilot.json"
+      - "research/receipts/2026-08-18-binance-funding-source-proof.json"
+      - "research/receipts/2026-08-18-binance-funding-coverage.json"
+      - "research/receipts/2026-08-18-binance-funding-materialization-authority.json"
+      - "research/receipts/2026-08-18-binance-funding-materialization-authority-amendment.json"
+      - "research/receipts/2026-08-18-historical-universe-long-horizon-review.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-d2-authority-snapshot-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate static dashboard source
+        run: python scripts/validate_dashboard_static.py
+
+      - name: Build deployable dashboard from frozen Repository authorities
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/dashboard-site
+          cp -R web/. artifacts/dashboard-site/
+          python scripts/build_dashboard_authority_snapshot.py \
+            --output artifacts/dashboard-site/data/dashboard.json
+
+      - name: Assert normalized snapshot stays paper-only and secret-free
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('artifacts/dashboard-site/data/dashboard.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          assert data['authority'] is False
+          assert data['snapshotType'] == 'NORMALIZED_VIEW_OF_FROZEN_REPOSITORY_AUTHORITIES'
+          assert data['project']['mode'] == 'PAPER-ONLY'
+          assert data['project']['marketCount'] == 15
+          assert data['project']['fundingMonths'] == 1010
+          assert data['project']['tradePlanAuthorized'] is False
+          assert data['project']['liveTradingAuthorized'] is False
+          assert data['securityBoundary']['containsSecrets'] is False
+          assert data['securityBoundary']['authorizesSourceSwitch'] is False
+          assert data['securityBoundary']['authorizesPionexNativeRelabeling'] is False
+          assert data['securityBoundary']['authorizesTradePlans'] is False
+          assert data['securityBoundary']['authorizesLiveTrading'] is False
+          assert len(data['markets']) == 15
+          text = path.read_text(encoding='utf-8')
+          for token in ('R2_SECRET_ACCESS_KEY', 'R2_ACCESS_KEY_ID', 'PIONEX_API_SECRET', 'BEGIN PRIVATE KEY'):
+              assert token not in text
+          PY
+
+      - name: HTTP smoke with real normalized authority snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 4173 -d artifacts/dashboard-site > /tmp/dashboard-d2-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill ${SERVER_PID} || true' EXIT
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then
+              break
+            fi
+            sleep 0.25
+          done
+          curl --fail --silent --show-error http://127.0.0.1:4173/data/dashboard.json > /tmp/dashboard.json
+          python - <<'PY'
+          import json
+          data = json.load(open('/tmp/dashboard.json', encoding='utf-8'))
+          assert data['snapshotLabel'] == 'Repository authority snapshot'
+          assert data['project']['mode'] == 'PAPER-ONLY'
+          PY
+
+      - name: Upload deployable dashboard evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-d2-authority-snapshot-${{ github.run_id }}
+          path: artifacts/dashboard-site
+          if-no-files-found: error
+          retention-days: 90
