@@ -6,414 +6,246 @@ Updated: 2026-08-18
 
 Qookey Crypto Autopilot
 
-## Repository
-
-`qookey109-pixel/crypto-autopilot`
+Repository: `qookey109-pixel/crypto-autopilot`
 
 ## Current formal stage
 
-**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BINANCE HISTORICAL SOURCE V0.1 READY / BINANCE VISION BULK SOURCE V0.1 READY / BINANCE VISION LIVE PROOF PASS / BINANCE VISION R2 BOUNDED PROOF PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / HISTORICAL UNIVERSE BACKTEST ADMISSION V0.1 READY / HISTORICAL LIQUIDITY RANKING V0.1 READY / HISTORICAL LIQUIDITY BACKTEST ADMISSION V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / HISTORICAL SSTATE EVIDENCE INGESTION V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / PARAMETER SWEEP FRAMEWORK V0.1 READY / PIONEX HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
+**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BINANCE HISTORICAL SOURCE V0.1 READY / BINANCE VISION BULK SOURCE V0.1 READY / BINANCE VISION LIVE PROOF PASS / BINANCE VISION R2 BOUNDED PROOF PASS / BINANCE 2025 COVERAGE SCAN PASS / BINANCE 2025 R2 PILOT PASS / BINANCE OBSERVED R2 BUDGET GATE PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / HISTORICAL UNIVERSE BACKTEST ADMISSION V0.1 READY / HISTORICAL LIQUIDITY RANKING V0.1 READY / HISTORICAL LIQUIDITY BACKTEST ADMISSION V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / HISTORICAL SSTATE EVIDENCE INGESTION V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / PARAMETER SWEEP FRAMEWORK V0.1 READY / PIONEX HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
 
-No live-money authorization exists.
+No live-money authorization exists. `trade_plan_authorized` remains `false`.
 
 ## Provider roles and provenance boundary
 
-- **Pionex** remains the execution-target exchange and the authority for the already-frozen Pionex-native M1/M1A/M1B evidence.
-- **Binance USD-M / Binance Vision** is the preferred candidate source for long-horizon research history after its own provider-separated proofs.
-- Binance data is always `provider=binance_usdm`; syntactic symbol mapping such as `BTC_USDT_PERP <-> BTCUSDT` never converts provenance.
-- Binance data must never be written under Pionex-native R2 keys or used to authorize Pionex-native Historical Universe records.
-- A separate Pionex/Binance overlap and strategy-signal equivalence gate is mandatory before a strategy-source switch can become authoritative.
-- The project target is maximum provider-available history capped at eight years, not a promise that every perpetual market has eight years of history.
+- **Pionex** is the execution-target exchange and remains authority for the frozen Pionex-native M1/M1A/M1B evidence.
+- **Binance USD-M / Binance Vision** is the preferred candidate source for long-horizon research history.
+- Binance data always remains `provider=binance_usdm`; symbol mapping such as `BTC_USDT_PERP <-> BTCUSDT` never converts provenance.
+- Binance data must never be stored under Pionex-native R2 keys or silently authorize Pionex-native Historical Universe records.
+- A Pionex/Binance overlap + strategy-signal equivalence gate is mandatory before Binance history can substitute for Pionex-native strategy authority.
+- Historical target is **maximum provider-available history capped at eight years**, not an assumption that every perpetual market has eight years of data.
 
-## Completed
+## Frozen data/storage authority
 
-### V0.1 foundation
+### M1 / M1A — Pionex public historical foundation
 
-- Exchange-agnostic adapter boundary established.
-- Pionex public futures market-data client established.
-- Paper broker scaffolded.
-- SState adapter contract established without modifying SState core.
-- SState Intraday Wave V0.1 deterministic strategy/risk baseline added.
-- CI and secrets hygiene baseline added.
+Authority: `research/receipts/2026-08-17-m1a-pionex.json`
 
-### M1 — Historical Data Foundation
+- Public Pionex acquisition proof run `32010845699` at `6f6f97ada779e2d2faaf1c4a6c3f82df1354ee9c`.
+- Frozen 15-symbol candidate universe: BTC, ETH, SOL, HYPE, ADA, BNB, UNI, XRP, LTC, LINK, DOGE, AAVE, AVAX, INJ, SUI.
+- `15M` / `60M` / `4H`, 13,230 candles, 0 gaps, 0 duplicate timestamps, 0 invalid candles.
+- Pionex plural `/api/v1/market/bookTickers` runtime behavior is frozen; singular route is not used.
 
-- Active PERP discovery, 24h ticker and best-bid/ask parsing implemented.
-- Historical `15M` / `60M` / `4H` backward pagination implemented.
-- Inclusive `endTime` handled with `earliest_time - 1 ms` pagination.
-- Audits cover duplicates, ordering, gaps, alignment and OHLCV validity.
-- Deterministic fixture writer and acquisition CLI tools added.
+### M1B — Cloudflare R2 historical store
 
-### M1A — Live Pionex Acquisition Proof
+Authority: `research/receipts/2026-08-18-m1b-r2.json`
 
-Authoritative receipt: `research/receipts/2026-08-17-m1a-pionex.json`
-
-- Live public acquisition executed from GitHub Actions run `32010845699` at commit `6f6f97ada779e2d2faaf1c4a6c3f82df1354ee9c`.
-- Universe is restricted to a versioned crypto-only candidate pool before liquidity ranking.
-- Selected 15: BTC, ETH, SOL, HYPE, ADA, BNB, UNI, XRP, LTC, LINK, DOGE, AAVE, AVAX, INJ, SUI.
-- Bounded sample: 2026-08-10 08:00 UTC through 2026-08-17 07:59:59.999 UTC.
-- 15 symbols x 3 intervals; 13,230 candles total.
-- 60 Kline pages plus 3 universe discovery requests.
-- Audit PASS: 0 gaps, 0 duplicate timestamps, 0 invalid candles; no silent interpolation.
-- Evidence artifact SHA-256: `2cc359fe5248329716e614ae1df4161347c1987a5b34a5b2087a3c97dadab3a4`.
-- Bulk extracted JSON was about 2.2 MB for the seven-day proof and was not committed to Git.
-- Pionex runtime discrepancy found and frozen: singular `/bookTicker` returned 404; implementation uses plural `/bookTickers` with regression coverage.
-- An earlier exploratory run that admitted non-crypto instruments is explicitly non-authoritative.
-
-### M1B — Cloudflare R2 Historical Store
-
-Authoritative completion receipt: `research/receipts/2026-08-18-m1b-r2.json`
-
-- Cloudflare R2 S3-compatible storage adapter is implemented; credentials remain secret-manager only.
-- Deterministic R2 object-key contract is implemented.
-- Parquet candle encoding/decoding uses Zstandard compression.
-- Partition policy remains monthly `15M` and annual `60M` / `4H` by default.
-- SHA-256 verified upload/download path is implemented.
-- Real Cloudflare R2 round-trip proof passed.
-- Frozen M1A bounded dataset materialization passed in GitHub Actions run `32093154424` at head `94145b90c8067e062472be9080635afa879d24ea`.
-- Dataset gate: 45 objects, 13,230 rows, 15 symbols, intervals `15M` / `60M` / `4H`.
-- Every uploaded Parquet object was downloaded with SHA-256 verification, decoded, and compared for exact candle equality with the frozen source.
-- Dataset audit passed with strict timestamp ordering/uniqueness and no silent repair/interpolation.
-- Total observed Parquet payload for the seven-day bounded dataset: 425,161 bytes.
-- R2 manifest: `manifests/historical/year=2026/month=08/manifest-20260818T024828Z.json`.
-- Manifest SHA-256: `e0a8252d0853aeaf2f3fbe87e7c1c48d1450eef40140ee399d2c15bcf7ce8d16`.
-- R2 receipt: `receipts/historical/m1b-m1a-upload-32093154424.json`.
-- R2 receipt SHA-256: `846ca4d4f668336b277efe7799a5d46077ee080ec7d0c7dbe81b05fc8cc44cd2`.
-- Pionex-native histories and external/provider-proxy histories must remain provenance-separated.
-
-### Historical capacity sizing and backfill design
-
-Primary design document: `docs/HISTORICAL_CAPACITY_AND_BACKFILL_V0_1.md`
-Machine-readable estimate: `research/estimates/2026-08-18-historical-capacity.json`
-
-- Capacity sizing is derived from the observed M1B payload, not a guessed compression ratio.
-- Conservative linear estimate for 250 markets x 8 years x native `15M` / `60M` / `4H`: approximately 2.956 GB.
-- Two-times capacity factor: approximately 5.912 GB; three-times factor: approximately 8.868 GB.
-- A `15M`-only comparison is approximately 1.808 GB for 250 markets x 8 years.
-- Full-target partition count upper bound: approximately 28,000 market-data objects under the current monthly `15M` / annual `60M` / annual `4H` policy.
-- The earlier strict API-page upper design bound was approximately 184,750 Kline requests; Binance Vision bulk archives now provide a lower-request long-horizon candidate path, but actual provider/symbol coverage must be discovered first.
-- Resumable design freezes deterministic work-item identity, staging before canonical finalize, checkpointed acquisition, idempotent resume, quarantine-on-mismatch, and historical-universe provenance requirements.
+- Real Pionex M1A materialization run `32093154424` PASS.
+- 45 objects / 13,230 rows / 425,161 Parquet bytes.
+- Zstd Parquet, deterministic keys, SHA-256 upload/download verification and exact candle round-trip equality are frozen.
+- Binance and any external provider must remain in separate R2 namespaces.
 
 ### R2 Cost & Budget Gate V0.1
 
-Authoritative receipt: `research/receipts/2026-08-18-r2-cost-budget.json`
-Primary document: `docs/R2_COST_BUDGET_V0_1.md`
-Machine-readable estimate: `research/estimates/2026-08-18-r2-cost-budget.json`
+Authority: `research/receipts/2026-08-18-r2-cost-budget.json`
 Policy: `config/r2_budget_v0_1.json`
+Estimate: `research/estimates/2026-08-18-r2-cost-budget.json`
 
-- Cloudflare R2 Standard pricing was rechecked against the official pricing documentation on 2026-08-18.
-- Current included monthly R2 Standard envelope: 10 GB-month, 1M Class A operations, 10M Class B operations; internet egress is free.
-- Planned 250-market x 8-year canonical + retained-staging storage estimate: approximately 5.912 GB-month.
-- Planned full-target operation model: approximately 224,000 Class A and 140,000 Class B operations for a fresh successful materialization.
-- Planned usage evaluates `PASS` with estimated R2 cost USD 0/month under the frozen pricing snapshot.
-- 3x stress: approximately 8.868 GB-month, 672,000 Class A and 420,000 Class B operations; estimated USD 0/month but storage enters `WARN` headroom.
-- Project guardrails: storage WARN > 8 GB / BLOCK > 10 GB; Class A WARN > 750k / BLOCK > 1M; Class B WARN > 7.5M / BLOCK > 10M.
-- CI executes `python scripts/check_r2_budget.py` and blocks a `BLOCK` result or frozen expectation mismatch.
-- PR #13 implementation proof CI run `32098212233` passed unit tests and the R2 cost/budget gate at tested commit `6332f35bfbc32f0cc64488b2f3492f1a5c5a28d6`.
-- R2 included usage is account-level; actual account usage must be reviewed before large expansion because unrelated buckets/projects can consume the same allowance.
-- This cost gate covers R2 Standard only. Workers, Workflows, Queues, D1 and other Cloudflare services require separate cost gates.
+- Original conservative M1B-derived envelope remains frozen as a reference.
+- 250 markets x 8 years canonical estimate: about 2.956 GB.
+- Canonical + retained staging: about 5.912 GB.
+- 3x storage stress: about 8.868 GB.
+- Frozen project guardrails: storage WARN > 8 GB / BLOCK > 10 GB; Class A WARN > 750k / BLOCK > 1M; Class B WARN > 7.5M / BLOCK > 10M.
+- CI continues to run `python scripts/check_r2_budget.py`.
 
-### Pionex Historical Backfill Pilot implementation and automation
+## Binance long-history foundation
 
-Initial implementation merge: PR #10 / commit `12baaccd1d29254e15cd87dcbed35ec3c7afc7d5`.
-Automation hardening merge: PR #12 / commit `7e8abfa402122bf0424bd47558bad0d3197495e5`.
+### Binance Historical Data Source V0.1 — READY
 
-- R2-backed deterministic checkpoint, staging and per-partition receipt namespaces are implemented.
-- Work-item states are `PENDING -> ACQUIRING -> STAGED -> VERIFIED -> FINALIZED`.
-- Work identity is provider + market type + symbol + interval + partition.
-- Existing finalized work is verified and skipped on rerun.
-- A `STAGED` partition can be resumed in a later Python process without refetching its source candles.
-- Existing canonical data without matching authority is protected: the pilot refuses to overwrite it.
-- Pionex public Kline acquisition is wrapped with a 3 requests/second soft project pace and conservative HTTP 429 backoff.
-- The pilot uses the frozen 15-symbol M1A universe, native `15M` / `60M` / `4H`, and a bounded UTC calendar year (default 2025).
-- The workflow uses three 5-symbol shards with `max-parallel: 1`.
-- Shard 0 includes a planned interruption after a staged partition, followed by a later process that exercises R2-backed resume.
-- Each shard has bounded automatic retries while preserving checkpoint state; canonical conflicts and audit failures remain non-retryable safety stops.
-- Structured JSON failure diagnostics and run-level aggregate evidence are emitted as GitHub artifacts.
-- The workflow supports automatic `main` push triggering, a daily scheduled continuation, and manual dispatch as an override.
-- Concurrency prevents overlapping historical pilot runs for the same pilot year.
-- PR #10 CI run `32094937866` passed; PR #12 CI run `32097382736` passed.
-- This pilot remains useful as a Pionex-native execution-target benchmark/equivalence anchor even though Binance Vision is now the preferred long-horizon history candidate.
-- No private API, account, position, order or live-trading path was introduced.
-
-### Binance Historical Data Source V0.1
-
-Primary document: `docs/BINANCE_HISTORICAL_SOURCE_V0_1.md`
+Document: `docs/BINANCE_HISTORICAL_SOURCE_V0_1.md`
 Policy: `config/binance_historical_source_v0_1.json`
-Implementation merge: PR #30 / commit `3cdf7bf36fad17759b423b8a0572c46af738330f`.
+Merge: PR #30 / `3cdf7bf36fad17759b423b8a0572c46af738330f`
 
-- A public-only Binance USD-M adapter is implemented for trade Klines, Mark Price Klines, Funding Rate history and Open Interest history.
-- Trade Klines and Mark Price Klines support deterministic `startTime` / `endTime` pagination for the V0.1 `15m` / `1h` / `4h` layers.
-- Funding Rate history supports deterministic pagination and can be converted to the Backtest Engine `FundingPoint` shape without changing Binance provenance.
-- Binance documents Open Interest history as the latest one month only; V0.1 uses a conservative 30-day window and treats OI as recent-history/forward-accumulation evidence rather than an eight-year source.
-- Pionex/Binance symbol mapping is syntactic only and never converts provider authority.
-- CI run `32107773210` passed all unit/regression tests plus the R2 cost/budget gate.
+- Public-only USD-M Kline, Mark Price Kline, Funding Rate history and Open Interest history adapters are implemented.
+- Trade/Mark historical pagination supports the strategy `15m` / `1h` / `4h` layers.
+- Funding can map into Backtest `FundingPoint` while retaining Binance provenance.
+- Binance documents OI history as latest one month only; V0.1 conservatively limits OI queries to 30 days and treats longer history as forward-accumulation/separate-source work.
 
-### Binance Vision Bulk Source V0.1
+### Binance Vision Bulk Source V0.1 — READY
 
-Primary document: `docs/BINANCE_VISION_BULK_SOURCE_V0_1.md`
+Document: `docs/BINANCE_VISION_BULK_SOURCE_V0_1.md`
 Policy: `config/binance_vision_v0_1.json`
-Implementation merge: PR #31 / commit `f8e3023337ff27f263297467653c63b129114d2f`.
+Merge: PR #31 / `f8e3023337ff27f263297467653c63b129114d2f`
 
-- Official Binance Vision daily/monthly archives are supported for USD-M trade Klines and Mark Price Klines.
-- Every admitted ZIP requires its official `.CHECKSUM`, exact SHA-256 match, the exact expected CSV member, strict timestamp order/uniqueness and no gaps or silent interpolation.
-- Trade Klines reuse the existing project candle audit; Mark Price bars require exact closed-bar boundaries.
-- The official Binance public-data helper baseline for Futures begins at 2020-01-01, but individual market onset is never assumed; actual first/last observations must be discovered per symbol.
-- Completed history prefers monthly archives; daily archives are reserved for current/incomplete months unless a deterministic reconciliation rule is added.
-- Upstream archive SHA changes fail closed as revision conflicts and require explicit review rather than silently changing a backtest dataset.
-- Binance Vision `metrics` is not promoted to canonical long-term OI authority in V0.1.
-- CI run `32108190061` passed all unit/regression tests plus the R2 cost/budget gate.
+- Official daily/monthly USD-M archives are supported for trade Klines and Mark Price Klines.
+- Every archive requires official `.CHECKSUM`, exact ZIP SHA-256, expected CSV member, strict timestamp uniqueness/order and no gaps/interpolation.
+- Upstream archive SHA changes fail closed for explicit revision review.
+- Official helper baseline starts 2020-01-01; individual symbol onset is never assumed.
 
 ### Binance Vision Live Proof — PASS
 
-Authoritative receipt: `research/receipts/2026-08-18-binance-vision-live-proof.json`
-Workflow: `Binance Vision Live Proof`
-Authority merge: PR #34 / commit `03fbe1ee30c573dbd5d19b78208086c01ebc0636`.
+Authority: `research/receipts/2026-08-18-binance-vision-live-proof.json`
+Authority merge: PR #34 / `03fbe1ee30c573dbd5d19b78208086c01ebc0636`
 
-- Credential-free live proof run `32108454930` / job `95622625128` completed successfully; CI run `32108454911` also passed.
-- Fixed scope: January 2025; BTCUSDT, ETHUSDT, SOLUSDT.
-- Six official archives were verified: three monthly `15m` trade-Kline archives and three monthly `1h` Mark Price archives.
-- All official `.CHECKSUM` files matched the downloaded ZIP SHA-256 values.
-- Full-month boundaries and row counts passed: 2,976 `15m` rows per symbol and 744 `1h` Mark Price rows per symbol.
-- Aggregate: 11,160 rows and 482,555 downloaded archive bytes.
-- Evidence artifact `9313989037`, artifact ZIP SHA-256 `a26f8214c9850b6747ee231a55ccfd1472ac6e87b9dddbf8b239a8295703f815`.
-- The proof establishes bounded Binance Vision delivery/integrity only; it does not establish eight-year/all-market coverage or Pionex/Binance strategy equivalence.
+- Run `32108454930`, job `95622625128`, CI `32108454911` PASS.
+- January 2025 BTCUSDT / ETHUSDT / SOLUSDT.
+- 3 monthly `15m` trade-Kline + 3 monthly `1h` Mark Price archives.
+- 6/6 official CHECKSUM PASS; 11,160 rows; full-month coverage PASS.
 
 ### Binance Vision -> R2 Bounded Proof — PASS
 
-Authoritative receipt: `research/receipts/2026-08-18-binance-vision-r2-proof.json`
-Workflow: `Binance Vision R2 Proof`
-Implementation merge: PR #35 / commit `3e1888ef1aad557a402bd6c5e66c7d80541997b1`.
-Authority merge: PR #36 / commit `79a0c90195116e6536896738c7cf9fb7caccfe84`.
+Authority: `research/receipts/2026-08-18-binance-vision-r2-proof.json`
+Implementation: PR #35 / `3e1888ef1aad557a402bd6c5e66c7d80541997b1`
+Authority merge: PR #36 / `79a0c90195116e6536896738c7cf9fb7caccfe84`
 
-- Real proof run `32109048193` / job `95624370904` completed successfully; CI run `32109048136` also passed.
-- Frozen scope: January 2025 BTCUSDT/ETHUSDT/SOLUSDT `15M` Binance-native data.
-- Three Binance canonical objects were materialized under `market-data/binance_usdm/...`; no Pionex canonical namespace was touched.
-- Aggregate: 3 objects, 8,928 candles and 251,270 Parquet bytes.
-- Every source Vision archive SHA matched the frozen live-proof authority.
-- Every R2 object was downloaded with SHA-256 verification, decoded from Parquet and compared for exact candle equality.
-- BTCUSDT R2 SHA-256: `df67878b90c074b61dc31c0194c008e103521dbddf476ff4c488cc872dbcb231`.
-- ETHUSDT R2 SHA-256: `4025d2cdd7d52537d4ab68dd61bc945c163b4117374d301d0940294b550571e1`.
-- SOLUSDT R2 SHA-256: `3bc66bdc0237260a9ea6df15f180a5285490de3470699d98e3b6c18ad37ea67c`.
-- Evidence artifact `9314191509`, artifact ZIP SHA-256 `c87c87f89909cfa8566b94f244d6b995bddfc61e48ca4485910fe1bf64c0afad`.
-- The proof-only manifest/receipt R2 keys contain a duplicated `binance-vision-r2-proof` phrase; the proof remains valid and future production naming will normalize it without rerunning or invalidating this authority.
-- This bounded proof does not authorize the full 8-year / ~250-market expansion.
+- Run `32109048193`, job `95624370904`, CI `32109048136` PASS.
+- BTC/ETH/SOL January 2025 `15M`: 3 objects / 8,928 rows / 251,270 Parquet bytes.
+- Every source SHA, R2 SHA, Parquet decode and exact-candle equality check passed.
+- Only `market-data/binance_usdm/...` was touched; Pionex canonical namespace remained untouched.
 
-### Backtest Engine V0.1 foundation
+### Binance 2025 Coverage Scan — PASS
 
-Primary document: `docs/BACKTEST_ENGINE_V0_1.md`
-Implementation merge: PR #14 / commit `b0ad363bb5b6c9bef9db1bc1d8125158d6d01839`.
+Authority: `research/receipts/2026-08-18-binance-2025-coverage-scan.json`
+Implementation merge: PR #38 / `907deb2ceda11ed70c646c0e2007a0b54a46e728`
+Authority merge: PR #39 / `eae72925fc20963926b85e1b21dc9286068d6237`
 
-- Deterministic paper-only LONG execution core is implemented.
-- Event evidence follows `StrategySignal -> RiskDecision -> OrderIntent -> Fill -> Position -> PnL` without rewriting SState.
-- A strategy signal may fill only on the first candle strictly after the signal timestamp, blocking same-bar lookahead fills.
-- If stop and target are both touched by one OHLC candle, V0.1 uses conservative stop-first resolution.
-- Existing `RiskConfig` / `size_long_trade` remains the sizing authority, including the 1% risk baseline, leverage cap, daily loss gate and daily trade-count gate.
-- Explicit taker fee, adverse slippage and supplied funding-point cost models are implemented.
-- Deterministic results include trades, rejected plans, event sequence, equity curve, PnL, drawdown, win rate, profit factor and trade-level Sharpe-style output when defined.
-- V0.1 allows one open portfolio position at a time; overlapping signals are rejected instead of silently changing portfolio risk.
-- CI run `32102829605` passed all unit/regression tests plus the R2 cost/budget gate.
-- No live-order path or private Pionex API was introduced.
+- Run `32109845513`, job `95626701407`, CI `32109845422` PASS.
+- 15 candidates x 12 months x (`15m`,`1h`,`4h` trade + `1h` Mark) = 720 checksum-backed checks.
+- 704 AVAILABLE / 16 NO_DATA.
+- 14/15 symbols have all 12 months of scanned 2025 archive presence.
+- HYPEUSDT has archive presence only from 2025-05 through 2025-12; January-April are explicit NO_DATA for all four scanned archive types.
+- Archive presence is not listing-date or content-completeness authority by itself.
 
-### Historical Universe V0.1 foundation
+### Binance 15-market / 2025 R2 Content Pilot — PASS
 
-Primary document: `docs/HISTORICAL_UNIVERSE_V0_1.md`
-Implementation merge: PR #15 / commit `2cb299d44f75b66c374adf87ce0e83d0ccad4342`.
+Authority: `research/receipts/2026-08-18-binance-2025-r2-pilot.json`
+Document: `docs/BINANCE_2025_R2_PILOT_V0_1.md`
+Implementation merge: PR #40 / `41b80f559b4aa55c40e92a3d94d6912748d5443d`
+Authority merge: PR #41 / `ff1b1a978769617523105c4acbcac46267e2fa57`
 
-- Historical membership is evidence-bounded by `provider + market_type + symbol + interval`.
-- The index never extrapolates a market before the first authoritative coverage timestamp or after the last authoritative coverage timestamp.
-- Default V0.1 eligibility requires native `15M`, `60M` and `4H` coverage at the queried timestamp.
-- Native/proxy provenance is explicit and is never inferred from a provider name.
-- Verified historical partition receipts can be converted into bounded coverage records; `NO_DATA` does not create membership.
-- Overlapping non-identical authority for the same identity is rejected rather than silently reconciled.
-- Deterministic snapshots freeze sorted eligible symbols and the authority references used by the query.
-- CI run `32102838532` passed all unit/regression tests plus the R2 cost/budget gate.
-- Exact listing/delisting discovery and maximum-available universe reconstruction remain future evidence work; point-in-time liquidity ranking lives downstream in Historical Liquidity V0.1.
+- Pilot run `32110538170`, job `95628773842`, CI `32110538110` PASS.
+- 528/528 source archives passed official checksum + candle audit.
+- 206 R2 canonical trade-Kline objects: 176 monthly `15M`, 15 annual `60M`, 15 annual `4H`.
+- 671,022 candles / 18,778,928 Parquet bytes.
+- 203 new objects uploaded; 3 prior BTC/ETH/SOL January objects were exact-verified and not overwritten.
+- All annual cross-month audits, R2 SHA verification, Parquet decode and exact-candle equality checks passed.
+- HYPEUSDT first observed audited 2025 Klines: `15M` 2025-05-30 10:30 UTC; `60M` 10:00 UTC; `4H` 08:00 UTC. These are observed Kline onsets, not independent listing-date authority.
+- No synthetic HYPE January-April/early-May data was created.
 
-### Historical Universe -> Backtest Admission V0.1
+### Observed Binance R2 Budget Gate — PASS
 
-Primary document: `docs/HISTORICAL_UNIVERSE_BACKTEST_ADMISSION_V0_1.md`
-Implementation merge: PR #25 / commit `213addc9ce55cdd5b606b4c2ee501ff4ce92d05d`.
+Authority: `research/receipts/2026-08-18-binance-observed-r2-budget.json`
+Estimate: `research/estimates/2026-08-18-binance-observed-r2-budget.json`
+Implementation: PR #42 / `370a833547d09540d10e6ea633f948d0af0aeddc`
+Authority merge: PR #43 / `fcda027598d0d851ccb30c59baa7532974f96808`
 
-- Every `LongTradePlan` is checked against the evidence-bounded Historical Universe at that plan's own `signal_time_ms` before it can be passed to Backtest Engine V0.1.
-- V0.1 admission requires native `15M`, `60M` and `4H` coverage at the exact signal timestamp.
-- Today's/latest universe and later partition evidence are never substituted for historical membership.
-- Proxy/external observations cannot authorize a Pionex-native backtest plan.
-- Admitted decisions retain plan-symbol-scoped historical authority references; unrelated market refs are excluded.
-- Missing intervals, pre-listing/post-coverage timestamps and proxy-only evidence fail closed.
-- Duplicate plan ids are rejected before admission and repeated evaluation is deterministic.
-- CI run `32105245530` passed all unit/regression tests plus the R2 cost/budget gate.
-- This gate enforces existing evidence only; it does not create missing listing/history authority or liquidity evidence.
+- Basis: real 2025 Binance pilot, 671,022 rows / 18,778,928 Parquet bytes.
+- Partial-HYPE missing rows are conservatively imputed before scaling so partial availability cannot lower the target estimate.
+- 250 markets x 8 years canonical: about **2.574 GB**.
+- Canonical + retained staging: about **5.148 GB**.
+- 3x capacity stress: about **7.722 GB**.
+- Planned operations retain the conservative 224k Class A / 140k Class B envelope; 3x stress 672k / 420k.
+- Planned and 3x stress both evaluate PASS under the frozen R2 guardrails, with estimated R2 cost USD 0/month under the frozen pricing snapshot, subject to account-shared free-tier usage.
+- CI runs both the original M1B budget gate and `python scripts/check_binance_observed_r2_budget.py`.
 
-### Historical Liquidity Evidence / Ranking V0.1
+## Research/backtest safety layers — READY
 
-Primary document: `docs/HISTORICAL_LIQUIDITY_V0_1.md`
-Machine-readable policy: `config/historical_liquidity_v0_1.json`
-Implementation merge: PR #27 / commit `89a6eb25daf1e5d4559cb1ad6efde49dbb7000f1`.
+### Backtest Engine V0.1
 
-- Point-in-time provider-native 24h ticker + BBO liquidity batches are modeled with explicit snapshot time, true availability time, source reference, optional SHA-256 and native/proxy provenance.
-- A later snapshot cannot be backprojected into an earlier query and a stale snapshot is not silently carried forward.
-- Ranking is downstream of Historical Universe and can only consider symbols with evidence-bounded native `15M` / `60M` / `4H` coverage at the requested timestamp.
-- V0.1 requires complete liquidity coverage for the entire evidence-bounded Historical Universe before ranking; partial retained coverage fails closed instead of creating a biased candidate set.
-- Frozen baseline ranking preserves existing current-universe behavior where applicable: target 15, maximum spread 30 bps, 24h freshness ceiling, 24h quote turnover descending, spread ascending, symbol ascending.
-- The target remains a target rather than a quota; a spread gate may return fewer than 15 markets.
-- Extra liquidity symbols outside the Historical Universe are ignored and proxy snapshots cannot authorize Pionex-native ranking.
-- Returned snapshots retain Historical Universe authority refs plus liquidity batch source ref/SHA.
-- CI run `32105860143` passed all unit/regression tests plus the R2 cost/budget gate.
-- `config/historical_liquidity_v0_1.json` remains `FRAMEWORK_ONLY`: no real historical Pionex liquidity evidence series is yet frozen PASS.
+Document: `docs/BACKTEST_ENGINE_V0_1.md`
+Merge: PR #14 / `b0ad363bb5b6c9bef9db1bc1d8125158d6d01839`
 
-### Historical Liquidity -> Backtest Admission V0.1
+- Deterministic LONG-only paper backtest core.
+- Signal fills no earlier than the next candle; same-bar stop/target collision defaults conservative stop-first.
+- Existing risk authority remains 1% risk baseline, 3x leverage cap, daily -3R and max daily new-trade gate.
+- Fee, adverse slippage and supplied funding costs are modeled.
 
-Primary document: `docs/HISTORICAL_LIQUIDITY_BACKTEST_ADMISSION_V0_1.md`
-Implementation merge: PR #28 / commit `93f01e8192066145c6f414956d96071b2b9e9f2c`.
+### Historical Universe + admission
 
-- Every `LongTradePlan` is evaluated against the point-in-time Historical Liquidity ranking at its own `signal_time_ms`.
-- A plan must first be Historical Universe eligible and then be present in the ranked liquidity universe for that exact historical timestamp.
-- Later/latest liquidity snapshots are never substituted for an older plan.
-- Missing, stale, incomplete or wrong-provenance liquidity evidence is an evidence error and aborts admission instead of being misclassified as an ordinary strategy rejection.
-- Normal rejection distinguishes a historically absent symbol from a historically present symbol that did not rank into the liquid-market universe.
-- Decisions retain symbol-scoped Historical Universe refs, liquidity batch id, source ref/SHA and exact rank when admitted.
-- Duplicate plan ids fail before admission.
-- CI run `32106049209` passed all unit/regression tests plus the R2 cost/budget gate.
-- This gate is implementation-ready but cannot authorize real historical plans until a real historical liquidity evidence series is frozen PASS.
+Documents: `docs/HISTORICAL_UNIVERSE_V0_1.md`, `docs/HISTORICAL_UNIVERSE_BACKTEST_ADMISSION_V0_1.md`
+Merges: PR #15 / `2cb299d44f75b66c374adf87ce0e83d0ccad4342`; PR #25 / `213addc9ce55cdd5b606b4c2ee501ff4ce92d05d`
 
-### Technical Features V0.1 foundation
+- Historical market membership is evidence-bounded; no current-universe backprojection.
+- Backtest plans must be historically eligible at their own signal timestamps.
+- Proxy/provider data cannot silently authorize Pionex-native membership.
 
-Primary document: `docs/TECHNICAL_FEATURES_V0_1.md`
-Implementation merge: PR #17 / commit `1f40641761e6b78f8a22dfd728187491714268bf`.
+### Historical Liquidity + admission
 
-- Deterministic raw EMA20, EMA50, EMA20 slope, ATR14, volume SMA20/ratio, previous-high and ATR-normalized EMA20 extension calculations are implemented.
-- Feature snapshots are consumable only after `available_at_ms = bar_time_ms + interval_ms`, enforcing closed-bar semantics.
-- Existing candle audit is mandatory before calculation; gaps, duplicates, misalignment or invalid OHLCV fail closed with no silent interpolation or repair.
-- EMA uses SMA seeding and standard recursive alpha; ATR14 uses Wilder smoothing.
-- Future-candle mutation regression tests prove later candles cannot alter earlier technical snapshots.
-- The longest baseline warmup is EMA50; normal positive-volume data becomes technically ready at the 50th candle.
-- Raw extension is exposed without inventing an overextension threshold.
-- Strategy concepts whose numerical/semantic thresholds are not yet frozen remain intentionally absent as booleans.
-- CI run `32103247659` passed all unit/regression tests plus the R2 cost/budget gate.
+Documents: `docs/HISTORICAL_LIQUIDITY_V0_1.md`, `docs/HISTORICAL_LIQUIDITY_BACKTEST_ADMISSION_V0_1.md`
+Merges: PR #27 / `89a6eb25daf1e5d4559cb1ad6efde49dbb7000f1`; PR #28 / `93f01e8192066145c6f414956d96071b2b9e9f2c`
 
-### Historical SState Replay V0.1 foundation
+- Point-in-time liquidity ranking and admission contracts are READY.
+- Missing/stale/incomplete liquidity evidence fails closed rather than becoming a strategy loss.
+- Real historical Pionex liquidity evidence series is not yet frozen PASS.
 
-Primary document: `docs/HISTORICAL_SSTATE_REPLAY_V0_1.md`
-Implementation merge: PR #18 / commit `826b2626d4f0c4e0c115d8af7aa4a6e48d53019c`.
+### Technical Features V0.1
 
-- Exact-bar, read-only replay authority is implemented for already-recorded SState outputs.
-- Each historical point freezes symbol, bar identity, true availability timestamp, unchanged `SStateContext`, source reference and optional SHA-256.
-- A point cannot be read before its `available_at_ms` boundary.
-- A prior SState value is not implicitly carried forward to an unrecorded bar.
-- Conflicting non-identical authority for the same symbol/bar is rejected.
-- Stored SState context is returned unchanged; no recomputation, probability reinterpretation or core modification occurs.
-- Test fixtures validate the replay contract only and are explicitly not real historical SState evidence.
-- CI run `32103390907` passed all unit/regression tests plus the R2 cost/budget gate.
+Document: `docs/TECHNICAL_FEATURES_V0_1.md`
+Merge: PR #17 / `1f40641761e6b78f8a22dfd728187491714268bf`
 
-### Historical SState Evidence Ingestion V0.1
+- Closed-bar EMA20/EMA50/EMA20 slope/ATR14/volume ratio/previous-high/ATR-normalized extension are deterministic and anti-lookahead tested.
+- No undefined strategy threshold is silently invented.
 
-Primary document: `docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md`
-Implementation merge: PR #23 / commit `dca0507fa7e160a6dcea25dd552cf05d7dc6b3f0`.
+### Historical SState replay/evidence
 
-- A deterministic canonical `historical-sstate-records-v0.1` payload schema is implemented.
-- Evidence manifests freeze evidence id/status, real-vs-fixture kind, availability basis, interval, producer provenance/SHA-256, source reference, payload SHA-256, record count and generation time.
-- V0.1 historical authority admits only `PASS + REAL_RECORDED + RECORDED_RUNTIME` evidence.
-- Fixtures are rejected from historical authority even when structurally valid.
-- After-the-fact `RECONSTRUCTED` availability is rejected until a separate deterministic reconstruction proof is designed and approved.
-- SState evidence must be 4H-aligned and cannot become available before the source 4H bar closes.
-- Future-dated manifests, payload SHA mismatch, record-count mismatch, duplicate symbol/bar identities and noncanonical payload encodings fail closed.
-- Verified evidence converts into existing `HistoricalSStatePoint` objects without recomputing or modifying SState; payload SHA and evidence id remain in replay provenance.
-- CI run `32104898978` passed all unit/regression tests plus the R2 cost/budget gate.
-- This is an ingestion contract only; no real historical SState evidence bundle is yet frozen PASS.
+Documents: `docs/HISTORICAL_SSTATE_REPLAY_V0_1.md`, `docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md`
+Merges: PR #18 / `826b2626d4f0c4e0c115d8af7aa4a6e48d53019c`; PR #23 / `dca0507fa7e160a6dcea25dd552cf05d7dc6b3f0`
 
-### Strategy Replay Readiness V0.1 gate
+- Exact-bar read-only SState replay and evidence-ingestion contracts are READY.
+- Only real recorded-runtime evidence can become historical SState authority.
+- No real historical SState evidence bundle is yet frozen PASS.
 
-Primary document: `docs/STRATEGY_REPLAY_READINESS_V0_1.md`
-Implementation merge: PR #19 / commit `43535f02ba3120e5c319e3668d6fa431fe668067`.
+### Strategy Replay Readiness + Parameter Sweep
 
-- Historical replay readiness now distinguishes `PASS`, `FAIL` and `UNDEFINED` instead of silently supplying missing defaults.
-- Frozen SState background rules are executable: allowed states, probability availability, >=50 samples and >=0.60 probability.
-- Frozen 1H setup rules are executable: EMA20 > EMA50, EMA20 slope > 0 and close > EMA20.
-- Incomplete technical warmup fails closed.
-- Current authority leaves ATR-normalized overextension, pullback proximity/semantics, reclaim semantics, previous-high break semantics, volume confirmation threshold and structural-stop ATR buffer size `UNDEFINED`.
-- `trade_plan_authorized` remains false while mandatory strategy semantics are undefined.
-- Backtest Engine V0.1 may simulate explicitly supplied plans, but automatic historical plan generation is not yet authoritative.
-- CI run `32103570004` passed all unit/regression tests plus the R2 cost/budget gate.
+Documents: `docs/STRATEGY_REPLAY_READINESS_V0_1.md`, `docs/STRATEGY_PARAMETER_SWEEP_V0_1.md`
+Merges: PR #19 / `43535f02ba3120e5c319e3668d6fa431fe668067`; PR #21 / `69abd931b88950aae50780dc67f3d57d095c2db3`
 
-### Strategy Parameter Freeze / Sweep Framework V0.1
+- Replay readiness distinguishes PASS / FAIL / UNDEFINED.
+- Six mandatory semantics remain UNDEFINED: ATR overextension, EMA20 pullback proximity/semantics, EMA20 reclaim, previous-high break, volume confirmation threshold, structural-stop ATR buffer.
+- Parameter sweep framework freezes UPDATE selection / sensitivity / one-shot disjoint VALIDATION rules, but no real candidate space or validated winning parameter set exists yet.
+- `trade_plan_authorized=false` remains mandatory.
 
-Primary document: `docs/STRATEGY_PARAMETER_SWEEP_V0_1.md`
-Machine-readable boundary: `config/strategy_parameter_sweep_v0_1.json`
-Implementation merge: PR #21 / commit `69abd931b88950aae50780dc67f3d57d095c2db3`.
+## Still not complete
 
-- Deterministic numeric/categorical parameter grids and SHA-256 plan fingerprints are implemented.
-- Candidate values, UPDATE folds, one disjoint VALIDATION fold, primary metric, trade-count gates, metric floors, drawdown ceilings and local-stability rules must be frozen before evaluation.
-- UPDATE selection requires the complete candidate x UPDATE-fold matrix; selective omission is a protocol error.
-- Candidate ranking is robust-first using worst-fold primary metric, median primary metric, lower worst drawdown and deterministic id.
-- The selected UPDATE candidate must pass a local-neighbor sensitivity/stability gate so an isolated backtest peak cannot be frozen.
-- VALIDATION can evaluate only the already-selected UPDATE candidate; validation-time reselection is forbidden.
-- PASS and FAIL validation decisions both mark validation consumed; failed validation cannot freeze a parameter set.
-- A validated parameter set can be frozen only after PASS with matching plan fingerprints and retains UPDATE evidence digest plus validation provenance.
-- Current machine-readable boundary remains `FRAMEWORK_ONLY`: no real candidate values, production sweep thresholds, real validation split or validated parameter set are frozen yet.
-- `trade_plan_authorized` therefore remains false.
-- Initial PR #21 CI failed only because the new test file imported unavailable `pytest`; tests were converted to the repository's `unittest` harness with no production-code change. Corrected CI run `32104427875` passed all unit/regression tests plus the R2 cost/budget gate.
-
-## Not completed
-
-- Pionex one-year Historical Backfill Pilot execution evidence is not yet frozen as PASS; interruption/resume evidence and aggregate authority still need closure.
-- Binance 15-market / 2025 multi-interval coverage scan and provider-separated R2 pilot are not yet frozen PASS.
-- Maximum-available Binance historical coverage discovery across the target universe, capped at eight years.
-- Full provider-separated long-horizon Binance Vision -> R2 materialization is not authorized yet.
-- Pionex/Binance overlap plus strategy-signal equivalence authority has not been frozen; Binance history cannot be relabeled or silently substituted as Pionex-native strategy authority.
-- Automatic historical-universe source acquisition/reconstruction for survivorship-bias-safe long-horizon backtests.
-- Real historical Pionex point-in-time liquidity evidence acquisition/production and a frozen PASS series covering historical backtest dates.
-- Long-horizon Binance Funding Rate acquisition/materialization has not yet been frozen PASS; only the public-source adapter/pagination contract is ready.
-- Long-horizon Binance Mark Price acquisition/materialization has not yet been frozen PASS; source and bulk contracts are ready.
-- Open Interest cannot be treated as an eight-year Binance REST source because the documented provider retention is only the latest one month; forward accumulation/review remains required.
-- Real historical SState evidence production/acquisition and a real evidence bundle passing the ingestion gate with true recorded-runtime availability timestamps.
-- Real candidate-space, selection-policy, UPDATE/VALIDATION split freeze and independently validated parameter set for currently `UNDEFINED` strategy rules.
-- End-to-end authoritative strategy replay from historical candles + SState into automatically generated Backtest Engine plans.
-- Advanced fill simulation such as partial fills/order-book depth and exchange-specific fee tiers.
-- Production-grade paper broker position lifecycle, reconciliation and settlement.
-- Cloudflare Worker/D1/Pages deployment.
-- Cloudflare Workers/Workflows/Queues/D1 cost gate.
-- Pionex private API permission verification.
-- Server-side protective-order verification.
-- Order/position reconciliation and restart recovery.
-- Shadow-live verification.
+- Pionex one-year Historical Backfill Pilot aggregate evidence is not yet frozen PASS; it remains the execution-target benchmark/equivalence anchor.
+- Pionex/Binance candle/feature/strategy-signal equivalence authority is not yet frozen.
+- Maximum-available Binance historical coverage onset/end discovery for the candidate universe is not yet frozen beyond the 2025 proof.
+- Full long-horizon Binance Vision -> R2 expansion is not authorized yet.
+- Historical-universe reconstruction for long-horizon backtests is not complete.
+- Real point-in-time historical Pionex liquidity evidence is not frozen PASS.
+- Binance long-horizon Funding Rate dataset/materialization is not frozen PASS.
+- Binance long-horizon Mark Price dataset/materialization is not frozen PASS.
+- OI beyond the documented recent provider window requires forward accumulation or a separately reviewed source.
+- Real historical SState evidence production/acquisition is not complete.
+- Real candidate-space + UPDATE/VALIDATION evidence for the six undefined strategy rules is not frozen.
+- End-to-end authoritative historical strategy replay into automatically generated Backtest Engine plans is not authorized.
+- Production-grade paper broker lifecycle/reconciliation/settlement is not complete.
+- Cloudflare Workers/Workflows/Queues/D1 control-plane migration and its separate cost gate are not complete.
+- Pionex private execution permissions/protective orders/reconciliation/shadow-live gates are not complete.
 - Live trading is forbidden.
 
 ## Next milestone
 
-**Binance 15-market / 2025 coverage scan and provider-separated R2 pilot**
+**Pionex <-> Binance Equivalence Gate V0.1 + maximum-available Binance coverage discovery**
 
-1. Use the frozen M1A 15-market crypto universe only as a symbol candidate list; map symbols syntactically to Binance USD-M without changing provider provenance.
-2. For each mapped market, discover actual Binance Vision coverage instead of assuming a 2020 or eight-year onset.
-3. Verify completed monthly `15m`, `1h`, `4h` trade-Kline availability for 2025 with official `.CHECKSUM` + strict audit.
-4. Verify 2025 Mark Price archive coverage where required and record explicit `NO_DATA` for unavailable archives rather than silently dropping markets.
-5. Acquire Funding Rate history through the verified Binance REST path with provider/source receipts.
-6. Materialize a bounded 15-market / 2025 Binance-native dataset to `market-data/binance_usdm/...` in R2 with SHA-256 and exact Parquet round-trip verification.
-7. Freeze symbol/dataset first/last coverage, gaps, object counts, rows, bytes, archive SHA values and R2 receipts.
-8. Re-run the R2 cost/budget gate using observed Binance payload sizes before authorizing larger historical expansion.
-9. Keep the automated Pionex 2025 pilot running/closing in parallel as the execution-target benchmark/equivalence anchor.
-10. Design and freeze the Pionex/Binance overlap + strategy-signal equivalence gate before Binance history can affect authoritative strategy conclusions.
-11. Only after the 15-market/2025 Binance pilot and equivalence plan are reviewed may maximum-available expansion toward the eight-year / approximately 250-market cap be considered.
-12. Prepare a separate Cloudflare Workers/Workflows/Queues/D1 cost gate before CF1 control-plane migration.
+1. Freeze an overlap/equivalence protocol before looking at pass/fail results.
+2. Use only mapped symbols with both Pionex-native and Binance-native evidence for the same timestamps; never splice providers.
+3. Compare timestamp coverage and OHLC behavior using explicit tolerances; treat exchange-specific volume as venue-specific evidence rather than requiring equality.
+4. Compare closed-bar technical features and strategy-relevant rule outcomes where semantics are already frozen.
+5. Do not claim full strategy-signal equivalence for the six currently UNDEFINED rules; defer those dimensions until parameters are independently frozen.
+6. Produce deterministic per-symbol/per-timeframe PASS/REVIEW/FAIL evidence and an aggregate gate decision.
+7. In parallel, scan actual earliest/latest Binance Vision archive coverage for each candidate market instead of assuming 2020 or eight years.
+8. Keep the Pionex one-year pilot running/closing as the execution-target benchmark.
+9. Build provider-separated Binance Funding and Mark Price historical materialization in parallel; keep OI recent-window only.
+10. Re-run observed R2 budget/cost gates after any materially larger source scope or additional dataset is proposed.
+11. Only after equivalence + historical coverage/universe review may a staged multi-year expansion be authorized; do not jump directly to 8 years x ~250 markets.
+12. Before CF1 control-plane migration, create separate Workers/Workflows/Queues/D1 cost gates.
 
-### Safe parallel work while historical acquisition runs
+## Safety gates before live trading
 
-- Close the automated Pionex one-year pilot and freeze its aggregate evidence; do not discard it because it remains the execution-target benchmark.
-- Prepare the real candidate-space semantics and evidence split for the six `UNDEFINED` strategy rules, but do not consume validation or freeze winning values before the data/split authority is reviewed.
-- Design/implement a real SState evidence producer/export workflow against the pinned SState authority; generated records must pass the Historical SState Evidence Ingestion V0.1 gate before replay use.
-- Acquire or produce real point-in-time Pionex liquidity evidence with source/SHA/availability provenance; do not project today's volume ranks into the past.
-- Design recent OI forward accumulation without claiming provider history beyond its documented retention.
-- Do not authorize automatic historical trade plans until missing strategy semantics are versioned and independently validated.
-- Do not authorize the eight-year / approximately 250-market expansion until the new Binance pilot/equivalence gates are reviewed.
-
-## Safety gates before any live trading
-
-- Backtest quality gates pass.
-- Paper trading quality gates pass.
-- Shadow-live reconciliation passes.
-- Pionex private Futures API access is confirmed for the account.
-- Protective stop/TP behavior is verified on the exchange side.
-- Idempotent order intent/client IDs exist.
-- Restart reconciliation is proven.
-- Daily loss / stale-data / API-error kill switches are proven.
-- Explicit live authorization is recorded.
+- Backtest quality gates PASS.
+- Paper trading quality gates PASS.
+- Shadow-live reconciliation PASS.
+- Pionex private Futures API permission verified.
+- Protective stop/TP behavior verified exchange-side.
+- Idempotent order intent/client IDs and restart reconciliation proven.
+- Daily-loss / stale-data / API-error kill switches proven.
+- Explicit live authorization recorded.
