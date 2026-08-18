@@ -1,0 +1,111 @@
+{
+  "schema": "binance-funding-interior-continuity-review-v0.1",
+  "status": "PASS",
+  "stage": "BINANCE_FUNDING_INTERIOR_CONTINUITY_REVIEW_SCOPE_REDUCTION_REQUIRED",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "provider": "binance_usdm",
+  "delivery": "binance_vision",
+  "dataset": "fundingRate",
+  "review_outcome": "SCOPE_REDUCTION_REQUIRED",
+  "trigger": {
+    "writer_pr": 63,
+    "writer_head_sha": "d352ea69907feb1fdb184c2acbcbcbd36ca59430",
+    "failed_preflight_run_id": 32160244669,
+    "failed_preflight_job_id": 95787325030,
+    "failed_preflight_conclusion": "failure",
+    "failure_class": "SOURCE_CONTENT_CADENCE_GAP",
+    "r2_credentials_used": false,
+    "r2_writes_performed": false
+  },
+  "diagnostic_evidence": {
+    "run_id": 32160244675,
+    "conclusion": "success",
+    "artifact_id": 9333359688,
+    "artifact_zip_sha256": "63d2cbaeb461bcd2afcfe9396f6806f306cf92bf3028412fd11bd5f2e0750064",
+    "full_cadence_diagnostic_json_sha256": "9043ca1fd0c100192562eb4508112e5c312472497adbb6ed50372957ae34ad6a",
+    "daily_source_diagnostic_json_sha256": "98e6940d350dcf2cbbb513b2db8d25d9607e2b4e64ec400df5d4badd623a5837",
+    "source_archive_count_examined": 1010,
+    "archives_failing_50ms_cadence_audit": 1
+  },
+  "observed_gap": {
+    "symbol": "HYPEUSDT",
+    "period": "2026-06",
+    "archive_sha256": "34a9ffa1b10d9d2d9e1e245b14784ebdf422550bf1558df44be6c1d5681e6cb8",
+    "rows": 179,
+    "source_declared_interval_hours": [4],
+    "first_time_ms": 1780272000001,
+    "last_time_ms": 1782849600003,
+    "gap_left_time_ms": 1782259200005,
+    "gap_left_time_utc": "2026-06-24T00:00:00.005Z",
+    "gap_right_time_ms": 1782288000005,
+    "gap_right_time_utc": "2026-06-24T08:00:00.005Z",
+    "observed_delta_ms": 28800000,
+    "declared_interval_expected_delta_ms": 14400000,
+    "cadence_residual_ms": 14400000,
+    "expected_cadence_slot_between_observed_rows_utc": "2026-06-24T04:00:00Z",
+    "left_source_rate": 0.00005,
+    "right_source_rate": 0.00005
+  },
+  "daily_binance_vision_fallback_check": {
+    "day": "2026-06-24",
+    "target_time_utc": "2026-06-24T04:00:00Z",
+    "daily_zip_http_status": 404,
+    "daily_checksum_http_status": 404,
+    "daily_archive_available": false,
+    "interpretation": "NO_OFFICIAL_BINANCE_VISION_DAILY_FUNDING_ARCHIVE_AT_TESTED_PATH",
+    "does_not_prove_exchange_settlement_did_not_occur": true
+  },
+  "forensic_interpretation": {
+    "ordinary_source_timestamp_jitter": false,
+    "safe_to_expand_50ms_tolerance": false,
+    "safe_to_interpolate_missing_observation": false,
+    "safe_to_copy_neighbor_rate": false,
+    "safe_to_splice_another_provider": false,
+    "proves_provider_monthly_archive_has_declared_cadence_discontinuity": true,
+    "proves_exact_business_reason_for_missing_slot": false,
+    "proves_exchange_did_or_did_not_settle_at_missing_slot": false
+  },
+  "v0_1_materialization_effect": {
+    "original_authorized_scope_sha256": "81f64c4f07f1c77bf8391962e0ff7b3eb5f004d4a53bd0d9b8f50328c18c267c",
+    "original_source_archive_count": 1010,
+    "original_annual_canonical_objects": 95,
+    "original_planned_total_r2_write_objects": 194,
+    "original_preflight_contract_satisfied": false,
+    "v0_1_write_execution_must_remain_blocked": true,
+    "reason": "The frozen V0.1 contract requires every source archive and annual cadence audit to PASS before the first R2 write. HYPEUSDT 2026-06 fails that prerequisite."
+  },
+  "required_scope_change": {
+    "policy": "DEFER_WHOLE_ANNUAL_PARTITION_CONTAINING_UNRESOLVED_SOURCE_GAP",
+    "deferred_symbol": "HYPEUSDT",
+    "deferred_year": 2026,
+    "deferred_source_months": [1, 2, 3, 4, 5, 6, 7],
+    "reason": "Annual-per-symbol is the frozen canonical partition shape. Materializing a subset of HYPEUSDT 2026 would create an annual canonical object with a known interior source gap.",
+    "remaining_expected_source_months": 1003,
+    "remaining_expected_annual_canonical_objects": 94,
+    "remaining_expected_annual_partition_receipts": 94,
+    "remaining_run_level_metadata_objects": 4,
+    "remaining_expected_total_r2_object_identities": 192,
+    "new_scope_sha256_must_be_recomputed": true,
+    "new_checksum_set_sha256_must_be_recomputed": true,
+    "requires_separately_versioned_materialization_plan_and_authority": true
+  },
+  "authority_boundary": {
+    "authorizes_v0_1_funding_r2_writes": false,
+    "authorizes_v0_2_funding_r2_writes": false,
+    "authorizes_interpolation": false,
+    "authorizes_source_switch": false,
+    "authorizes_provider_splicing": false,
+    "authorizes_pionex_native_relabeling": false,
+    "authorizes_historical_universe_membership": false,
+    "authorizes_backtest_admission": false,
+    "authorizes_automatic_trade_plans": false,
+    "authorizes_real_money_orders": false,
+    "authorizes_live_trading": false
+  },
+  "next_required_evidence": [
+    "BINANCE_FUNDING_MATERIALIZATION_PLAN_V0_2_EXCLUDING_HYPEUSDT_2026",
+    "V0_2_EXACT_SCOPE_AND_CHECKSUM_SET_AUTHORITY",
+    "FULL_1003_SOURCE_ARCHIVE_AND_94_ANNUAL_PARTITION_PREFLIGHT_PASS"
+  ]
+}
