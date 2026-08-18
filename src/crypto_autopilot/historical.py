@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import json
 import math
+import random
+import time
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Protocol
+from urllib.error import HTTPError
 
 from .models import Candle
 
@@ -24,6 +28,77 @@ class KlineClient(Protocol):
         limit: int = 500,
         end_time_ms: int | None = None,
     ) -> list[Candle]: ...
+
+
+class PacedKlineClient:
+    """Rate-limit adapter for public Kline acquisition.
+
+    The project soft limit defaults to 3 requests/second, well below Pionex's
+    documented shared 10 requests/second IP ceiling. HTTP 429 is treated as a
+    temporary ban and receives a conservative 65-second-plus-jitter backoff.
+    """
+
+    def __init__(
+        self,
+        delegate: KlineClient,
+        *,
+        requests_per_second: float = 3.0,
+        retry_after_seconds: float = 65.0,
+        max_429_retries: int = 4,
+        jitter_seconds: float = 2.0,
+        sleep_fn: Callable[[float], None] = time.sleep,
+        monotonic_fn: Callable[[], float] = time.monotonic,
+        random_fn: Callable[[], float] = random.random,
+    ) -> None:
+        if requests_per_second <= 0:
+            raise ValueError("requests_per_second must be positive")
+        if retry_after_seconds < 0 or jitter_seconds < 0:
+            raise ValueError("retry delays cannot be negative")
+        if max_429_retries < 0:
+            raise ValueError("max_429_retries cannot be negative")
+        self.delegate = delegate
+        self.minimum_interval_seconds = 1.0 / requests_per_second
+        self.retry_after_seconds = retry_after_seconds
+        self.max_429_retries = max_429_retries
+        self.jitter_seconds = jitter_seconds
+        self.sleep_fn = sleep_fn
+        self.monotonic_fn = monotonic_fn
+        self.random_fn = random_fn
+        self._last_request_started: float | None = None
+
+    def _pace(self) -> None:
+        now = self.monotonic_fn()
+        if self._last_request_started is not None:
+            remaining = self.minimum_interval_seconds - (now - self._last_request_started)
+            if remaining > 0:
+                self.sleep_fn(remaining)
+                now = self.monotonic_fn()
+        self._last_request_started = now
+
+    def get_klines(
+        self,
+        symbol: str,
+        interval: str,
+        *,
+        limit: int = 500,
+        end_time_ms: int | None = None,
+    ) -> list[Candle]:
+        retries = 0
+        while True:
+            self._pace()
+            try:
+                return self.delegate.get_klines(
+                    symbol,
+                    interval,
+                    limit=limit,
+                    end_time_ms=end_time_ms,
+                )
+            except HTTPError as exc:
+                if exc.code != 429 or retries >= self.max_429_retries:
+                    raise
+                retries += 1
+                delay = self.retry_after_seconds + self.random_fn() * self.jitter_seconds
+                self.sleep_fn(delay)
 
 
 class HistoricalDataError(RuntimeError):
