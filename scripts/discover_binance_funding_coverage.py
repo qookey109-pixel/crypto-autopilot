@@ -130,11 +130,22 @@ def probe_many(
 
 
 def audit_archive(key: BinanceVisionFundingArchiveKey) -> dict[str, object]:
-    checksum = fetch_bytes(key.checksum_url, allow_not_found=False)
-    archive = fetch_bytes(key.url, allow_not_found=False)
-    if checksum is None or archive is None:
-        raise RuntimeError(f"Funding archive disappeared after availability probe: {key.identity}")
-    return asdict(ingest_funding_archive(key, archive_bytes=archive, checksum_payload=checksum).receipt)
+    try:
+        checksum = fetch_bytes(key.checksum_url, allow_not_found=False)
+        archive = fetch_bytes(key.url, allow_not_found=False)
+        if checksum is None or archive is None:
+            raise RuntimeError("archive disappeared after availability probe")
+        return asdict(
+            ingest_funding_archive(
+                key,
+                archive_bytes=archive,
+                checksum_payload=checksum,
+            ).receipt
+        )
+    except Exception as exc:
+        raise RuntimeError(
+            f"Funding edge audit failed for symbol={key.symbol} period={key.period}: {exc}"
+        ) from exc
 
 
 def main() -> int:
