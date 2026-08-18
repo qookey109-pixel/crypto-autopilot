@@ -1,0 +1,60 @@
+name: Binance Funding R2 Budget Determination
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/binance-funding-r2-budget.yml"
+      - "scripts/determine_binance_funding_r2_budget.py"
+      - "src/crypto_autopilot/binance_funding_budget.py"
+      - "src/crypto_autopilot/binance_funding.py"
+      - "tests/test_binance_funding_budget.py"
+      - "config/binance_funding_r2_budget_v0_1.json"
+      - "research/receipts/2026-08-18-binance-funding-coverage.json"
+      - "research/receipts/2026-08-18-binance-funding-source-proof.json"
+      - "research/receipts/2026-08-18-binance-observed-r2-budget.json"
+      - "config/r2_budget_v0_1.json"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/binance-funding-r2-budget.yml"
+      - "scripts/determine_binance_funding_r2_budget.py"
+      - "src/crypto_autopilot/binance_funding_budget.py"
+      - "config/binance_funding_r2_budget_v0_1.json"
+      - "research/receipts/2026-08-18-binance-funding-coverage.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binance-funding-r2-budget-v0-1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  determine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Determine Funding R2 budget impact without writes
+        run: |
+          python scripts/determine_binance_funding_r2_budget.py \
+            --config config/binance_funding_r2_budget_v0_1.json \
+            --output artifacts/binance-funding-r2-budget.json
+
+      - name: Upload Funding R2 budget evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-funding-r2-budget-${{ github.run_id }}
+          path: artifacts/binance-funding-r2-budget.json
+          if-no-files-found: warn
+          retention-days: 90
