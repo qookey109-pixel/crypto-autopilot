@@ -12,7 +12,7 @@ Qookey Crypto Autopilot
 
 ## Current formal stage
 
-**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE FOUNDATION V0.1 READY / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
+**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
 
 No live-money authorization exists.
 
@@ -99,7 +99,7 @@ Policy: `config/r2_budget_v0_1.json`
 - Planned usage evaluates `PASS` with estimated R2 cost USD 0/month under the frozen pricing snapshot.
 - 3x stress: approximately 8.868 GB-month, 672,000 Class A and 420,000 Class B operations; estimated USD 0/month but storage enters `WARN` headroom.
 - Project guardrails: storage WARN > 8 GB / BLOCK > 10 GB; Class A WARN > 750k / BLOCK > 1M; Class B WARN > 7.5M / BLOCK > 10M.
-- CI now executes `python scripts/check_r2_budget.py` and blocks a `BLOCK` result or frozen expectation mismatch.
+- CI executes `python scripts/check_r2_budget.py` and blocks a `BLOCK` result or frozen expectation mismatch.
 - PR #13 implementation proof CI run `32098212233` passed unit tests and the R2 cost/budget gate at tested commit `6332f35bfbc32f0cc64488b2f3492f1a5c5a28d6`.
 - R2 included usage is account-level; actual account usage must be reviewed before large expansion because unrelated buckets/projects can consume the same allowance.
 - This cost gate covers R2 Standard only. Workers, Workflows, Queues, D1 and other Cloudflare services require separate cost gates.
@@ -119,9 +119,9 @@ Automation hardening merge: PR #12 / commit `7e8abfa402122bf0424bd47558bad0d3197
 - The pilot uses the frozen 15-symbol M1A universe, native `15M` / `60M` / `4H`, and a bounded UTC calendar year (default 2025).
 - The workflow uses three 5-symbol shards with `max-parallel: 1`.
 - Shard 0 includes a planned interruption after a staged partition, followed by a later process that exercises R2-backed resume.
-- Each shard now has bounded automatic retries while preserving checkpoint state; canonical conflicts and audit failures remain non-retryable safety stops.
+- Each shard has bounded automatic retries while preserving checkpoint state; canonical conflicts and audit failures remain non-retryable safety stops.
 - Structured JSON failure diagnostics and run-level aggregate evidence are emitted as GitHub artifacts.
-- The workflow now supports automatic `main` push triggering, a daily scheduled continuation, and manual dispatch as an override.
+- The workflow supports automatic `main` push triggering, a daily scheduled continuation, and manual dispatch as an override.
 - Concurrency prevents overlapping historical pilot runs for the same pilot year.
 - PR #10 CI run `32094937866` passed; PR #12 CI run `32097382736` passed.
 - No private API, account, position, order or live-trading path was introduced.
@@ -133,14 +133,13 @@ Implementation merge: PR #14 / commit `b0ad363bb5b6c9bef9db1bc1d8125158d6d01839`
 
 - Deterministic paper-only LONG execution core is implemented.
 - Event evidence follows `StrategySignal -> RiskDecision -> OrderIntent -> Fill -> Position -> PnL` without rewriting SState.
-- A strategy signal may fill only on the first candle strictly after the signal timestamp, permanently blocking same-bar lookahead fills.
+- A strategy signal may fill only on the first candle strictly after the signal timestamp, blocking same-bar lookahead fills.
 - If stop and target are both touched by one OHLC candle, V0.1 uses conservative stop-first resolution.
 - Existing `RiskConfig` / `size_long_trade` remains the sizing authority, including the 1% risk baseline, leverage cap, daily loss gate and daily trade-count gate.
 - Explicit taker fee, adverse slippage and supplied funding-point cost models are implemented.
 - Deterministic results include trades, rejected plans, event sequence, equity curve, PnL, drawdown, win rate, profit factor and trade-level Sharpe-style output when defined.
-- V0.1 deliberately allows one open portfolio position at a time; overlapping signals are rejected instead of silently changing portfolio risk.
+- V0.1 allows one open portfolio position at a time; overlapping signals are rejected instead of silently changing portfolio risk.
 - CI run `32102829605` passed all unit/regression tests plus the R2 cost/budget gate.
-- Real historical feature generation and real SState historical output ingestion are not part of this foundation yet.
 - No live-order path or private Pionex API was introduced.
 
 ### Historical Universe V0.1 foundation
@@ -158,6 +157,49 @@ Implementation merge: PR #15 / commit `2cb299d44f75b66c374adf87ce0e83d0ccad4342`
 - CI run `32102838532` passed all unit/regression tests plus the R2 cost/budget gate.
 - Exact listing/delisting discovery, historical liquidity ranking and full 8-year universe reconstruction remain future evidence work.
 
+### Technical Features V0.1 foundation
+
+Primary document: `docs/TECHNICAL_FEATURES_V0_1.md`
+Implementation merge: PR #17 / commit `1f40641761e6b78f8a22dfd728187491714268bf`.
+
+- Deterministic raw EMA20, EMA50, EMA20 slope, ATR14, volume SMA20/ratio, previous-high and ATR-normalized EMA20 extension calculations are implemented.
+- Feature snapshots are consumable only after `available_at_ms = bar_time_ms + interval_ms`, enforcing closed-bar semantics.
+- Existing candle audit is mandatory before calculation; gaps, duplicates, misalignment or invalid OHLCV fail closed with no silent interpolation or repair.
+- EMA uses SMA seeding and standard recursive alpha; ATR14 uses Wilder smoothing.
+- Future-candle mutation regression tests prove later candles cannot alter earlier technical snapshots.
+- The longest baseline warmup is EMA50; normal positive-volume data becomes technically ready at the 50th candle.
+- Raw extension is exposed without inventing an overextension threshold.
+- Strategy concepts whose numerical/semantic thresholds are not yet frozen remain intentionally absent as booleans.
+- CI run `32103247659` passed all unit/regression tests plus the R2 cost/budget gate.
+
+### Historical SState Replay V0.1 foundation
+
+Primary document: `docs/HISTORICAL_SSTATE_REPLAY_V0_1.md`
+Implementation merge: PR #18 / commit `826b2626d4f0c4e0c115d8af7aa4a6e48d53019c`.
+
+- Exact-bar, read-only replay authority is implemented for already-recorded SState outputs.
+- Each historical point freezes symbol, bar identity, true availability timestamp, unchanged `SStateContext`, source reference and optional SHA-256.
+- A point cannot be read before its `available_at_ms` boundary.
+- A prior SState value is not implicitly carried forward to an unrecorded bar.
+- Conflicting non-identical authority for the same symbol/bar is rejected.
+- Stored SState context is returned unchanged; no recomputation, probability reinterpretation or core modification occurs.
+- Test fixtures validate the replay contract only and are explicitly not real historical SState evidence.
+- CI run `32103390907` passed all unit/regression tests plus the R2 cost/budget gate.
+
+### Strategy Replay Readiness V0.1 gate
+
+Primary document: `docs/STRATEGY_REPLAY_READINESS_V0_1.md`
+Implementation merge: PR #19 / commit `43535f02ba3120e5c319e3668d6fa431fe668067`.
+
+- Historical replay readiness now distinguishes `PASS`, `FAIL` and `UNDEFINED` instead of silently supplying missing defaults.
+- Frozen SState background rules are executable: allowed states, probability availability, >=50 samples and >=0.60 probability.
+- Frozen 1H setup rules are executable: EMA20 > EMA50, EMA20 slope > 0 and close > EMA20.
+- Incomplete technical warmup fails closed.
+- Current authority leaves ATR-normalized overextension, pullback proximity/semantics, reclaim semantics, previous-high break semantics, volume confirmation threshold and structural-stop ATR buffer size `UNDEFINED`.
+- `trade_plan_authorized` remains false while mandatory strategy semantics are undefined.
+- Backtest Engine V0.1 may simulate explicitly supplied plans, but automatic historical plan generation is not yet authoritative.
+- CI run `32103570004` passed all unit/regression tests plus the R2 cost/budget gate.
+
 ## Not completed
 
 - Real Historical Backfill Pilot execution evidence against Pionex + Cloudflare R2 is not yet frozen as PASS.
@@ -169,9 +211,9 @@ Implementation merge: PR #15 / commit `2cb299d44f75b66c374adf87ce0e83d0ccad4342`
 - Funding-rate history acquisition; the backtest engine currently accepts supplied funding points only.
 - Mark-price history.
 - Open-interest history.
-- Technical indicator calculation (EMA/ATR/volume).
-- Real historical SState output ingestion.
-- End-to-end strategy replay from historical features/SState into Backtest Engine V0.1.
+- Real historical SState output acquisition/ingestion with true availability timestamps.
+- Versioned parameter freeze/validation for currently `UNDEFINED` strategy rules.
+- End-to-end authoritative strategy replay from historical candles + SState into automatically generated Backtest Engine plans.
 - Advanced fill simulation such as partial fills/order-book depth and exchange-specific fee tiers.
 - Production-grade paper broker position lifecycle, reconciliation and settlement.
 - Cloudflare Worker/D1/Pages deployment.
@@ -198,9 +240,11 @@ Implementation merge: PR #15 / commit `2cb299d44f75b66c374adf87ce0e83d0ccad4342`
 
 ### Safe parallel work while the pilot runs
 
-- Build deterministic EMA/ATR/volume feature calculation with strict closed-bar semantics.
-- Define a historical SState read-only replay adapter without modifying SState core.
+- Build the Strategy Parameter Freeze / Sweep Framework for currently `UNDEFINED` rules without selecting winning parameters from the same sample used for validation.
+- Prepare real historical SState evidence-ingestion contracts while keeping SState core read-only.
 - Wire historical-universe snapshots into backtest admission once real partition receipts are available.
+- Prepare funding-rate/mark-price/open-interest acquisition design without changing Pionex-native Kline authority.
+- Do not authorize automatic historical trade plans until missing strategy semantics are versioned and independently validated.
 - Do not authorize the 8-year / approximately 250-market expansion until the one-year pilot authority is frozen PASS.
 
 ## Safety gates before any live trading
