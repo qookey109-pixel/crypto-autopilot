@@ -1,0 +1,54 @@
+name: Binance Funding Source Proof
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/binance-funding-source-proof.yml"
+      - "scripts/prove_binance_funding_source.py"
+      - "src/crypto_autopilot/binance_funding.py"
+      - "tests/test_binance_funding.py"
+      - "config/binance_funding_v0_1.json"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/binance-funding-source-proof.yml"
+      - "scripts/prove_binance_funding_source.py"
+      - "src/crypto_autopilot/binance_funding.py"
+      - "config/binance_funding_v0_1.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binance-funding-source-proof-v0-1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Run read-only Binance Funding source proof
+        run: |
+          python scripts/prove_binance_funding_source.py \
+            --config config/binance_funding_v0_1.json \
+            --output artifacts/binance-funding-source-proof.json
+
+      - name: Upload Binance Funding source proof evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-funding-source-proof-${{ github.run_id }}
+          path: artifacts/binance-funding-source-proof.json
+          if-no-files-found: warn
+          retention-days: 90
