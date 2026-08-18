@@ -1,0 +1,49 @@
+name: Binance 2025 Coverage Scan
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/binance-2025-coverage-scan.yml"
+      - "scripts/scan_binance_2025_coverage.py"
+      - "src/crypto_autopilot/binance_vision.py"
+      - "src/crypto_autopilot/binance_historical.py"
+      - "research/receipts/2026-08-17-m1a-pionex.json"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/binance-2025-coverage-scan.yml"
+      - "scripts/scan_binance_2025_coverage.py"
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Scan checksum-backed Binance Vision archive presence
+        run: |
+          python scripts/scan_binance_2025_coverage.py \
+            --year 2025 \
+            --workers 8 \
+            --output artifacts/binance-2025-coverage-scan.json
+
+      - name: Upload coverage evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-2025-coverage-scan-${{ github.run_id }}
+          path: artifacts/binance-2025-coverage-scan.json
+          if-no-files-found: warn
+          retention-days: 90
