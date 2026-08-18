@@ -1,0 +1,44 @@
+{
+  "schema": "binance-funding-source-checksum-set-authority-v0.1",
+  "status": "PASS",
+  "stage": "BINANCE_FUNDING_SOURCE_CHECKSUM_SET_FROZEN",
+  "date": "2026-08-18",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "provider": "binance_usdm",
+  "delivery": "binance_vision",
+  "dataset": "fundingRate",
+  "frequency": "monthly",
+  "source_coverage_authority": "research/receipts/2026-08-18-binance-funding-coverage.json",
+  "source_artifact": {
+    "id": 9322497897,
+    "name": "binance-funding-coverage-32131873026",
+    "zip_sha256": "9111c52ab99bc3c13f9a0d6f05f94b6851c97e4a76709bc020f7cc8a30fc9db9",
+    "coverage_json_sha256": "58d3bb99b20ed0190a5aa60b49d190eef9638c070aa2df9634209e3ce2873ad5"
+  },
+  "available_archive_count": 1010,
+  "canonicalization": {
+    "selection": "monthly_records where status == AVAILABLE",
+    "sort": ["symbol ASC", "period ASC"],
+    "line_format": "{symbol}\\t{period}\\t{archive_sha256}\\n",
+    "encoding": "utf-8",
+    "hash": "sha256"
+  },
+  "checksum_set_sha256": "7ed43292ecee61c358360b8a255fb7e7844bf7ac10626425c44292b4ad92963a",
+  "writer_requirement": {
+    "fetch_all_1010_official_checksums_before_first_r2_write": true,
+    "recompute_checksum_set_sha256": true,
+    "required_checksum_set_sha256": "7ed43292ecee61c358360b8a255fb7e7844bf7ac10626425c44292b4ad92963a",
+    "any_checksum_change_fails_closed_before_r2_write": true,
+    "missing_or_extra_month_fails_closed_before_r2_write": true
+  },
+  "authority_boundary": {
+    "pins_all_1010_checksum_observed_available_monthly_archive_sha256_as_one_canonical_digest": true,
+    "proves_full_interior_row_level_continuity": false,
+    "authorizes_r2_writes": false,
+    "authorizes_source_switch": false,
+    "authorizes_provider_splicing": false,
+    "authorizes_pionex_native_relabeling": false,
+    "authorizes_backtest_admission": false,
+    "authorizes_live_trading": false
+  }
+}
