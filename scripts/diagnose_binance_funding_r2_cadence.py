@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import json
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 from crypto_autopilot.binance_funding import (
     BinanceVisionFundingArchiveKey,
@@ -11,7 +14,6 @@ from crypto_autopilot.binance_funding import (
 )
 from crypto_autopilot.binance_funding_materialization_plan import build_materialization_scope
 from crypto_autopilot.binance_funding_materializer import source_keys_from_scope
-from scripts.materialize_binance_funding_r2 import fetch_bytes
 
 
 COVERAGE = "research/receipts/2026-08-18-binance-funding-coverage.json"
@@ -23,6 +25,27 @@ def load_json(path: str) -> dict[str, object]:
     if not isinstance(payload, dict):
         raise RuntimeError(f"expected object: {path}")
     return payload
+
+
+def fetch_bytes(url: str, *, attempts: int = 3, timeout_seconds: float = 30.0) -> bytes:
+    last_error: Exception | None = None
+    for attempt in range(attempts):
+        request = Request(
+            url,
+            headers={"Accept": "*/*", "User-Agent": "qookey-funding-r2-diagnostic/0.1"},
+        )
+        try:
+            with urlopen(request, timeout=timeout_seconds) as response:  # noqa: S310 - frozen HTTPS host
+                return response.read()
+        except HTTPError as exc:
+            last_error = exc
+            if exc.code not in {408, 425, 429, 500, 502, 503, 504}:
+                break
+        except (URLError, TimeoutError) as exc:
+            last_error = exc
+        if attempt + 1 < attempts:
+            time.sleep(1.0 * (attempt + 1))
+    raise RuntimeError(f"failed to fetch {url}: {last_error}") from last_error
 
 
 def inspect(key: BinanceVisionFundingArchiveKey) -> dict[str, object] | None:
