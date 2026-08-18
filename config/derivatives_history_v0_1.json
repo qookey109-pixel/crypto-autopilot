@@ -1,0 +1,39 @@
+{
+  "version": "0.1.0",
+  "mode": "paper_research_only",
+  "provider": "pionex",
+  "market_type": "perp",
+  "status": "FRAMEWORK_ONLY",
+  "funding_rate": {
+    "endpoint": "/api/v1/market/fundingRates",
+    "historical_backfill_documented": true,
+    "pagination": "endTime -> earliest_funding_time_minus_1ms",
+    "max_page_size": 500,
+    "cadence_assumption": "NONE",
+    "backtest_conversion_allowed_after_audit": true
+  },
+  "mark_price": {
+    "endpoint": "/api/v1/market/markKlines",
+    "historical_backfill_documented": false,
+    "bounded_latest_window_only": true,
+    "max_page_size": 2000,
+    "supported_project_intervals": ["1M", "5M", "15M", "30M", "60M", "4H", "8H", "12H", "1D", "1W"],
+    "availability_rule": "bar_close_only",
+    "undocumented_endTime_forbidden": true
+  },
+  "open_interest": {
+    "endpoint": "/api/v1/market/openInterests",
+    "historical_backfill_documented": false,
+    "snapshot_capture_only": true,
+    "availability_rule": "response_timestamp_or_later",
+    "future_backprojection_forbidden": true
+  },
+  "guardrails": {
+    "private_api_used": false,
+    "live_trading_authorized": false,
+    "sstate_core_modified": false,
+    "provider_provenance_required": true,
+    "silent_interpolation_forbidden": true,
+    "unsupported_history_must_fail_closed": true
+  }
+}
