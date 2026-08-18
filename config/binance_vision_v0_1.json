@@ -1,0 +1,58 @@
+{
+  "version": "0.1.0",
+  "status": "BULK_SOURCE_FRAMEWORK_READY",
+  "verified_against_official_repo_date": "2026-08-18",
+  "provider": "binance_usdm",
+  "delivery": "binance_vision",
+  "base_url": "https://data.binance.vision/",
+  "execution_exchange": "pionex",
+  "native_to_execution_exchange": false,
+  "may_authorize_pionex_native_history": false,
+  "requires_equivalence_gate_before_strategy_source_switch": true,
+  "official_helper_baseline_start": "2020-01-01",
+  "coverage_rule": "discover_actual_symbol_specific_onset; never synthesize pre-provider perpetual history",
+  "datasets": {
+    "klines": {
+      "approved_bulk_candidate": true,
+      "intervals": ["15m", "1h", "4h"],
+      "frequencies": ["monthly", "daily"],
+      "source_api_lineage": "/fapi/v1/klines"
+    },
+    "markPriceKlines": {
+      "approved_bulk_candidate": true,
+      "intervals": ["15m", "1h", "4h"],
+      "frequencies": ["monthly", "daily"]
+    },
+    "funding_rates": {
+      "approved_bulk_candidate": false,
+      "preferred_source": "REST /fapi/v1/fundingRate until a bulk archive is independently verified"
+    },
+    "open_interest": {
+      "approved_bulk_candidate": false,
+      "reason": "Vision metrics are not admitted as canonical OI by V0.1; official REST history is only the latest 1 month"
+    }
+  },
+  "integrity": {
+    "official_checksum_required": true,
+    "checksum_algorithm": "sha256",
+    "single_expected_csv_member_required": true,
+    "strict_timestamp_order_required": true,
+    "duplicate_timestamps_forbidden": true,
+    "gaps_forbidden": true,
+    "silent_interpolation_forbidden": true,
+    "archive_revision_policy": "fail_closed_and_require_explicit_review"
+  },
+  "materialization": {
+    "completed_history_preference": "monthly",
+    "current_incomplete_month_preference": "daily",
+    "r2_provider_namespace": "market-data/binance_usdm/",
+    "pionex_namespace_forbidden": "market-data/pionex/"
+  },
+  "authority": {
+    "archive_presence_alone_is_not_pass": true,
+    "404_or_missing_archive_must_be_receipted_as_no_data": true,
+    "provider_specific_sha_and_source_url_must_be_retained": true,
+    "live_trading_authorized": false,
+    "private_api_required": false
+  }
+}
