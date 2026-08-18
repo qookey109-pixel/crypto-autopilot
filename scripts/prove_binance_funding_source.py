@@ -8,6 +8,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from crypto_autopilot.binance_funding import (
+    FUNDING_CADENCE_JITTER_TOLERANCE_MS,
     BinanceVisionFundingArchiveKey,
     ingest_funding_archive,
 )
@@ -38,6 +39,8 @@ def load_config(path: str) -> dict[str, object]:
         raise RuntimeError("funding provider/delivery mismatch")
     if payload.get("dataset") != "fundingRate" or payload.get("archive_frequency") != "monthly":
         raise RuntimeError("funding source must remain monthly Binance Vision fundingRate")
+    if int(payload.get("cadence_jitter_tolerance_ms") or -1) != FUNDING_CADENCE_JITTER_TOLERANCE_MS:
+        raise RuntimeError("funding cadence jitter tolerance config/code mismatch")
     for field in (
         "source_switch_authorized",
         "r2_writes_authorized",
@@ -50,6 +53,19 @@ def load_config(path: str) -> dict[str, object]:
         if payload.get(field) is not False:
             raise RuntimeError(f"{field} must remain false during source proof")
     return payload
+
+
+def max_cadence_residual_ms(observations: tuple[object, ...]) -> int:
+    hour_ms = 3_600_000
+    residuals: list[int] = []
+    for left, right in zip(observations, observations[1:]):
+        delta = right.funding_time_ms - left.funding_time_ms
+        expected = {
+            left.funding_interval_hours * hour_ms,
+            right.funding_interval_hours * hour_ms,
+        }
+        residuals.append(min(abs(delta - item) for item in expected))
+    return max(residuals, default=0)
 
 
 def main() -> int:
@@ -66,6 +82,7 @@ def main() -> int:
 
     receipts: list[dict[str, object]] = []
     total_rows = 0
+    proof_max_jitter_ms = 0
     for symbol in symbols:
         key = BinanceVisionFundingArchiveKey(symbol=symbol, period=period)
         checksum = fetch_bytes(key.checksum_url)
@@ -76,6 +93,10 @@ def main() -> int:
             checksum_payload=checksum,
         )
         receipt = result.receipt
+        observed_jitter = max_cadence_residual_ms(result.observations)
+        if observed_jitter > FUNDING_CADENCE_JITTER_TOLERANCE_MS:
+            raise RuntimeError("accepted Funding archive exceeded frozen cadence jitter tolerance")
+        proof_max_jitter_ms = max(proof_max_jitter_ms, observed_jitter)
         total_rows += receipt.row_count
         receipts.append(
             {
@@ -91,7 +112,8 @@ def main() -> int:
                 "interval_hours": list(receipt.interval_hours),
                 "min_rate": receipt.min_rate,
                 "max_rate": receipt.max_rate,
-                "cadence_anomalies": receipt.cadence_anomalies,
+                "max_abs_cadence_residual_ms": observed_jitter,
+                "cadence_anomalies_beyond_tolerance": receipt.cadence_anomalies,
                 "audit_ok": receipt.audit_ok,
             }
         )
@@ -111,10 +133,15 @@ def main() -> int:
         "symbol_count": len(symbols),
         "symbols": list(symbols),
         "total_rows": total_rows,
+        "cadence_jitter_tolerance_ms": FUNDING_CADENCE_JITTER_TOLERANCE_MS,
+        "proof_scope_max_abs_cadence_residual_ms": proof_max_jitter_ms,
+        "raw_timestamps_preserved": True,
+        "timestamps_rounded_or_interpolated": False,
         "receipts": receipts,
         "interpretation_boundary": {
             "proves_monthly_funding_archive_path": True,
             "proves_checksum_and_archive_schema_for_proof_scope": True,
+            "proves_bounded_source_timestamp_jitter_for_proof_scope": True,
             "proves_long_horizon_15_symbol_coverage": False,
             "proves_r2_materialization": False,
             "source_switch_authorized": False,
@@ -126,7 +153,17 @@ def main() -> int:
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, sort_keys=True, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"execution_status": "PASS", "rows": total_rows, "output": str(output)}, sort_keys=True))
+    print(
+        json.dumps(
+            {
+                "execution_status": "PASS",
+                "rows": total_rows,
+                "proof_max_jitter_ms": proof_max_jitter_ms,
+                "output": str(output),
+            },
+            sort_keys=True,
+        )
+    )
     return 0
 
 
