@@ -1,0 +1,72 @@
+name: Binance 2025 R2 Pilot
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/binance-2025-r2-pilot.yml"
+      - "scripts/materialize_binance_2025_r2_pilot.py"
+      - "src/crypto_autopilot/binance_2025_pilot.py"
+      - "src/crypto_autopilot/binance_vision.py"
+      - "src/crypto_autopilot/storage/**"
+      - "research/receipts/2026-08-18-binance-2025-coverage-scan.json"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/binance-2025-r2-pilot.yml"
+      - "scripts/materialize_binance_2025_r2_pilot.py"
+      - "src/crypto_autopilot/binance_2025_pilot.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binance-2025-r2-pilot
+  cancel-in-progress: false
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Verify R2 secret names are present
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_ACCOUNT_ID}"
+          test -n "${R2_BUCKET_NAME}"
+          test -n "${R2_ACCESS_KEY_ID}"
+          test -n "${R2_SECRET_ACCESS_KEY}"
+
+      - name: Materialize audited Binance 2025 pilot to R2
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/materialize_binance_2025_r2_pilot.py \
+            --coverage-authority research/receipts/2026-08-18-binance-2025-coverage-scan.json \
+            --workers 8 \
+            --run-id "${GITHUB_RUN_ID}" \
+            --output-dir artifacts/binance-2025-r2-pilot
+
+      - name: Upload Binance 2025 R2 pilot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-2025-r2-pilot-${{ github.run_id }}
+          path: artifacts/binance-2025-r2-pilot/*.json
+          if-no-files-found: warn
+          retention-days: 90
