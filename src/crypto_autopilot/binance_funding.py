@@ -13,6 +13,9 @@ from typing import Iterable
 from .binance_vision import BINANCE_VISION_BASE_URL, parse_checksum, sha256_bytes
 
 
+FUNDING_CADENCE_JITTER_TOLERANCE_MS = 10
+
+
 class BinanceFundingEvidenceError(RuntimeError):
     pass
 
@@ -64,10 +67,7 @@ class BinanceVisionFundingArchiveKey:
 
     @property
     def path(self) -> str:
-        return (
-            "data/futures/um/monthly/fundingRate/"
-            f"{self.symbol}/{self.filename}"
-        )
+        return f"data/futures/um/monthly/fundingRate/{self.symbol}/{self.filename}"
 
     @property
     def url(self) -> str:
@@ -231,18 +231,21 @@ def _parse_observations(
     return tuple(parsed)
 
 
-def _cadence_anomalies(observations: tuple[BinanceFundingObservation, ...]) -> int:
-    anomalies = 0
+def _cadence_residual_ms(left: BinanceFundingObservation, right: BinanceFundingObservation) -> int:
     hour_ms = 60 * 60 * 1000
-    for left, right in zip(observations, observations[1:]):
-        delta = right.funding_time_ms - left.funding_time_ms
-        allowed = {
-            left.funding_interval_hours * hour_ms,
-            right.funding_interval_hours * hour_ms,
-        }
-        if delta not in allowed:
-            anomalies += 1
-    return anomalies
+    delta = right.funding_time_ms - left.funding_time_ms
+    expected = {
+        left.funding_interval_hours * hour_ms,
+        right.funding_interval_hours * hour_ms,
+    }
+    return min((delta - item for item in expected), key=abs)
+
+
+def _cadence_anomalies(observations: tuple[BinanceFundingObservation, ...]) -> int:
+    return sum(
+        abs(_cadence_residual_ms(left, right)) > FUNDING_CADENCE_JITTER_TOLERANCE_MS
+        for left, right in zip(observations, observations[1:])
+    )
 
 
 def ingest_funding_archive(
