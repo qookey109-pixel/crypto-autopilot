@@ -1,0 +1,89 @@
+{
+  "schema": "binance-observed-r2-budget-authority-v0.1",
+  "status": "PASS",
+  "stage": "BINANCE_OBSERVED_R2_BUDGET_GATE_PASS",
+  "date": "2026-08-18",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "source_authority": "research/receipts/2026-08-18-binance-2025-r2-pilot.json",
+  "estimate": "research/estimates/2026-08-18-binance-observed-r2-budget.json",
+  "policy": "config/r2_budget_v0_1.json",
+  "provider": "binance_usdm",
+  "basis": {
+    "observed_candidate_count": 15,
+    "observed_year": 2025,
+    "observed_rows": 671022,
+    "observed_parquet_bytes": 18778928,
+    "rows_per_full_market_year": 45990,
+    "full_candidate_year_rows": 689850,
+    "missing_equivalent_rows": 18828,
+    "observed_bytes_per_row": 27.98556232135459,
+    "imputation_method": "Impute the partial-HYPE missing rows up to a complete 15-market year at the observed bytes-per-row before target scaling.",
+    "target_markets": 250,
+    "target_years": 8
+  },
+  "storage_projection": {
+    "canonical_only_gb_month": 2.5741120223,
+    "canonical_plus_retained_staging_gb_month": 5.1482240446,
+    "three_x_capacity_stress_gb_month": 7.722336067
+  },
+  "operation_projection": {
+    "planned_class_a_requests": 224000,
+    "planned_class_b_requests": 140000,
+    "three_x_class_a_requests": 672000,
+    "three_x_class_b_requests": 420000,
+    "method": "Retain the previously frozen conservative 28,000-partition operation envelope rather than lowering the request model because Binance Vision reduces source HTTP pagination."
+  },
+  "gate_result": {
+    "planned_usage": "PASS",
+    "three_x_capacity_and_operation_stress": "PASS",
+    "planned_estimated_r2_monthly_cost_usd": 0.0,
+    "stress_estimated_r2_monthly_cost_usd": 0.0,
+    "pricing_basis": "Frozen Cloudflare R2 Standard pricing snapshot in config/r2_budget_v0_1.json"
+  },
+  "comparison_to_original_m1b_model": {
+    "original_canonical_gb": 2.9558812381,
+    "observed_recalibrated_canonical_gb": 2.5741120223,
+    "original_canonical_plus_staging_gb": 5.9117624762,
+    "observed_recalibrated_canonical_plus_staging_gb": 5.1482240446,
+    "original_three_x_stress_gb": 8.8676437143,
+    "observed_recalibrated_three_x_stress_gb": 7.722336067,
+    "interpretation": "The original M1B estimate remains a valid conservative frozen reference. The Binance full-year-equivalent estimate is the preferred observed capacity calibration for Binance long-history planning."
+  },
+  "ci": {
+    "implementation_pr": 42,
+    "run_id": 32111610966,
+    "job_id": 95632076309,
+    "conclusion": "success",
+    "merge_commit": "370a833547d09540d10e6ea633f948d0af0aeddc",
+    "original_r2_budget_gate_pass": true,
+    "observed_binance_r2_budget_gate_pass": true
+  },
+  "validation": {
+    "source_row_count_matches_frozen_2025_pilot": true,
+    "source_parquet_bytes_match_frozen_2025_pilot": true,
+    "capacity_recomputed_in_ci": true,
+    "partial_hype_underestimation_guarded": true,
+    "planned_usage_under_project_guardrails": true,
+    "three_x_stress_under_project_guardrails": true,
+    "live_trading_authorized": false
+  },
+  "caveats": [
+    "R2 free-tier usage is account-level; unrelated buckets or projects may consume the same included monthly allowance.",
+    "The projection covers trade-Kline storage plus the frozen operation envelope; Mark Price, Funding, Open Interest, SState evidence, reports and future derived datasets require separate capacity additions.",
+    "This capacity gate does not prove that 250 Binance USD-M markets have eight years of history.",
+    "Cloudflare Workers, Workflows, Queues and D1 require separate cost gates before CF1 migration."
+  ],
+  "authority_boundary": {
+    "authorizes_full_8_year_250_market_backfill": false,
+    "authorizes_pionex_binance_source_switch": false,
+    "authorizes_pionex_native_relabeling": false,
+    "authorizes_automatic_trade_plans": false,
+    "authorizes_live_trading": false,
+    "next_required_gates": [
+      "Pionex/Binance overlap and strategy-signal equivalence",
+      "maximum-available Binance historical coverage discovery",
+      "historical-universe reconstruction",
+      "large-expansion review"
+    ]
+  }
+}
