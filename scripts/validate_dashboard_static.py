@@ -33,6 +33,18 @@ FORBIDDEN_RUNTIME_PHRASES = (
     '"tradePlanAuthorized": true',
 )
 
+REQUIRED_ZH_HANT_LABELS = (
+    "總覽",
+    "資料健康度",
+    "交易訊號",
+    "模擬持倉",
+    "模擬交易",
+    "績效中心",
+    "回測",
+    "風險與閘門",
+    "真實交易目前停用",
+)
+
 
 def main() -> int:
     missing = [str(path) for path in REQUIRED if not path.is_file()]
@@ -49,16 +61,23 @@ def main() -> int:
 
     data = json.loads((ROOT / "data" / "dashboard.json").read_text(encoding="utf-8"))
     if data.get("authority") is not False:
-        raise RuntimeError("D1 dashboard fixture must explicitly declare authority=false")
+        raise RuntimeError("dashboard fixture must explicitly declare authority=false")
+    if data.get("locale") != "zh-Hant-TW":
+        raise RuntimeError("dashboard fixture must declare locale=zh-Hant-TW")
     project = data.get("project") or {}
     if project.get("mode") != "PAPER-ONLY":
-        raise RuntimeError("D1 dashboard must remain PAPER-ONLY")
+        raise RuntimeError("dashboard must remain PAPER-ONLY")
     if project.get("tradePlanAuthorized") is not False:
-        raise RuntimeError("D1 dashboard fixture must keep tradePlanAuthorized=false")
+        raise RuntimeError("dashboard fixture must keep tradePlanAuthorized=false")
     if project.get("liveTradingAuthorized") is not False:
-        raise RuntimeError("D1 dashboard fixture must keep liveTradingAuthorized=false")
+        raise RuntimeError("dashboard fixture must keep liveTradingAuthorized=false")
 
     html = (ROOT / "index.html").read_text(encoding="utf-8")
+    if '<html lang="zh-Hant-TW">' not in html:
+        raise RuntimeError("dashboard HTML must declare zh-Hant-TW")
+    for label in REQUIRED_ZH_HANT_LABELS:
+        if label not in html:
+            raise RuntimeError(f"dashboard Traditional Chinese label missing: {label}")
     for view in (
         "overview",
         "data-health",
@@ -71,6 +90,10 @@ def main() -> int:
     ):
         if f'id="view-{view}"' not in html:
             raise RuntimeError(f"dashboard view missing: {view}")
+
+    app_js = (ROOT / "app.js").read_text(encoding="utf-8")
+    if "通過 · PASS" not in app_js or "未授權 · NOT_AUTHORIZED" not in app_js:
+        raise RuntimeError("dashboard must preserve raw authority codes beside Chinese labels")
 
     headers = (ROOT / "_headers").read_text(encoding="utf-8")
     for header in (
@@ -86,9 +109,10 @@ def main() -> int:
         json.dumps(
             {
                 "status": "PASS",
-                "stage": "DASHBOARD_D1_STATIC_SAFETY_PASS",
+                "stage": "DASHBOARD_ZH_HANT_STATIC_SAFETY_PASS",
                 "required_files": len(REQUIRED),
                 "views": 8,
+                "locale": "zh-Hant-TW",
                 "authority_fixture": False,
                 "paper_only": True,
                 "live_execution_surface": False,

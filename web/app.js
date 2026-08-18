@@ -1,5 +1,5 @@
 const FALLBACK = {
-  snapshotLabel: "Safe fixture snapshot",
+  snapshotLabel: "安全測試資料快照",
   project: { marketCount: 15, fundingMonths: 1010 },
   pipeline: [],
   gates: [],
@@ -8,11 +8,29 @@ const FALLBACK = {
 
 const state = { data: FALLBACK };
 
+const STATUS_LABELS = {
+  PASS: "通過 · PASS",
+  READY: "已就緒 · READY",
+  AUTHORIZED: "已授權 · AUTHORIZED",
+  PENDING: "等待中 · PENDING",
+  IN_PROGRESS: "進行中 · IN_PROGRESS",
+  NOT_READY: "尚未就緒 · NOT_READY",
+  REVIEW_REQUIRED: "需要審查 · REVIEW_REQUIRED",
+  SCOPE_REDUCTION_REQUIRED: "需縮減範圍 · SCOPE_REDUCTION_REQUIRED",
+  BLOCKED: "已阻擋 · BLOCKED",
+  NOT_AUTHORIZED: "未授權 · NOT_AUTHORIZED",
+  FAIL: "失敗 · FAIL"
+};
+
 function badgeClass(status) {
   if (["PASS", "READY", "AUTHORIZED"].includes(status)) return "pass";
   if (["PENDING", "IN_PROGRESS", "NOT_READY", "REVIEW_REQUIRED", "SCOPE_REDUCTION_REQUIRED"].includes(status)) return "pending";
   if (["BLOCKED", "NOT_AUTHORIZED", "FAIL"].includes(status)) return "danger";
   return "neutral";
+}
+
+function displayStatus(status) {
+  return STATUS_LABELS[status] || status;
 }
 
 function statusDot(status) {
@@ -29,7 +47,7 @@ function renderPipeline(items) {
         <strong>${item.name}</strong>
         <span>${item.detail}</span>
       </div>
-      <span class="badge ${badgeClass(item.status)}">${item.status}</span>
+      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${item.status}">${displayStatus(item.status)}</span>
     </div>
   `).join("");
 }
@@ -41,7 +59,7 @@ function renderCriticalGates(items) {
     <div class="gate ${item.tone || "pending"}">
       <strong>${item.name}</strong>
       <small>${item.detail}</small>
-      <span class="badge ${badgeClass(item.status)}">${item.status}</span>
+      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${item.status}">${displayStatus(item.status)}</span>
     </div>
   `).join("");
 }
@@ -52,7 +70,7 @@ function renderAllGates(items) {
     <div class="gate ${item.tone || "pending"}">
       <strong>${item.name}</strong>
       <small>${item.detail}</small>
-      <span class="badge ${badgeClass(item.status)}">${item.status}</span>
+      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${item.status}">${displayStatus(item.status)}</span>
     </div>
   `).join("");
 }
@@ -62,11 +80,11 @@ function renderMarkets(items) {
   root.innerHTML = items.map(item => `
     <tr>
       <td><strong>${item.symbol}</strong></td>
-      <td class="${item.trade === "PASS" ? "cell-pass" : "cell-pending"}">${item.trade}</td>
-      <td class="${item.mark === "PASS" ? "cell-pass" : "cell-pending"}">${item.mark}</td>
-      <td class="${item.funding === "PASS" ? "cell-pass" : "cell-pending"}">${item.funding}</td>
+      <td class="${item.trade === "PASS" ? "cell-pass" : "cell-pending"}">${displayStatus(item.trade)}</td>
+      <td class="${item.mark === "PASS" ? "cell-pass" : "cell-pending"}">${displayStatus(item.mark)}</td>
+      <td class="${item.funding === "PASS" ? "cell-pass" : "cell-pending"}">${displayStatus(item.funding)}</td>
       <td><span class="provider-tag ${item.provider === "PIONEX" ? "pionex" : "binance"}">${item.provider}</span></td>
-      <td><span class="badge ${badgeClass(item.status)}">${item.status}</span></td>
+      <td><span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${item.status}">${displayStatus(item.status)}</span></td>
     </tr>
   `).join("");
 }
@@ -74,9 +92,9 @@ function renderMarkets(items) {
 function render(data) {
   state.data = data;
   document.querySelector("#snapshot-label").textContent = data.snapshotLabel;
-  document.querySelector("#market-count").textContent = Number(data.project.marketCount || 0).toLocaleString();
+  document.querySelector("#market-count").textContent = Number(data.project.marketCount || 0).toLocaleString("zh-TW");
   const fundingMonths = data.project.fundingMonthsObserved ?? data.project.fundingMonths ?? 0;
-  document.querySelector("#funding-months").textContent = Number(fundingMonths).toLocaleString();
+  document.querySelector("#funding-months").textContent = Number(fundingMonths).toLocaleString("zh-TW");
   renderPipeline(data.pipeline || []);
   renderCriticalGates(data.gates || []);
   renderAllGates(data.gates || []);
@@ -92,19 +110,19 @@ async function loadData() {
   } catch (error) {
     console.error("Dashboard snapshot load failed", error);
     render(FALLBACK);
-    document.querySelector("#snapshot-label").textContent = "Snapshot unavailable";
+    document.querySelector("#snapshot-label").textContent = "狀態快照暫時無法讀取";
   }
 }
 
 const titles = {
-  overview: "Overview",
-  "data-health": "Data Health",
-  signals: "Signals",
-  positions: "Paper Positions",
-  trades: "Paper Trades",
-  performance: "Performance Center",
-  backtests: "Backtests",
-  gates: "Risk & Gates"
+  overview: "總覽",
+  "data-health": "資料健康度",
+  signals: "交易訊號",
+  positions: "模擬持倉",
+  trades: "模擬交易",
+  performance: "績效中心",
+  backtests: "回測",
+  gates: "風險與閘門"
 };
 
 document.querySelectorAll(".nav-item").forEach(button => {
