@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-08-17
+Updated: 2026-08-18
 
 ## Project
 
@@ -12,7 +12,7 @@ Qookey Crypto Autopilot
 
 ## Current formal stage
 
-**V0.1 M1B R2 FOUNDATION READY / PAPER-ONLY**
+**V0.1 M1B COMPLETE / PAPER-ONLY**
 
 No live-money authorization exists.
 
@@ -51,35 +51,36 @@ Authoritative receipt: `research/receipts/2026-08-17-m1a-pionex.json`
 - Pionex runtime discrepancy found and frozen: singular `/bookTicker` returned 404; implementation uses plural `/bookTickers` with regression coverage.
 - An earlier exploratory run that admitted non-crypto instruments is explicitly non-authoritative.
 
-### M1B — Cloudflare R2 foundation
+### M1B — Cloudflare R2 Historical Store
 
-- R2 S3-compatible storage adapter implemented; credentials are secret-manager only.
-- Deterministic R2 object-key contract implemented.
-- Parquet candle encoding/decoding implemented with Zstandard compression.
-- Partition policy established: monthly `15M`; annual `60M` / `4H` by default.
-- SHA-256 object receipt and verified download path implemented.
-- Real-bucket round-trip proof script added.
-- Storage layout is designed for approximately 250 markets and maximum available history capped at eight years.
-- Pionex-native histories and future external proxy histories are required to remain provenance-separated.
+Authoritative completion receipt: `research/receipts/2026-08-18-m1b-r2.json`
 
-## M1B not yet authoritative
-
-The Cloudflare R2 bucket has not yet been connected from this environment. M1B must not be marked COMPLETE until a real R2 round-trip proof passes against the project bucket.
-
-Required secret values, never committed:
-
-- `CLOUDFLARE_ACCOUNT_ID`
-- `R2_BUCKET_NAME`
-- `R2_ACCESS_KEY_ID`
-- `R2_SECRET_ACCESS_KEY`
+- Cloudflare R2 S3-compatible storage adapter is implemented; credentials remain secret-manager only.
+- Deterministic R2 object-key contract is implemented.
+- Parquet candle encoding/decoding uses Zstandard compression.
+- Partition policy remains monthly `15M` and annual `60M` / `4H` by default.
+- SHA-256 verified upload/download path is implemented.
+- Real Cloudflare R2 round-trip proof passed.
+- Frozen M1A bounded dataset materialization passed in GitHub Actions run `32093154424` at head `94145b90c8067e062472be9080635afa879d24ea`.
+- Dataset gate: 45 objects, 13,230 rows, 15 symbols, intervals `15M` / `60M` / `4H`.
+- Every uploaded Parquet object was downloaded with SHA-256 verification, decoded, and compared for exact candle equality with the frozen source.
+- Dataset audit passed with strict timestamp ordering/uniqueness and no silent repair/interpolation.
+- Total observed Parquet payload for the seven-day bounded dataset: 425,161 bytes.
+- R2 manifest: `manifests/historical/year=2026/month=08/manifest-20260818T024828Z.json`.
+- Manifest SHA-256: `e0a8252d0853aeaf2f3fbe87e7c1c48d1450eef40140ee399d2c15bcf7ce8d16`.
+- R2 receipt: `receipts/historical/m1b-m1a-upload-32093154424.json`.
+- R2 receipt SHA-256: `846ca4d4f668336b277efe7799a5d46077ee080ec7d0c7dbe81b05fc8cc44cd2`.
+- Pionex-native histories and any future external proxy histories must remain provenance-separated.
 
 ## Not completed
 
-- Real Cloudflare R2 bucket round-trip proof.
-- Upload of the bounded M1A dataset to R2.
-- Dataset-level R2 manifest/receipt freeze.
+- Observed-compression capacity model for one-year / eight-year / approximately 250-market storage.
+- Cloudflare R2 GB-month / Class A / Class B operation budget estimate.
 - Long-horizon maximum-available historical backfill (target cap: eight years).
 - Dynamic historical-universe reconstruction for survivorship-bias-safe backtests.
+- Funding-rate history.
+- Mark-price history.
+- Open-interest history.
 - Technical indicator calculation (EMA/ATR/volume).
 - Real SState output ingestion.
 - Full event-driven backtest engine.
@@ -94,16 +95,16 @@ Required secret values, never committed:
 
 ## Next milestone
 
-**M1B-PROOF — Real Cloudflare R2 Round Trip**
+**Historical capacity sizing and resumable backfill design**
 
-1. Create/connect the Cloudflare account and R2 bucket for this project.
-2. Create an R2 API token / S3 Access Key scoped to the project bucket.
-3. Store values only as GitHub/Cloudflare secrets.
-4. Run `scripts/r2_roundtrip_proof.py` against the real bucket.
-5. Require upload/download SHA-256 equality and row-count equality.
-6. Upload the bounded M1A proof dataset and freeze a dataset manifest.
-7. Measure actual Parquet compression, then estimate the 8-year / ~250-market storage and API budget.
-8. Begin resumable maximum-available historical acquisition only after the proof passes.
+1. Use the observed M1B Parquet payload (`425,161` bytes for the bounded 15-symbol / 7-day / 3-interval dataset) to calculate measured storage rates.
+2. Estimate one-year and eight-year storage for the planned research universe, including an approximately 250-market upper design target.
+3. Estimate R2 GB-month plus Class A / Class B operation counts for acquisition, verification and later reads.
+4. Keep `15M` as the likely canonical historical candle where appropriate; evaluate deterministic `1H` / `4H` resampling or derived caches before duplicating long-horizon storage.
+5. Define resumable, checkpointed and retry-safe maximum-available acquisition.
+6. Define historical-universe reconstruction so backtests do not use today's universe retroactively.
+7. Preserve provider/source provenance; never present external proxy history as Pionex-native PERP history.
+8. Begin long-horizon acquisition only after the capacity and request budget is reviewed.
 
 ## Safety gates before any live trading
 
