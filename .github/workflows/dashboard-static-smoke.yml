@@ -36,6 +36,19 @@ jobs:
           python -m http.server 4173 -d web > /tmp/qookey-dashboard-http.log 2>&1 &
           echo $! > /tmp/qookey-dashboard-http.pid
 
+      - name: Wait for static server readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent "http://127.0.0.1:4173/" >/dev/null; then
+              exit 0
+            fi
+            sleep 0.25
+          done
+          cat /tmp/qookey-dashboard-http.log || true
+          exit 1
+
       - name: HTTP smoke
         shell: bash
         run: |
