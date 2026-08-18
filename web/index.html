@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="zh-Hant-TW">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark" />
-  <title>Qookey Crypto Autopilot</title>
+  <title>Qookey Crypto Autopilot 控制台</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
@@ -14,26 +14,26 @@
         <div class="brand-mark">Q</div>
         <div>
           <strong>Qookey</strong>
-          <span>Crypto Autopilot</span>
+          <span>加密貨幣自動化控制台</span>
         </div>
       </div>
 
       <nav class="nav-list">
-        <button class="nav-item active" data-view="overview">Overview</button>
-        <button class="nav-item" data-view="data-health">Data Health</button>
-        <button class="nav-item" data-view="signals">Signals</button>
-        <button class="nav-item" data-view="positions">Paper Positions</button>
-        <button class="nav-item" data-view="trades">Paper Trades</button>
-        <button class="nav-item" data-view="performance">Performance</button>
-        <button class="nav-item" data-view="backtests">Backtests</button>
-        <button class="nav-item" data-view="gates">Risk & Gates</button>
+        <button class="nav-item active" data-view="overview">總覽</button>
+        <button class="nav-item" data-view="data-health">資料健康度</button>
+        <button class="nav-item" data-view="signals">交易訊號</button>
+        <button class="nav-item" data-view="positions">模擬持倉</button>
+        <button class="nav-item" data-view="trades">模擬交易</button>
+        <button class="nav-item" data-view="performance">績效中心</button>
+        <button class="nav-item" data-view="backtests">回測</button>
+        <button class="nav-item" data-view="gates">風險與閘門</button>
       </nav>
 
       <div class="sidebar-footer">
         <span class="status-dot safe"></span>
         <div>
           <strong>PAPER-ONLY</strong>
-          <span>Live trading disabled</span>
+          <span>真實交易目前停用</span>
         </div>
       </div>
     </aside>
@@ -41,13 +41,13 @@
     <main class="main-panel">
       <header class="topbar">
         <div>
-          <p class="eyebrow">Research / Paper Trading Control Center</p>
-          <h1 id="page-title">Overview</h1>
+          <p class="eyebrow">研究 / 模擬交易控制中心</p>
+          <h1 id="page-title">總覽</h1>
         </div>
         <div class="topbar-actions">
           <div class="snapshot-pill">
             <span class="status-dot safe"></span>
-            <span id="snapshot-label">Safe fixture snapshot</span>
+            <span id="snapshot-label">安全測試資料快照</span>
           </div>
           <button class="icon-button" id="refresh-button" aria-label="重新整理">↻</button>
         </div>
@@ -57,29 +57,29 @@
         <div class="hero-grid">
           <article class="hero-card accent-card">
             <div>
-              <p class="card-kicker">System Mode</p>
+              <p class="card-kicker">系統模式</p>
               <h2>PAPER-ONLY</h2>
-              <p>Research, backtest and paper execution only. No real-money route is enabled.</p>
+              <p>目前僅允許研究、回測與模擬交易；真實資金下單路徑尚未開啟。</p>
             </div>
             <div class="shield">✓</div>
           </article>
 
           <article class="metric-card">
-            <p class="card-kicker">Tracked Markets</p>
+            <p class="card-kicker">追蹤市場</p>
             <strong class="metric-value" id="market-count">15</strong>
-            <span class="metric-note">Pionex candidate universe</span>
+            <span class="metric-note">Pionex 候選交易標的</span>
           </article>
 
           <article class="metric-card">
-            <p class="card-kicker">Funding Coverage</p>
+            <p class="card-kicker">Funding 覆蓋</p>
             <strong class="metric-value" id="funding-months">1,010</strong>
-            <span class="metric-note">Observed Binance symbol-months</span>
+            <span class="metric-note">已觀察 Binance 標的月份數</span>
           </article>
 
           <article class="metric-card">
-            <p class="card-kicker">Live Trading</p>
-            <strong class="metric-value danger-text">OFF</strong>
-            <span class="metric-note">Authorization remains false</span>
+            <p class="card-kicker">真實交易</p>
+            <strong class="metric-value danger-text">關閉</strong>
+            <span class="metric-note">授權狀態維持 false</span>
           </article>
         </div>
 
@@ -87,10 +87,10 @@
           <article class="panel">
             <div class="panel-header">
               <div>
-                <p class="card-kicker">Pipeline</p>
-                <h3>Authority Readiness</h3>
+                <p class="card-kicker">資料管線</p>
+                <h3>授權與準備度</h3>
               </div>
-              <span class="badge neutral">READ-ONLY</span>
+              <span class="badge neutral">唯讀</span>
             </div>
             <div class="pipeline" id="pipeline-list"></div>
           </article>
@@ -98,8 +98,8 @@
           <article class="panel">
             <div class="panel-header">
               <div>
-                <p class="card-kicker">Risk</p>
-                <h3>Critical Gates</h3>
+                <p class="card-kicker">風險控制</p>
+                <h3>關鍵安全閘門</h3>
               </div>
             </div>
             <div class="gate-stack" id="critical-gates"></div>
@@ -110,12 +110,12 @@
           <article class="panel performance-card">
             <div class="panel-header">
               <div>
-                <p class="card-kicker">Paper Performance</p>
-                <h3>Equity Preview</h3>
+                <p class="card-kicker">模擬績效</p>
+                <h3>資產曲線預覽</h3>
               </div>
-              <span class="badge pending">AWAITING PAPER BROKER</span>
+              <span class="badge pending">等待模擬券商完成</span>
             </div>
-            <svg class="equity-chart" viewBox="0 0 800 260" role="img" aria-label="Paper performance placeholder">
+            <svg class="equity-chart" viewBox="0 0 800 260" role="img" aria-label="模擬績效預覽圖">
               <defs>
                 <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="currentColor" stop-opacity=".24" />
@@ -126,25 +126,25 @@
               <path class="area" d="M0 190 C70 180,100 160,150 168 S245 120,300 132 S390 104,440 112 S520 80,575 92 S665 58,720 68 S770 52,800 48 L800 260 L0 260 Z" />
               <path class="line" d="M0 190 C70 180,100 160,150 168 S245 120,300 132 S390 104,440 112 S520 80,575 92 S665 58,720 68 S770 52,800 48" />
             </svg>
-            <p class="empty-note">Real paper P&amp;L will appear only after the production-grade paper broker lifecycle is authorized.</p>
+            <p class="empty-note">正式的模擬 P&amp;L 會在 production-grade paper broker lifecycle 通過授權後顯示。</p>
           </article>
 
           <article class="panel">
             <div class="panel-header">
               <div>
-                <p class="card-kicker">Data</p>
-                <h3>Provider Separation</h3>
+                <p class="card-kicker">資料來源</p>
+                <h3>Provider 分離</h3>
               </div>
             </div>
             <div class="provider-card">
               <span class="provider-tag pionex">PIONEX</span>
-              <strong>Execution target</strong>
-              <p>Native evidence remains separate and authoritative.</p>
+              <strong>執行目標交易所</strong>
+              <p>Pionex-native 證據獨立保存，並維持自己的正式 authority。</p>
             </div>
             <div class="provider-card">
               <span class="provider-tag binance">BINANCE USD-M</span>
-              <strong>Research history</strong>
-              <p>Never relabeled as Pionex-native.</p>
+              <strong>研究歷史資料來源</strong>
+              <p>Binance 歷史資料永遠不會被標示成 Pionex-native。</p>
             </div>
           </article>
         </div>
@@ -154,21 +154,21 @@
         <div class="panel">
           <div class="panel-header">
             <div>
-              <p class="card-kicker">Historical Data</p>
-              <h3>Market Coverage</h3>
+              <p class="card-kicker">歷史資料</p>
+              <h3>市場資料覆蓋</h3>
             </div>
-            <span class="badge neutral">PROVIDER-AWARE</span>
+            <span class="badge neutral">保留 PROVIDER 來源</span>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Symbol</th>
-                  <th>Trade</th>
-                  <th>Mark</th>
+                  <th>交易標的</th>
+                  <th>成交 K 線</th>
+                  <th>Mark Price</th>
                   <th>Funding</th>
-                  <th>Provider</th>
-                  <th>Status</th>
+                  <th>資料來源</th>
+                  <th>狀態</th>
                 </tr>
               </thead>
               <tbody id="market-table"></tbody>
@@ -180,46 +180,46 @@
       <section class="view" id="view-signals">
         <div class="empty-state panel">
           <div class="empty-icon">⌁</div>
-          <h3>Signals view is ready for safe API wiring</h3>
-          <p>V0.1 shell contains no order action. Strategy outputs will be read-only.</p>
+          <h3>交易訊號頁已準備好接安全 API</h3>
+          <p>目前介面沒有下單按鈕；策略輸出只會以唯讀方式顯示。</p>
         </div>
       </section>
 
       <section class="view" id="view-positions">
         <div class="empty-state panel">
           <div class="empty-icon">◎</div>
-          <h3>No production paper positions yet</h3>
-          <p>Position lifecycle appears only after paper broker reconciliation authority is complete.</p>
+          <h3>目前尚無正式模擬持倉資料</h3>
+          <p>Paper Broker 的持倉生命週期與 reconciliation authority 完成後才會顯示。</p>
         </div>
       </section>
 
       <section class="view" id="view-trades">
         <div class="empty-state panel">
           <div class="empty-icon">↗</div>
-          <h3>Paper trade history not connected</h3>
-          <p>This shell intentionally has no private exchange or live execution endpoint.</p>
+          <h3>模擬交易紀錄尚未接入</h3>
+          <p>此網站目前刻意不提供私人交易所 API 或真實下單端點。</p>
         </div>
       </section>
 
       <section class="view" id="view-performance">
         <div class="metrics-row">
-          <article class="metric-card"><p class="card-kicker">Return</p><strong>—</strong><span>Paper data pending</span></article>
-          <article class="metric-card"><p class="card-kicker">Win Rate</p><strong>—</strong><span>Paper data pending</span></article>
-          <article class="metric-card"><p class="card-kicker">Profit Factor</p><strong>—</strong><span>Paper data pending</span></article>
-          <article class="metric-card"><p class="card-kicker">Max Drawdown</p><strong>—</strong><span>Paper data pending</span></article>
+          <article class="metric-card"><p class="card-kicker">報酬率</p><strong>—</strong><span>等待模擬交易資料</span></article>
+          <article class="metric-card"><p class="card-kicker">勝率</p><strong>—</strong><span>等待模擬交易資料</span></article>
+          <article class="metric-card"><p class="card-kicker">獲利因子</p><strong>—</strong><span>等待模擬交易資料</span></article>
+          <article class="metric-card"><p class="card-kicker">最大回撤</p><strong>—</strong><span>等待模擬交易資料</span></article>
         </div>
         <div class="empty-state panel">
           <div class="empty-icon">∿</div>
-          <h3>Performance Center shell ready</h3>
-          <p>Equity, P&amp;L, drawdown, long/short and per-symbol attribution will connect to normalized paper-trading snapshots.</p>
+          <h3>績效中心介面已完成</h3>
+          <p>之後會接入資產曲線、P&amp;L、回撤、多空表現、各標的貢獻與 Funding 貢獻。</p>
         </div>
       </section>
 
       <section class="view" id="view-backtests">
         <div class="empty-state panel">
           <div class="empty-icon">◫</div>
-          <h3>Backtest authority browser</h3>
-          <p>Future cards will show dataset authority, provider, run SHA, window, parameter identity and admission state.</p>
+          <h3>回測 Authority 瀏覽器</h3>
+          <p>未來會顯示資料集 authority、provider、run SHA、回測期間、參數版本與 admission 狀態。</p>
         </div>
       </section>
 
@@ -228,9 +228,9 @@
           <div class="panel-header">
             <div>
               <p class="card-kicker">Fail-Closed</p>
-              <h3>All Project Gates</h3>
+              <h3>全部專案安全閘門</h3>
             </div>
-            <span class="badge danger">NO LIVE ROUTE</span>
+            <span class="badge danger">無真實交易路徑</span>
           </div>
           <div class="gate-grid" id="all-gates"></div>
         </div>
