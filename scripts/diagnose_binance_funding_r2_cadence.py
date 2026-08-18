@@ -10,6 +10,9 @@ from urllib.request import Request, urlopen
 from crypto_autopilot.binance_funding import (
     BinanceVisionFundingArchiveKey,
     _cadence_residual_ms,
+    _parse_observations,
+    _rows_from_archive,
+    _verify_checksum,
     ingest_funding_archive,
 )
 from crypto_autopilot.binance_funding_materialization_plan import build_materialization_scope
@@ -60,40 +63,44 @@ def inspect(key: BinanceVisionFundingArchiveKey) -> dict[str, object] | None:
         )
         return None
     except Exception as original:
-        try:
-            relaxed = ingest_funding_archive(
-                key,
-                archive_bytes=archive,
-                checksum_payload=checksum,
-                cadence_jitter_tolerance_ms=1000,
-            )
-        except Exception as relaxed_error:
-            return {
-                "symbol": key.symbol,
-                "period": key.period,
-                "status": "FAILS_EVEN_AT_1000MS",
-                "error_50ms": str(original),
-                "error_1000ms": str(relaxed_error),
-            }
-
-        residuals = [
-            _cadence_residual_ms(left, right)
-            for left, right in zip(relaxed.observations, relaxed.observations[1:])
-        ]
-        above = [value for value in residuals if abs(value) > 50]
-        ranked = sorted(above, key=lambda value: abs(value), reverse=True)
+        archive_sha = _verify_checksum(
+            key,
+            archive_bytes=archive,
+            checksum_payload=checksum,
+        )
+        observations = _parse_observations(key, _rows_from_archive(key, archive))
+        anomalies: list[dict[str, object]] = []
+        residuals: list[int] = []
+        for index, (left, right) in enumerate(zip(observations, observations[1:])):
+            residual = _cadence_residual_ms(left, right)
+            residuals.append(residual)
+            if abs(residual) > 50:
+                anomalies.append(
+                    {
+                        "index": index,
+                        "left_time_ms": left.funding_time_ms,
+                        "right_time_ms": right.funding_time_ms,
+                        "delta_ms": right.funding_time_ms - left.funding_time_ms,
+                        "left_interval_hours": left.funding_interval_hours,
+                        "right_interval_hours": right.funding_interval_hours,
+                        "residual_ms": residual,
+                        "left_rate": left.rate,
+                        "right_rate": right.rate,
+                    }
+                )
         return {
             "symbol": key.symbol,
             "period": key.period,
-            "status": "SOURCE_JITTER_ABOVE_50MS_BUT_WITHIN_1000MS",
-            "rows": relaxed.receipt.row_count,
-            "interval_hours": list(relaxed.receipt.interval_hours),
-            "first_time_ms": relaxed.receipt.first_time_ms,
-            "last_time_ms": relaxed.receipt.last_time_ms,
-            "residual_count_above_50ms": len(above),
+            "status": "RAW_RESIDUAL_DIAGNOSTIC",
+            "error_50ms": str(original),
+            "rows": len(observations),
+            "interval_hours": sorted({item.funding_interval_hours for item in observations}),
+            "first_time_ms": observations[0].funding_time_ms,
+            "last_time_ms": observations[-1].funding_time_ms,
+            "residual_count_above_50ms": len(anomalies),
             "max_abs_residual_ms": max((abs(value) for value in residuals), default=0),
-            "largest_residuals_ms": ranked[:10],
-            "archive_sha256": relaxed.receipt.archive_sha256,
+            "anomalies": anomalies[:20],
+            "archive_sha256": archive_sha,
         }
 
 
