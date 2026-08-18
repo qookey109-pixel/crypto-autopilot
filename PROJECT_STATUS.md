@@ -12,7 +12,7 @@ Qookey Crypto Autopilot
 
 ## Current formal stage
 
-**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / PARAMETER SWEEP FRAMEWORK V0.1 READY / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
+**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / HISTORICAL SSTATE EVIDENCE INGESTION V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / PARAMETER SWEEP FRAMEWORK V0.1 READY / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
 
 No live-money authorization exists.
 
@@ -186,6 +186,22 @@ Implementation merge: PR #18 / commit `826b2626d4f0c4e0c115d8af7aa4a6e48d53019c`
 - Test fixtures validate the replay contract only and are explicitly not real historical SState evidence.
 - CI run `32103390907` passed all unit/regression tests plus the R2 cost/budget gate.
 
+### Historical SState Evidence Ingestion V0.1
+
+Primary document: `docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md`
+Implementation merge: PR #23 / commit `dca0507fa7e160a6dcea25dd552cf05d7dc6b3f0`.
+
+- A deterministic canonical `historical-sstate-records-v0.1` payload schema is implemented.
+- Evidence manifests freeze evidence id/status, real-vs-fixture kind, availability basis, interval, producer provenance/SHA-256, source reference, payload SHA-256, record count and generation time.
+- V0.1 historical authority admits only `PASS + REAL_RECORDED + RECORDED_RUNTIME` evidence.
+- Fixtures are rejected from historical authority even when structurally valid.
+- After-the-fact `RECONSTRUCTED` availability is rejected until a separate deterministic reconstruction proof is designed and approved.
+- SState evidence must be 4H-aligned and cannot become available before the source 4H bar closes.
+- Future-dated manifests, payload SHA mismatch, record-count mismatch, duplicate symbol/bar identities and noncanonical payload encodings fail closed.
+- Verified evidence converts into existing `HistoricalSStatePoint` objects without recomputing or modifying SState; payload SHA and evidence id remain in replay provenance.
+- CI run `32104898978` passed all unit/regression tests plus the R2 cost/budget gate.
+- This is an ingestion contract only; no real historical SState evidence bundle is yet frozen PASS.
+
 ### Strategy Replay Readiness V0.1 gate
 
 Primary document: `docs/STRATEGY_REPLAY_READINESS_V0_1.md`
@@ -229,7 +245,7 @@ Implementation merge: PR #21 / commit `69abd931b88950aae50780dc67f3d57d095c2db3`
 - Funding-rate history acquisition; the backtest engine currently accepts supplied funding points only.
 - Mark-price history.
 - Open-interest history.
-- Real historical SState output acquisition/ingestion with true availability timestamps.
+- Real historical SState evidence production/acquisition and a real evidence bundle passing the ingestion gate with true recorded-runtime availability timestamps.
 - Real candidate-space, selection-policy, UPDATE/VALIDATION split freeze and independently validated parameter set for currently `UNDEFINED` strategy rules.
 - End-to-end authoritative strategy replay from historical candles + SState into automatically generated Backtest Engine plans.
 - Advanced fill simulation such as partial fills/order-book depth and exchange-specific fee tiers.
@@ -259,7 +275,7 @@ Implementation merge: PR #21 / commit `69abd931b88950aae50780dc67f3d57d095c2db3`
 ### Safe parallel work while the pilot runs
 
 - Prepare the real candidate-space semantics and evidence split for the six `UNDEFINED` strategy rules, but do not consume validation or freeze winning values before the data/split authority is reviewed.
-- Prepare real historical SState evidence-ingestion contracts while keeping SState core read-only.
+- Design/implement a real SState evidence producer/export workflow against the pinned SState authority; generated records must pass the Historical SState Evidence Ingestion V0.1 gate before replay use.
 - Wire historical-universe snapshots into backtest admission once real partition receipts are available.
 - Prepare funding-rate/mark-price/open-interest acquisition design without changing Pionex-native Kline authority.
 - Do not authorize automatic historical trade plans until missing strategy semantics are versioned and independently validated.
