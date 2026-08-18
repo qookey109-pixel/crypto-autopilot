@@ -10,7 +10,7 @@ const state = { data: FALLBACK };
 
 function badgeClass(status) {
   if (["PASS", "READY", "AUTHORIZED"].includes(status)) return "pass";
-  if (["PENDING", "IN_PROGRESS", "NOT_READY"].includes(status)) return "pending";
+  if (["PENDING", "IN_PROGRESS", "NOT_READY", "REVIEW_REQUIRED", "SCOPE_REDUCTION_REQUIRED"].includes(status)) return "pending";
   if (["BLOCKED", "NOT_AUTHORIZED", "FAIL"].includes(status)) return "danger";
   return "neutral";
 }
@@ -74,8 +74,9 @@ function renderMarkets(items) {
 function render(data) {
   state.data = data;
   document.querySelector("#snapshot-label").textContent = data.snapshotLabel;
-  document.querySelector("#market-count").textContent = data.project.marketCount.toLocaleString();
-  document.querySelector("#funding-months").textContent = data.project.fundingMonths.toLocaleString();
+  document.querySelector("#market-count").textContent = Number(data.project.marketCount || 0).toLocaleString();
+  const fundingMonths = data.project.fundingMonthsObserved ?? data.project.fundingMonths ?? 0;
+  document.querySelector("#funding-months").textContent = Number(fundingMonths).toLocaleString();
   renderPipeline(data.pipeline || []);
   renderCriticalGates(data.gates || []);
   renderAllGates(data.gates || []);
@@ -89,9 +90,9 @@ async function loadData() {
     const data = await response.json();
     render(data);
   } catch (error) {
-    console.error("Dashboard fixture load failed", error);
+    console.error("Dashboard snapshot load failed", error);
     render(FALLBACK);
-    document.querySelector("#snapshot-label").textContent = "Fixture unavailable";
+    document.querySelector("#snapshot-label").textContent = "Snapshot unavailable";
   }
 }
 
