@@ -12,7 +12,7 @@ Qookey Crypto Autopilot
 
 ## Current formal stage
 
-**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
+**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / PARAMETER SWEEP FRAMEWORK V0.1 READY / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
 
 No live-money authorization exists.
 
@@ -200,6 +200,24 @@ Implementation merge: PR #19 / commit `43535f02ba3120e5c319e3668d6fa431fe668067`
 - Backtest Engine V0.1 may simulate explicitly supplied plans, but automatic historical plan generation is not yet authoritative.
 - CI run `32103570004` passed all unit/regression tests plus the R2 cost/budget gate.
 
+### Strategy Parameter Freeze / Sweep Framework V0.1
+
+Primary document: `docs/STRATEGY_PARAMETER_SWEEP_V0_1.md`
+Machine-readable boundary: `config/strategy_parameter_sweep_v0_1.json`
+Implementation merge: PR #21 / commit `69abd931b88950aae50780dc67f3d57d095c2db3`.
+
+- Deterministic numeric/categorical parameter grids and SHA-256 plan fingerprints are implemented.
+- Candidate values, UPDATE folds, one disjoint VALIDATION fold, primary metric, trade-count gates, metric floors, drawdown ceilings and local-stability rules must be frozen before evaluation.
+- UPDATE selection requires the complete candidate × UPDATE-fold matrix; selective omission is a protocol error.
+- Candidate ranking is robust-first using worst-fold primary metric, median primary metric, lower worst drawdown and deterministic id.
+- The selected UPDATE candidate must pass a local-neighbor sensitivity/stability gate so an isolated backtest peak cannot be frozen.
+- VALIDATION can evaluate only the already-selected UPDATE candidate; validation-time reselection is forbidden.
+- PASS and FAIL validation decisions both mark validation consumed; failed validation cannot freeze a parameter set.
+- A validated parameter set can be frozen only after PASS with matching plan fingerprints and retains UPDATE evidence digest plus validation provenance.
+- Current machine-readable boundary remains `FRAMEWORK_ONLY`: no real candidate values, production sweep thresholds, real validation split or validated parameter set are frozen yet.
+- `trade_plan_authorized` therefore remains false.
+- Initial PR #21 CI failed only because the new test file imported unavailable `pytest`; tests were converted to the repository's `unittest` harness with no production-code change. Corrected CI run `32104427875` passed all unit/regression tests plus the R2 cost/budget gate.
+
 ## Not completed
 
 - Real Historical Backfill Pilot execution evidence against Pionex + Cloudflare R2 is not yet frozen as PASS.
@@ -212,7 +230,7 @@ Implementation merge: PR #19 / commit `43535f02ba3120e5c319e3668d6fa431fe668067`
 - Mark-price history.
 - Open-interest history.
 - Real historical SState output acquisition/ingestion with true availability timestamps.
-- Versioned parameter freeze/validation for currently `UNDEFINED` strategy rules.
+- Real candidate-space, selection-policy, UPDATE/VALIDATION split freeze and independently validated parameter set for currently `UNDEFINED` strategy rules.
 - End-to-end authoritative strategy replay from historical candles + SState into automatically generated Backtest Engine plans.
 - Advanced fill simulation such as partial fills/order-book depth and exchange-specific fee tiers.
 - Production-grade paper broker position lifecycle, reconciliation and settlement.
@@ -240,7 +258,7 @@ Implementation merge: PR #19 / commit `43535f02ba3120e5c319e3668d6fa431fe668067`
 
 ### Safe parallel work while the pilot runs
 
-- Build the Strategy Parameter Freeze / Sweep Framework for currently `UNDEFINED` rules without selecting winning parameters from the same sample used for validation.
+- Prepare the real candidate-space semantics and evidence split for the six `UNDEFINED` strategy rules, but do not consume validation or freeze winning values before the data/split authority is reviewed.
 - Prepare real historical SState evidence-ingestion contracts while keeping SState core read-only.
 - Wire historical-universe snapshots into backtest admission once real partition receipts are available.
 - Prepare funding-rate/mark-price/open-interest acquisition design without changing Pionex-native Kline authority.
