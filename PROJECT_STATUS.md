@@ -12,7 +12,7 @@ Qookey Crypto Autopilot
 
 ## Current formal stage
 
-**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / HISTORICAL SSTATE EVIDENCE INGESTION V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / PARAMETER SWEEP FRAMEWORK V0.1 READY / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
+**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / HISTORICAL UNIVERSE BACKTEST ADMISSION V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / HISTORICAL SSTATE EVIDENCE INGESTION V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / PARAMETER SWEEP FRAMEWORK V0.1 READY / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
 
 No live-money authorization exists.
 
@@ -157,6 +157,21 @@ Implementation merge: PR #15 / commit `2cb299d44f75b66c374adf87ce0e83d0ccad4342`
 - CI run `32102838532` passed all unit/regression tests plus the R2 cost/budget gate.
 - Exact listing/delisting discovery, historical liquidity ranking and full 8-year universe reconstruction remain future evidence work.
 
+### Historical Universe → Backtest Admission V0.1
+
+Primary document: `docs/HISTORICAL_UNIVERSE_BACKTEST_ADMISSION_V0_1.md`
+Implementation merge: PR #25 / commit `213addc9ce55cdd5b606b4c2ee501ff4ce92d05d`.
+
+- Every `LongTradePlan` is checked against the evidence-bounded Historical Universe at that plan's own `signal_time_ms` before it can be passed to Backtest Engine V0.1.
+- V0.1 admission requires native `15M`, `60M` and `4H` coverage at the exact signal timestamp.
+- Today's/latest universe and later partition evidence are never substituted for historical membership.
+- Proxy/external observations cannot authorize a Pionex-native backtest plan.
+- Admitted decisions retain plan-symbol-scoped historical authority references; unrelated market refs are excluded.
+- Missing intervals, pre-listing/post-coverage timestamps and proxy-only evidence fail closed.
+- Duplicate plan ids are rejected before admission and repeated evaluation is deterministic.
+- CI run `32105245530` passed all unit/regression tests plus the R2 cost/budget gate.
+- This gate enforces existing evidence only; it does not create missing listing/history authority or historical liquidity rankings.
+
 ### Technical Features V0.1 foundation
 
 Primary document: `docs/TECHNICAL_FEATURES_V0_1.md`
@@ -276,7 +291,7 @@ Implementation merge: PR #21 / commit `69abd931b88950aae50780dc67f3d57d095c2db3`
 
 - Prepare the real candidate-space semantics and evidence split for the six `UNDEFINED` strategy rules, but do not consume validation or freeze winning values before the data/split authority is reviewed.
 - Design/implement a real SState evidence producer/export workflow against the pinned SState authority; generated records must pass the Historical SState Evidence Ingestion V0.1 gate before replay use.
-- Wire historical-universe snapshots into backtest admission once real partition receipts are available.
+- Build historical liquidity evidence/ranking contracts without projecting today's volume ranks into the past.
 - Prepare funding-rate/mark-price/open-interest acquisition design without changing Pionex-native Kline authority.
 - Do not authorize automatic historical trade plans until missing strategy semantics are versioned and independently validated.
 - Do not authorize the 8-year / approximately 250-market expansion until the one-year pilot authority is frozen PASS.
