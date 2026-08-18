@@ -1,0 +1,146 @@
+{
+  "schema": "binance-funding-source-proof-authority-v0.1",
+  "status": "PASS",
+  "stage": "BINANCE_FUNDING_SOURCE_PROOF_PASS",
+  "date": "2026-08-18",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "provider": "binance_usdm",
+  "delivery": "binance_vision",
+  "execution_exchange": "pionex",
+  "native_to_execution_exchange": false,
+  "may_authorize_pionex_native_history": false,
+  "dataset": "fundingRate",
+  "frequency": "monthly",
+  "proof_scope": {
+    "period": "2024-01",
+    "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+    "symbol_count": 3,
+    "total_rows": 279,
+    "rows_per_symbol": 93,
+    "declared_interval_hours": [8]
+  },
+  "source_audit": {
+    "archive_path_pattern": "data/futures/um/monthly/fundingRate/{SYMBOL}/{SYMBOL}-fundingRate-{YYYY-MM}.zip",
+    "schema": ["calc_time", "funding_interval_hours", "last_funding_rate"],
+    "checksum_required": true,
+    "zip_member_exact_match_required": true,
+    "strictly_increasing_timestamps_required": true,
+    "unique_timestamps_required": true,
+    "finite_rates_required": true,
+    "source_declared_interval_preserved": true,
+    "raw_timestamps_preserved": true,
+    "timestamps_rounded_or_interpolated": false,
+    "cadence_jitter_tolerance_ms": 10,
+    "proof_scope_max_abs_cadence_residual_ms": 3,
+    "cadence_anomalies_beyond_tolerance": 0
+  },
+  "archives": [
+    {
+      "symbol": "BTCUSDT",
+      "period": "2024-01",
+      "archive_sha256": "3e0d30870672aa8f0f937881056e3cfd55913ae5c780cd50b33f2763aa0ba58e",
+      "row_count": 93,
+      "first_time_ms": 1704067200000,
+      "last_time_ms": 1706716800000,
+      "interval_hours": [8],
+      "max_abs_cadence_residual_ms": 3,
+      "min_rate": 0.00002154,
+      "max_rate": 0.00065846,
+      "audit_ok": true
+    },
+    {
+      "symbol": "ETHUSDT",
+      "period": "2024-01",
+      "archive_sha256": "5a71469b0b363886df904e784dddefc484dd943334b1fb7454713ce4ed715a4b",
+      "row_count": 93,
+      "first_time_ms": 1704067200000,
+      "last_time_ms": 1706716800000,
+      "interval_hours": [8],
+      "max_abs_cadence_residual_ms": 3,
+      "min_rate": 0.00006135,
+      "max_rate": 0.00063801,
+      "audit_ok": true
+    },
+    {
+      "symbol": "SOLUSDT",
+      "period": "2024-01",
+      "archive_sha256": "6b514b6c2bb67ff04df97d747efb9c6e4bb1bb27e889f1dc51a42ab1419a3d24",
+      "row_count": 93,
+      "first_time_ms": 1704067200000,
+      "last_time_ms": 1706716800000,
+      "interval_hours": [8],
+      "max_abs_cadence_residual_ms": 3,
+      "min_rate": 0.00002568,
+      "max_rate": 0.00096801,
+      "audit_ok": true
+    }
+  ],
+  "protocol_revision_history": {
+    "initial_protocol_frozen_before_live_execution": true,
+    "superseded_exact_millisecond_run_id": 32128779729,
+    "superseded_exact_millisecond_job_id": 95685098101,
+    "superseded_reason": "Exact-millisecond cadence equality incorrectly treated bounded source calc_time jitter as missing Funding observations.",
+    "diagnostic_run_id": 32129021753,
+    "diagnostic_job_id": 95685821423,
+    "diagnostic_result": {
+      "btc_nonzero_residuals": 28,
+      "eth_nonzero_residuals": 28,
+      "sol_nonzero_residuals": 28,
+      "observed_residual_values_ms": [-3, -2, -1, 0, 1, 2, 3],
+      "max_abs_residual_ms": 3
+    },
+    "protocol_refrozen_before_pass_authority": true,
+    "refrozen_tolerance_ms": 10,
+    "correction_type": "SOURCE_TIMESTAMP_SEMANTICS_COMPATIBILITY_CORRECTION",
+    "strategy_or_performance_threshold_changed": false
+  },
+  "github_actions": {
+    "workflow": "Binance Funding Source Proof",
+    "run_id": 32129522890,
+    "job_id": 95687364367,
+    "workflow_head_branch": "feature/binance-funding-materialization-v0-1",
+    "workflow_head_sha": "5b7274fab4ee4f5c4f88c88fe90a78cb79b06036",
+    "conclusion": "success",
+    "ci_run_id": 32129522893,
+    "ci_job_id": 95687364093,
+    "ci_conclusion": "success",
+    "tested_merge_ref_sha": "d069f3cd40b51b07954d6d06e3f0012ef07769b5",
+    "tested_tree_sha": "b799963b3fb6796d729163717b29454289093a8d",
+    "implementation_merge_commit": "4a28f673482c121f44946317ed6d5127ec3917eb",
+    "implementation_main_tree_sha": "b799963b3fb6796d729163717b29454289093a8d",
+    "tested_and_merged_tree_identical": true
+  },
+  "artifact": {
+    "id": 9321632187,
+    "name": "binance-funding-source-proof-32129522890",
+    "zip_size_bytes": 1281,
+    "zip_sha256": "0127acea89d3aba9d8948d88fe6486875b2116e7c18ab8abda23b3a3946262cf",
+    "proof_json_sha256": "4a1953055b0c522138a41b8e720ce50ca8df74ee552f455002ee14be4d0a618d",
+    "proof_json_bytes": 3695
+  },
+  "future_canonical_layout": {
+    "key_template": "market-data/binance_usdm/perp/{symbol}/funding/year={year}/funding.parquet",
+    "partition": "annual_per_symbol",
+    "compression": "zstd",
+    "fields": ["symbol", "funding_time_ms", "funding_interval_hours", "funding_rate"]
+  },
+  "next_required_evidence": [
+    "BINANCE_FUNDING_15_SYMBOL_MONTHLY_COVERAGE_DISCOVERY_PASS",
+    "FUNDING_R2_COST_BUDGET_REVIEW_IF_SCOPE_MATERIALLY_CHANGES",
+    "EXPLICIT_BINANCE_FUNDING_R2_MATERIALIZATION_AUTHORITY"
+  ],
+  "authority_boundary": {
+    "proves_monthly_funding_archive_path": true,
+    "proves_checksum_archive_schema_and_bounded_timestamp_jitter_for_proof_scope": true,
+    "proves_long_horizon_15_symbol_funding_coverage": false,
+    "proves_funding_r2_materialization": false,
+    "authorizes_funding_r2_writes": false,
+    "authorizes_source_switch": false,
+    "authorizes_provider_splicing": false,
+    "authorizes_pionex_native_relabeling": false,
+    "authorizes_historical_universe_membership": false,
+    "authorizes_backtest_admission": false,
+    "authorizes_automatic_trade_plans": false,
+    "authorizes_live_trading": false
+  }
+}
