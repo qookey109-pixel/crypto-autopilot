@@ -27,12 +27,11 @@ Funding and Open Interest are intentionally out of scope for this discovery and 
 
 The project target is maximum provider-available history capped at eight years.
 
-The discovery does **not** assume that any symbol has eight years of data and does not assume that all symbols begin in 2020.
+The discovery does **not** assume that any symbol has eight years of data, does not assume that all symbols begin in 2020, and does not freeze any Binance provider-onset month in advance.
 
-The effective monthly scan floor is the later of:
+The effective monthly scan floor is derived solely from the project eight-year cap at execution time. For an August 2026 execution, this means the scan begins in August 2018. Every in-cap month is probed against Binance Vision; an official archive CHECKSUM proves presence and HTTP 404 is retained as explicit `NO_DATA`.
 
-1. the project eight-year cap floor; or
-2. the Binance Vision V0.1 provider archive floor `2020-01`.
+Existing helper tooling that starts from `2020-01` is not treated as provider-onset authority and is not used to truncate this discovery.
 
 The scan covers all complete UTC months through the previous UTC month. The current incomplete UTC month is handled separately using published daily archives through yesterday UTC.
 
