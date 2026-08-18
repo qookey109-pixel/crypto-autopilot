@@ -2,8 +2,14 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from urllib.error import HTTPError
 
-from crypto_autopilot.historical import audit_candles, backfill_klines, write_backfill_json
+from crypto_autopilot.historical import (
+    PacedKlineClient,
+    audit_candles,
+    backfill_klines,
+    write_backfill_json,
+)
 from crypto_autopilot.models import Candle
 
 STEP = 15 * 60 * 1000
@@ -29,6 +35,31 @@ class FakeClient:
         self.end_times.append(end_time_ms)
         eligible = [item for item in self.candles if end_time_ms is None or item.time_ms <= end_time_ms]
         return eligible[-limit:]
+
+
+class RateLimitThenSuccessClient:
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def get_klines(self, symbol, interval, *, limit=500, end_time_ms=None):
+        del symbol, interval, limit, end_time_ms
+        self.calls += 1
+        if self.calls == 1:
+            raise HTTPError("https://api.pionex.com", 429, "rate limited", None, None)
+        return [candle(1)]
+
+
+class FakeClock:
+    def __init__(self) -> None:
+        self.now = 0.0
+        self.sleeps: list[float] = []
+
+    def monotonic(self) -> float:
+        return self.now
+
+    def sleep(self, seconds: float) -> None:
+        self.sleeps.append(seconds)
+        self.now += seconds
 
 
 class HistoricalTests(unittest.TestCase):
@@ -78,6 +109,39 @@ class HistoricalTests(unittest.TestCase):
             payload = json.loads(first.read_text())
             self.assertEqual(payload["source"], "pionex_futures_klines")
             self.assertTrue(payload["audit"]["ok"])
+
+    def test_paced_client_backs_off_after_http_429(self) -> None:
+        delegate = RateLimitThenSuccessClient()
+        clock = FakeClock()
+        client = PacedKlineClient(
+            delegate,
+            requests_per_second=3.0,
+            retry_after_seconds=65.0,
+            max_429_retries=2,
+            jitter_seconds=0.0,
+            sleep_fn=clock.sleep,
+            monotonic_fn=clock.monotonic,
+            random_fn=lambda: 0.0,
+        )
+        rows = client.get_klines("BTC_USDT_PERP", "15M")
+        self.assertEqual(rows, [candle(1)])
+        self.assertEqual(delegate.calls, 2)
+        self.assertEqual(clock.sleeps, [65.0])
+
+    def test_paced_client_enforces_soft_request_interval(self) -> None:
+        delegate = FakeClient([candle(1)])
+        clock = FakeClock()
+        client = PacedKlineClient(
+            delegate,
+            requests_per_second=2.0,
+            jitter_seconds=0.0,
+            sleep_fn=clock.sleep,
+            monotonic_fn=clock.monotonic,
+            random_fn=lambda: 0.0,
+        )
+        client.get_klines("BTC_USDT_PERP", "15M")
+        client.get_klines("BTC_USDT_PERP", "15M")
+        self.assertEqual(clock.sleeps, [0.5])
 
 
 if __name__ == "__main__":
