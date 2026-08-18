@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "pricing_snapshot": {
+    "checked_at_utc": "2026-08-18T04:10:00Z",
+    "source": "https://developers.cloudflare.com/r2/pricing/",
+    "storage_class": "Standard",
+    "free_storage_gb_month": 10.0,
+    "storage_usd_per_gb_month": 0.015,
+    "free_class_a_requests_per_month": 1000000,
+    "class_a_usd_per_million": 4.5,
+    "free_class_b_requests_per_month": 10000000,
+    "class_b_usd_per_million": 0.36,
+    "egress_usd_per_gb": 0.0,
+    "billable_usage_rounds_up_to_next_unit": true
+  },
+  "project_guardrails": {
+    "storage_warn_gb_month": 8.0,
+    "storage_block_gb_month": 10.0,
+    "class_a_warn_requests_per_month": 750000,
+    "class_a_block_requests_per_month": 1000000,
+    "class_b_warn_requests_per_month": 7500000,
+    "class_b_block_requests_per_month": 10000000,
+    "shared_account_usage_must_be_reviewed_before_large_expansion": true
+  }
+}

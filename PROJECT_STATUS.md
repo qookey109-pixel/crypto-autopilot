@@ -12,7 +12,7 @@ Qookey Crypto Autopilot
 
 ## Current formal stage
 
-**V0.1 M1B COMPLETE / HISTORICAL BACKFILL PILOT READY TO RUN / PAPER-ONLY**
+**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
 
 No live-money authorization exists.
 
@@ -82,15 +82,32 @@ Machine-readable estimate: `research/estimates/2026-08-18-historical-capacity.js
 - Two-times capacity factor: approximately 5.912 GB; three-times factor: approximately 8.868 GB.
 - A `15M`-only comparison is approximately 1.808 GB for 250 markets x 8 years, but native `60M` / `4H` are retained for the first long-history proof because storage is not the limiting factor.
 - Full-target partition count upper bound: approximately 28,000 market-data objects under the current monthly `15M` / annual `60M` / annual `4H` policy.
-- Minimum initial R2 write + verified-read operation volume is approximately 28,000 Class A writes plus 28,000 Class B reads, before checkpoint/manifest overhead.
-- Current Cloudflare R2 Standard free-tier envelope is sufficient for the candle-only design if the account's free allowance remains available.
-- Pionex Kline page limit is 500 and the documented shared IP limit is 10 requests/second; the project soft target is 3 requests/second with conservative 429 backoff.
 - Strict eight-year / 250-market / three-interval API-page upper design bound is approximately 184,750 Kline requests; actual usage should be lower because provider history differs by market.
 - Resumable design freezes deterministic work-item identity, staging before canonical finalize, checkpointed backward pagination, idempotent resume, quarantine-on-mismatch, and historical-universe provenance requirements.
 
-### Historical Backfill Pilot implementation
+### R2 Cost & Budget Gate V0.1
 
-Implementation merge: PR #10 / commit `12baaccd1d29254e15cd87dcbed35ec3c7afc7d5`.
+Authoritative receipt: `research/receipts/2026-08-18-r2-cost-budget.json`
+Primary document: `docs/R2_COST_BUDGET_V0_1.md`
+Machine-readable estimate: `research/estimates/2026-08-18-r2-cost-budget.json`
+Policy: `config/r2_budget_v0_1.json`
+
+- Cloudflare R2 Standard pricing was rechecked against the official pricing documentation on 2026-08-18.
+- Current included monthly R2 Standard envelope: 10 GB-month, 1M Class A operations, 10M Class B operations; internet egress is free.
+- Planned 250-market x 8-year canonical + retained-staging storage estimate: approximately 5.912 GB-month.
+- Planned full-target operation model: approximately 224,000 Class A and 140,000 Class B operations for a fresh successful materialization.
+- Planned usage evaluates `PASS` with estimated R2 cost USD 0/month under the frozen pricing snapshot.
+- 3x stress: approximately 8.868 GB-month, 672,000 Class A and 420,000 Class B operations; estimated USD 0/month but storage enters `WARN` headroom.
+- Project guardrails: storage WARN > 8 GB / BLOCK > 10 GB; Class A WARN > 750k / BLOCK > 1M; Class B WARN > 7.5M / BLOCK > 10M.
+- CI now executes `python scripts/check_r2_budget.py` and blocks a `BLOCK` result or frozen expectation mismatch.
+- PR #13 implementation proof CI run `32098212233` passed unit tests and the R2 cost/budget gate at tested commit `6332f35bfbc32f0cc64488b2f3492f1a5c5a28d6`.
+- R2 included usage is account-level; actual account usage must be reviewed before large expansion because unrelated buckets/projects can consume the same allowance.
+- This cost gate covers R2 Standard only. Workers, Workflows, Queues, D1 and other Cloudflare services require separate cost gates.
+
+### Historical Backfill Pilot implementation and automation
+
+Initial implementation merge: PR #10 / commit `12baaccd1d29254e15cd87dcbed35ec3c7afc7d5`.
+Automation hardening merge: PR #12 / commit `7e8abfa402122bf0424bd47558bad0d3197495e5`.
 
 - R2-backed deterministic checkpoint, staging and per-partition receipt namespaces are implemented.
 - Work-item states are `PENDING -> ACQUIRING -> STAGED -> VERIFIED -> FINALIZED`.
@@ -100,16 +117,19 @@ Implementation merge: PR #10 / commit `12baaccd1d29254e15cd87dcbed35ec3c7afc7d5`
 - Existing canonical data without matching authority is protected: the pilot refuses to overwrite it.
 - Pionex public Kline acquisition is wrapped with a 3 requests/second soft project pace and conservative HTTP 429 backoff.
 - The pilot uses the frozen 15-symbol M1A universe, native `15M` / `60M` / `4H`, and a bounded UTC calendar year (default 2025).
-- GitHub Actions workflow `.github/workflows/historical-backfill-pilot.yml` uses three 5-symbol shards with `max-parallel: 1`.
-- Shard 0 includes a planned interruption after a staged partition, followed by a second process that exercises R2-backed resume.
-- Unit/regression tests cover pacing, 429 handling, staged resume, finalized idempotent skips, canonical conflict protection and deterministic layout.
-- PR #10 CI run `32094937866` completed successfully.
+- The workflow uses three 5-symbol shards with `max-parallel: 1`.
+- Shard 0 includes a planned interruption after a staged partition, followed by a later process that exercises R2-backed resume.
+- Each shard now has bounded automatic retries while preserving checkpoint state; canonical conflicts and audit failures remain non-retryable safety stops.
+- Structured JSON failure diagnostics and run-level aggregate evidence are emitted as GitHub artifacts.
+- The workflow now supports automatic `main` push triggering, a daily scheduled continuation, and manual dispatch as an override.
+- Concurrency prevents overlapping historical pilot runs for the same pilot year.
+- PR #10 CI run `32094937866` passed; PR #12 CI run `32097382736` passed.
 - No private API, account, position, order or live-trading path was introduced.
 
 ## Not completed
 
-- Real Historical Backfill Pilot execution against Pionex + Cloudflare R2.
-- Real interruption/resume evidence receipt for the pilot.
+- Real Historical Backfill Pilot execution evidence against Pionex + Cloudflare R2 is not yet frozen as PASS.
+- Real interruption/resume evidence receipt for the one-year pilot.
 - Freeze of the one-year pilot dataset/partition authority after all three shards pass.
 - Long-horizon maximum-available historical backfill (target cap: eight years).
 - Dynamic historical-universe reconstruction for survivorship-bias-safe backtests.
@@ -122,6 +142,7 @@ Implementation merge: PR #10 / commit `12baaccd1d29254e15cd87dcbed35ec3c7afc7d5`
 - Fee/funding/slippage model.
 - Paper position lifecycle and settlement.
 - Cloudflare Worker/D1/Pages deployment.
+- Cloudflare Workers/Workflows/Queues/D1 cost gate.
 - Pionex private API permission verification.
 - Server-side protective-order verification.
 - Order/position reconciliation and restart recovery.
@@ -130,16 +151,17 @@ Implementation merge: PR #10 / commit `12baaccd1d29254e15cd87dcbed35ec3c7afc7d5`
 
 ## Next milestone
 
-**Execute Historical Backfill Pilot — resumable one-year proof**
+**Observe and close Historical Backfill Pilot — resumable one-year proof**
 
-1. Run GitHub Actions workflow `Historical Backfill Pilot` from `main` with year `2025`.
+1. Let the automated `Historical Backfill Pilot` continue the 2025 run from `main`; manual clicking is no longer required for normal continuation.
 2. Require all three 5-symbol shard jobs to complete successfully.
-3. On a fresh run, require shard 0 to record the planned-stop phase and then resume from R2 staging in the subsequent process.
+3. Require shard 0 to retain evidence of the planned-stop phase and subsequent R2-backed resume.
 4. Require all finalized partitions to pass candle audit, Parquet decode and R2 SHA-256 verification.
 5. Confirm no canonical-conflict guard fired and no authoritative M1B object was overwritten.
-6. Review each shard evidence artifact and aggregate the pilot object/row/page counts.
+6. Review each shard evidence artifact and the aggregate pilot evidence.
 7. Freeze a Repository authority receipt for the real pilot run.
 8. Only after the receipt is reviewed may maximum-available expansion toward the 8-year / approximately 250-market target be authorized.
+9. After the one-year pilot closes, prepare a separate Cloudflare Workers/Workflows/Queues/D1 cost gate before CF1 control-plane migration.
 
 ## Safety gates before any live trading
 
