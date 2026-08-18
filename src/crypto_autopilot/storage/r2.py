@@ -82,3 +82,27 @@ class R2Store:
                 f"expected {expected_sha256}, got {actual_sha256}"
             )
         return payload
+
+    def get_bytes_if_exists(self, key: str) -> bytes | None:
+        """Read an object if it exists and verify the SHA-256 metadata when present."""
+
+        try:
+            response = self.client.get_object(Bucket=self.bucket, Key=key)
+        except Exception as exc:  # boto3's ClientError is optional until runtime
+            response_payload = getattr(exc, "response", {}) or {}
+            code = str(response_payload.get("Error", {}).get("Code", ""))
+            status = response_payload.get("ResponseMetadata", {}).get("HTTPStatusCode")
+            if code in {"NoSuchKey", "NotFound", "404"} or status == 404:
+                return None
+            raise
+
+        payload = response["Body"].read()
+        expected_sha256 = str(response.get("Metadata", {}).get("sha256") or "")
+        if expected_sha256:
+            actual_sha256 = hashlib.sha256(payload).hexdigest()
+            if actual_sha256 != expected_sha256:
+                raise ValueError(
+                    f"R2 metadata SHA-256 mismatch for {key}: "
+                    f"expected {expected_sha256}, got {actual_sha256}"
+                )
+        return payload
