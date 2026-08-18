@@ -12,7 +12,7 @@ Qookey Crypto Autopilot
 
 ## Current formal stage
 
-**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
+**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE FOUNDATION V0.1 READY / HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
 
 No live-money authorization exists.
 
@@ -126,21 +126,54 @@ Automation hardening merge: PR #12 / commit `7e8abfa402122bf0424bd47558bad0d3197
 - PR #10 CI run `32094937866` passed; PR #12 CI run `32097382736` passed.
 - No private API, account, position, order or live-trading path was introduced.
 
+### Backtest Engine V0.1 foundation
+
+Primary document: `docs/BACKTEST_ENGINE_V0_1.md`
+Implementation merge: PR #14 / commit `b0ad363bb5b6c9bef9db1bc1d8125158d6d01839`.
+
+- Deterministic paper-only LONG execution core is implemented.
+- Event evidence follows `StrategySignal -> RiskDecision -> OrderIntent -> Fill -> Position -> PnL` without rewriting SState.
+- A strategy signal may fill only on the first candle strictly after the signal timestamp, permanently blocking same-bar lookahead fills.
+- If stop and target are both touched by one OHLC candle, V0.1 uses conservative stop-first resolution.
+- Existing `RiskConfig` / `size_long_trade` remains the sizing authority, including the 1% risk baseline, leverage cap, daily loss gate and daily trade-count gate.
+- Explicit taker fee, adverse slippage and supplied funding-point cost models are implemented.
+- Deterministic results include trades, rejected plans, event sequence, equity curve, PnL, drawdown, win rate, profit factor and trade-level Sharpe-style output when defined.
+- V0.1 deliberately allows one open portfolio position at a time; overlapping signals are rejected instead of silently changing portfolio risk.
+- CI run `32102829605` passed all unit/regression tests plus the R2 cost/budget gate.
+- Real historical feature generation and real SState historical output ingestion are not part of this foundation yet.
+- No live-order path or private Pionex API was introduced.
+
+### Historical Universe V0.1 foundation
+
+Primary document: `docs/HISTORICAL_UNIVERSE_V0_1.md`
+Implementation merge: PR #15 / commit `2cb299d44f75b66c374adf87ce0e83d0ccad4342`.
+
+- Historical membership is evidence-bounded by `provider + market_type + symbol + interval`.
+- The index never extrapolates a market before the first authoritative coverage timestamp or after the last authoritative coverage timestamp.
+- Default V0.1 eligibility requires native `15M`, `60M` and `4H` coverage at the queried timestamp.
+- Native/proxy provenance is explicit and is never inferred from a provider name.
+- Verified historical partition receipts can be converted into bounded coverage records; `NO_DATA` does not create membership.
+- Overlapping non-identical authority for the same identity is rejected rather than silently reconciled.
+- Deterministic snapshots freeze sorted eligible symbols and the authority references used by the query.
+- CI run `32102838532` passed all unit/regression tests plus the R2 cost/budget gate.
+- Exact listing/delisting discovery, historical liquidity ranking and full 8-year universe reconstruction remain future evidence work.
+
 ## Not completed
 
 - Real Historical Backfill Pilot execution evidence against Pionex + Cloudflare R2 is not yet frozen as PASS.
 - Real interruption/resume evidence receipt for the one-year pilot.
 - Freeze of the one-year pilot dataset/partition authority after all three shards pass.
 - Long-horizon maximum-available historical backfill (target cap: eight years).
-- Dynamic historical-universe reconstruction for survivorship-bias-safe backtests.
-- Funding-rate history.
+- Automatic historical-universe source acquisition/reconstruction for survivorship-bias-safe 8-year backtests.
+- Historical liquidity reconstruction/ranking for each backtest date.
+- Funding-rate history acquisition; the backtest engine currently accepts supplied funding points only.
 - Mark-price history.
 - Open-interest history.
 - Technical indicator calculation (EMA/ATR/volume).
-- Real SState output ingestion.
-- Full event-driven backtest engine.
-- Fee/funding/slippage model.
-- Paper position lifecycle and settlement.
+- Real historical SState output ingestion.
+- End-to-end strategy replay from historical features/SState into Backtest Engine V0.1.
+- Advanced fill simulation such as partial fills/order-book depth and exchange-specific fee tiers.
+- Production-grade paper broker position lifecycle, reconciliation and settlement.
 - Cloudflare Worker/D1/Pages deployment.
 - Cloudflare Workers/Workflows/Queues/D1 cost gate.
 - Pionex private API permission verification.
@@ -162,6 +195,13 @@ Automation hardening merge: PR #12 / commit `7e8abfa402122bf0424bd47558bad0d3197
 7. Freeze a Repository authority receipt for the real pilot run.
 8. Only after the receipt is reviewed may maximum-available expansion toward the 8-year / approximately 250-market target be authorized.
 9. After the one-year pilot closes, prepare a separate Cloudflare Workers/Workflows/Queues/D1 cost gate before CF1 control-plane migration.
+
+### Safe parallel work while the pilot runs
+
+- Build deterministic EMA/ATR/volume feature calculation with strict closed-bar semantics.
+- Define a historical SState read-only replay adapter without modifying SState core.
+- Wire historical-universe snapshots into backtest admission once real partition receipts are available.
+- Do not authorize the 8-year / approximately 250-market expansion until the one-year pilot authority is frozen PASS.
 
 ## Safety gates before any live trading
 
