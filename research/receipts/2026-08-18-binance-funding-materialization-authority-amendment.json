@@ -1,0 +1,39 @@
+{
+  "schema": "binance-funding-r2-materialization-authority-amendment-v0.1",
+  "status": "PASS",
+  "stage": "BINANCE_FUNDING_R2_MATERIALIZATION_AUTHORITY_CHECKSUM_SET_BOUND",
+  "date": "2026-08-18",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "amends": "research/receipts/2026-08-18-binance-funding-materialization-authority.json",
+  "checksum_set_authority": "research/receipts/2026-08-18-binance-funding-source-checksum-set.json",
+  "provider": "binance_usdm",
+  "dataset": "fundingRate",
+  "authorized_scope_sha256": "81f64c4f07f1c77bf8391962e0ff7b3eb5f004d4a53bd0d9b8f50328c18c267c",
+  "authorized_source_archive_count": 1010,
+  "required_checksum_set_sha256": "7ed43292ecee61c358360b8a255fb7e7844bf7ac10626425c44292b4ad92963a",
+  "runtime_unlock_contract": {
+    "original_materialization_authority_must_pass": true,
+    "this_amendment_must_pass": true,
+    "checksum_set_authority_must_pass": true,
+    "writer_must_recompute_exact_scope_sha256": true,
+    "writer_scope_sha256_must_equal": "81f64c4f07f1c77bf8391962e0ff7b3eb5f004d4a53bd0d9b8f50328c18c267c",
+    "writer_must_fetch_all_1010_official_checksum_files_before_first_r2_write": true,
+    "writer_must_recompute_checksum_set_sha256": true,
+    "writer_checksum_set_sha256_must_equal": "7ed43292ecee61c358360b8a255fb7e7844bf7ac10626425c44292b4ad92963a",
+    "any_scope_or_checksum_set_mismatch_fails_before_first_r2_write": true,
+    "all_source_content_and_annual_parquet_preflight_from_original_authority_remains_required": true
+  },
+  "permissions": {
+    "funding_materialization_authorized": true,
+    "r2_writes_authorized_for_original_exact_scope_only": true,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "interpretation": "This amendment only tightens the existing storage-only Funding materialization authority by binding all 1,010 source archive checksums into one canonical digest. It does not expand scope or permissions."
+}
