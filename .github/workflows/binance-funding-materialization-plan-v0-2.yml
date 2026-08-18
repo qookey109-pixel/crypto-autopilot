@@ -30,8 +30,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install package
-        run: python -m pip install -e .
+      - name: Install package and planner test dependency
+        run: |
+          python -m pip install -e .
+          python -m pip install pytest
 
       - name: Run V0.2 planner tests
         run: python -m pytest -q tests/test_binance_funding_materialization_plan_v0_2.py
