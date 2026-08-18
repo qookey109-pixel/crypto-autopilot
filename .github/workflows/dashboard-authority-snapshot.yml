@@ -14,6 +14,7 @@ on:
       - "research/receipts/2026-08-18-binance-funding-coverage.json"
       - "research/receipts/2026-08-19-binance-funding-interior-continuity-review.json"
       - "research/receipts/2026-08-19-binance-funding-materialization-authority-v0-2.json"
+      - "research/receipts/2026-08-19-binance-funding-r2-v0-2-full-preflight.json"
       - "research/receipts/2026-08-18-historical-universe-long-horizon-review.json"
 
 permissions:
@@ -46,7 +47,7 @@ jobs:
           python scripts/build_dashboard_authority_snapshot.py \
             --output artifacts/dashboard-site/data/dashboard.json
 
-      - name: Assert Chinese snapshot stays fail-closed, paper-only and secret-free
+      - name: Assert Chinese snapshot reflects preflight PASS but no R2 materialization
         shell: bash
         run: |
           set -euo pipefail
@@ -64,11 +65,16 @@ jobs:
           assert data['project']['marketCount'] == 15
           assert data['project']['fundingMonthsObserved'] == 1010
           assert data['project']['fundingV0_2StorageAuthorized'] is True
-          assert data['project']['fundingWriterReady'] is False
-          assert data['project']['fundingWriterState'] == 'NOT_READY'
+          assert data['project']['fundingWriterReady'] is True
+          assert data['project']['fundingWriterState'] == 'READY'
+          assert data['project']['fundingFullPreflightPass'] is True
+          assert data['project']['fundingMaterializationComplete'] is False
+          assert data['project']['fundingMaterializationState'] == 'NOT_READY'
           assert data['project']['fundingV0_2SourceMonths'] == 1003
           assert data['project']['fundingV0_2AnnualObjects'] == 94
           assert data['project']['fundingV0_2R2Identities'] == 192
+          assert data['project']['fundingV0_2Observations'] == 91747
+          assert data['project']['fundingV0_2LocalParquetBytes'] == 1138749
           assert data['project']['tradePlanAuthorized'] is False
           assert data['project']['liveTradingAuthorized'] is False
           assert data['securityBoundary']['containsSecrets'] is False
@@ -81,6 +87,9 @@ jobs:
           assert hype['funding'] == 'REVIEW_REQUIRED'
           assert hype['status'] == 'REVIEW_REQUIRED'
           assert hype['fundingContinuityReview']['deferredYear'] == 2026
+          pipeline = {row['name']: row['status'] for row in data['pipeline']}
+          assert pipeline['Funding V0.2 Full Preflight'] == 'PASS'
+          assert pipeline['Funding V0.2 實際 R2 Materialization'] == 'NOT_READY'
           text = path.read_text(encoding='utf-8')
           for token in ('R2_SECRET_ACCESS_KEY', 'R2_ACCESS_KEY_ID', 'PIONEX_API_SECRET', 'BEGIN PRIVATE KEY'):
               assert token not in text
@@ -111,8 +120,9 @@ jobs:
           assert '風險與閘門' in html
           assert data['snapshotLabel'] == 'Repository 正式 Authority 狀態快照'
           assert data['project']['mode'] == 'PAPER-ONLY'
-          assert data['project']['fundingV0_2StorageAuthorized'] is True
-          assert data['project']['fundingWriterState'] == 'NOT_READY'
+          assert data['project']['fundingWriterState'] == 'READY'
+          assert data['project']['fundingFullPreflightPass'] is True
+          assert data['project']['fundingMaterializationState'] == 'NOT_READY'
           PY
 
       - name: Upload deployable Chinese dashboard evidence
