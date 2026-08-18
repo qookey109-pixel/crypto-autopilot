@@ -1,0 +1,57 @@
+name: Binance Maximum Coverage Discovery
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/binance-max-coverage-discovery.yml"
+      - "scripts/discover_binance_max_coverage.py"
+      - "src/crypto_autopilot/binance_coverage.py"
+      - "src/crypto_autopilot/binance_vision.py"
+      - "src/crypto_autopilot/binance_historical.py"
+      - "config/binance_max_coverage_v0_1.json"
+      - "research/receipts/2026-08-17-m1a-pionex.json"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/binance-max-coverage-discovery.yml"
+      - "scripts/discover_binance_max_coverage.py"
+      - "src/crypto_autopilot/binance_coverage.py"
+      - "config/binance_max_coverage_v0_1.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binance-max-coverage-discovery-v0-1-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Discover maximum checksum-backed Binance Vision coverage
+        run: |
+          python scripts/discover_binance_max_coverage.py \
+            --config config/binance_max_coverage_v0_1.json \
+            --workers 12 \
+            --output artifacts/binance-max-coverage-discovery.json
+
+      - name: Upload coverage discovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-max-coverage-discovery-${{ github.run_id }}
+          path: artifacts/binance-max-coverage-discovery.json
+          if-no-files-found: warn
+          retention-days: 90
