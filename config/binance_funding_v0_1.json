@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "status": "PROTOCOL_FROZEN_BEFORE_LIVE_PROOF",
+  "status": "PROTOCOL_FROZEN_AFTER_BOUNDED_SOURCE_DIAGNOSTIC_BEFORE_PASS_AUTHORITY",
   "provider": "binance_usdm",
   "delivery": "binance_vision",
   "execution_exchange": "pionex",
@@ -19,6 +19,8 @@
   "cadence_policy": "FAIL_CLOSED_ON_UNEXPLAINED_INTERVAL_GAP_WITH_BOUNDED_SOURCE_TIMESTAMP_JITTER",
   "cadence_jitter_tolerance_ms": 10,
   "observed_proof_scope_max_abs_jitter_ms_before_tolerance_freeze": 3,
+  "superseded_exact_millisecond_proof_run_id": 32128779729,
+  "superseded_exact_millisecond_proof_reason": "Source calc_time contained bounded +/-3ms jitter around declared 8h cadence; exact-millisecond equality was an invalid source assumption.",
   "duplicate_timestamp_policy": "FAIL_CLOSED",
   "archive_revision_policy": "FAIL_CLOSED_REQUIRE_EXPLICIT_REVIEW",
   "coverage_policy": "DISCOVER_BEFORE_LONG_HORIZON_MATERIALIZATION",
