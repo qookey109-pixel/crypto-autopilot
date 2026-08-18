@@ -1,0 +1,54 @@
+name: M1B M1A Dataset Upload
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Download frozen M1A acquisition artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: m1a-pionex-acquisition-32010845699
+          path: source-artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 32010845699
+
+      - name: Upload bounded M1A dataset to R2
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/upload_m1a_dataset_to_r2.py \
+            --input-dir source-artifact/acquisition \
+            --authority-receipt research/receipts/2026-08-17-m1a-pionex.json \
+            --storage-run-id "m1b-m1a-upload-${GITHUB_RUN_ID}" \
+            --output-dir artifacts
+
+      - name: Upload dataset manifest and receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1b-m1a-dataset-receipt-${{ github.run_id }}
+          path: |
+            artifacts/m1b-m1a-dataset-manifest.json
+            artifacts/m1b-m1a-dataset-receipt.json
+          if-no-files-found: error
