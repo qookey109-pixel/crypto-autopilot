@@ -147,9 +147,15 @@ def validate_existing_2025(payload: dict[str, object]) -> None:
         raise BinanceExpansionPlanError("existing 2025 materialization authority must PASS")
     if int(payload.get("year") or 0) != 2025:
         raise BinanceExpansionPlanError("existing materialization authority must be 2025")
-    if int(payload.get("object_count") or 0) != 206:
+    if payload.get("provider") not in {None, "binance_usdm"}:
+        raise BinanceExpansionPlanError("existing materialization provider mismatch")
+    scope = payload.get("scope") or {}
+    if int(scope.get("candidate_count") or 0) != 15:
+        raise BinanceExpansionPlanError("existing 2025 authority candidate count mismatch")
+    if int(scope.get("canonical_object_count") or 0) != 206:
         raise BinanceExpansionPlanError("existing 2025 authority object count mismatch")
-    if payload.get("pionex_namespace_touched") is not False:
+    validation = payload.get("validation") or {}
+    if validation.get("pionex_namespace_touched") is not False:
         raise BinanceExpansionPlanError("existing Binance materialization touched Pionex namespace")
 
 
