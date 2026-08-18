@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Qookey Crypto Autopilot</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="主選單">
+      <div class="brand">
+        <div class="brand-mark">Q</div>
+        <div>
+          <strong>Qookey</strong>
+          <span>Crypto Autopilot</span>
+        </div>
+      </div>
+
+      <nav class="nav-list">
+        <button class="nav-item active" data-view="overview">Overview</button>
+        <button class="nav-item" data-view="data-health">Data Health</button>
+        <button class="nav-item" data-view="signals">Signals</button>
+        <button class="nav-item" data-view="positions">Paper Positions</button>
+        <button class="nav-item" data-view="trades">Paper Trades</button>
+        <button class="nav-item" data-view="performance">Performance</button>
+        <button class="nav-item" data-view="backtests">Backtests</button>
+        <button class="nav-item" data-view="gates">Risk & Gates</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="status-dot safe"></span>
+        <div>
+          <strong>PAPER-ONLY</strong>
+          <span>Live trading disabled</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Research / Paper Trading Control Center</p>
+          <h1 id="page-title">Overview</h1>
+        </div>
+        <div class="topbar-actions">
+          <div class="snapshot-pill">
+            <span class="status-dot safe"></span>
+            <span id="snapshot-label">Safe fixture snapshot</span>
+          </div>
+          <button class="icon-button" id="refresh-button" aria-label="重新整理">↻</button>
+        </div>
+      </header>
+
+      <section class="view active" id="view-overview">
+        <div class="hero-grid">
+          <article class="hero-card accent-card">
+            <div>
+              <p class="card-kicker">System Mode</p>
+              <h2>PAPER-ONLY</h2>
+              <p>Research, backtest and paper execution only. No real-money route is enabled.</p>
+            </div>
+            <div class="shield">✓</div>
+          </article>
+
+          <article class="metric-card">
+            <p class="card-kicker">Tracked Markets</p>
+            <strong class="metric-value" id="market-count">15</strong>
+            <span class="metric-note">Pionex candidate universe</span>
+          </article>
+
+          <article class="metric-card">
+            <p class="card-kicker">Funding Coverage</p>
+            <strong class="metric-value" id="funding-months">1,010</strong>
+            <span class="metric-note">Observed Binance symbol-months</span>
+          </article>
+
+          <article class="metric-card">
+            <p class="card-kicker">Live Trading</p>
+            <strong class="metric-value danger-text">OFF</strong>
+            <span class="metric-note">Authorization remains false</span>
+          </article>
+        </div>
+
+        <div class="dashboard-grid two-one">
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="card-kicker">Pipeline</p>
+                <h3>Authority Readiness</h3>
+              </div>
+              <span class="badge neutral">READ-ONLY</span>
+            </div>
+            <div class="pipeline" id="pipeline-list"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="card-kicker">Risk</p>
+                <h3>Critical Gates</h3>
+              </div>
+            </div>
+            <div class="gate-stack" id="critical-gates"></div>
+          </article>
+        </div>
+
+        <div class="dashboard-grid two-one">
+          <article class="panel performance-card">
+            <div class="panel-header">
+              <div>
+                <p class="card-kicker">Paper Performance</p>
+                <h3>Equity Preview</h3>
+              </div>
+              <span class="badge pending">AWAITING PAPER BROKER</span>
+            </div>
+            <svg class="equity-chart" viewBox="0 0 800 260" role="img" aria-label="Paper performance placeholder">
+              <defs>
+                <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="currentColor" stop-opacity=".24" />
+                  <stop offset="100%" stop-color="currentColor" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path class="grid-line" d="M0 50 H800 M0 130 H800 M0 210 H800" />
+              <path class="area" d="M0 190 C70 180,100 160,150 168 S245 120,300 132 S390 104,440 112 S520 80,575 92 S665 58,720 68 S770 52,800 48 L800 260 L0 260 Z" />
+              <path class="line" d="M0 190 C70 180,100 160,150 168 S245 120,300 132 S390 104,440 112 S520 80,575 92 S665 58,720 68 S770 52,800 48" />
+            </svg>
+            <p class="empty-note">Real paper P&amp;L will appear only after the production-grade paper broker lifecycle is authorized.</p>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="card-kicker">Data</p>
+                <h3>Provider Separation</h3>
+              </div>
+            </div>
+            <div class="provider-card">
+              <span class="provider-tag pionex">PIONEX</span>
+              <strong>Execution target</strong>
+              <p>Native evidence remains separate and authoritative.</p>
+            </div>
+            <div class="provider-card">
+              <span class="provider-tag binance">BINANCE USD-M</span>
+              <strong>Research history</strong>
+              <p>Never relabeled as Pionex-native.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="view-data-health">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="card-kicker">Historical Data</p>
+              <h3>Market Coverage</h3>
+            </div>
+            <span class="badge neutral">PROVIDER-AWARE</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Symbol</th>
+                  <th>Trade</th>
+                  <th>Mark</th>
+                  <th>Funding</th>
+                  <th>Provider</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="market-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-signals">
+        <div class="empty-state panel">
+          <div class="empty-icon">⌁</div>
+          <h3>Signals view is ready for safe API wiring</h3>
+          <p>V0.1 shell contains no order action. Strategy outputs will be read-only.</p>
+        </div>
+      </section>
+
+      <section class="view" id="view-positions">
+        <div class="empty-state panel">
+          <div class="empty-icon">◎</div>
+          <h3>No production paper positions yet</h3>
+          <p>Position lifecycle appears only after paper broker reconciliation authority is complete.</p>
+        </div>
+      </section>
+
+      <section class="view" id="view-trades">
+        <div class="empty-state panel">
+          <div class="empty-icon">↗</div>
+          <h3>Paper trade history not connected</h3>
+          <p>This shell intentionally has no private exchange or live execution endpoint.</p>
+        </div>
+      </section>
+
+      <section class="view" id="view-performance">
+        <div class="metrics-row">
+          <article class="metric-card"><p class="card-kicker">Return</p><strong>—</strong><span>Paper data pending</span></article>
+          <article class="metric-card"><p class="card-kicker">Win Rate</p><strong>—</strong><span>Paper data pending</span></article>
+          <article class="metric-card"><p class="card-kicker">Profit Factor</p><strong>—</strong><span>Paper data pending</span></article>
+          <article class="metric-card"><p class="card-kicker">Max Drawdown</p><strong>—</strong><span>Paper data pending</span></article>
+        </div>
+        <div class="empty-state panel">
+          <div class="empty-icon">∿</div>
+          <h3>Performance Center shell ready</h3>
+          <p>Equity, P&amp;L, drawdown, long/short and per-symbol attribution will connect to normalized paper-trading snapshots.</p>
+        </div>
+      </section>
+
+      <section class="view" id="view-backtests">
+        <div class="empty-state panel">
+          <div class="empty-icon">◫</div>
+          <h3>Backtest authority browser</h3>
+          <p>Future cards will show dataset authority, provider, run SHA, window, parameter identity and admission state.</p>
+        </div>
+      </section>
+
+      <section class="view" id="view-gates">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="card-kicker">Fail-Closed</p>
+              <h3>All Project Gates</h3>
+            </div>
+            <span class="badge danger">NO LIVE ROUTE</span>
+          </div>
+          <div class="gate-grid" id="all-gates"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
