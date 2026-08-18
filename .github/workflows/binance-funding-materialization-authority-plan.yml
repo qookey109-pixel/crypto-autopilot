@@ -1,0 +1,57 @@
+name: Binance Funding Materialization Authority Plan
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/binance-funding-materialization-authority-plan.yml"
+      - "scripts/plan_binance_funding_materialization_authority.py"
+      - "src/crypto_autopilot/binance_funding_materialization_plan.py"
+      - "tests/test_binance_funding_materialization_plan.py"
+      - "config/binance_funding_materialization_authority_v0_1.json"
+      - "research/receipts/2026-08-18-binance-funding-coverage.json"
+      - "research/receipts/2026-08-18-binance-funding-r2-budget.json"
+      - "research/receipts/2026-08-18-binance-funding-source-proof.json"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/binance-funding-materialization-authority-plan.yml"
+      - "scripts/plan_binance_funding_materialization_authority.py"
+      - "src/crypto_autopilot/binance_funding_materialization_plan.py"
+      - "config/binance_funding_materialization_authority_v0_1.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binance-funding-materialization-authority-plan-v0-1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Generate read-only explicit-authority plan
+        run: |
+          python scripts/plan_binance_funding_materialization_authority.py \
+            --config config/binance_funding_materialization_authority_v0_1.json \
+            --output artifacts/binance-funding-materialization-authority-plan.json
+
+      - name: Upload authority planning evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-funding-materialization-authority-plan-${{ github.run_id }}
+          path: artifacts/binance-funding-materialization-authority-plan.json
+          if-no-files-found: warn
+          retention-days: 90
