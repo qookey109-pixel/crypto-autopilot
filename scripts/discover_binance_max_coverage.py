@@ -194,6 +194,8 @@ def main() -> int:
         raise RuntimeError("coverage discovery must not authorize source switching")
     if config.get("large_scale_backfill_authorized") is not False:
         raise RuntimeError("coverage discovery must not authorize large-scale backfill")
+    if config.get("current_month_daily_extension") is not True:
+        raise RuntimeError("current-month daily extension must remain enabled")
 
     authority = str(config["candidate_authority"])
     pairs = load_candidate_universe(authority)
@@ -212,9 +214,11 @@ def main() -> int:
     now = datetime.now(timezone.utc)
     today = now.date()
     last_complete_month = previous_month(today)
-    provider_floor = date.fromisoformat(f"{config['provider_archive_floor_month']}-01")
-    cap_floor = history_cap_floor(today, int(config["project_history_cap_years"]))
-    scan_floor = max(provider_floor, cap_floor)
+    if config.get("scan_floor_policy") != "PROJECT_HISTORY_CAP_ONLY":
+        raise RuntimeError("coverage discovery must not assume a provider onset month")
+    if config.get("provider_earliest_month_assumption") is not None:
+        raise RuntimeError("provider earliest month must remain unassumed")
+    scan_floor = history_cap_floor(today, int(config["project_history_cap_years"]))
 
     monthly_periods = month_periods(
         scan_floor.strftime("%Y-%m"),
@@ -353,7 +357,8 @@ def main() -> int:
         "candidate_count": len(pairs),
         "mapping": mapping,
         "project_history_cap_years": int(config["project_history_cap_years"]),
-        "provider_archive_floor_month": str(config["provider_archive_floor_month"]),
+        "scan_floor_policy": str(config["scan_floor_policy"]),
+        "provider_earliest_month_assumption": None,
         "effective_scan_floor_month": scan_floor.strftime("%Y-%m"),
         "last_complete_month_scanned": last_complete_month.strftime("%Y-%m"),
         "current_month_daily_extension_through": (
