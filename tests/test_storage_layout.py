@@ -1,7 +1,14 @@
 import unittest
 from datetime import datetime, timezone
 
-from crypto_autopilot.storage.layout import HistoricalObjectKey, manifest_key, receipt_key
+from crypto_autopilot.storage.layout import (
+    HistoricalObjectKey,
+    historical_checkpoint_key,
+    historical_partition_receipt_key,
+    historical_staging_key,
+    manifest_key,
+    receipt_key,
+)
 
 
 class StorageLayoutTests(unittest.TestCase):
@@ -30,6 +37,31 @@ class StorageLayoutTests(unittest.TestCase):
         self.assertEqual(
             key,
             "market-data/pionex/perp/ETH_USDT_PERP/4h/year=2025/candles.parquet",
+        )
+
+    def test_checkpoint_staging_and_partition_receipt_keys_are_stable(self) -> None:
+        common = {
+            "exchange": "pionex",
+            "market_type": "perp",
+            "symbol": "BTC_USDT_PERP",
+            "interval": "15M",
+            "year": 2025,
+            "month": 1,
+        }
+        self.assertEqual(
+            historical_checkpoint_key(**common),
+            "checkpoints/historical/pionex/perp/BTC_USDT_PERP/15m/"
+            "year=2025/month=01/checkpoint.json",
+        )
+        self.assertEqual(
+            historical_staging_key(**common),
+            "staging/historical/pionex/perp/BTC_USDT_PERP/15m/"
+            "year=2025/month=01/candles.parquet",
+        )
+        self.assertEqual(
+            historical_partition_receipt_key(**common),
+            "receipts/historical/partitions/pionex/perp/BTC_USDT_PERP/15m/"
+            "year=2025/month=01/receipt.json",
         )
 
     def test_receipt_and_manifest_keys(self) -> None:
