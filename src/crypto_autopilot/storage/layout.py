@@ -34,6 +34,86 @@ class HistoricalObjectKey:
         return f"{prefix}/month={self.month:02d}/candles.parquet"
 
 
+def _historical_partition_suffix(
+    *,
+    exchange: str,
+    market_type: str,
+    symbol: str,
+    interval: str,
+    year: int,
+    month: int | None,
+) -> str:
+    canonical = HistoricalObjectKey(
+        exchange=exchange,
+        market_type=market_type,
+        symbol=symbol,
+        interval=interval,
+        year=year,
+        month=month,
+    ).build()
+    return canonical.removeprefix("market-data/").removesuffix("/candles.parquet")
+
+
+def historical_checkpoint_key(
+    *,
+    exchange: str,
+    market_type: str,
+    symbol: str,
+    interval: str,
+    year: int,
+    month: int | None = None,
+) -> str:
+    suffix = _historical_partition_suffix(
+        exchange=exchange,
+        market_type=market_type,
+        symbol=symbol,
+        interval=interval,
+        year=year,
+        month=month,
+    )
+    return f"checkpoints/historical/{suffix}/checkpoint.json"
+
+
+def historical_staging_key(
+    *,
+    exchange: str,
+    market_type: str,
+    symbol: str,
+    interval: str,
+    year: int,
+    month: int | None = None,
+) -> str:
+    suffix = _historical_partition_suffix(
+        exchange=exchange,
+        market_type=market_type,
+        symbol=symbol,
+        interval=interval,
+        year=year,
+        month=month,
+    )
+    return f"staging/historical/{suffix}/candles.parquet"
+
+
+def historical_partition_receipt_key(
+    *,
+    exchange: str,
+    market_type: str,
+    symbol: str,
+    interval: str,
+    year: int,
+    month: int | None = None,
+) -> str:
+    suffix = _historical_partition_suffix(
+        exchange=exchange,
+        market_type=market_type,
+        symbol=symbol,
+        interval=interval,
+        year=year,
+        month=month,
+    )
+    return f"receipts/historical/partitions/{suffix}/receipt.json"
+
+
 def receipt_key(run_id: str) -> str:
     clean = run_id.strip().replace("/", "-")
     if not clean:
