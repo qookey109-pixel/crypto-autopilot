@@ -9,11 +9,15 @@ M1A = Path("research/receipts/2026-08-17-m1a-pionex.json")
 BINANCE_2025 = Path("research/receipts/2026-08-18-binance-2025-r2-pilot.json")
 FUNDING_SOURCE = Path("research/receipts/2026-08-18-binance-funding-source-proof.json")
 FUNDING_COVERAGE = Path("research/receipts/2026-08-18-binance-funding-coverage.json")
-FUNDING_AUTHORITY = Path("research/receipts/2026-08-18-binance-funding-materialization-authority.json")
-FUNDING_AMENDMENT = Path("research/receipts/2026-08-18-binance-funding-materialization-authority-amendment.json")
 FUNDING_CONTINUITY_REVIEW = Path("research/receipts/2026-08-19-binance-funding-interior-continuity-review.json")
+FUNDING_AUTHORITY_V0_2 = Path(
+    "research/receipts/2026-08-19-binance-funding-materialization-authority-v0-2.json"
+)
 HISTORICAL_UNIVERSE = Path("research/receipts/2026-08-18-historical-universe-long-horizon-review.json")
 PROJECT_STATUS = Path("PROJECT_STATUS.md")
+
+EXPECTED_V0_2_SCOPE_SHA = "1e0ff54daeec8e5e47376fedb631c663687dd6fb6a4c297d269c33acdf99ad58"
+EXPECTED_V0_2_CHECKSUM_SHA = "881c14d3b3c780b8a0d56ca2f7fd57d2abff310fcd7cb4b13dc01f506b9b64f3"
 
 
 def load_json(path: Path) -> dict[str, object]:
@@ -54,9 +58,8 @@ def build_snapshot() -> dict[str, object]:
     binance_2025 = load_json(BINANCE_2025)
     funding_source = load_json(FUNDING_SOURCE)
     funding_coverage = load_json(FUNDING_COVERAGE)
-    funding_authority = load_json(FUNDING_AUTHORITY)
-    funding_amendment = load_json(FUNDING_AMENDMENT)
     continuity_review = load_json(FUNDING_CONTINUITY_REVIEW)
+    funding_v0_2 = load_json(FUNDING_AUTHORITY_V0_2)
     universe_review = load_json(HISTORICAL_UNIVERSE)
     status_text = PROJECT_STATUS.read_text(encoding="utf-8")
 
@@ -64,9 +67,8 @@ def build_snapshot() -> dict[str, object]:
         (binance_2025, BINANCE_2025),
         (funding_source, FUNDING_SOURCE),
         (funding_coverage, FUNDING_COVERAGE),
-        (funding_authority, FUNDING_AUTHORITY),
-        (funding_amendment, FUNDING_AMENDMENT),
         (continuity_review, FUNDING_CONTINUITY_REVIEW),
+        (funding_v0_2, FUNDING_AUTHORITY_V0_2),
         (universe_review, HISTORICAL_UNIVERSE),
     ):
         require_pass(payload, path)
@@ -85,42 +87,52 @@ def build_snapshot() -> dict[str, object]:
     if scan.get("candidate_count") != 15 or scan.get("monthly_available_checks") != 1010:
         raise RuntimeError("Funding Coverage authority counts changed")
 
-    authorized_scope = funding_authority.get("authorized_scope") or {}
-    authorized_actions = funding_authority.get("authorized_actions") or {}
-    if not isinstance(authorized_scope, dict) or not isinstance(authorized_actions, dict):
-        raise RuntimeError("Funding materialization authority shape changed")
-    funding_storage_scope_authorized = (
-        authorized_actions.get("funding_materialization_authorized") is True
-        and authorized_actions.get("r2_writes_authorized") is True
-    )
-
-    checksum_bound = "checksum" in json.dumps(funding_amendment, sort_keys=True).lower()
-    if not checksum_bound:
-        raise RuntimeError("Funding authority amendment no longer binds source checksums")
-
     if continuity_review.get("review_outcome") != "SCOPE_REDUCTION_REQUIRED":
         raise RuntimeError("Funding continuity review outcome changed")
-    materialization_effect = continuity_review.get("v0_1_materialization_effect") or {}
-    scope_change = continuity_review.get("required_scope_change") or {}
     observed_gap = continuity_review.get("observed_gap") or {}
-    if not isinstance(materialization_effect, dict) or not isinstance(scope_change, dict) or not isinstance(observed_gap, dict):
-        raise RuntimeError("Funding continuity review shape changed")
-    if materialization_effect.get("v0_1_write_execution_must_remain_blocked") is not True:
-        raise RuntimeError("Funding V0.1 is no longer explicitly blocked by continuity review")
-    if scope_change.get("remaining_expected_source_months") != 1003:
-        raise RuntimeError("Funding V0.2 planning source-month target changed")
-    if scope_change.get("remaining_expected_annual_canonical_objects") != 94:
-        raise RuntimeError("Funding V0.2 annual-object target changed")
+    if not isinstance(observed_gap, dict) or observed_gap.get("symbol") != "HYPEUSDT":
+        raise RuntimeError("Funding continuity gap identity changed")
 
-    funding_materialization_ready = False
-    funding_materialization_state = "SCOPE_REDUCTION_REQUIRED"
+    if funding_v0_2.get("stage") != "BINANCE_FUNDING_R2_MATERIALIZATION_V0_2_AUTHORIZED":
+        raise RuntimeError("Funding V0.2 authority stage changed")
+    if funding_v0_2.get("authority_type") != "STORAGE_MATERIALIZATION_ONLY":
+        raise RuntimeError("Funding V0.2 authority type changed")
+    authorized_scope = funding_v0_2.get("authorized_scope") or {}
+    authorized_actions = funding_v0_2.get("authorized_actions") or {}
+    blocked_actions = funding_v0_2.get("explicitly_not_authorized") or {}
+    deferred_scope = funding_v0_2.get("deferred_scope") or {}
+    if not all(
+        isinstance(value, dict)
+        for value in (authorized_scope, authorized_actions, blocked_actions, deferred_scope)
+    ):
+        raise RuntimeError("Funding V0.2 authority shape changed")
+
+    if authorized_scope.get("canonical_scope_sha256") != EXPECTED_V0_2_SCOPE_SHA:
+        raise RuntimeError("Funding V0.2 scope SHA changed")
+    if authorized_scope.get("source_checksum_set_sha256") != EXPECTED_V0_2_CHECKSUM_SHA:
+        raise RuntimeError("Funding V0.2 checksum-set SHA changed")
+    if authorized_scope.get("source_archive_count") != 1003:
+        raise RuntimeError("Funding V0.2 source archive count changed")
+    if authorized_scope.get("annual_canonical_objects") != 94:
+        raise RuntimeError("Funding V0.2 annual object count changed")
+    if authorized_scope.get("planned_total_r2_object_identities") != 192:
+        raise RuntimeError("Funding V0.2 R2 identity count changed")
+    if authorized_actions.get("funding_materialization_authorized") is not True:
+        raise RuntimeError("Funding V0.2 storage materialization authority missing")
+    if authorized_actions.get("r2_writes_authorized") is not True:
+        raise RuntimeError("Funding V0.2 exact storage write authority missing")
+    if blocked_actions.get("live_trading_authorized") is not False:
+        raise RuntimeError("live trading boundary changed")
+    if blocked_actions.get("source_switch_authorized") is not False:
+        raise RuntimeError("source switch boundary changed")
+    if deferred_scope.get("symbol") != "HYPEUSDT" or deferred_scope.get("year") != 2026:
+        raise RuntimeError("Funding deferred scope changed")
 
     equivalence_pending = "PIONEX-BINANCE EQUIVALENCE GATE PENDING SOURCE PUBLICATION" in status_text
     equivalence_status = "PENDING" if equivalence_pending else "NOT_READY"
 
-    universe_status = "NOT_READY"
-    review_text = json.dumps(universe_review, sort_keys=True)
-    if "NOT_READY" not in review_text:
+    universe_text = json.dumps(universe_review, sort_keys=True)
+    if "NOT_READY" not in universe_text:
         raise RuntimeError("Historical Universe review no longer declares membership NOT_READY")
 
     candidate_symbols: list[str] = []
@@ -131,22 +143,20 @@ def build_snapshot() -> dict[str, object]:
     if set(candidate_symbols) != set(boundaries):
         raise RuntimeError("Pionex candidate universe and Funding boundary universe differ")
 
-    gap_symbol = str(observed_gap.get("symbol") or "")
     markets: list[dict[str, object]] = []
     for symbol in candidate_symbols:
         boundary = boundaries[symbol]
         if not isinstance(boundary, dict):
             raise RuntimeError(f"invalid Funding boundary row: {symbol}")
-        funding_status = "REVIEW_REQUIRED" if symbol == gap_symbol else "PASS"
-        row_status = "REVIEW_REQUIRED" if symbol == gap_symbol else "READY"
+        is_hype = symbol == "HYPEUSDT"
         markets.append(
             {
                 "symbol": symbol,
                 "trade": "PASS",
                 "mark": "PASS",
-                "funding": funding_status,
+                "funding": "REVIEW_REQUIRED" if is_hype else "PASS",
                 "provider": "BINANCE USD-M",
-                "status": row_status,
+                "status": "REVIEW_REQUIRED" if is_hype else "READY",
                 "fundingFirstPeriod": boundary.get("first_available_period"),
                 "fundingLastPeriod": boundary.get("last_available_period"),
                 "fundingFirstUtc": boundary.get("earliest_funding_time_utc"),
@@ -156,22 +166,25 @@ def build_snapshot() -> dict[str, object]:
                 "nativeToExecutionExchange": False,
                 "fundingContinuityReview": (
                     {
-                        "state": "SCOPE_REDUCTION_REQUIRED",
-                        "deferredYear": int(scope_change["deferred_year"]),
+                        "state": "DEFERRED_2026",
+                        "deferredYear": 2026,
                         "gapPeriod": observed_gap.get("period"),
-                        "gapExpectedSlotUtc": observed_gap.get("expected_cadence_slot_between_observed_rows_utc"),
+                        "gapExpectedSlotUtc": observed_gap.get(
+                            "expected_cadence_slot_between_observed_rows_utc"
+                        ),
                     }
-                    if symbol == gap_symbol
+                    if is_hype
                     else None
                 ),
             }
         )
 
     return {
-        "schema": "qookey-dashboard-authority-snapshot-v0.1",
+        "schema": "qookey-dashboard-authority-snapshot-v0.2",
         "authority": False,
+        "locale": "zh-Hant-TW",
         "snapshotType": "NORMALIZED_VIEW_OF_FROZEN_REPOSITORY_AUTHORITIES",
-        "snapshotLabel": "Repository authority snapshot",
+        "snapshotLabel": "Repository 正式 Authority 狀態快照",
         "project": {
             "name": "Qookey Crypto Autopilot",
             "mode": "PAPER-ONLY",
@@ -179,31 +192,107 @@ def build_snapshot() -> dict[str, object]:
             "fundingMonthsObserved": int(scan["monthly_available_checks"]),
             "tradePlanAuthorized": False,
             "liveTradingAuthorized": False,
-            "fundingStorageScopeAuthorized": funding_storage_scope_authorized,
-            "fundingMaterializationReady": funding_materialization_ready,
-            "fundingMaterializationState": funding_materialization_state,
-            "fundingV0_1CanonicalScopeSha256": authorized_scope.get("canonical_scope_sha256"),
-            "fundingV0_2PlannedSourceMonths": int(scope_change["remaining_expected_source_months"]),
-            "fundingV0_2PlannedAnnualObjects": int(scope_change["remaining_expected_annual_canonical_objects"]),
-            "fundingV0_2PlannedR2Identities": int(scope_change["remaining_expected_total_r2_object_identities"]),
+            "fundingV0_2StorageAuthorized": True,
+            "fundingWriterReady": False,
+            "fundingWriterState": "NOT_READY",
+            "fundingV0_2SourceMonths": int(authorized_scope["source_archive_count"]),
+            "fundingV0_2AnnualObjects": int(authorized_scope["annual_canonical_objects"]),
+            "fundingV0_2R2Identities": int(authorized_scope["planned_total_r2_object_identities"]),
+            "fundingV0_2CanonicalScopeSha256": EXPECTED_V0_2_SCOPE_SHA,
+            "fundingV0_2ChecksumSetSha256": EXPECTED_V0_2_CHECKSUM_SHA,
         },
         "pipeline": [
-            pipeline_item("Pionex M1A Dataset", "15-symbol / 15M / 60M / 4H frozen evidence", "PASS"),
-            pipeline_item("Binance 2025 R2 Pilot", "Provider-separated Trade-Kline materialization authority", "PASS"),
-            pipeline_item("Funding Source Proof", "Checksum / schema / cadence source semantics", "PASS"),
-            pipeline_item("Funding Coverage", f"{scan['monthly_available_checks']:,} observed symbol-months across 15 symbols", "PASS"),
-            pipeline_item("Funding V0.1 Scope Authority", "Exact 1,010-month storage scope was authorized and checksum-set bound", "AUTHORIZED"),
-            pipeline_item("Funding Materialization Execution", "Full interior preflight found HYPEUSDT 2026-06 cadence discontinuity; V0.2 scope reduction required", funding_materialization_state),
-            pipeline_item("Pionex ↔ Binance Equivalence", "Frozen 45-pair source gate", equivalence_status),
-            pipeline_item("Historical Universe Membership", "Long-horizon review PASS; membership evidence still required", universe_status),
+            pipeline_item(
+                "Pionex M1A 資料集",
+                "15 個標的、15M / 60M / 4H 的 Pionex-native 凍結證據",
+                "PASS",
+            ),
+            pipeline_item(
+                "Binance 2025 R2 資料",
+                "Provider 分離的 Trade-Kline 歷史資料已完成 2025 R2 pilot",
+                "PASS",
+            ),
+            pipeline_item(
+                "Funding 來源證明",
+                "官方 checksum、schema、時間順序與 cadence 語意已驗證",
+                "PASS",
+            ),
+            pipeline_item(
+                "Funding 覆蓋範圍",
+                f"15 個標的共觀察到 {scan['monthly_available_checks']:,} 個 symbol-month",
+                "PASS",
+            ),
+            pipeline_item(
+                "Funding V0.2 R2 儲存授權",
+                "精確 1,003 個來源月份 / 94 個年度 Parquet / 192 個 R2 identities 已授權",
+                "AUTHORIZED",
+            ),
+            pipeline_item(
+                "Funding V0.2 Writer / Full Preflight",
+                "Writer 尚未以新 V0.2 scope 完成 1,003 archive + 94 annual partition 全量 preflight",
+                "NOT_READY",
+            ),
+            pipeline_item(
+                "Pionex ↔ Binance 等價性",
+                "45 組凍結比對仍等待來源 publication evidence；source switch 尚未授權",
+                equivalence_status,
+            ),
+            pipeline_item(
+                "歷史 Universe Membership",
+                "Long-horizon review 已 PASS，但正式 membership 證據尚未完成",
+                "NOT_READY",
+            ),
         ],
         "gates": [
-            gate("R2 Budget", "Observed historical-data budget authorities remain PASS.", "PASS", "pass", False),
-            gate("Provider Equivalence", "Source switch remains blocked until the frozen Pionex ↔ Binance gate resolves.", equivalence_status, "pending", True),
-            gate("Historical Universe", "Review PASS is not membership authority.", universe_status, "pending", True),
-            gate("Funding Materialization", "V0.1 execution is blocked. HYPEUSDT 2026 is deferred and V0.2 exact scope must be re-frozen before writes.", "NOT_READY", "pending", True),
-            gate("Paper Broker", "Production-grade lifecycle and reconciliation are not yet authority-complete.", "NOT_READY", "pending", True),
-            gate("Live Trading", "No real-money order or private execution route is authorized.", "NOT_AUTHORIZED", "blocked", True),
+            gate(
+                "R2 儲存預算",
+                "目前歷史資料預算 authority 維持 PASS；V0.2 Funding scope 比原預算更小。",
+                "PASS",
+                "pass",
+                False,
+            ),
+            gate(
+                "Provider 等價性",
+                "Pionex ↔ Binance Equivalence Gate 尚未 PASS，因此 source switch 仍被阻擋。",
+                equivalence_status,
+                "pending",
+                True,
+            ),
+            gate(
+                "歷史 Universe",
+                "Long-horizon review PASS 不等於正式 Historical Universe membership authority。",
+                "NOT_READY",
+                "pending",
+                True,
+            ),
+            gate(
+                "Funding Materialization",
+                "V0.2 儲存 scope 已授權，但 Writer / Full Preflight 尚未完成，因此尚未宣稱 R2 materialization PASS。",
+                "NOT_READY",
+                "pending",
+                True,
+            ),
+            gate(
+                "HYPEUSDT 2026 Funding",
+                "2026 年度 partition 因 2026-06 官方 archive cadence gap 而整年 defer；禁止插值或跨 provider 補值。",
+                "REVIEW_REQUIRED",
+                "pending",
+                False,
+            ),
+            gate(
+                "模擬券商 Paper Broker",
+                "Production-grade lifecycle 與 reconciliation authority 尚未完成。",
+                "NOT_READY",
+                "pending",
+                True,
+            ),
+            gate(
+                "真實交易",
+                "目前沒有任何真實資金下單或私人 execution route 授權。",
+                "NOT_AUTHORIZED",
+                "blocked",
+                True,
+            ),
         ],
         "markets": markets,
         "sourceAuthorities": [
@@ -211,9 +300,8 @@ def build_snapshot() -> dict[str, object]:
             str(BINANCE_2025),
             str(FUNDING_SOURCE),
             str(FUNDING_COVERAGE),
-            str(FUNDING_AUTHORITY),
-            str(FUNDING_AMENDMENT),
             str(FUNDING_CONTINUITY_REVIEW),
+            str(FUNDING_AUTHORITY_V0_2),
             str(HISTORICAL_UNIVERSE),
             str(PROJECT_STATUS),
         ],
@@ -240,10 +328,13 @@ def main() -> int:
         json.dumps(
             {
                 "status": "PASS",
-                "stage": "DASHBOARD_D2_AUTHORITY_SNAPSHOT_PASS",
+                "stage": "DASHBOARD_ZH_HANT_AUTHORITY_SNAPSHOT_PASS",
                 "market_count": snapshot["project"]["marketCount"],
                 "funding_months_observed": snapshot["project"]["fundingMonthsObserved"],
-                "funding_materialization_state": snapshot["project"]["fundingMaterializationState"],
+                "funding_v0_2_storage_authorized": snapshot["project"][
+                    "fundingV0_2StorageAuthorized"
+                ],
+                "funding_writer_state": snapshot["project"]["fundingWriterState"],
                 "output": str(output),
             },
             sort_keys=True,
