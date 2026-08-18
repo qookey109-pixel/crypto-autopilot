@@ -6,6 +6,7 @@ import unittest
 import zipfile
 
 from crypto_autopilot.binance_funding import (
+    FUNDING_CADENCE_JITTER_TOLERANCE_MS,
     BinanceFundingEvidenceError,
     BinanceFundingObservation,
     BinanceFundingRevisionConflictError,
@@ -75,6 +76,33 @@ class BinanceFundingTests(unittest.TestCase):
         result = ingest_funding_archive(key, archive_bytes=payload, checksum_payload=checksum)
         self.assertEqual(result.receipt.interval_hours, (4, 8))
 
+    def test_realistic_millisecond_jitter_is_preserved_and_allowed(self) -> None:
+        self.assertEqual(FUNDING_CADENCE_JITTER_TOLERANCE_MS, 10)
+        key = BinanceVisionFundingArchiveKey("BTCUSDT", "2024-01")
+        csv_text = "\n".join(
+            [
+                "1704384000000,8,0.0001",
+                "1704412800003,8,0.0002",
+                "1704441600000,8,0.0003",
+            ]
+        ) + "\n"
+        payload, checksum = archive_payload(key, csv_text)
+        result = ingest_funding_archive(key, archive_bytes=payload, checksum_payload=checksum)
+        self.assertEqual(result.observations[1].funding_time_ms, 1704412800003)
+        self.assertEqual(result.receipt.cadence_anomalies, 0)
+
+    def test_jitter_beyond_frozen_tolerance_fails_closed(self) -> None:
+        key = BinanceVisionFundingArchiveKey("BTCUSDT", "2024-01")
+        csv_text = "\n".join(
+            [
+                "1704384000000,8,0.0001",
+                "1704412800011,8,0.0002",
+            ]
+        ) + "\n"
+        payload, checksum = archive_payload(key, csv_text)
+        with self.assertRaises(BinanceFundingEvidenceError):
+            ingest_funding_archive(key, archive_bytes=payload, checksum_payload=checksum)
+
     def test_unexplained_gap_fails_closed(self) -> None:
         key = BinanceVisionFundingArchiveKey("SOLUSDT", "2024-01")
         csv_text = "\n".join(
@@ -105,7 +133,7 @@ class BinanceFundingTests(unittest.TestCase):
         with self.assertRaises(BinanceFundingRevisionConflictError):
             assert_no_funding_archive_revision(result.receipt, changed)
 
-    def test_annual_combine_rejects_cross_symbol_or_duplicate_times(self) -> None:
+    def test_annual_combine_rejects_cross_symbol(self) -> None:
         key = BinanceVisionFundingArchiveKey("BTCUSDT", "2024-01")
         payload, checksum = archive_payload(
             key,
