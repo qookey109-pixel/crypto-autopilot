@@ -1,0 +1,57 @@
+name: Binance Funding R2 Preflight
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/binance-funding-r2-preflight.yml"
+      - ".github/workflows/binance-funding-r2-materialize.yml"
+      - "scripts/materialize_binance_funding_r2.py"
+      - "src/crypto_autopilot/binance_funding_materializer.py"
+      - "src/crypto_autopilot/binance_funding.py"
+      - "src/crypto_autopilot/binance_funding_materialization_plan.py"
+      - "tests/test_binance_funding_materializer.py"
+      - "research/receipts/2026-08-18-binance-funding-materialization-authority.json"
+      - "research/receipts/2026-08-18-binance-funding-materialization-authority-amendment.json"
+      - "research/receipts/2026-08-18-binance-funding-source-checksum-set.json"
+      - "research/receipts/2026-08-18-binance-funding-coverage.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binance-funding-r2-preflight-v0-1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Full Funding source and annual Parquet preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/materialize_binance_funding_r2.py \
+            --mode preflight \
+            --workers 12 \
+            --run-id "${GITHUB_RUN_ID}" \
+            --output-dir artifacts/binance-funding-r2-materialization
+
+      - name: Upload Funding preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-funding-r2-preflight-${{ github.run_id }}
+          path: artifacts/binance-funding-r2-materialization/*.json
+          if-no-files-found: warn
+          retention-days: 90
