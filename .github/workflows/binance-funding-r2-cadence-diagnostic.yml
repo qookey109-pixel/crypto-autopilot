@@ -1,0 +1,38 @@
+name: Binance Funding R2 Cadence Diagnostic
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/binance-funding-r2-cadence-diagnostic.yml"
+      - "scripts/diagnose_binance_funding_r2_cadence.py"
+      - "scripts/materialize_binance_funding_r2.py"
+      - "src/crypto_autopilot/binance_funding.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binance-funding-r2-cadence-diagnostic-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package
+        run: python -m pip install -e .
+      - name: Diagnose all authorized Funding archives
+        run: python scripts/diagnose_binance_funding_r2_cadence.py
+      - name: Upload diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-funding-r2-cadence-diagnostic-${{ github.run_id }}
+          path: artifacts/binance-funding-r2-cadence-diagnostic.json
+          if-no-files-found: warn
+          retention-days: 30
