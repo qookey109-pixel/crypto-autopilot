@@ -10,7 +10,7 @@ Repository: `qookey109-pixel/crypto-autopilot`
 
 ## Current formal stage
 
-**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BINANCE HISTORICAL SOURCE V0.1 READY / BINANCE VISION BULK SOURCE V0.1 READY / BINANCE VISION LIVE PROOF PASS / BINANCE VISION R2 BOUNDED PROOF PASS / BINANCE 2025 COVERAGE SCAN PASS / BINANCE 2025 R2 PILOT PASS / BINANCE OBSERVED R2 BUDGET GATE PASS / BINANCE MAXIMUM-AVAILABLE COVERAGE DISCOVERY PASS / PIONEX-BINANCE EQUIVALENCE GATE PENDING SOURCE PUBLICATION / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / HISTORICAL UNIVERSE BACKTEST ADMISSION V0.1 READY / HISTORICAL LIQUIDITY RANKING V0.1 READY / HISTORICAL LIQUIDITY BACKTEST ADMISSION V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / HISTORICAL SSTATE EVIDENCE INGESTION V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / PARAMETER SWEEP FRAMEWORK V0.1 READY / PIONEX HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
+**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BINANCE HISTORICAL SOURCE V0.1 READY / BINANCE VISION BULK SOURCE V0.1 READY / BINANCE VISION LIVE PROOF PASS / BINANCE VISION R2 BOUNDED PROOF PASS / BINANCE 2025 COVERAGE SCAN PASS / BINANCE 2025 R2 PILOT PASS / BINANCE OBSERVED R2 BUDGET GATE PASS / BINANCE MAXIMUM-AVAILABLE COVERAGE DISCOVERY PASS / BINANCE STAGED MULTI-YEAR EXPANSION PLAN PASS / PIONEX-BINANCE EQUIVALENCE GATE PENDING SOURCE PUBLICATION / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / HISTORICAL UNIVERSE BACKTEST ADMISSION V0.1 READY / HISTORICAL LIQUIDITY RANKING V0.1 READY / HISTORICAL LIQUIDITY BACKTEST ADMISSION V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / HISTORICAL SSTATE EVIDENCE INGESTION V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / PARAMETER SWEEP FRAMEWORK V0.1 READY / PIONEX HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
 
 No live-money authorization exists. `trade_plan_authorized` remains `false`.
 
@@ -164,6 +164,24 @@ Implementation merge: PR #47 / `02d434178cc6a85f8e83b6cd15a130f8d4b652c1`
 - The workflow-tested merge-ref tree and merged `main` tree are identical: `b42fc54d629185ccbd9fbca1865239dd52c37613`.
 - This authority freezes coverage boundaries only. It does not prove listing dates, full interior content continuity, Pionex/Binance equivalence, source-switch authority, large-scale R2 backfill authority or live-trading authority.
 
+### Binance Staged Multi-Year Expansion Plan V0.1 — PASS
+
+Authority: `research/receipts/2026-08-18-binance-staged-expansion-plan.json`
+Protocol: `config/binance_staged_expansion_plan_v0_1.json`
+Document: `docs/BINANCE_STAGED_MULTIYEAR_EXPANSION_PLAN_V0_1.md`
+Implementation merge: PR #49 / `2840be31322e21a2d3fe13060af3f24c2df67af3`
+
+- Valid planning run `32122690358`, job `95666394952`, CI `32122690359` PASS.
+- The first planner execution `32122498652` failed before producing a plan because it read the frozen 2025 authority counters from the wrong schema level; the parser/tests were corrected to the formal nested `scope` schema before the PASS run. No R2 writes occurred.
+- Planning is Trade-Kline only and derives scope from frozen observed coverage; 2025 is excluded because it is already materialized PASS, while incomplete 2026 is explicitly deferred.
+- Frozen wave order: `W1=2024`, `W2=2023`, `W3=2022`, `W4=2021`, `W5=2020`.
+- Historical increment: 729 symbol-months / 2,187 source archives / 859 future R2 objects / 2,793,893 estimated rows / 78,188,670 estimated Parquet bytes.
+- Including existing 2025, projected canonical Trade-Kline storage is about **0.09697 GB**; canonical + retained staging about **0.19394 GB**; 3x capacity stress about **0.29090 GB**.
+- Deferred 2026 through July: 15 symbols / 105 symbol-months / 402,413 estimated rows / 11,261,755 estimated bytes; no 2026 materialization is authorized by this plan.
+- The workflow-tested merge-ref tree and merged implementation `main` tree are identical: `dd462c8322f5df9c0ecdb2ff54397636dce9bee4`.
+- Every wave has `materialization_authorized=false`. W1 is not authorized until Equivalence PASS authority, Historical Universe long-horizon review and an explicit staged-expansion authority all exist.
+- Mark Price, Funding, historical liquidity and historical SState remain separate future authorities; this plan does not authorize source switching, Pionex-native relabeling, 8y x ~250 expansion or live trading.
+
 ### Pionex <-> Binance Equivalence Gate V0.1 — PENDING SOURCE PUBLICATION
 
 Protocol: `config/provider_equivalence_v0_1.json`
@@ -241,8 +259,8 @@ Merges: PR #19 / `43535f02ba3120e5c319e3668d6fa431fe668067`; PR #21 / `69abd931b
 
 - Pionex one-year Historical Backfill Pilot aggregate evidence is not yet frozen PASS; it remains the execution-target benchmark/equivalence anchor.
 - Pionex/Binance candle/feature/strategy-signal equivalence authority is not yet frozen.
-- Full long-horizon Binance Vision -> R2 expansion is not authorized yet.
-- Historical-universe reconstruction for long-horizon backtests is not complete.
+- Staged multi-year Trade-Kline planning is frozen PASS, but **no wave materialization is authorized**; full long-horizon Binance Vision -> R2 expansion remains incomplete.
+- Historical-universe reconstruction/review for long-horizon backtests is not complete.
 - Real point-in-time historical Pionex liquidity evidence is not frozen PASS.
 - Binance long-horizon Funding Rate dataset/materialization is not frozen PASS.
 - Binance long-horizon Mark Price dataset/materialization is not frozen PASS; only maximum-available Mark Price coverage boundaries are now frozen PASS.
@@ -257,20 +275,21 @@ Merges: PR #19 / `43535f02ba3120e5c319e3668d6fa431fe668067`; PR #21 / `69abd931b
 
 ## Next milestone
 
-**Pionex <-> Binance Equivalence Gate V0.1 + staged multi-year expansion planning**
+**Pionex <-> Binance Equivalence Gate V0.1 + Historical Universe long-horizon review**
 
-1. Keep the frozen Equivalence V0.1 protocol unchanged while the required Binance Vision `2026-08-17` source remains unpublished.
+1. Keep the frozen Equivalence V0.1 protocol unchanged while the required Binance Vision `2026-08-17` source remains unpublished according to the latest frozen authority.
 2. Preserve the temporary hourly retry; source-publication delay is not a Gate FAIL and does not authorize threshold/scope changes.
 3. When live execution reaches `execution_status=PASS`, read all 45 pair evidence and preserve the exact aggregate `PASS` / `REVIEW` / `FAIL` outcome.
 4. Do not claim full strategy-signal equivalence for the six currently UNDEFINED rules; defer those dimensions until parameters are independently frozen.
-5. If an Equivalence Gate outcome is produced, freeze it in a separate authority receipt without changing thresholds after evidence; only a PASS authority may be merged as PASS.
+5. If an Equivalence Gate outcome is produced, freeze it in a separate authority receipt without changing thresholds after evidence; only an exact PASS outcome may be frozen as PASS.
 6. Remove the temporary hourly schedule only after an Equivalence authority is frozen.
-7. Use `research/receipts/2026-08-18-binance-max-coverage-discovery.json` as the frozen planning ceiling for the current 15-symbol Binance Trade + Mark Price scope; do not re-assume uniform 2020 or eight-year coverage.
-8. Keep the Pionex one-year pilot running/closing as the execution-target benchmark.
-9. Build provider-separated Binance Funding historical materialization in parallel; Mark Price materialization may use the newly frozen coverage boundaries, while OI remains recent-window only.
-10. Re-run observed R2 budget/cost gates after any materially larger source scope or additional dataset is proposed.
-11. Only after equivalence + historical-universe review may a staged multi-year expansion be authorized; do not jump directly to 8 years x ~250 markets.
-12. Before CF1 control-plane migration, create separate Workers/Workflows/Queues/D1 cost gates.
+7. Use `research/receipts/2026-08-18-binance-staged-expansion-plan.json` as the frozen planning authority for the current 15-symbol Trade-Kline expansion; do not regenerate waves by assuming uniform onset dates.
+8. Perform the Historical Universe long-horizon review before any W1 materialization. Existing current-universe membership must not be backprojected into earlier years without point-in-time evidence.
+9. Keep every staged wave unauthorized until all three frozen prerequisites exist: Equivalence PASS authority, Historical Universe long-horizon review, and explicit staged-expansion authority naming the exact wave/scope.
+10. Build provider-separated Binance Funding historical materialization in parallel; Mark Price materialization may use the frozen coverage boundaries, while OI remains recent-window only.
+11. Re-run observed R2 budget/cost gates after any materially larger market count, additional dataset or changed partition scheme is proposed.
+12. Do not jump directly to 8 years x ~250 markets, and do not start W1 merely because its projected capacity is small.
+13. Before CF1 control-plane migration, create separate Workers/Workflows/Queues/D1 cost gates.
 
 ## Safety gates before live trading
 
