@@ -4,12 +4,16 @@ import argparse
 import hashlib
 import json
 import os
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 from crypto_autopilot.binance_historical import pionex_perp_to_binance_usdm
-from crypto_autopilot.exchanges.binance_usdm_public import BinanceUSDMPublicClient
+from crypto_autopilot.binance_vision import BinanceVisionArchiveKey, ingest_kline_archive
 from crypto_autopilot.provider_equivalence import (
     ProviderEquivalencePolicy,
     aggregate_provider_equivalence,
@@ -91,10 +95,76 @@ def validate_frozen_policy(policy_json: dict) -> ProviderEquivalencePolicy:
     return policy
 
 
+def download(url: str, *, retries: int = 3, timeout_seconds: float = 30.0) -> bytes:
+    last_error: Exception | None = None
+    for attempt in range(retries):
+        try:
+            request = Request(
+                url,
+                headers={"User-Agent": "qookey-crypto-autopilot-equivalence-proof/0.1"},
+            )
+            with urlopen(request, timeout=timeout_seconds) as response:  # noqa: S310 - validated Vision URL
+                return response.read()
+        except HTTPError as exc:
+            last_error = exc
+            if exc.code == 404:
+                raise RuntimeError(f"required Binance Vision daily archive is missing: {url}") from exc
+            if exc.code not in {408, 425, 429, 500, 502, 503, 504}:
+                break
+        except (URLError, TimeoutError) as exc:
+            last_error = exc
+        if attempt + 1 < retries:
+            time.sleep(0.75 * (attempt + 1))
+    raise RuntimeError(f"failed to download Binance Vision evidence: {url}: {last_error}") from last_error
+
+
+def fetch_daily_archive(key: BinanceVisionArchiveKey):
+    archive_bytes = download(key.url)
+    checksum_bytes = download(key.checksum_url)
+    return ingest_kline_archive(key, archive_bytes=archive_bytes, checksum_payload=checksum_bytes)
+
+
+def date_periods(start_ms: int, end_ms: int) -> tuple[str, ...]:
+    start_date = datetime.fromtimestamp(start_ms / 1000.0, tz=timezone.utc).date()
+    end_date = datetime.fromtimestamp(end_ms / 1000.0, tz=timezone.utc).date()
+    periods = []
+    current = start_date
+    while current <= end_date:
+        periods.append(current.isoformat())
+        current += timedelta(days=1)
+    return tuple(periods)
+
+
+def fetch_binance_daily_evidence(
+    *,
+    symbols: tuple[str, ...],
+    periods: tuple[str, ...],
+    workers: int,
+):
+    keys = [
+        BinanceVisionArchiveKey("klines", "daily", symbol, interval, period)
+        for symbol in symbols
+        for interval in ("15m", "1h", "4h")
+        for period in periods
+    ]
+    results = {}
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = {executor.submit(fetch_daily_archive, key): key for key in keys}
+        for future in as_completed(futures):
+            key = futures[future]
+            results[(key.symbol, key.interval, key.period)] = future.result()
+    if len(results) != len(keys):
+        raise RuntimeError(f"Binance Vision archive count mismatch: {len(results)} != {len(keys)}")
+    return results
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default="artifacts/pionex-binance-equivalence.json")
+    parser.add_argument("--workers", type=int, default=8)
     args = parser.parse_args()
+    if not 1 <= args.workers <= 16:
+        raise ValueError("workers must be between 1 and 16")
 
     m1a = load_json(M1A_AUTHORITY)
     m1b = load_json(M1B_AUTHORITY)
@@ -116,6 +186,22 @@ def main() -> int:
         raise RuntimeError("policy/M1A overlap end mismatch")
     start_ms = int(datetime.fromisoformat(start_utc.replace("Z", "+00:00")).timestamp() * 1000)
     end_ms = int(datetime.fromisoformat(end_utc.replace("Z", "+00:00")).timestamp() * 1000)
+
+    selected_pairs = tuple(
+        (
+            str(selected["symbol"]),
+            pionex_perp_to_binance_usdm(str(selected["symbol"])),
+        )
+        for selected in m1a.get("selected_universe", [])
+    )
+    if len(selected_pairs) != 15 or len({pair[1] for pair in selected_pairs}) != 15:
+        raise RuntimeError("M1A overlap must map to 15 unique Binance symbols")
+    periods = date_periods(start_ms, end_ms)
+    binance_archives = fetch_binance_daily_evidence(
+        symbols=tuple(pair[1] for pair in selected_pairs),
+        periods=periods,
+        workers=args.workers,
+    )
 
     store = R2Store(
         account_id=os.environ["CLOUDFLARE_ACCOUNT_ID"],
@@ -140,12 +226,9 @@ def main() -> int:
     if len(object_index) != 45:
         raise RuntimeError("M1B manifest does not contain 45 unique symbol/interval objects")
 
-    client = BinanceUSDMPublicClient(timeout_seconds=30.0)
     results = []
     evidence_pairs = []
-    for selected in m1a.get("selected_universe", []):
-        pionex_symbol = str(selected["symbol"])
-        binance_symbol = pionex_perp_to_binance_usdm(pionex_symbol)
+    for pionex_symbol, binance_symbol in selected_pairs:
         for interval in ("15M", "60M", "4H"):
             source = object_index[(pionex_symbol, interval)]
             pionex_payload = store.get_bytes_verified(
@@ -155,17 +238,19 @@ def main() -> int:
             if len(pionex_candles) != int(source["rows"]):
                 raise RuntimeError(f"Pionex R2 row mismatch: {pionex_symbol} {interval}")
 
+            binance_interval = BINANCE_INTERVAL[interval]
+            daily = tuple(
+                binance_archives[(binance_symbol, binance_interval, period)]
+                for period in periods
+            )
             binance_candles = tuple(
-                client.get_klines(
-                    binance_symbol,
-                    BINANCE_INTERVAL[interval],
-                    start_time_ms=start_ms,
-                    end_time_ms=end_ms,
-                    limit=1500,
-                )
+                candle
+                for archive in daily
+                for candle in archive.candles
+                if start_ms <= candle.time_ms <= end_ms
             )
             if not binance_candles:
-                raise RuntimeError(f"Binance returned no overlap candles: {binance_symbol} {interval}")
+                raise RuntimeError(f"Binance Vision returned no overlap candles: {binance_symbol} {interval}")
 
             result = compare_provider_pair(
                 pionex_symbol=pionex_symbol,
@@ -184,8 +269,18 @@ def main() -> int:
                     "pionex_r2_key": source["key"],
                     "pionex_r2_sha256": source["sha256"],
                     "pionex_candle_sha256": canonical_candle_sha(pionex_candles),
-                    "binance_endpoint": "/fapi/v1/klines",
-                    "binance_interval": BINANCE_INTERVAL[interval],
+                    "binance_delivery": "binance_vision_daily",
+                    "binance_interval": binance_interval,
+                    "binance_periods": list(periods),
+                    "binance_source_archives": [
+                        {
+                            "filename": archive.key.filename,
+                            "source_url": archive.key.url,
+                            "archive_sha256": archive.receipt.archive_sha256,
+                            "row_count": archive.receipt.row_count,
+                        }
+                        for archive in daily
+                    ],
                     "binance_candle_sha256": canonical_candle_sha(binance_candles),
                     "requested_start_ms": start_ms,
                     "requested_end_ms": end_ms,
@@ -207,6 +302,7 @@ def main() -> int:
         "full_strategy_signal_equivalence_status": aggregate.full_strategy_signal_equivalence_status,
         "left_provider": "pionex",
         "right_provider": "binance_usdm",
+        "right_delivery": "binance_vision_daily",
         "execution_target": "pionex",
         "policy": str(POLICY_PATH),
         "policy_status": policy_json["status"],
@@ -214,6 +310,8 @@ def main() -> int:
         "pionex_r2_authority": str(M1B_AUTHORITY),
         "overlap_start_ms": start_ms,
         "overlap_end_ms": end_ms,
+        "binance_daily_periods": list(periods),
+        "binance_archive_count": len(binance_archives),
         "pair_count": len(results),
         "status_counts": status_counts,
         "aggregate": {
@@ -230,6 +328,12 @@ def main() -> int:
         "volume_equivalence_evaluated": False,
         "private_api_used": False,
         "live_trading_authorized": False,
+        "prior_execution_attempt": {
+            "run_id": 32112849706,
+            "result": "EXECUTION_FAILED_BEFORE_GATE_RESULT",
+            "cause": "Binance REST /fapi/v1/klines returned HTTP 451 from the GitHub hosted Azure runner region.",
+            "thresholds_changed_after_failure": False,
+        },
         "github_run_id": os.getenv("GITHUB_RUN_ID"),
         "github_sha": os.getenv("GITHUB_SHA"),
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -255,6 +359,7 @@ def main() -> int:
                 "pass": aggregate.pass_count,
                 "review": aggregate.review_count,
                 "fail": aggregate.fail_count,
+                "binance_archives": len(binance_archives),
                 "source_switch_authorized": aggregate.source_switch_authorized,
                 "output": str(output),
             },
