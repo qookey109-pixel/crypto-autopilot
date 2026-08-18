@@ -72,10 +72,25 @@ Authoritative completion receipt: `research/receipts/2026-08-18-m1b-r2.json`
 - R2 receipt SHA-256: `846ca4d4f668336b277efe7799a5d46077ee080ec7d0c7dbe81b05fc8cc44cd2`.
 - Pionex-native histories and any future external proxy histories must remain provenance-separated.
 
+### Historical capacity sizing and backfill design
+
+Primary design document: `docs/HISTORICAL_CAPACITY_AND_BACKFILL_V0_1.md`
+Machine-readable estimate: `research/estimates/2026-08-18-historical-capacity.json`
+
+- Capacity sizing is derived from the observed M1B payload, not a guessed compression ratio.
+- Conservative linear estimate for 250 markets x 8 years x native `15M` / `60M` / `4H`: approximately 2.956 GB.
+- Two-times capacity factor: approximately 5.912 GB; three-times factor: approximately 8.868 GB.
+- A `15M`-only comparison is approximately 1.808 GB for 250 markets x 8 years, but native `60M` / `4H` are retained for the first long-history proof because storage is not the limiting factor.
+- Full-target partition count upper bound: approximately 28,000 market-data objects under the current monthly `15M` / annual `60M` / annual `4H` policy.
+- Minimum initial R2 write + verified-read operation volume is approximately 28,000 Class A writes plus 28,000 Class B reads, before checkpoint/manifest overhead.
+- Current Cloudflare R2 Standard free-tier envelope is sufficient for the candle-only design if the account's free allowance remains available.
+- Pionex Kline page limit is 500 and the documented shared IP limit is 10 requests/second; the project soft target is 3 requests/second with conservative 429 backoff.
+- Strict eight-year / 250-market / three-interval API-page upper design bound is approximately 184,750 Kline requests; actual usage should be lower because provider history differs by market.
+- Resumable design freezes deterministic work-item identity, staging before canonical finalize, checkpointed backward pagination, idempotent resume, quarantine-on-mismatch, and historical-universe provenance requirements.
+
 ## Not completed
 
-- Observed-compression capacity model for one-year / eight-year / approximately 250-market storage.
-- Cloudflare R2 GB-month / Class A / Class B operation budget estimate.
+- Resumable historical backfill pilot implementation and interruption/resume proof.
 - Long-horizon maximum-available historical backfill (target cap: eight years).
 - Dynamic historical-universe reconstruction for survivorship-bias-safe backtests.
 - Funding-rate history.
@@ -95,16 +110,17 @@ Authoritative completion receipt: `research/receipts/2026-08-18-m1b-r2.json`
 
 ## Next milestone
 
-**Historical capacity sizing and resumable backfill design**
+**Historical Backfill Pilot — resumable one-year proof**
 
-1. Use the observed M1B Parquet payload (`425,161` bytes for the bounded 15-symbol / 7-day / 3-interval dataset) to calculate measured storage rates.
-2. Estimate one-year and eight-year storage for the planned research universe, including an approximately 250-market upper design target.
-3. Estimate R2 GB-month plus Class A / Class B operation counts for acquisition, verification and later reads.
-4. Keep `15M` as the likely canonical historical candle where appropriate; evaluate deterministic `1H` / `4H` resampling or derived caches before duplicating long-horizon storage.
-5. Define resumable, checkpointed and retry-safe maximum-available acquisition.
-6. Define historical-universe reconstruction so backtests do not use today's universe retroactively.
-7. Preserve provider/source provenance; never present external proxy history as Pionex-native PERP history.
-8. Begin long-horizon acquisition only after the capacity and request budget is reviewed.
+1. Implement R2-backed work-item checkpoints with states `PENDING -> ACQUIRING -> STAGED -> VERIFIED -> FINALIZED`.
+2. Use deterministic identity: provider + market type + symbol + interval + partition.
+3. Keep native `15M`, `60M`, `4H` for the pilot.
+4. Use the current 15-symbol M1A universe and a bounded one-year acquisition window where provider history exists.
+5. Pace Pionex Kline acquisition at a 3 requests/second project soft target; back off at least 65 seconds plus jitter after HTTP 429.
+6. Use 5-symbol GitHub Actions shards with `max-parallel: 1` initially.
+7. Intentionally interrupt at least one shard and prove restart/resume creates no duplicate or lost candles.
+8. Finalize only complete/audited partitions; require SHA-256 R2 verification, Parquet decode, timestamp/gap/OHLCV audit and receipt generation.
+9. Freeze pilot evidence before authorizing maximum-available expansion toward the 8-year / approximately 250-market target.
 
 ## Safety gates before any live trading
 
