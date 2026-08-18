@@ -34,7 +34,7 @@ jobs:
         run: python -m pip install -e .
 
       - name: Run V0.2 planner tests
-        run: python -m unittest tests.test_binance_funding_materialization_plan_v0_2 -v
+        run: python -m unittest discover -s tests -p 'test_binance_funding_materialization_plan_v0_2.py' -v
 
       - name: Generate read-only V0.2 materialization plan
         run: |
