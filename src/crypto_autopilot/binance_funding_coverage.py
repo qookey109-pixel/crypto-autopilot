@@ -4,13 +4,16 @@ from datetime import datetime, timezone
 from typing import Iterable
 
 
+COVERAGE_EDGE_CADENCE_JITTER_TOLERANCE_MS = 50
+
+
 class BinanceFundingCoverageError(RuntimeError):
     pass
 
 
 def validate_funding_coverage_config(config: dict[str, object]) -> None:
-    if config.get("status") != "PROTOCOL_FROZEN_BEFORE_DISCOVERY":
-        raise BinanceFundingCoverageError("Funding coverage protocol must be frozen before discovery")
+    if config.get("status") != "PROTOCOL_REFROZEN_AFTER_EDGE_DIAGNOSTIC_BEFORE_COVERAGE_PASS_AUTHORITY":
+        raise BinanceFundingCoverageError("Funding coverage protocol must be refrozen before PASS authority")
     if config.get("provider") != "binance_usdm" or config.get("delivery") != "binance_vision":
         raise BinanceFundingCoverageError("Funding coverage provider/delivery mismatch")
     if config.get("dataset") != "fundingRate" or config.get("archive_frequency") != "monthly":
@@ -29,6 +32,19 @@ def validate_funding_coverage_config(config: dict[str, object]) -> None:
         raise BinanceFundingCoverageError("Funding edge audit policy changed")
     if config.get("interior_policy") != "CHECKSUM_PRESENCE_ONLY":
         raise BinanceFundingCoverageError("Funding interior policy changed")
+    if int(config.get("source_proof_default_cadence_jitter_tolerance_ms") or -1) != 10:
+        raise BinanceFundingCoverageError("Funding source-proof default tolerance must remain 10ms")
+    if int(config.get("coverage_edge_cadence_jitter_tolerance_ms") or -1) != COVERAGE_EDGE_CADENCE_JITTER_TOLERANCE_MS:
+        raise BinanceFundingCoverageError("Funding coverage edge tolerance changed after diagnostic freeze")
+    diagnostic = config.get("coverage_edge_diagnostic") or {}
+    if int(diagnostic.get("observed_max_abs_residual_ms") or -1) != 45:
+        raise BinanceFundingCoverageError("Funding coverage edge diagnostic maximum must remain frozen at 45ms")
+    if diagnostic.get("tolerance_refrozen_before_coverage_pass_authority") is not True:
+        raise BinanceFundingCoverageError("Funding coverage tolerance must be refrozen before PASS authority")
+    if diagnostic.get("raw_timestamps_preserved") is not True:
+        raise BinanceFundingCoverageError("Funding raw timestamps must remain preserved")
+    if diagnostic.get("missing_funding_event_gap_observed") is not False:
+        raise BinanceFundingCoverageError("diagnostic must not claim a missing Funding event gap")
     if config.get("funding_onset_may_be_inferred_from_trade_onset") is not False:
         raise BinanceFundingCoverageError("Funding onset must not be inferred from Trade onset")
     if config.get("archive_presence_is_listing_authority") is not False:
