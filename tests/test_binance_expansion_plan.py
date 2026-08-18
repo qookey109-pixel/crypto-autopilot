@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime
 
 from crypto_autopilot.binance_expansion_plan import (
     BinanceExpansionPlanError,
@@ -142,9 +142,13 @@ class BinanceExpansionPlanTests(unittest.TestCase):
             {
                 "status": "PASS",
                 "stage": "BINANCE_2025_R2_PILOT_PASS",
+                "provider": "binance_usdm",
                 "year": 2025,
-                "object_count": 206,
-                "pionex_namespace_touched": False,
+                "scope": {
+                    "candidate_count": 15,
+                    "canonical_object_count": 206,
+                },
+                "validation": {"pionex_namespace_touched": False},
             }
         )
         with self.assertRaises(BinanceExpansionPlanError):
@@ -152,9 +156,13 @@ class BinanceExpansionPlanTests(unittest.TestCase):
                 {
                     "status": "PASS",
                     "stage": "BINANCE_2025_R2_PILOT_PASS",
+                    "provider": "binance_usdm",
                     "year": 2025,
-                    "object_count": 205,
-                    "pionex_namespace_touched": False,
+                    "scope": {
+                        "candidate_count": 15,
+                        "canonical_object_count": 205,
+                    },
+                    "validation": {"pionex_namespace_touched": False},
                 }
             )
 
