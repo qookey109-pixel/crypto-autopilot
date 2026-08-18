@@ -1,0 +1,58 @@
+name: Binance Funding Coverage Discovery
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/binance-funding-coverage.yml"
+      - "scripts/discover_binance_funding_coverage.py"
+      - "src/crypto_autopilot/binance_funding_coverage.py"
+      - "src/crypto_autopilot/binance_funding.py"
+      - "tests/test_binance_funding_coverage.py"
+      - "config/binance_funding_coverage_v0_1.json"
+      - "research/receipts/2026-08-18-binance-funding-source-proof.json"
+      - "research/receipts/2026-08-17-m1a-pionex.json"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/binance-funding-coverage.yml"
+      - "scripts/discover_binance_funding_coverage.py"
+      - "src/crypto_autopilot/binance_funding_coverage.py"
+      - "config/binance_funding_coverage_v0_1.json"
+      - "research/receipts/2026-08-18-binance-funding-source-proof.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binance-funding-coverage-v0-1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Discover read-only Binance Funding coverage
+        run: |
+          python scripts/discover_binance_funding_coverage.py \
+            --config config/binance_funding_coverage_v0_1.json \
+            --output artifacts/binance-funding-coverage.json
+
+      - name: Upload Funding coverage evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-funding-coverage-${{ github.run_id }}
+          path: artifacts/binance-funding-coverage.json
+          if-no-files-found: warn
+          retention-days: 90
