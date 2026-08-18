@@ -1,0 +1,83 @@
+{
+  "schema": "binance-funding-r2-v0-2-full-preflight-authority-v0.1",
+  "status": "PASS",
+  "stage": "BINANCE_FUNDING_R2_V0_2_FULL_PREFLIGHT_PASS",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "PREWRITE_SOURCE_AND_SERIALIZATION_EVIDENCE_ONLY",
+  "provider": "binance_usdm",
+  "delivery": "binance_vision",
+  "dataset": "fundingRate",
+  "implementation": {
+    "pr": 72,
+    "head_sha": "b05b5b59501fde735ebb06f762026c1e15f617d7",
+    "merge_commit": "6be4511ea7f496e98b634e4d5b0825563e54de22",
+    "ci_run_id": 32166392673,
+    "ci_conclusion": "success",
+    "preflight_run_id": 32166392701,
+    "preflight_conclusion": "success",
+    "artifact_id": 9335591596,
+    "artifact_zip_sha256": "6f32e4d507f0a0569831ea7e664823bb55854bedd2f6118caabc9bdbf30964ec",
+    "preflight_json_sha256": "2c31d0a5a2bbd4fadeec5c5495becb5de5ef0e10a5662259e14632ba4c81dcdd"
+  },
+  "prerequisite_authority": {
+    "path": "research/receipts/2026-08-19-binance-funding-materialization-authority-v0-2.json",
+    "required_status": "PASS",
+    "required_stage": "BINANCE_FUNDING_R2_MATERIALIZATION_V0_2_AUTHORIZED",
+    "authority_type": "STORAGE_MATERIALIZATION_ONLY"
+  },
+  "exact_scope": {
+    "canonical_scope_sha256": "1e0ff54daeec8e5e47376fedb631c663687dd6fb6a4c297d269c33acdf99ad58",
+    "source_checksum_set_sha256": "881c14d3b3c780b8a0d56ca2f7fd57d2abff310fcd7cb4b13dc01f506b9b64f3",
+    "source_archive_count": 1003,
+    "annual_canonical_object_count": 94,
+    "annual_partition_receipt_count": 94,
+    "planned_run_metadata_objects": 4,
+    "planned_total_r2_object_identities": 192,
+    "total_funding_observations": 91747,
+    "total_local_parquet_bytes": 1138749,
+    "cadence_jitter_tolerance_ms": 50
+  },
+  "preflight_results": {
+    "all_1003_official_source_checksums_verified": true,
+    "all_1003_source_content_audits_pass": true,
+    "source_checksum_set_matches_authorized_digest": true,
+    "all_94_annual_cross_month_audits_pass": true,
+    "all_94_annual_zstd_parquet_objects_built_locally": true,
+    "all_94_parquet_to_funding_exact_observation_round_trips_pass": true,
+    "raw_source_calc_time_preserved_exactly": true,
+    "source_declared_funding_interval_hours_preserved_exactly": true,
+    "hypeusdt_2026_deferred": true
+  },
+  "deferred_scope": {
+    "symbol": "HYPEUSDT",
+    "year": 2026,
+    "source_months": [1, 2, 3, 4, 5, 6, 7],
+    "materialization_authorized": false,
+    "interpolation_authorized": false,
+    "provider_splicing_authorized": false
+  },
+  "execution_boundary": {
+    "r2_credentials_used": false,
+    "r2_client_constructed": false,
+    "r2_writes_performed": false,
+    "actual_r2_materialization_completed": false,
+    "authorizes_execution_without_repeating_full_preflight": false,
+    "actual_write_execution_must_repeat_full_preflight": true,
+    "source_revision_or_scope_mismatch_must_fail_before_first_r2_write": true,
+    "existing_object_mismatch_must_fail_without_overwrite": true
+  },
+  "explicitly_not_authorized": {
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "private_pionex_api_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_required_stage": "BINANCE_FUNDING_R2_V0_2_EXACT_MATERIALIZATION_EXECUTION_AND_POSTWRITE_VERIFICATION"
+}
