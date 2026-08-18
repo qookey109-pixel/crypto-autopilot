@@ -1,0 +1,43 @@
+{
+  "version": "0.1.0",
+  "status": "PROTOCOL_FROZEN_BEFORE_PLANNING",
+  "provider": "binance_usdm",
+  "delivery": "binance_vision",
+  "execution_exchange": "pionex",
+  "coverage_authority": "research/receipts/2026-08-18-binance-max-coverage-discovery.json",
+  "capacity_authority": "research/receipts/2026-08-18-binance-observed-r2-budget.json",
+  "existing_materialization_authority": "research/receipts/2026-08-18-binance-2025-r2-pilot.json",
+  "candidate_count": 15,
+  "planning_scope": "trade_klines_only",
+  "project_intervals": ["15M", "60M", "4H"],
+  "source_intervals": ["15m", "1h", "4h"],
+  "wave_policy": "NEWEST_COMPLETE_UNMATERIALIZED_YEAR_TO_OLDEST_OBSERVED_YEAR",
+  "already_materialized_years": [2025],
+  "current_incomplete_year_policy": "DEFER",
+  "partial_onset_month_policy": "ALLOW_OBSERVED_PARTIAL_MONTH_NO_SYNTHESIS",
+  "partial_month_budget_policy": "COUNT_AS_FULL_MONTH_EQUIVALENT",
+  "existing_partition_policy": {
+    "15M": "monthly",
+    "60M": "annual",
+    "4H": "annual"
+  },
+  "required_before_any_wave_materialization": [
+    "PIONEX_BINANCE_EQUIVALENCE_GATE_PASS_AUTHORITY",
+    "HISTORICAL_UNIVERSE_LONG_HORIZON_REVIEW",
+    "EXPLICIT_STAGED_EXPANSION_AUTHORITY"
+  ],
+  "separate_future_authorities": [
+    "long_horizon_mark_price_materialization",
+    "long_horizon_funding_materialization",
+    "historical_liquidity",
+    "historical_sstate"
+  ],
+  "source_switch_authorized": false,
+  "large_scale_backfill_authorized": false,
+  "r2_writes_authorized": false,
+  "pionex_native_relabel_authorized": false,
+  "provider_splicing_authorized": false,
+  "silent_interpolation_authorized": false,
+  "trade_plan_authorized": false,
+  "live_trading_authorized": false
+}
