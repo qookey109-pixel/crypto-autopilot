@@ -1,0 +1,62 @@
+name: Dashboard Cloudflare Temporary Preview
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "wrangler.preview.jsonc"
+      - ".github/workflows/dashboard-cloudflare-temporary-preview.yml"
+      - "web/**"
+      - "scripts/build_dashboard_authority_snapshot.py"
+      - "research/receipts/**"
+      - "PROJECT_STATUS.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-cloudflare-temporary-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build safe authority-driven dashboard site
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/validate_dashboard_static.py
+          mkdir -p artifacts/dashboard-site
+          cp -R web/. artifacts/dashboard-site/
+          python scripts/build_dashboard_authority_snapshot.py \
+            --output artifacts/dashboard-site/data/dashboard.json
+
+      - name: Deploy temporary Workers Static Assets preview without account credentials
+        shell: bash
+        env:
+          NO_COLOR: "1"
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@latest deploy \
+            --temporary \
+            --config wrangler.preview.jsonc \
+            2>&1 | tee artifacts/cloudflare-temporary-deploy.log
+
+      - name: Upload preview evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-cloudflare-temporary-preview-${{ github.run_id }}
+          path: |
+            artifacts/dashboard-site
+            artifacts/cloudflare-temporary-deploy.log
+          if-no-files-found: warn
+          retention-days: 1
