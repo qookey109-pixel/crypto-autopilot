@@ -1,0 +1,121 @@
+{
+  "schema": "binance-2025-r2-pilot-authority-v0.1",
+  "status": "PASS",
+  "stage": "BINANCE_2025_R2_PILOT_PASS",
+  "date": "2026-08-18",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "provider": "binance_usdm",
+  "delivery": "binance_vision",
+  "execution_exchange": "pionex",
+  "native_to_execution_exchange": false,
+  "may_authorize_pionex_native_history": false,
+  "requires_equivalence_gate_before_strategy_source_switch": true,
+  "year": 2025,
+  "coverage_authority": "research/receipts/2026-08-18-binance-2025-coverage-scan.json",
+  "scope": {
+    "candidate_count": 15,
+    "source_archive_count": 528,
+    "canonical_object_count": 206,
+    "uploaded_object_count": 203,
+    "verified_existing_object_count": 3,
+    "total_rows": 671022,
+    "total_parquet_bytes": 18778928,
+    "rows_by_interval": {
+      "15M": 511254,
+      "60M": 127814,
+      "4H": 31954
+    },
+    "bytes_by_interval": {
+      "15M": 14101768,
+      "60M": 3648852,
+      "4H": 1028308
+    },
+    "objects_by_interval": {
+      "15M": 176,
+      "60M": 15,
+      "4H": 15
+    }
+  },
+  "hype_observed_coverage": {
+    "synthetic_pre_may_data_created": false,
+    "15M": {
+      "first_time_ms": 1748601000000,
+      "first_time_utc": "2025-05-30T10:30:00Z",
+      "last_time_ms": 1767224700000,
+      "last_time_utc": "2025-12-31T23:45:00Z",
+      "rows": 20694
+    },
+    "60M": {
+      "first_time_ms": 1748599200000,
+      "first_time_utc": "2025-05-30T10:00:00Z",
+      "last_time_ms": 1767222000000,
+      "last_time_utc": "2025-12-31T23:00:00Z",
+      "rows": 5174
+    },
+    "4H": {
+      "first_time_ms": 1748592000000,
+      "first_time_utc": "2025-05-30T08:00:00Z",
+      "last_time_ms": 1767211200000,
+      "last_time_utc": "2025-12-31T20:00:00Z",
+      "rows": 1294
+    },
+    "interpretation": "These are first observed Binance trade-Kline timestamps in the audited 2025 archive set. They are not, by themselves, independent listing-date authority."
+  },
+  "github_actions": {
+    "workflow": "Binance 2025 R2 Pilot",
+    "run_id": 32110538170,
+    "job_id": 95628773842,
+    "workflow_head_branch": "proof/binance-2025-r2-pilot-v0-1",
+    "workflow_head_sha": "531efed0b05e54e9bea7d65081cc8027956d9f57",
+    "github_pull_request_merge_ref_sha": "7e3060a452c53630ffb81addc2762ce7db99fff6",
+    "conclusion": "success",
+    "ci_run_id": 32110538110,
+    "ci_job_id": 95628773496,
+    "ci_conclusion": "success",
+    "implementation_merge_commit": "41b80f559b4aa55c40e92a3d94d6912748d5443d"
+  },
+  "artifact": {
+    "id": 9314841398,
+    "name": "binance-2025-r2-pilot-32110538170",
+    "size_bytes": 51809,
+    "zip_sha256": "267b7c58f8037f3a7ac444d6477e8a2a43eb2b9edb215a41f72ad61e30fd41d6",
+    "manifest_json_sha256": "7ccc493858cffed0695ad651fd3a7acde8ee53f1461d65bb0f37a5ccb16e50a6",
+    "manifest_json_bytes": 471628,
+    "receipt_json_sha256": "d107b7ae4d095c600dad610e1f41718fa2cd3a968cd05ac19debd51ce8bc15b6",
+    "receipt_json_bytes": 6476,
+    "expires_at": "2026-11-16T07:15:03Z"
+  },
+  "r2_evidence": {
+    "manifest_key": "manifests/historical/binance_usdm/year=2026/month=08/binance-2025-pilot-32110538170.json",
+    "manifest_sha256": "4d523ca5e43c829d866a5b0d55e1c502d65e407b3e04ac6c26ce02ef494bd56d",
+    "receipt_key": "receipts/historical/binance_usdm/binance-2025-pilot-32110538170.json",
+    "receipt_sha256": "44201400918b7755a6bd19de804bae084741f9b11df014f1e9058a0e5c8897d4"
+  },
+  "validation": {
+    "all_528_source_checksums_verified": true,
+    "all_source_candle_audits_passed": true,
+    "all_annual_cross_month_audits_passed": true,
+    "all_206_r2_objects_sha_verified": true,
+    "all_206_parquet_objects_decoded": true,
+    "all_206_exact_candle_equality_verified": true,
+    "existing_objects_overwritten": false,
+    "three_existing_objects_exact_verified": true,
+    "pionex_namespace_touched": false,
+    "hype_pre_may_synthetic_data_created": false,
+    "private_api_used": false,
+    "live_trading_authorized": false
+  },
+  "authority_boundary": {
+    "proves_2025_15_candidate_binance_trade_kline_dataset": true,
+    "proves_provider_separated_binance_to_r2_materialization": true,
+    "proves_observed_hype_first_trade_kline_timestamps": true,
+    "proves_independent_hype_listing_date": false,
+    "proves_mark_price_dataset_materialization": false,
+    "proves_funding_dataset_materialization": false,
+    "proves_pionex_binance_equivalence": false,
+    "authorizes_pionex_native_relabeling": false,
+    "authorizes_eight_year_250_market_expansion": false,
+    "authorizes_automatic_trade_plans": false,
+    "authorizes_live_trading": false
+  }
+}
