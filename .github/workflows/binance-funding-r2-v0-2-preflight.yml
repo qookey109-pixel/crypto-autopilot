@@ -13,6 +13,7 @@ on:
       - "src/crypto_autopilot/binance_funding.py"
       - "tests/test_binance_funding_materializer_v0_2.py"
       - "config/binance_funding_materialization_authority_v0_2.json"
+      - "config/binance_funding_r2_materialization_execution_v0_2.json"
       - "research/receipts/2026-08-19-binance-funding-materialization-authority-v0-2.json"
       - "research/receipts/2026-08-19-binance-funding-r2-v0-2-full-preflight.json"
       - "research/receipts/2026-08-19-binance-funding-interior-continuity-review.json"
@@ -46,6 +47,28 @@ jobs:
 
       - name: Run Funding V0.2 writer and execution contract tests
         run: python -m unittest discover -s tests -p 'test_binance_funding_materializer_v0_2.py' -v
+
+      - name: Validate explicit execution marker when present
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -f config/binance_funding_r2_materialization_execution_v0_2.json; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          from crypto_autopilot.binance_funding_materializer_v0_2 import validate_execution_marker
+          marker = json.loads(Path('config/binance_funding_r2_materialization_execution_v0_2.json').read_text(encoding='utf-8'))
+          validate_execution_marker(marker)
+          assert marker['expected_source_archive_count'] == 1003
+          assert marker['expected_annual_canonical_objects'] == 94
+          assert marker['expected_annual_partition_receipts'] == 94
+          assert marker['expected_run_metadata_objects'] == 4
+          assert marker['expected_total_r2_object_identities'] == 192
+          assert marker['repeat_full_preflight_before_first_r2_write'] is True
+          assert marker['prewrite_exact_conflict_scan_required'] is True
+          assert marker['existing_object_policy'] == 'VERIFY_EXACT_OR_FAIL_NO_OVERWRITE'
+          PY
+          fi
 
       - name: Assert no R2 or exchange secrets are exposed to PR preflight
         shell: bash
