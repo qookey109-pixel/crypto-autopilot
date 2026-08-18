@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "status": "R2_COST_BUDGET_ESTIMATE_READY",
+  "basis": {
+    "capacity_estimate": "research/estimates/2026-08-18-historical-capacity.json",
+    "observed_m1b_parquet_bytes": 425161,
+    "observed_symbols": 15,
+    "observed_days": 7,
+    "target_markets": 250,
+    "target_years": 8,
+    "native_intervals": ["15M", "60M", "4H"],
+    "market_data_partitions": 28000
+  },
+  "pricing_snapshot": {
+    "checked_at_utc": "2026-08-18T04:10:00Z",
+    "source": "https://developers.cloudflare.com/r2/pricing/",
+    "storage_class": "Standard",
+    "free_storage_gb_month": 10.0,
+    "storage_usd_per_gb_month": 0.015,
+    "free_class_a_requests_per_month": 1000000,
+    "class_a_usd_per_million": 4.5,
+    "free_class_b_requests_per_month": 10000000,
+    "class_b_usd_per_million": 0.36,
+    "egress_usd_per_gb": 0.0
+  },
+  "storage_scenarios": {
+    "canonical_only": {
+      "gb_month": 2.9558812381,
+      "estimated_monthly_cost_usd": 0.0
+    },
+    "canonical_plus_retained_staging": {
+      "gb_month": 5.9117624762,
+      "estimated_monthly_cost_usd": 0.0
+    },
+    "three_x_capacity_stress": {
+      "gb_month": 8.8676437143,
+      "estimated_monthly_cost_usd": 0.0,
+      "gate_status": "WARN"
+    }
+  },
+  "operation_model": {
+    "fresh_success_per_partition": {
+      "class_a": 8,
+      "class_b": 5,
+      "notes": "Includes checkpoint state writes, staging/canonical/receipt writes, and verification/existence reads in the current resumable flow."
+    },
+    "fresh_full_target": {
+      "class_a": 224000,
+      "class_b": 140000
+    },
+    "three_x_transient_overhead": {
+      "class_a": 672000,
+      "class_b": 420000,
+      "estimated_monthly_cost_usd": 0.0
+    }
+  },
+  "planned_usage": {
+    "storage_gb_month": 5.9117624762,
+    "class_a_requests_per_month": 224000,
+    "class_b_requests_per_month": 140000
+  },
+  "guardrails": {
+    "storage_warn_gb_month": 8.0,
+    "storage_block_gb_month": 10.0,
+    "class_a_warn_requests_per_month": 750000,
+    "class_a_block_requests_per_month": 1000000,
+    "class_b_warn_requests_per_month": 7500000,
+    "class_b_block_requests_per_month": 10000000
+  },
+  "gate_expectation": {
+    "planned_usage": "PASS",
+    "three_x_storage_stress": "WARN",
+    "above_free_storage_envelope": "BLOCK"
+  },
+  "cost_examples_usd_per_month": {
+    "10_1_gb": 0.015,
+    "15_gb": 0.075,
+    "20_gb": 0.15,
+    "50_gb": 0.6,
+    "100_gb": 1.35,
+    "500_gb": 7.35,
+    "1000_gb": 14.85
+  },
+  "caveats": [
+    "R2 free-tier usage is account-level; other buckets or projects can consume the same included monthly usage.",
+    "Cloudflare rounds billable storage and operation overage up to the next billing unit.",
+    "This budget covers R2 Standard storage and R2 operations only; future Workers, Workflows, Queues, D1, or other services require separate budget gates.",
+    "The 8 GB project warning threshold intentionally preserves 2 GB of headroom below the 10 GB Standard storage free tier."
+  ]
+}
