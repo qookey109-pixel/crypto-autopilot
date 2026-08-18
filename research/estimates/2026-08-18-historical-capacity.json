@@ -1,0 +1,91 @@
+{
+  "assumptions": {
+    "days_per_year": 365.25,
+    "full_history_year_cap": 8,
+    "linear_payload_scaling_is_conservative": true,
+    "market_upper_design_target": 250,
+    "partition_policy": {
+      "15M": "monthly",
+      "4H": "annual",
+      "60M": "annual"
+    }
+  },
+  "cloudflare_r2_pricing_snapshot": {
+    "checked_at_utc": "2026-08-18T03:03:00Z",
+    "class_a_free_requests_per_month": 1000000,
+    "class_a_usd_per_million": 4.5,
+    "class_b_free_requests_per_month": 10000000,
+    "class_b_usd_per_million": 0.36,
+    "egress_usd_per_gb": 0.0,
+    "source": "https://developers.cloudflare.com/r2/pricing/",
+    "standard_free_storage_gb_month": 10.0,
+    "standard_storage_usd_per_gb_month": 0.015
+  },
+  "estimates": {
+    "all_native_intervals": {
+      "15_markets_1_year_gb": 0.0221691093,
+      "15_markets_8_years_gb": 0.1773528743,
+      "100_markets_8_years_gb": 1.1823524952,
+      "250_markets_8_years_gb": 2.9558812381,
+      "250_markets_8_years_2x_capacity_factor_gb": 5.9117624762,
+      "250_markets_8_years_3x_capacity_factor_gb": 8.8676437143
+    },
+    "canonical_15m_comparison": {
+      "100_markets_8_years_gb": 0.7232144762,
+      "250_markets_8_years_gb": 1.8080361905
+    },
+    "r2_full_target_operations": {
+      "market_data_objects": 28000,
+      "minimum_class_a_puts": 28000,
+      "minimum_class_b_verified_gets": 28000
+    }
+  },
+  "observed_m1b": {
+    "intervals": {
+      "15M": {
+        "bytes": 260060,
+        "rows": 10080
+      },
+      "4H": {
+        "bytes": 55838,
+        "rows": 630
+      },
+      "60M": {
+        "bytes": 109263,
+        "rows": 2520
+      }
+    },
+    "object_count": 45,
+    "receipt": "research/receipts/2026-08-18-m1b-r2.json",
+    "sample_days": 7,
+    "symbol_count": 15,
+    "total_parquet_bytes": 425161,
+    "total_rows": 13230
+  },
+  "pionex_snapshot": {
+    "checked_at_utc": "2026-08-18T03:03:00Z",
+    "documented_ip_requests_per_second": 10,
+    "kline_limit_max": 500,
+    "kline_weight": 1,
+    "rate_limit_source": "https://pionex-doc.gitbook.io/apidocs/restful/general/rate-limit",
+    "route": "/api/v1/market/klines",
+    "route_source": "https://pionex-doc.gitbook.io/apidocs/restful/markets/get-klines",
+    "soft_project_requests_per_second": 3,
+    "upper_bound_8y_pages_per_symbol": {
+      "15M": 562,
+      "4H": 36,
+      "60M": 141,
+      "all": 739
+    },
+    "upper_bound_250_market_kline_pages": 184750,
+    "upper_bound_ideal_pacing_hours_at_3_rps": 17.1065
+  },
+  "recommendation": {
+    "drop_native_1h_4h_for_storage_savings": false,
+    "full_backfill_authorized": false,
+    "next_step": "bounded one-year 15-symbol resumable historical backfill pilot",
+    "reason": "The three-native-interval candle store fits comfortably inside the current R2 capacity envelope; preserve exchange-native semantics until strategy-signal equivalence authorizes derivation."
+  },
+  "schema_version": 1,
+  "status": "CAPACITY_SIZING_COMPLETE"
+}
