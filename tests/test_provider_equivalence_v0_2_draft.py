@@ -77,7 +77,9 @@ class ProviderEquivalenceV02DraftTests(unittest.TestCase):
         metric = draft["direction_metric_design"]
         self.assertEqual(metric["proposed_agreement_pass_min"], 0.98)
         self.assertEqual(metric["proposed_agreement_review_min"], 0.95)
-        self.assertIn("verified price increment", metric["verified_increment_rule"])
+        increment_rule = metric["verified_increment_rule"]
+        self.assertIn("frozen price increment", increment_rule)
+        self.assertIn("never infer", increment_rule)
         cap = metric["indeterminate_fraction_metric"]
         self.assertIsNone(cap["pass_max"])
         self.assertIsNone(cap["review_max"])
