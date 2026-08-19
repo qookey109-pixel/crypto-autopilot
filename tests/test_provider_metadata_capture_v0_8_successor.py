@@ -87,14 +87,45 @@ class FakeStore:
         return payload
 
 
-def test_prepared_successor_runtime_can_complete_with_fakes_but_is_not_wired_to_execution() -> None:
+def test_public_successor_entrypoint_is_hard_disabled_before_provider_or_r2_access() -> None:
+    provider_called = False
+    store_called = False
+
+    def provider_fetcher():
+        nonlocal provider_called
+        provider_called = True
+        raise AssertionError("hard-disabled public entrypoint reached provider")
+
+    def store_factory():
+        nonlocal store_called
+        store_called = True
+        raise AssertionError("hard-disabled public entrypoint constructed R2")
+
+    result = successor.execute_successor_capture(
+        now=datetime(2026, 8, 27, 0, 17, tzinfo=timezone.utc),
+        provider_fetcher=provider_fetcher,
+        store_factory=store_factory,
+    )
+    assert successor.SUCCESSOR_RUNTIME_EXECUTION_AUTHORIZED is False
+    assert result["status"] == "SKIP"
+    assert result["stage"] == "V0_8_SUCCESSOR_RUNTIME_EXECUTION_NOT_AUTHORIZED"
+    assert result["provider_requests_performed"] == 0
+    assert result["render_relay_requests_performed"] == 0
+    assert result["r2_client_constructed"] is False
+    assert result["r2_writes_performed"] is False
+    assert result["holdout_candles_accessed"] is False
+    assert provider_called is False
+    assert store_called is False
+
+
+def test_authorized_core_can_complete_with_fakes_without_production_access() -> None:
     prior_run = os.environ.get("GITHUB_RUN_ID")
     prior_sha = os.environ.get("GITHUB_SHA")
     os.environ["GITHUB_RUN_ID"] = "424242"
     os.environ["GITHUB_SHA"] = "fixture-sha"
     store = FakeStore(initial_sizes=[22_120_404])
     try:
-        result = successor.execute_successor_capture(
+        result = successor._execute_successor_capture_authorized(  # noqa: SLF001
             now=datetime(2026, 8, 27, 0, 17, tzinfo=timezone.utc),
             provider_fetcher=_payloads,
             store_factory=lambda: store,
@@ -132,12 +163,12 @@ def test_prepared_successor_runtime_can_complete_with_fakes_but_is_not_wired_to_
     assert "METADATA_RELAY_TOKEN" not in json.dumps(receipt)
 
 
-def test_free_only_headroom_blocks_before_any_write() -> None:
+def test_authorized_core_free_only_headroom_blocks_before_any_write() -> None:
     prior_run = os.environ.get("GITHUB_RUN_ID")
     os.environ["GITHUB_RUN_ID"] = "424243"
     store = FakeStore(initial_sizes=[7_999_999_999])
     try:
-        result = successor.execute_successor_capture(
+        result = successor._execute_successor_capture_authorized(  # noqa: SLF001
             now=datetime(2026, 8, 27, 0, 47, tzinfo=timezone.utc),
             provider_fetcher=_payloads,
             store_factory=lambda: store,
@@ -156,7 +187,7 @@ def test_free_only_headroom_blocks_before_any_write() -> None:
     assert store.objects == {}
 
 
-def test_outside_window_stops_before_provider_and_r2_access() -> None:
+def test_authorized_core_outside_window_stops_before_provider_and_r2_access() -> None:
     provider_called = False
     store_called = False
 
@@ -170,7 +201,7 @@ def test_outside_window_stops_before_provider_and_r2_access() -> None:
         store_called = True
         raise AssertionError("outside-window run constructed R2")
 
-    result = successor.execute_successor_capture(
+    result = successor._execute_successor_capture_authorized(  # noqa: SLF001
         now=datetime(2026, 8, 26, 23, 59, tzinfo=timezone.utc),
         provider_fetcher=provider_fetcher,
         store_factory=store_factory,
@@ -185,6 +216,7 @@ def test_outside_window_stops_before_provider_and_r2_access() -> None:
 def test_prepared_authorities_keep_all_execution_gates_closed() -> None:
     _, v07, _, _ = successor.validate_prepared_runtime_authorities()
     boundary = v07["execution_boundary"]
+    assert successor.SUCCESSOR_RUNTIME_EXECUTION_AUTHORIZED is False
     assert boundary["render_metadata_relay_enablement_authorized"] is False
     assert boundary["render_metadata_capture_execution_authorized"] is False
     assert boundary["scheduled_capture_activation_authorized"] is False
