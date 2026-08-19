@@ -1,0 +1,74 @@
+{
+  "version": "0.1.0",
+  "status": "PROTOCOL_FROZEN_BEFORE_TRANSPORT_EVIDENCE",
+  "stage": "PROVIDER_EQUIVALENCE_V0_2_LOCAL_TRANSPORT_PROBE_PROTOCOL_FROZEN",
+  "purpose": "Prove that an operator-controlled local execution transport can reach the unchanged official Pionex and Binance USD-M public metadata endpoints before any new forward holdout is frozen.",
+  "authority_prerequisite": "research/receipts/2026-08-19-provider-equivalence-v0-2-transport-blocked.json",
+  "universe_authority": "research/receipts/2026-08-17-m1a-pionex.json",
+  "executor": {
+    "class": "operator_controlled_local_host",
+    "interactive_manual_execution_only": true,
+    "scheduled_execution_authorized": false,
+    "github_hosted_execution_authorized": false,
+    "cloudflare_worker_execution_authorized": false
+  },
+  "providers": {
+    "pionex": {
+      "public_endpoint": "https://api.pionex.com/api/v1/common/symbols",
+      "required_http_status": 200,
+      "max_response_bytes": 5000000,
+      "selected_symbol_field": "data.symbols[].symbol",
+      "required_metadata_field": "data.symbols[].quoteStep"
+    },
+    "binance_usdm": {
+      "public_endpoint": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+      "required_http_status": 200,
+      "max_response_bytes": 10000000,
+      "selected_symbol_field": "symbols[].symbol",
+      "required_metadata_field": "symbols[].filters[filterType=PRICE_FILTER].tickSize"
+    }
+  },
+  "pass_criteria": {
+    "both_providers_http_200": true,
+    "both_payloads_json_parse": true,
+    "all_15_frozen_symbols_present_once_per_provider": true,
+    "required_metadata_field_present_for_all_selected_symbols": true,
+    "increment_values_must_not_be_emitted": true,
+    "r2_client_must_not_be_constructed": true,
+    "r2_writes_must_be_zero": true,
+    "holdout_candles_must_not_be_accessed": true
+  },
+  "evidence_output": {
+    "format": "json",
+    "raw_payload_retained": false,
+    "raw_payload_sha256_recorded": true,
+    "raw_payload_bytes_recorded": true,
+    "selected_symbol_count_recorded": true,
+    "increment_values_emitted": false,
+    "hostname_recorded": false,
+    "ip_address_recorded": false
+  },
+  "authorization_boundary": {
+    "transport_probe_execution_authorized": true,
+    "metadata_capture_execution_authorized": false,
+    "metadata_only_r2_writes_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "replacement_holdout_freeze_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "result_rule": {
+    "pass": "Both providers satisfy every pass criterion in one local execution.",
+    "blocked": "Any HTTP transport denial such as 403/451, DNS/TLS failure, timeout, or network refusal.",
+    "fail": "Transport succeeds but payload/schema/symbol coverage violates the frozen contract.",
+    "post_pass": "A PASS is transport evidence only. A separate authority must freeze a new forward metadata-capture window and holdout."
+  }
+}
