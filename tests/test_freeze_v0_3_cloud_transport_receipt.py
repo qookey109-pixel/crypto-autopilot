@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/freeze_v0_3_cloud_transport_receipt.py"
+WORKFLOW = ROOT / ".github/workflows/automate-v0-3-cloud-transport-follow-up.yml"
 
 
 def _module():
@@ -77,3 +78,17 @@ def test_blocked_or_unsanitized_results_fail_closed() -> None:
         pass
     else:
         raise AssertionError("unsanitized increment metadata must be rejected")
+
+
+def test_follow_up_workflow_only_trusts_manual_main_diagnostic_runs() -> None:
+    text = WORKFLOW.read_text()
+    assert "workflow_run:" in text
+    assert "Diagnose V0.3 Cloudflare Container Binance Transport" in text
+    assert "github.event.workflow_run.event == 'workflow_dispatch'" in text
+    assert "github.event.workflow_run.head_branch == 'main'" in text
+    assert "github.event.workflow_run.conclusion == 'success'" in text
+    assert "github.event.workflow_run.conclusion != 'success'" in text
+    assert "actions: read" in text
+    assert "contents: write" in text
+    assert "pull-requests: write" in text
+    assert "issues: write" in text
