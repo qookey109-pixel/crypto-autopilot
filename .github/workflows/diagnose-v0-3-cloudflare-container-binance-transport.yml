@@ -19,6 +19,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Report Cloudflare secret presence only
+        shell: bash
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            echo "CLOUDFLARE_ACCOUNT_ID=PRESENT"
+          else
+            echo "CLOUDFLARE_ACCOUNT_ID=MISSING"
+          fi
+          if [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "CLOUDFLARE_API_TOKEN=PRESENT"
+          else
+            echo "CLOUDFLARE_API_TOKEN=MISSING"
+          fi
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
