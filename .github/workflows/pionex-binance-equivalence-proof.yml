@@ -68,3 +68,5 @@ jobs:
           path: artifacts/pionex-binance-equivalence.json
           if-no-files-found: warn
           retention-days: 90
+
+# Diagnostic touch 2026-08-19: re-run the frozen source-publication gate without changing scope or thresholds.
