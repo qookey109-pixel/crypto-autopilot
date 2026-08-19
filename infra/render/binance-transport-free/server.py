@@ -13,11 +13,16 @@ USER_AGENT = "qookey-provider-equivalence-render-free-preflight/0.1"
 METADATA_RELAY_USER_AGENT = "qookey-provider-equivalence-render-metadata-relay/0.1"
 METADATA_RELAY_PATH = "/metadata/binance-exchange-info"
 METADATA_RELAY_AUTH_CHECK_PATH = "/metadata/auth-check"
+METADATA_RELAY_SMOKE_PATH = "/metadata/relay-smoke"
 MAX_BODY_BYTES = 8_000_000
 
-# V0.7 deliberately ships the relay implementation disabled in code. A later,
-# separately versioned execution/cutover authority must change this constant.
+# V0.7 raw relay remains disabled until the final atomic capture cutover.
 METADATA_RELAY_EXECUTION_AUTHORIZED = False
+
+# V0.9 authorizes only a sanitized, zero-R2 live transport smoke. The smoke
+# exercises the same Binance fetch helper as the future raw relay but never
+# emits or persists the raw exchangeInfo body.
+V0_9_RELAY_SMOKE_EXECUTION_AUTHORIZED = True
 
 
 def summarize_exchange_info(upstream_status: int, payload: Any) -> dict[str, Any]:
@@ -142,12 +147,47 @@ def fetch_exchange_info_raw() -> tuple[int, bytes | None, str, int | None]:
     return upstream_status, body, content_type, len(symbols)
 
 
+def relay_smoke_payload() -> tuple[int, dict[str, Any]]:
+    upstream_status, raw, _content_type, symbol_count = fetch_exchange_info_raw()
+    passed = (
+        upstream_status == 200
+        and raw is not None
+        and isinstance(symbol_count, int)
+        and symbol_count > 0
+    )
+    payload = {
+        "status": "PASS" if passed else "BLOCKED",
+        "stage": "V0_9_RENDER_RELAY_LIVE_SMOKE_PASS" if passed else "V0_9_RENDER_RELAY_LIVE_SMOKE_BLOCKED",
+        "transport": "render_free_web_service",
+        "runtime_platform": "render",
+        "runtime_region": os.environ.get("RENDER_REGION", "frankfurt"),
+        "upstream_url": UPSTREAM_URL,
+        "upstream_status": upstream_status,
+        "json_ok": raw is not None,
+        "symbols_array": raw is not None and symbol_count is not None,
+        "symbol_count": symbol_count,
+        "api_key_used": False,
+        "increment_values_emitted": False,
+        "raw_exchange_info_emitted": False,
+        "raw_exchange_info_persisted": False,
+        "provider_requests_performed": 1,
+        "r2_client_constructed": False,
+        "r2_writes_performed": False,
+        "holdout_candles_accessed": False,
+        "holdout_evaluated": False,
+        "source_switch_performed": False,
+        "live_trading_performed": False,
+        "raw_relay_execution_authorized": METADATA_RELAY_EXECUTION_AUTHORIZED,
+    }
+    return (200 if passed else 502), payload
+
+
 def _json_bytes(payload: dict[str, Any]) -> bytes:
     return json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "QookeyRenderFreeTransport/0.3"
+    server_version = "QookeyRenderFreeTransport/0.4"
 
     def _send_json(self, status: int, payload: dict[str, Any]) -> None:
         body = _json_bytes(payload)
@@ -164,8 +204,6 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         if self.path == METADATA_RELAY_AUTH_CHECK_PATH:
-            # V0.8 pre-activation secret handshake only. This path deliberately
-            # performs no provider request and cannot enable the metadata relay.
             expected = os.environ.get("METADATA_RELAY_TOKEN")
             if not expected:
                 self._send_json(
@@ -202,9 +240,58 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(200, shared_secret_auth_check_payload())
             return
 
+        if self.path == METADATA_RELAY_SMOKE_PATH:
+            if not V0_9_RELAY_SMOKE_EXECUTION_AUTHORIZED:
+                self._send_json(
+                    503,
+                    {
+                        "status": "DISABLED",
+                        "stage": "V0_9_RELAY_SMOKE_EXECUTION_NOT_AUTHORIZED",
+                        "provider_requests_performed": 0,
+                        "r2_client_constructed": False,
+                        "r2_writes_performed": False,
+                        "holdout_candles_accessed": False,
+                        "source_switch_performed": False,
+                        "live_trading_performed": False,
+                    },
+                )
+                return
+            expected = os.environ.get("METADATA_RELAY_TOKEN")
+            if not expected:
+                self._send_json(
+                    503,
+                    {
+                        "status": "BLOCKED",
+                        "stage": "V0_9_RELAY_SMOKE_SECRET_NOT_CONFIGURED",
+                        "provider_requests_performed": 0,
+                        "r2_client_constructed": False,
+                        "r2_writes_performed": False,
+                        "holdout_candles_accessed": False,
+                        "source_switch_performed": False,
+                        "live_trading_performed": False,
+                    },
+                )
+                return
+            if not is_authorized(self.headers.get("Authorization"), expected):
+                self._send_json(
+                    401,
+                    {
+                        "status": "UNAUTHORIZED",
+                        "stage": "V0_9_RELAY_SMOKE_SECRET_MISMATCH_OR_MISSING",
+                        "provider_requests_performed": 0,
+                        "r2_client_constructed": False,
+                        "r2_writes_performed": False,
+                        "holdout_candles_accessed": False,
+                        "source_switch_performed": False,
+                        "live_trading_performed": False,
+                    },
+                )
+                return
+            status, payload = relay_smoke_payload()
+            self._send_json(status, payload)
+            return
+
         if self.path == METADATA_RELAY_PATH:
-            # V0.7 must not perform a provider request. This hard code gate stays
-            # false until a separate versioned execution/cutover authority.
             if not metadata_relay_enabled():
                 self._send_json(
                     503,
