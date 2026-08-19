@@ -1,0 +1,27 @@
+name: Diagnose V0.2 Metadata Main Run
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/diagnose-v0-2-metadata-main.yml"
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect main merge workflow runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: f5df54d8e834f1a702eab4ab06d23837cbab02bc
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${REPO}/actions/runs?head_sha=${HEAD_SHA}&per_page=50" \
+            --jq '.workflow_runs[] | {id,name,event,status,conclusion,head_sha,html_url}'
