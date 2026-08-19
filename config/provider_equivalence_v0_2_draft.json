@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0-draft.2",
+  "version": "0.2.0-draft.3",
   "status": "PROTOCOL_DRAFT_NOT_AUTHORIZED",
   "purpose": "Design a separately versioned, microstructure-aware provider-equivalence protocol without rewriting V0.1.",
   "v0_1_boundary": {
@@ -49,15 +49,17 @@
     "state": ["ema20_gt_ema50", "ema20_slope_positive", "close_gt_ema20"]
   },
   "microstructure_metadata_prerequisite": {
-    "state": "REQUIRED_BEFORE_PROTOCOL_FREEZE",
+    "state": "FIELD_SEMANTICS_PASS_HISTORICAL_VALUES_NOT_READY",
     "design_protocol": "config/provider_equivalence_v0_2_metadata_draft.json",
+    "semantic_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-price-increment-semantics.json",
     "public_provider_metadata_only": true,
-    "pionex_price_increment_authority_required": true,
-    "binance_price_increment_authority_required": true,
+    "pionex_price_increment_semantics_resolved": true,
+    "binance_price_increment_semantics_resolved": true,
+    "historical_increment_values_required": true,
     "all_15_symbol_mappings_required": true,
     "effective_during_candidate_holdout_required": true,
     "raw_payload_sha256_receipts_required": true,
-    "exact_json_paths_or_fields_must_be_frozen": true,
+    "exact_json_paths_or_fields_frozen": true,
     "metadata_value_interpolation_forbidden": true,
     "metadata_provider_splicing_forbidden": true
   },
@@ -128,7 +130,7 @@
   },
   "aggregate_design": {
     "expected_pair_count": 45,
-    "state": "DRAFT_BLOCKED_ON_PRICE_INCREMENT_METADATA_AUTHORITY",
+    "state": "DRAFT_BLOCKED_ON_HISTORICAL_PRICE_INCREMENT_VALUES",
     "pair_pass_requires": [
       "all retained V0.1 price metrics PASS",
       "microstructure-aware direction agreement PASS",
@@ -153,6 +155,8 @@
   },
   "authorization_boundary": {
     "protocol_frozen": false,
+    "metadata_field_semantics_frozen": true,
+    "historical_metadata_values_authorized": false,
     "metadata_acquisition_authorized": false,
     "holdout_data_access_authorized": false,
     "holdout_evaluation_authorized": false,
@@ -165,5 +169,5 @@
     "real_money_order_authorized": false,
     "live_trading_authorized": false
   },
-  "next_required_stage": "PUBLIC_PRICE_INCREMENT_METADATA_SCHEMA_AUTHORITY_BEFORE_V0_2_FREEZE"
+  "next_required_stage": "HISTORICAL_PRICE_INCREMENT_VALUE_APPLICABILITY_DESIGN_WITHOUT_OPENING_HOLDOUT"
 }
