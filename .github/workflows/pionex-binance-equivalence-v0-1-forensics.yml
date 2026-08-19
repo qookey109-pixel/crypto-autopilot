@@ -49,7 +49,7 @@ jobs:
           test -n "${R2_SECRET_ACCESS_KEY}"
 
       - name: Unit test forensic primitives
-        run: python -m pytest -q tests/test_equivalence_forensics.py
+        run: python -m unittest tests.test_equivalence_forensics -v
 
       - name: Run descriptive-only frozen V0.1 forensic replay
         shell: bash
