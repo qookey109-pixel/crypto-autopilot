@@ -75,10 +75,15 @@
     "runtime": "docker",
     "monthly_runtime_budget_usd": 0,
     "metadata_relay_path": "/metadata/binance-exchange-info",
+    "relay_scaffold_implemented": true,
+    "code_execution_gate_constant": "METADATA_RELAY_EXECUTION_AUTHORIZED",
+    "code_execution_gate_frozen_false": true,
     "metadata_relay_enable_env": "METADATA_RELAY_ENABLED",
     "metadata_relay_token_env": "METADATA_RELAY_TOKEN",
     "metadata_relay_enabled_value": "true",
-    "default_when_env_missing": "DISABLED_FAIL_CLOSED",
+    "environment_flags_cannot_override_frozen_false_code_gate": true,
+    "relay_activation_requires_separate_code_change_and_versioned_authority": true,
+    "default_state": "DISABLED_FAIL_CLOSED_NO_PROVIDER_REQUEST",
     "raw_payload_cache_authorized": false,
     "raw_payload_persistence_authorized": false,
     "request_body_logging_authorized": false,
@@ -163,5 +168,5 @@
     "upgrade_to_paid_render_instance": false,
     "add_payment_method_to_continue": false
   },
-  "next_required_stage": "IMPLEMENT_DISABLED_RENDER_METADATA_RELAY_AND_VALIDATE_WITHOUT_PROVIDER_CAPTURE_THEN_FREEZE_SEPARATE_EXECUTION_CUTOVER_AUTHORITY"
+  "next_required_stage": "VALIDATE_DISABLED_RENDER_METADATA_RELAY_THEN_FREEZE_SEPARATE_EXECUTION_CUTOVER_AUTHORITY"
 }
