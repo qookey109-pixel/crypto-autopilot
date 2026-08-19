@@ -14,7 +14,7 @@ This file is the current project-status index. Frozen receipts, configs, documen
 
 ## Current formal stage
 
-**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / R2 BUDGET GATES PASS / BINANCE MAXIMUM-AVAILABLE COVERAGE DISCOVERY PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / R2 LIVE USAGE 22.120404 MB / PIONEX-BINANCE EQUIVALENCE V0.1 FAIL / EQUIVALENCE V0.1 DIRECTION FORENSICS PASS / V0.2 SELF-HOSTED MAC BINANCE TRANSPORT PASS / V0.2 REPLACEMENT METADATA CAPTURE AUTHORIZED / V0.2 REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE LONG-HORIZON REVIEW PASS / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / STRATEGY REPLAY READINESS GATE BLOCKED ON AUTHORITY / PAPER-ONLY**
+**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / R2 BUDGET GATES PASS / BINANCE MAXIMUM-AVAILABLE COVERAGE DISCOVERY PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / R2 LIVE USAGE 22.120404 MB / PIONEX-BINANCE EQUIVALENCE V0.1 FAIL / EQUIVALENCE V0.1 DIRECTION FORENSICS PASS / V0.2 SELF-HOSTED MAC BINANCE TRANSPORT PASS / V0.2 REPLACEMENT METADATA CAPTURE AUTHORIZED / V0.5 RENDER FREE BINANCE TRANSPORT PASS / V0.6 RENDER TRANSPORT AUTHORITY TRANSITION PASS / V0.7 RENDER METADATA CAPTURE PROTOCOL PREPARED EXECUTION_NOT_AUTHORIZED / V0.2 REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE LONG-HORIZON REVIEW PASS / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / STRATEGY REPLAY READINESS GATE BLOCKED ON AUTHORITY / PAPER-ONLY**
 
 No live-money authorization exists. `trade_plan_authorized=false` and `live_trading_authorized=false` remain mandatory.
 
@@ -221,6 +221,32 @@ Replacement protocol:
 - Metadata stability PASS, if later achieved, still does **not** authorize holdout candle access; a separate holdout-access authority is required.
 - `source_switch_authorized=false`, W1 remains false, backtest admission remains false, automatic trade plan remains false, and live trading remains false.
 
+## Render successor transport line — V0.5 PASS / V0.6 TRANSITION PASS / V0.7 PREPARED
+
+Transport PASS authority:
+`research/receipts/2026-08-19-provider-equivalence-v0-5-render-free-transport-pass.json`
+
+Transport transition authority:
+`research/receipts/2026-08-19-provider-equivalence-v0-6-render-transport-authority-transition.json`
+
+Prepared successor metadata protocol:
+`config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json`
+
+Prepared protocol receipt:
+`research/receipts/2026-08-19-provider-equivalence-v0-7-render-metadata-capture-protocol-prepared.json`
+
+- V0.5 Render Free / Frankfurt reached the exact official Binance USD-M `exchangeInfo` endpoint with HTTP 200, valid JSON and a nonempty `symbols[]` array; sanitized evidence recorded `symbol_count=872`.
+- V0.6 created a separate versioned transport-authority transition and did not mutate or erase the historical V0.2 Self-Hosted Mac authority.
+- V0.7 preserves the exact V0.2 replacement holdout, metadata capture window, 194 hourly slots, UTC `:17/:47` schedule targets, 15-symbol / 45-pair scope and price-increment semantics.
+- V0.7 prepares GitHub-hosted Ubuntu orchestration with direct public Pionex metadata transport and Render Free Frankfurt only for the Binance USD-M metadata transport leg.
+- The V0.7 Render metadata relay scaffold is hard-disabled in code with `METADATA_RELAY_EXECUTION_AUTHORIZED=false`. Environment variables cannot enable it without a later versioned code/authority change.
+- V0.7 has no active schedule trigger, performs no provider metadata capture, authorizes no metadata R2 writes and does not access holdout candles.
+- R2 credentials remain GitHub Actions Secrets only and must not be placed in Render.
+- FREE-ONLY remains binding: Render stays Free, monthly project runtime budget remains `0 USD`, and the current operational R2 hard stop for this successor design is 8 GB with a required prewrite headroom gate.
+- The public Binance `exchangeInfo` path does not require a Binance API key. This is not a project-wide Binance API-key ban; future authenticated Binance scope may be separately versioned. A Binance API key cannot be used as a transport-blocker bypass.
+- Until a separate execution/cutover authority is frozen and merged, the V0.2 Self-Hosted Mac path remains the only metadata-capture execution path already authorized by Repository authority.
+- Any future V0.7 execution cutover must explicitly prevent the old V0.2 self-hosted scheduled path and the successor Render path from running concurrently.
+
 ## Historical Universe — REVIEW PASS / MEMBERSHIP NOT_READY
 
 Authority: `research/receipts/2026-08-18-historical-universe-long-horizon-review.json`
@@ -239,7 +265,7 @@ However:
 - framework readiness is not evidence admission;
 - Historical Universe membership is not ready;
 - Pionex ↔ Binance V0.1 provider equivalence is FAIL;
-- V0.2 metadata stability has not yet been proven;
+- metadata stability has not yet been proven;
 - the replacement holdout remains unopened and unauthorized for candle access;
 - full strategy-signal equivalence remains deferred because required strategy semantics are not yet formally defined;
 - no strategy parameter change, automatic trade plan or live execution is authorized.
@@ -259,32 +285,36 @@ Fixed GitHub Pages site:
 
 ## Current blockers
 
-1. **Metadata stability:** replacement V0.2 metadata capture is authorized but has not run the complete 194-slot stability gate.
-2. **Holdout access:** replacement `2026-08-28` through `2026-09-03` holdout is frozen unopened; candle access remains explicitly unauthorized until a separate authority after metadata stability PASS.
-3. **Provider substitution/equivalence:** V0.1 is definitive FAIL; Binance must not be substituted for Pionex provenance under that protocol.
-4. **Trade-Kline W1:** 2024 materialization remains NOT_AUTHORIZED.
-5. **Historical Universe membership:** NOT_READY until audited materialized partitions exist under an authorized path.
-6. **Strategy replay admission:** blocked by authority and still-undefined full strategy-equivalence semantics.
-7. **HYPE Funding 2026:** remains deferred; no interpolation or provider splice is authorized.
-8. **Live execution:** deliberately forbidden; project remains PAPER-ONLY.
+1. **V0.7 execution cutover:** successor Render metadata protocol is prepared, but relay enablement, scheduled capture activation and metadata R2 writes remain NOT_AUTHORIZED until a separate versioned cutover authority is frozen.
+2. **Old/new capture-path exclusivity:** the future successor path must explicitly prevent concurrent execution with the existing V0.2 self-hosted scheduled capture path.
+3. **Metadata stability:** the complete 194-slot stability gate has not run.
+4. **Holdout access:** replacement `2026-08-28` through `2026-09-03` holdout is frozen unopened; candle access remains explicitly unauthorized until a separate authority after metadata stability PASS.
+5. **Provider substitution/equivalence:** V0.1 is definitive FAIL; Binance must not be substituted for Pionex provenance under that protocol.
+6. **Trade-Kline W1:** 2024 materialization remains NOT_AUTHORIZED.
+7. **Historical Universe membership:** NOT_READY until audited materialized partitions exist under an authorized path.
+8. **Strategy replay admission:** blocked by authority and still-undefined full strategy-equivalence semantics.
+9. **HYPE Funding 2026:** remains deferred; no interpolation or provider splice is authorized.
+10. **Live execution:** deliberately forbidden; project remains PAPER-ONLY.
 
 ## Next formal milestone
 
-### V0.2 metadata-only capture and stability gate
+### Separate successor Render metadata execution/cutover authority
 
-The next permitted execution step is the frozen metadata-only capture window on the self-hosted macOS ARM64 transport.
+The next permitted development step is to validate the hard-disabled V0.7 relay and then freeze a separate versioned execution/cutover authority. That authority must exist before any successor Render metadata capture execution or R2 write.
 
 Required discipline:
 
 1. Keep V0.1 permanently FAIL and do not change its thresholds or scope.
-2. Do not rerun the completed self-hosted transport preflight unless evidence corruption is discovered.
-3. Run only scheduled public metadata capture under `config/provider_equivalence_v0_2_metadata_capture_v0_2.json`.
-4. Require at least one complete valid capture for each of the 194 UTC hourly slots.
-5. Require exact per-provider normalized-vector stability across the full capture window.
-6. Missing hourly coverage or any changed vector invalidates metadata applicability and forbids holdout evaluation.
-7. Do not fetch or evaluate any replacement holdout candles during metadata capture.
-8. Metadata stability PASS does not itself open the holdout; freeze a separate holdout-access authority first.
-9. Source switch, W1, Historical Universe membership, backtest admission, automatic trade plans and live trading remain blocked.
+2. Preserve the V0.2 Self-Hosted Mac authority, V0.5 Render PASS evidence and V0.6 transition receipt as historical authorities; do not rewrite them.
+3. Keep the exact V0.2 replacement holdout and V0.7 inherited metadata window/scope unchanged.
+4. Validate only the V0.7 disabled relay behavior while its code execution gate remains false; do not make a Binance metadata relay provider request under V0.7 prepared authority.
+5. Before successor execution, freeze a new authority that explicitly disables/resolves the old V0.2 scheduled capture path so both paths cannot capture concurrently.
+6. Only that future authority may authorize changing `METADATA_RELAY_EXECUTION_AUTHORIZED` from false and activating a successor schedule.
+7. Keep R2 credentials on GitHub Actions only; Render must never receive them.
+8. Require a fresh R2 free-tier headroom check before any future metadata write, with the FREE-ONLY 8 GB operational hard stop for this successor design.
+9. Require at least one complete valid capture for each of the 194 UTC hourly slots and exact per-provider normalized-vector stability across the full window after execution is separately authorized.
+10. Do not fetch or evaluate replacement holdout candles during metadata capture. Metadata stability PASS still requires a separate holdout-access authority before any candle access.
+11. Source switch, W1, Historical Universe membership, backtest admission, automatic trade plans and live trading remain blocked.
 
 ## Explicitly forbidden next actions
 
@@ -294,9 +324,13 @@ Required discipline:
 - Do not silently add a post-hoc deadband and claim V0.1 PASS.
 - Do not re-enable the obsolete hourly source-publication retry.
 - Do not reactivate the superseded `2026-08-21` through `2026-08-27` holdout.
-- Do not rerun the successful self-hosted transport preflight as part of routine capture.
 - Do not access replacement holdout K-lines before a separate holdout-access authority exists.
+- Do not enable the V0.7 Render metadata relay or activate its schedule before a separate execution/cutover authority exists.
+- Do not allow V0.2 self-hosted capture and the successor Render capture path to run concurrently.
+- Do not give Render R2 credentials.
 - Do not use a third-party proxy in place of the exact official Binance endpoint.
+- Do not use a Binance API key as a transport-blocker bypass; this restriction does not prohibit separately versioned future authenticated Binance functionality.
+- Do not upgrade Render to a paid plan or add a payment method to continue this FREE-ONLY path.
 - Do not authorize W1 merely because R2 has ample storage capacity.
 - Do not write Binance data into a Pionex-native namespace.
 - Do not splice providers or interpolate missing source events.
