@@ -37,14 +37,29 @@ def test_dispatch_marker_is_one_shot_and_diagnostic_only() -> None:
         assert boundary[key] is False
 
 
-def test_dispatch_workflow_only_runs_on_main_marker_change() -> None:
+def test_dispatch_workflow_runs_only_on_main_marker_change_and_handles_follow_up_inline() -> None:
     text = WORKFLOW.read_text()
     assert "push:" in text
     assert "- main" in text
     assert "config/cloud_transport_automation_v0_1.json" in text
+
     assert "actions: write" in text
-    assert "contents: read" in text
+    assert "contents: write" in text
     assert "issues: write" in text
+    assert "pull-requests: write" in text
+
     assert "workflow_run_id" in text
     assert "diagnose-v0-3-cloudflare-container-binance-transport.yml/dispatches" in text
     assert "-f ref=main" in text
+
+    # The dispatcher must process its child run inline rather than depending on
+    # another workflow_run hop triggered by GITHUB_TOKEN.
+    assert "Wait for diagnostic completion" in text
+    assert "actions/runs/${RUN_ID}" in text
+    assert "Record diagnostic failure fail-closed" in text
+    assert "steps.wait.outputs.conclusion != 'success'" in text
+    assert "Download sanitized PASS artifact" in text
+    assert "run-id: ${{ steps.dispatch.outputs.run_id }}" in text
+    assert "scripts/freeze_v0_3_cloud_transport_receipt.py" in text
+    assert "automation/v0-3-transport-receipt-${SOURCE_RUN_ID}" in text
+    assert "Cloudflare metadata-capture authority remains false" in text
