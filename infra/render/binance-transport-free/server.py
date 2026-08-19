@@ -14,15 +14,18 @@ METADATA_RELAY_USER_AGENT = "qookey-provider-equivalence-render-metadata-relay/0
 METADATA_RELAY_PATH = "/metadata/binance-exchange-info"
 METADATA_RELAY_AUTH_CHECK_PATH = "/metadata/auth-check"
 METADATA_RELAY_SMOKE_PATH = "/metadata/relay-smoke"
+V0_10_METADATA_RELAY_PATH = "/metadata/v0-10/binance-exchange-info"
 MAX_BODY_BYTES = 8_000_000
 
-# V0.7 raw relay remains disabled until the final atomic capture cutover.
+# Historical V0.7 raw relay remains permanently disabled.
 METADATA_RELAY_EXECUTION_AUTHORIZED = False
 
-# V0.9 authorizes only a sanitized, zero-R2 live transport smoke. The smoke
-# exercises the same Binance fetch helper as the future raw relay but never
-# emits or persists the raw exchangeInfo body.
+# V0.9 smoke remains a sanitized diagnostic only.
 V0_9_RELAY_SMOKE_EXECUTION_AUTHORIZED = True
+
+# V0.10 is a separate versioned raw relay authority. This path becomes effective
+# only when the exact final atomic cutover change set is merged to main.
+V0_10_METADATA_RELAY_EXECUTION_AUTHORIZED = True
 
 
 def summarize_exchange_info(upstream_status: int, payload: Any) -> dict[str, Any]:
@@ -112,12 +115,7 @@ def shared_secret_auth_check_payload() -> dict[str, Any]:
 
 
 def fetch_exchange_info_raw() -> tuple[int, bytes | None, str, int | None]:
-    """Fetch exact Binance exchangeInfo bytes for the future authorized relay.
-
-    The body is parsed only to validate the frozen transport contract. On PASS,
-    the exact upstream bytes are returned without reserialization. Nothing is
-    persisted and no R2 client is constructed here.
-    """
+    """Fetch exact Binance exchangeInfo bytes without persistence."""
 
     request = Request(UPSTREAM_URL, headers={"User-Agent": METADATA_RELAY_USER_AGENT})
     upstream_status = 0
@@ -187,7 +185,7 @@ def _json_bytes(payload: dict[str, Any]) -> bytes:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "QookeyRenderFreeTransport/0.4"
+    server_version = "QookeyRenderFreeTransport/0.5"
 
     def _send_json(self, status: int, payload: dict[str, Any]) -> None:
         body = _json_bytes(payload)
@@ -197,6 +195,68 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def _send_raw_relay(self) -> None:
+        expected = os.environ.get("METADATA_RELAY_TOKEN")
+        if not expected:
+            self._send_json(
+                503,
+                {
+                    "status": "BLOCKED",
+                    "stage": "V0_10_RAW_RELAY_SECRET_NOT_CONFIGURED",
+                    "provider_requests_performed": 0,
+                    "r2_client_constructed": False,
+                    "r2_writes_performed": False,
+                    "holdout_candles_accessed": False,
+                    "source_switch_performed": False,
+                    "live_trading_performed": False,
+                },
+            )
+            return
+        if not is_authorized(self.headers.get("Authorization"), expected):
+            self._send_json(
+                401,
+                {
+                    "status": "UNAUTHORIZED",
+                    "stage": "V0_10_RAW_RELAY_SECRET_MISMATCH_OR_MISSING",
+                    "provider_requests_performed": 0,
+                    "r2_client_constructed": False,
+                    "r2_writes_performed": False,
+                    "holdout_candles_accessed": False,
+                    "source_switch_performed": False,
+                    "live_trading_performed": False,
+                },
+            )
+            return
+
+        upstream_status, raw, content_type, symbol_count = fetch_exchange_info_raw()
+        if raw is None or upstream_status != 200 or not symbol_count:
+            self._send_json(
+                502,
+                {
+                    "status": "BLOCKED",
+                    "stage": "V0_10_RAW_RELAY_UPSTREAM_BLOCKED",
+                    "upstream_status": upstream_status,
+                    "provider_requests_performed": 1,
+                    "raw_exchange_info_persisted": False,
+                    "r2_client_constructed": False,
+                    "r2_writes_performed": False,
+                    "holdout_candles_accessed": False,
+                    "source_switch_performed": False,
+                    "live_trading_performed": False,
+                },
+            )
+            return
+
+        self.send_response(200)
+        self.send_header("Content-Type", content_type or "application/json")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Qookey-Upstream-Status", str(upstream_status))
+        self.send_header("X-Qookey-Symbol-Count", str(symbol_count))
+        self.send_header("X-Qookey-Raw-Persisted", "false")
+        self.send_header("Content-Length", str(len(raw)))
+        self.end_headers()
+        self.wfile.write(raw)
 
     def do_GET(self) -> None:  # noqa: N802
         if self.path == "/health":
@@ -289,6 +349,25 @@ class Handler(BaseHTTPRequestHandler):
                 return
             status, payload = relay_smoke_payload()
             self._send_json(status, payload)
+            return
+
+        if self.path == V0_10_METADATA_RELAY_PATH:
+            if not V0_10_METADATA_RELAY_EXECUTION_AUTHORIZED:
+                self._send_json(
+                    503,
+                    {
+                        "status": "DISABLED",
+                        "stage": "V0_10_RAW_RELAY_EXECUTION_NOT_AUTHORIZED",
+                        "provider_requests_performed": 0,
+                        "r2_client_constructed": False,
+                        "r2_writes_performed": False,
+                        "holdout_candles_accessed": False,
+                        "source_switch_performed": False,
+                        "live_trading_performed": False,
+                    },
+                )
+                return
+            self._send_raw_relay()
             return
 
         if self.path == METADATA_RELAY_PATH:
