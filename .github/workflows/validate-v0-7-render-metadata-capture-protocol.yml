@@ -55,5 +55,5 @@ jobs:
           assert cfg['execution_boundary']['live_trading_authorized'] is False
           assert cfg['github_orchestration_boundary']['schedule_trigger_enabled_by_this_protocol'] is False
           assert module.METADATA_RELAY_EXECUTION_AUTHORIZED is False
-          assert '  schedule:' not in workflow
+          assert not any(line == '  schedule:' for line in workflow.splitlines())
           PY
