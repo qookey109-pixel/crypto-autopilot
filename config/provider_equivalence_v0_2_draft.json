@@ -1,0 +1,137 @@
+{
+  "version": "0.2.0-draft.1",
+  "status": "PROTOCOL_DRAFT_NOT_AUTHORIZED",
+  "purpose": "Design a separately versioned, microstructure-aware provider-equivalence protocol without rewriting V0.1.",
+  "v0_1_boundary": {
+    "authority": "research/receipts/2026-08-19-pionex-binance-equivalence-v0-1.json",
+    "forensic_authority": "research/receipts/2026-08-19-pionex-binance-equivalence-v0-1-direction-forensics.json",
+    "frozen_gate_status": "FAIL",
+    "v0_1_thresholds_changed": false,
+    "v0_1_scope_changed": false,
+    "v0_1_regraded": false
+  },
+  "providers": {
+    "left": "pionex",
+    "right": "binance_usdm",
+    "execution_target": "pionex",
+    "provider_splicing_forbidden": true,
+    "pionex_native_relabel_forbidden": true
+  },
+  "candidate_holdout": {
+    "state": "PREDECLARED_BUT_NOT_AUTHORIZED_FOR_ACCESS",
+    "start_utc": "2026-08-03T08:00:00Z",
+    "end_utc": "2026-08-10T07:59:59.999Z",
+    "intervals": ["15M", "60M", "4H"],
+    "candidate_symbol_count": 15,
+    "mapped_pair_count": 45,
+    "must_not_overlap_v0_1": true,
+    "holdout_data_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "holdout_result_known": false
+  },
+  "scope_policy": {
+    "symbol_scope": "SAME_FROZEN_15_SYMBOL_M1A_UNIVERSE",
+    "interval_scope": "SAME_15M_60M_4H",
+    "scope_reduction_after_evidence_forbidden": true,
+    "missing_pair_policy": "FAIL_CLOSED"
+  },
+  "price_metrics_bps": {
+    "design_rule": "COPY_V0_1_UNCHANGED",
+    "median_ohlc": {"proposed_pass_max": 10.0, "proposed_review_max": 25.0},
+    "p95_open_close": {"proposed_pass_max": 25.0, "proposed_review_max": 75.0},
+    "p95_high_low": {"proposed_pass_max": 75.0, "proposed_review_max": 200.0}
+  },
+  "setup_60m_metric": {
+    "design_rule": "COPY_V0_1_UNCHANGED",
+    "proposed_pass_min": 0.98,
+    "proposed_review_min": 0.95,
+    "minimum_ready_bars": 100,
+    "state": ["ema20_gt_ema50", "ema20_slope_positive", "close_gt_ema20"]
+  },
+  "microstructure_metadata_prerequisite": {
+    "state": "REQUIRED_BEFORE_PROTOCOL_FREEZE",
+    "public_provider_metadata_only": true,
+    "pionex_price_increment_authority_required": true,
+    "binance_price_increment_authority_required": true,
+    "all_15_symbol_mappings_required": true,
+    "effective_during_candidate_holdout_required": true,
+    "raw_payload_sha256_receipts_required": true,
+    "exact_json_paths_or_fields_must_be_frozen": true,
+    "metadata_value_interpolation_forbidden": true,
+    "metadata_provider_splicing_forbidden": true
+  },
+  "direction_metric_design": {
+    "name": "MICROSTRUCTURE_AWARE_CLOSE_TO_CLOSE_DIRECTION_AGREEMENT",
+    "state": "DRAFT",
+    "raw_direction_states": ["DOWN", "FLAT", "UP"],
+    "raw_direction_uses_exact_close_delta_sign": true,
+    "classification": {
+      "both_same_direction": "COMPARABLE_MATCH",
+      "opposite_nonzero_directions": "COMPARABLE_MISMATCH",
+      "one_provider_flat_and_other_moves_more_than_one_verified_price_increment": "COMPARABLE_MISMATCH",
+      "one_provider_flat_and_other_moves_at_most_one_verified_price_increment": "MICROSTRUCTURE_INDETERMINATE"
+    },
+    "verified_increment_rule": "Use the moving provider's own frozen price increment effective for the holdout symbol; never infer an increment from V0.1 mismatch deltas.",
+    "agreement_denominator": "COMPARABLE_MATCH + COMPARABLE_MISMATCH only",
+    "proposed_agreement_pass_min": 0.98,
+    "proposed_agreement_review_min": 0.95,
+    "agreement_threshold_design_rule": "COPY_V0_1_UNCHANGED",
+    "minimum_comparable_rows": {
+      "15M": 600,
+      "60M": 150,
+      "4H": 40
+    },
+    "indeterminate_fraction_metric": {
+      "denominator": "all adjacent close-to-close comparisons",
+      "pass_max": null,
+      "review_max": null,
+      "state": "UNRESOLVED_MUST_FREEZE_BEFORE_HOLDOUT_ACCESS"
+    }
+  },
+  "hard_requirements": {
+    "exact_timestamp_set_required": true,
+    "both_provider_candle_audits_required": true,
+    "silent_interpolation_forbidden": true,
+    "volume_equivalence_required": false,
+    "provider_splicing_forbidden": true,
+    "verified_price_increment_metadata_required": true,
+    "indeterminate_fraction_thresholds_must_be_resolved_before_freeze": true,
+    "all_thresholds_must_be_frozen_before_holdout_access": true
+  },
+  "aggregate_design": {
+    "expected_pair_count": 45,
+    "state": "DRAFT_UNTIL_INDETERMINATE_FRACTION_THRESHOLDS_ARE_FROZEN",
+    "pair_pass_requires": [
+      "all retained V0.1 price metrics PASS",
+      "microstructure-aware direction agreement PASS",
+      "indeterminate fraction PASS",
+      "60M setup agreement PASS when applicable",
+      "minimum comparable rows satisfied"
+    ],
+    "pair_fail_closed_on_missing_metadata": true,
+    "pair_fail_closed_on_missing_pair": true
+  },
+  "evidence_discipline": {
+    "holdout_must_not_be_fetched_before_protocol_freeze": true,
+    "holdout_must_not_be_previewed_manually": true,
+    "thresholds_must_not_change_after_holdout_evidence": true,
+    "pass_review_fail_results_must_all_be_retained": true,
+    "v0_1_must_never_be_rewritten": true,
+    "new_version_required_for_any_post_evidence_change": true
+  },
+  "authorization_boundary": {
+    "protocol_frozen": false,
+    "metadata_acquisition_authorized": false,
+    "holdout_data_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_required_stage": "PUBLIC_PRICE_INCREMENT_METADATA_PROTOCOL_AND_INDETERMINATE_FRACTION_THRESHOLD_DESIGN_BEFORE_V0_2_FREEZE"
+}
