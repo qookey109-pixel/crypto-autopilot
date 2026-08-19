@@ -1,0 +1,53 @@
+{
+  "schema_version": "provider_equivalence_v0_3_cloudflare_container_free_plan_blocked_v0_1",
+  "stage": "V0_3_CLOUDFLARE_CONTAINER_BLOCKED_FREE_PLAN",
+  "observed_at_utc": "2026-08-19T11:20:00Z",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "evidence": {
+    "diagnostic_run_id": 32246057672,
+    "diagnostic_run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/32246057672",
+    "validate": "PASS",
+    "cloudflare_ci_credentials_present": true,
+    "worker_upload_completed": true,
+    "container_image_build_completed": true,
+    "container_application_registration": "UNAUTHORIZED",
+    "binance_probe_reached": false,
+    "sanitized_result_artifact_available": false
+  },
+  "plan_observation": {
+    "cloudflare_account_plan": "FREE",
+    "observation_source": "USER_CONFIRMED_CLOUDFLARE_DASHBOARD",
+    "containers_official_availability": "WORKERS_PAID_ONLY",
+    "containers_free_plan_available": false,
+    "official_source": "https://developers.cloudflare.com/containers/"
+  },
+  "result": {
+    "transport_pass": false,
+    "classification": "BLOCKED_BY_FREE_PLAN_ENTITLEMENT",
+    "retry_same_container_path_authorized": false,
+    "workers_paid_upgrade_authorized": false,
+    "paid_fallback_authorized": false,
+    "next_transport_direction": "SEPARATE_ZERO_COST_MAC_INDEPENDENT_TRANSPORT_PROOF"
+  },
+  "side_effects": {
+    "r2_writes_performed": false,
+    "holdout_candles_accessed": false,
+    "holdout_evaluated": false,
+    "source_switch_performed": false,
+    "live_trading_performed": false
+  },
+  "authority_boundary": {
+    "v0_1_equivalence_status": "FAIL",
+    "v0_1_mutated": false,
+    "v0_2_self_hosted_mac_transport_remains_current": true,
+    "cloud_transport_authorized_for_metadata_capture": false,
+    "metadata_capture_execution_authorized_by_this_receipt": false,
+    "holdout_candle_access_authorized": false,
+    "source_switch_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "schema_version": "cloud_free_tier_policy_v0_1",
+  "status": "FREE_ONLY_FROZEN",
+  "checked_at_utc": "2026-08-19T11:20:00Z",
+  "monthly_budget_usd": 0,
+  "billing_policy": {
+    "workers_paid_upgrade_authorized": false,
+    "paid_fallback_authorized": false,
+    "usage_overage_authorized": false,
+    "automatic_subscription_change_authorized": false,
+    "fail_closed_before_project_safety_ceiling": true,
+    "shared_account_usage_requires_headroom": true
+  },
+  "cloudflare": {
+    "workers": {
+      "allowed": true,
+      "official_free_limits": {
+        "requests_per_day": 100000,
+        "cpu_ms_per_invocation": 10,
+        "external_subrequests_per_invocation": 50,
+        "cron_triggers_per_account": 5
+      },
+      "project_safety_ceiling": {
+        "requests_per_day": 75000,
+        "external_subrequests_per_invocation": 40,
+        "cron_triggers": 4
+      }
+    },
+    "workflows": {
+      "allowed": true,
+      "official_free_limits": {
+        "steps_per_day": 3000,
+        "storage_gb_month": 1.0,
+        "max_steps_per_instance": 1024
+      },
+      "project_safety_ceiling": {
+        "steps_per_day": 2250,
+        "storage_gb_month": 0.75,
+        "max_steps_per_instance": 768
+      }
+    },
+    "queues": {
+      "allowed": true,
+      "official_free_limits": {
+        "operations_per_day": 10000,
+        "retention_hours": 24
+      },
+      "project_safety_ceiling": {
+        "operations_per_day": 7500,
+        "retention_hours": 24
+      }
+    },
+    "d1": {
+      "allowed": true,
+      "official_free_limits": {
+        "rows_read_per_day": 5000000,
+        "rows_written_per_day": 100000,
+        "storage_gb_total": 5.0
+      },
+      "project_safety_ceiling": {
+        "rows_read_per_day": 4000000,
+        "rows_written_per_day": 75000,
+        "storage_gb_total": 4.0
+      }
+    },
+    "r2_standard": {
+      "allowed": true,
+      "official_free_limits": {
+        "storage_gb_month": 10.0,
+        "class_a_requests_per_month": 1000000,
+        "class_b_requests_per_month": 10000000,
+        "egress_usd_per_gb": 0.0
+      },
+      "project_safety_ceiling": {
+        "storage_gb_month": 8.0,
+        "class_a_requests_per_month": 750000,
+        "class_b_requests_per_month": 7500000
+      },
+      "existing_policy_reference": "config/r2_budget_v0_1.json",
+      "note": "For future FREE-ONLY work, the prior 8 GB warning threshold is promoted to an operational hard stop. Existing frozen receipts/configs are not rewritten."
+    },
+    "containers": {
+      "allowed": false,
+      "official_plan_requirement": "WORKERS_PAID",
+      "free_plan_available": false,
+      "automatic_retry_authorized": false,
+      "upgrade_authorized": false
+    },
+    "r2_sql": {
+      "allowed": false,
+      "reason": "DISABLED_BY_DEFAULT_TO_AVOID_USAGE_BASED_OVERAGE_UNTIL_SEPARATE_ZERO_COST_BUDGET_PROOF"
+    },
+    "r2_data_catalog": {
+      "allowed": false,
+      "reason": "DISABLED_BY_DEFAULT_TO_AVOID_USAGE_BASED_OVERAGE_UNTIL_SEPARATE_ZERO_COST_BUDGET_PROOF"
+    },
+    "durable_objects": {
+      "allowed": false,
+      "reason": "NOT_REQUIRED_FOR_V0_1_FREE_CONTROL_PLANE; PREFER_D1_QUEUES_WORKFLOWS_UNTIL_A_SEPARATE_NEED_AND_BUDGET_PROOF"
+    }
+  },
+  "preferred_free_architecture": {
+    "code_and_authority": "github",
+    "scheduler_and_lightweight_api": "cloudflare_workers_free",
+    "durable_orchestration": "cloudflare_workflows_free",
+    "event_buffer": "cloudflare_queues_free",
+    "control_state": "cloudflare_d1_free",
+    "immutable_data": "cloudflare_r2_standard_free",
+    "dashboard": "github_pages_or_cloudflare_static_assets",
+    "provider_transport": "SEPARATE_FREE_TRANSPORT_PROOF_REQUIRED_WHEN_CLOUDFLARE_WORKER_EGRESS_IS_BLOCKED"
+  },
+  "authority_boundary": {
+    "v0_1_equivalence_status": "FAIL",
+    "v0_1_mutated": false,
+    "v0_2_self_hosted_mac_transport_authority_mutated": false,
+    "cloudflare_container_transport_authorized": false,
+    "cloud_transport_authorized_for_metadata_capture": false,
+    "metadata_capture_execution_authorized_by_this_policy": false,
+    "holdout_candle_access_authorized": false,
+    "source_switch_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "official_sources": {
+    "workers_limits": "https://developers.cloudflare.com/workers/platform/limits/",
+    "workflows_pricing": "https://developers.cloudflare.com/workflows/reference/pricing/",
+    "queues_pricing": "https://developers.cloudflare.com/queues/platform/pricing/",
+    "d1_pricing": "https://developers.cloudflare.com/d1/platform/pricing/",
+    "r2_pricing": "https://developers.cloudflare.com/r2/pricing/",
+    "containers_pricing": "https://developers.cloudflare.com/containers/pricing/"
+  }
+}
