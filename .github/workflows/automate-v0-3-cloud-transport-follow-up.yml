@@ -1,138 +1,22 @@
-name: Automate V0.3 Cloud Transport Follow-up
+name: Retired V0.3 Cloudflare Container Follow-up
 
 on:
-  workflow_run:
-    workflows:
-      - Diagnose V0.3 Cloudflare Container Binance Transport
-    types:
-      - completed
+  workflow_dispatch:
 
 permissions:
-  actions: read
-  contents: write
-  issues: write
-  pull-requests: write
+  contents: read
 
 jobs:
-  record-failure:
-    if: >-
-      ${{
-        github.event.workflow_run.event == 'workflow_dispatch' &&
-        github.event.workflow_run.head_branch == 'main' &&
-        github.event.workflow_run.conclusion != 'success'
-      }}
+  retired:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    env:
-      GH_TOKEN: ${{ github.token }}
-      RUN_URL: ${{ github.event.workflow_run.html_url }}
-      RUN_ID: ${{ github.event.workflow_run.id }}
-      CONCLUSION: ${{ github.event.workflow_run.conclusion }}
     steps:
-      - name: Record fail-closed diagnostic result in Issue 105
-        shell: bash
+      - name: Preserve fail-closed retired state
         run: |
-          set -euo pipefail
-          gh issue comment 105 \
-            --repo "$GITHUB_REPOSITORY" \
-            --body "V0.3 Cloudflare Container transport diagnostic run ${RUN_ID} completed with **${CONCLUSION}**: ${RUN_URL}\n\nFail-closed boundary remains in force. No metadata-capture authority, holdout access, source switch, W1, backtest admission, trade plan, real-money order, or live trading is granted by this run."
-
-  freeze-pass:
-    if: >-
-      ${{
-        github.event.workflow_run.event == 'workflow_dispatch' &&
-        github.event.workflow_run.head_branch == 'main' &&
-        github.event.workflow_run.conclusion == 'success'
-      }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      GH_TOKEN: ${{ github.token }}
-      SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
-      SOURCE_RUN_URL: ${{ github.event.workflow_run.html_url }}
-      SOURCE_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
-      SOURCE_OBSERVED_AT: ${{ github.event.workflow_run.updated_at }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-
-      - name: Download sanitized transport artifact from triggering run
-        uses: actions/download-artifact@v4
-        with:
-          pattern: v0-3-cloudflare-container-binance-transport-*
-          path: /tmp/v0-3-cloud-transport
-          merge-multiple: true
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          run-id: ${{ github.event.workflow_run.id }}
-
-      - name: Validate artifact and freeze deterministic receipt
-        shell: bash
-        run: |
-          set -euo pipefail
-          mapfile -t results < <(find /tmp/v0-3-cloud-transport -type f -name result.json -print)
-          if [ "${#results[@]}" -ne 1 ]; then
-            echo "Expected exactly one sanitized result.json, found ${#results[@]}" >&2
-            exit 1
-          fi
-          day="${SOURCE_OBSERVED_AT%%T*}"
-          receipt="research/receipts/${day}-provider-equivalence-v0-3-cloudflare-container-transport-pass-run-${SOURCE_RUN_ID}.json"
-          python scripts/freeze_v0_3_cloud_transport_receipt.py \
-            --result "${results[0]}" \
-            --output "$receipt" \
-            --run-id "$SOURCE_RUN_ID" \
-            --run-url "$SOURCE_RUN_URL" \
-            --head-sha "$SOURCE_HEAD_SHA" \
-            --observed-at "$SOURCE_OBSERVED_AT"
-          echo "RECEIPT_PATH=$receipt" >> "$GITHUB_ENV"
-
-      - name: Create or update receipt branch
-        shell: bash
-        run: |
-          set -euo pipefail
-          branch="automation/v0-3-transport-receipt-${SOURCE_RUN_ID}"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
-            git fetch origin "$branch:$branch"
-            git checkout "$branch"
-            git checkout main -- scripts/freeze_v0_3_cloud_transport_receipt.py
-            git checkout main -- .github/workflows/automate-v0-3-cloud-transport-follow-up.yml
-          else
-            git checkout -b "$branch"
-          fi
-          git add "$RECEIPT_PATH"
-          if git diff --cached --quiet; then
-            echo "Receipt already committed; continuing idempotently."
-          else
-            git commit -m "Freeze V0.3 Cloudflare Container transport PASS receipt"
-            git push origin "$branch"
-          fi
-          echo "RECEIPT_BRANCH=$branch" >> "$GITHUB_ENV"
-
-      - name: Open receipt PR if needed
-        shell: bash
-        run: |
-          set -euo pipefail
-          existing="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --head "$RECEIPT_BRANCH" --json url --jq '.[0].url // empty')"
-          if [ -n "$existing" ]; then
-            pr_url="$existing"
-          else
-            pr_url="$(gh pr create \
-              --repo "$GITHUB_REPOSITORY" \
-              --base main \
-              --head "$RECEIPT_BRANCH" \
-              --title "Freeze V0.3 Cloudflare Container transport PASS receipt" \
-              --body "Automated evidence-only receipt from successful V0.3 Cloudflare Container transport preflight run ${SOURCE_RUN_ID}.\n\nThis PR does **not** authorize metadata capture on Cloudflare, holdout access, source switching, Historical Universe membership, W1, backtest admission, trade planning, real-money orders, or live trading. A separate versioned cloud transport authority transition is still required.")"
-          fi
-          echo "RECEIPT_PR_URL=$pr_url" >> "$GITHUB_ENV"
-
-      - name: Record PASS follow-up in Issue 105
-        shell: bash
-        run: |
-          set -euo pipefail
-          gh issue comment 105 \
-            --repo "$GITHUB_REPOSITORY" \
-            --body "V0.3 Cloudflare Container transport diagnostic run ${SOURCE_RUN_ID} **PASS**: ${SOURCE_RUN_URL}\n\nSanitized receipt validation completed and an evidence-only receipt PR was prepared automatically: ${RECEIPT_PR_URL}\n\nCloudflare metadata-capture authority remains false until a separate versioned authority transition is reviewed and merged."
+          echo 'status=RETIRED_NO_EXECUTION'
+          echo 'reason=Cloudflare Containers require Workers Paid and are forbidden by the project FREE-ONLY policy.'
+          echo 'provider_requests_performed=0'
+          echo 'r2_writes_performed=false'
+          echo 'holdout_candles_accessed=false'
+          echo 'source_switch_authorized=false'
+          echo 'live_trading_authorized=false'
