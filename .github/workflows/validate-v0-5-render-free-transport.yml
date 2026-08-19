@@ -1,0 +1,42 @@
+name: Validate V0.5 Render Free Binance Transport
+
+on:
+  pull_request:
+    paths:
+      - config/provider_equivalence_v0_5_render_free_transport_preflight_v0_1.json
+      - infra/render/binance-transport-free/**
+      - tests/test_render_free_transport_preflight_v0_5.py
+      - .github/workflows/validate-v0-5-render-free-transport.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install test dependency
+        run: python -m pip install pytest
+      - name: Validate V0.5 frozen boundary
+        run: python -m pytest -q tests/test_render_free_transport_preflight_v0_5.py
+      - name: Build Render Free diagnostic image
+        run: docker build -t qookey-render-free-transport-v0-5 infra/render/binance-transport-free
+      - name: Assert no deployment or paid runtime is authorized here
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          cfg = json.loads(Path('config/provider_equivalence_v0_5_render_free_transport_preflight_v0_1.json').read_text())
+          assert cfg['status'] == 'PREFLIGHT_PREPARED_NOT_EXECUTED'
+          assert cfg['runtime']['monthly_runtime_budget_usd'] == 0
+          assert cfg['runtime']['payment_method_for_project_forbidden'] is True
+          assert cfg['failure_policy']['upgrade_to_paid_instance'] is False
+          assert cfg['authority_boundary']['metadata_capture_execution_authorized'] is False
+          assert cfg['authority_boundary']['holdout_candle_access_authorized'] is False
+          assert cfg['authority_boundary']['source_switch_authorized'] is False
+          assert cfg['authority_boundary']['live_trading_authorized'] is False
+          PY
