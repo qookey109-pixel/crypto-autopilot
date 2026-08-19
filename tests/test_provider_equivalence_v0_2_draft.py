@@ -72,7 +72,7 @@ class ProviderEquivalenceV02DraftTests(unittest.TestCase):
         self.assertEqual(new_setup["minimum_ready_bars"], old_setup["minimum_ready_bars"])
         self.assertEqual(new_setup["state"], old_setup["state"])
 
-    def test_direction_design_requires_verified_increment_and_unresolved_cap_before_freeze(self) -> None:
+    def test_direction_design_requires_verified_increment_and_derived_evidence_floor(self) -> None:
         draft = load(V0_2)
         metric = draft["direction_metric_design"]
         self.assertEqual(metric["proposed_agreement_pass_min"], 0.98)
@@ -80,15 +80,58 @@ class ProviderEquivalenceV02DraftTests(unittest.TestCase):
         increment_rule = metric["verified_increment_rule"]
         self.assertIn("frozen price increment", increment_rule)
         self.assertIn("never infer", increment_rule)
+
         cap = metric["indeterminate_fraction_metric"]
-        self.assertIsNone(cap["pass_max"])
-        self.assertIsNone(cap["review_max"])
-        self.assertEqual(cap["state"], "UNRESOLVED_MUST_FREEZE_BEFORE_HOLDOUT_ACCESS")
+        self.assertEqual(cap["state"], "RESOLVED_BY_UNCHANGED_V0_1_MINIMUM_ROW_REQUIREMENTS")
+        self.assertIs(cap["separate_pass_review_thresholds_added"], False)
+        self.assertIs(cap["derivation_uses_v0_1_mismatch_results"], False)
+        self.assertEqual(
+            cap["expected_candle_rows_in_exact_7d_holdout"],
+            {"15M": 672, "60M": 168, "4H": 42},
+        )
+        self.assertEqual(
+            cap["expected_adjacent_comparisons"],
+            {"15M": 671, "60M": 167, "4H": 41},
+        )
+        self.assertEqual(
+            cap["minimum_comparable_comparisons"],
+            {"15M": 599, "60M": 149, "4H": 39},
+        )
+        self.assertEqual(
+            cap["derived_max_indeterminate_count"],
+            {"15M": 72, "60M": 18, "4H": 2},
+        )
+        for interval in ("15M", "60M", "4H"):
+            expected = cap["expected_adjacent_comparisons"][interval]
+            minimum = cap["minimum_comparable_comparisons"][interval]
+            maximum = cap["derived_max_indeterminate_count"][interval]
+            self.assertEqual(expected - minimum, maximum)
+
         prerequisite = draft["microstructure_metadata_prerequisite"]
         self.assertEqual(prerequisite["state"], "REQUIRED_BEFORE_PROTOCOL_FREEZE")
+        self.assertEqual(
+            prerequisite["design_protocol"],
+            "config/provider_equivalence_v0_2_metadata_draft.json",
+        )
         self.assertIs(prerequisite["pionex_price_increment_authority_required"], True)
         self.assertIs(prerequisite["binance_price_increment_authority_required"], True)
         self.assertIs(prerequisite["raw_payload_sha256_receipts_required"], True)
+
+    def test_v0_2_remains_blocked_on_metadata_authority(self) -> None:
+        draft = load(V0_2)
+        self.assertEqual(
+            draft["aggregate_design"]["state"],
+            "DRAFT_BLOCKED_ON_PRICE_INCREMENT_METADATA_AUTHORITY",
+        )
+        self.assertEqual(
+            draft["next_required_stage"],
+            "PUBLIC_PRICE_INCREMENT_METADATA_SCHEMA_AUTHORITY_BEFORE_V0_2_FREEZE",
+        )
+        self.assertIs(draft["hard_requirements"]["verified_price_increment_metadata_required"], True)
+        self.assertIs(
+            draft["hard_requirements"]["all_thresholds_and_metadata_contracts_must_be_frozen_before_holdout_access"],
+            True,
+        )
 
     def test_v0_1_is_never_regraded(self) -> None:
         draft = load(V0_2)

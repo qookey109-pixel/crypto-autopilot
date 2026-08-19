@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0-draft.1",
+  "version": "0.2.0-draft.2",
   "status": "PROTOCOL_DRAFT_NOT_AUTHORIZED",
   "purpose": "Design a separately versioned, microstructure-aware provider-equivalence protocol without rewriting V0.1.",
   "v0_1_boundary": {
@@ -50,6 +50,7 @@
   },
   "microstructure_metadata_prerequisite": {
     "state": "REQUIRED_BEFORE_PROTOCOL_FREEZE",
+    "design_protocol": "config/provider_equivalence_v0_2_metadata_draft.json",
     "public_provider_metadata_only": true,
     "pionex_price_increment_authority_required": true,
     "binance_price_increment_authority_required": true,
@@ -82,10 +83,36 @@
       "4H": 40
     },
     "indeterminate_fraction_metric": {
-      "denominator": "all adjacent close-to-close comparisons",
-      "pass_max": null,
-      "review_max": null,
-      "state": "UNRESOLVED_MUST_FREEZE_BEFORE_HOLDOUT_ACCESS"
+      "state": "RESOLVED_BY_UNCHANGED_V0_1_MINIMUM_ROW_REQUIREMENTS",
+      "separate_pass_review_thresholds_added": false,
+      "design_rule": "Do not add a tunable indeterminate-fraction threshold. Instead require enough comparable adjacent comparisons to preserve the unchanged V0.1 minimum-row evidence floor.",
+      "expected_candle_rows_in_exact_7d_holdout": {
+        "15M": 672,
+        "60M": 168,
+        "4H": 42
+      },
+      "expected_adjacent_comparisons": {
+        "15M": 671,
+        "60M": 167,
+        "4H": 41
+      },
+      "minimum_comparable_comparisons": {
+        "15M": 599,
+        "60M": 149,
+        "4H": 39
+      },
+      "derived_max_indeterminate_count": {
+        "15M": 72,
+        "60M": 18,
+        "4H": 2
+      },
+      "derived_max_indeterminate_fraction": {
+        "15M": 0.10730253353204174,
+        "60M": 0.10778443113772455,
+        "4H": 0.04878048780487805
+      },
+      "derivation_uses_v0_1_mismatch_results": false,
+      "fail_rule": "FAIL if comparable adjacent comparisons fall below the interval minimum; no post-evidence tuning is allowed."
     }
   },
   "hard_requirements": {
@@ -95,21 +122,26 @@
     "volume_equivalence_required": false,
     "provider_splicing_forbidden": true,
     "verified_price_increment_metadata_required": true,
-    "indeterminate_fraction_thresholds_must_be_resolved_before_freeze": true,
-    "all_thresholds_must_be_frozen_before_holdout_access": true
+    "indeterminate_fraction_cap_design_resolved": true,
+    "indeterminate_cap_must_not_be_tuned_on_holdout": true,
+    "all_thresholds_and_metadata_contracts_must_be_frozen_before_holdout_access": true
   },
   "aggregate_design": {
     "expected_pair_count": 45,
-    "state": "DRAFT_UNTIL_INDETERMINATE_FRACTION_THRESHOLDS_ARE_FROZEN",
+    "state": "DRAFT_BLOCKED_ON_PRICE_INCREMENT_METADATA_AUTHORITY",
     "pair_pass_requires": [
       "all retained V0.1 price metrics PASS",
       "microstructure-aware direction agreement PASS",
-      "indeterminate fraction PASS",
       "60M setup agreement PASS when applicable",
-      "minimum comparable rows satisfied"
+      "minimum comparable comparisons satisfied"
+    ],
+    "pair_review_requires": [
+      "no pair-level FAIL reason",
+      "at least one retained metric is REVIEW"
     ],
     "pair_fail_closed_on_missing_metadata": true,
-    "pair_fail_closed_on_missing_pair": true
+    "pair_fail_closed_on_missing_pair": true,
+    "aggregate_rule_proposed": "COPY_V0_1: all 45 PASS => PASS; no FAIL and REVIEW fraction <= 0.20 => REVIEW; otherwise FAIL"
   },
   "evidence_discipline": {
     "holdout_must_not_be_fetched_before_protocol_freeze": true,
@@ -133,5 +165,5 @@
     "real_money_order_authorized": false,
     "live_trading_authorized": false
   },
-  "next_required_stage": "PUBLIC_PRICE_INCREMENT_METADATA_PROTOCOL_AND_INDETERMINATE_FRACTION_THRESHOLD_DESIGN_BEFORE_V0_2_FREEZE"
+  "next_required_stage": "PUBLIC_PRICE_INCREMENT_METADATA_SCHEMA_AUTHORITY_BEFORE_V0_2_FREEZE"
 }
