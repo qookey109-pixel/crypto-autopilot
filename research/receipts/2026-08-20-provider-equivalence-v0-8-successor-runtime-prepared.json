@@ -13,6 +13,9 @@
   },
   "implementation": {
     "module": "src/crypto_autopilot/provider_metadata_capture_v0_8_successor.py",
+    "public_entrypoint": "execute_successor_capture",
+    "public_entrypoint_code_gate": "SUCCESSOR_RUNTIME_EXECUTION_AUTHORIZED",
+    "public_entrypoint_code_gate_frozen_false": true,
     "pionex_transport": "github_hosted_direct_public_https",
     "binance_transport": "render_free_web_service",
     "binance_relay_path": "/metadata/binance-exchange-info",
@@ -32,6 +35,7 @@
     "production_r2_client_constructed": false,
     "production_r2_writes_performed": false,
     "holdout_candles_accessed": false,
+    "public_entrypoint_zero_access_skip_covered": true,
     "fake_store_success_path_covered": true,
     "fake_store_headroom_block_path_covered": true,
     "outside_window_zero_access_path_covered": true,
@@ -39,6 +43,7 @@
   },
   "execution_boundary": {
     "runtime_wired_to_scheduled_execution": false,
+    "successor_runtime_public_entrypoint_execution_authorized": false,
     "v0_8_capture_execution_gate": false,
     "render_metadata_relay_execution_gate": false,
     "successor_schedule_enabled": false,
