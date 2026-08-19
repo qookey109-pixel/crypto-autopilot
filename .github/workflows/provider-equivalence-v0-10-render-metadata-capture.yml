@@ -1,0 +1,266 @@
+name: Provider Equivalence V0.10 Render Metadata Capture
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+      - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
+      - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
+      - "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
+      - "research/receipts/2026-08-20-provider-equivalence-v0-9-render-relay-smoke-pass.json"
+      - "src/crypto_autopilot/provider_metadata_capture_v0_10.py"
+      - "scripts/capture_provider_equivalence_v0_10_metadata.py"
+      - "infra/render/binance-transport-free/server.py"
+      - "tests/test_final_atomic_cutover_v0_10.py"
+  schedule:
+    - cron: "17,47 * 27-31 8 *"
+    - cron: "17,47 * 1-3 9 *"
+    - cron: "17,47 0-1 4 9 *"
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: provider-equivalence-v0-10-metadata-${{ github.event_name }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  validate-atomic-cutover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install package and pytest
+        run: |
+          python -m pip install -e .
+          python -m pip install pytest
+      - name: Validate final cutover, relay and receipt boundaries
+        run: |
+          python -m pytest -q \
+            tests/test_final_atomic_cutover_v0_10.py \
+            tests/test_render_relay_smoke_pass_v0_9.py \
+            tests/test_provider_metadata_capture_v0_8_successor.py \
+            tests/test_render_metadata_capture_protocol_v0_7.py
+      - name: Assert atomic old/new schedule exclusivity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          old = Path('.github/workflows/provider-equivalence-v0-2-metadata-capture.yml').read_text().splitlines()
+          new = Path('.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml').read_text().splitlines()
+          cfg = json.loads(Path('config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json').read_text())
+          authority = json.loads(Path('research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json').read_text())
+          server = Path('infra/render/binance-transport-free/server.py').read_text()
+
+          assert not any(line == '  schedule:' for line in old)
+          assert not any('runs-on: [self-hosted' in line for line in old)
+          assert any(line == '  schedule:' for line in new)
+          expected_crons = {
+              '    - cron: "17,47 * 27-31 8 *"',
+              '    - cron: "17,47 * 1-3 9 *"',
+              '    - cron: "17,47 0-1 4 9 *"',
+          }
+          assert expected_crons.issubset(set(new))
+          assert cfg['atomic_repository_cutover']['successor_cron_utc'] == [
+              '17,47 * 27-31 8 *',
+              '17,47 * 1-3 9 *',
+              '17,47 0-1 4 9 *',
+          ]
+          assert cfg['atomic_repository_cutover']['concurrent_old_and_new_capture_paths_authorized'] is False
+          assert authority['effectivity']['requires_human_review_before_merge'] is True
+          assert 'METADATA_RELAY_EXECUTION_AUTHORIZED = False' in server
+          assert 'V0_10_METADATA_RELAY_EXECUTION_AUTHORIZED = True' in server
+          for secret_name in ('R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_ACCOUNT_ID', 'R2_BUCKET_NAME'):
+              assert secret_name not in server
+          PY
+
+  window-gate:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      inside_window: ${{ steps.gate.outputs.inside_window }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: gate
+        name: Gate V0.10 capture to exact frozen metadata window
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          protocol = json.loads(Path('config/provider_equivalence_v0_2_metadata_capture_v0_2.json').read_text())
+          window = protocol['metadata_capture_window']
+          start = datetime.fromisoformat(window['start_utc'].replace('Z', '+00:00'))
+          end = datetime.fromisoformat(window['end_utc'].replace('Z', '+00:00'))
+          now = datetime.now(timezone.utc)
+          inside = start <= now <= end
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as handle:
+              handle.write(f"inside_window={'true' if inside else 'false'}\n")
+          print(json.dumps({
+              'inside_window': inside,
+              'provider_requests_performed': 0,
+              'r2_client_constructed': False,
+              'r2_writes_performed': False,
+              'holdout_candles_accessed': False,
+          }, sort_keys=True))
+          PY
+
+  capture:
+    needs: [validate-atomic-cutover, window-gate]
+    if: github.event_name == 'schedule' && needs.window-gate.outputs.inside_window == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - id: freshness
+        name: Reject stale scheduled runs before provider or R2 access
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+
+          output = Path('artifacts/provider-metadata-capture-v0-10.json')
+          eligible = False
+          reason = 'UNKNOWN'
+          created_at_text = None
+          try:
+              url = (
+                  f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}"
+                  f"/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+              )
+              request = Request(
+                  url,
+                  headers={
+                      'Accept': 'application/vnd.github+json',
+                      'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
+                      'X-GitHub-Api-Version': '2022-11-28',
+                      'User-Agent': 'qookey-v0-10-metadata-schedule-freshness-guard/0.1',
+                  },
+              )
+              with urlopen(request, timeout=20) as response:
+                  run = json.loads(response.read().decode('utf-8'))
+              created_at_text = str(run['created_at'])
+              created_at = datetime.fromisoformat(created_at_text.replace('Z', '+00:00'))
+              now = datetime.now(timezone.utc)
+              age = now - created_at
+              protocol = json.loads(Path('config/provider_equivalence_v0_2_metadata_capture_v0_2.json').read_text())
+              window = protocol['metadata_capture_window']
+              start = datetime.fromisoformat(window['start_utc'].replace('Z', '+00:00'))
+              end = datetime.fromisoformat(window['end_utc'].replace('Z', '+00:00'))
+              if not (start <= created_at <= end):
+                  reason = 'RUN_CREATED_OUTSIDE_FROZEN_WINDOW'
+              elif age < timedelta(0) or age > timedelta(minutes=30):
+                  reason = 'STALE_QUEUED_RUN_OVER_30_MINUTES'
+              elif not (start <= now <= end):
+                  reason = 'EXECUTION_TIME_OUTSIDE_FROZEN_WINDOW'
+              else:
+                  eligible = True
+                  reason = 'FRESH_SCHEDULED_RUN'
+          except Exception as exc:
+              reason = f"FRESHNESS_GUARD_ERROR_{type(exc).__name__}"
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as handle:
+              handle.write(f"eligible={'true' if eligible else 'false'}\n")
+
+          if not eligible:
+              payload = {
+                  'status': 'SKIP',
+                  'stage': 'SCHEDULE_FRESHNESS_GUARD_SKIP',
+                  'reason': reason,
+                  'workflow_run_created_at_utc': created_at_text,
+                  'provider_requests_performed': 0,
+                  'render_relay_requests_performed': 0,
+                  'r2_client_constructed': False,
+                  'r2_writes_performed': False,
+                  'r2_deletes_performed': False,
+                  'holdout_candles_accessed': False,
+                  'source_switch_authorized': False,
+                  'live_trading_authorized': False,
+                  'capture_execution_version': 'v0_10',
+              }
+              output.write_text(json.dumps(payload, sort_keys=True, indent=2) + '\n')
+              print(json.dumps(payload, sort_keys=True))
+          else:
+              print(json.dumps({'eligible': True, 'reason': reason}, sort_keys=True))
+          PY
+
+      - name: Install package
+        if: steps.freshness.outputs.eligible == 'true'
+        run: python -m pip install -e .
+
+      - name: Capture frozen provider metadata through V0.10 successor path
+        if: steps.freshness.outputs.eligible == 'true'
+        env:
+          METADATA_RELAY_TOKEN: ${{ secrets.METADATA_RELAY_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          python scripts/capture_provider_equivalence_v0_10_metadata.py \
+            --mode capture \
+            --output artifacts/provider-metadata-capture-v0-10.json
+
+      - name: Assert V0.10 capture boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path('artifacts/provider-metadata-capture-v0-10.json').read_text())
+          assert payload['holdout_candles_accessed'] is False
+          assert payload['source_switch_authorized'] is False
+          assert payload['live_trading_authorized'] is False
+          assert payload['capture_execution_version'] == 'v0_10'
+          if payload['status'] == 'PASS':
+              assert payload['stage'] == 'PROVIDER_EQUIVALENCE_V0_10_RENDER_METADATA_CAPTURE_PASS'
+              assert payload['receipt_schema'] == 'provider-equivalence-v0-10-render-metadata-capture-receipt-v0.1'
+              assert payload['object_count'] == 3
+              assert payload['postwrite_sha256_verification'] is True
+              assert payload['provider_requests_performed'] == 2
+              assert payload['render_relay_requests_performed'] == 1
+              assert payload['r2_writes_performed'] is True
+              assert payload['r2_deletes_performed'] is False
+          elif payload['status'] == 'BLOCKED':
+              assert payload['stage'] == 'R2_FREE_ONLY_HEADROOM_GATE_BLOCKED_BEFORE_WRITE'
+              assert payload['r2_writes_performed'] is False
+          else:
+              assert payload['status'] == 'SKIP'
+              assert payload['stage'] in {
+                  'OUTSIDE_FROZEN_METADATA_CAPTURE_WINDOW',
+                  'SCHEDULE_FRESHNESS_GUARD_SKIP',
+              }
+              assert payload['provider_requests_performed'] == 0
+              assert payload['r2_client_constructed'] is False
+              assert payload['r2_writes_performed'] is False
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: provider-metadata-capture-v0-10-${{ github.run_id }}
+          path: artifacts/provider-metadata-capture-v0-10.json
+          retention-days: 30
+          if-no-files-found: error
