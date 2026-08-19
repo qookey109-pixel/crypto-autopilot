@@ -9,26 +9,13 @@ on:
       - "tests/test_provider_metadata_capture_v0_2.py"
       - "config/provider_equivalence_v0_2_metadata_capture_v0_1.json"
       - "research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority.json"
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
-      - "scripts/capture_provider_equivalence_v0_2_metadata.py"
-      - "src/crypto_autopilot/provider_metadata_capture_v0_2.py"
-      - "tests/test_provider_metadata_capture_v0_2.py"
-  schedule:
-    - cron: "17 * * * *"
-    - cron: "47 * * * *"
+      - "research/receipts/2026-08-19-provider-equivalence-v0-2-transport-blocked.json"
 
 permissions:
   contents: read
 
-concurrency:
-  group: provider-equivalence-v0-2-metadata-${{ github.event_name }}-${{ github.run_id }}
-  cancel-in-progress: false
-
 jobs:
-  validate:
+  validate-suspended-state:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -40,118 +27,38 @@ jobs:
         run: python -m pip install -e .
       - name: Unit test metadata capture boundaries
         run: python -m unittest tests.test_provider_metadata_capture_v0_2 -v
-      - name: Assert holdout candles remain forbidden
+      - name: Assert transport blocker suspends execution before window start
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           import json
           from pathlib import Path
-          authority = json.loads(Path('research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority.json').read_text())
-          blocked = authority['explicitly_not_authorized']
-          assert blocked['holdout_candle_access_authorized'] is False
-          assert blocked['holdout_evaluation_authorized'] is False
-          assert blocked['source_switch_authorized'] is False
-          assert blocked['staged_trade_kline_w1_materialization_authorized'] is False
-          assert blocked['live_trading_authorized'] is False
+
+          blocker = json.loads(
+              Path('research/receipts/2026-08-19-provider-equivalence-v0-2-transport-blocked.json').read_text()
+          )
+          assert blocker['status'] == 'PASS'
+          assert blocker['stage'] == 'PROVIDER_EQUIVALENCE_V0_2_METADATA_TRANSPORT_BLOCKED_CAPTURE_SUSPENDED'
+          fail_safe = blocker['capture_fail_safe']
+          assert fail_safe['scheduled_capture_started'] is False
+          assert fail_safe['complete_capture_receipts_written'] == 0
+          assert fail_safe['scheduled_capture_suspended_before_window_start'] is True
+          holdout = blocker['holdout_state']
+          assert holdout['state'] == 'SUPERSEDED_UNOPENED_BEFORE_METADATA_CAPTURE_EVIDENCE'
+          assert holdout['holdout_candles_accessed'] is False
+          assert holdout['holdout_evaluated'] is False
+          assert holdout['replacement_holdout_frozen'] is False
+          boundary = blocker['authorization_boundary']
+          assert boundary['metadata_capture_execution_authorized'] is False
+          assert boundary['metadata_only_r2_writes_authorized'] is False
+          assert boundary['holdout_candle_access_authorized'] is False
+          assert boundary['holdout_evaluation_authorized'] is False
+          assert boundary['source_switch_authorized'] is False
+          assert boundary['staged_trade_kline_w1_materialization_authorized'] is False
+          assert boundary['live_trading_authorized'] is False
           PY
 
-  connectivity-preflight:
-    if: github.event_name == 'push'
-    needs: validate
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install package
-        run: python -m pip install -e .
-      - name: Public metadata connectivity preflight — no R2
-        run: |
-          python scripts/capture_provider_equivalence_v0_2_metadata.py \
-            --mode connectivity-preflight \
-            --output artifacts/provider-metadata-connectivity.json
-      - name: Verify no-write preflight boundary
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          payload = json.loads(Path('artifacts/provider-metadata-connectivity.json').read_text())
-          assert payload['status'] == 'PASS'
-          assert payload['pionex_selected_symbol_count'] == 15
-          assert payload['binance_selected_symbol_count'] == 15
-          assert payload['increment_values_emitted'] is False
-          assert payload['r2_client_constructed'] is False
-          assert payload['r2_writes_performed'] is False
-          assert payload['holdout_candles_accessed'] is False
-          assert payload['source_switch_authorized'] is False
-          assert payload['live_trading_authorized'] is False
-          PY
-      - uses: actions/upload-artifact@v4
-        with:
-          name: provider-metadata-connectivity-${{ github.run_id }}
-          path: artifacts/provider-metadata-connectivity.json
-          retention-days: 30
-          if-no-files-found: error
-
-  capture:
-    if: github.event_name == 'schedule'
-    needs: validate
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
-      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install package
-        run: python -m pip install -e .
-      - name: Verify existing R2 secrets are non-empty
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -n "${CLOUDFLARE_ACCOUNT_ID}"
-          test -n "${R2_BUCKET_NAME}"
-          test -n "${R2_ACCESS_KEY_ID}"
-          test -n "${R2_SECRET_ACCESS_KEY}"
-      - name: Capture public provider metadata if inside frozen window
-        run: |
-          python scripts/capture_provider_equivalence_v0_2_metadata.py \
-            --mode capture \
-            --output artifacts/provider-metadata-capture.json
-      - name: Assert capture never touches holdout candles or trading
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          payload = json.loads(Path('artifacts/provider-metadata-capture.json').read_text())
-          assert payload['holdout_candles_accessed'] is False
-          if payload['status'] == 'PASS':
-              assert payload['object_count'] == 3
-              assert payload['postwrite_sha256_verification'] is True
-              assert payload['r2_writes_performed'] is True
-              assert payload['r2_deletes_performed'] is False
-              assert payload['source_switch_authorized'] is False
-              assert payload['live_trading_authorized'] is False
-          else:
-              assert payload['status'] == 'SKIP'
-              assert payload['provider_requests_performed'] == 0
-              assert payload['r2_writes_performed'] is False
-          PY
-      - uses: actions/upload-artifact@v4
-        with:
-          name: provider-metadata-capture-${{ github.run_id }}
-          path: artifacts/provider-metadata-capture.json
-          retention-days: 30
-          if-no-files-found: error
+# Scheduled capture and main-push connectivity are intentionally absent while
+# the frozen transport blocker is active. A separately versioned transport PASS
+# authority must land before any new forward capture window or holdout is frozen.
