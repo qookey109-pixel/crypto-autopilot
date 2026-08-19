@@ -1,0 +1,28 @@
+{
+  "schema_version": "cloud_transport_automation_v0_1",
+  "status": "V0_3_DIAGNOSTIC_DISPATCH_AUTHORIZED",
+  "dispatch_generation": 1,
+  "target_workflow": ".github/workflows/diagnose-v0-3-cloudflare-container-binance-transport.yml",
+  "target_ref": "main",
+  "reason": "retry_after_cloudflare_api_token_cloudchamber_edit_permission_added",
+  "automation_policy": {
+    "dispatch_on_marker_merge_to_main": true,
+    "manual_run_button_required": false,
+    "scheduled_repeat": false,
+    "retry_loop": false
+  },
+  "authority_boundary": {
+    "v0_1_equivalence_status": "FAIL",
+    "v0_1_mutated": false,
+    "v0_2_self_hosted_mac_transport_authority_mutated": false,
+    "cloud_transport_authorized_for_metadata_capture": false,
+    "metadata_capture_execution_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "source_switch_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

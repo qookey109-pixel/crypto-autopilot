@@ -1,0 +1,91 @@
+name: Dispatch V0.3 Cloud Transport From Authority Marker
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - config/cloud_transport_automation_v0_1.json
+
+permissions:
+  actions: write
+  contents: read
+  issues: write
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate versioned dispatch authority marker
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('config/cloud_transport_automation_v0_1.json')
+          cfg = json.loads(path.read_text())
+          assert cfg['schema_version'] == 'cloud_transport_automation_v0_1'
+          assert cfg['status'] == 'V0_3_DIAGNOSTIC_DISPATCH_AUTHORIZED'
+          assert isinstance(cfg['dispatch_generation'], int) and cfg['dispatch_generation'] > 0
+          assert cfg['target_workflow'] == '.github/workflows/diagnose-v0-3-cloudflare-container-binance-transport.yml'
+          assert cfg['target_ref'] == 'main'
+          policy = cfg['automation_policy']
+          assert policy['dispatch_on_marker_merge_to_main'] is True
+          assert policy['manual_run_button_required'] is False
+          assert policy['scheduled_repeat'] is False
+          assert policy['retry_loop'] is False
+          boundary = cfg['authority_boundary']
+          assert boundary['v0_1_equivalence_status'] == 'FAIL'
+          assert boundary['v0_1_mutated'] is False
+          assert boundary['v0_2_self_hosted_mac_transport_authority_mutated'] is False
+          for key in (
+              'cloud_transport_authorized_for_metadata_capture',
+              'metadata_capture_execution_authorized',
+              'holdout_candle_access_authorized',
+              'source_switch_authorized',
+              'historical_universe_membership_authorized',
+              'backtest_admission_authorized',
+              'automatic_trade_plan_authorized',
+              'real_money_order_authorized',
+              'live_trading_authorized',
+          ):
+              assert boundary[key] is False, key
+          PY
+
+      - name: Dispatch V0.3 diagnostic on main
+        id: dispatch
+        shell: bash
+        run: |
+          set -euo pipefail
+          response="$(gh api \
+            --method POST \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2026-03-10' \
+            "repos/${GITHUB_REPOSITORY}/actions/workflows/diagnose-v0-3-cloudflare-container-binance-transport.yml/dispatches" \
+            -f ref=main)"
+          run_id="$(python -c 'import json,sys; print(json.load(sys.stdin).get("workflow_run_id", ""))' <<<"$response")"
+          run_url="$(python -c 'import json,sys; print(json.load(sys.stdin).get("html_url", ""))' <<<"$response")"
+          if [ -z "$run_id" ] || [ -z "$run_url" ]; then
+            echo "Workflow dispatch did not return run metadata" >&2
+            exit 1
+          fi
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "run_url=$run_url" >> "$GITHUB_OUTPUT"
+
+      - name: Record automatic dispatch in Issue 105
+        shell: bash
+        env:
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+          RUN_URL: ${{ steps.dispatch.outputs.run_url }}
+        run: |
+          set -euo pipefail
+          gh issue comment 105 \
+            --repo "$GITHUB_REPOSITORY" \
+            --body "Automation marker dispatched V0.3 Cloudflare Container transport diagnostic run ${RUN_ID}: ${RUN_URL}\n\nThis dispatch is diagnostic-only. It grants no metadata-capture authority, holdout access, source switch, W1, backtest admission, trade plan, real-money order, or live trading. PASS/FAIL follow-up is handled automatically by the V0.3 follow-up workflow."
