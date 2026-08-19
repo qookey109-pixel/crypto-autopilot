@@ -1,0 +1,26 @@
+name: Diagnose Equivalence Runs
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/diagnose-equivalence-runs.yml"
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: List latest equivalence runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${REPO}/actions/workflows/pionex-binance-equivalence-proof.yml/runs?per_page=8" \
+            --jq '.workflow_runs[] | {id,run_number,event,status,conclusion,head_sha,created_at,updated_at,html_url}'
