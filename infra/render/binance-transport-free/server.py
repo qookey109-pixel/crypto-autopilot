@@ -12,6 +12,7 @@ UPSTREAM_URL = "https://fapi.binance.com/fapi/v1/exchangeInfo"
 USER_AGENT = "qookey-provider-equivalence-render-free-preflight/0.1"
 METADATA_RELAY_USER_AGENT = "qookey-provider-equivalence-render-metadata-relay/0.1"
 METADATA_RELAY_PATH = "/metadata/binance-exchange-info"
+METADATA_RELAY_AUTH_CHECK_PATH = "/metadata/auth-check"
 MAX_BODY_BYTES = 8_000_000
 
 # V0.7 deliberately ships the relay implementation disabled in code. A later,
@@ -87,6 +88,24 @@ def metadata_relay_enabled() -> bool:
     return os.environ.get("METADATA_RELAY_ENABLED", "").strip().lower() == "true"
 
 
+def shared_secret_auth_check_payload() -> dict[str, Any]:
+    return {
+        "status": "PASS",
+        "stage": "V0_8_SHARED_RELAY_SECRET_MATCH_PRECHECK",
+        "shared_secret_match": True,
+        "render_metadata_relay_execution_authorized": METADATA_RELAY_EXECUTION_AUTHORIZED,
+        "render_metadata_relay_enabled": metadata_relay_enabled(),
+        "provider_requests_performed": 0,
+        "raw_exchange_info_persisted": False,
+        "r2_client_constructed": False,
+        "r2_writes_performed": False,
+        "holdout_candles_accessed": False,
+        "holdout_evaluated": False,
+        "source_switch_performed": False,
+        "live_trading_performed": False,
+    }
+
+
 def fetch_exchange_info_raw() -> tuple[int, bytes | None, str, int | None]:
     """Fetch exact Binance exchangeInfo bytes for the future authorized relay.
 
@@ -128,7 +147,7 @@ def _json_bytes(payload: dict[str, Any]) -> bytes:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "QookeyRenderFreeTransport/0.2"
+    server_version = "QookeyRenderFreeTransport/0.3"
 
     def _send_json(self, status: int, payload: dict[str, Any]) -> None:
         body = _json_bytes(payload)
@@ -142,6 +161,45 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802
         if self.path == "/health":
             self._send_json(200, {"status": "ok"})
+            return
+
+        if self.path == METADATA_RELAY_AUTH_CHECK_PATH:
+            # V0.8 pre-activation secret handshake only. This path deliberately
+            # performs no provider request and cannot enable the metadata relay.
+            expected = os.environ.get("METADATA_RELAY_TOKEN")
+            if not expected:
+                self._send_json(
+                    503,
+                    {
+                        "status": "BLOCKED",
+                        "stage": "V0_8_SHARED_RELAY_SECRET_NOT_CONFIGURED",
+                        "shared_secret_match": False,
+                        "provider_requests_performed": 0,
+                        "r2_client_constructed": False,
+                        "r2_writes_performed": False,
+                        "holdout_candles_accessed": False,
+                        "source_switch_performed": False,
+                        "live_trading_performed": False,
+                    },
+                )
+                return
+            if not is_authorized(self.headers.get("Authorization"), expected):
+                self._send_json(
+                    401,
+                    {
+                        "status": "UNAUTHORIZED",
+                        "stage": "V0_8_SHARED_RELAY_SECRET_MISMATCH_OR_MISSING",
+                        "shared_secret_match": False,
+                        "provider_requests_performed": 0,
+                        "r2_client_constructed": False,
+                        "r2_writes_performed": False,
+                        "holdout_candles_accessed": False,
+                        "source_switch_performed": False,
+                        "live_trading_performed": False,
+                    },
+                )
+                return
+            self._send_json(200, shared_secret_auth_check_payload())
             return
 
         if self.path == METADATA_RELAY_PATH:
