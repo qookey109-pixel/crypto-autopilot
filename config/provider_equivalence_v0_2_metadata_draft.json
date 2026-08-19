@@ -1,97 +1,73 @@
 {
-  "version": "0.1.0-draft.2",
-  "status": "METADATA_PROTOCOL_DRAFT_NOT_AUTHORIZED",
-  "purpose": "Define fail-closed public price-increment metadata evidence requirements for Provider Equivalence V0.2 without acquiring metadata values or holdout candles.",
+  "version": "0.1.0-draft.3",
+  "status": "METADATA_PROTOCOL_DRAFT_FORWARD_CAPTURE_AUTHORIZED",
+  "purpose": "Use contemporaneous public metadata capture around a future unopened holdout instead of backfilling current price-increment values into an unsupported historical period.",
   "semantic_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-price-increment-semantics.json",
+  "capture_protocol": "config/provider_equivalence_v0_2_metadata_capture_v0_1.json",
+  "capture_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority.json",
   "official_documentation_basis": {
     "pionex": {
-      "documentation_url": "https://www.pionex.com/docs/api-docs/futures-api/common",
       "official_repository": "pionex-official/pionex-open-api",
       "official_file": "openapi_futures.yaml",
       "pre_holdout_commit": "b8c63d29ed9b49d967b75b75b0c2ef057e45cc77",
       "pre_holdout_git_blob_sha1": "46f9b20d5ab7946dcb11663913987a511ac5be10",
       "public_endpoint": "https://api.pionex.com/api/v1/common/symbols",
-      "request_scope": "15 frozen Pionex perpetual symbols only",
-      "documented_response_fields": [
-        "data.symbols[].symbol",
-        "data.symbols[].contractType",
-        "data.symbols[].quotePrecision",
-        "data.symbols[].quoteStep",
-        "data.symbols[].status"
-      ],
       "price_increment_field": "data.symbols[].quoteStep",
       "official_field_description": "Price step size (quote asset)",
-      "field_semantics_status": "PASS_EXPLICIT_PRICE_STEP_SIZE_IN_PRE_HOLDOUT_OFFICIAL_OPENAPI",
-      "field_semantics_authorized": true,
-      "historical_field_value_authorized": false
+      "field_semantics_authorized": true
     },
     "binance_usdm": {
-      "documentation_url": "https://developers.binance.com/zh-CN/docs/products/derivatives-trading-usds-futures/common-definition",
-      "endpoint_contract": "USD-M /exchangeInfo public response",
+      "public_endpoint": "https://fapi.binance.com/fapi/v1/exchangeInfo",
       "documented_filter": "PRICE_FILTER",
       "price_increment_field": "symbols[].filters[filterType=PRICE_FILTER].tickSize",
-      "field_semantics_status": "PASS_EXPLICIT_PRICE_STEP_INTERVAL",
-      "field_semantics_authorized": true,
-      "historical_field_value_authorized": false
+      "field_semantics_authorized": true
     }
   },
-  "required_symbol_scope": {
-    "source": "research/receipts/2026-08-17-m1a-pionex.json",
-    "pionex_symbol_count": 15,
-    "binance_mapped_symbol_count": 15,
-    "scope_reduction_for_metadata_failure_forbidden": true
+  "superseded_historical_applicability_attempt": {
+    "start_utc": "2026-08-03T08:00:00Z",
+    "end_utc": "2026-08-10T07:59:59.999Z",
+    "state": "SUPERSEDED_UNOPENED",
+    "current_snapshot_backfill_forbidden": true,
+    "m1a_artifact_contains_raw_symbols_response": false,
+    "holdout_candles_accessed": false
   },
-  "future_acquisition_contract": {
-    "state": "DESIGN_ONLY_NOT_AUTHORIZED",
+  "forward_applicability": {
+    "state": "CAPTURE_PROTOCOL_FROZEN_VALUES_PENDING",
+    "candidate_holdout_start_utc": "2026-08-21T00:00:00Z",
+    "candidate_holdout_end_utc": "2026-08-27T23:59:59.999Z",
+    "capture_start_utc": "2026-08-20T00:00:00Z",
+    "capture_end_utc": "2026-08-28T01:59:59.999Z",
+    "hourly_slot_count": 194,
+    "required_rule": "At least one complete capture in every UTC hourly slot and exact normalized per-provider vector stability across all complete captures.",
+    "missing_slot_result": "METADATA_APPLICABILITY_INVALID",
+    "changed_increment_or_status_result": "METADATA_APPLICABILITY_INVALID",
+    "invalid_result_authorizes_holdout_candles": false,
+    "pass_result_authorizes_holdout_candles": false,
+    "separate_holdout_access_authority_required_after_pass": true
+  },
+  "capture_contract": {
     "public_endpoints_only": true,
-    "private_api_key_forbidden": true,
-    "raw_response_bytes_must_be_retained": true,
-    "http_status_must_be_200": true,
-    "content_type_must_be_json": true,
-    "retrieved_at_utc_required": true,
+    "private_provider_api_keys_forbidden": true,
+    "raw_response_bytes_retained": true,
     "raw_payload_sha256_required": true,
-    "provider_response_timestamp_preserved_if_present": true,
     "all_15_symbols_required": true,
     "duplicate_symbol_rows_forbidden": true,
     "missing_symbol_fails_closed": true,
     "nonpositive_increment_fails_closed": true,
+    "provider_status_preserved": true,
+    "contract_type_preserved": true,
+    "decimal_source_strings_preserved": true,
     "provider_splicing_forbidden": true,
-    "value_interpolation_forbidden": true
-  },
-  "pionex_semantic_resolution": {
-    "state": "PASS_FROZEN_SEMANTIC_AUTHORITY",
-    "authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-price-increment-semantics.json",
-    "quoteStep_name_alone_is_sufficient_proof": false,
-    "pre_holdout_official_openapi_description_used": true,
-    "official_description": "Price step size (quote asset)",
-    "current_market_price_lattice_observation_used_as_authority": false,
-    "observed_v0_1_price_deltas_used_as_authority": false,
-    "holdout_data_used_to_resolve_semantics": false
-  },
-  "historical_applicability": {
-    "state": "ONLY_REMAINING_BLOCKER_BEFORE_METADATA_VALUE_AUTHORITY",
-    "candidate_holdout_start_utc": "2026-08-03T08:00:00Z",
-    "candidate_holdout_end_utc": "2026-08-10T07:59:59.999Z",
-    "current_metadata_snapshot_alone_proves_historical_effective_value": false,
-    "m1a_artifact_contains_raw_symbols_response": false,
-    "required_resolution": "Freeze an evidence rule demonstrating that each provider increment value used by V0.2 is valid for, or conservative with respect to, the candidate holdout period.",
-    "holdout_candles_must_remain_unopened_during_resolution": true
-  },
-  "receipt_design": {
-    "future_receipt_path": "research/receipts/YYYY-MM-DD-provider-equivalence-v0-2-price-increment-metadata.json",
-    "per_provider_raw_sha256_required": true,
-    "per_symbol_normalized_increment_required": true,
-    "per_symbol_source_field_required": true,
-    "per_symbol_semantic_authority_required": true,
-    "per_symbol_holdout_applicability_required": true,
-    "normalization_must_preserve_decimal_exactness": true
+    "value_interpolation_forbidden": true,
+    "candle_inference_forbidden": true
   },
   "authorization_boundary": {
     "field_semantics_authority_frozen": true,
-    "metadata_protocol_frozen": false,
-    "metadata_acquisition_authorized": false,
-    "metadata_values_known": false,
-    "historical_metadata_values_authorized": false,
+    "metadata_capture_protocol_frozen": true,
+    "metadata_capture_authorized": true,
+    "metadata_only_r2_writes_authorized": true,
+    "metadata_values_complete": false,
+    "metadata_applicability_pass": false,
     "holdout_data_access_authorized": false,
     "holdout_evaluation_authorized": false,
     "source_switch_authorized": false,
@@ -100,5 +76,5 @@
     "trade_plan_authorized": false,
     "live_trading_authorized": false
   },
-  "next_required_stage": "RESOLVE_HISTORICAL_PRICE_INCREMENT_VALUE_APPLICABILITY_WITHOUT_OPENING_HOLDOUT"
+  "next_required_stage": "METADATA_CAPTURE_IMPLEMENTATION_AND_CONNECTIVITY_PREFLIGHT"
 }
