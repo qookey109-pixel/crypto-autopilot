@@ -30,7 +30,7 @@ def test_current_entry_docs_reflect_v08_without_granting_execution() -> None:
     assert "V0.8 RENDER METADATA CUTOVER PREPARED EXECUTION_NOT_AUTHORIZED" in status
     assert "V0_8_CAPTURE_EXECUTION_AUTHORIZED=false" in status
     assert "METADATA_RELAY_EXECUTION_AUTHORIZED=false" in status
-    assert "successorMetadataCaptureExecutionAuthorized":=False if False else True
+    assert "successor schedule" in status.lower()
 
     assert "Project runtime budget is `0 USD/month`" in agents
     assert "Old/new capture paths must never run concurrently" in agents
