@@ -12,6 +12,7 @@ const STATUS_LABELS = {
   PASS: "通過 · PASS",
   READY: "已就緒 · READY",
   AUTHORIZED: "已授權 · AUTHORIZED",
+  PREPARED: "已準備 · PREPARED",
   PENDING: "等待中 · PENDING",
   IN_PROGRESS: "進行中 · IN_PROGRESS",
   NOT_READY: "尚未就緒 · NOT_READY",
@@ -24,7 +25,7 @@ const STATUS_LABELS = {
 
 function badgeClass(status) {
   if (["PASS", "READY", "AUTHORIZED"].includes(status)) return "pass";
-  if (["PENDING", "IN_PROGRESS", "NOT_READY", "REVIEW_REQUIRED", "SCOPE_REDUCTION_REQUIRED"].includes(status)) return "pending";
+  if (["PREPARED", "PENDING", "IN_PROGRESS", "NOT_READY", "REVIEW_REQUIRED", "SCOPE_REDUCTION_REQUIRED"].includes(status)) return "pending";
   if (["BLOCKED", "NOT_AUTHORIZED", "FAIL"].includes(status)) return "danger";
   return "neutral";
 }

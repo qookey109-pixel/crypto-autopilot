@@ -1,0 +1,87 @@
+name: Provider Equivalence V0.8 Render Metadata Capture Scaffold
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/provider-equivalence-v0-8-render-metadata-capture.yml"
+      - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
+      - ".github/workflows/automate-v0-3-cloud-transport-follow-up.yml"
+      - ".github/workflows/diagnose-v0-3-cloudflare-container-binance-transport.yml"
+      - ".github/workflows/dispatch-v0-3-cloud-transport-from-authority-marker.yml"
+      - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
+      - "research/receipts/2026-08-19-provider-equivalence-v0-8-render-metadata-cutover-prepared.json"
+      - "src/crypto_autopilot/provider_metadata_capture_v0_8.py"
+      - "scripts/check_provider_equivalence_v0_8_cutover.py"
+      - "tests/test_provider_metadata_cutover_v0_8.py"
+      - "tests/test_project_authority_hygiene_v0_8.py"
+      - "PROJECT_STATUS.md"
+      - "README.md"
+      - "AGENTS.md"
+      - "web/**"
+      - "scripts/apply_dashboard_latest_authority.py"
+      - "infra/render/binance-transport-free/server.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: provider-equivalence-v0-8-cutover-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-prepared-cutover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install package and pytest
+        run: |
+          python -m pip install -e .
+          python -m pip install pytest
+      - name: Validate V0.8 cutover contract
+        run: |
+          python scripts/check_provider_equivalence_v0_8_cutover.py \
+            --mode validate \
+            --output /tmp/v0-8-cutover-validation.json
+      - name: Prove successor capture is hard-disabled before any secret or provider access
+        run: |
+          python scripts/check_provider_equivalence_v0_8_cutover.py \
+            --mode guard \
+            --output /tmp/v0-8-capture-guard.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('/tmp/v0-8-capture-guard.json').read_text())
+          assert result['status'] == 'SKIP'
+          assert result['stage'] == 'V0_8_CAPTURE_EXECUTION_NOT_AUTHORIZED'
+          assert result['provider_requests_performed'] == 0
+          assert result['render_relay_requests_performed'] == 0
+          assert result['r2_client_constructed'] is False
+          assert result['r2_writes_performed'] is False
+          assert result['holdout_candles_accessed'] is False
+          assert result['source_switch_authorized'] is False
+          assert result['live_trading_authorized'] is False
+          PY
+      - name: V0.8 boundary and authority-hygiene regression tests
+        run: |
+          python -m pytest -q \
+            tests/test_provider_metadata_cutover_v0_8.py \
+            tests/test_project_authority_hygiene_v0_8.py \
+            tests/test_render_metadata_capture_protocol_v0_7.py
+      - name: Assert no successor schedule exists in V0.8 preparation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          successor = Path('.github/workflows/provider-equivalence-v0-8-render-metadata-capture.yml').read_text().splitlines()
+          old = Path('.github/workflows/provider-equivalence-v0-2-metadata-capture.yml').read_text().splitlines()
+          assert not any(line == '  schedule:' for line in successor)
+          assert any(line == '  schedule:' for line in old)
+          PY
+      - name: Validate current dashboard safe fixture
+        run: python scripts/validate_dashboard_static.py
