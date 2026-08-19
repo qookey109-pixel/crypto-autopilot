@@ -27,8 +27,10 @@ class ProviderEquivalenceV02DraftTests(unittest.TestCase):
         draft = load(V0_2)
         self.assertEqual(draft["status"], "PROTOCOL_DRAFT_NOT_AUTHORIZED")
         boundary = draft["authorization_boundary"]
+        self.assertIs(boundary["metadata_field_semantics_frozen"], True)
         for key in (
             "protocol_frozen",
+            "historical_metadata_values_authorized",
             "metadata_acquisition_authorized",
             "holdout_data_access_authorized",
             "holdout_evaluation_authorized",
@@ -108,24 +110,32 @@ class ProviderEquivalenceV02DraftTests(unittest.TestCase):
             self.assertEqual(expected - minimum, maximum)
 
         prerequisite = draft["microstructure_metadata_prerequisite"]
-        self.assertEqual(prerequisite["state"], "REQUIRED_BEFORE_PROTOCOL_FREEZE")
+        self.assertEqual(
+            prerequisite["state"],
+            "FIELD_SEMANTICS_PASS_HISTORICAL_VALUES_NOT_READY",
+        )
         self.assertEqual(
             prerequisite["design_protocol"],
             "config/provider_equivalence_v0_2_metadata_draft.json",
         )
-        self.assertIs(prerequisite["pionex_price_increment_authority_required"], True)
-        self.assertIs(prerequisite["binance_price_increment_authority_required"], True)
+        self.assertEqual(
+            prerequisite["semantic_authority"],
+            "research/receipts/2026-08-19-provider-equivalence-v0-2-price-increment-semantics.json",
+        )
+        self.assertIs(prerequisite["pionex_price_increment_semantics_resolved"], True)
+        self.assertIs(prerequisite["binance_price_increment_semantics_resolved"], True)
+        self.assertIs(prerequisite["historical_increment_values_required"], True)
         self.assertIs(prerequisite["raw_payload_sha256_receipts_required"], True)
 
-    def test_v0_2_remains_blocked_on_metadata_authority(self) -> None:
+    def test_v0_2_remains_blocked_only_on_historical_increment_values(self) -> None:
         draft = load(V0_2)
         self.assertEqual(
             draft["aggregate_design"]["state"],
-            "DRAFT_BLOCKED_ON_PRICE_INCREMENT_METADATA_AUTHORITY",
+            "DRAFT_BLOCKED_ON_HISTORICAL_PRICE_INCREMENT_VALUES",
         )
         self.assertEqual(
             draft["next_required_stage"],
-            "PUBLIC_PRICE_INCREMENT_METADATA_SCHEMA_AUTHORITY_BEFORE_V0_2_FREEZE",
+            "HISTORICAL_PRICE_INCREMENT_VALUE_APPLICABILITY_DESIGN_WITHOUT_OPENING_HOLDOUT",
         )
         self.assertIs(draft["hard_requirements"]["verified_price_increment_metadata_required"], True)
         self.assertIs(

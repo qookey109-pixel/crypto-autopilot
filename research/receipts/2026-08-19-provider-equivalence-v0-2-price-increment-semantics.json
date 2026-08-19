@@ -1,0 +1,85 @@
+{
+  "schema": "provider-equivalence-v0-2-price-increment-semantics-authority-v0.1",
+  "status": "PASS",
+  "stage": "PROVIDER_EQUIVALENCE_V0_2_PRICE_INCREMENT_SEMANTICS_PASS_VALUES_NOT_READY",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "PUBLIC_SCHEMA_SEMANTICS_ONLY",
+  "purpose": "Freeze provider field semantics required by the V0.2 microstructure design without acquiring or evaluating the unopened holdout.",
+  "v0_1_boundary": {
+    "frozen_authority": "research/receipts/2026-08-19-pionex-binance-equivalence-v0-1.json",
+    "frozen_gate_status": "FAIL",
+    "v0_1_regraded": false,
+    "v0_1_thresholds_changed": false,
+    "v0_1_scope_changed": false
+  },
+  "candidate_holdout_boundary": {
+    "start_utc": "2026-08-03T08:00:00Z",
+    "end_utc": "2026-08-10T07:59:59.999Z",
+    "holdout_data_accessed": false,
+    "holdout_evaluated": false,
+    "holdout_result_known": false
+  },
+  "pionex": {
+    "provider": "pionex",
+    "official_repository": "pionex-official/pionex-open-api",
+    "official_file": "openapi_futures.yaml",
+    "pre_holdout_commit": "b8c63d29ed9b49d967b75b75b0c2ef057e45cc77",
+    "pre_holdout_commit_timestamp_utc": "2026-07-21T11:47:42Z",
+    "git_blob_sha1": "46f9b20d5ab7946dcb11663913987a511ac5be10",
+    "public_endpoint": "GET https://api.pionex.com/api/v1/common/symbols",
+    "schema": "components.schemas.FuturesSymbolInfo",
+    "field": "quoteStep",
+    "official_field_description": "Price step size (quote asset)",
+    "semantic_status": "PASS_EXPLICIT_PRICE_STEP_SIZE",
+    "semantic_authority_precedes_holdout": true,
+    "field_name_only_used_as_proof": false,
+    "v0_1_price_deltas_used_as_proof": false,
+    "historical_symbol_values_known": false,
+    "historical_symbol_values_authorized": false
+  },
+  "binance_usdm": {
+    "provider": "binance_usdm",
+    "official_documentation": "https://developers.binance.com/docs/derivatives/usds-margined-futures/common-definition",
+    "public_endpoint_contract": "USD-M /exchangeInfo",
+    "filter": "PRICE_FILTER",
+    "field": "tickSize",
+    "semantic_status": "PASS_EXPLICIT_PRICE_STEP_INTERVAL",
+    "historical_symbol_values_known": false,
+    "historical_symbol_values_authorized": false
+  },
+  "semantic_result": {
+    "pionex_quote_step_semantics_resolved": true,
+    "binance_tick_size_semantics_resolved": true,
+    "both_provider_price_increment_field_semantics_ready": true,
+    "historical_value_applicability_ready": false,
+    "metadata_acquisition_ready": false,
+    "v0_2_protocol_freeze_ready": false
+  },
+  "remaining_blocker": {
+    "name": "HISTORICAL_PRICE_INCREMENT_VALUE_APPLICABILITY",
+    "description": "The official schemas define the fields, but no frozen evidence yet proves the per-symbol increment values applicable during the 2026-08-03 through 2026-08-10 candidate holdout.",
+    "current_metadata_snapshot_alone_is_sufficient": false,
+    "m1a_artifact_contains_raw_symbols_response": false,
+    "holdout_candles_may_be_opened_to_infer_values": false,
+    "provider_values_may_be_interpolated": false,
+    "provider_values_may_be_spliced": false
+  },
+  "authorization_boundary": {
+    "semantic_authority_frozen": true,
+    "historical_metadata_values_authorized": false,
+    "metadata_acquisition_authorized": false,
+    "v0_2_protocol_frozen": false,
+    "holdout_data_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_required_stage": "HISTORICAL_PRICE_INCREMENT_VALUE_APPLICABILITY_DESIGN_WITHOUT_OPENING_HOLDOUT"
+}

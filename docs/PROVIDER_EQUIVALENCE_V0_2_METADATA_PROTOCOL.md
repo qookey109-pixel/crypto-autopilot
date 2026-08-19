@@ -10,52 +10,51 @@ The V0.1 forensic evidence showed that most exact-sign disagreements are one-pro
 
 That classification is only defensible if the permitted price increment comes from an independent provider contract. It must never be inferred from the V0.1 mismatches themselves.
 
-## Binance USD-M candidate authority
+## Field semantics — PASS
+
+Semantic authority:
+
+`research/receipts/2026-08-19-provider-equivalence-v0-2-price-increment-semantics.json`
+
+Both provider field meanings are now resolved. This removes the field-semantics blocker only; it does not establish the per-symbol historical values applicable to the candidate holdout.
+
+### Binance USD-M
 
 Official Binance USD-M documentation defines the `PRICE_FILTER` contract and its `tickSize` field as the price-step interval used by the filter.
 
-Candidate future public metadata source:
+Future public metadata source:
 
 - USD-M public `/exchangeInfo`
 - symbol filter: `filterType=PRICE_FILTER`
-- candidate field: `tickSize`
+- field: `tickSize`
 
 Before use, the future acquisition stage must retain the complete raw response bytes, retrieval time, SHA-256, exact symbol row and exact field path. Missing, duplicate or non-positive values fail closed.
 
-The draft does not yet acquire these values.
+### Pionex Futures
 
-## Pionex candidate field and current blocker
+A stronger Pionex authority was found in the official machine-readable repository:
 
-Official Pionex Futures common-symbol documentation exposes the public symbols endpoint and includes fields such as:
+- repository: `pionex-official/pionex-open-api`
+- file: `openapi_futures.yaml`
+- pre-holdout commit: `b8c63d29ed9b49d967b75b75b0c2ef057e45cc77`
+- Git blob: `46f9b20d5ab7946dcb11663913987a511ac5be10`
+- field: `FuturesSymbolInfo.quoteStep`
+- official description: `Price step size (quote asset)`
 
-- `symbol`
-- `contractType`
-- `quotePrecision`
-- `quoteStep`
-- `status`
+That immutable repository snapshot predates the candidate holdout, so the meaning of `quoteStep` is frozen as explicit price-step semantics. The field name alone was not used as proof, and V0.1 price deltas were not used to infer the meaning.
 
-Candidate field: `data.symbols[].quoteStep`.
+The M1A acquisition artifact was also re-inspected. It contains the selected universe and 45 candle files, but it does **not** retain the raw `/api/v1/common/symbols` response, so it cannot supply historical `quoteStep` values.
 
-However, the currently reviewed official page exposes the field without an explicit statement that `quoteStep` is the permitted futures **price increment / tick**. The field name alone is not sufficient authority for V0.2.
-
-Therefore:
-
-- `quoteStep` is only a candidate field;
-- `candidate_field_may_be_used_as_v0_2_increment_authority=false`;
-- a current market price lattice observation can be supporting evidence only;
-- V0.1 candle deltas may not be used to infer the increment;
-- the unopened V0.2 holdout may not be sampled to resolve this semantic question.
-
-Acceptable semantic resolution requires an official Pionex source, or separately reviewed public Pionex contract/schema material, that explicitly ties the field to permitted futures price increments.
-
-## Historical applicability blocker
+## Historical value applicability — ONLY REMAINING METADATA BLOCKER
 
 V0.2 predeclares an unopened candidate holdout:
 
 - `2026-08-03T08:00:00Z`
 - through `2026-08-10T07:59:59.999Z`
 
-A metadata snapshot retrieved now does not automatically prove that the same increment was effective during that prior period.
+The schemas prove what the fields mean. They do not by themselves prove the exact per-symbol values effective during that prior period.
+
+A metadata snapshot retrieved now does not automatically prove that the same increment was effective during the holdout.
 
 Before V0.2 freezes, each provider/symbol increment must have an evidence rule showing that the selected value is valid for, or conservative with respect to, the candidate holdout period. The rule itself must be frozen before holdout candles are opened.
 
@@ -83,7 +82,7 @@ No metadata value becomes V0.2 authority merely because it appears plausible.
 
 ## Indeterminate-cap design without threshold shopping
 
-The V0.2 direction design needs to prevent excessive `MICROSTRUCTURE_INDETERMINATE` rows from disappearing from the denominator. Rather than add another tunable PASS/REVIEW percentage, draft.2 derives a hard evidence floor from the unchanged V0.1 minimum-row requirements.
+The V0.2 direction design needs to prevent excessive `MICROSTRUCTURE_INDETERMINATE` rows from disappearing from the denominator. Rather than add another tunable PASS/REVIEW percentage, draft.2+ derives a hard evidence floor from the unchanged V0.1 minimum-row requirements.
 
 For the exact seven-day holdout:
 
@@ -99,10 +98,11 @@ If comparable adjacent comparisons fall below the interval minimum, the pair fai
 
 ## Current authorization boundary
 
-All remain false:
+Field semantics are frozen, but all of these remain false:
 
 - metadata protocol frozen;
 - metadata acquisition authorized;
+- historical metadata values authorized;
 - metadata values known;
 - holdout data access authorized;
 - holdout evaluation authorized;
@@ -116,9 +116,6 @@ All remain false:
 
 ## Next required stage
 
-Resolve both of these **without opening the holdout**:
+Resolve **historical price-increment value applicability** without opening the holdout.
 
-1. Pionex `quoteStep` semantic authority.
-2. Historical applicability of each provider's price increment to the candidate holdout.
-
-Only after those are resolved can a separate V0.2 frozen-protocol authority be proposed. V0.1 remains permanently FAIL regardless of V0.2's future result.
+Only after per-symbol values for both providers are supported by a frozen holdout-applicability rule can a separate V0.2 frozen-protocol authority be proposed. V0.1 remains permanently FAIL regardless of V0.2's future result.
