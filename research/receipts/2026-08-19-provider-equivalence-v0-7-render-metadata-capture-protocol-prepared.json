@@ -1,0 +1,84 @@
+{
+  "schema": "provider-equivalence-v0-7-render-metadata-capture-protocol-prepared-authority-v0.1",
+  "status": "PASS",
+  "stage": "PROVIDER_EQUIVALENCE_V0_7_RENDER_METADATA_CAPTURE_PROTOCOL_PREPARED_EXECUTION_NOT_AUTHORIZED",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "main_baseline": "8a70522766fe449c9eb1025f48874ded4f1a0a58",
+  "protocol": "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json",
+  "prerequisites": {
+    "v0_5_render_transport_pass": "research/receipts/2026-08-19-provider-equivalence-v0-5-render-free-transport-pass.json",
+    "v0_6_render_transport_transition": "research/receipts/2026-08-19-provider-equivalence-v0-6-render-transport-authority-transition.json",
+    "v0_5_status": "PASS",
+    "v0_6_status": "PASS"
+  },
+  "preserved_scientific_scope": {
+    "candidate_holdout_start_utc": "2026-08-28T00:00:00Z",
+    "candidate_holdout_end_utc": "2026-09-03T23:59:59.999Z",
+    "metadata_capture_start_utc": "2026-08-27T00:00:00Z",
+    "metadata_capture_end_utc": "2026-09-04T01:59:59.999Z",
+    "hourly_slot_count": 194,
+    "scheduled_minutes_utc": [17, 47],
+    "candidate_symbol_count": 15,
+    "mapped_pair_count": 45,
+    "v0_2_holdout_changed": false,
+    "v0_2_metadata_semantics_changed": false,
+    "holdout_candles_accessed": false,
+    "holdout_candles_evaluated": false
+  },
+  "prepared_architecture": {
+    "orchestrator": "github_hosted_ubuntu",
+    "pionex_transport": "direct_public_https",
+    "binance_transport": "render_free_web_service",
+    "render_service_id": "srv-da2qlb67bikc73bibobg",
+    "render_region": "frankfurt",
+    "render_plan": "free",
+    "render_metadata_relay_path": "/metadata/binance-exchange-info",
+    "render_relay_default_state": "DISABLED_FAIL_CLOSED",
+    "r2_credentials_location": "github_actions_secrets_only",
+    "render_receives_r2_credentials": false,
+    "scheduled_capture_enabled": false,
+    "r2_writes_performed": false,
+    "provider_metadata_capture_performed": false
+  },
+  "free_only_boundary": {
+    "monthly_runtime_budget_usd": 0,
+    "render_paid_upgrade_authorized": false,
+    "payment_method_addition_authorized": false,
+    "r2_operational_hard_stop_bytes": 8000000000,
+    "projected_metadata_storage_cap_bytes": 4294967296,
+    "current_bucket_usage_reference_bytes": 22120404,
+    "prewrite_headroom_gate_required": true
+  },
+  "binance_api_key_boundary": {
+    "public_exchange_info_requires_api_key": false,
+    "project_wide_binance_api_key_prohibition_declared": false,
+    "api_key_used_or_required_for_this_public_metadata_path": false,
+    "api_key_transport_bypass_authorized": false,
+    "future_authenticated_binance_scope_may_be_versioned_separately": true
+  },
+  "authorization_boundary": {
+    "render_metadata_relay_implementation_authorized": true,
+    "render_metadata_relay_enablement_authorized": false,
+    "render_metadata_capture_execution_authorized": false,
+    "scheduled_capture_activation_authorized": false,
+    "metadata_only_r2_writes_authorized_by_this_receipt": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "cutover_requirement": {
+    "old_v0_2_self_hosted_schedule_must_not_run_concurrently": true,
+    "separate_versioned_execution_cutover_authority_required": true,
+    "separate_cutover_must_resolve_old_schedule_path_before_v0_7_capture": true
+  },
+  "next_required_stage": "IMPLEMENT_DISABLED_RENDER_METADATA_RELAY_AND_VALIDATE_WITHOUT_PROVIDER_CAPTURE"
+}
