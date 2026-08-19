@@ -1,0 +1,46 @@
+{
+  "schema": "provider-equivalence-v0-2-local-transport-probe-authority-v0.1",
+  "status": "PASS",
+  "stage": "PROVIDER_EQUIVALENCE_V0_2_LOCAL_TRANSPORT_PROBE_AUTHORIZED",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "upstream_blocker": "research/receipts/2026-08-19-provider-equivalence-v0-2-transport-blocked.json",
+  "protocol": "config/provider_equivalence_v0_2_transport_probe_v0_1.json",
+  "purpose": "Authorize a one-shot operator-controlled local connectivity proof for the unchanged official Pionex and Binance USD-M metadata endpoints.",
+  "execution_scope": {
+    "operator_controlled_local_host": true,
+    "interactive_manual_execution_only": true,
+    "scheduled_execution_authorized": false,
+    "provider_requests_authorized": [
+      "https://api.pionex.com/api/v1/common/symbols",
+      "https://fapi.binance.com/fapi/v1/exchangeInfo"
+    ],
+    "selected_universe_authority": "research/receipts/2026-08-17-m1a-pionex.json",
+    "expected_selected_symbol_count_per_provider": 15,
+    "increment_values_emitted": false,
+    "raw_payload_retained": false,
+    "raw_payload_sha256_recorded": true
+  },
+  "authorization_boundary": {
+    "transport_probe_execution_authorized": true,
+    "metadata_capture_execution_authorized": false,
+    "metadata_only_r2_writes_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "replacement_holdout_freeze_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "post_execution_rule": {
+    "PASS": "Freeze the transport result in a separate authority before declaring any new metadata-capture window or holdout.",
+    "BLOCKED": "Do not retry as metadata capture and do not open any holdout; design another transport proof version.",
+    "FAIL": "Do not proceed; review the provider contract/schema without opening holdout candles."
+  }
+}
