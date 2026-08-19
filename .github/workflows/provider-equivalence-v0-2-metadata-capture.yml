@@ -1,266 +1,61 @@
-name: Provider Equivalence V0.2 Metadata Capture
+name: Provider Equivalence V0.2 Metadata Capture — Retired Scheduled Path
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
-      - "scripts/capture_provider_equivalence_v0_2_metadata.py"
-      - "src/crypto_autopilot/provider_metadata_capture_v0_2.py"
-      - "tests/test_provider_metadata_capture_v0_2.py"
+      - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+      - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
+      - "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
       - "config/provider_equivalence_v0_2_metadata_capture_v0_2.json"
-      - "research/receipts/2026-08-19-provider-equivalence-v0-2-self-hosted-mac-transport-pass.json"
       - "research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority-v0-2.json"
-      - "research/receipts/2026-08-19-provider-equivalence-v0-2-transport-blocked.json"
-  schedule:
-    - cron: "17 * * * *"
-    - cron: "47 * * * *"
 
 permissions:
-  actions: read
   contents: read
 
-concurrency:
-  group: provider-equivalence-v0-2-metadata-${{ github.event_name }}-${{ github.run_id }}
-  cancel-in-progress: false
-
 jobs:
-  validate-authority-transition:
-    if: github.event_name == 'pull_request'
+  validate-retired-history:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - name: Install package
-        run: python -m pip install -e .
-      - name: Unit test metadata capture boundaries
-        run: python -m unittest tests.test_provider_metadata_capture_v0_2 -v
-      - name: Assert new capture authority is metadata-only and old blocker is preserved
+          python-version: "3.13"
+      - name: Assert V0.2 history is preserved but scheduled execution is retired
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           import json
-          from datetime import datetime
           from pathlib import Path
 
-          blocker_path = Path('research/receipts/2026-08-19-provider-equivalence-v0-2-transport-blocked.json')
-          transport_path = Path('research/receipts/2026-08-19-provider-equivalence-v0-2-self-hosted-mac-transport-pass.json')
-          authority_path = Path('research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority-v0-2.json')
-          v0_1_path = Path('research/receipts/2026-08-19-pionex-binance-equivalence-v0-1.json')
+          old_workflow = Path('.github/workflows/provider-equivalence-v0-2-metadata-capture.yml').read_text().splitlines()
+          successor_workflow = Path('.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml').read_text().splitlines()
+          protocol = json.loads(Path('config/provider_equivalence_v0_2_metadata_capture_v0_2.json').read_text())
+          old_authority = json.loads(Path('research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority-v0-2.json').read_text())
+          cutover = json.loads(Path('config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json').read_text())
+          authority = json.loads(Path('research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json').read_text())
 
-          blocker = json.loads(blocker_path.read_text())
-          transport = json.loads(transport_path.read_text())
-          authority = json.loads(authority_path.read_text())
-          v0_1 = json.loads(v0_1_path.read_text())
-
-          assert blocker['stage'] == 'PROVIDER_EQUIVALENCE_V0_2_METADATA_TRANSPORT_BLOCKED_CAPTURE_SUSPENDED'
-          assert blocker['holdout_state']['state'] == 'SUPERSEDED_UNOPENED_BEFORE_METADATA_CAPTURE_EVIDENCE'
-          assert blocker['holdout_state']['holdout_candles_accessed'] is False
-          assert blocker['holdout_state']['holdout_evaluated'] is False
-
-          assert transport['status'] == 'PASS'
-          assert transport['execution_evidence']['http_status'] == 200
-          assert transport['execution_evidence']['json_ok'] is True
-          assert transport['execution_evidence']['symbols_array'] is True
-          assert transport['sanitization_and_safety']['increment_values_emitted'] is False
-          assert transport['sanitization_and_safety']['r2_writes_performed'] is False
-          assert transport['sanitization_and_safety']['holdout_candles_accessed'] is False
-
-          old_holdout = authority['superseded_holdout']
-          new_holdout = authority['new_frozen_candidate_holdout']
-          old_end = datetime.fromisoformat(old_holdout['end_utc'].replace('Z', '+00:00'))
-          new_start = datetime.fromisoformat(new_holdout['start_utc'].replace('Z', '+00:00'))
-          assert new_start > old_end
-          assert old_holdout['reactivation_authorized'] is False
-          assert new_holdout['candles_accessed'] is False
-          assert new_holdout['candles_evaluated'] is False
-
-          blocked = authority['explicitly_not_authorized']
-          assert blocked['holdout_candle_access_authorized'] is False
-          assert blocked['holdout_evaluation_authorized'] is False
-          assert blocked['source_switch_authorized'] is False
-          assert blocked['staged_trade_kline_w1_materialization_authorized'] is False
-          assert blocked['backtest_admission_authorized'] is False
-          assert blocked['automatic_trade_plan_authorized'] is False
-          assert blocked['live_trading_authorized'] is False
-
-          assert v0_1['status'] == 'FAIL'
-          assert v0_1['aggregate']['gate_status'] == 'FAIL'
-          assert v0_1['aggregate']['source_switch_authorized'] is False
+          assert not any(line == '  schedule:' for line in old_workflow)
+          assert not any('self-hosted' in line and 'runs-on:' in line for line in old_workflow)
+          assert any(line == '  schedule:' for line in successor_workflow)
+          assert protocol['metadata_capture_window']['hourly_slot_count'] == 194
+          assert old_authority['stage'] == 'PROVIDER_EQUIVALENCE_V0_2_REPLACEMENT_METADATA_CAPTURE_AUTHORIZED'
+          assert old_authority['new_frozen_candidate_holdout']['state'] == 'FROZEN_UNOPENED'
+          assert cutover['atomic_repository_cutover']['old_schedule_removed_in_same_change'] is True
+          assert cutover['atomic_repository_cutover']['successor_schedule_enabled_in_same_change'] is True
+          assert cutover['atomic_repository_cutover']['concurrent_old_and_new_capture_paths_authorized'] is False
+          assert authority['post_merge_authorization']['old_v0_2_scheduled_execution_authorized'] is False
+          assert authority['effectivity']['requires_human_review_before_merge'] is True
           PY
 
-  window-gate:
-    if: github.event_name == 'schedule'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      inside_window: ${{ steps.gate.outputs.inside_window }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: gate
-        name: Gate self-hosted dispatch to exact frozen window
-        shell: bash
+      - name: Record harmless retired-path state
         run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json
-          import os
-          from datetime import datetime, timezone
-          from pathlib import Path
-
-          protocol = json.loads(
-              Path('config/provider_equivalence_v0_2_metadata_capture_v0_2.json').read_text()
-          )
-          window = protocol['metadata_capture_window']
-          start = datetime.fromisoformat(window['start_utc'].replace('Z', '+00:00'))
-          end = datetime.fromisoformat(window['end_utc'].replace('Z', '+00:00'))
-          now = datetime.now(timezone.utc)
-          inside = start <= now <= end
-          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as handle:
-              handle.write(f"inside_window={'true' if inside else 'false'}\n")
-          print(json.dumps({
-              'inside_window': inside,
-              'holdout_candles_accessed': False,
-              'r2_client_constructed': False,
-              'r2_writes_performed': False,
-          }, sort_keys=True))
-          PY
-
-  capture:
-    needs: window-gate
-    if: github.event_name == 'schedule' && needs.window-gate.outputs.inside_window == 'true'
-    runs-on: [self-hosted, macOS, ARM64]
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - id: freshness
-        name: Reject stale queued runs before provider or R2 access
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts
-          python3 - <<'PY'
-          import json
-          import os
-          from datetime import datetime, timedelta, timezone
-          from pathlib import Path
-          from urllib.request import Request, urlopen
-
-          output = Path('artifacts/provider-metadata-capture.json')
-          eligible = False
-          reason = 'UNKNOWN'
-          created_at_text = None
-          try:
-              url = (
-                  f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}"
-                  f"/actions/runs/{os.environ['GITHUB_RUN_ID']}"
-              )
-              request = Request(
-                  url,
-                  headers={
-                      'Accept': 'application/vnd.github+json',
-                      'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
-                      'X-GitHub-Api-Version': '2022-11-28',
-                      'User-Agent': 'qookey-metadata-schedule-freshness-guard/0.1',
-                  },
-              )
-              with urlopen(request, timeout=20) as response:
-                  run = json.loads(response.read().decode('utf-8'))
-              created_at_text = str(run['created_at'])
-              created_at = datetime.fromisoformat(created_at_text.replace('Z', '+00:00'))
-              now = datetime.now(timezone.utc)
-              age = now - created_at
-              protocol = json.loads(
-                  Path('config/provider_equivalence_v0_2_metadata_capture_v0_2.json').read_text()
-              )
-              window = protocol['metadata_capture_window']
-              start = datetime.fromisoformat(window['start_utc'].replace('Z', '+00:00'))
-              end = datetime.fromisoformat(window['end_utc'].replace('Z', '+00:00'))
-              if not (start <= created_at <= end):
-                  reason = 'RUN_CREATED_OUTSIDE_FROZEN_WINDOW'
-              elif age < timedelta(0) or age > timedelta(minutes=30):
-                  reason = 'STALE_QUEUED_RUN_OVER_30_MINUTES'
-              elif not (start <= now <= end):
-                  reason = 'EXECUTION_TIME_OUTSIDE_FROZEN_WINDOW'
-              else:
-                  eligible = True
-                  reason = 'FRESH_SCHEDULED_RUN'
-          except Exception as exc:
-              reason = f"FRESHNESS_GUARD_ERROR_{type(exc).__name__}"
-
-          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as handle:
-              handle.write(f"eligible={'true' if eligible else 'false'}\n")
-
-          if not eligible:
-              payload = {
-                  'status': 'SKIP',
-                  'stage': 'SCHEDULE_FRESHNESS_GUARD_SKIP',
-                  'reason': reason,
-                  'workflow_run_created_at_utc': created_at_text,
-                  'provider_requests_performed': 0,
-                  'increment_values_emitted': False,
-                  'r2_client_constructed': False,
-                  'r2_writes_performed': False,
-                  'r2_deletes_performed': False,
-                  'holdout_candles_accessed': False,
-                  'source_switch_authorized': False,
-                  'live_trading_authorized': False,
-              }
-              output.write_text(json.dumps(payload, sort_keys=True, indent=2) + '\n')
-              print(json.dumps(payload, sort_keys=True))
-          else:
-              print(json.dumps({'eligible': True, 'reason': reason}, sort_keys=True))
-          PY
-      - name: Install package
-        if: steps.freshness.outputs.eligible == 'true'
-        run: python3 -m pip install -e .
-      - name: Capture frozen provider metadata only
-        if: steps.freshness.outputs.eligible == 'true'
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: |
-          python3 scripts/capture_provider_equivalence_v0_2_metadata.py \
-            --mode capture \
-            --output artifacts/provider-metadata-capture.json
-      - name: Assert capture never touches holdout candles or trading
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          payload = json.loads(Path('artifacts/provider-metadata-capture.json').read_text())
-          assert payload['holdout_candles_accessed'] is False
-          if payload['status'] == 'PASS':
-              assert payload['stage'] == 'PROVIDER_EQUIVALENCE_V0_2_METADATA_CAPTURE_PASS'
-              assert payload['object_count'] == 3
-              assert payload['postwrite_sha256_verification'] is True
-              assert payload['r2_writes_performed'] is True
-              assert payload['r2_deletes_performed'] is False
-              assert payload['source_switch_authorized'] is False
-              assert payload['live_trading_authorized'] is False
-          else:
-              assert payload['status'] == 'SKIP'
-              assert payload['stage'] in {
-                  'OUTSIDE_FROZEN_METADATA_CAPTURE_WINDOW',
-                  'SCHEDULE_FRESHNESS_GUARD_SKIP',
-              }
-              assert payload['provider_requests_performed'] == 0
-              assert payload['r2_client_constructed'] is False
-              assert payload['r2_writes_performed'] is False
-          PY
-      - uses: actions/upload-artifact@v4
-        with:
-          name: provider-metadata-capture-${{ github.run_id }}
-          path: artifacts/provider-metadata-capture.json
-          retention-days: 30
-          if-no-files-found: error
+          echo 'V0.2 scheduled metadata capture path is retained as historical authority only.'
+          echo 'provider_requests_performed=0'
+          echo 'r2_writes_performed=false'
+          echo 'holdout_candles_accessed=false'
+          echo 'source_switch_authorized=false'
+          echo 'live_trading_authorized=false'
