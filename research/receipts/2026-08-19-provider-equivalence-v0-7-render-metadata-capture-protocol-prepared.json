@@ -34,7 +34,10 @@
     "render_region": "frankfurt",
     "render_plan": "free",
     "render_metadata_relay_path": "/metadata/binance-exchange-info",
-    "render_relay_default_state": "DISABLED_FAIL_CLOSED",
+    "render_relay_scaffold_implemented": true,
+    "render_relay_code_execution_gate": "METADATA_RELAY_EXECUTION_AUTHORIZED=false",
+    "environment_flags_can_enable_relay_without_code_change": false,
+    "render_relay_default_state": "DISABLED_FAIL_CLOSED_NO_PROVIDER_REQUEST",
     "r2_credentials_location": "github_actions_secrets_only",
     "render_receives_r2_credentials": false,
     "scheduled_capture_enabled": false,
@@ -80,5 +83,5 @@
     "separate_versioned_execution_cutover_authority_required": true,
     "separate_cutover_must_resolve_old_schedule_path_before_v0_7_capture": true
   },
-  "next_required_stage": "IMPLEMENT_DISABLED_RENDER_METADATA_RELAY_AND_VALIDATE_WITHOUT_PROVIDER_CAPTURE"
+  "next_required_stage": "VALIDATE_DISABLED_RENDER_METADATA_RELAY_THEN_FREEZE_SEPARATE_EXECUTION_CUTOVER_AUTHORITY"
 }
