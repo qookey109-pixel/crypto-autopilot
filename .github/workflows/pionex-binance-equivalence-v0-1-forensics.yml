@@ -1,0 +1,100 @@
+name: Pionex Binance Equivalence V0.1 Forensics
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/pionex-binance-equivalence-v0-1-forensics.yml"
+      - "scripts/forensic_pionex_binance_equivalence_v0_1.py"
+      - "src/crypto_autopilot/equivalence_forensics.py"
+      - "tests/test_equivalence_forensics.py"
+      - "config/provider_equivalence_v0_1.json"
+      - "research/receipts/2026-08-19-pionex-binance-equivalence-v0-1.json"
+      - "research/receipts/2026-08-17-m1a-pionex.json"
+      - "research/receipts/2026-08-18-m1b-r2.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pionex-binance-equivalence-v0-1-forensics-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  forensic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Verify existing R2 read credentials are present
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_ACCOUNT_ID}"
+          test -n "${R2_BUCKET_NAME}"
+          test -n "${R2_ACCESS_KEY_ID}"
+          test -n "${R2_SECRET_ACCESS_KEY}"
+
+      - name: Unit test forensic primitives
+        run: python -m pytest -q tests/test_equivalence_forensics.py
+
+      - name: Run descriptive-only frozen V0.1 forensic replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/forensic_pionex_binance_equivalence_v0_1.py \
+            --output artifacts/pionex-binance-equivalence-v0-1-forensics.json
+
+      - name: Validate forensic safety boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(
+              Path('artifacts/pionex-binance-equivalence-v0-1-forensics.json').read_text(encoding='utf-8')
+          )
+          assert payload['execution_status'] == 'PASS'
+          assert payload['analysis_status'] == 'DESCRIPTIVE_ONLY'
+          assert payload['frozen_v0_1_gate_status'] == 'FAIL'
+          assert payload['frozen_v0_1_outcome_changed'] is False
+          replay = payload['v0_1_reproduction']
+          assert (replay['pair_count'], replay['pass_count'], replay['review_count'], replay['fail_count']) == (45, 18, 18, 9)
+          assert replay['gate_status'] == 'FAIL'
+          source = payload['source_replay']
+          assert source['binance_vision_daily_archive_count'] == 360
+          assert source['r2_writes_performed'] is False
+          assert source['r2_deletes_performed'] is False
+          boundary = payload['decision_boundary']
+          assert boundary['descriptive_bins_are_gate_thresholds'] is False
+          assert boundary['new_deadband_applied'] is False
+          assert boundary['new_threshold_proposed'] is False
+          assert boundary['v0_1_thresholds_changed'] is False
+          assert boundary['v0_1_scope_changed'] is False
+          assert boundary['source_switch_authorized'] is False
+          assert boundary['staged_trade_kline_w1_materialization_authorized'] is False
+          assert boundary['live_trading_authorized'] is False
+          PY
+
+      - name: Upload forensic evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: pionex-binance-equivalence-v0-1-forensics-${{ github.run_id }}
+          path: artifacts/pionex-binance-equivalence-v0-1-forensics.json
+          retention-days: 90
+          if-no-files-found: error
