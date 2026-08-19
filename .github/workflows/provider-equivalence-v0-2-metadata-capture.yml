@@ -42,7 +42,7 @@ jobs:
           assert not any('self-hosted' in line and 'runs-on:' in line for line in old_workflow)
           assert any(line == '  schedule:' for line in successor_workflow)
           assert protocol['metadata_capture_window']['hourly_slot_count'] == 194
-          assert old_authority['stage'] == 'PROVIDER_EQUIVALENCE_V0_2_REPLACEMENT_METADATA_CAPTURE_AUTHORIZED'
+          assert old_authority['stage'] == 'PROVIDER_EQUIVALENCE_V0_2_FORWARD_METADATA_CAPTURE_AUTHORIZED_HOLDOUT_CANDLES_FORBIDDEN'
           assert old_authority['new_frozen_candidate_holdout']['state'] == 'FROZEN_UNOPENED'
           assert cutover['atomic_repository_cutover']['old_schedule_removed_in_same_change'] is True
           assert cutover['atomic_repository_cutover']['successor_schedule_enabled_in_same_change'] is True
