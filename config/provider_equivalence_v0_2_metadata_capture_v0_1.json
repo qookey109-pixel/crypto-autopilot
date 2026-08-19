@@ -1,0 +1,127 @@
+{
+  "version": "0.1.0",
+  "status": "PROTOCOL_FROZEN_BEFORE_METADATA_EVIDENCE",
+  "purpose": "Capture provider price-increment metadata contemporaneously around an unopened future V0.2 holdout so historical applicability never depends on backfilled assumptions.",
+  "superseded_candidate_holdout": {
+    "start_utc": "2026-08-03T08:00:00Z",
+    "end_utc": "2026-08-10T07:59:59.999Z",
+    "state": "SUPERSEDED_UNOPENED_BEFORE_ANY_EVIDENCE",
+    "candles_accessed": false,
+    "candles_evaluated": false,
+    "result_known": false,
+    "reason": "No authoritative per-symbol price-increment values were preserved for that historical period. Do not backfill today's metadata as historical truth."
+  },
+  "candidate_holdout": {
+    "state": "FROZEN_UNOPENED",
+    "start_utc": "2026-08-21T00:00:00Z",
+    "end_utc": "2026-08-27T23:59:59.999Z",
+    "duration_hours": 168,
+    "intervals": ["15M", "60M", "4H"],
+    "candidate_symbol_count": 15,
+    "mapped_pair_count": 45,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "holdout_result_known": false
+  },
+  "metadata_capture_window": {
+    "start_utc": "2026-08-20T00:00:00Z",
+    "end_utc": "2026-08-28T01:59:59.999Z",
+    "hourly_slot_count": 194,
+    "scheduled_minutes_utc": [17, 47],
+    "nominal_capture_attempts": 388,
+    "required_coverage": "AT_LEAST_ONE_COMPLETE_VALID_CAPTURE_PER_UTC_HOURLY_SLOT",
+    "duplicate_capture_policy": "ALLOWED_ONLY_IF_NORMALIZED_15_SYMBOL_VECTORS_AGREE_WITHIN_SLOT",
+    "stability_policy": "ALL_COMPLETE_CAPTURE_VECTORS_ACROSS_THE_FULL_CAPTURE_WINDOW_MUST_MATCH_EXACTLY_PER_PROVIDER",
+    "missing_hour_policy": "METADATA_APPLICABILITY_INVALID_NO_HOLDOUT_EVALUATION",
+    "changed_vector_policy": "METADATA_APPLICABILITY_INVALID_NO_HOLDOUT_EVALUATION"
+  },
+  "providers": {
+    "pionex": {
+      "public_endpoint": "https://api.pionex.com/api/v1/common/symbols",
+      "request_parameters": "NONE_OFFICIAL_OPENAPI_DESCRIBES_ALL_FUTURES_TRADING_PAIR_INFORMATION",
+      "increment_field": "data.symbols[].quoteStep",
+      "semantic_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-price-increment-semantics.json",
+      "raw_uncompressed_response_max_bytes": 2097152
+    },
+    "binance_usdm": {
+      "public_endpoint": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+      "request_parameters": "NONE_IN_OFFICIAL_USDM_EXCHANGE_INFORMATION_CONTRACT",
+      "increment_field": "symbols[].filters[filterType=PRICE_FILTER].tickSize",
+      "semantic_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-price-increment-semantics.json",
+      "official_request_weight": 1,
+      "raw_uncompressed_response_max_bytes": 8388608
+    }
+  },
+  "normalization": {
+    "symbol_scope_authority": "research/receipts/2026-08-17-m1a-pionex.json",
+    "exact_15_pionex_symbols_required": true,
+    "exact_15_binance_mappings_required": true,
+    "price_increment_decimal_preserved_as_source_string": true,
+    "positive_increment_required": true,
+    "duplicate_symbol_rows_forbidden": true,
+    "missing_symbol_forbidden": true,
+    "provider_status_preserved": true,
+    "provider_contract_type_preserved": true,
+    "increment_inference_from_candles_forbidden": true,
+    "value_interpolation_forbidden": true,
+    "provider_splicing_forbidden": true
+  },
+  "storage": {
+    "backend": "cloudflare_r2",
+    "namespace": "metadata/provider-equivalence/v0_2/forward-holdout-20260821/",
+    "run_scoped_immutable_keys": true,
+    "objects_per_complete_capture": 3,
+    "objects": ["pionex-symbols.json.gz", "binance-usdm-exchange-info.json.gz", "receipt.json"],
+    "raw_response_bytes_retained_via_deterministic_gzip": true,
+    "raw_sha256_recorded": true,
+    "compressed_sha256_recorded": true,
+    "receipt_written_last": true,
+    "postwrite_readback_sha256_required": true,
+    "overwrite_authorized": false,
+    "delete_authorized": false,
+    "maximum_complete_capture_attempts_for_budget_projection": 388,
+    "projected_max_new_object_count": 1164,
+    "projected_max_uncompressed_provider_bytes": 4068474880,
+    "projected_metadata_storage_cap_bytes": 4294967296,
+    "current_bucket_usage_reference_bytes": 22120404,
+    "existing_project_storage_block_guardrail_bytes": 10000000000,
+    "budget_state": "PASS_BELOW_EXISTING_STORAGE_BLOCK_GUARDRAIL"
+  },
+  "capture_execution": {
+    "public_metadata_only": true,
+    "private_provider_api_key_forbidden": true,
+    "r2_credentials_from_github_secrets_only": true,
+    "github_actions_scheduled_capture_authorized": true,
+    "connectivity_preflight_authorized_after_merge": true,
+    "connectivity_preflight_must_not_write_r2": true,
+    "connectivity_preflight_must_not_emit_increment_values": true,
+    "holdout_candles_forbidden": true
+  },
+  "future_applicability_gate": {
+    "state": "NOT_YET_RUN",
+    "requires_all_194_hourly_slots": true,
+    "requires_exact_vector_stability": true,
+    "requires_all_raw_sha_receipts": true,
+    "requires_no_missing_symbols": true,
+    "requires_no_nonpositive_increments": true,
+    "pass_authorizes_holdout_candle_access": false,
+    "separate_holdout_access_authority_required_after_pass": true
+  },
+  "authorization_boundary": {
+    "metadata_capture_protocol_frozen": true,
+    "metadata_capture_authorized": true,
+    "metadata_only_r2_writes_authorized": true,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_required_stage": "IMPLEMENT_AND_PREFLIGHT_METADATA_ONLY_CAPTURE_BEFORE_2026_08_20T00_00_00Z"
+}
