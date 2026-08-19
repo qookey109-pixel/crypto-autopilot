@@ -3,7 +3,11 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import threading
+from http.server import ThreadingHTTPServer
 from pathlib import Path
+from urllib.error import HTTPError
+from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 V02 = ROOT / "config/provider_equivalence_v0_2_metadata_capture_v0_2.json"
@@ -61,6 +65,46 @@ def test_v07_render_relay_is_hard_disabled_even_if_environment_requests_enableme
     assert runtime["code_execution_gate_frozen_false"] is True
     assert runtime["environment_flags_cannot_override_frozen_false_code_gate"] is True
     assert runtime["relay_activation_requires_separate_code_change_and_versioned_authority"] is True
+
+
+def test_disabled_relay_http_path_returns_503_without_provider_request() -> None:
+    module = _server_module()
+    provider_called = False
+
+    def forbidden_fetch():
+        nonlocal provider_called
+        provider_called = True
+        raise AssertionError("disabled V0.7 relay attempted a Binance provider request")
+
+    module.fetch_exchange_info_raw = forbidden_fetch
+    prior = os.environ.get("METADATA_RELAY_ENABLED")
+    os.environ["METADATA_RELAY_ENABLED"] = "true"
+    server = ThreadingHTTPServer(("127.0.0.1", 0), module.Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        port = server.server_address[1]
+        try:
+            urlopen(f"http://127.0.0.1:{port}{module.METADATA_RELAY_PATH}", timeout=5)
+            raise AssertionError("disabled V0.7 relay unexpectedly returned success")
+        except HTTPError as exc:
+            assert exc.code == 503
+            payload = json.loads(exc.read().decode("utf-8"))
+        assert payload["status"] == "DISABLED"
+        assert payload["stage"] == "V0_7_METADATA_RELAY_EXECUTION_NOT_AUTHORIZED"
+        assert payload["provider_requests_performed"] == 0
+        assert payload["r2_client_constructed"] is False
+        assert payload["r2_writes_performed"] is False
+        assert payload["holdout_candles_accessed"] is False
+        assert provider_called is False
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+        if prior is None:
+            os.environ.pop("METADATA_RELAY_ENABLED", None)
+        else:
+            os.environ["METADATA_RELAY_ENABLED"] = prior
 
 
 def test_v07_uses_render_only_for_binance_transport_and_keeps_r2_credentials_on_github() -> None:
