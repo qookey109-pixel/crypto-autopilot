@@ -1,0 +1,107 @@
+name: Dashboard GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - "scripts/build_dashboard_authority_snapshot.py"
+      - "scripts/apply_dashboard_latest_authority.py"
+      - "research/receipts/**"
+      - "PROJECT_STATUS.md"
+      - ".github/workflows/dashboard-github-pages.yml"
+  pull_request:
+    paths:
+      - "web/**"
+      - "scripts/build_dashboard_authority_snapshot.py"
+      - "scripts/apply_dashboard_latest_authority.py"
+      - "research/receipts/**"
+      - "PROJECT_STATUS.md"
+      - ".github/workflows/dashboard-github-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate Traditional Chinese dashboard safety
+        run: python scripts/validate_dashboard_static.py
+
+      - name: Build latest frozen authority dashboard
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site/data
+          cp -R web/. _site/
+          python scripts/build_dashboard_authority_snapshot.py \
+            --output _site/data/dashboard.json
+          python scripts/apply_dashboard_latest_authority.py \
+            --input _site/data/dashboard.json \
+            --output _site/data/dashboard.json
+          touch _site/.nojekyll
+
+      - name: Assert Funding PASS, R2 usage and PAPER-ONLY boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('_site/data/dashboard.json').read_text(encoding='utf-8'))
+          project = data['project']
+          assert data['locale'] == 'zh-Hant-TW'
+          assert project['fundingMaterializationComplete'] is True
+          assert project['fundingMaterializationState'] == 'PASS'
+          assert project['fundingV0_2R2Identities'] == 192
+          assert project['fundingV0_2UploadedObjectCount'] == 192
+          assert project['r2BucketObjectCount'] == 457
+          assert project['r2BucketBytes'] == 22120404
+          assert project['mode'] == 'PAPER-ONLY'
+          assert project['tradePlanAuthorized'] is False
+          assert project['liveTradingAuthorized'] is False
+          PY
+
+      - name: Upload PR build evidence
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-pages-build-${{ github.run_id }}
+          path: _site
+          retention-days: 3
+          if-no-files-found: error
+
+      - name: Upload GitHub Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
