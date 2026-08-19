@@ -1,0 +1,49 @@
+{
+  "schema": "provider-equivalence-v0-9-render-relay-smoke-authority-v0.1",
+  "status": "PASS",
+  "stage": "PROVIDER_EQUIVALENCE_V0_9_RENDER_RELAY_LIVE_SMOKE_AUTHORIZED_CAPTURE_NOT_AUTHORIZED",
+  "date": "2026-08-20",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "SANITIZED_TRANSPORT_SMOKE_EXECUTION_ONLY",
+  "protocol": "config/provider_equivalence_v0_9_render_relay_smoke_v0_1.json",
+  "main_baseline": "02af7e143bddcc568f1db389d81c65fa2d5ab0e0",
+  "authorized_action": {
+    "render_relay_live_smoke": true,
+    "smoke_path": "/metadata/relay-smoke",
+    "expected_provider_requests": 1,
+    "raw_exchange_info_emitted": false,
+    "raw_exchange_info_persisted": false,
+    "r2_client_construction": false,
+    "r2_writes": false,
+    "holdout_access": false
+  },
+  "pre_execution_state": {
+    "smoke_result_known": false,
+    "provider_requests_performed_by_this_receipt": 0,
+    "r2_writes_performed_by_this_receipt": false,
+    "holdout_candles_accessed": false,
+    "raw_relay_execution_authorized": false,
+    "successor_capture_execution_authorized": false,
+    "successor_schedule_enabled": false,
+    "old_v0_2_schedule_still_current": true
+  },
+  "authorization_boundary": {
+    "raw_render_metadata_relay_enablement_authorized": false,
+    "successor_metadata_capture_execution_authorized": false,
+    "successor_schedule_activation_authorized": false,
+    "old_v0_2_schedule_disable_authorized": false,
+    "metadata_r2_writes_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_required_stage": "EXECUTE_ONE_SANITIZED_V0_9_RENDER_RELAY_LIVE_SMOKE_AND_FREEZE_PASS_OR_FAIL_RECEIPT"
+}
