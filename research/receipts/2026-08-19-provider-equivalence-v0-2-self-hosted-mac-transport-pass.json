@@ -1,0 +1,68 @@
+{
+  "schema": "provider-equivalence-v0-2-self-hosted-mac-transport-pass-authority-v0.1",
+  "status": "PASS",
+  "stage": "PROVIDER_EQUIVALENCE_V0_2_SELF_HOSTED_MAC_BINANCE_TRANSPORT_PASS",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "SANITIZED_EXECUTION_TRANSPORT_PASS",
+  "supersedes": "NO_PRIOR_RECEIPT_OVERWRITTEN",
+  "preserved_blocker_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-transport-blocked.json",
+  "provider_contract_unchanged": {
+    "provider": "binance_usdm",
+    "official_endpoint": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "provider_changed": false,
+    "endpoint_semantics_changed": false,
+    "field_changed": false,
+    "v0_1_thresholds_changed": false,
+    "v0_1_scope_changed": false,
+    "third_party_proxy_used": false
+  },
+  "execution_evidence": {
+    "workflow_file": ".github/workflows/diagnose-v0-2-self-hosted-mac-binance-transport.yml",
+    "workflow_name": "Diagnose V0.2 Self-Hosted Mac Binance Transport",
+    "workflow_run_display": "Diagnose V0.2 Self-Hosted Mac Binance Transport #1",
+    "artifact_file": "self-hosted-mac-binance-transport.json",
+    "transport": "github_self_hosted_mac",
+    "runner_os": "Darwin",
+    "runner_machine": "arm64",
+    "required_runner_labels": ["self-hosted", "macOS", "ARM64"],
+    "http_status": 200,
+    "json_ok": true,
+    "symbols_array": true,
+    "symbol_count": 872,
+    "result": "PASS"
+  },
+  "sanitization_and_safety": {
+    "increment_values_emitted": false,
+    "r2_client_constructed": false,
+    "r2_writes_performed": false,
+    "holdout_candles_accessed": false,
+    "source_switch_authorized": false,
+    "live_trading_authorized": false
+  },
+  "authority_interpretation": {
+    "hosted_github_runner_blocker_history_preserved": true,
+    "cloudflare_worker_blocker_history_preserved": true,
+    "transport_pass_does_not_equal_metadata_stability_pass": true,
+    "transport_pass_does_not_equal_provider_equivalence_pass": true,
+    "v0_1_gate_remains_fail": true,
+    "old_2026_08_21_to_2026_08_27_holdout_reactivation_authorized": false
+  },
+  "authorization_boundary": {
+    "new_future_metadata_window_may_be_frozen": true,
+    "metadata_capture_execution_authorized_by_this_receipt_alone": false,
+    "metadata_only_r2_writes_authorized_by_this_receipt_alone": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_required_stage": "FREEZE_REPLACEMENT_FUTURE_METADATA_CAPTURE_WINDOW_AND_INDEPENDENT_HOLDOUT"
+}
