@@ -1,6 +1,6 @@
-# Qookey Crypto Autopilot Dashboard — D1 Static Shell
+# Qookey Crypto Autopilot Dashboard
 
-This directory contains the first read-only dashboard shell defined by `docs/DASHBOARD_V0_1.md`.
+This directory contains the read-only Traditional Chinese dashboard shell defined by `docs/DASHBOARD_V0_1.md`.
 
 ## Local preview
 
@@ -18,19 +18,43 @@ http://127.0.0.1:4173/
 
 A local HTTP server is required because the dashboard loads `web/data/dashboard.json` with `fetch()`.
 
-## D1 data boundary
+## Authority boundary
 
-`web/data/dashboard.json` is an explicit **safe fixture**. It is not Repository authority and must never be interpreted as one.
+`web/data/dashboard.json` is a checked-in **safe fixture** for local/static testing. It explicitly declares `authority=false`; it is not a Repository authority and must never be interpreted as one.
 
-D2 will replace the fixture with a server-side normalized authority snapshot API. The browser must never receive:
+The deployed GitHub Pages site is different: CI copies the static shell, rebuilds a normalized snapshot from frozen Repository authorities, then applies the latest authority overlay before deployment:
 
-- Pionex API secrets;
+```text
+frozen receipts/configs + PROJECT_STATUS.md
+                 |
+                 v
+scripts/build_dashboard_authority_snapshot.py
+                 |
+                 v
+scripts/apply_dashboard_latest_authority.py
+                 |
+                 v
+_site/data/dashboard.json
+```
+
+The generated deployed snapshot also declares `authority=false`. It is a **read-only normalized view** of Repository authority, not a new authority source. If the dashboard conflicts with `PROJECT_STATUS.md` or a frozen receipt/config, the Repository authority wins.
+
+Current generated status includes Funding V0.2 materialization PASS, R2 usage, Equivalence V0.1 definitive FAIL, Render V0.5/V0.6 transport state, V0.7 prepared metadata protocol, V0.8 prepared atomic cutover state, unopened holdout and PAPER-ONLY safety boundaries.
+
+## Secret and execution boundary
+
+The browser and generated fixture must never receive:
+
+- Pionex or Binance API secrets;
+- Render relay token values;
 - R2 S3 credentials;
 - Cloudflare account credentials;
 - unrestricted private R2 access;
 - live-order credentials or endpoints.
 
-## D1 views
+The dashboard has no authority to enable a relay, schedule, R2 write, source switch, trade plan or live execution.
+
+## Views
 
 - Overview
 - Data Health
@@ -43,10 +67,8 @@ D2 will replace the fixture with a server-side normalized authority snapshot API
 
 ## Deployment shape
 
-The `web/` directory is intentionally static and can be served by a static hosting layer such as Cloudflare Pages.
-
-No build step is required for D1.
+The `web/` directory is intentionally static. GitHub Actions builds the normalized authority view and deploys it to GitHub Pages. No client-side private API or secret-bearing backend is required.
 
 ## Safety
 
-D1 contains no real-money order action, no private exchange endpoint and no live-trading control. `PAPER-ONLY` is visible in the interface and provider provenance remains explicit.
+The dashboard contains no real-money order action, no private exchange execution endpoint and no live-trading control. `PAPER-ONLY` is visible in the interface and provider provenance remains explicit.
