@@ -20,22 +20,15 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts
-          TOKEN="$(python - <<'PY'
-          import secrets
-          print(secrets.token_urlsafe(32))
-          PY
-          )"
-          printf '%s' "$TOKEN" > artifacts/proxy-token.txt
-          cat > artifacts/worker.mjs <<EOF
-          const TOKEN = ${TOKEN@Q};
+          cat > artifacts/worker.mjs <<'EOF'
           export default {
             async fetch(request) {
               const url = new URL(request.url);
-              if (url.pathname !== "/check" || url.searchParams.get("token") !== TOKEN) {
+              if (url.pathname !== "/check") {
                 return new Response("not found", { status: 404 });
               }
               const upstream = await fetch("https://fapi.binance.com/fapi/v1/exchangeInfo", {
-                headers: { "User-Agent": "qookey-provider-equivalence-transport-check/0.1" }
+                headers: { "User-Agent": "qookey-provider-equivalence-transport-check/0.2" }
               });
               let jsonOk = false;
               let symbolsArray = false;
@@ -81,10 +74,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          TOKEN="$(cat artifacts/proxy-token.txt)"
           PROXY_URL="$(cat artifacts/proxy-url.txt)"
           curl --fail --silent --show-error \
-            "${PROXY_URL}/check?token=${TOKEN}" \
+            "${PROXY_URL}/check" \
             > artifacts/result.json
           python - <<'PY'
           import json
@@ -108,11 +100,11 @@ jobs:
           }, sort_keys=True))
           PY
 
-      - name: Remove ephemeral token and unsanitized deployment log
+      - name: Remove unsanitized deployment files
         if: always()
         shell: bash
         run: |
-          rm -f artifacts/proxy-token.txt artifacts/proxy-url.txt artifacts/deploy.log artifacts/worker.mjs artifacts/wrangler.jsonc
+          rm -f artifacts/proxy-url.txt artifacts/deploy.log artifacts/worker.mjs artifacts/wrangler.jsonc
 
       - name: Upload sanitized diagnostic result
         if: always()
