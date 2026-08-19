@@ -1,0 +1,65 @@
+{
+  "schema_version": "provider_equivalence_v0_6_render_transport_authority_transition_v0_1",
+  "status": "TRANSPORT_AUTHORITY_TRANSITION_FROZEN",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "purpose": "Version a Mac-independent zero-cost Binance USD-M public-metadata transport authority transition after the V0.5 Render Frankfurt transport PASS without mutating V0.2 Self-Hosted Mac authority or authorizing metadata capture execution.",
+  "free_policy_authority": "config/cloud_free_tier_policy_v0_1.json",
+  "prerequisites": {
+    "v0_2_self_hosted_mac_transport_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-self-hosted-mac-transport-pass.json",
+    "v0_2_forward_metadata_capture_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority-v0-2.json",
+    "v0_5_render_preflight_protocol": "config/provider_equivalence_v0_5_render_free_transport_preflight_v0_1.json",
+    "v0_5_render_transport_pass_authority": "research/receipts/2026-08-19-provider-equivalence-v0-5-render-free-transport-pass.json",
+    "v0_5_status_required": "PASS"
+  },
+  "transition": {
+    "prior_transport_authority": "github_self_hosted_mac",
+    "new_transport_authority_for_successor_public_metadata_protocol": "render_free_web_service",
+    "provider": "binance_usdm",
+    "official_endpoint": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "runtime_platform": "render",
+    "runtime_region": "frankfurt",
+    "runtime_plan": "free",
+    "monthly_runtime_budget_usd": 0,
+    "v0_2_historical_authority_preserved": true,
+    "v0_2_receipt_mutated": false,
+    "v0_2_metadata_capture_protocol_mutated": false,
+    "automatic_fallback_to_prior_transport_authorized": false,
+    "successor_metadata_capture_protocol_required_before_execution": true
+  },
+  "binance_api_key_boundary": {
+    "public_exchange_info_requires_api_key": false,
+    "api_key_used_in_v0_5_preflight": false,
+    "project_wide_binance_api_key_prohibition_declared": false,
+    "api_key_bypass_for_transport_failure_authorized": false,
+    "future_authenticated_binance_api_may_be_versioned_separately": true
+  },
+  "execution_boundary": {
+    "render_metadata_capture_execution_authorized": false,
+    "render_r2_writes_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "failure_policy": {
+    "render_unavailable": "FAIL_CLOSED",
+    "render_free_allowance_exhausted": "FAIL_CLOSED",
+    "binance_403_or_451": "FAIL_CLOSED",
+    "invalid_json": "FAIL_CLOSED",
+    "empty_symbols": "FAIL_CLOSED",
+    "use_proxy_bypass": false,
+    "switch_endpoint": false,
+    "use_binance_api_key_as_transport_bypass": false,
+    "upgrade_to_paid_render_instance": false,
+    "add_payment_method_to_continue": false
+  },
+  "next_required_stage": "FREEZE_SUCCESSOR_RENDER_METADATA_CAPTURE_PROTOCOL_AND_RUNTIME_BOUNDARY_BEFORE_ANY_RENDER_METADATA_CAPTURE_EXECUTION"
+}
