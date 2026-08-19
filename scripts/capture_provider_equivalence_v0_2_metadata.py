@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from crypto_autopilot.provider_metadata_capture_suspension_v0_2 import suspended_execution_result
+from crypto_autopilot.provider_metadata_capture_v0_2 import capture_to_r2, connectivity_preflight
 
 
 def main() -> int:
@@ -17,10 +17,10 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
-    # Latest authority supersedes the previously authorized GitHub-hosted
-    # execution path. Do not contact providers or construct an R2 client until
-    # a separately versioned transport connectivity PASS authority exists.
-    result = suspended_execution_result(requested_mode=args.mode)
+    if args.mode == "connectivity-preflight":
+        result = connectivity_preflight()
+    else:
+        result = capture_to_r2()
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
