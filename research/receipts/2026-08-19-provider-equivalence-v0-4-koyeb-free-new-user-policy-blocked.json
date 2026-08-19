@@ -1,0 +1,26 @@
+{
+  "schema_version": "provider_equivalence_v0_4_koyeb_free_new_user_policy_blocked_v0_1",
+  "status": "BLOCKED_BY_NEW_USER_PAID_POLICY",
+  "observed_date_utc": "2026-08-19",
+  "candidate": "koyeb_free_web_service",
+  "execution_started": false,
+  "binance_probe_started": false,
+  "reason": "Current Koyeb new-user onboarding no longer provides a zero-cost service creation path compatible with the project's monthly_budget_usd=0 policy.",
+  "project_decision": {
+    "retry_same_candidate": false,
+    "add_payment_method": false,
+    "upgrade_to_paid_plan": false,
+    "candidate_superseded": true,
+    "next_candidate": "render_free_web_service"
+  },
+  "authority_boundary": {
+    "v0_2_self_hosted_mac_transport_authority_mutated": false,
+    "metadata_capture_execution_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "source_switch_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
