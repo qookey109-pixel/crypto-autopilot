@@ -1,0 +1,122 @@
+from __future__ import annotations
+
+import json
+import unittest
+from datetime import datetime, timezone
+
+from crypto_autopilot.provider_metadata_capture_v0_2 import (
+    capture_slot,
+    load_and_validate_authority,
+    parse_binance_exchange_info,
+    parse_pionex_symbols,
+)
+
+
+class ProviderMetadataCaptureV02Tests(unittest.TestCase):
+    def test_frozen_authority_loads_15_symbol_mapping(self) -> None:
+        protocol, pionex, binance = load_and_validate_authority()
+        self.assertEqual(len(pionex), 15)
+        self.assertEqual(len(binance), 15)
+        self.assertEqual(protocol["metadata_capture_window"]["hourly_slot_count"], 194)
+        self.assertIs(protocol["authorization_boundary"]["holdout_candle_access_authorized"], False)
+        self.assertIs(protocol["authorization_boundary"]["live_trading_authorized"], False)
+
+    def test_parse_pionex_requires_exact_expected_symbols_and_positive_steps(self) -> None:
+        raw = json.dumps(
+            {
+                "data": {
+                    "symbols": [
+                        {
+                            "symbol": "BTC_USDT_PERP",
+                            "quoteStep": "0.1",
+                            "status": "TRADING",
+                            "contractType": "PERP",
+                        },
+                        {
+                            "symbol": "ETH_USDT_PERP",
+                            "quoteStep": "0.01",
+                            "status": "TRADING",
+                            "contractType": "PERP",
+                        },
+                    ]
+                }
+            }
+        ).encode()
+        rows = parse_pionex_symbols(raw, ("BTC_USDT_PERP", "ETH_USDT_PERP"))
+        self.assertEqual([row["symbol"] for row in rows], ["BTC_USDT_PERP", "ETH_USDT_PERP"])
+        self.assertEqual(rows[0]["price_increment"], "0.1")
+        self.assertEqual(rows[1]["price_increment"], "0.01")
+        self.assertTrue(all(row["source_field"] == "data.symbols[].quoteStep" for row in rows))
+
+    def test_parse_pionex_missing_symbol_fails_closed(self) -> None:
+        raw = json.dumps(
+            {
+                "data": {
+                    "symbols": [
+                        {
+                            "symbol": "BTC_USDT_PERP",
+                            "quoteStep": "0.1",
+                            "status": "TRADING",
+                            "contractType": "PERP",
+                        }
+                    ]
+                }
+            }
+        ).encode()
+        with self.assertRaisesRegex(RuntimeError, "missing frozen symbols"):
+            parse_pionex_symbols(raw, ("BTC_USDT_PERP", "ETH_USDT_PERP"))
+
+    def test_parse_binance_requires_price_filter(self) -> None:
+        raw = json.dumps(
+            {
+                "symbols": [
+                    {
+                        "symbol": "BTCUSDT",
+                        "status": "TRADING",
+                        "contractType": "PERPETUAL",
+                        "filters": [
+                            {"filterType": "PRICE_FILTER", "tickSize": "0.10"},
+                            {"filterType": "LOT_SIZE", "stepSize": "0.001"},
+                        ],
+                    }
+                ]
+            }
+        ).encode()
+        rows = parse_binance_exchange_info(raw, ("BTCUSDT",))
+        self.assertEqual(rows[0]["price_increment"], "0.10")
+        self.assertEqual(
+            rows[0]["source_field"],
+            "symbols[].filters[filterType=PRICE_FILTER].tickSize",
+        )
+
+    def test_nonpositive_increment_fails_closed(self) -> None:
+        raw = json.dumps(
+            {
+                "symbols": [
+                    {
+                        "symbol": "BTCUSDT",
+                        "status": "TRADING",
+                        "contractType": "PERPETUAL",
+                        "filters": [{"filterType": "PRICE_FILTER", "tickSize": "0"}],
+                    }
+                ]
+            }
+        ).encode()
+        with self.assertRaisesRegex(RuntimeError, "finite and positive"):
+            parse_binance_exchange_info(raw, ("BTCUSDT",))
+
+    def test_capture_slot_is_hourly_and_fails_closed_outside_window(self) -> None:
+        protocol, _, _ = load_and_validate_authority()
+        inside = datetime(2026, 8, 21, 3, 47, 12, tzinfo=timezone.utc)
+        self.assertEqual(
+            capture_slot(inside, protocol),
+            datetime(2026, 8, 21, 3, 0, 0, tzinfo=timezone.utc),
+        )
+        before = datetime(2026, 8, 19, 23, 59, 59, tzinfo=timezone.utc)
+        after = datetime(2026, 8, 28, 2, 0, 0, tzinfo=timezone.utc)
+        self.assertIsNone(capture_slot(before, protocol))
+        self.assertIsNone(capture_slot(after, protocol))
+
+
+if __name__ == "__main__":
+    unittest.main()
