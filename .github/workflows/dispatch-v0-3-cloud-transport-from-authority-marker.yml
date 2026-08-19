@@ -9,17 +9,21 @@ on:
 
 permissions:
   actions: write
-  contents: read
+  contents: write
   issues: write
+  pull-requests: write
 
 jobs:
   dispatch:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 40
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Validate versioned dispatch authority marker
         shell: bash
@@ -88,4 +92,144 @@ jobs:
           set -euo pipefail
           gh issue comment 105 \
             --repo "$GITHUB_REPOSITORY" \
-            --body "Automation marker dispatched V0.3 Cloudflare Container transport diagnostic run ${RUN_ID}: ${RUN_URL}\n\nThis dispatch is diagnostic-only. It grants no metadata-capture authority, holdout access, source switch, W1, backtest admission, trade plan, real-money order, or live trading. PASS/FAIL follow-up is handled automatically by the V0.3 follow-up workflow."
+            --body "Automation marker dispatched V0.3 Cloudflare Container transport diagnostic run ${RUN_ID}: ${RUN_URL}\n\nThis dispatch is diagnostic-only. It grants no metadata-capture authority, holdout access, source switch, W1, backtest admission, trade plan, real-money order, or live trading. The dispatcher will wait for completion and process PASS/FAIL inline."
+
+      - name: Wait for diagnostic completion
+        id: wait
+        shell: bash
+        env:
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 180); do
+            response="$(gh api \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2026-03-10' \
+              "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}")"
+            status="$(python -c 'import json,sys; print(json.load(sys.stdin).get("status", ""))' <<<"$response")"
+            conclusion="$(python -c 'import json,sys; print(json.load(sys.stdin).get("conclusion") or "")' <<<"$response")"
+            if [ "$status" = "completed" ]; then
+              echo "conclusion=$conclusion" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Timed out waiting for diagnostic run ${RUN_ID}" >&2
+          exit 1
+
+      - name: Record diagnostic failure fail-closed
+        if: steps.wait.outputs.conclusion != 'success'
+        shell: bash
+        env:
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+          RUN_URL: ${{ steps.dispatch.outputs.run_url }}
+          CONCLUSION: ${{ steps.wait.outputs.conclusion }}
+        run: |
+          set -euo pipefail
+          gh issue comment 105 \
+            --repo "$GITHUB_REPOSITORY" \
+            --body "V0.3 Cloudflare Container transport diagnostic run ${RUN_ID} completed with **${CONCLUSION}**: ${RUN_URL}\n\nFail-closed remains in force. No metadata-capture authority, holdout access, source switch, W1, Historical Universe membership, backtest admission, trade plan, real-money order, or live trading is granted."
+
+      - name: Download sanitized PASS artifact
+        if: steps.wait.outputs.conclusion == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: v0-3-cloudflare-container-binance-transport-*
+          path: /tmp/v0-3-cloud-transport
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.dispatch.outputs.run_id }}
+
+      - name: Validate PASS artifact and freeze receipt
+        if: steps.wait.outputs.conclusion == 'success'
+        id: receipt
+        shell: bash
+        env:
+          SOURCE_RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+          SOURCE_RUN_URL: ${{ steps.dispatch.outputs.run_url }}
+        run: |
+          set -euo pipefail
+          mapfile -t results < <(find /tmp/v0-3-cloud-transport -type f -name result.json -print)
+          if [ "${#results[@]}" -ne 1 ]; then
+            echo "Expected exactly one sanitized result.json, found ${#results[@]}" >&2
+            exit 1
+          fi
+          response="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2026-03-10' \
+            "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN_ID}")"
+          head_sha="$(python -c 'import json,sys; print(json.load(sys.stdin)["head_sha"])' <<<"$response")"
+          observed_at="$(python -c 'import json,sys; print(json.load(sys.stdin)["updated_at"])' <<<"$response")"
+          day="${observed_at%%T*}"
+          receipt="research/receipts/${day}-provider-equivalence-v0-3-cloudflare-container-transport-pass-run-${SOURCE_RUN_ID}.json"
+          python scripts/freeze_v0_3_cloud_transport_receipt.py \
+            --result "${results[0]}" \
+            --output "$receipt" \
+            --run-id "$SOURCE_RUN_ID" \
+            --run-url "$SOURCE_RUN_URL" \
+            --head-sha "$head_sha" \
+            --observed-at "$observed_at"
+          echo "path=$receipt" >> "$GITHUB_OUTPUT"
+
+      - name: Push PASS receipt branch and prepare PR
+        if: steps.wait.outputs.conclusion == 'success'
+        id: pr
+        shell: bash
+        env:
+          SOURCE_RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+          RECEIPT_PATH: ${{ steps.receipt.outputs.path }}
+        run: |
+          set -euo pipefail
+          branch="automation/v0-3-transport-receipt-${SOURCE_RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            git fetch origin "$branch:$branch"
+            git checkout "$branch"
+          else
+            git checkout -b "$branch"
+          fi
+          git add "$RECEIPT_PATH"
+          if ! git diff --cached --quiet; then
+            git commit -m "Freeze V0.3 Cloudflare Container transport PASS receipt"
+            git push origin "$branch"
+          fi
+          existing="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --head "$branch" --json url --jq '.[0].url // empty')"
+          if [ -n "$existing" ]; then
+            pr_url="$existing"
+          else
+            if pr_url="$(gh pr create \
+              --repo "$GITHUB_REPOSITORY" \
+              --base main \
+              --head "$branch" \
+              --title "Freeze V0.3 Cloudflare Container transport PASS receipt" \
+              --body "Automated evidence-only receipt from V0.3 Cloudflare Container transport preflight run ${SOURCE_RUN_ID}. This PR grants no metadata-capture authority, holdout access, source switch, W1, backtest admission, trade plan, real-money order, or live trading. A separate versioned cloud transport authority transition is still required." 2>/tmp/pr-create.err)"; then
+              :
+            else
+              pr_url=""
+              echo "GitHub Actions could not create the receipt PR; receipt branch remains available." >&2
+              cat /tmp/pr-create.err >&2 || true
+            fi
+          fi
+          echo "url=$pr_url" >> "$GITHUB_OUTPUT"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
+      - name: Record PASS evidence follow-up
+        if: steps.wait.outputs.conclusion == 'success'
+        shell: bash
+        env:
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+          RUN_URL: ${{ steps.dispatch.outputs.run_url }}
+          PR_URL: ${{ steps.pr.outputs.url }}
+          RECEIPT_BRANCH: ${{ steps.pr.outputs.branch }}
+        run: |
+          set -euo pipefail
+          if [ -n "$PR_URL" ]; then
+            followup="Evidence-only receipt PR: ${PR_URL}"
+          else
+            followup="Receipt branch prepared: ${RECEIPT_BRANCH} (GitHub Actions PR creation was unavailable)."
+          fi
+          gh issue comment 105 \
+            --repo "$GITHUB_REPOSITORY" \
+            --body "V0.3 Cloudflare Container transport diagnostic run ${RUN_ID} **PASS**: ${RUN_URL}\n\nSanitized evidence was revalidated and frozen automatically. ${followup}\n\nCloudflare metadata-capture authority remains false until a separate versioned authority transition is reviewed and merged."
