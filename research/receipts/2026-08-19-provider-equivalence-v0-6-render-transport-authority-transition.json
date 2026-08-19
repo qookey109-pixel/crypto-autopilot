@@ -1,0 +1,64 @@
+{
+  "schema": "provider-equivalence-v0-6-render-transport-authority-transition-v0.1",
+  "status": "PASS",
+  "stage": "PROVIDER_EQUIVALENCE_V0_6_RENDER_TRANSPORT_AUTHORITY_TRANSITION_FROZEN",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "main_baseline": "7c7ecd4d48b0d53ecbecd7af9282d32f6e75c03a",
+  "protocol": "config/provider_equivalence_v0_6_render_transport_authority_transition_v0_1.json",
+  "prerequisite_evidence": {
+    "v0_2_self_hosted_mac_transport": "research/receipts/2026-08-19-provider-equivalence-v0-2-self-hosted-mac-transport-pass.json",
+    "v0_2_forward_metadata_capture_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority-v0-2.json",
+    "v0_5_render_transport_pass": "research/receipts/2026-08-19-provider-equivalence-v0-5-render-free-transport-pass.json",
+    "v0_5_render_transport_status": "PASS",
+    "v0_5_upstream_status": 200,
+    "v0_5_json_ok": true,
+    "v0_5_symbols_array": true,
+    "v0_5_symbol_count": 872
+  },
+  "decision": {
+    "prior_transport_authority_preserved_as_history": "github_self_hosted_mac",
+    "successor_public_metadata_transport_authority": "render_free_web_service",
+    "provider": "binance_usdm",
+    "official_endpoint": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "render_region": "frankfurt",
+    "render_plan": "free",
+    "monthly_budget_usd": 0,
+    "v0_2_authority_overwritten": false,
+    "v0_2_metadata_capture_protocol_overwritten": false,
+    "render_metadata_capture_execution_authorized_by_this_receipt": false,
+    "successor_metadata_capture_protocol_required": true
+  },
+  "api_key_interpretation": {
+    "v0_5_public_preflight_used_binance_api_key": false,
+    "this_receipt_declares_project_wide_binance_api_key_ban": false,
+    "binance_api_key_transport_bypass_authorized": false,
+    "future_versioned_authenticated_binance_usage_for_other_scopes_remains_possible": true
+  },
+  "safety": {
+    "increment_values_emitted_by_transition": false,
+    "raw_exchange_info_persisted_by_transition": false,
+    "r2_client_constructed_by_transition": false,
+    "r2_writes_performed_by_transition": false,
+    "holdout_candles_accessed": false,
+    "holdout_evaluated": false,
+    "source_switch_performed": false,
+    "live_trading_performed": false
+  },
+  "authorization_boundary": {
+    "render_metadata_capture_execution_authorized": false,
+    "render_metadata_only_r2_writes_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_required_stage": "SUCCESSOR_RENDER_METADATA_CAPTURE_PROTOCOL_AND_RUNTIME_BOUNDARY"
+}
