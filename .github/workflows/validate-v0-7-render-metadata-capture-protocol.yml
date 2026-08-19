@@ -1,0 +1,59 @@
+name: Validate V0.7 Render Metadata Capture Protocol
+
+on:
+  pull_request:
+    paths:
+      - config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json
+      - research/receipts/2026-08-19-provider-equivalence-v0-7-render-metadata-capture-protocol-prepared.json
+      - infra/render/binance-transport-free/server.py
+      - tests/test_render_metadata_capture_protocol_v0_7.py
+      - .github/workflows/validate-v0-7-render-metadata-capture-protocol.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: Validate V0.7 and regress V0.6/V0.5 boundaries
+        run: |
+          python -m pytest -q \
+            tests/test_render_metadata_capture_protocol_v0_7.py \
+            tests/test_render_transport_authority_transition_v0_6.py \
+            tests/test_render_free_transport_pass_v0_5.py \
+            tests/test_render_free_transport_preflight_v0_5.py
+      - name: Build Render image with disabled relay scaffold
+        run: docker build -t qookey-render-metadata-v0-7 infra/render/binance-transport-free
+      - name: Assert V0.7 cannot execute or schedule capture
+        run: |
+          python - <<'PY'
+          import importlib.util
+          import json
+          from pathlib import Path
+
+          cfg = json.loads(Path('config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json').read_text())
+          workflow = Path('.github/workflows/validate-v0-7-render-metadata-capture-protocol.yml').read_text()
+          server_path = Path('infra/render/binance-transport-free/server.py')
+          spec = importlib.util.spec_from_file_location('render_v07', server_path)
+          assert spec and spec.loader
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+
+          assert cfg['execution_boundary']['render_metadata_relay_enablement_authorized'] is False
+          assert cfg['execution_boundary']['render_metadata_capture_execution_authorized'] is False
+          assert cfg['execution_boundary']['scheduled_capture_activation_authorized'] is False
+          assert cfg['execution_boundary']['metadata_only_r2_writes_authorized_by_this_protocol'] is False
+          assert cfg['execution_boundary']['holdout_candle_access_authorized'] is False
+          assert cfg['execution_boundary']['live_trading_authorized'] is False
+          assert cfg['github_orchestration_boundary']['schedule_trigger_enabled_by_this_protocol'] is False
+          assert module.METADATA_RELAY_EXECUTION_AUTHORIZED is False
+          assert '  schedule:' not in workflow
+          PY
