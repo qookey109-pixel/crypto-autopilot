@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0-draft.3",
+  "version": "0.2.0-draft.4",
   "status": "PROTOCOL_DRAFT_NOT_AUTHORIZED",
   "purpose": "Design a separately versioned, microstructure-aware provider-equivalence protocol without rewriting V0.1.",
   "v0_1_boundary": {
@@ -17,14 +17,23 @@
     "provider_splicing_forbidden": true,
     "pionex_native_relabel_forbidden": true
   },
-  "candidate_holdout": {
-    "state": "PREDECLARED_BUT_NOT_AUTHORIZED_FOR_ACCESS",
+  "superseded_candidate_holdout": {
     "start_utc": "2026-08-03T08:00:00Z",
     "end_utc": "2026-08-10T07:59:59.999Z",
+    "state": "SUPERSEDED_UNOPENED_BEFORE_ANY_EVIDENCE",
+    "holdout_data_accessed": false,
+    "holdout_evaluated": false,
+    "holdout_result_known": false,
+    "reason": "Historical per-symbol price-increment values were not preserved; current values must not be backfilled into the past."
+  },
+  "candidate_holdout": {
+    "state": "FROZEN_UNOPENED_FORWARD_CANDIDATE",
+    "start_utc": "2026-08-21T00:00:00Z",
+    "end_utc": "2026-08-27T23:59:59.999Z",
     "intervals": ["15M", "60M", "4H"],
     "candidate_symbol_count": 15,
     "mapped_pair_count": 45,
-    "must_not_overlap_v0_1": true,
+    "metadata_capture_protocol": "config/provider_equivalence_v0_2_metadata_capture_v0_1.json",
     "holdout_data_access_authorized": false,
     "holdout_evaluation_authorized": false,
     "holdout_result_known": false
@@ -49,17 +58,16 @@
     "state": ["ema20_gt_ema50", "ema20_slope_positive", "close_gt_ema20"]
   },
   "microstructure_metadata_prerequisite": {
-    "state": "FIELD_SEMANTICS_PASS_HISTORICAL_VALUES_NOT_READY",
+    "state": "FIELD_SEMANTICS_PASS_FORWARD_CAPTURE_AUTHORIZED_VALUES_PENDING",
     "design_protocol": "config/provider_equivalence_v0_2_metadata_draft.json",
+    "capture_protocol": "config/provider_equivalence_v0_2_metadata_capture_v0_1.json",
     "semantic_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-price-increment-semantics.json",
-    "public_provider_metadata_only": true,
+    "capture_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority.json",
     "pionex_price_increment_semantics_resolved": true,
     "binance_price_increment_semantics_resolved": true,
-    "historical_increment_values_required": true,
+    "contemporaneous_increment_stability_required": true,
     "all_15_symbol_mappings_required": true,
-    "effective_during_candidate_holdout_required": true,
     "raw_payload_sha256_receipts_required": true,
-    "exact_json_paths_or_fields_frozen": true,
     "metadata_value_interpolation_forbidden": true,
     "metadata_provider_splicing_forbidden": true
   },
@@ -74,45 +82,20 @@
       "one_provider_flat_and_other_moves_more_than_one_verified_price_increment": "COMPARABLE_MISMATCH",
       "one_provider_flat_and_other_moves_at_most_one_verified_price_increment": "MICROSTRUCTURE_INDETERMINATE"
     },
-    "verified_increment_rule": "Use the moving provider's own frozen price increment effective for the holdout symbol; never infer an increment from V0.1 mismatch deltas.",
+    "verified_increment_rule": "Use the moving provider's own frozen, contemporaneously captured price increment for the holdout symbol; never infer an increment from candle deltas.",
     "agreement_denominator": "COMPARABLE_MATCH + COMPARABLE_MISMATCH only",
     "proposed_agreement_pass_min": 0.98,
     "proposed_agreement_review_min": 0.95,
     "agreement_threshold_design_rule": "COPY_V0_1_UNCHANGED",
-    "minimum_comparable_rows": {
-      "15M": 600,
-      "60M": 150,
-      "4H": 40
-    },
+    "minimum_comparable_rows": {"15M": 600, "60M": 150, "4H": 40},
     "indeterminate_fraction_metric": {
       "state": "RESOLVED_BY_UNCHANGED_V0_1_MINIMUM_ROW_REQUIREMENTS",
       "separate_pass_review_thresholds_added": false,
-      "design_rule": "Do not add a tunable indeterminate-fraction threshold. Instead require enough comparable adjacent comparisons to preserve the unchanged V0.1 minimum-row evidence floor.",
-      "expected_candle_rows_in_exact_7d_holdout": {
-        "15M": 672,
-        "60M": 168,
-        "4H": 42
-      },
-      "expected_adjacent_comparisons": {
-        "15M": 671,
-        "60M": 167,
-        "4H": 41
-      },
-      "minimum_comparable_comparisons": {
-        "15M": 599,
-        "60M": 149,
-        "4H": 39
-      },
-      "derived_max_indeterminate_count": {
-        "15M": 72,
-        "60M": 18,
-        "4H": 2
-      },
-      "derived_max_indeterminate_fraction": {
-        "15M": 0.10730253353204174,
-        "60M": 0.10778443113772455,
-        "4H": 0.04878048780487805
-      },
+      "expected_candle_rows_in_exact_7d_holdout": {"15M": 672, "60M": 168, "4H": 42},
+      "expected_adjacent_comparisons": {"15M": 671, "60M": 167, "4H": 41},
+      "minimum_comparable_comparisons": {"15M": 599, "60M": 149, "4H": 39},
+      "derived_max_indeterminate_count": {"15M": 72, "60M": 18, "4H": 2},
+      "derived_max_indeterminate_fraction": {"15M": 0.10730253353204174, "60M": 0.10778443113772455, "4H": 0.04878048780487805},
       "derivation_uses_v0_1_mismatch_results": false,
       "fail_rule": "FAIL if comparable adjacent comparisons fall below the interval minimum; no post-evidence tuning is allowed."
     }
@@ -124,29 +107,25 @@
     "volume_equivalence_required": false,
     "provider_splicing_forbidden": true,
     "verified_price_increment_metadata_required": true,
-    "indeterminate_fraction_cap_design_resolved": true,
-    "indeterminate_cap_must_not_be_tuned_on_holdout": true,
+    "metadata_applicability_gate_must_pass_before_holdout_candle_access": true,
     "all_thresholds_and_metadata_contracts_must_be_frozen_before_holdout_access": true
   },
   "aggregate_design": {
     "expected_pair_count": 45,
-    "state": "DRAFT_BLOCKED_ON_HISTORICAL_PRICE_INCREMENT_VALUES",
+    "state": "DRAFT_WAITING_FORWARD_METADATA_CAPTURE_AND_APPLICABILITY_GATE",
     "pair_pass_requires": [
       "all retained V0.1 price metrics PASS",
       "microstructure-aware direction agreement PASS",
       "60M setup agreement PASS when applicable",
       "minimum comparable comparisons satisfied"
     ],
-    "pair_review_requires": [
-      "no pair-level FAIL reason",
-      "at least one retained metric is REVIEW"
-    ],
+    "pair_review_requires": ["no pair-level FAIL reason", "at least one retained metric is REVIEW"],
     "pair_fail_closed_on_missing_metadata": true,
     "pair_fail_closed_on_missing_pair": true,
     "aggregate_rule_proposed": "COPY_V0_1: all 45 PASS => PASS; no FAIL and REVIEW fraction <= 0.20 => REVIEW; otherwise FAIL"
   },
   "evidence_discipline": {
-    "holdout_must_not_be_fetched_before_protocol_freeze": true,
+    "holdout_must_not_be_fetched_before_metadata_applicability_pass_and_separate_access_authority": true,
     "holdout_must_not_be_previewed_manually": true,
     "thresholds_must_not_change_after_holdout_evidence": true,
     "pass_review_fail_results_must_all_be_retained": true,
@@ -156,8 +135,9 @@
   "authorization_boundary": {
     "protocol_frozen": false,
     "metadata_field_semantics_frozen": true,
-    "historical_metadata_values_authorized": false,
-    "metadata_acquisition_authorized": false,
+    "metadata_capture_protocol_frozen": true,
+    "metadata_capture_authorized": true,
+    "metadata_only_r2_writes_authorized": true,
     "holdout_data_access_authorized": false,
     "holdout_evaluation_authorized": false,
     "source_switch_authorized": false,
@@ -169,5 +149,5 @@
     "real_money_order_authorized": false,
     "live_trading_authorized": false
   },
-  "next_required_stage": "HISTORICAL_PRICE_INCREMENT_VALUE_APPLICABILITY_DESIGN_WITHOUT_OPENING_HOLDOUT"
+  "next_required_stage": "METADATA_CAPTURE_IMPLEMENTATION_AND_CONNECTIVITY_PREFLIGHT_BEFORE_2026_08_20T00_00_00Z"
 }
