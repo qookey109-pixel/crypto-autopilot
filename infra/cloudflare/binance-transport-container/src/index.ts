@@ -6,17 +6,7 @@ export class BinanceTransportContainer extends Container {
   defaultPort = 8080;
   sleepAfter = "1m";
   enableInternet = false;
-  interceptHttps = true;
   allowedHosts = ["fapi.binance.com"];
-  entrypoint = [
-    "sh",
-    "-lc",
-    [
-      "cp /etc/cloudflare/certs/cloudflare-containers-ca.crt /usr/local/share/ca-certificates/cloudflare-containers-ca.crt",
-      "update-ca-certificates",
-      "exec python /app/server.py",
-    ].join(" && "),
-  ];
 }
 
 type Env = {
