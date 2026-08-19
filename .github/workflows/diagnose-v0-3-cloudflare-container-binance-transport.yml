@@ -1,0 +1,198 @@
+name: Diagnose V0.3 Cloudflare Container Binance Transport
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/diagnose-v0-3-cloudflare-container-binance-transport.yml"
+      - "config/provider_equivalence_v0_3_cloud_transport_preflight_v0_1.json"
+      - "infra/cloudflare/binance-transport-container/**"
+      - "tests/test_cloudflare_container_transport_preflight_v0_3.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Python test dependency
+        run: python -m pip install pytest
+
+      - name: Validate frozen diagnostic boundary
+        run: python -m pytest -q tests/test_cloudflare_container_transport_preflight_v0_3.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Cloudflare diagnostic dependencies
+        working-directory: infra/cloudflare/binance-transport-container
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck Worker gateway
+        working-directory: infra/cloudflare/binance-transport-container
+        run: npm run typecheck
+
+      - name: Build diagnostic container image
+        working-directory: infra/cloudflare/binance-transport-container
+        run: docker build -t qookey-binance-cloud-transport-v0-3 .
+
+  diagnose:
+    if: github.event_name == 'workflow_dispatch'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Require Cloudflare CI credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo "Missing CLOUDFLARE_API_TOKEN" >&2; exit 1; }
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo "Missing CLOUDFLARE_ACCOUNT_ID" >&2; exit 1; }
+
+      - name: Install Cloudflare diagnostic dependencies
+        working-directory: infra/cloudflare/binance-transport-container
+        run: npm install --no-audit --no-fund
+
+      - name: Generate per-run diagnostic bearer secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          TOKEN="$(python - <<'PY'
+          import secrets
+          print(secrets.token_urlsafe(48))
+          PY
+          )"
+          echo "::add-mask::$TOKEN"
+          echo "DIAGNOSTIC_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+          python - "$TOKEN" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          Path('/tmp/qookey-v0-3-secrets.json').write_text(
+              json.dumps({'DIAGNOSTIC_TOKEN': sys.argv[1]})
+          )
+          PY
+
+      - name: Deploy Cloudflare Container diagnostic
+        working-directory: infra/cloudflare/binance-transport-container
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler deploy \
+            --config wrangler.jsonc \
+            --secrets-file /tmp/qookey-v0-3-secrets.json \
+            --containers-rollout immediate \
+            --strict 2>&1 | tee /tmp/qookey-v0-3-deploy.log
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          text = Path('/tmp/qookey-v0-3-deploy.log').read_text(errors='replace')
+          urls = re.findall(r'https://[^\s]+\.workers\.dev', text)
+          if not urls:
+              raise SystemExit('Unable to discover workers.dev diagnostic URL from Wrangler output')
+          Path('/tmp/qookey-v0-3-worker-url.txt').write_text(urls[-1])
+          PY
+          echo "WORKER_URL=$(cat /tmp/qookey-v0-3-worker-url.txt)" >> "$GITHUB_ENV"
+
+      - name: Probe Binance through real Cloudflare Container egress
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          ready=false
+          for attempt in $(seq 1 90); do
+            status="$(curl \
+              --silent \
+              --show-error \
+              --max-time 20 \
+              --output artifacts/result.json \
+              --write-out '%{http_code}' \
+              --header "Authorization: Bearer ${DIAGNOSTIC_TOKEN}" \
+              "${WORKER_URL}/check" || true)"
+            if [ "$status" = "200" ] && python - <<'PY'
+          import json
+          from pathlib import Path
+          try:
+              payload = json.loads(Path('artifacts/result.json').read_text())
+          except Exception:
+              raise SystemExit(1)
+          raise SystemExit(0 if payload.get('transport') == 'cloudflare_container' else 1)
+          PY
+            then
+              ready=true
+              break
+            fi
+            sleep 5
+          done
+          if [ "$ready" != "true" ]; then
+            echo "Cloudflare Container did not return a diagnostic response" >&2
+            exit 1
+          fi
+
+      - name: Assert sanitized transport PASS
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('artifacts/result.json')
+          payload = json.loads(path.read_text())
+          assert payload['status'] == 'PASS', payload
+          assert payload['transport'] == 'cloudflare_container'
+          assert payload['upstream_url'] == 'https://fapi.binance.com/fapi/v1/exchangeInfo'
+          assert payload['upstream_status'] == 200
+          assert payload['json_ok'] is True
+          assert payload['symbols_array'] is True
+          assert isinstance(payload['symbol_count'], int) and payload['symbol_count'] > 0
+          assert payload['api_key_used'] is False
+          assert payload['increment_values_emitted'] is False
+          assert payload['raw_exchange_info_persisted'] is False
+          assert payload['r2_client_constructed'] is False
+          assert payload['r2_writes_performed'] is False
+          assert payload['holdout_candles_accessed'] is False
+          assert payload['holdout_evaluated'] is False
+          assert payload['source_switch_performed'] is False
+          assert payload['live_trading_performed'] is False
+          serialized = json.dumps(payload, sort_keys=True)
+          for forbidden in ('tickSize', 'quoteStep', 'apiSecret', 'secretKey'):
+              assert forbidden not in serialized
+          print(json.dumps(payload, sort_keys=True))
+          PY
+
+      - name: Remove transient credentials and deployment logs
+        if: always()
+        shell: bash
+        run: |
+          rm -f \
+            /tmp/qookey-v0-3-secrets.json \
+            /tmp/qookey-v0-3-deploy.log \
+            /tmp/qookey-v0-3-worker-url.txt
+
+      - name: Upload sanitized Cloudflare Container transport result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v0-3-cloudflare-container-binance-transport-${{ github.run_id }}
+          path: artifacts/result.json
+          retention-days: 7
+          if-no-files-found: warn
