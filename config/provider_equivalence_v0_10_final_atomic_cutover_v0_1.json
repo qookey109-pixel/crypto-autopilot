@@ -38,7 +38,12 @@
     "old_self_hosted_capture_execution_after_merge": false,
     "successor_workflow": ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
     "successor_schedule_enabled_in_same_change": true,
-    "successor_cron_utc": ["17 * * * *", "47 * * * *"],
+    "successor_schedule_window_scoped": true,
+    "successor_cron_utc": [
+      "17,47 * 27-31 8 *",
+      "17,47 * 1-3 9 *",
+      "17,47 0-1 4 9 *"
+    ],
     "successor_runner": "ubuntu-latest",
     "concurrent_old_and_new_capture_paths_authorized": false,
     "automatic_fallback_to_old_v0_2_path": false
