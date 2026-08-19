@@ -1,0 +1,87 @@
+{
+  "schema": "provider-equivalence-v0-2-transport-blocker-authority-v0.1",
+  "status": "PASS",
+  "stage": "PROVIDER_EQUIVALENCE_V0_2_METADATA_TRANSPORT_BLOCKED_CAPTURE_SUSPENDED",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "EXECUTION_TRANSPORT_BLOCKER_AND_FAIL_SAFE_SUSPENSION",
+  "provider_contract_unchanged": {
+    "provider": "binance_usdm",
+    "official_endpoint": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "field": "symbols[].filters[filterType=PRICE_FILTER].tickSize",
+    "provider_changed": false,
+    "endpoint_semantics_changed": false,
+    "field_changed": false,
+    "v0_1_thresholds_changed": false,
+    "v0_1_scope_changed": false
+  },
+  "diagnostics": {
+    "github_main_connectivity": {
+      "workflow_run_id": 32211389329,
+      "job_id": 95944673588,
+      "runner": "ubuntu-latest",
+      "result": "BLOCKED",
+      "http_status": 451,
+      "pionex_path_reached_before_binance_failure": true,
+      "r2_client_constructed": false,
+      "r2_writes_performed": false,
+      "holdout_candles_accessed": false
+    },
+    "cloudflare_temporary_worker": {
+      "workflow_run_id": 32211875378,
+      "artifact_id": 9351023942,
+      "artifact_digest": "sha256:d4e6648c58e266b256380bb884c7202be2985bc5b020570406b2c21ece3e9021",
+      "result": "BLOCKED",
+      "upstream_http_status": 403,
+      "increment_values_emitted": false,
+      "r2_writes_performed": false,
+      "holdout_candles_accessed": false
+    },
+    "github_runner_matrix": {
+      "workflow_run_id": 32212113839,
+      "result": "BLOCKED_ALL_RUNNERS",
+      "ubuntu_latest": {"http_status": 451, "transport_status": "BLOCKED"},
+      "macos_14_arm64": {"http_status": 451, "transport_status": "BLOCKED"},
+      "windows_latest": {"http_status": 451, "transport_status": "BLOCKED"},
+      "increment_values_emitted": false,
+      "r2_writes_performed": false,
+      "holdout_candles_accessed": false
+    }
+  },
+  "capture_fail_safe": {
+    "prior_capture_protocol": "config/provider_equivalence_v0_2_metadata_capture_v0_1.json",
+    "prior_capture_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority.json",
+    "scheduled_capture_started": false,
+    "complete_capture_receipts_written": 0,
+    "metadata_capture_window_start_utc": "2026-08-20T00:00:00Z",
+    "scheduled_capture_suspended_before_window_start": true,
+    "reason": "All tested hosted transports are blocked by the official Binance USD-M endpoint. Known-failing transport must not be allowed to manufacture missing hourly slots.",
+    "github_schedule_must_be_removed": true
+  },
+  "holdout_state": {
+    "prior_forward_candidate_start_utc": "2026-08-21T00:00:00Z",
+    "prior_forward_candidate_end_utc": "2026-08-27T23:59:59.999Z",
+    "state": "SUPERSEDED_UNOPENED_BEFORE_METADATA_CAPTURE_EVIDENCE",
+    "holdout_candles_accessed": false,
+    "holdout_evaluated": false,
+    "holdout_result_known": false,
+    "replacement_holdout_frozen": false,
+    "replacement_rule": "Freeze a new future holdout only after an execution transport connectivity PASS is independently evidenced."
+  },
+  "authorization_boundary": {
+    "metadata_capture_execution_authorized": false,
+    "metadata_only_r2_writes_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_required_stage": "EXECUTION_TRANSPORT_CONNECTIVITY_PASS_BEFORE_NEW_FORWARD_HOLDOUT_FREEZE"
+}
