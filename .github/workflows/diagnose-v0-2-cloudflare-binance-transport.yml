@@ -28,7 +28,7 @@ jobs:
                 return new Response("not found", { status: 404 });
               }
               const upstream = await fetch("https://fapi.binance.com/fapi/v1/exchangeInfo", {
-                headers: { "User-Agent": "qookey-provider-equivalence-transport-check/0.2" }
+                headers: { "User-Agent": "qookey-provider-equivalence-transport-check/0.3" }
               });
               let jsonOk = false;
               let symbolsArray = false;
@@ -75,9 +75,19 @@ jobs:
         run: |
           set -euo pipefail
           PROXY_URL="$(cat artifacts/proxy-url.txt)"
-          curl --fail --silent --show-error \
-            "${PROXY_URL}/check" \
-            > artifacts/result.json
+          ready=false
+          for attempt in $(seq 1 15); do
+            status="$(curl --silent --show-error --output artifacts/result.json --write-out '%{http_code}' "${PROXY_URL}/check" || true)"
+            if [ "$status" = "200" ]; then
+              ready=true
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" != "true" ]; then
+            echo "temporary worker did not become ready within propagation window" >&2
+            exit 1
+          fi
           python - <<'PY'
           import json
           from pathlib import Path
