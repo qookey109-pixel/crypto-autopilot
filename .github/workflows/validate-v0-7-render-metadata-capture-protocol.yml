@@ -3,8 +3,10 @@ name: Validate V0.7 Render Metadata Capture Protocol
 on:
   pull_request:
     paths:
+      - PROJECT_STATUS.md
       - config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json
       - research/receipts/2026-08-19-provider-equivalence-v0-7-render-metadata-capture-protocol-prepared.json
+      - infra/render/binance-transport-free/README.md
       - infra/render/binance-transport-free/server.py
       - tests/test_render_metadata_capture_protocol_v0_7.py
       - .github/workflows/validate-v0-7-render-metadata-capture-protocol.yml
