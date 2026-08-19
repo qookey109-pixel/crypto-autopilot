@@ -19,8 +19,8 @@
     "candidate_symbol_count": 15,
     "intervals": ["15M", "60M", "4H"],
     "expected_pair_count": 45,
-    "overlap_start_utc": "2026-08-10T00:00:00Z",
-    "overlap_end_utc": "2026-08-17T23:59:59.999Z"
+    "overlap_start_utc": "2026-08-10T08:00:00Z",
+    "overlap_end_utc": "2026-08-17T07:59:59.999Z"
   },
   "execution": {
     "workflow_run_id": 32206479914,
