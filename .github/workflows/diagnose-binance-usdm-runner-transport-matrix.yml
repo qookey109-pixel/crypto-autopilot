@@ -1,0 +1,35 @@
+name: Diagnose Binance USD-M Runner Transport Matrix
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/diagnose-binance-usdm-runner-transport-matrix.yml"
+      - "scripts/diagnose_binance_usdm_transport.py"
+
+permissions:
+  contents: read
+
+jobs:
+  transport:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest, macos-14, windows-latest]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Probe exact Binance USD-M official endpoint without values or R2
+        env:
+          DIAGNOSTIC_OUTPUT: artifacts/binance-transport-${{ matrix.runner }}.json
+        run: python scripts/diagnose_binance_usdm_transport.py
+      - name: Upload sanitized result
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-usdm-transport-${{ matrix.runner }}-${{ github.run_id }}
+          path: artifacts/binance-transport-${{ matrix.runner }}.json
+          retention-days: 3
+          if-no-files-found: error
