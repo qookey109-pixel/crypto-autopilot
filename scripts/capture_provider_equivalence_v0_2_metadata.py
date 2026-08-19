@@ -4,23 +4,16 @@ import argparse
 import json
 from pathlib import Path
 
-from crypto_autopilot.provider_metadata_capture_v0_2 import capture_to_r2, connectivity_preflight
+from crypto_autopilot.provider_metadata_capture_v0_2 import capture_to_r2
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--mode",
-        choices=("connectivity-preflight", "capture"),
-        required=True,
-    )
+    parser.add_argument("--mode", choices=("capture",), required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
-    if args.mode == "connectivity-preflight":
-        result = connectivity_preflight()
-    else:
-        result = capture_to_r2()
+    result = capture_to_r2()
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
