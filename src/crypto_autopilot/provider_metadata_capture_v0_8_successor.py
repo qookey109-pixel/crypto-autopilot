@@ -23,6 +23,12 @@ HANDSHAKE = Path(
 EXPECTED_HANDSHAKE_STAGE = "PROVIDER_EQUIVALENCE_V0_8_SHARED_RELAY_SECRET_HANDSHAKE_PASS"
 USER_AGENT = "qookey-provider-equivalence-v0-8-successor-capture/0.1"
 
+# The runtime is fully implemented for deterministic dry testing, but the public
+# production entrypoint is deliberately hard-disabled. A later versioned final
+# activation authority must change this constant together with the old/new
+# schedule cutover and Render relay activation.
+SUCCESSOR_RUNTIME_EXECUTION_AUTHORIZED = False
+
 
 @dataclass(frozen=True)
 class CaptureArtifacts:
@@ -108,7 +114,9 @@ def validate_prepared_runtime_authorities() -> tuple[
     return protocol, v07, pionex_symbols, binance_symbols
 
 
-def _fetch_render_relay_raw(*, url: str, max_bytes: int, timeout_seconds: float = 30.0) -> tuple[bytes, str]:
+def _fetch_render_relay_raw(
+    *, url: str, max_bytes: int, timeout_seconds: float = 30.0
+) -> tuple[bytes, str]:
     token = os.environ.get("METADATA_RELAY_TOKEN")
     if not token:
         raise RuntimeError("METADATA_RELAY_TOKEN is required for the successor Binance relay")
@@ -139,7 +147,9 @@ def _fetch_render_relay_raw(*, url: str, max_bytes: int, timeout_seconds: float 
     return raw, content_type
 
 
-def fetch_successor_provider_payloads() -> tuple[v02.ProviderPayload, v02.ProviderPayload, dict[str, Any]]:
+def fetch_successor_provider_payloads() -> tuple[
+    v02.ProviderPayload, v02.ProviderPayload, dict[str, Any]
+]:
     protocol, v07, pionex_symbols, binance_symbols = validate_prepared_runtime_authorities()
     providers = v07["provider_semantics"]
     pionex_cfg = providers["pionex"]
@@ -174,7 +184,9 @@ def _gzip(raw: bytes) -> bytes:
 
 
 def _json_bytes(payload: dict[str, Any]) -> bytes:
-    return (json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode("utf-8")
+    return (json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode(
+        "utf-8"
+    )
 
 
 def build_capture_artifacts(
@@ -280,12 +292,49 @@ def current_bucket_bytes(store: Any) -> int:
     return total
 
 
+def _execution_disabled_result() -> dict[str, Any]:
+    return {
+        "status": "SKIP",
+        "stage": "V0_8_SUCCESSOR_RUNTIME_EXECUTION_NOT_AUTHORIZED",
+        "provider_requests_performed": 0,
+        "render_relay_requests_performed": 0,
+        "r2_client_constructed": False,
+        "r2_writes_performed": False,
+        "holdout_candles_accessed": False,
+        "source_switch_authorized": False,
+        "live_trading_authorized": False,
+    }
+
+
 def execute_successor_capture(
     *,
     now: datetime | None = None,
-    provider_fetcher: Callable[[], tuple[v02.ProviderPayload, v02.ProviderPayload, dict[str, Any]]] = fetch_successor_provider_payloads,
+    provider_fetcher: Callable[
+        [], tuple[v02.ProviderPayload, v02.ProviderPayload, dict[str, Any]]
+    ] = fetch_successor_provider_payloads,
     store_factory: Callable[[], Any] = _r2_store_from_env,
 ) -> dict[str, Any]:
+    """Production-facing entrypoint, hard-disabled until final activation authority."""
+
+    if not SUCCESSOR_RUNTIME_EXECUTION_AUTHORIZED:
+        return _execution_disabled_result()
+    return _execute_successor_capture_authorized(
+        now=now,
+        provider_fetcher=provider_fetcher,
+        store_factory=store_factory,
+    )
+
+
+def _execute_successor_capture_authorized(
+    *,
+    now: datetime | None = None,
+    provider_fetcher: Callable[
+        [], tuple[v02.ProviderPayload, v02.ProviderPayload, dict[str, Any]]
+    ] = fetch_successor_provider_payloads,
+    store_factory: Callable[[], Any] = _r2_store_from_env,
+) -> dict[str, Any]:
+    """Execution core exercised only with fakes before final activation."""
+
     protocol, v07, _, _ = validate_prepared_runtime_authorities()
     observed = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     slot = v02.capture_slot(observed, protocol)
@@ -359,7 +408,11 @@ def execute_successor_capture(
         artifacts.receipt_key,
         artifacts.receipt_bytes,
         content_type="application/json",
-        metadata={"dataset": "provider_equivalence_v0_8_metadata", "slot": artifacts.slot_id, "run": run_id},
+        metadata={
+            "dataset": "provider_equivalence_v0_8_metadata",
+            "slot": artifacts.slot_id,
+            "run": run_id,
+        },
     )
 
     store.get_bytes_verified(artifacts.pionex_key, expected_sha256=p_receipt.sha256)
