@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-08-18
+Updated: 2026-08-19
 
 ## Project
 
@@ -8,27 +8,31 @@ Qookey Crypto Autopilot
 
 Repository: `qookey109-pixel/crypto-autopilot`
 
-This file is the current project-status index. Detailed evidence remains in the referenced frozen receipts, configs, documents, PRs and workflow artifacts; this summary does not replace those authorities.
+Public dashboard: `https://qookey109-pixel.github.io/crypto-autopilot/`
+
+This file is the current project-status index. Frozen receipts, configs, documents, workflow artifacts and merged PRs remain the detailed authorities; this summary does not replace them.
 
 ## Current formal stage
 
-**V0.1 M1B COMPLETE / R2 COST BUDGET GATE PASS / BINANCE HISTORICAL SOURCE V0.1 READY / BINANCE VISION BULK SOURCE V0.1 READY / BINANCE VISION LIVE PROOF PASS / BINANCE VISION R2 BOUNDED PROOF PASS / BINANCE 2025 COVERAGE SCAN PASS / BINANCE 2025 R2 PILOT PASS / BINANCE OBSERVED R2 BUDGET GATE PASS / BINANCE MAXIMUM-AVAILABLE COVERAGE DISCOVERY PASS / BINANCE FUNDING SOURCE PROOF PASS / BINANCE FUNDING COVERAGE DISCOVERY PASS / BINANCE STAGED MULTI-YEAR EXPANSION PLAN PASS / HISTORICAL UNIVERSE LONG-HORIZON REVIEW PASS / PIONEX-BINANCE EQUIVALENCE GATE PENDING SOURCE PUBLICATION / BACKTEST CORE V0.1 READY / HISTORICAL UNIVERSE V0.1 READY / HISTORICAL UNIVERSE BACKTEST ADMISSION V0.1 READY / HISTORICAL LIQUIDITY RANKING V0.1 READY / HISTORICAL LIQUIDITY BACKTEST ADMISSION V0.1 READY / TECHNICAL FEATURES V0.1 READY / HISTORICAL SSTATE REPLAY V0.1 READY / HISTORICAL SSTATE EVIDENCE INGESTION V0.1 READY / STRATEGY REPLAY READINESS GATE ACTIVE / PARAMETER SWEEP FRAMEWORK V0.1 READY / PIONEX HISTORICAL BACKFILL PILOT AUTOMATED / PAPER-ONLY**
+**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / R2 BUDGET GATES PASS / BINANCE MAXIMUM-AVAILABLE COVERAGE DISCOVERY PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / R2 LIVE USAGE 22.120404 MB / PIONEX-BINANCE EQUIVALENCE V0.1 FAIL / EQUIVALENCE V0.1 DIRECTION FORENSICS PASS / HISTORICAL UNIVERSE LONG-HORIZON REVIEW PASS / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / STRATEGY REPLAY READINESS GATE BLOCKED ON AUTHORITY / PAPER-ONLY**
 
-No live-money authorization exists. `trade_plan_authorized=false` remains mandatory.
+No live-money authorization exists. `trade_plan_authorized=false` and `live_trading_authorized=false` remain mandatory.
 
 ## Non-negotiable provider and safety boundaries
 
-- **Pionex** is the execution-target exchange and remains authority for frozen Pionex-native evidence.
-- **Binance USD-M / Binance Vision** is a provider-separated research-history source and always remains `provider=binance_usdm`.
+- **Pionex** remains the execution-target exchange and the provenance authority for frozen Pionex-native evidence.
+- **Binance USD-M / Binance Vision** remains a provider-separated research-history source and always stays `provider=binance_usdm`.
 - Symbol mapping such as `BTC_USDT_PERP <-> BTCUSDT` never converts provenance.
-- Binance data must not be written under Pionex-native R2 keys or silently create Pionex-native Historical Universe membership.
-- Provider splicing, Pionex-native relabeling and silent interpolation are forbidden.
-- Historical target is maximum provider-observed history capped at eight years; uniform eight-year availability is never assumed.
+- Binance data must never be relabeled or written as Pionex-native data.
+- Provider splicing, Pionex-native relabeling and silent interpolation remain forbidden.
+- `source_switch_authorized=false` after the definitive Equivalence V0.1 FAIL.
+- Frozen Equivalence V0.1 scope and thresholds must not be changed after evidence.
 - No staged Trade-Kline wave is authorized for materialization yet.
-- Funding coverage PASS is not Funding R2 materialization authority.
-- Historical Universe long-horizon review PASS is not Historical Universe membership authority.
+- Historical Universe review PASS is not Historical Universe membership authority.
+- Backtest framework readiness is not backtest-admission authority.
 - SState frozen core is not modified by these historical-data phases.
-- Live trading remains forbidden.
+- No martingale, loss doubling or unlimited averaging is authorized.
+- Real-money orders and live trading remain forbidden.
 
 ## Frozen data and storage authorities
 
@@ -36,282 +40,231 @@ No live-money authorization exists. `trade_plan_authorized=false` remains mandat
 
 Authority: `research/receipts/2026-08-17-m1a-pionex.json`
 
-- Frozen 15-symbol candidate universe: BTC, ETH, SOL, HYPE, ADA, BNB, UNI, XRP, LTC, LINK, DOGE, AAVE, AVAX, INJ, SUI.
-- `15M` / `60M` / `4H`: 13,230 candles, zero gaps, zero duplicate timestamps, zero invalid candles.
-- Pionex plural `/api/v1/market/bookTickers` runtime behavior is frozen.
+- 15-symbol frozen candidate universe: BTC, ETH, SOL, HYPE, ADA, BNB, UNI, XRP, LTC, LINK, DOGE, AAVE, AVAX, INJ, SUI.
+- `15M` / `60M` / `4H`.
+- 13,230 candles.
+- Zero gaps, zero duplicate timestamps and zero invalid candles.
 
 ### M1B Cloudflare R2 historical store — PASS
 
 Authority: `research/receipts/2026-08-18-m1b-r2.json`
 
-- Real Pionex M1A materialization run `32093154424` PASS.
+- Materialization run `32093154424` PASS.
 - 45 objects / 13,230 rows / 425,161 Parquet bytes.
 - Zstd Parquet, deterministic keys, SHA-256 upload/download verification and exact candle round-trip equality are frozen.
 
-### R2 Cost & Budget Gate V0.1 — PASS
+### Binance 2025 R2 content pilot — PASS
 
-Authority: `research/receipts/2026-08-18-r2-cost-budget.json`
-Policy: `config/r2_budget_v0_1.json`
-Estimate: `research/estimates/2026-08-18-r2-cost-budget.json`
+Authority: `research/receipts/2026-08-18-binance-2025-r2-pilot.json`
 
-- Conservative 250 markets x 8 years canonical reference: about 2.956 GB.
-- Canonical + retained staging: about 5.912 GB.
-- 3x storage stress: about 8.868 GB.
-- Guardrails remain WARN > 8 GB / BLOCK > 10 GB storage; Class A WARN > 750k / BLOCK > 1M; Class B WARN > 7.5M / BLOCK > 10M.
+- 528 / 528 official source archives audited.
+- 206 canonical Trade-Kline R2 objects.
+- 671,022 candles.
+- 18,778,928 Parquet bytes.
+- 203 new objects uploaded; 3 pre-existing objects exact-verified without overwrite.
+- Provider provenance remains Binance USD-M.
+
+### R2 budget — PASS
+
+Authorities:
+
+- `research/receipts/2026-08-18-r2-cost-budget.json`
+- `research/receipts/2026-08-18-binance-observed-r2-budget.json`
+
+Observed 2025 basis:
+
+- 671,022 rows / 18,778,928 bytes.
+- 250 markets x 8 years canonical projection: about 2.574 GB.
+- Canonical + retained staging: about 5.148 GB.
+- 3x storage stress: about 7.722 GB.
+- Existing storage BLOCK guardrail remains 10 GB.
+
+### Current live R2 usage — PASS / READ-ONLY INVENTORY
+
+Authority: `research/receipts/2026-08-19-r2-bucket-usage.json`
+
+- 457 objects.
+- 22,120,404 bytes.
+- 22.120404 MB decimal, about 21.10 MiB binary.
+- Inventory operation performed zero writes and zero deletes.
 
 ## Binance long-history foundation
 
-### Binance Historical Data Source V0.1 — READY
-
-Document: `docs/BINANCE_HISTORICAL_SOURCE_V0_1.md`
-Policy: `config/binance_historical_source_v0_1.json`
-Merge: PR #30 / `3cdf7bf36fad17759b423b8a0572c46af738330f`
-
-- Public USD-M Trade Kline, Mark Price, Funding Rate and recent Open Interest adapters are implemented.
-- Funding already maps into Backtest `FundingPoint` while retaining Binance provenance.
-- OI remains limited to the documented recent provider window and is not treated as long-horizon history.
-
-### Binance Vision Bulk Source V0.1 — READY
-
-Document: `docs/BINANCE_VISION_BULK_SOURCE_V0_1.md`
-Policy: `config/binance_vision_v0_1.json`
-Merge: PR #31 / `f8e3023337ff27f263297467653c63b129114d2f`
-
-- Official checksum-backed daily/monthly archive ingestion is implemented.
-- Source archive revisions fail closed for explicit review.
-
-### Binance Vision Live Proof — PASS
-
-Authority: `research/receipts/2026-08-18-binance-vision-live-proof.json`
-Authority merge: PR #34 / `03fbe1ee30c573dbd5d19b78208086c01ebc0636`
-
-- January 2025 BTCUSDT / ETHUSDT / SOLUSDT.
-- Six official Trade/Mark archives, 11,160 rows, all checksums and full-month audits PASS.
-
-### Binance Vision -> R2 Bounded Proof — PASS
-
-Authority: `research/receipts/2026-08-18-binance-vision-r2-proof.json`
-Implementation: PR #35 / `3e1888ef1aad557a402bd6c5e66c7d80541997b1`
-Authority merge: PR #36 / `79a0c90195116e6536896738c7cf9fb7caccfe84`
-
-- BTC/ETH/SOL January 2025 `15M`: 3 objects / 8,928 rows / 251,270 Parquet bytes.
-- R2 SHA, decode and exact-candle equality all PASS; Pionex namespace untouched.
-
-### Binance 2025 Coverage Scan — PASS
-
-Authority: `research/receipts/2026-08-18-binance-2025-coverage-scan.json`
-Implementation merge: PR #38 / `907deb2ceda11ed70c646c0e2007a0b54a46e728`
-Authority merge: PR #39 / `eae72925fc20963926b85e1b21dc9286068d6237`
-
-- 720 checksum-backed checks: 704 AVAILABLE / 16 NO_DATA.
-- HYPE 2025 archive presence begins in May; archive presence is not independent listing-date authority.
-
-### Binance 15-market / 2025 R2 Content Pilot — PASS
-
-Authority: `research/receipts/2026-08-18-binance-2025-r2-pilot.json`
-Document: `docs/BINANCE_2025_R2_PILOT_V0_1.md`
-Implementation merge: PR #40 / `41b80f559b4aa55c40e92a3d94d6912748d5443d`
-Authority merge: PR #41 / `ff1b1a978769617523105c4acbcac46267e2fa57`
-
-- 528/528 source archives audited.
-- 206 canonical Trade-Kline R2 objects / 671,022 candles / 18,778,928 Parquet bytes.
-- 203 new objects uploaded; 3 existing objects exact-verified without overwrite.
-- HYPE pre-onset data was not synthesized.
-
-### Observed Binance R2 Budget Gate — PASS
-
-Authority: `research/receipts/2026-08-18-binance-observed-r2-budget.json`
-Estimate: `research/estimates/2026-08-18-binance-observed-r2-budget.json`
-Implementation: PR #42 / `370a833547d09540d10e6ea633f948d0af0aeddc`
-Authority merge: PR #43 / `fcda027598d0d851ccb30c59baa7532974f96808`
-
-- Real 2025 basis: 671,022 rows / 18,778,928 Parquet bytes.
-- 250 x 8y observed-capacity canonical projection: about 2.574 GB; retained staging about 5.148 GB; 3x stress about 7.722 GB.
-- Existing R2 budget gates remain PASS.
-
-### Maximum-Available Binance Historical Coverage Discovery — PASS
+### Maximum-available historical coverage discovery — PASS
 
 Authority: `research/receipts/2026-08-18-binance-max-coverage-discovery.json`
-Protocol: `config/binance_max_coverage_v0_1.json`
-Document: `docs/BINANCE_MAX_COVERAGE_DISCOVERY_V0_1.md`
-Implementation merge: PR #47 / `02d434178cc6a85f8e83b6cd15a130f8d4b652c1`
 
-- Scanned from project cap floor `2018-08` through complete month `2026-07`, then current-month daily edge.
+- Project history floor: `2018-08`.
+- Complete-month edge: `2026-07`.
 - 5,760 monthly checks: 4,040 AVAILABLE / 1,720 NO_DATA.
-- 1,020 daily checks: 960 AVAILABLE / 60 NO_DATA; latest published edge in that authority execution was `2026-08-16`.
-- 180 boundary/current-edge archives audited.
-- 15/15 symbols have observed Trade + Mark Price common windows; zero internal monthly archive-presence gaps in observed spans.
-- Coverage boundaries are not listing-date, full interior continuity, equivalence or materialization authority.
+- 1,020 daily checks: 960 AVAILABLE / 60 NO_DATA.
+- Coverage boundaries do not themselves authorize materialization, equivalence, Historical Universe membership or source switching.
 
-### Binance Funding Source Proof V0.1 — PASS
-
-Authority: `research/receipts/2026-08-18-binance-funding-source-proof.json`
-Protocol: `config/binance_funding_v0_1.json`
-Document: `docs/BINANCE_FUNDING_V0_1.md`
-Implementation: PR #53 / `4a28f673482c121f44946317ed6d5127ec3917eb`
-Authority merge: PR #54 / `f548654f983b2d8159492a6d3003501d88790135`
-
-- Valid proof run `32129522890`, job `95687364367`; CI run `32129522893`, job `95687364093` PASS.
-- BTCUSDT / ETHUSDT / SOLUSDT, January 2024: 93 Funding rows each / 279 total.
-- Official `.CHECKSUM`, ZIP member, schema, monotonicity, uniqueness and cadence audits PASS.
-- Source-declared Funding interval is preserved; the proof scope used 8h intervals.
-- Initial exact-millisecond cadence run `32128779729` was superseded before PASS authority. Diagnostic run `32129021753` showed only +/-1..3 ms source `calc_time` jitter, not missing Funding events.
-- Source-proof default cadence tolerance is frozen at 10 ms; observed proof maximum was 3 ms. Raw source timestamps are preserved exactly and never rounded/interpolated.
-- This authority proves the bounded source path/schema/checksum semantics only; it does not authorize Funding R2 materialization or backtest admission.
-
-### Binance Funding Coverage Discovery V0.1 — PASS / MATERIALIZATION NOT AUTHORIZED
-
-Authority: `research/receipts/2026-08-18-binance-funding-coverage.json`
-Protocol: `config/binance_funding_coverage_v0_1.json`
-Document: `docs/BINANCE_FUNDING_COVERAGE_V0_1.md`
-Implementation: PR #55 / `61704679c00143a074cb5b2ffadb885c311cf922`
-
-- Final proof tree: `25206003464d24b4366bd23faec40934b43c7a6a`; merged implementation `main` tree is identical.
-- Final Coverage run `32131873026`, job `95694584611` PASS; same-tree Source Proof `32131873018` PASS; CI `32131873091`, job `95694584508` PASS.
-- Auxiliary PR #56 was used only to obtain an independent concurrency group for the exact final tree and was closed without merge.
-- Scan window `2018-08` through complete month `2026-07`: 1,440 symbol-month checks / 1,010 AVAILABLE / 430 NO_DATA.
-- 15/15 symbols have observed Funding coverage; 30/30 first/last edge archives audited; zero internal monthly archive-presence gaps inside observed spans.
-- Funding onset is provider-observed, symbol-specific and not copied from Trade onset. Examples: BTC/ETH `2020-01-01`, INJ `2022-08-16 16:00 UTC`, SUI `2023-05-03 16:00:00.011 UTC`, HYPE `2025-05-30 12:00:00.006 UTC`.
-- HYPE's audited current edge uses a source-declared 4h Funding interval; the other audited current edges used 8h in this execution.
-- Long-horizon edge diagnostic run `32130801751`, job `95691293211` found maximum source timestamp residual 45 ms across all 30 edges and no missing declared-interval Funding event.
-- Coverage edge audit tolerance was therefore re-frozen at 50 ms before Coverage PASS authority; the Source Proof default remains 10 ms. Raw timestamps remain unchanged and residuals beyond the selected authority tolerance fail closed.
-- Interior months are checksum-presence evidence only; full interior row-level continuity is not yet proven.
-- Funding R2 writes/materialization, source switching, Historical Universe membership and backtest admission remain unauthorized.
-
-### Binance Staged Multi-Year Expansion Plan V0.1 — PASS
+### Binance staged Trade-Kline expansion plan — PASS / MATERIALIZATION NOT_AUTHORIZED
 
 Authority: `research/receipts/2026-08-18-binance-staged-expansion-plan.json`
-Protocol: `config/binance_staged_expansion_plan_v0_1.json`
-Document: `docs/BINANCE_STAGED_MULTIYEAR_EXPANSION_PLAN_V0_1.md`
-Implementation merge: PR #49 / `2840be31322e21a2d3fe13060af3f24c2df67af3`
 
-- Trade-Kline-only wave order: `W1=2024`, `W2=2023`, `W3=2022`, `W4=2021`, `W5=2020`.
-- Historical increment: 729 symbol-months / 2,187 archives / 859 future R2 objects / 2,793,893 estimated rows / 78,188,670 estimated Parquet bytes.
-- Including existing 2025, projected canonical Trade-Kline storage is about 0.09697 GB; 3x stress about 0.29090 GB.
-- Incomplete 2026 is deferred.
-- Every wave remains `materialization_authorized=false`.
+Planned order:
 
-### Historical Universe Long-Horizon Review V0.1 — PASS / MEMBERSHIP NOT READY
+- W1 2024: 14 symbols / 168 symbol-months / 504 source archives / 196 future R2 objects.
+- W2 2023: 14 symbols / 164 symbol-months / 492 archives / 192 objects.
+- W3 2022: 13 symbols / 149 symbol-months / 447 archives / 175 objects.
+- W4 2021: 12 symbols / 144 symbol-months / 432 archives / 168 objects.
+- W5 2020: 12 symbols / 104 symbol-months / 312 archives / 128 objects.
 
-Authority: `research/receipts/2026-08-18-historical-universe-long-horizon-review.json`
-Protocol: `config/historical_universe_long_horizon_review_v0_1.json`
-Document: `docs/HISTORICAL_UNIVERSE_LONG_HORIZON_REVIEW_V0_1.md`
-Implementation merge: PR #51 / `e81b1df9db3d085f7bfa237d5126ccdb43786bb4`
+All waves remain `materialization_authorized=false`. W1 must not proceed while provider-equivalence authority is unresolved for the intended substitution/use case.
 
-- Review prerequisite is satisfied for W1 acquisition scope: 2024 / 14 symbols / 168 symbol-months / HYPE excluded.
-- Pre-materialization Historical Universe membership records remain zero.
-- Future membership requires audited materialized `15M` / `60M` / `4H` partition receipts with actual first/last timestamps and provider-separated provenance.
-- Review PASS does not authorize W1 materialization or backtest admission.
+## Funding V0.2 — MATERIALIZATION PASS
 
-### Pionex <-> Binance Equivalence Gate V0.1 — PENDING SOURCE PUBLICATION
+Storage authority:
+`research/receipts/2026-08-19-binance-funding-materialization-authority-v0-2.json`
+
+Preflight authority:
+`research/receipts/2026-08-19-binance-funding-r2-v0-2-full-preflight.json`
+
+Final materialization authority:
+`research/receipts/2026-08-19-binance-funding-r2-v0-2-materialization.json`
+
+Formal result:
+
+- workflow run `32168151926` SUCCESS.
+- stage `BINANCE_FUNDING_R2_V0_2_MATERIALIZATION_PASS`.
+- 1,003 official source archives.
+- 94 annual canonical Parquet objects.
+- 94 annual partition receipts.
+- 4 run metadata objects.
+- 192 / 192 authorized R2 identities post-write verified.
+- 91,747 Funding observations.
+- 1,138,749 local Parquet bytes in the frozen preflight build.
+- 192 uploaded / 0 exact-existing in the final execution.
+- HYPEUSDT 2026 remains deferred because its June 2026 source continuity issue was not repaired or interpolated.
+- Source switch, provider splicing, Pionex relabeling, Historical Universe membership, backtest admission, trade-plan authorization and live trading remain false.
+
+## Pionex ↔ Binance Equivalence V0.1 — DEFINITIVE FAIL
 
 Protocol: `config/provider_equivalence_v0_1.json`
-Implementation merge: PR #45 / `1564be073dd878e5116940543f6c3706a94f4a47`
-Runner merge: PR #46 / `de5227f065df507f8ed78b4f14ef4a0e0295fb97`
 
-- Frozen before evidence: 15 symbols / Pionex M1A 7-day window / `15M`,`60M`,`4H` / 45 pairs.
-- Thresholds, overlap and symbol scope must not be changed after evidence.
-- Run `32112849706`: GitHub Azure Binance REST HTTP 451; not a Gate FAIL.
-- Run `32113043035`: required `2026-08-17` Binance Vision daily archive unpublished; not a Gate FAIL.
-- Run `32113484720`: `execution_status=PENDING_SOURCE_PUBLICATION`, `gate_status=PENDING`, `pair_count=0`, `source_switch_authorized=false`.
-- Latest frozen authority therefore remains PENDING SOURCE PUBLICATION. Temporary hourly retry remains active.
+Frozen result authority:
+`research/receipts/2026-08-19-pionex-binance-equivalence-v0-1.json`
 
-## Research and backtest safety layers
+Result document:
+`docs/PIONEX_BINANCE_EQUIVALENCE_V0_1_RESULT.md`
 
-### Backtest Engine V0.1 — READY
+Definitive evidence run: `32206479914`.
 
-Document: `docs/BACKTEST_ENGINE_V0_1.md`
-Merge: PR #14 / `b0ad363bb5b6c9bef9db1bc1d8125158d6d01839`
+- Full source publication was available; this is no longer `PENDING_SOURCE_PUBLICATION`.
+- Execution status: PASS.
+- Gate status: **FAIL**.
+- Frozen overlap: `2026-08-10T08:00:00Z` through `2026-08-17T07:59:59.999Z`.
+- 15 symbols / 3 intervals / 45 pairs.
+- 18 PASS / 18 REVIEW / 9 FAIL.
+- 360 Binance Vision daily archives.
+- All 9 FAIL pairs contain `return_direction_agreement_fail`.
+- Interval result distribution:
+  - `15M`: 4 PASS / 4 REVIEW / 7 FAIL.
+  - `60M`: 5 PASS / 8 REVIEW / 2 FAIL.
+  - `4H`: 9 PASS / 6 REVIEW / 0 FAIL.
+- `source_switch_authorized=false`.
+- Hourly source-publication retry was removed because a definitive Gate result now exists.
+- The V0.1 result is permanent and must not be rewritten by changing thresholds or scope after evidence.
 
-- Deterministic LONG-only paper backtest; next-candle fill discipline; conservative stop-first same-bar collision.
-- Existing 1% risk baseline, 3x leverage cap, fee/slippage/funding model remain unchanged.
+## Equivalence V0.1 direction forensic — PASS / DESCRIPTIVE ONLY
 
-### Historical Universe + Backtest Admission — READY
+Authority:
+`research/receipts/2026-08-19-pionex-binance-equivalence-v0-1-direction-forensics.json`
 
-Documents: `docs/HISTORICAL_UNIVERSE_V0_1.md`, `docs/HISTORICAL_UNIVERSE_BACKTEST_ADMISSION_V0_1.md`
-Merges: PR #15 / `2cb299d44f75b66c374adf87ce0e83d0ccad4342`; PR #25 / `213addc9ce55cdd5b606b4c2ee501ff4ce92d05d`
+Protocol document:
+`docs/PIONEX_BINANCE_EQUIVALENCE_V0_1_FORENSICS.md`
 
-- No evidence, no historical membership.
-- Native evidence for all required intervals is mandatory for default admission.
-- Proxy/external-provider evidence cannot silently authorize Pionex-native membership.
+Evidence run: `32208040423`.
 
-### Historical Liquidity + Admission — READY / EVIDENCE INCOMPLETE
+The forensic replay reloaded the same frozen evidence, reproduced the complete 45-pair `18 PASS / 18 REVIEW / 9 FAIL` result, and then described the exact-sign disagreement shape without re-grading V0.1.
 
-Documents: `docs/HISTORICAL_LIQUIDITY_V0_1.md`, `docs/HISTORICAL_LIQUIDITY_BACKTEST_ADMISSION_V0_1.md`
-Merges: PR #27 / `89a6eb25daf1e5d4559cb1ad6efde49dbb7000f1`; PR #28 / `93f01e8192066145c6f414956d96071b2b9e9f2c`
+Key findings:
 
-- Point-in-time ranking/admission contracts are ready.
-- Real historical Pionex liquidity evidence series is not yet frozen PASS.
+- 623 total direction-mismatch bars across all 45 pairs.
+- 432 mismatches are inside the 9 V0.1 FAIL pairs.
+- Across all pairs: 539 / 623 mismatches (86.5%) are `ONE_PROVIDER_FLAT`; 84 are opposite non-zero signs.
+- In the 9 FAIL pairs: 388 / 432 mismatches (89.8%) are `ONE_PROVIDER_FLAT`; 44 are opposite non-zero signs.
+- Mismatches by interval: 536 at `15M`, 78 at `60M`, 9 at `4H`.
+- The disagreements are **not** confined to microscopic returns: the FAIL pairs include 16 mismatch bars above 10 bps.
+- Therefore a post-hoc tiny-return deadband is not accepted as a legitimate V0.1 fix.
+- The forensic evidence supports a measurement-design review, not a source switch.
+- R2 forensic access was read-only: zero writes / zero deletes.
 
-### Technical Features V0.1 — READY
+V0.1 remains FAIL. The forensic PASS does not authorize W1, backtest admission, Historical Universe membership or live trading.
 
-Document: `docs/TECHNICAL_FEATURES_V0_1.md`
-Merge: PR #17 / `1f40641761e6b78f8a22dfd728187491714268bf`
+## Historical Universe — REVIEW PASS / MEMBERSHIP NOT_READY
 
-- Closed-bar EMA/ATR/volume/previous-high feature calculations are deterministic and anti-lookahead tested.
+Authority: `research/receipts/2026-08-18-historical-universe-long-horizon-review.json`
 
-### Historical SState Replay / Evidence — READY / EVIDENCE INCOMPLETE
+- Long-horizon review prerequisite is satisfied for planned W1 scope: 2024 / 14 symbols / HYPE excluded.
+- Formal long-horizon membership is still NOT_READY.
+- Future membership requires audited materialized `15M` / `60M` / `4H` partition receipts with actual first/last timestamps and provider-separated provenance.
+- No Binance provider evidence may silently create Pionex-native membership.
 
-Documents: `docs/HISTORICAL_SSTATE_REPLAY_V0_1.md`, `docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md`
-Merges: PR #18 / `826b2626d4f0c4e0c115d8af7aa4a6e48d53019c`; PR #23 / `dca0507fa7e160a6dcea25dd552cf05d7dc6b3f0`
+## Backtest and strategy framework
 
-- Exact-bar read-only SState replay/evidence contracts are ready.
-- No real historical SState evidence bundle is frozen PASS yet.
+Existing backtest, Historical Universe framework, historical liquidity, technical-feature, historical SState replay/evidence-ingestion and parameter-sweep components remain implementation-ready from prior merged work.
 
-### Strategy Replay Readiness + Parameter Sweep — READY / PARAMETERS UNDEFINED
+However:
 
-Documents: `docs/STRATEGY_REPLAY_READINESS_V0_1.md`, `docs/STRATEGY_PARAMETER_SWEEP_V0_1.md`
-Merges: PR #19 / `43535f02ba3120e5c319e3668d6fa431fe668067`; PR #21 / `69abd931b88950aae50780dc67f3d57d095c2db3`
+- framework readiness is not evidence admission;
+- Historical Universe membership is not ready;
+- Pionex ↔ Binance V0.1 provider equivalence is FAIL;
+- full strategy-signal equivalence remains deferred because required strategy semantics are not yet formally defined;
+- no strategy parameter change, automatic trade plan or live execution is authorized.
 
-- Six mandatory semantics remain UNDEFINED: ATR overextension, EMA20 pullback proximity/semantics, EMA20 reclaim, previous-high break, volume confirmation threshold, structural-stop ATR buffer.
-- No validated winning parameter set exists.
-- `trade_plan_authorized=false` remains mandatory.
+## Dashboard
 
-## Still not complete
+Fixed GitHub Pages site:
+`https://qookey109-pixel.github.io/crypto-autopilot/`
 
-- Pionex one-year Historical Backfill Pilot aggregate evidence is not yet frozen PASS; it remains an execution-target benchmark/equivalence anchor.
-- Pionex/Binance Equivalence authority is not frozen PASS.
-- W1 Trade-Kline materialization is not authorized; no later staged wave is authorized.
-- Historical Universe long-horizon membership remains `NOT_READY` until audited materialized partition receipts exist.
-- Binance Funding source proof and maximum observed monthly coverage are frozen PASS, but **Funding R2 materialization is not authorized or frozen PASS**; interior row-level continuity beyond audited edges remains incomplete.
-- Binance long-horizon Mark Price materialization is not frozen PASS; only observed coverage boundaries are frozen.
-- Real historical Pionex liquidity evidence is not frozen PASS.
-- OI beyond the documented recent provider window requires forward accumulation or a separately reviewed source.
-- Real historical SState evidence production/acquisition is incomplete.
-- Real candidate-space UPDATE/VALIDATION evidence for the six undefined strategy rules is not frozen.
-- End-to-end authoritative strategy replay into automatically generated trade plans is not authorized.
-- Production-grade paper broker lifecycle/reconciliation/settlement is incomplete.
-- Cloudflare Workers/Workflows/Queues/D1 control-plane migration and separate cost gate are incomplete.
-- Pionex private execution/protective-order/reconciliation/shadow-live gates are incomplete.
-- Live trading is forbidden.
+- Traditional Chinese: `zh-Hant-TW`.
+- Repository-authority normalized view only; dashboard JSON itself declares `authority=false`.
+- Shows Funding V0.2 materialization PASS, R2 live usage and Equivalence V0.1 FAIL.
+- `mode=PAPER-ONLY`.
+- `tradePlanAuthorized=false`.
+- `liveTradingAuthorized=false`.
+- `main` updates affecting dashboard authorities are automatically built and deployed with GitHub Actions.
 
-## Next milestone
+## Current blockers
 
-**Pionex <-> Binance Equivalence Gate V0.1 + W1 explicit staged-expansion authority, with Funding R2 planning in parallel**
+1. **Provider substitution/equivalence:** V0.1 is definitive FAIL; Binance must not be substituted for Pionex provenance under that protocol.
+2. **Trade-Kline W1:** 2024 materialization remains NOT_AUTHORIZED.
+3. **Historical Universe membership:** NOT_READY until audited materialized partitions exist under an authorized path.
+4. **Strategy replay admission:** blocked by authority and still-undefined full strategy-equivalence semantics.
+5. **HYPE Funding 2026:** remains deferred; no interpolation or provider splice is authorized.
+6. **Live execution:** deliberately forbidden; project remains PAPER-ONLY.
 
-1. Keep Equivalence V0.1 thresholds, 15-symbol scope, 45 pairs and overlap unchanged while the latest frozen authority remains `PENDING SOURCE PUBLICATION`.
-2. Preserve the temporary retry; source-publication delay is not a Gate FAIL and does not authorize scope changes.
-3. When Equivalence produces live evidence, preserve the exact aggregate `PASS` / `REVIEW` / `FAIL` outcome and freeze it separately; only exact PASS may satisfy the W1 prerequisite.
-4. Do not claim full strategy-signal equivalence for the six currently UNDEFINED strategy semantics.
-5. After Equivalence PASS, create a separate explicit W1-only staged-expansion authority for **2024 / 14 symbols / 168 symbol-months**; do not broaden scope during authorization.
-6. Do not execute W1 until its explicit authority is CI-validated and frozen.
-7. After future W1 materialization, create audited `15M` / `60M` / `4H` partition receipts and provider-separated Historical Universe records before backtest admission.
-8. Funding Source Proof + 15-symbol Funding Coverage are now frozen PASS. Before any Funding R2 writes, quantify the discovered **1,010 available symbol-month** scope against existing R2 storage/operation assumptions.
-9. If the Funding scope materially changes the existing cost envelope, freeze a Funding-specific R2 budget review; otherwise freeze a documented no-material-change determination with the calculation basis.
-10. Only after the Funding budget decision, create a separate explicit Funding R2 materialization authority naming exact symbols/months/years and verification rules.
-11. Funding materialization must remain under `market-data/binance_usdm/...`; it must not create Pionex-native provenance or Historical Universe membership by itself.
-12. Mark Price long-horizon materialization remains separate; OI remains recent-window only.
-13. Re-run R2 budget/cost gates after any materially larger market count, additional dataset or partition-scheme change.
-14. Do not jump directly to 8 years x ~250 markets.
-15. Before CF1 control-plane migration, create separate Workers/Workflows/Queues/D1 cost gates.
+## Next formal milestone
 
-## Safety gates before live trading
+### Equivalence V0.2 protocol design — DESIGN ONLY, NOT YET AUTHORIZED
 
-- Backtest quality gates PASS.
-- Paper trading quality gates PASS.
-- Shadow-live reconciliation PASS.
-- Pionex private Futures API permission verified.
-- Protective stop/TP behavior verified exchange-side.
-- Idempotent order intent/client IDs and restart reconciliation proven.
-- Daily-loss / stale-data / API-error kill switches proven.
-- Explicit live authorization recorded.
+The next permitted research step is to design a separately versioned Equivalence V0.2 protocol that addresses the V0.1 measurement-design question without rewriting V0.1.
+
+Required discipline:
+
+1. V0.1 remains permanently FAIL.
+2. V0.2 must have a new versioned config and protocol document.
+3. Exact metrics, thresholds, symbol scope, intervals and holdout window must be frozen **before** V0.2 evidence is evaluated.
+4. V0.2 must use an independent holdout that was not inspected during V0.1 forensic design.
+5. No threshold may be selected by looking at the V0.2 holdout result.
+6. PASS, REVIEW and FAIL must all be accepted outcomes.
+7. A V0.2 design/freeze does not itself authorize source switching or W1 materialization.
+8. W1, Historical Universe membership, backtest admission, automatic trade plans and live trading remain blocked until separately authorized by their own evidence chain.
+
+A candidate independent holdout may be proposed in the V0.2 design, but it must not be fetched or evaluated before the protocol is formally frozen.
+
+## Explicitly forbidden next actions
+
+- Do not lower or alter Equivalence V0.1 thresholds.
+- Do not shrink the V0.1 15-symbol / 45-pair scope to manufacture PASS.
+- Do not reinterpret the V0.1 forensic descriptive bins as Gate thresholds.
+- Do not silently add a post-hoc deadband and claim V0.1 PASS.
+- Do not re-enable the obsolete hourly source-publication retry.
+- Do not authorize W1 merely because R2 has ample storage capacity.
+- Do not write Binance data into a Pionex-native namespace.
+- Do not splice providers or interpolate missing source events.
+- Do not change SState frozen core for this historical-data phase.
+- Do not authorize automatic trade plans, real-money orders or live trading.
