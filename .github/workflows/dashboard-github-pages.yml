@@ -8,6 +8,8 @@ on:
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/apply_dashboard_latest_authority.py"
       - "research/receipts/**"
+      - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
+      - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
       - "PROJECT_STATUS.md"
       - ".github/workflows/dashboard-github-pages.yml"
   pull_request:
@@ -16,6 +18,8 @@ on:
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/apply_dashboard_latest_authority.py"
       - "research/receipts/**"
+      - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
+      - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
       - "PROJECT_STATUS.md"
       - ".github/workflows/dashboard-github-pages.yml"
   workflow_dispatch:
@@ -35,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
 
       - name: Validate Traditional Chinese dashboard safety
         run: python scripts/validate_dashboard_static.py
@@ -54,7 +58,7 @@ jobs:
             --output _site/data/dashboard.json
           touch _site/.nojekyll
 
-      - name: Assert Funding PASS, R2 usage and PAPER-ONLY boundary
+      - name: Assert latest authority, V0.8 cutover and PAPER-ONLY boundary
         shell: bash
         run: |
           set -euo pipefail
@@ -63,13 +67,32 @@ jobs:
           from pathlib import Path
           data = json.loads(Path('_site/data/dashboard.json').read_text(encoding='utf-8'))
           project = data['project']
+          assert data['authority'] is False
           assert data['locale'] == 'zh-Hant-TW'
+          assert data['schema'] == 'qookey-dashboard-authority-snapshot-v0.6'
           assert project['fundingMaterializationComplete'] is True
           assert project['fundingMaterializationState'] == 'PASS'
           assert project['fundingV0_2R2Identities'] == 192
           assert project['fundingV0_2UploadedObjectCount'] == 192
           assert project['r2BucketObjectCount'] == 457
           assert project['r2BucketBytes'] == 22120404
+          assert project['providerEquivalenceGateState'] == 'FAIL'
+          assert (
+              project['providerEquivalencePassCount'],
+              project['providerEquivalenceReviewCount'],
+              project['providerEquivalenceFailCount'],
+          ) == (18, 18, 9)
+          assert project['renderTransportV0_5State'] == 'PASS'
+          assert project['renderTransportV0_6AuthorityState'] == 'PASS'
+          assert project['renderMetadataV0_7State'] == 'PREPARED_EXECUTION_NOT_AUTHORIZED'
+          assert project['renderMetadataV0_8CutoverState'] == 'PREPARED_EXECUTION_NOT_AUTHORIZED'
+          assert project['currentMetadataCaptureExecutionPath'] == 'github_self_hosted_mac'
+          assert project['successorMetadataCaptureExecutionAuthorized'] is False
+          assert project['successorMetadataScheduleEnabled'] is False
+          assert project['metadataCapturePathsConcurrentAuthorized'] is False
+          assert project['replacementHoldoutState'] == 'FROZEN_UNOPENED'
+          assert project['metadataStabilityState'] == 'NOT_YET_RUN'
+          assert project['cloudRuntimeMonthlyBudgetUsd'] == 0
           assert project['mode'] == 'PAPER-ONLY'
           assert project['tradePlanAuthorized'] is False
           assert project['liveTradingAuthorized'] is False
