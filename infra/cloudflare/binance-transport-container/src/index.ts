@@ -9,8 +9,16 @@ export class BinanceTransportContainer extends Container {
   allowedHosts = ["fapi.binance.com"];
 }
 
+type ContainerStub = {
+  fetch(request: Request): Promise<Response>;
+};
+
+type NamedContainerNamespace = {
+  getByName(name: string): ContainerStub;
+};
+
 type Env = {
-  BINANCE_TRANSPORT: DurableObjectNamespace;
+  BINANCE_TRANSPORT: NamedContainerNamespace;
   DIAGNOSTIC_TOKEN?: string;
 };
 
