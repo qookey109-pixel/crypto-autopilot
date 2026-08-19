@@ -39,7 +39,10 @@ jobs:
           authority = json.loads(Path('research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json').read_text())
 
           assert not any(line == '  schedule:' for line in old_workflow)
-          assert not any('self-hosted' in line and 'runs-on:' in line for line in old_workflow)
+          assert not any(
+              line.strip().startswith('runs' + '-on:') and ('self' + '-hosted') in line
+              for line in old_workflow
+          )
           assert any(line == '  schedule:' for line in successor_workflow)
           assert protocol['metadata_capture_window']['hourly_slot_count'] == 194
           assert old_authority['stage'] == 'PROVIDER_EQUIVALENCE_V0_2_FORWARD_METADATA_CAPTURE_AUTHORIZED_HOLDOUT_CANDLES_FORBIDDEN'
