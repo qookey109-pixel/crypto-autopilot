@@ -1,0 +1,67 @@
+{
+  "version": "0.1.0",
+  "status": "PREFLIGHT_PREPARED_NOT_EXECUTED",
+  "purpose": "Prepare an independently versioned Cloudflare Container transport preflight for Binance USD-M public exchangeInfo without modifying V0.1 or the active V0.2 Self-Hosted Mac authority.",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_boundary": {
+    "v0_1_equivalence_status": "FAIL",
+    "v0_1_mutated": false,
+    "v0_2_active_transport": "github_self_hosted_mac",
+    "v0_2_transport_authority_mutated": false,
+    "v0_2_metadata_capture_authority_mutated": false,
+    "cloud_transport_authorized_for_metadata_capture": false,
+    "cloud_transport_authorized_to_supersede_v0_2": false
+  },
+  "diagnostic": {
+    "transport": "cloudflare_container",
+    "provider": "binance_usdm",
+    "official_endpoint": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "method": "GET",
+    "api_key_required": false,
+    "private_api_credentials_forbidden": true,
+    "expected_success": {
+      "http_status": 200,
+      "json_object": true,
+      "symbols_array": true,
+      "symbol_count_positive": true
+    },
+    "sanitized_output_only": true,
+    "increment_values_emitted": false,
+    "raw_exchange_info_persisted": false,
+    "r2_client_constructed": false,
+    "r2_writes_performed": false,
+    "holdout_candles_accessed": false,
+    "holdout_evaluated": false,
+    "source_switch_performed": false,
+    "live_trading_performed": false
+  },
+  "cloudflare_container_policy": {
+    "internet_default": "DENY",
+    "allowed_hosts": ["fapi.binance.com"],
+    "allowed_ports": [443],
+    "worker_authentication_required": true,
+    "container_sleep_after_idle": "1m",
+    "workers_paid_plan_required": true
+  },
+  "pass_rule": "PASS only if a real Cloudflare Container execution reaches the unchanged official Binance USD-M exchangeInfo endpoint with HTTP 200, parses a JSON object containing a non-empty symbols[] array, emits only the sanitized diagnostic fields, and performs zero R2 writes, zero holdout access, zero source switching, and zero trading.",
+  "fail_rule": "Any non-200 provider response, invalid JSON, missing/empty symbols[] array, deployment failure, or evidence-boundary violation is FAIL/BLOCKED. Do not substitute a proxy, alternate provider, alternate endpoint, API-key workaround, or manually fabricated evidence.",
+  "post_pass_rule": "A transport PASS alone does not authorize metadata capture migration. A separate versioned authority transition must explicitly supersede the V0.2 Self-Hosted Mac transport before any scheduled capture transport changes.",
+  "authorization_boundary": {
+    "cloudflare_container_deployment_for_transport_diagnostic_authorized": true,
+    "public_metadata_transport_probe_authorized": true,
+    "metadata_capture_execution_authorized": false,
+    "metadata_only_r2_writes_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_required_stage": "EXECUTE_CLOUDFLARE_CONTAINER_PUBLIC_TRANSPORT_PREFLIGHT_AND_FREEZE_SANITIZED_RESULT"
+}
