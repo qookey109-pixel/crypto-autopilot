@@ -9,6 +9,9 @@ from .models import Candle
 # Descriptive bins frozen before the forensic evidence run. They are NOT Gate
 # thresholds and must not be interpreted as source-switch authorization.
 FORENSIC_ABS_RETURN_BPS_BINS: tuple[float, ...] = (0.1, 0.5, 1.0, 2.0, 5.0, 10.0)
+# Numerical-comparison tolerance only. This is many orders of magnitude below
+# any descriptive bin and does not alter return signs or V0.1 Gate grading.
+FORENSIC_FLOAT_EPSILON_BPS = 1e-12
 
 
 def _direction(value: float) -> int:
@@ -44,10 +47,14 @@ def _summary(values: list[float]) -> dict[str, float | None]:
     }
 
 
+def _le_descriptive_boundary(value: float, boundary: float) -> bool:
+    return value <= boundary + FORENSIC_FLOAT_EPSILON_BPS
+
+
 def _bucket_label(value: float) -> str:
     previous = 0.0
     for upper in FORENSIC_ABS_RETURN_BPS_BINS:
-        if value <= upper:
+        if _le_descriptive_boundary(value, upper):
             if previous == 0.0:
                 return f"<= {upper:g} bps"
             return f"({previous:g}, {upper:g}] bps"
@@ -137,8 +144,8 @@ def analyze_direction_mismatches(
 
     cumulative_counts = {
         f"both_abs_returns_le_{threshold:g}_bps": sum(
-            abs(float(row["pionex_return_bps"])) <= threshold
-            and abs(float(row["binance_return_bps"])) <= threshold
+            _le_descriptive_boundary(abs(float(row["pionex_return_bps"])), threshold)
+            and _le_descriptive_boundary(abs(float(row["binance_return_bps"])), threshold)
             for row in mismatch_rows
         )
         for threshold in FORENSIC_ABS_RETURN_BPS_BINS
@@ -157,6 +164,7 @@ def analyze_direction_mismatches(
             ),
         },
         "predeclared_descriptive_bins_bps": list(FORENSIC_ABS_RETURN_BPS_BINS),
+        "floating_comparison_epsilon_bps": FORENSIC_FLOAT_EPSILON_BPS,
         "max_abs_return_bps_bin_counts": bin_counts,
         "both_abs_returns_cumulative_counts": cumulative_counts,
         "mismatch_magnitude_summary_bps": {
