@@ -1,0 +1,90 @@
+{
+  "schema": "pionex-binance-equivalence-v0-1-authority-v0.1",
+  "status": "FAIL",
+  "stage": "PIONEX_BINANCE_EQUIVALENCE_GATE_FAIL",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "FROZEN_PROVIDER_EQUIVALENCE_GATE_RESULT",
+  "providers": {
+    "left": "pionex",
+    "right": "binance_usdm",
+    "right_delivery": "binance_vision_daily",
+    "execution_target": "pionex"
+  },
+  "protocol": {
+    "path": "config/provider_equivalence_v0_1.json",
+    "status": "PROTOCOL_FROZEN_BEFORE_LIVE_EVIDENCE",
+    "scope_changed_after_evidence": false,
+    "thresholds_changed_after_evidence": false,
+    "candidate_symbol_count": 15,
+    "intervals": ["15M", "60M", "4H"],
+    "expected_pair_count": 45,
+    "overlap_start_utc": "2026-08-10T00:00:00Z",
+    "overlap_end_utc": "2026-08-17T23:59:59.999Z"
+  },
+  "execution": {
+    "workflow_run_id": 32206479914,
+    "workflow_run_number": 22,
+    "event": "schedule",
+    "head_sha": "63761aea1c2facbe6970c3ee7eab402ee52cae58",
+    "execution_status": "PASS",
+    "artifact_id": 9349306105,
+    "artifact_name": "pionex-binance-equivalence-32206479914",
+    "artifact_zip_sha256": "16975dfcdc34c621b7abe8326cb3cdab0aebffcee27dce2720a8db7f28640af0",
+    "result_json_sha256": "c4ddf68700b03c907fbf43101e9a8a39ead12fa80d395119aa53d3b52e527353",
+    "binance_daily_archive_count": 360,
+    "all_required_source_publication_available": true,
+    "private_api_used": false
+  },
+  "aggregate": {
+    "gate_status": "FAIL",
+    "evaluated_pair_count": 45,
+    "pass_count": 18,
+    "review_count": 18,
+    "fail_count": 9,
+    "source_switch_authorized": false,
+    "full_strategy_signal_equivalence_status": "DEFERRED_UNDEFINED_STRATEGY_RULES"
+  },
+  "failure_forensics": {
+    "all_failures_share_reason": "return_direction_agreement_fail",
+    "failures_by_interval": {
+      "15M": 7,
+      "60M": 2,
+      "4H": 0
+    },
+    "failed_pairs": [
+      {"symbol": "ADA_USDT_PERP", "interval": "15M", "return_direction_agreement": 0.8479880774962743},
+      {"symbol": "ADA_USDT_PERP", "interval": "60M", "return_direction_agreement": 0.9161676646706587},
+      {"symbol": "UNI_USDT_PERP", "interval": "15M", "return_direction_agreement": 0.9463487332339792},
+      {"symbol": "UNI_USDT_PERP", "interval": "60M", "return_direction_agreement": 0.9281437125748503},
+      {"symbol": "XRP_USDT_PERP", "interval": "15M", "return_direction_agreement": 0.9418777943368107},
+      {"symbol": "LTC_USDT_PERP", "interval": "15M", "return_direction_agreement": 0.8718330849478391},
+      {"symbol": "DOGE_USDT_PERP", "interval": "15M", "return_direction_agreement": 0.9254843517138599},
+      {"symbol": "INJ_USDT_PERP", "interval": "15M", "return_direction_agreement": 0.9344262295081968},
+      {"symbol": "SUI_USDT_PERP", "interval": "15M", "return_direction_agreement": 0.9269746646795827}
+    ],
+    "review_reason_counts": {
+      "return_direction_agreement_review": 18,
+      "setup_60m_agreement_review": 2
+    },
+    "interval_status_counts": {
+      "15M": {"PASS": 4, "REVIEW": 4, "FAIL": 7},
+      "60M": {"PASS": 5, "REVIEW": 8, "FAIL": 2},
+      "4H": {"PASS": 9, "REVIEW": 6, "FAIL": 0}
+    }
+  },
+  "authority_boundary": {
+    "gate_result_exists": true,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "supersedes_runtime_state": "PIONEX-BINANCE EQUIVALENCE GATE PENDING SOURCE PUBLICATION",
+  "next_required_stage": "EQUIVALENCE_V0_1_FAIL_FORENSIC_REVIEW_WITHOUT_THRESHOLD_OR_SCOPE_CHANGES"
+}

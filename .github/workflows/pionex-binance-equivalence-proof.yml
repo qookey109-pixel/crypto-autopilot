@@ -2,8 +2,6 @@ name: Pionex Binance Equivalence Proof
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "17 * * * *"
   pull_request:
     paths:
       - ".github/workflows/pionex-binance-equivalence-proof.yml"
@@ -12,6 +10,7 @@ on:
       - "config/provider_equivalence_v0_1.json"
       - "research/receipts/2026-08-17-m1a-pionex.json"
       - "research/receipts/2026-08-18-m1b-r2.json"
+      - "research/receipts/2026-08-19-pionex-binance-equivalence-v0-1.json"
   push:
     branches: [main]
     paths:
@@ -68,3 +67,6 @@ jobs:
           path: artifacts/pionex-binance-equivalence.json
           if-no-files-found: warn
           retention-days: 90
+
+# Hourly source-publication retry removed after run 32206479914 produced a definitive V0.1 gate result.
+# Manual/PR execution remains available for reproducibility and forensic work only.
