@@ -19,117 +19,65 @@ def load(path: Path) -> dict[str, object]:
 
 
 class ProviderEquivalenceV02MetadataDraftTests(unittest.TestCase):
-    def test_metadata_protocol_is_design_only_and_cannot_open_holdout(self) -> None:
+    def test_field_semantics_remain_frozen(self) -> None:
         payload = load(METADATA)
-        self.assertEqual(payload["status"], "METADATA_PROTOCOL_DRAFT_NOT_AUTHORIZED")
-        boundary = payload["authorization_boundary"]
-        self.assertIs(boundary["field_semantics_authority_frozen"], True)
-        for key in (
-            "metadata_protocol_frozen",
-            "metadata_acquisition_authorized",
-            "metadata_values_known",
-            "historical_metadata_values_authorized",
-            "holdout_data_access_authorized",
-            "holdout_evaluation_authorized",
-            "source_switch_authorized",
-            "staged_trade_kline_w1_materialization_authorized",
-            "backtest_admission_authorized",
-            "trade_plan_authorized",
-            "live_trading_authorized",
-        ):
-            self.assertIs(boundary[key], False, key)
-
-    def test_binance_field_semantics_are_resolved_but_value_authority_is_not(self) -> None:
-        payload = load(METADATA)
+        self.assertIs(payload["authorization_boundary"]["field_semantics_authority_frozen"], True)
+        pionex = payload["official_documentation_basis"]["pionex"]
+        self.assertEqual(pionex["official_field_description"], "Price step size (quote asset)")
+        self.assertIs(pionex["field_semantics_authorized"], True)
         binance = payload["official_documentation_basis"]["binance_usdm"]
         self.assertEqual(binance["documented_filter"], "PRICE_FILTER")
-        self.assertEqual(
-            binance["price_increment_field"],
-            "symbols[].filters[filterType=PRICE_FILTER].tickSize",
-        )
-        self.assertEqual(binance["field_semantics_status"], "PASS_EXPLICIT_PRICE_STEP_INTERVAL")
         self.assertIs(binance["field_semantics_authorized"], True)
-        self.assertIs(binance["historical_field_value_authorized"], False)
-
-    def test_pionex_quotestep_semantics_are_frozen_from_pre_holdout_official_openapi(self) -> None:
-        payload = load(METADATA)
-        pionex = payload["official_documentation_basis"]["pionex"]
-        self.assertEqual(pionex["official_repository"], "pionex-official/pionex-open-api")
-        self.assertEqual(pionex["official_file"], "openapi_futures.yaml")
-        self.assertEqual(
-            pionex["pre_holdout_commit"],
-            "b8c63d29ed9b49d967b75b75b0c2ef057e45cc77",
-        )
-        self.assertEqual(
-            pionex["pre_holdout_git_blob_sha1"],
-            "46f9b20d5ab7946dcb11663913987a511ac5be10",
-        )
-        self.assertEqual(pionex["price_increment_field"], "data.symbols[].quoteStep")
-        self.assertEqual(pionex["official_field_description"], "Price step size (quote asset)")
-        self.assertEqual(
-            pionex["field_semantics_status"],
-            "PASS_EXPLICIT_PRICE_STEP_SIZE_IN_PRE_HOLDOUT_OFFICIAL_OPENAPI",
-        )
-        self.assertIs(pionex["field_semantics_authorized"], True)
-        self.assertIs(pionex["historical_field_value_authorized"], False)
-
-        resolution = payload["pionex_semantic_resolution"]
-        self.assertEqual(resolution["state"], "PASS_FROZEN_SEMANTIC_AUTHORITY")
-        self.assertIs(resolution["quoteStep_name_alone_is_sufficient_proof"], False)
-        self.assertIs(resolution["pre_holdout_official_openapi_description_used"], True)
-        self.assertIs(resolution["current_market_price_lattice_observation_used_as_authority"], False)
-        self.assertIs(resolution["observed_v0_1_price_deltas_used_as_authority"], False)
-        self.assertIs(resolution["holdout_data_used_to_resolve_semantics"], False)
-
-    def test_semantics_receipt_preserves_v0_1_and_holdout_boundaries(self) -> None:
         receipt = load(SEMANTICS)
         self.assertEqual(receipt["status"], "PASS")
-        self.assertEqual(
-            receipt["stage"],
-            "PROVIDER_EQUIVALENCE_V0_2_PRICE_INCREMENT_SEMANTICS_PASS_VALUES_NOT_READY",
-        )
-        self.assertEqual(receipt["v0_1_boundary"]["frozen_gate_status"], "FAIL")
-        self.assertIs(receipt["candidate_holdout_boundary"]["holdout_data_accessed"], False)
-        self.assertIs(receipt["candidate_holdout_boundary"]["holdout_evaluated"], False)
-        self.assertIs(receipt["candidate_holdout_boundary"]["holdout_result_known"], False)
-        self.assertIs(receipt["semantic_result"]["pionex_quote_step_semantics_resolved"], True)
-        self.assertIs(receipt["semantic_result"]["historical_value_applicability_ready"], False)
 
-    def test_only_remaining_metadata_blocker_is_historical_value_applicability(self) -> None:
+    def test_old_historical_value_attempt_is_superseded_without_candle_access(self) -> None:
         payload = load(METADATA)
-        applicability = payload["historical_applicability"]
-        self.assertEqual(
-            applicability["state"],
-            "ONLY_REMAINING_BLOCKER_BEFORE_METADATA_VALUE_AUTHORITY",
-        )
-        self.assertIs(applicability["current_metadata_snapshot_alone_proves_historical_effective_value"], False)
-        self.assertIs(applicability["m1a_artifact_contains_raw_symbols_response"], False)
-        self.assertIs(applicability["holdout_candles_must_remain_unopened_during_resolution"], True)
-        draft = load(V0_2)
-        holdout = draft["candidate_holdout"]
-        self.assertEqual(applicability["candidate_holdout_start_utc"], holdout["start_utc"])
-        self.assertEqual(applicability["candidate_holdout_end_utc"], holdout["end_utc"])
+        old = payload["superseded_historical_applicability_attempt"]
+        self.assertEqual(old["state"], "SUPERSEDED_UNOPENED")
+        self.assertIs(old["current_snapshot_backfill_forbidden"], True)
+        self.assertIs(old["m1a_artifact_contains_raw_symbols_response"], False)
+        self.assertIs(old["holdout_candles_accessed"], False)
 
-    def test_future_acquisition_contract_is_fail_closed_and_public_only(self) -> None:
+    def test_forward_capture_window_matches_new_candidate_holdout(self) -> None:
         payload = load(METADATA)
-        contract = payload["future_acquisition_contract"]
-        self.assertEqual(contract["state"], "DESIGN_ONLY_NOT_AUTHORIZED")
+        forward = payload["forward_applicability"]
+        holdout = load(V0_2)["candidate_holdout"]
+        self.assertEqual(forward["state"], "CAPTURE_PROTOCOL_FROZEN_VALUES_PENDING")
+        self.assertEqual(forward["candidate_holdout_start_utc"], holdout["start_utc"])
+        self.assertEqual(forward["candidate_holdout_end_utc"], holdout["end_utc"])
+        self.assertEqual(forward["capture_start_utc"], "2026-08-20T00:00:00Z")
+        self.assertEqual(forward["capture_end_utc"], "2026-08-28T01:59:59.999Z")
+        self.assertEqual(forward["hourly_slot_count"], 194)
+        self.assertIs(forward["invalid_result_authorizes_holdout_candles"], False)
+        self.assertIs(forward["pass_result_authorizes_holdout_candles"], False)
+        self.assertIs(forward["separate_holdout_access_authority_required_after_pass"], True)
+
+    def test_capture_contract_is_public_fail_closed_and_candle_independent(self) -> None:
+        contract = load(METADATA)["capture_contract"]
         self.assertIs(contract["public_endpoints_only"], True)
-        self.assertIs(contract["private_api_key_forbidden"], True)
-        self.assertIs(contract["raw_response_bytes_must_be_retained"], True)
+        self.assertIs(contract["private_provider_api_keys_forbidden"], True)
+        self.assertIs(contract["raw_response_bytes_retained"], True)
         self.assertIs(contract["raw_payload_sha256_required"], True)
         self.assertIs(contract["all_15_symbols_required"], True)
         self.assertIs(contract["missing_symbol_fails_closed"], True)
         self.assertIs(contract["nonpositive_increment_fails_closed"], True)
         self.assertIs(contract["provider_splicing_forbidden"], True)
         self.assertIs(contract["value_interpolation_forbidden"], True)
+        self.assertIs(contract["candle_inference_forbidden"], True)
 
-    def test_next_stage_cannot_be_holdout_evaluation(self) -> None:
-        payload = load(METADATA)
-        self.assertEqual(
-            payload["next_required_stage"],
-            "RESOLVE_HISTORICAL_PRICE_INCREMENT_VALUE_APPLICABILITY_WITHOUT_OPENING_HOLDOUT",
-        )
+    def test_capture_authority_does_not_open_holdout(self) -> None:
+        boundary = load(METADATA)["authorization_boundary"]
+        self.assertIs(boundary["metadata_capture_protocol_frozen"], True)
+        self.assertIs(boundary["metadata_capture_authorized"], True)
+        self.assertIs(boundary["metadata_only_r2_writes_authorized"], True)
+        self.assertIs(boundary["metadata_values_complete"], False)
+        self.assertIs(boundary["metadata_applicability_pass"], False)
+        self.assertIs(boundary["holdout_data_access_authorized"], False)
+        self.assertIs(boundary["holdout_evaluation_authorized"], False)
+        self.assertIs(boundary["source_switch_authorized"], False)
+        self.assertIs(boundary["staged_trade_kline_w1_materialization_authorized"], False)
+        self.assertIs(boundary["live_trading_authorized"], False)
 
 
 if __name__ == "__main__":

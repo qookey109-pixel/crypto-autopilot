@@ -1,0 +1,85 @@
+{
+  "schema": "provider-equivalence-v0-2-forward-metadata-capture-authority-v0.1",
+  "status": "PASS",
+  "stage": "PROVIDER_EQUIVALENCE_V0_2_FORWARD_METADATA_CAPTURE_AUTHORIZED_HOLDOUT_CANDLES_FORBIDDEN",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "PUBLIC_METADATA_CAPTURE_ONLY",
+  "protocol": "config/provider_equivalence_v0_2_metadata_capture_v0_1.json",
+  "prerequisites": {
+    "v0_1_gate_authority": "research/receipts/2026-08-19-pionex-binance-equivalence-v0-1.json",
+    "v0_1_gate_status": "FAIL",
+    "v0_1_forensic_authority": "research/receipts/2026-08-19-pionex-binance-equivalence-v0-1-direction-forensics.json",
+    "field_semantics_authority": "research/receipts/2026-08-19-provider-equivalence-v0-2-price-increment-semantics.json",
+    "field_semantics_status": "PASS"
+  },
+  "supersession": {
+    "old_candidate_start_utc": "2026-08-03T08:00:00Z",
+    "old_candidate_end_utc": "2026-08-10T07:59:59.999Z",
+    "old_candidate_state": "SUPERSEDED_UNOPENED_BEFORE_ANY_EVIDENCE",
+    "old_holdout_candles_accessed": false,
+    "old_holdout_evaluated": false,
+    "old_holdout_result_known": false,
+    "supersession_reason": "Historical per-symbol increment values were not preserved. A future contemporaneous capture is required rather than backfilling current values into the past."
+  },
+  "new_frozen_candidate_holdout": {
+    "start_utc": "2026-08-21T00:00:00Z",
+    "end_utc": "2026-08-27T23:59:59.999Z",
+    "duration_hours": 168,
+    "symbol_count": 15,
+    "intervals": ["15M", "60M", "4H"],
+    "pair_count": 45,
+    "candles_accessed": false,
+    "candles_evaluated": false,
+    "result_known": false
+  },
+  "metadata_capture": {
+    "capture_start_utc": "2026-08-20T00:00:00Z",
+    "capture_end_utc": "2026-08-28T01:59:59.999Z",
+    "hourly_slot_count": 194,
+    "scheduled_minutes_utc": [17, 47],
+    "required_hourly_coverage": 194,
+    "pionex_endpoint": "https://api.pionex.com/api/v1/common/symbols",
+    "pionex_field": "data.symbols[].quoteStep",
+    "binance_endpoint": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "binance_field": "symbols[].filters[filterType=PRICE_FILTER].tickSize",
+    "raw_payload_retention": true,
+    "raw_sha256_required": true,
+    "normalized_vector_stability_required": true,
+    "missing_hour_invalidates_holdout": true,
+    "changed_vector_invalidates_holdout": true
+  },
+  "r2_budget": {
+    "namespace": "metadata/provider-equivalence/v0_2/forward-holdout-20260821/",
+    "objects_per_complete_capture": 3,
+    "projected_max_new_objects": 1164,
+    "projected_metadata_storage_cap_bytes": 4294967296,
+    "current_bucket_reference_bytes": 22120404,
+    "existing_storage_block_guardrail_bytes": 10000000000,
+    "budget_gate": "PASS"
+  },
+  "authorized_actions": {
+    "public_metadata_connectivity_preflight": true,
+    "scheduled_public_metadata_capture": true,
+    "metadata_only_r2_writes_under_exact_namespace": true,
+    "gzip_raw_payload_retention": true,
+    "postwrite_sha256_verification": true
+  },
+  "explicitly_not_authorized": {
+    "old_holdout_reactivation": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "private_pionex_api_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_required_stage": "METADATA_CAPTURE_IMPLEMENTATION_AND_CONNECTIVITY_PREFLIGHT"
+}
