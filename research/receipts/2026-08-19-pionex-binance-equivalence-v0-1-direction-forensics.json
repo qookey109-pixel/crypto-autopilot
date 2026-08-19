@@ -1,0 +1,115 @@
+{
+  "schema": "pionex-binance-equivalence-v0-1-direction-forensics-authority-v0.1",
+  "status": "PASS",
+  "stage": "PIONEX_BINANCE_EQUIVALENCE_V0_1_DIRECTION_FORENSICS_PASS",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "DESCRIPTIVE_FORENSIC_EVIDENCE_ONLY",
+  "frozen_v0_1_authority": "research/receipts/2026-08-19-pionex-binance-equivalence-v0-1.json",
+  "frozen_v0_1_gate_status": "FAIL",
+  "frozen_v0_1_outcome_changed": false,
+  "implementation": {
+    "pr": 89,
+    "evidence_run_id": 32208040423,
+    "ci_run_id": 32208040395,
+    "artifact_id": 9349771365,
+    "artifact_name": "pionex-binance-equivalence-v0-1-forensics-32208040423",
+    "artifact_zip_sha256": "1fbd3af5ee32806a69ca52e1c6756fc8bc686693c4934d37f5a3f879c97dc5b7",
+    "forensic_json_sha256": "5339316b0143fa9752dbe564d30a4748dcc64261e21f5ade344d8a83b0f9d256"
+  },
+  "predeclared_descriptive_protocol": {
+    "document": "docs/PIONEX_BINANCE_EQUIVALENCE_V0_1_FORENSICS.md",
+    "absolute_return_bins_bps": [0.1, 0.5, 1.0, 2.0, 5.0, 10.0],
+    "bins_are_gate_thresholds": false,
+    "new_deadband_applied": false,
+    "new_threshold_proposed": false
+  },
+  "source_replay": {
+    "overlap_start_utc": "2026-08-10T08:00:00Z",
+    "overlap_end_utc": "2026-08-17T07:59:59.999Z",
+    "pionex_r2_object_count": 45,
+    "binance_vision_daily_archive_count": 360,
+    "official_binance_checksums_verified": true,
+    "v0_1_pair_count_reproduced": 45,
+    "v0_1_pass_count_reproduced": 18,
+    "v0_1_review_count_reproduced": 18,
+    "v0_1_fail_count_reproduced": 9,
+    "v0_1_gate_status_reproduced": "FAIL",
+    "r2_reads_performed": true,
+    "r2_writes_performed": false,
+    "r2_deletes_performed": false,
+    "provider_splicing_used": false,
+    "private_api_used": false
+  },
+  "direction_forensics": {
+    "total_direction_mismatches_all_45_pairs": 623,
+    "direction_mismatches_in_9_fail_pairs": 432,
+    "all_pairs_mismatch_shape_counts": {
+      "ONE_PROVIDER_FLAT": 539,
+      "OPPOSITE_NONZERO_SIGNS": 84
+    },
+    "all_pairs_one_provider_flat_fraction": 0.8651685393258427,
+    "fail_pairs_mismatch_shape_counts": {
+      "ONE_PROVIDER_FLAT": 388,
+      "OPPOSITE_NONZERO_SIGNS": 44
+    },
+    "fail_pairs_one_provider_flat_fraction": 0.8981481481481481,
+    "mismatches_by_interval": {
+      "15M": 536,
+      "60M": 78,
+      "4H": 9
+    },
+    "all_pairs_max_abs_return_bps_bins": {
+      "<=0.1": 3,
+      "(0.1,0.5]": 14,
+      "(0.5,1]": 42,
+      "(1,2]": 199,
+      "(2,5]": 230,
+      "(5,10]": 119,
+      ">10": 16
+    },
+    "fail_pairs_both_absolute_returns_cumulative_counts": {
+      "<=0.1_bps": 0,
+      "<=0.5_bps": 0,
+      "<=1_bps": 26,
+      "<=2_bps": 119,
+      "<=5_bps": 298,
+      "<=10_bps": 416,
+      ">10_bps": 16
+    },
+    "failed_pair_summaries": [
+      {"symbol": "ADA_USDT_PERP", "interval": "15M", "mismatches": 102, "one_provider_flat": 95, "opposite_nonzero_signs": 7, "median_max_abs_return_bps": 5.602240896358705, "p95_max_abs_return_bps": 11.146722786039632},
+      {"symbol": "ADA_USDT_PERP", "interval": "60M", "mismatches": 14, "one_provider_flat": 13, "opposite_nonzero_signs": 1, "median_max_abs_return_bps": 5.527958206312936, "p95_max_abs_return_bps": 7.58843397387447},
+      {"symbol": "UNI_USDT_PERP", "interval": "15M", "mismatches": 36, "one_provider_flat": 34, "opposite_nonzero_signs": 2, "median_max_abs_return_bps": 3.0441580845660345, "p95_max_abs_return_bps": 6.170306802166142},
+      {"symbol": "UNI_USDT_PERP", "interval": "60M", "mismatches": 12, "one_provider_flat": 11, "opposite_nonzero_signs": 1, "median_max_abs_return_bps": 2.823662796538101, "p95_max_abs_return_bps": 4.465131518030875},
+      {"symbol": "XRP_USDT_PERP", "interval": "15M", "mismatches": 39, "one_provider_flat": 37, "opposite_nonzero_signs": 2, "median_max_abs_return_bps": 0.9984025559104331, "p95_max_abs_return_bps": 2.000740362248594},
+      {"symbol": "LTC_USDT_PERP", "interval": "15M", "mismatches": 86, "one_provider_flat": 73, "opposite_nonzero_signs": 13, "median_max_abs_return_bps": 2.255045693342831, "p95_max_abs_return_bps": 4.511872250193013},
+      {"symbol": "DOGE_USDT_PERP", "interval": "15M", "mismatches": 50, "one_provider_flat": 44, "opposite_nonzero_signs": 6, "median_max_abs_return_bps": 1.4284694023307165, "p95_max_abs_return_bps": 2.8288045037847542},
+      {"symbol": "INJ_USDT_PERP", "interval": "15M", "mismatches": 44, "one_provider_flat": 37, "opposite_nonzero_signs": 7, "median_max_abs_return_bps": 2.419389013404099, "p95_max_abs_return_bps": 6.956765400956256},
+      {"symbol": "SUI_USDT_PERP", "interval": "15M", "mismatches": 49, "one_provider_flat": 44, "opposite_nonzero_signs": 5, "median_max_abs_return_bps": 1.466920932961552, "p95_max_abs_return_bps": 2.949592728408175}
+    ]
+  },
+  "interpretation": {
+    "dominant_pattern": "ONE_PROVIDER_FLAT_WHILE_OTHER_PROVIDER_MOVES",
+    "dominant_pattern_is_sufficient_to_regrade_v0_1": false,
+    "simple_tiny_return_deadband_supported_as_a_posthoc_fix": false,
+    "reason": "The one-provider-flat pattern dominates, but failed-pair disagreements are not confined to microscopic returns; 16 failed-pair mismatches exceed 10 bps and 44 failed-pair mismatches have opposite non-zero signs.",
+    "measurement_design_review_justified": true,
+    "independent_evidence_required_before_any_v0_2_gate_decision": true
+  },
+  "authority_boundary": {
+    "v0_1_thresholds_changed": false,
+    "v0_1_scope_changed": false,
+    "v0_1_gate_status": "FAIL",
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_required_stage": "DESIGN_SEPARATELY_VERSIONED_EQUIVALENCE_V0_2_PROTOCOL_WITH_INDEPENDENT_HOLDOUT_BEFORE_EVIDENCE"
+}
