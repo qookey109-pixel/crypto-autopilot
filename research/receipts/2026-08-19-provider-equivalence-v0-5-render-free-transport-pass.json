@@ -1,0 +1,70 @@
+{
+  "schema": "provider-equivalence-v0-5-render-free-transport-pass-authority-v0.1",
+  "status": "PASS",
+  "stage": "PROVIDER_EQUIVALENCE_V0_5_RENDER_FREE_BINANCE_TRANSPORT_PASS",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "SANITIZED_EXECUTION_TRANSPORT_PASS",
+  "protocol": "config/provider_equivalence_v0_5_render_free_transport_preflight_v0_1.json",
+  "main_baseline": "5be231d248c886c3e0de46041f1db61b5b097fd3",
+  "render": {
+    "workspace_id": "tea-da2qcpuk1f9s73dro7q0",
+    "service_id": "srv-da2qlb67bikc73bibobg",
+    "service_name": "qookey-binance-transport-v0-5",
+    "service_url": "https://qookey-binance-transport-v0-5.onrender.com",
+    "plan": "free",
+    "region": "frankfurt",
+    "runtime": "docker",
+    "root_directory": "infra/render/binance-transport-free",
+    "health_check_path": "/health",
+    "deploy_id": "dep-da2qrbvtlipc73f3s000",
+    "deploy_status": "live"
+  },
+  "execution_evidence": {
+    "observed_at_utc": "2026-08-19T13:54:55Z",
+    "transport": "render_free_web_service",
+    "runtime_platform": "render",
+    "runtime_region": "frankfurt",
+    "upstream_url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "upstream_status": 200,
+    "json_ok": true,
+    "symbols_array": true,
+    "symbol_count": 872,
+    "result": "PASS"
+  },
+  "sanitization_and_safety": {
+    "api_key_used": false,
+    "increment_values_emitted": false,
+    "raw_exchange_info_persisted": false,
+    "r2_client_constructed": false,
+    "r2_writes_performed": false,
+    "holdout_candles_accessed": false,
+    "holdout_evaluated": false,
+    "source_switch_performed": false,
+    "live_trading_performed": false,
+    "diagnostic_token_value_recorded": false
+  },
+  "authority_interpretation": {
+    "v0_1_equivalence_remains_fail": true,
+    "v0_2_self_hosted_mac_transport_authority_preserved": true,
+    "this_pass_replaces_v0_2_authority": false,
+    "render_transport_authorized_for_metadata_capture_by_this_receipt_alone": false,
+    "metadata_stability_passed": false,
+    "holdout_opened": false
+  },
+  "authorization_boundary": {
+    "metadata_capture_execution_authorized_by_this_receipt_alone": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_required_stage": "FREEZE_SEPARATE_VERSIONED_RENDER_TRANSPORT_AUTHORITY_TRANSITION"
+}
