@@ -1,0 +1,27 @@
+name: Diagnose Main Pages Run
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/diagnose-pages-main-run.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect latest main merge workflow runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: cf27a331ab6c36c8deddfe3aab4a48e935c67423
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${REPO}/actions/runs?head_sha=${HEAD_SHA}&per_page=100" \
+            --jq '.workflow_runs[] | {id,name,event,status,conclusion,head_sha,html_url}'
