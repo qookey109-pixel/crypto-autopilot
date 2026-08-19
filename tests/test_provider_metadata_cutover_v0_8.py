@@ -11,8 +11,10 @@ ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
 V07 = ROOT / "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
 V02 = ROOT / "config/provider_equivalence_v0_2_metadata_capture_v0_2.json"
+V010 = ROOT / "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
 SUCCESSOR_WORKFLOW = ROOT / ".github/workflows/provider-equivalence-v0-8-render-metadata-capture.yml"
 OLD_WORKFLOW = ROOT / ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
+V010_WORKFLOW = ROOT / ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
 
 
 def _load(path: Path) -> dict:
@@ -101,8 +103,20 @@ def test_v08_requires_atomic_exclusive_cutover_and_out_of_band_secret() -> None:
         assert boundary[key] is False, key
 
 
-def test_only_v02_has_schedule_before_activation_authority() -> None:
+def test_v08_prepared_topology_can_transition_only_through_v010_atomic_authority() -> None:
     old_lines = OLD_WORKFLOW.read_text(encoding="utf-8").splitlines()
-    successor_lines = SUCCESSOR_WORKFLOW.read_text(encoding="utf-8").splitlines()
-    assert any(line == "  schedule:" for line in old_lines)
-    assert not any(line == "  schedule:" for line in successor_lines)
+    v08_lines = SUCCESSOR_WORKFLOW.read_text(encoding="utf-8").splitlines()
+    v010_lines = V010_WORKFLOW.read_text(encoding="utf-8").splitlines()
+    v010 = _load(V010)
+
+    # V0.8 remains a frozen prepared/no-schedule historical stage.
+    assert not any(line == "  schedule:" for line in v08_lines)
+    assert v08.V0_8_CAPTURE_EXECUTION_AUTHORIZED is False
+
+    # The later V0.10 authority is the only topology change allowed here.
+    assert not any(line == "  schedule:" for line in old_lines)
+    assert any(line == "  schedule:" for line in v010_lines)
+    cutover = v010["atomic_repository_cutover"]
+    assert cutover["old_schedule_removed_in_same_change"] is True
+    assert cutover["successor_schedule_enabled_in_same_change"] is True
+    assert cutover["concurrent_old_and_new_capture_paths_authorized"] is False
