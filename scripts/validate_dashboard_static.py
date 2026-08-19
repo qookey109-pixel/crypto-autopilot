@@ -19,6 +19,7 @@ FORBIDDEN_TEXT = (
     "CLOUDFLARE_ACCOUNT_ID",
     "PIONEX_API_SECRET",
     "PIONEX_SECRET",
+    "METADATA_RELAY_TOKEN=",
     "sk-proj-",
     "BEGIN PRIVATE KEY",
 )
@@ -31,6 +32,9 @@ FORBIDDEN_RUNTIME_PHRASES = (
     "liveTradingAuthorized: true",
     '"liveTradingAuthorized": true',
     '"tradePlanAuthorized": true',
+    '"successorMetadataCaptureExecutionAuthorized": true',
+    '"successorMetadataScheduleEnabled": true',
+    '"metadataCapturePathsConcurrentAuthorized": true',
 )
 
 REQUIRED_ZH_HANT_LABELS = (
@@ -57,7 +61,7 @@ def main() -> int:
             raise RuntimeError(f"dashboard contains forbidden secret identifier/material: {token}")
     for phrase in FORBIDDEN_RUNTIME_PHRASES:
         if phrase in combined:
-            raise RuntimeError(f"dashboard contains forbidden live execution phrase: {phrase}")
+            raise RuntimeError(f"dashboard contains forbidden live/successor execution phrase: {phrase}")
 
     data = json.loads((ROOT / "data" / "dashboard.json").read_text(encoding="utf-8"))
     if data.get("authority") is not False:
@@ -71,6 +75,20 @@ def main() -> int:
         raise RuntimeError("dashboard fixture must keep tradePlanAuthorized=false")
     if project.get("liveTradingAuthorized") is not False:
         raise RuntimeError("dashboard fixture must keep liveTradingAuthorized=false")
+    if project.get("providerEquivalenceGateState") != "FAIL":
+        raise RuntimeError("dashboard fixture must reflect frozen Equivalence V0.1 FAIL")
+    if project.get("fundingMaterializationState") != "PASS":
+        raise RuntimeError("dashboard fixture must reflect Funding V0.2 materialization PASS")
+    if project.get("renderMetadataV0_8CutoverState") != "PREPARED_EXECUTION_NOT_AUTHORIZED":
+        raise RuntimeError("dashboard fixture must reflect V0.8 prepared-not-authorized state")
+    if project.get("successorMetadataCaptureExecutionAuthorized") is not False:
+        raise RuntimeError("dashboard fixture must keep successor capture disabled")
+    if project.get("successorMetadataScheduleEnabled") is not False:
+        raise RuntimeError("dashboard fixture must keep successor schedule disabled")
+    if project.get("metadataCapturePathsConcurrentAuthorized") is not False:
+        raise RuntimeError("dashboard fixture must forbid concurrent capture paths")
+    if project.get("replacementHoldoutState") != "FROZEN_UNOPENED":
+        raise RuntimeError("dashboard fixture must keep replacement holdout unopened")
 
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     if '<html lang="zh-Hant-TW">' not in html:
@@ -92,8 +110,14 @@ def main() -> int:
             raise RuntimeError(f"dashboard view missing: {view}")
 
     app_js = (ROOT / "app.js").read_text(encoding="utf-8")
-    if "通過 · PASS" not in app_js or "未授權 · NOT_AUTHORIZED" not in app_js:
-        raise RuntimeError("dashboard must preserve raw authority codes beside Chinese labels")
+    for label in (
+        "通過 · PASS",
+        "已準備 · PREPARED",
+        "未授權 · NOT_AUTHORIZED",
+        "失敗 · FAIL",
+    ):
+        if label not in app_js:
+            raise RuntimeError(f"dashboard status label missing: {label}")
 
     headers = (ROOT / "_headers").read_text(encoding="utf-8")
     for header in (
@@ -109,12 +133,15 @@ def main() -> int:
         json.dumps(
             {
                 "status": "PASS",
-                "stage": "DASHBOARD_ZH_HANT_STATIC_SAFETY_PASS",
+                "stage": "DASHBOARD_ZH_HANT_STATIC_SAFETY_V0_8_PASS",
                 "required_files": len(REQUIRED),
                 "views": 8,
                 "locale": "zh-Hant-TW",
                 "authority_fixture": False,
                 "paper_only": True,
+                "equivalence_v0_1": project["providerEquivalenceGateState"],
+                "render_v0_8": project["renderMetadataV0_8CutoverState"],
+                "successor_execution": False,
                 "live_execution_surface": False,
             },
             sort_keys=True,
