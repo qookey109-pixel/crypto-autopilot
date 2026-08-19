@@ -63,10 +63,9 @@ class EquivalenceForensicsTests(unittest.TestCase):
         rows = result["mismatches"]
         self.assertEqual(len(rows), 3)
         self.assertTrue(all(float(row["max_abs_return_bps"]) < 0.11 for row in rows))
-        self.assertEqual(
-            result["both_abs_returns_cumulative_counts"]["both_abs_returns_le_0.1_bps"],
-            3,
-        )
+        cumulative = result["both_abs_returns_cumulative_counts"]
+        self.assertEqual(cumulative["both_abs_returns_le_0.1_bps"], 2)
+        self.assertEqual(cumulative["both_abs_returns_le_0.5_bps"], 3)
 
     def test_direction_forensics_matches_identical_returns(self) -> None:
         candles = (
