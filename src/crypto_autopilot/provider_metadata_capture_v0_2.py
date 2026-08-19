@@ -16,9 +16,9 @@ from .binance_historical import pionex_perp_to_binance_usdm
 from .storage.r2 import R2Store
 
 
-PROTOCOL = Path("config/provider_equivalence_v0_2_metadata_capture_v0_1.json")
+PROTOCOL = Path("config/provider_equivalence_v0_2_metadata_capture_v0_2.json")
 AUTHORITY = Path(
-    "research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority.json"
+    "research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority-v0-2.json"
 )
 M1A = Path("research/receipts/2026-08-17-m1a-pionex.json")
 
