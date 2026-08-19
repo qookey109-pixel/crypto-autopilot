@@ -1,0 +1,124 @@
+name: Diagnose V0.2 Cloudflare Binance Transport
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/diagnose-v0-2-cloudflare-binance-transport.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate fixed-upstream diagnostic Worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          TOKEN="$(python - <<'PY'
+          import secrets
+          print(secrets.token_urlsafe(32))
+          PY
+          )"
+          printf '%s' "$TOKEN" > artifacts/proxy-token.txt
+          cat > artifacts/worker.mjs <<EOF
+          const TOKEN = ${TOKEN@Q};
+          export default {
+            async fetch(request) {
+              const url = new URL(request.url);
+              if (url.pathname !== "/check" || url.searchParams.get("token") !== TOKEN) {
+                return new Response("not found", { status: 404 });
+              }
+              const upstream = await fetch("https://fapi.binance.com/fapi/v1/exchangeInfo", {
+                headers: { "User-Agent": "qookey-provider-equivalence-transport-check/0.1" }
+              });
+              let jsonOk = false;
+              let symbolsArray = false;
+              let symbolCount = null;
+              try {
+                const payload = await upstream.json();
+                jsonOk = payload !== null && typeof payload === "object";
+                symbolsArray = Array.isArray(payload?.symbols);
+                symbolCount = symbolsArray ? payload.symbols.length : null;
+              } catch (_) {}
+              return Response.json({
+                upstream_status: upstream.status,
+                json_ok: jsonOk,
+                symbols_array: symbolsArray,
+                symbol_count: symbolCount,
+                increment_values_emitted: false,
+                upstream_url: "https://fapi.binance.com/fapi/v1/exchangeInfo"
+              }, { status: 200 });
+            }
+          };
+          EOF
+          cat > artifacts/wrangler.jsonc <<'EOF'
+          {
+            "$schema": "./node_modules/wrangler/config-schema.json",
+            "name": "qookey-v0-2-binance-transport-check",
+            "main": "./worker.mjs",
+            "compatibility_date": "2026-08-19"
+          }
+          EOF
+
+      - name: Deploy temporary Cloudflare Worker without persistent credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd artifacts
+          npx --yes wrangler@latest deploy --temporary --config wrangler.jsonc > deploy.log 2>&1
+          PROXY_URL="$(grep -Eo 'https://[^[:space:]]+\.workers\.dev' deploy.log | head -n1)"
+          test -n "$PROXY_URL"
+          printf '%s' "$PROXY_URL" > proxy-url.txt
+          echo "temporary worker transport deployed"
+
+      - name: Verify Binance official endpoint through Cloudflare egress
+        shell: bash
+        run: |
+          set -euo pipefail
+          TOKEN="$(cat artifacts/proxy-token.txt)"
+          PROXY_URL="$(cat artifacts/proxy-url.txt)"
+          curl --fail --silent --show-error \
+            "${PROXY_URL}/check?token=${TOKEN}" \
+            > artifacts/result.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path('artifacts/result.json').read_text())
+          assert payload['upstream_url'] == 'https://fapi.binance.com/fapi/v1/exchangeInfo'
+          assert payload['upstream_status'] == 200
+          assert payload['json_ok'] is True
+          assert payload['symbols_array'] is True
+          assert isinstance(payload['symbol_count'], int) and payload['symbol_count'] > 0
+          assert payload['increment_values_emitted'] is False
+          print(json.dumps({
+              'status': 'PASS',
+              'transport': 'cloudflare_temporary_worker',
+              'upstream_status': payload['upstream_status'],
+              'json_ok': payload['json_ok'],
+              'symbols_array': payload['symbols_array'],
+              'increment_values_emitted': False,
+              'r2_writes_performed': False,
+              'holdout_candles_accessed': False,
+          }, sort_keys=True))
+          PY
+
+      - name: Remove ephemeral token and unsanitized deployment log
+        if: always()
+        shell: bash
+        run: |
+          rm -f artifacts/proxy-token.txt artifacts/proxy-url.txt artifacts/deploy.log artifacts/worker.mjs artifacts/wrangler.jsonc
+
+      - name: Upload sanitized diagnostic result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v0-2-cloudflare-binance-transport-${{ github.run_id }}
+          path: artifacts/result.json
+          retention-days: 3
+          if-no-files-found: warn
