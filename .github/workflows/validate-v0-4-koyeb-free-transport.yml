@@ -1,0 +1,51 @@
+name: Validate V0.4 Koyeb Free Binance Transport
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/validate-v0-4-koyeb-free-transport.yml"
+      - "config/provider_equivalence_v0_4_koyeb_free_transport_preflight_v0_1.json"
+      - "infra/koyeb/binance-transport-free/**"
+      - "tests/test_koyeb_free_transport_preflight_v0_4.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install test dependency
+        run: python -m pip install pytest
+
+      - name: Validate V0.4 frozen boundary
+        run: python -m pytest -q tests/test_koyeb_free_transport_preflight_v0_4.py
+
+      - name: Build Koyeb Free diagnostic image
+        working-directory: infra/koyeb/binance-transport-free
+        run: docker build -t qookey-koyeb-free-binance-transport-v0-4 .
+
+      - name: Assert no deployment or paid runtime is authorized here
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          cfg = json.loads(Path('config/provider_equivalence_v0_4_koyeb_free_transport_preflight_v0_1.json').read_text())
+          assert cfg['status'] == 'PREFLIGHT_PREPARED_NOT_EXECUTED'
+          assert cfg['runtime']['instance_type'] == 'free'
+          assert cfg['runtime']['monthly_runtime_budget_usd'] == 0
+          assert cfg['failure_policy']['upgrade_to_paid_instance'] is False
+          assert cfg['authority_boundary']['metadata_capture_execution_authorized'] is False
+          assert cfg['authority_boundary']['holdout_candle_access_authorized'] is False
+          assert cfg['authority_boundary']['live_trading_authorized'] is False
+          PY
