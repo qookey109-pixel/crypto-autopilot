@@ -1,0 +1,48 @@
+{
+  "schema": "r2-bucket-usage-read-only-authority-v0.1",
+  "status": "PASS",
+  "stage": "R2_BUCKET_USAGE_READ_ONLY_INVENTORY_PASS",
+  "date": "2026-08-19",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "READ_ONLY_STORAGE_INVENTORY_ONLY",
+  "execution": {
+    "diagnostic_pr": 80,
+    "workflow_run_id": 32170470811,
+    "job_id": 95820138860,
+    "artifact_id": 9337052296,
+    "read_only": true,
+    "writes_performed": false,
+    "deletes_performed": false,
+    "bucket_name_redacted": true
+  },
+  "inventory": {
+    "total_object_count": 457,
+    "total_bytes": 22120404,
+    "total_MB_decimal": 22.120404,
+    "total_MiB_binary": 21.095661,
+    "total_GB_decimal": 0.022120404,
+    "total_GiB_binary": 0.020601232,
+    "by_top_level_prefix": {
+      "checkpoints": {"objects": 3, "bytes": 1245},
+      "manifests": {"objects": 7, "bytes": 1447851},
+      "market-data": {"objects": 346, "bytes": 20344917},
+      "receipts": {"objects": 101, "bytes": 326391}
+    },
+    "by_two_level_prefix": {
+      "market-data/binance_usdm": {"objects": 300, "bytes": 19917677},
+      "market-data/pionex": {"objects": 46, "bytes": 427240}
+    }
+  },
+  "notes": [
+    "This snapshot is a direct ListObjectsV2 inventory after Funding V0.2 materialization PASS.",
+    "No PutObject or DeleteObject operation was performed by the inventory workflow.",
+    "This receipt is capacity evidence only and grants no trading or source-switch authority."
+  ],
+  "explicitly_not_authorized": {
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
