@@ -1,27 +1,24 @@
-name: Validate V0.9 Render Relay Live Smoke
+name: Validate V0.9 Render Relay Smoke — Frozen PASS Regression
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "config/provider_equivalence_v0_9_render_relay_smoke_v0_1.json"
+      - "research/receipts/2026-08-20-provider-equivalence-v0-9-render-relay-smoke-pass.json"
       - "infra/render/binance-transport-free/server.py"
       - "tests/test_render_relay_smoke_v0_9.py"
+      - "tests/test_render_relay_smoke_pass_v0_9.py"
       - ".github/workflows/validate-v0-9-render-relay-smoke.yml"
-  push:
-    branches: [main]
-    paths:
-      - "config/provider_equivalence_v0_9_render_relay_smoke_v0_1.json"
-      - "infra/render/binance-transport-free/server.py"
-      - "tests/test_render_relay_smoke_v0_9.py"
-      - ".github/workflows/validate-v0-9-render-relay-smoke.yml"
-  workflow_dispatch:
+      - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
+      - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+      - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
 
 permissions:
   contents: read
-  issues: write
 
 jobs:
-  local-boundary:
+  frozen-pass-regression:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -31,107 +28,49 @@ jobs:
           python-version: "3.13"
       - name: Install pytest
         run: python -m pip install pytest
-      - name: Validate smoke-only authority and HTTP boundaries
+      - name: Validate frozen V0.9 smoke authority and HTTP boundaries locally
         run: |
           python -m pytest -q \
             tests/test_render_relay_smoke_v0_9.py \
+            tests/test_render_relay_smoke_pass_v0_9.py \
             tests/test_render_shared_secret_preflight_v0_8.py \
             tests/test_render_metadata_capture_protocol_v0_7.py
-      - name: Assert raw relay and successor capture remain disabled
+      - name: Assert V0.9 evidence stays frozen while schedule ownership may transition to V0.10
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          server = Path('infra/render/binance-transport-free/server.py').read_text()
-          successor = Path('src/crypto_autopilot/provider_metadata_capture_v0_8_successor.py').read_text()
-          workflow = Path('.github/workflows/provider-equivalence-v0-8-render-metadata-capture.yml').read_text().splitlines()
-          old = Path('.github/workflows/provider-equivalence-v0-2-metadata-capture.yml').read_text().splitlines()
-          assert 'V0_9_RELAY_SMOKE_EXECUTION_AUTHORIZED = True' in server
-          assert 'METADATA_RELAY_EXECUTION_AUTHORIZED = False' in server
-          assert 'SUCCESSOR_RUNTIME_EXECUTION_AUTHORIZED = False' in successor
-          assert not any(line == '  schedule:' for line in workflow)
-          assert any(line == '  schedule:' for line in old)
-          PY
-
-  live-smoke:
-    if: github.event_name != 'pull_request'
-    needs: local-boundary
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      METADATA_RELAY_TOKEN: ${{ secrets.METADATA_RELAY_TOKEN }}
-      SMOKE_URL: https://qookey-binance-transport-v0-5.onrender.com/metadata/relay-smoke
-    steps:
-      - name: Require shared secret presence without printing it
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -n "${METADATA_RELAY_TOKEN}"
-
-      - name: Wait only for new Render revision, then execute exactly one app-level smoke
-        shell: bash
-        run: |
-          set -euo pipefail
-          set +x
-          rm -f /tmp/v09-relay-smoke.json
-          final_code=""
-          for attempt in $(seq 1 60); do
-            code="$(curl --silent --show-error \
-              --output /tmp/v09-relay-smoke.json \
-              --write-out '%{http_code}' \
-              -H "Authorization: Bearer ${METADATA_RELAY_TOKEN}" \
-              "${SMOKE_URL}" || true)"
-            if [ "${code}" = "404" ]; then
-              sleep 3
-              continue
-            fi
-            final_code="${code}"
-            break
-          done
-          test -n "${final_code}"
-          test "${final_code}" = "200"
           python - <<'PY'
           import json
           from pathlib import Path
-          p = json.loads(Path('/tmp/v09-relay-smoke.json').read_text())
-          allowed = {
-              'status', 'stage', 'transport', 'runtime_platform', 'runtime_region',
-              'upstream_url', 'upstream_status', 'json_ok', 'symbols_array',
-              'symbol_count', 'api_key_used', 'increment_values_emitted',
-              'raw_exchange_info_emitted', 'raw_exchange_info_persisted',
-              'provider_requests_performed', 'r2_client_constructed',
-              'r2_writes_performed', 'holdout_candles_accessed',
-              'holdout_evaluated', 'source_switch_performed',
-              'live_trading_performed', 'raw_relay_execution_authorized',
-          }
-          assert set(p) == allowed
-          assert p['status'] == 'PASS'
-          assert p['stage'] == 'V0_9_RENDER_RELAY_LIVE_SMOKE_PASS'
-          assert p['upstream_status'] == 200
-          assert p['json_ok'] is True
-          assert p['symbols_array'] is True
-          assert isinstance(p['symbol_count'], int) and p['symbol_count'] > 0
-          assert p['api_key_used'] is False
-          assert p['increment_values_emitted'] is False
-          assert p['raw_exchange_info_emitted'] is False
-          assert p['raw_exchange_info_persisted'] is False
-          assert p['provider_requests_performed'] == 1
-          assert p['r2_client_constructed'] is False
-          assert p['r2_writes_performed'] is False
-          assert p['holdout_candles_accessed'] is False
-          assert p['holdout_evaluated'] is False
-          assert p['source_switch_performed'] is False
-          assert p['live_trading_performed'] is False
-          assert p['raw_relay_execution_authorized'] is False
+
+          server = Path('infra/render/binance-transport-free/server.py').read_text()
+          successor = Path('src/crypto_autopilot/provider_metadata_capture_v0_8_successor.py').read_text()
+          v08_workflow = Path('.github/workflows/provider-equivalence-v0-8-render-metadata-capture.yml').read_text().splitlines()
+          old = Path('.github/workflows/provider-equivalence-v0-2-metadata-capture.yml').read_text().splitlines()
+          new = Path('.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml').read_text().splitlines()
+          smoke = json.loads(Path('research/receipts/2026-08-20-provider-equivalence-v0-9-render-relay-smoke-pass.json').read_text())
+          cutover = json.loads(Path('config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json').read_text())
+
+          assert smoke['status'] == 'PASS'
+          assert smoke['result']['upstream_status'] == 200
+          assert smoke['result']['symbol_count'] == 872
+          assert smoke['result']['provider_requests_performed'] == 1
+          assert smoke['result']['r2_writes_performed'] is False
+          assert smoke['result']['holdout_candles_accessed'] is False
+          assert 'V0_9_RELAY_SMOKE_EXECUTION_AUTHORIZED = True' in server
+          assert 'METADATA_RELAY_EXECUTION_AUTHORIZED = False' in server
+          assert 'SUCCESSOR_RUNTIME_EXECUTION_AUTHORIZED = False' in successor
+          assert not any(line == '  schedule:' for line in v08_workflow)
+          assert not any(line == '  schedule:' for line in old)
+          assert any(line == '  schedule:' for line in new)
+          assert cutover['atomic_repository_cutover']['old_schedule_removed_in_same_change'] is True
+          assert cutover['atomic_repository_cutover']['successor_schedule_enabled_in_same_change'] is True
+          assert cutover['atomic_repository_cutover']['concurrent_old_and_new_capture_paths_authorized'] is False
           PY
 
-      - name: Record sanitized PASS on FREE-ONLY authority issue
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
+      - name: Record frozen regression-only state
         run: |
-          set -euo pipefail
-          symbol_count="$(python -c "import json; print(json.load(open('/tmp/v09-relay-smoke.json'))['symbol_count'])")"
-          body="V0.9 Render relay live smoke PASS. run_id=${GITHUB_RUN_ID}; head_sha=${GITHUB_SHA}; upstream_status=200; json_ok=true; symbols_array=true; symbol_count=${symbol_count}; provider_requests_performed=1; api_key_used=false; increment_values_emitted=false; raw_exchange_info_emitted=false; raw_exchange_info_persisted=false; r2_client_constructed=false; r2_writes_performed=false; holdout_candles_accessed=false; source_switch_performed=false; live_trading_performed=false; raw_relay_execution_authorized=false; successor_capture_execution_authorized=false. Sanitized smoke evidence only; final atomic cutover remains unauthorized."
-          gh api "repos/${GITHUB_REPOSITORY}/issues/111/comments" -f body="${body}" >/dev/null
+          echo 'V0.9 live smoke PASS is frozen; this workflow performs no provider request.'
+          echo 'provider_requests_performed=0'
+          echo 'r2_writes_performed=false'
+          echo 'holdout_candles_accessed=false'
