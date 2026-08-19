@@ -14,7 +14,7 @@ This file is the current project-status index. Frozen receipts, configs, documen
 
 ## Current formal stage
 
-**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / R2 BUDGET GATES PASS / BINANCE MAXIMUM-AVAILABLE COVERAGE DISCOVERY PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / R2 LIVE USAGE 22.120404 MB / PIONEX-BINANCE EQUIVALENCE V0.1 FAIL / EQUIVALENCE V0.1 DIRECTION FORENSICS PASS / HISTORICAL UNIVERSE LONG-HORIZON REVIEW PASS / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / STRATEGY REPLAY READINESS GATE BLOCKED ON AUTHORITY / PAPER-ONLY**
+**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / R2 BUDGET GATES PASS / BINANCE MAXIMUM-AVAILABLE COVERAGE DISCOVERY PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / R2 LIVE USAGE 22.120404 MB / PIONEX-BINANCE EQUIVALENCE V0.1 FAIL / EQUIVALENCE V0.1 DIRECTION FORENSICS PASS / V0.2 SELF-HOSTED MAC BINANCE TRANSPORT PASS / V0.2 REPLACEMENT METADATA CAPTURE AUTHORIZED / V0.2 REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE LONG-HORIZON REVIEW PASS / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / STRATEGY REPLAY READINESS GATE BLOCKED ON AUTHORITY / PAPER-ONLY**
 
 No live-money authorization exists. `trade_plan_authorized=false` and `live_trading_authorized=false` remain mandatory.
 
@@ -194,6 +194,33 @@ Key findings:
 
 V0.1 remains FAIL. The forensic PASS does not authorize W1, backtest admission, Historical Universe membership or live trading.
 
+## Equivalence V0.2 metadata authority transition — TRANSPORT PASS / CAPTURE AUTHORIZED / HOLDOUT UNOPENED
+
+Historical blocker authority remains immutable:
+`research/receipts/2026-08-19-provider-equivalence-v0-2-transport-blocked.json`
+
+Self-hosted transport PASS authority:
+`research/receipts/2026-08-19-provider-equivalence-v0-2-self-hosted-mac-transport-pass.json`
+
+Replacement metadata capture authority:
+`research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority-v0-2.json`
+
+Replacement protocol:
+`config/provider_equivalence_v0_2_metadata_capture_v0_2.json`
+
+- Hosted GitHub Ubuntu/macOS/Windows HTTP 451 evidence remains preserved.
+- Cloudflare Worker HTTP 403 evidence remains preserved.
+- Self-hosted macOS ARM64 transport reached the exact Binance USD-M official `exchangeInfo` endpoint with HTTP 200, valid JSON and a valid `symbols[]` array.
+- The transport receipt contains sanitized transport evidence only: no increment values, no R2 client, no R2 writes and no holdout candles.
+- The old `2026-08-21T00:00:00Z` through `2026-08-27T23:59:59.999Z` candidate remains permanently `SUPERSEDED_UNOPENED_BEFORE_METADATA_CAPTURE_EVIDENCE` and must not be reactivated.
+- Replacement holdout is frozen unopened for `2026-08-28T00:00:00Z` through `2026-09-03T23:59:59.999Z`.
+- Replacement metadata capture window is `2026-08-27T00:00:00Z` through `2026-09-04T01:59:59.999Z`, 194 hourly slots, with scheduled attempts at UTC minute 17 and 47.
+- Metadata capture is authorized only on `[self-hosted, macOS, ARM64]` and only for the frozen public provider metadata fields.
+- The completed transport preflight is not authorized for routine rerun.
+- Metadata stability status is `NOT_YET_RUN`.
+- Metadata stability PASS, if later achieved, still does **not** authorize holdout candle access; a separate holdout-access authority is required.
+- `source_switch_authorized=false`, W1 remains false, backtest admission remains false, automatic trade plan remains false, and live trading remains false.
+
 ## Historical Universe — REVIEW PASS / MEMBERSHIP NOT_READY
 
 Authority: `research/receipts/2026-08-18-historical-universe-long-horizon-review.json`
@@ -212,6 +239,8 @@ However:
 - framework readiness is not evidence admission;
 - Historical Universe membership is not ready;
 - Pionex ↔ Binance V0.1 provider equivalence is FAIL;
+- V0.2 metadata stability has not yet been proven;
+- the replacement holdout remains unopened and unauthorized for candle access;
 - full strategy-signal equivalence remains deferred because required strategy semantics are not yet formally defined;
 - no strategy parameter change, automatic trade plan or live execution is authorized.
 
@@ -230,31 +259,32 @@ Fixed GitHub Pages site:
 
 ## Current blockers
 
-1. **Provider substitution/equivalence:** V0.1 is definitive FAIL; Binance must not be substituted for Pionex provenance under that protocol.
-2. **Trade-Kline W1:** 2024 materialization remains NOT_AUTHORIZED.
-3. **Historical Universe membership:** NOT_READY until audited materialized partitions exist under an authorized path.
-4. **Strategy replay admission:** blocked by authority and still-undefined full strategy-equivalence semantics.
-5. **HYPE Funding 2026:** remains deferred; no interpolation or provider splice is authorized.
-6. **Live execution:** deliberately forbidden; project remains PAPER-ONLY.
+1. **Metadata stability:** replacement V0.2 metadata capture is authorized but has not run the complete 194-slot stability gate.
+2. **Holdout access:** replacement `2026-08-28` through `2026-09-03` holdout is frozen unopened; candle access remains explicitly unauthorized until a separate authority after metadata stability PASS.
+3. **Provider substitution/equivalence:** V0.1 is definitive FAIL; Binance must not be substituted for Pionex provenance under that protocol.
+4. **Trade-Kline W1:** 2024 materialization remains NOT_AUTHORIZED.
+5. **Historical Universe membership:** NOT_READY until audited materialized partitions exist under an authorized path.
+6. **Strategy replay admission:** blocked by authority and still-undefined full strategy-equivalence semantics.
+7. **HYPE Funding 2026:** remains deferred; no interpolation or provider splice is authorized.
+8. **Live execution:** deliberately forbidden; project remains PAPER-ONLY.
 
 ## Next formal milestone
 
-### Equivalence V0.2 protocol design — DESIGN ONLY, NOT YET AUTHORIZED
+### V0.2 metadata-only capture and stability gate
 
-The next permitted research step is to design a separately versioned Equivalence V0.2 protocol that addresses the V0.1 measurement-design question without rewriting V0.1.
+The next permitted execution step is the frozen metadata-only capture window on the self-hosted macOS ARM64 transport.
 
 Required discipline:
 
-1. V0.1 remains permanently FAIL.
-2. V0.2 must have a new versioned config and protocol document.
-3. Exact metrics, thresholds, symbol scope, intervals and holdout window must be frozen **before** V0.2 evidence is evaluated.
-4. V0.2 must use an independent holdout that was not inspected during V0.1 forensic design.
-5. No threshold may be selected by looking at the V0.2 holdout result.
-6. PASS, REVIEW and FAIL must all be accepted outcomes.
-7. A V0.2 design/freeze does not itself authorize source switching or W1 materialization.
-8. W1, Historical Universe membership, backtest admission, automatic trade plans and live trading remain blocked until separately authorized by their own evidence chain.
-
-A candidate independent holdout may be proposed in the V0.2 design, but it must not be fetched or evaluated before the protocol is formally frozen.
+1. Keep V0.1 permanently FAIL and do not change its thresholds or scope.
+2. Do not rerun the completed self-hosted transport preflight unless evidence corruption is discovered.
+3. Run only scheduled public metadata capture under `config/provider_equivalence_v0_2_metadata_capture_v0_2.json`.
+4. Require at least one complete valid capture for each of the 194 UTC hourly slots.
+5. Require exact per-provider normalized-vector stability across the full capture window.
+6. Missing hourly coverage or any changed vector invalidates metadata applicability and forbids holdout evaluation.
+7. Do not fetch or evaluate any replacement holdout candles during metadata capture.
+8. Metadata stability PASS does not itself open the holdout; freeze a separate holdout-access authority first.
+9. Source switch, W1, Historical Universe membership, backtest admission, automatic trade plans and live trading remain blocked.
 
 ## Explicitly forbidden next actions
 
@@ -263,6 +293,10 @@ A candidate independent holdout may be proposed in the V0.2 design, but it must 
 - Do not reinterpret the V0.1 forensic descriptive bins as Gate thresholds.
 - Do not silently add a post-hoc deadband and claim V0.1 PASS.
 - Do not re-enable the obsolete hourly source-publication retry.
+- Do not reactivate the superseded `2026-08-21` through `2026-08-27` holdout.
+- Do not rerun the successful self-hosted transport preflight as part of routine capture.
+- Do not access replacement holdout K-lines before a separate holdout-access authority exists.
+- Do not use a third-party proxy in place of the exact official Binance endpoint.
 - Do not authorize W1 merely because R2 has ample storage capacity.
 - Do not write Binance data into a Pionex-native namespace.
 - Do not splice providers or interpolate missing source events.
