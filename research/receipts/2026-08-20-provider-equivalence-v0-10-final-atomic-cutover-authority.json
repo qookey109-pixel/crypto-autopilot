@@ -1,0 +1,64 @@
+{
+  "schema": "provider-equivalence-v0-10-final-atomic-cutover-authority-v0.1",
+  "status": "PASS",
+  "stage": "PROVIDER_EQUIVALENCE_V0_10_FINAL_ATOMIC_CUTOVER_AUTHORIZED_ON_MAIN_MERGE",
+  "date": "2026-08-20",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "ATOMIC_METADATA_CAPTURE_EXECUTION_TRANSITION_EFFECTIVE_ON_EXACT_MAIN_MERGE",
+  "protocol": "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
+  "main_baseline": "887a5bb7c4d528d224249c9953a84488a6ee764f",
+  "prerequisite_evidence": {
+    "v0_8_shared_secret_handshake_status": "PASS",
+    "v0_8_successor_runtime_status": "PASS",
+    "v0_9_render_relay_smoke_status": "PASS",
+    "v0_9_upstream_status": 200,
+    "v0_9_json_ok": true,
+    "v0_9_symbols_array": true,
+    "v0_9_symbol_count": 872,
+    "v0_9_r2_writes_performed": false,
+    "v0_9_holdout_candles_accessed": false
+  },
+  "change_set": {
+    "old_v0_2_schedule_removed": true,
+    "old_v0_2_historical_authority_preserved": true,
+    "new_v0_10_schedule_added": true,
+    "new_v0_10_schedule_minutes_utc": [17, 47],
+    "new_v0_10_runner": "ubuntu-latest",
+    "new_v0_10_render_raw_relay_path": "/metadata/v0-10/binance-exchange-info",
+    "v0_7_raw_relay_remains_disabled": true,
+    "render_r2_credentials_present": false,
+    "github_actions_r2_credentials_required_for_capture": true
+  },
+  "pre_merge_execution_state": {
+    "authority_effective": false,
+    "old_v0_2_schedule_still_active_on_main": true,
+    "new_v0_10_schedule_active_on_main": false,
+    "v0_10_provider_capture_performed_by_this_receipt": false,
+    "v0_10_r2_writes_performed_by_this_receipt": false,
+    "holdout_candles_accessed": false
+  },
+  "post_merge_authorization": {
+    "metadata_capture_execution_authorized": true,
+    "metadata_only_r2_writes_authorized": true,
+    "v0_10_render_raw_relay_authorized": true,
+    "old_v0_2_scheduled_execution_authorized": false,
+    "concurrent_old_new_capture_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "effectivity": {
+    "effective_before_merge": false,
+    "effective_only_after_exact_pr_change_set_is_merged_to_main": true,
+    "requires_human_review_before_merge": true
+  },
+  "next_required_stage_after_effective_merge": "METADATA_STABILITY_CAPTURE_194_SLOTS_HOLDOUT_UNOPENED"
+}
