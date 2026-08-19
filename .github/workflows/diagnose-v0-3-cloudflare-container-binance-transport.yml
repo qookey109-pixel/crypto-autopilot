@@ -46,7 +46,7 @@ jobs:
         run: docker build -t qookey-binance-cloud-transport-v0-3 .
 
   diagnose:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'automation/v0-3-cloudflare-retry-20260819'
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 30
