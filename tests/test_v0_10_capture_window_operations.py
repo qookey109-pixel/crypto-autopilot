@@ -10,6 +10,7 @@ RUNBOOK = ROOT / "docs/V0_10_CAPTURE_WINDOW_OPERATIONS_RUNBOOK.md"
 CAPTURE_WORKFLOW = ROOT / ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
 OBSERVER_WORKFLOW = ROOT / ".github/workflows/observe-v0-10-scheduled-capture.yml"
 POST_WINDOW = ROOT / "config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json"
+OPERATIONAL_STATUS = ROOT / "web/data/operational-status.json"
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -145,3 +146,26 @@ def test_runbook_and_post_window_package_keep_v0_11_unauthorized() -> None:
     assert "PREPARED / NO NEW EXECUTION AUTHORITY" in runbook
     assert "Do not manually backfill" in runbook
     assert "FROZEN_UNOPENED" in runbook
+
+
+def test_dashboard_projection_exposes_operations_without_granting_authority() -> None:
+    dashboard = _load(OPERATIONAL_STATUS)
+    assert dashboard["authority"] is False
+    project = dashboard["project"]
+    assert isinstance(project, dict)
+    assert project["v0_10CaptureWindowOperationsState"] == "PREPARED"
+    assert project["v0_10ScheduledAttemptCount"] == 388
+    assert project["manualCaptureBackfillAuthorized"] is False
+    assert project["retroactiveSlotBackfillAuthorized"] is False
+    assert project["midWindowCriticalMutationDefaultAuthorized"] is False
+    assert project["emergencyCriticalPathChangeRequiresVersionedAuthority"] is True
+    assert project["v0_11ProductionR2EvaluationState"] == "NOT_AUTHORIZED"
+    assert project["replacementHoldoutState"] == "FROZEN_UNOPENED"
+
+    security = dashboard["securityBoundary"]
+    assert isinstance(security, dict)
+    assert all(value is False for value in security.values())
+
+    source_authorities = dashboard["sourceAuthorities"]
+    assert isinstance(source_authorities, list)
+    assert "config/v0_10_capture_window_operations_v0_1.json" in source_authorities
