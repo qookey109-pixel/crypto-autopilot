@@ -99,7 +99,9 @@ class HistoricalBackfillStorageTest(unittest.TestCase):
     def test_planned_stop_resumes_from_staging_and_then_skips_finalized(self) -> None:
         store = FakeStore()
         client = FakeClient(2025)
-        fixed_now = lambda: datetime(2026, 8, 18, 4, 0, tzinfo=timezone.utc)
+
+        def fixed_now() -> datetime:
+            return datetime(2026, 8, 18, 4, 0, tzinfo=timezone.utc)
 
         with self.assertRaises(PlannedInterruption) as caught:
             run_historical_backfill_pilot(

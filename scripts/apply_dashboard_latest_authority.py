@@ -396,7 +396,7 @@ def main() -> int:
     materialization, usage, equivalence = validate_foundation()
     lineage = validate_render_lineage()
 
-    exact_scope = require_dict(materialization.get("exact_scope") or {}, "funding exact scope")
+    require_dict(materialization.get("exact_scope") or {}, "funding exact scope")
     postwrite = require_dict(materialization.get("postwrite_results") or {}, "funding postwrite")
     inventory = require_dict(usage.get("inventory") or {}, "R2 inventory")
     eq_aggregate = require_dict(equivalence.get("aggregate") or {}, "equivalence aggregate")

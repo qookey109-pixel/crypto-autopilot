@@ -24,6 +24,7 @@ EXPECTED = {
     "packaging": "26.3",
     "pluggy": "1.6.0",
     "pygments": "2.21.0",
+    "ruff": "0.16.0",
 }
 
 CRITICAL = (
@@ -47,7 +48,7 @@ def _constraint_map() -> dict[str, str]:
 
 
 class CIDependencyConstraintsTests(unittest.TestCase):
-    def test_constraints_match_the_validated_pr135_snapshot(self) -> None:
+    def test_constraints_match_the_reviewed_ci_snapshot(self) -> None:
         self.assertEqual(_constraint_map(), EXPECTED)
 
     def test_public_project_metadata_keeps_compatibility_ranges(self) -> None:
@@ -78,6 +79,14 @@ class CIDependencyConstraintsTests(unittest.TestCase):
                 trigger_section = text.split("permissions:", 1)[0]
                 self.assertIn("requirements/ci-constraints.txt", trigger_section)
                 self.assertIn("tests/test_ci_dependency_constraints.py", trigger_section)
+
+    def test_ci_enforces_pinned_ruff_core_correctness_rules(self) -> None:
+        config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+        self.assertEqual(config["tool"]["ruff"]["lint"]["select"], ["E4", "E7", "E9", "F"])
+        ci = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
+        self.assertIn("python -m pip install -c requirements/ci-constraints.txt ruff", ci)
+        self.assertIn("ruff check src tests scripts", ci)
+        self.assertLess(ci.index("ruff check src tests scripts"), ci.index("python -m unittest discover"))
 
     def test_v0_10_capture_pins_python_before_freshness_and_provider_access(self) -> None:
         text = (WORKFLOWS / "provider-equivalence-v0-10-render-metadata-capture.yml").read_text(

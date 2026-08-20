@@ -1,10 +1,11 @@
 # CI/test reproducibility snapshot.
 #
-# These exact versions were resolved by successful GitHub-hosted PR #135 jobs
-# on 2026-08-20 across Python 3.12 and 3.13. This file constrains CI/test
-# environments only; pyproject.toml remains the public compatibility contract.
-# Update this snapshot only through a reviewed dependency-maintenance PR with
-# the full relevant regression suite passing.
+# Runtime/test dependency versions were originally resolved by successful
+# GitHub-hosted jobs on 2026-08-20 across Python 3.12 and 3.13. Tooling added
+# later must also be explicitly pinned and reviewed. This file constrains
+# CI/test environments only; pyproject.toml remains the public compatibility
+# contract. Update this snapshot only through a reviewed dependency-maintenance
+# PR with the full relevant regression suite passing.
 
 boto3==1.43.75
 botocore==1.43.75
@@ -20,3 +21,5 @@ iniconfig==2.3.0
 packaging==26.3
 pluggy==1.6.0
 pygments==2.21.0
+
+ruff==0.16.0

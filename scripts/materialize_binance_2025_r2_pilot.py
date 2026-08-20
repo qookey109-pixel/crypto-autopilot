@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import calendar
 import hashlib
 import json
 import os
