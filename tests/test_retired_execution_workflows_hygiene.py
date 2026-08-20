@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import unittest
 from pathlib import Path
 
 
@@ -33,39 +34,44 @@ FORBIDDEN_EXECUTION_TOKENS = (
 )
 
 
-def test_retired_historical_execution_workflows_are_validation_only() -> None:
-    for name in RETIRED:
-        text = (WORKFLOWS / name).read_text(encoding="utf-8")
-        lines = text.splitlines()
-        assert "RETIRED" in text, name
-        assert "RETIRED_NO_EXECUTION" in text, name
-        assert not any(line == "  schedule:" for line in lines), name
-        assert not any(line == "  push:" for line in lines), name
-        assert not any(line.strip() == "workflow_dispatch:" for line in lines), name
-        for token in FORBIDDEN_EXECUTION_TOKENS:
-            assert token not in text, f"{name}: {token}"
-        for marker in (
-            "provider_requests_performed=0",
-            "r2_writes_performed=false",
-            "holdout_candles_accessed=false",
-            "source_switch_authorized=false",
-            "live_trading_authorized=false",
+class RetiredExecutionWorkflowHygieneTests(unittest.TestCase):
+    def test_retired_historical_execution_workflows_are_validation_only(self) -> None:
+        for name in RETIRED:
+            with self.subTest(workflow=name):
+                text = (WORKFLOWS / name).read_text(encoding="utf-8")
+                lines = text.splitlines()
+                self.assertIn("RETIRED", text)
+                self.assertIn("RETIRED_NO_EXECUTION", text)
+                self.assertFalse(any(line == "  schedule:" for line in lines))
+                self.assertFalse(any(line == "  push:" for line in lines))
+                self.assertFalse(any(line.strip() == "workflow_dispatch:" for line in lines))
+                for token in FORBIDDEN_EXECUTION_TOKENS:
+                    self.assertNotIn(token, text, token)
+                for marker in (
+                    "provider_requests_performed=0",
+                    "r2_writes_performed=false",
+                    "holdout_candles_accessed=false",
+                    "source_switch_authorized=false",
+                    "live_trading_authorized=false",
+                ):
+                    self.assertIn(marker, text, marker)
+
+    def test_v0_10_current_metadata_schedule_remains_active_and_unique(self) -> None:
+        current = (
+            WORKFLOWS / "provider-equivalence-v0-10-render-metadata-capture.yml"
+        ).read_text(encoding="utf-8")
+        old = (WORKFLOWS / "provider-equivalence-v0-2-metadata-capture.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertTrue(any(line == "  schedule:" for line in current.splitlines()))
+        self.assertFalse(any(line == "  schedule:" for line in old.splitlines()))
+        for cron in (
+            '    - cron: "17,47 * 27-31 8 *"',
+            '    - cron: "17,47 * 1-3 9 *"',
+            '    - cron: "17,47 0-1 4 9 *"',
         ):
-            assert marker in text, f"{name}: {marker}"
+            self.assertIn(cron, current)
 
 
-def test_v0_10_current_metadata_schedule_remains_active_and_unique() -> None:
-    current = (WORKFLOWS / "provider-equivalence-v0-10-render-metadata-capture.yml").read_text(
-        encoding="utf-8"
-    )
-    old = (WORKFLOWS / "provider-equivalence-v0-2-metadata-capture.yml").read_text(
-        encoding="utf-8"
-    )
-    assert any(line == "  schedule:" for line in current.splitlines())
-    assert not any(line == "  schedule:" for line in old.splitlines())
-    for cron in (
-        '    - cron: "17,47 * 27-31 8 *"',
-        '    - cron: "17,47 * 1-3 9 *"',
-        '    - cron: "17,47 0-1 4 9 *"',
-    ):
-        assert cron in current
+if __name__ == "__main__":
+    unittest.main()
