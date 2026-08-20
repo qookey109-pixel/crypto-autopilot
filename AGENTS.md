@@ -37,6 +37,7 @@ Repository `main` is the formal current authority. If chat history, an issue com
 - Render Free / Frankfurt is the current proven Binance public-metadata transport leg.
 - Render must never receive R2 credentials. R2 credentials belong only in the authorized GitHub Actions/local secret boundary.
 - Apply the FREE-ONLY operational R2 hard stop/headroom gate before every authorized metadata write.
+- Historical workflows whose proof/materialization is already frozen must remain validation-only. Do not reintroduce schedule, push execution, provider requests, self-hosted execution, R2 secret bindings, or write commands without a new versioned authority.
 
 ## V0.10 effective metadata-capture authority
 
@@ -53,11 +54,23 @@ Repository `main` is the formal current authority. If chat history, an issue com
 - Scheduled V0.10 runs must remain serialized and stale queued runs must fail closed before provider/R2 access.
 - Do not create a second concurrent capture path or re-enable V0.2 scheduling while V0.10 is current authority.
 
+## V0.11 metadata-stability evaluator preparation
+
+- PR #131 froze the deterministic V0.11 evaluator before production stability evidence is read.
+- Current files: `config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json`, `research/receipts/2026-08-20-provider-equivalence-v0-11-metadata-stability-evaluator-prepared.json`, and `src/crypto_autopilot/provider_metadata_stability_v0_11.py`.
+- V0.11 is **PREPARED**, not a metadata-stability PASS.
+- `V0_11_R2_EVALUATION_EXECUTION_AUTHORIZED = False` remains binding until a separate post-window execution authority exists.
+- Do not construct an R2 client, list or read production V0.10 receipts, or automatically evaluate the production window under the prepared authority.
+- Synthetic validation is allowed and must preserve the frozen 194-slot rules: complete hourly coverage, exact within-slot duplicate agreement, and exact cross-window provider-vector stability.
+- Missing slots, invalid receipts, normalized-vector SHA mismatch, same-slot disagreement, or cross-window vector drift must fail closed.
+- V0.11 may never list/read raw provider objects or replacement holdout objects under its prepared authority.
+- A future metadata-stability PASS still does not authorize holdout candle access; that requires a separate versioned authority.
+
 ## Holdout and scientific boundary
 
 - Replacement holdout `2026-08-28` through `2026-09-03` remains `FROZEN_UNOPENED`.
 - Metadata capture does **not** authorize holdout candle access or evaluation.
-- Metadata stability is `NOT_YET_RUN` until complete 194-slot evidence is collected and reviewed.
+- Metadata stability is `NOT_YET_RUN` until complete 194-slot evidence is collected and reviewed under a separately authorized V0.11 production evaluation stage.
 - Even a future metadata stability PASS does not itself authorize holdout candles; a separate versioned holdout-access authority is required.
 - W1 materialization, Historical Universe membership, backtest admission, strategy parameter changes, automatic trade plans, real-money orders and live trading remain unauthorized.
 - Public Binance `exchangeInfo` used by this metadata path does not require an API key. This is not a project-wide Binance API-key ban; API keys may be used by a future separately versioned authenticated Binance scope, but never as a transport-blocker bypass.
