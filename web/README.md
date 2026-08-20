@@ -41,6 +41,8 @@ The generated deployed snapshot also declares `authority=false`. It is a **read-
 
 Current generated status includes Funding V0.2 materialization PASS, frozen R2 usage inventory, Equivalence V0.1 definitive FAIL, Render V0.5/V0.6 transport evidence, V0.8 shared-secret PASS, V0.9 authenticated relay-smoke PASS, **V0.10 effective metadata-capture cutover**, metadata stability `NOT_YET_RUN`, replacement holdout `FROZEN_UNOPENED`, and PAPER-ONLY trading boundaries.
 
+V0.11 metadata-stability evaluator rules are already **PREPARED / FROZEN BEFORE PRODUCTION EVIDENCE**, but production R2 evaluation is still unauthorized. Therefore the dashboard must continue to show metadata stability as `NOT_YET_RUN`; evaluator readiness is not a stability result.
+
 V0.10 metadata capture being `AUTHORIZED` on the dashboard means only the frozen public-provider metadata collection path is authorized. It does not mean holdout access, source switching, trade-plan authorization or live trading is authorized.
 
 ## Secret and execution boundary
@@ -54,7 +56,7 @@ The browser and generated fixture must never receive:
 - unrestricted private R2 access;
 - live-order credentials or endpoints.
 
-The dashboard is display-only. It has no authority or control surface to trigger V0.10 capture, change schedules, write R2, open holdout data, switch providers, create trade plans or enable live execution.
+The dashboard is display-only. It has no authority or control surface to trigger V0.10 capture, run V0.11 production evaluation, change schedules, write R2, open holdout data, switch providers, create trade plans or enable live execution.
 
 ## Views
 
