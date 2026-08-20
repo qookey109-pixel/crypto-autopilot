@@ -6,12 +6,15 @@ on:
     paths:
       - "config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json"
       - "config/provider_equivalence_v0_11_synthetic_failure_rehearsal_v0_1.json"
+      - "config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json"
       - "research/receipts/2026-08-20-provider-equivalence-v0-11-metadata-stability-evaluator-prepared.json"
+      - "research/receipts/2026-08-21-provider-equivalence-v0-11-synthetic-failure-rehearsal-pass.json"
       - "src/crypto_autopilot/provider_metadata_stability_v0_11.py"
       - "scripts/run_v0_11_synthetic_failure_rehearsal.py"
       - "tests/test_provider_metadata_stability_v0_11.py"
       - "tests/test_provider_metadata_stability_prepared_receipt_v0_11.py"
       - "tests/test_v0_11_synthetic_failure_rehearsal.py"
+      - "tests/test_v0_11_post_window_execution_package.py"
       - "tests/test_ci_dependency_constraints.py"
       - ".github/workflows/validate-v0-11-metadata-stability-evaluator.yml"
       - "config/provider_equivalence_v0_2_metadata_capture_v0_2.json"
@@ -48,6 +51,7 @@ jobs:
             tests/test_provider_metadata_stability_v0_11.py \
             tests/test_provider_metadata_stability_prepared_receipt_v0_11.py \
             tests/test_v0_11_synthetic_failure_rehearsal.py \
+            tests/test_v0_11_post_window_execution_package.py \
             tests/test_final_atomic_cutover_v0_10.py \
             tests/test_project_authority_hygiene_v0_8.py
       - name: Run explicit V0.11 synthetic failure rehearsal matrix
@@ -70,6 +74,7 @@ jobs:
 
           cfg = json.loads(Path('config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json').read_text())
           rehearsal = json.loads(Path('config/provider_equivalence_v0_11_synthetic_failure_rehearsal_v0_1.json').read_text())
+          package = json.loads(Path('config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json').read_text())
           runtime = Path('src/crypto_autopilot/provider_metadata_stability_v0_11.py').read_text()
           workflow = Path('.github/workflows/validate-v0-11-metadata-stability-evaluator.yml').read_text()
 
@@ -92,6 +97,14 @@ jobs:
           assert rehearsal['execution_boundary']['provider_requests_authorized'] is False
           assert rehearsal['execution_boundary']['holdout_candle_access_authorized'] is False
           assert rehearsal['required_synthetic_scenario_count'] == 12
+          assert package['status'] == 'POST_WINDOW_EXECUTION_PACKAGE_PREPARED_EXECUTION_NOT_AUTHORIZED'
+          assert package['current_execution_boundary']['package_is_execution_authority'] is False
+          assert package['current_execution_boundary']['v0_11_production_r2_evaluation_authorized'] is False
+          assert package['current_execution_boundary']['r2_client_construction_authorized'] is False
+          assert package['current_execution_boundary']['r2_receipt_reads_authorized'] is False
+          assert package['current_execution_boundary']['holdout_candle_access_authorized'] is False
+          assert package['current_execution_boundary']['source_switch_authorized'] is False
+          assert package['current_execution_boundary']['live_trading_authorized'] is False
           assert 'V0_11_R2_EVALUATION_EXECUTION_AUTHORIZED = False' in runtime
           assert not any(line == '  schedule:' for line in workflow.splitlines())
           expression_prefix = '$' + '{{ secrets.'
