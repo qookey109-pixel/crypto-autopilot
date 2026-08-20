@@ -1,0 +1,47 @@
+{
+  "schema": "qookey-dashboard-v0-11-operational-status-prepared-v0.1",
+  "status": "PREPARED",
+  "stage": "DASHBOARD_V0_11_OPERATIONAL_STATUS_PROJECTION_PREPARED",
+  "date": "2026-08-21",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "READ_ONLY_NON_AUTHORITY_UI_PROJECTION",
+  "projection": {
+    "file": "web/data/operational-status.json",
+    "locale": "zh-Hant-TW",
+    "authority": false,
+    "merges_into_existing_pipeline_view": true,
+    "merges_into_existing_gate_view": true,
+    "source_of_truth_remains_repository_main": true
+  },
+  "displayed_pre_window_state": {
+    "pre_window_readiness": "PASS",
+    "v0_10_scheduled_observer": "PREPARED",
+    "v0_10_critical_path_guard": "PASS_FROZEN",
+    "v0_11_synthetic_failure_rehearsal": "PASS",
+    "v0_11_synthetic_scenario_count": 12,
+    "v0_11_post_window_execution_package": "PREPARED",
+    "v0_11_production_r2_evaluation": "NOT_AUTHORIZED",
+    "metadata_stability": "NOT_YET_RUN",
+    "replacement_holdout": "FROZEN_UNOPENED"
+  },
+  "data_access_boundary": {
+    "github_static_repository_files_only": true,
+    "github_actions_live_api_reads": false,
+    "production_r2_reads": false,
+    "provider_requests": false,
+    "render_requests": false,
+    "capture_artifact_reads": false,
+    "holdout_reads": false,
+    "secret_values_read": false,
+    "secret_values_emitted": false
+  },
+  "authorization_boundary": {
+    "metadata_capture_authority_changed": false,
+    "v0_11_production_r2_evaluation_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "trade_kline_w1_materialization_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
