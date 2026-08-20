@@ -5,10 +5,14 @@ on:
   pull_request:
     paths:
       - "config/v0_10_capture_window_operations_v0_1.json"
+      - "config/v0_10_mid_window_emergency_change_template_v0_1.json"
       - "docs/V0_10_CAPTURE_WINDOW_OPERATIONS_RUNBOOK.md"
+      - "docs/V0_10_MID_WINDOW_EMERGENCY_CHANGE_TEMPLATE.md"
       - "tests/test_v0_10_capture_window_operations.py"
       - "tests/test_v0_10_capture_window_operations_receipt.py"
+      - "tests/test_v0_10_mid_window_emergency_change_template.py"
       - "research/receipts/2026-08-21-v0-10-capture-window-operations-prepared.json"
+      - "research/receipts/2026-08-21-v0-10-mid-window-emergency-template-prepared.json"
       - "web/data/operational-status.json"
       - ".github/workflows/validate-v0-10-capture-window-operations.yml"
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
@@ -37,11 +41,12 @@ jobs:
         run: |
           python -m pip install -c requirements/ci-constraints.txt -e .
           python -m pip install -c requirements/ci-constraints.txt pytest
-      - name: Validate capture-window operations, receipt, and fail-closed incident matrix
+      - name: Validate capture-window operations, receipts, and emergency boundaries
         run: |
           python -m pytest -q \
             tests/test_v0_10_capture_window_operations.py \
-            tests/test_v0_10_capture_window_operations_receipt.py
+            tests/test_v0_10_capture_window_operations_receipt.py \
+            tests/test_v0_10_mid_window_emergency_change_template.py
       - name: Assert validation workflow itself has no production execution surface
         shell: bash
         run: |
