@@ -57,6 +57,22 @@ class AuthorityStatusSyncTests(unittest.TestCase):
         ):
             self.assertIn(marker, security, marker)
 
+    def test_env_example_contains_only_current_or_intentional_secret_placeholders(self) -> None:
+        env_example = (ROOT / ".env.example").read_text(encoding="utf-8")
+        for marker in (
+            "PIONEX_API_KEY=",
+            "PIONEX_API_SECRET=",
+            "CLOUDFLARE_ACCOUNT_ID=",
+            "R2_BUCKET_NAME=",
+            "R2_ACCESS_KEY_ID=",
+            "R2_SECRET_ACCESS_KEY=",
+            "DIAGNOSTIC_TOKEN=",
+            "METADATA_RELAY_TOKEN=",
+        ):
+            self.assertIn(marker, env_example, marker)
+        self.assertNotIn("D1_DATABASE_ID", env_example)
+        self.assertNotIn("Future Cloudflare services", env_example)
+
 
 if __name__ == "__main__":
     unittest.main()
