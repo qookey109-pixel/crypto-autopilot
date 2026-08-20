@@ -1,55 +1,41 @@
-name: M1A Pionex Acquisition
+name: M1A Pionex Acquisition — RETIRED
 
 on:
-  workflow_dispatch:
-    inputs:
-      sample_days:
-        description: Bounded historical sample in days
-        required: false
-        default: "7"
-  push:
-    branches:
-      - run/m1a-acquisition
+  pull_request:
+    paths:
+      - ".github/workflows/m1a-acquisition.yml"
+      - "research/receipts/2026-08-17-m1a-pionex.json"
+
+permissions:
+  contents: read
 
 jobs:
-  acquire:
+  validate-retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions:
-      contents: read
-
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
         with:
-          python-version: "3.11"
-      - name: Install package
-        run: python -m pip install -e .
-      - name: Unit tests
-        run: python -m unittest discover -s tests -v
-      - name: Select live crypto-only Pionex universe
+          persist-credentials: false
+      - name: Validate frozen M1A authority without Pionex access
         run: |
-          mkdir -p artifacts
-          python scripts/select_pionex_universe.py \
-            --target-size 15 \
-            --min-size 10 \
-            --max-spread-bps 30 \
-            --base-allowlist config/crypto_universe_v0_1.json \
-            --output artifacts/universe.json
-      - name: Acquire bounded historical sample
-        run: |
-          SAMPLE_DAYS="${{ github.event.inputs.sample_days }}"
-          SAMPLE_DAYS="${SAMPLE_DAYS:-7}"
-          python scripts/acquire_pionex_sample.py \
-            --universe artifacts/universe.json \
-            --output-dir artifacts/acquisition \
-            --days "$SAMPLE_DAYS" \
-            --minimum-symbols 10
-      - name: Upload acquisition evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: m1a-pionex-acquisition-${{ github.run_id }}
-          path: artifacts/
-          if-no-files-found: warn
-          retention-days: 14
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(Path('research/receipts/2026-08-17-m1a-pionex.json').read_text(encoding='utf-8'))
+          assert receipt['stage'] == 'M1A_COMPLETE'
+          assert receipt['audit']['pass'] is True
+          assert receipt['acquisition_summary']['symbol_count'] == 15
+          assert receipt['acquisition_summary']['total_candles'] == 13230
+          assert receipt['guardrails']['private_api_used'] is False
+          assert receipt['guardrails']['live_trading_authorized'] is False
+          print('RETIRED_NO_EXECUTION')
+          print('provider_requests_performed=0')
+          print('r2_client_constructed=false')
+          print('r2_reads_performed=false')
+          print('r2_writes_performed=false')
+          print('holdout_candles_accessed=false')
+          print('source_switch_authorized=false')
+          print('live_trading_authorized=false')
+          PY
