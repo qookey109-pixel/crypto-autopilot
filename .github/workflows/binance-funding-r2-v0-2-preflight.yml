@@ -23,7 +23,8 @@ jobs:
           receipt = json.loads(Path('research/receipts/2026-08-19-binance-funding-r2-v0-2-full-preflight.json').read_text())
           assert receipt['status'] == 'PASS'
           assert receipt['stage'] == 'BINANCE_FUNDING_R2_V0_2_FULL_PREFLIGHT_PASS'
-          assert receipt['source_archive_count'] == 1003
+          assert receipt['exact_scope']['source_archive_count'] == 1003
+          assert receipt['execution_boundary']['r2_writes_performed'] is False
           print('RETIRED_NO_EXECUTION')
           print('provider_requests_performed=0')
           print('r2_writes_performed=false')
