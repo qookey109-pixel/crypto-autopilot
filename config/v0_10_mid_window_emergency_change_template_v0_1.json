@@ -1,0 +1,100 @@
+{
+  "schema_version": "v0_10_mid_window_emergency_change_template_v0_1",
+  "status": "TEMPLATE_PREPARED_NOT_AUTHORITY",
+  "date": "2026-08-21",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "purpose": "Predefine the minimum evidence and authorization fields required if a production-critical V0.10 intervention becomes unavoidable during the frozen metadata-capture window. This file is a template only and cannot authorize a change.",
+  "lineage": {
+    "capture_window_operations": "config/v0_10_capture_window_operations_v0_1.json",
+    "capture_window_runbook": "docs/V0_10_CAPTURE_WINDOW_OPERATIONS_RUNBOOK.md",
+    "critical_path_freeze": "config/v0_10_critical_path_freeze_v0_1.json",
+    "v0_10_cutover_authority": "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json",
+    "v0_11_post_window_package": "config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json"
+  },
+  "use_conditions": {
+    "may_be_used_before_frozen_window_start": false,
+    "may_be_used_after_frozen_window_end": false,
+    "may_be_used_only_for_observed_production_critical_incident": true,
+    "waiting_for_next_frozen_scheduled_attempt_must_be_considered_first": true,
+    "normal_scheduled_execution_remains_preferred": true,
+    "template_itself_is_authority": false
+  },
+  "required_at_use_time": {
+    "incident_id": "REQUIRED",
+    "incident_detected_at_utc": "REQUIRED_RFC3339",
+    "incident_classification": "REQUIRED_ENUM",
+    "affected_critical_paths": "REQUIRED_NONEMPTY_LIST",
+    "observed_failure_evidence_refs": "REQUIRED_NONEMPTY_LIST",
+    "pre_change_main_sha": "REQUIRED_40_HEX",
+    "pre_change_render_deploy_id_if_transport_affected": "REQUIRED_OR_EXPLICIT_NOT_APPLICABLE",
+    "why_next_frozen_scheduled_attempt_is_insufficient": "REQUIRED",
+    "minimum_change_description": "REQUIRED",
+    "exact_files_allowed_to_change": "REQUIRED_NONEMPTY_LIST",
+    "reviewed_test_plan": "REQUIRED_NONEMPTY_LIST",
+    "rollback_or_stop_condition": "REQUIRED",
+    "post_change_head_sha_before_merge": "REQUIRED_40_HEX",
+    "protected_main_pr_number": "REQUIRED_INTEGER",
+    "required_ci_results": [
+      "test (3.12)=PASS",
+      "test (3.13)=PASS",
+      "relevant path-scoped critical validation=PASS"
+    ],
+    "post_merge_main_sha": "REQUIRED_AFTER_MERGE_40_HEX",
+    "post_change_render_deploy_id_if_transport_affected": "REQUIRED_AFTER_DEPLOY_OR_EXPLICIT_NOT_APPLICABLE"
+  },
+  "permitted_change_shape": {
+    "minimum_necessary_change_only": true,
+    "must_be_versioned_separate_emergency_authority": true,
+    "must_use_protected_main_pr": true,
+    "must_bind_pre_and_post_change_sha": true,
+    "must_preserve_prior_failed_blocked_stale_and_missing_evidence": true,
+    "must_preserve_provider_provenance": true,
+    "must_preserve_frozen_window_boundaries": true,
+    "must_preserve_194_hourly_slots": true,
+    "must_preserve_scheduled_minutes_utc": [17, 47],
+    "must_preserve_15_symbol_scope": true,
+    "must_preserve_45_pair_scope": true,
+    "must_preserve_8gb_free_only_hard_stop": true,
+    "must_preserve_30_minute_freshness_guard": true,
+    "must_keep_replacement_holdout_frozen_unopened": true
+  },
+  "forbidden_even_under_emergency": {
+    "retroactive_slot_backfill_authorized": false,
+    "manual_capture_as_replacement_for_prior_missing_slot_authorized": false,
+    "rewrite_prior_run_timestamp_authorized": false,
+    "drop_failed_run_from_lineage_authorized": false,
+    "change_frozen_thresholds_authorized": false,
+    "change_frozen_scope_authorized": false,
+    "provider_substitution_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "disable_freshness_guard_authorized": false,
+    "raise_r2_free_only_hard_stop_authorized": false,
+    "delete_existing_r2_evidence_to_make_headroom_authorized": false,
+    "partial_capture_write_authorized": false,
+    "open_or_read_replacement_holdout_authorized": false,
+    "v0_11_production_r2_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "render_change_boundary": {
+    "render_change_allowed_without_separate_emergency_authority": false,
+    "render_auto_deploy_should_remain_off": true,
+    "render_redeploy_may_be_triggered_by_template": false,
+    "render_may_receive_r2_credentials": false,
+    "transport_change_requires_pre_and_post_deploy_ids": true
+  },
+  "result_interpretation": {
+    "template_prepared_means_incident_handling_is_predefined": true,
+    "template_prepared_means_production_change_authorized": false,
+    "future_emergency_authority_pass_means_prior_missing_slot_valid": false,
+    "future_emergency_change_may_rewrite_prior_scientific_evidence": false,
+    "future_emergency_change_may_authorize_holdout": false
+  }
+}
