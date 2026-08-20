@@ -21,10 +21,11 @@ The repository has moved beyond the original V0.1 implementation baseline while 
 - V0.10 final atomic metadata-capture cutover: **EFFECTIVE / AUTHORIZED** after merged PR #127 at `8fce944da479dbda0e2899f9b30b9de62351fa27`.
 - V0.2 self-hosted scheduled metadata capture is now **RETIRED AS EXECUTION PATH**; its receipts remain immutable historical evidence.
 - V0.10 GitHub-hosted Ubuntu scheduled metadata capture is the current authorized metadata-capture execution path.
+- V0.11 metadata-stability evaluator: **PREPARED / PRODUCTION R2 EVALUATION NOT AUTHORIZED**. Its deterministic 194-slot rules were frozen before production stability evidence is read.
 - Replacement holdout `2026-08-28` through `2026-09-03`: **FROZEN_UNOPENED**; candle access and evaluation remain unauthorized.
 - Metadata stability gate: **NOT_YET_RUN**. The next scientific stage is the frozen 194-slot metadata-stability capture window beginning `2026-08-27T00:00:00Z`.
 
-The V0.10 cutover authorizes only the frozen public-provider metadata capture phase and metadata-only R2 writes inside the exact window. It does **not** authorize replacement holdout candles, source switching, Historical Universe membership, W1 materialization, backtest admission, strategy changes, trade plans, real-money orders, or live trading.
+The V0.10 cutover authorizes only the frozen public-provider metadata capture phase and metadata-only R2 writes inside the exact window. V0.11 currently authorizes only evaluator preparation and synthetic validation. Neither stage authorizes replacement holdout candles, source switching, Historical Universe membership, W1 materialization, backtest admission, strategy changes, trade plans, real-money orders, or live trading.
 
 ## FREE-ONLY cloud policy
 
@@ -36,7 +37,8 @@ The current cloud policy is frozen in [`config/cloud_free_tier_policy_v0_1.json`
 - Koyeb V0.4 is superseded and is not a current transport candidate;
 - the current Mac-independent Binance public-metadata transport is **Render Free / Frankfurt**;
 - every V0.10 metadata R2 write must pass a fresh whole-bucket FREE-ONLY **8 GB hard-stop/headroom gate** before write;
-- Render must never receive R2 credentials; R2 credentials remain in GitHub Actions secrets only.
+- Render must never receive R2 credentials; R2 credentials remain in GitHub Actions secrets only;
+- historical proof/materialization workflows whose evidence is already frozen must be validation-only and must not silently regain schedules, push triggers, provider calls, self-hosted execution, or R2 credentials.
 
 ## V0.10 metadata capture execution boundary
 
@@ -55,6 +57,22 @@ Current authorized metadata-capture orchestration:
 - V0.2 self-hosted scheduled execution remains retired and is not an automatic fallback.
 
 The shared `METADATA_RELAY_TOKEN` is provisioned out of band in Render and GitHub Actions. Its value must never be committed, logged, posted in issues, artifacts, or chat.
+
+## V0.11 metadata-stability evaluator boundary
+
+The evaluator is frozen in `config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json` and `src/crypto_autopilot/provider_metadata_stability_v0_11.py`.
+
+Current state:
+
+- exact 194 UTC hourly slots are required;
+- each slot needs at least one complete valid V0.10 receipt;
+- duplicate captures within a slot are acceptable only when each provider's normalized 15-symbol vector matches exactly;
+- Pionex and Binance USD-M vectors must each remain exactly stable across the full frozen window;
+- missing slots, invalid receipts, SHA mismatch, intra-slot disagreement, or cross-window vector drift fail closed;
+- `V0_11_R2_EVALUATION_EXECUTION_AUTHORIZED = False`;
+- no production R2 client construction or receipt reads are authorized yet;
+- no holdout object may be listed, read, or evaluated;
+- a future stability PASS still requires a separate versioned holdout-access authority.
 
 ## V0.1 strategy scope
 
@@ -143,6 +161,7 @@ Bulk historical data is not stored in GitHub; canonical storage evidence is kept
 - No martingale, loss-doubling, unlimited averaging down, cross-margin dependency, or liquidation-as-stop.
 - Provider provenance remains explicit; provider splicing, silent interpolation and Pionex-native relabeling are forbidden.
 - V0.10 metadata capture authorization is **not** trading authorization.
+- V0.11 evaluator preparation is **not** metadata-stability PASS or production evaluation authority.
 - Replacement holdout candle access/evaluation remains forbidden until a separate post-stability authority exists.
 - No live order path is authorized.
 

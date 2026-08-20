@@ -1,138 +1,34 @@
-name: Binance Funding R2 V0.2 Full Preflight
+name: Binance Funding R2 V0.2 Full Preflight — RETIRED
 
 on:
-  workflow_dispatch:
   pull_request:
     paths:
       - ".github/workflows/binance-funding-r2-v0-2-preflight.yml"
-      - ".github/workflows/binance-funding-r2-v0-2-materialize.yml"
-      - "scripts/preflight_binance_funding_r2_v0_2.py"
-      - "scripts/materialize_binance_funding_r2_v0_2.py"
-      - "src/crypto_autopilot/binance_funding_materializer_v0_2.py"
-      - "src/crypto_autopilot/binance_funding_materialization_plan_v0_2.py"
-      - "src/crypto_autopilot/binance_funding.py"
-      - "tests/test_binance_funding_materializer_v0_2.py"
-      - "config/binance_funding_materialization_authority_v0_2.json"
-      - "config/binance_funding_r2_materialization_execution_v0_2.json"
-      - "research/receipts/2026-08-19-binance-funding-materialization-authority-v0-2.json"
       - "research/receipts/2026-08-19-binance-funding-r2-v0-2-full-preflight.json"
-      - "research/receipts/2026-08-19-binance-funding-interior-continuity-review.json"
-      - "research/receipts/2026-08-18-binance-funding-coverage.json"
 
 permissions:
   contents: read
 
-concurrency:
-  group: binance-funding-r2-v0-2-preflight-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  preflight:
+  validate-retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install package
-        run: python -m pip install -e .
-
-      - name: Compile V0.2 preflight and execution runners
+      - name: Validate frozen full-preflight authority without source re-download
         run: |
-          python -m py_compile scripts/preflight_binance_funding_r2_v0_2.py
-          python -m py_compile scripts/materialize_binance_funding_r2_v0_2.py
-
-      - name: Run Funding V0.2 writer and execution contract tests
-        run: python -m unittest discover -s tests -p 'test_binance_funding_materializer_v0_2.py' -v
-
-      - name: Validate explicit execution marker when present
-        shell: bash
-        run: |
-          set -euo pipefail
-          if test -f config/binance_funding_r2_materialization_execution_v0_2.json; then
-            python - <<'PY'
-          import json
-          from pathlib import Path
-          from crypto_autopilot.binance_funding_materializer_v0_2 import validate_execution_marker
-          marker = json.loads(Path('config/binance_funding_r2_materialization_execution_v0_2.json').read_text(encoding='utf-8'))
-          validate_execution_marker(marker)
-          assert marker['expected_source_archive_count'] == 1003
-          assert marker['expected_annual_canonical_objects'] == 94
-          assert marker['expected_annual_partition_receipts'] == 94
-          assert marker['expected_run_metadata_objects'] == 4
-          assert marker['expected_total_r2_object_identities'] == 192
-          assert marker['repeat_full_preflight_before_first_r2_write'] is True
-          assert marker['prewrite_exact_conflict_scan_required'] is True
-          assert marker['existing_object_policy'] == 'VERIFY_EXACT_OR_FAIL_NO_OVERWRITE'
-          PY
-          fi
-
-      - name: Assert no R2 or exchange secrets are exposed to PR preflight
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -z "${CLOUDFLARE_ACCOUNT_ID:-}"
-          test -z "${R2_BUCKET_NAME:-}"
-          test -z "${R2_ACCESS_KEY_ID:-}"
-          test -z "${R2_SECRET_ACCESS_KEY:-}"
-          test -z "${PIONEX_API_KEY:-}"
-          test -z "${PIONEX_API_SECRET:-}"
-
-      - name: Audit all 1,003 authorized Funding source archives and build 94 annual Parquet objects locally
-        shell: bash
-        run: |
-          set -euo pipefail
-          python scripts/preflight_binance_funding_r2_v0_2.py \
-            --workers 12 \
-            --output artifacts/binance-funding-r2-v0-2/preflight.json
-
-      - name: Validate full preflight evidence
-        shell: bash
-        run: |
-          set -euo pipefail
           python - <<'PY'
           import json
           from pathlib import Path
-
-          data = json.loads(Path('artifacts/binance-funding-r2-v0-2/preflight.json').read_text(encoding='utf-8'))
-          assert data['status'] == 'PASS'
-          assert data['stage'] == 'BINANCE_FUNDING_R2_V0_2_FULL_PREFLIGHT_PASS'
-          assert data['canonical_scope_sha256'] == '1e0ff54daeec8e5e47376fedb631c663687dd6fb6a4c297d269c33acdf99ad58'
-          assert data['source_checksum_set_sha256'] == '881c14d3b3c780b8a0d56ca2f7fd57d2abff310fcd7cb4b13dc01f506b9b64f3'
-          assert data['source_archive_count'] == 1003
-          assert data['annual_canonical_object_count'] == 94
-          assert data['annual_partition_receipt_count'] == 94
-          assert data['planned_total_r2_object_identities'] == 192
-          assert data['hypeusdt_2026_deferred'] is True
-          assert data['all_source_checksums_match_authorized_set'] is True
-          assert data['all_source_content_audits_pass'] is True
-          assert data['all_annual_cross_month_audits_pass'] is True
-          assert data['all_annual_parquet_round_trips_pass'] is True
-          assert data['r2_credentials_used'] is False
-          assert data['r2_client_constructed'] is False
-          assert data['r2_writes_performed'] is False
-          assert data['source_switch_authorized'] is False
-          assert data['provider_splicing_authorized'] is False
-          assert data['interpolation_authorized'] is False
-          assert data['pionex_native_relabel_authorized'] is False
-          assert data['trade_plan_authorized'] is False
-          assert data['live_trading_authorized'] is False
-          assert len(data['source_checksums']) == 1003
-          assert len(data['annual_builds']) == 94
-          assert not any(
-              row['symbol'] == 'HYPEUSDT' and row['year'] == 2026
-              for row in data['annual_builds']
-          )
+          receipt = json.loads(Path('research/receipts/2026-08-19-binance-funding-r2-v0-2-full-preflight.json').read_text())
+          assert receipt['status'] == 'PASS'
+          assert receipt['stage'] == 'BINANCE_FUNDING_R2_V0_2_FULL_PREFLIGHT_PASS'
+          assert receipt['exact_scope']['source_archive_count'] == 1003
+          assert receipt['execution_boundary']['r2_writes_performed'] is False
+          print('RETIRED_NO_EXECUTION')
+          print('provider_requests_performed=0')
+          print('r2_writes_performed=false')
+          print('holdout_candles_accessed=false')
+          print('source_switch_authorized=false')
+          print('live_trading_authorized=false')
           PY
-
-      - name: Upload Funding V0.2 preflight evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: binance-funding-r2-v0-2-preflight-${{ github.run_id }}
-          path: artifacts/binance-funding-r2-v0-2/preflight.json
-          if-no-files-found: warn
-          retention-days: 90

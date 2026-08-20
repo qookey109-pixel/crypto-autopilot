@@ -2,17 +2,21 @@
 
 ## Design goal
 
-Qookey Crypto Autopilot is cloud-first and exchange-agnostic. Pionex is the first exchange adapter, not the core architecture.
+Qookey Crypto Autopilot is an exchange-agnostic research/automation platform. Pionex is the current execution target and provenance authority for Pionex-native evidence, not the core architecture.
 
-## Runtime layers
+Current mode is **PAPER-ONLY**. No private execution or real-money order path is authorized.
+
+## Logical research stack
 
 ```text
-Pionex / future exchanges
+Provider-separated public market data
+        |                     |
+        |                     +--> Binance USD-M / Binance Vision research evidence
+        |
+        +--> Pionex native execution-target evidence
         |
         v
-Exchange adapters
-        |
-        +--> Market data / historical data
+Exchange adapters -----> Historical / metadata store (R2)
         |
         +--> SState adapter (read-only upstream)
                     |
@@ -29,24 +33,67 @@ Exchange adapters
                Performance
 ```
 
-## Planned cloud deployment
+Provider identity is part of the data contract. Binance evidence must never be relabeled as Pionex-native evidence, and provider splicing/source switching requires separate authority.
 
-- Cloudflare Pages: dashboard UI
-- Cloudflare Workers: API, scheduler, lightweight strategy/risk runtime
-- Durable Objects: live account/position state, order state, daily risk, kill switch
-- D1: signals, decisions, orders, trades, P&L
-- R2: historical candles, SState snapshots, model artifacts, backtests, reports
-- GitHub Actions: tests, backtests, offline model/research jobs
+## Current zero-cost infrastructure
 
-The browser is a cockpit only. Closing the website must not stop the bot once cloud runtime is introduced.
+The current deployed/repository architecture is:
+
+- **GitHub repository** — source code, versioned configs/receipts and formal authority.
+- **GitHub Actions** — CI, validation, offline research and the versioned V0.10 metadata-capture scheduler.
+- **Render Free / Frankfurt** — authenticated transport for the Binance public metadata leg only.
+- **Cloudflare R2 Standard Free** — immutable historical/provider metadata storage under explicit write authorities.
+- **GitHub Pages** — read-only Traditional Chinese dashboard; it is a normalized view and never authority.
+
+The project runtime budget is `0 USD/month`. Render must never receive R2 credentials.
+
+Cloudflare Containers and Koyeb are historical/superseded transport experiments and are not current runtime components. Earlier plans that mentioned Cloudflare Workers, Durable Objects or D1 are **future design possibilities only**; they are not current authority and must not be introduced as paid/runtime dependencies without a separately versioned decision.
+
+## Current metadata authority path
+
+```text
+GitHub Actions V0.10 scheduler
+        |
+        +--> Pionex public metadata HTTPS
+        |
+        +--> authenticated Render Free Frankfurt relay
+                 |
+                 +--> Binance USD-M public exchangeInfo
+        |
+        v
+fresh 8 GB R2 headroom gate
+        |
+        v
+immutable run-scoped metadata objects
+(receipt written last + SHA-256 readback)
+```
+
+The V0.10 path is authorized only inside the frozen metadata window. Historical V0.2 self-hosted scheduled execution is retired and is not an automatic fallback.
+
+V0.11 metadata-stability evaluator rules are frozen before production evidence is read, but production R2 evaluation remains hard-disabled. Its prepared authority does not construct R2 clients, read production receipts, call providers/Render, or access the replacement holdout.
+
+## Workflow lifecycle
+
+A workflow that produced frozen authority evidence is not automatically a reusable production tool. Once its execution role is superseded or complete, keep the filename/history but retire external side effects:
+
+- no schedule;
+- no push-triggered production execution;
+- no manual production rerun;
+- no provider/R2 secret binding;
+- no self-hosted runner requirement;
+- validate the frozen receipt/config instead.
+
+Reactivation requires a new versioned authority rather than silently editing a historical workflow back into service.
 
 ## Exchange boundary
 
-Strategy and risk code must not call Pionex-specific APIs directly. Exchange-specific behavior belongs under `src/crypto_autopilot/exchanges/`. A future MAX adapter should be able to implement the same boundary without rewriting strategy logic.
+Strategy and risk code must not call Pionex-specific APIs directly. Exchange-specific behavior belongs under `src/crypto_autopilot/exchanges/`. Future adapters must implement the same boundary without rewriting strategy logic.
 
 ## Authority rules
 
-- Backtest/paper state is internal to this project.
-- When live trading is eventually enabled, the exchange is authoritative for actual balances, positions, orders, and fills.
-- Internal state must reconcile against the exchange after restart or API uncertainty.
-- No LLM may bypass deterministic risk or kill-switch rules.
+- Repository `main` plus current versioned configs/receipts is formal project authority.
+- Historical receipts remain immutable even when their execution role is superseded.
+- Dashboard state is never authority.
+- Replacement holdout remains `FROZEN_UNOPENED` until a separate holdout-access authority exists.
+- No LLM or runtime may bypass deterministic risk, provenance, storage, authority or kill-switch rules.
+- If live trading is ever separately authorized, the exchange becomes authoritative for actual balances, positions, orders and fills, and internal state must reconcile after restart/API uncertainty.
