@@ -34,6 +34,16 @@ Historical proof/materialization workflows whose evidence is already frozen must
 
 The only current scheduled metadata-capture execution path is the versioned V0.10 workflow. V0.11 production R2 stability evaluation remains unauthorized until a separate post-window authority exists.
 
+Production-critical GitHub Actions are supply-chain hardened:
+
+- `actions/checkout`, `actions/setup-python`, artifact, and Pages actions on critical workflows execute from reviewed immutable 40-character commit SHAs rather than mutable major tags;
+- checkout keeps `persist-credentials: false`;
+- CI/test dependency resolution uses `requirements/ci-constraints.txt`, while `pyproject.toml` keeps public compatibility ranges;
+- the V0.10 scheduled capture job explicitly sets Python 3.13 before freshness checks, constrained dependency installation, provider access, or R2 access;
+- changes that weaken these boundaries are covered by Repository regression tests.
+
+Repository branch protection/ruleset state is an external GitHub setting, not a file-based authority. Do not assume `main` is protected unless GitHub settings are verified directly.
+
 ## Trading and holdout safety
 
 Current mode is **PAPER-ONLY**. No real-money or live order path is authorized.
