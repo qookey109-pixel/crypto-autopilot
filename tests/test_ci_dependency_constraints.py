@@ -88,6 +88,13 @@ class CIDependencyConstraintsTests(unittest.TestCase):
         self.assertIn("ruff check src tests scripts", ci)
         self.assertLess(ci.index("ruff check src tests scripts"), ci.index("python -m unittest discover"))
 
+    def test_ci_runs_on_pull_requests_and_main_pushes_only(self) -> None:
+        ci = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
+        trigger_section = ci.split("permissions:", 1)[0]
+        self.assertIn("  push:\n    branches:\n      - main\n", trigger_section)
+        self.assertIn("  pull_request:\n", trigger_section)
+        self.assertNotIn("  push:\n  pull_request:\n", trigger_section)
+
     def test_v0_10_capture_pins_python_before_freshness_and_provider_access(self) -> None:
         text = (WORKFLOWS / "provider-equivalence-v0-10-render-metadata-capture.yml").read_text(
             encoding="utf-8"
