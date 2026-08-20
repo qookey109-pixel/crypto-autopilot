@@ -69,8 +69,9 @@ jobs:
           assert cfg['workflow_boundary']['workflow_dispatch_production_evaluation_enabled'] is False
           assert 'V0_11_R2_EVALUATION_EXECUTION_AUTHORIZED = False' in runtime
           assert not any(line == '  schedule:' for line in workflow.splitlines())
+          expression_prefix = '$' + '{{ secrets.'
           for secret in ('R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_ACCOUNT_ID', 'R2_BUCKET_NAME', 'METADATA_RELAY_TOKEN'):
-              assert '${{ secrets.' + secret not in workflow
+              assert expression_prefix + secret not in workflow
           PY
       - name: Prove prepared production entrypoint stops before R2 construction
         run: |
