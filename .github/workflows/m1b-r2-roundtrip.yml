@@ -1,40 +1,33 @@
-name: M1B R2 Round Trip Proof
+name: M1B R2 Round Trip Proof — RETIRED
 
 on:
-  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/m1b-r2-roundtrip.yml"
+      - "research/receipts/2026-08-18-m1b-r2.json"
 
 permissions:
   contents: read
 
 jobs:
-  proof:
+  validate-retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
-      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install package
-        run: python -m pip install -e .
-
-      - name: Run real R2 round-trip proof
-        shell: bash
+      - name: Validate frozen M1B round-trip evidence without R2 access
         run: |
-          set -euo pipefail
-          mkdir -p artifacts
-          python scripts/r2_roundtrip_proof.py | tee artifacts/m1b-r2-roundtrip-receipt.json
-
-      - name: Upload proof receipt
-        uses: actions/upload-artifact@v4
-        with:
-          name: m1b-r2-roundtrip-receipt
-          path: artifacts/m1b-r2-roundtrip-receipt.json
-          if-no-files-found: error
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          receipt = json.loads(Path('research/receipts/2026-08-18-m1b-r2.json').read_text())
+          assert receipt['status'] == 'PASS'
+          assert receipt['validation']['object_r2_sha256_verified'] is True
+          assert receipt['validation']['parquet_decode_verified'] is True
+          print('RETIRED_NO_EXECUTION')
+          print('provider_requests_performed=0')
+          print('r2_writes_performed=false')
+          print('holdout_candles_accessed=false')
+          print('source_switch_authorized=false')
+          print('live_trading_authorized=false')
+          PY
