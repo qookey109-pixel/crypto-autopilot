@@ -46,6 +46,8 @@ jobs:
           from pathlib import Path
 
           workflow = Path('.github/workflows/validate-v0-10-capture-window-operations.yml').read_text(encoding='utf-8')
+          marker = '      - name: Assert validation workflow itself has no production execution surface'
+          executable_surface = workflow.split(marker, 1)[0]
           assert not any(line == '  schedule:' for line in workflow.splitlines())
           assert 'permissions:\n  contents: read' in workflow
           prefix = '$' + '{{ secrets.'
@@ -56,7 +58,7 @@ jobs:
               'R2_BUCKET_NAME',
               'METADATA_RELAY_TOKEN',
           ):
-              assert prefix + secret not in workflow
+              assert prefix + secret not in executable_surface
           for forbidden in (
               'aws s3',
               'boto3',
@@ -64,5 +66,5 @@ jobs:
               'api.pionex.com',
               '/metadata/v0-10/binance-exchange-info',
           ):
-              assert forbidden not in workflow
+              assert forbidden not in executable_surface
           PY
