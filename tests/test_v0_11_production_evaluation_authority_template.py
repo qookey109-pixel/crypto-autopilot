@@ -11,6 +11,7 @@ PROTOCOL = ROOT / "config/provider_equivalence_v0_11_metadata_stability_evaluati
 RUNTIME = ROOT / "src/crypto_autopilot/provider_metadata_stability_v0_11.py"
 POST_WINDOW = ROOT / "config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json"
 DOC = ROOT / "docs/V0_11_PRODUCTION_EVALUATION_AUTHORITY_TEMPLATE.md"
+OPERATIONAL_STATUS = ROOT / "web/data/operational-status.json"
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -116,6 +117,22 @@ def test_future_authority_must_keep_all_downstream_and_write_boundaries_false() 
     assert result["pass_automatically_authorizes_holdout_access"] is False
     assert result["fail_authorizes_holdout_access"] is False
     assert result["exact_result_must_be_frozen_as_repository_receipt"] is True
+
+
+def test_dashboard_projection_shows_template_without_granting_authority() -> None:
+    data = _load(OPERATIONAL_STATUS)
+    assert data["authority"] is False
+    project = data["project"]
+    assert isinstance(project, dict)
+    assert project["v0_11ProductionEvaluationAuthorityTemplateState"] == "PREPARED_NOT_AUTHORITY"
+    assert project["v0_11ProductionR2EvaluationState"] == "NOT_AUTHORIZED"
+    assert project["replacementHoldoutState"] == "FROZEN_UNOPENED"
+    source_authorities = data["sourceAuthorities"]
+    assert isinstance(source_authorities, list)
+    assert "config/provider_equivalence_v0_11_production_evaluation_authority_template_v0_1.json" in source_authorities
+    security = data["securityBoundary"]
+    assert isinstance(security, dict)
+    assert all(value is False for value in security.values())
 
 
 def test_current_runtime_stays_hard_disabled_and_doc_says_not_authorized() -> None:
