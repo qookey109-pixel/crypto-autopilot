@@ -1,0 +1,112 @@
+{
+  "schema_version": "provider_equivalence_v0_11_post_window_execution_package_v0_1",
+  "status": "POST_WINDOW_EXECUTION_PACKAGE_PREPARED_EXECUTION_NOT_AUTHORIZED",
+  "date": "2026-08-21",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "purpose": "Predefine the exact post-window authority sequence for a future V0.11 production receipt-only stability evaluation, while keeping all production R2 reads, holdout access, provider requests, source switching, W1 materialization, and trading unauthorized before a separate future execution-authority merge.",
+  "lineage": {
+    "v0_11_evaluator_protocol": "config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json",
+    "v0_11_evaluator_prepared_receipt": "research/receipts/2026-08-20-provider-equivalence-v0-11-metadata-stability-evaluator-prepared.json",
+    "v0_11_synthetic_rehearsal_protocol": "config/provider_equivalence_v0_11_synthetic_failure_rehearsal_v0_1.json",
+    "v0_11_synthetic_rehearsal_pass": "research/receipts/2026-08-21-provider-equivalence-v0-11-synthetic-failure-rehearsal-pass.json",
+    "v0_10_cutover_protocol": "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
+    "v0_10_cutover_authority": "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json",
+    "historical_authorities_mutated": false
+  },
+  "frozen_window_completion_gate": {
+    "metadata_capture_window_end_utc": "2026-09-04T01:59:59.999Z",
+    "future_execution_authority_may_be_created_before_window_end": false,
+    "future_production_r2_receipt_read_may_begin_before_window_end": false,
+    "future_evaluation_must_not_retroactively_backfill_missing_slots": true,
+    "future_evaluation_must_preserve_all_observed_failures": true
+  },
+  "future_execution_authority_required_fields": {
+    "must_be_separate_versioned_repository_authority": true,
+    "must_bind_exact_v0_11_protocol": true,
+    "must_bind_exact_completed_v0_10_capture_window": true,
+    "must_bind_current_main_at_future_review": true,
+    "must_require_human_review_and_protected_main_pr": true,
+    "must_keep_holdout_access_authorized_false": true,
+    "must_keep_source_switch_authorized_false": true,
+    "must_keep_w1_materialization_authorized_false": true,
+    "must_keep_real_money_order_authorized_false": true,
+    "must_keep_live_trading_authorized_false": true
+  },
+  "future_allowed_input_scope_only_after_separate_authority": {
+    "storage_backend": "cloudflare_r2",
+    "namespace": "metadata/provider-equivalence/v0_7/render-forward-holdout-20260828/",
+    "allowed_object_kind": "V0_10_CAPTURE_RECEIPT_JSON_ONLY",
+    "allowed_receipt_key_pattern": "metadata/provider-equivalence/v0_7/render-forward-holdout-20260828/capture/slot=YYYYMMDDTHH0000Z/run=NUMERIC_RUN_ID/receipt.json",
+    "raw_provider_objects_allowed": false,
+    "holdout_objects_may_be_listed": false,
+    "holdout_objects_may_be_read": false,
+    "provider_requests_allowed": false,
+    "render_requests_allowed": false,
+    "r2_writes_allowed": false,
+    "r2_deletes_allowed": false
+  },
+  "future_evaluation_sequence": [
+    "CONFIRM_CAPTURE_WINDOW_FULLY_ENDED_WITHOUT_READING_PRODUCTION_R2",
+    "VERIFY_V0_10_CRITICAL_PATH_INTEGRITY_AND_NO_UNREVIEWED_RUNTIME_DRIFT",
+    "CREATE_SEPARATE_VERSIONED_V0_11_PRODUCTION_EVALUATION_EXECUTION_AUTHORITY",
+    "MERGE_AUTHORITY_THROUGH_PROTECTED_MAIN_AFTER_REQUIRED_CI",
+    "ONLY_THEN_CONSTRUCT_R2_CLIENT_AND_LIST_ALLOWLISTED_V0_10_RECEIPTS",
+    "EVALUATE_EXACT_FROZEN_194_SLOT_SEMANTICS",
+    "EMIT_SANITIZED_RESULT_WITHOUT_INCREMENT_VALUES_OR_RAW_PROVIDER_PAYLOADS",
+    "FREEZE_EXACT_RESULT_AS_REPOSITORY_RECEIPT",
+    "KEEP_REPLACEMENT_HOLDOUT_UNOPENED_PENDING_SEPARATE_AUTHORITY"
+  ],
+  "frozen_fail_closed_rules": {
+    "missing_slot": "FAIL_METADATA_STABILITY_NO_HOLDOUT_AUTHORITY",
+    "invalid_receipt": "FAIL_METADATA_STABILITY_NO_HOLDOUT_AUTHORITY",
+    "normalized_vector_sha_mismatch": "FAIL_METADATA_STABILITY_NO_HOLDOUT_AUTHORITY",
+    "same_slot_vector_disagreement": "FAIL_METADATA_STABILITY_NO_HOLDOUT_AUTHORITY",
+    "cross_window_vector_drift": "FAIL_METADATA_STABILITY_NO_HOLDOUT_AUTHORITY",
+    "unexpected_receipt_like_key": "FAIL_CLOSED",
+    "raw_provider_object_access_attempt": "FAIL_CLOSED",
+    "holdout_object_access_attempt": "FAIL_CLOSED"
+  },
+  "future_sanitized_result_contract": {
+    "status_values": ["PASS", "FAIL"],
+    "expected_slot_count": 194,
+    "covered_slot_count_may_be_emitted": true,
+    "complete_valid_receipt_count_may_be_emitted": true,
+    "invalid_receipt_keys_may_be_emitted": true,
+    "missing_slot_ids_may_be_emitted": true,
+    "intra_slot_disagreements_may_be_emitted": true,
+    "cross_window_vector_drift_providers_may_be_emitted": true,
+    "stable_provider_vector_sha256_may_be_emitted": true,
+    "increment_values_may_be_emitted": false,
+    "raw_provider_responses_may_be_emitted": false,
+    "holdout_values_may_be_emitted": false,
+    "result_may_authorize_holdout_access": false
+  },
+  "current_execution_boundary": {
+    "package_is_execution_authority": false,
+    "v0_11_production_r2_evaluation_authorized": false,
+    "r2_client_construction_authorized": false,
+    "r2_receipt_listing_authorized": false,
+    "r2_receipt_reads_authorized": false,
+    "r2_writes_authorized": false,
+    "provider_requests_authorized": false,
+    "render_requests_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "post_future_stability_result_boundary": {
+    "pass_automatically_authorizes_holdout_access": false,
+    "fail_authorizes_holdout_access": false,
+    "separate_versioned_holdout_access_authority_required_after_pass": true,
+    "source_switch_remains_separate_future_decision": true,
+    "trade_kline_w1_remains_separate_future_authority": true
+  }
+}
