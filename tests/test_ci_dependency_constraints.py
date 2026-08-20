@@ -8,6 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONSTRAINTS = ROOT / "requirements" / "ci-constraints.txt"
 WORKFLOWS = ROOT / ".github" / "workflows"
+SETUP_PYTHON_V6_SHA = "ece7cb06caefa5fff74198d8649806c4678c61a1"
 
 EXPECTED = {
     "boto3": "1.43.75",
@@ -83,7 +84,7 @@ class CIDependencyConstraintsTests(unittest.TestCase):
             encoding="utf-8"
         )
         capture = text.split("\n  capture:\n", 1)[1]
-        setup_index = capture.index("- uses: actions/setup-python@v6")
+        setup_index = capture.index(f"- uses: actions/setup-python@{SETUP_PYTHON_V6_SHA}")
         freshness_index = capture.index("- id: freshness")
         install_index = capture.index("python -m pip install -c requirements/ci-constraints.txt -e .")
         provider_index = capture.index("python scripts/capture_provider_equivalence_v0_10_metadata.py")
