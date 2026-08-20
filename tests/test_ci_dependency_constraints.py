@@ -95,6 +95,12 @@ class CIDependencyConstraintsTests(unittest.TestCase):
         self.assertIn("  pull_request:\n", trigger_section)
         self.assertNotIn("  push:\n  pull_request:\n", trigger_section)
 
+    def test_ci_covers_supported_and_v0_10_runtime_python_versions(self) -> None:
+        ci = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
+        self.assertIn('python-version: ["3.12", "3.13"]', ci)
+        self.assertIn("python-version: ${{ matrix.python-version }}", ci)
+        self.assertIn("fail-fast: false", ci)
+
     def test_v0_10_capture_pins_python_before_freshness_and_provider_access(self) -> None:
         text = (WORKFLOWS / "provider-equivalence-v0-10-render-metadata-capture.yml").read_text(
             encoding="utf-8"
