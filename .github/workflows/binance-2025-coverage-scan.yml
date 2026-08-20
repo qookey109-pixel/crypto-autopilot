@@ -1,49 +1,41 @@
-name: Binance 2025 Coverage Scan
+name: Binance 2025 Coverage Scan — RETIRED
 
 on:
-  workflow_dispatch:
   pull_request:
     paths:
       - ".github/workflows/binance-2025-coverage-scan.yml"
-      - "scripts/scan_binance_2025_coverage.py"
-      - "src/crypto_autopilot/binance_vision.py"
-      - "src/crypto_autopilot/binance_historical.py"
-      - "research/receipts/2026-08-17-m1a-pionex.json"
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/binance-2025-coverage-scan.yml"
-      - "scripts/scan_binance_2025_coverage.py"
+      - "research/receipts/2026-08-18-binance-2025-coverage-scan.json"
 
 permissions:
   contents: read
 
 jobs:
-  scan:
+  validate-retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
         with:
-          python-version: "3.11"
-
-      - name: Install package
-        run: python -m pip install -e .
-
-      - name: Scan checksum-backed Binance Vision archive presence
+          persist-credentials: false
+      - name: Validate frozen coverage authority without provider access
         run: |
-          python scripts/scan_binance_2025_coverage.py \
-            --year 2025 \
-            --workers 8 \
-            --output artifacts/binance-2025-coverage-scan.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
 
-      - name: Upload coverage evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: binance-2025-coverage-scan-${{ github.run_id }}
-          path: artifacts/binance-2025-coverage-scan.json
-          if-no-files-found: warn
-          retention-days: 90
+          receipt = json.loads(Path('research/receipts/2026-08-18-binance-2025-coverage-scan.json').read_text(encoding='utf-8'))
+          assert receipt['status'] == 'PASS'
+          assert receipt['stage'] == 'BINANCE_2025_COVERAGE_SCAN_PASS'
+          assert receipt['scope']['archive_checks'] == 720
+          assert receipt['validation']['r2_write_used'] is False
+          assert receipt['authority_boundary']['authorizes_large_scale_backfill'] is False
+          assert receipt['authority_boundary']['authorizes_live_trading'] is False
+          print('RETIRED_NO_EXECUTION')
+          print('provider_requests_performed=0')
+          print('r2_client_constructed=false')
+          print('r2_reads_performed=false')
+          print('r2_writes_performed=false')
+          print('holdout_candles_accessed=false')
+          print('source_switch_authorized=false')
+          print('live_trading_authorized=false')
+          PY

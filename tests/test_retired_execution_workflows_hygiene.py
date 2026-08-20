@@ -17,6 +17,14 @@ RETIRED = (
     "binance-funding-r2-v0-2-materialize.yml",
     "m1b-m1a-dataset-upload.yml",
     "m1b-r2-roundtrip.yml",
+    "binance-2025-coverage-scan.yml",
+    "binance-funding-source-proof.yml",
+    "binance-funding-coverage.yml",
+    "binance-max-coverage-discovery.yml",
+    "m1a-acquisition.yml",
+    "pionex-binance-equivalence-proof.yml",
+    "pionex-binance-equivalence-v0-1-forensics.yml",
+    "historical-universe-long-horizon-review.yml",
 )
 
 FORBIDDEN_EXECUTION_TOKENS = (
@@ -30,6 +38,15 @@ FORBIDDEN_EXECUTION_TOKENS = (
     "scripts/materialize_binance_funding_r2_v0_2.py",
     "scripts/upload_m1a_dataset_to_r2.py",
     "scripts/r2_roundtrip_proof.py",
+    "scripts/scan_binance_2025_coverage.py",
+    "scripts/prove_binance_funding_source.py",
+    "scripts/discover_binance_funding_coverage.py",
+    "scripts/discover_binance_max_coverage.py",
+    "scripts/select_pionex_universe.py",
+    "scripts/acquire_pionex_sample.py",
+    "scripts/prove_pionex_binance_equivalence.py",
+    "scripts/forensic_pionex_binance_equivalence_v0_1.py",
+    "scripts/review_historical_universe_long_horizon.py",
     "urllib.request.urlopen",
 )
 

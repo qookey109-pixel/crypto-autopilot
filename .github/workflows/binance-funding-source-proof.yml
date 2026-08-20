@@ -1,54 +1,43 @@
-name: Binance Funding Source Proof
+name: Binance Funding Source Proof — RETIRED
 
 on:
-  workflow_dispatch:
   pull_request:
     paths:
       - ".github/workflows/binance-funding-source-proof.yml"
-      - "scripts/prove_binance_funding_source.py"
-      - "src/crypto_autopilot/binance_funding.py"
-      - "tests/test_binance_funding.py"
-      - "config/binance_funding_v0_1.json"
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/binance-funding-source-proof.yml"
-      - "scripts/prove_binance_funding_source.py"
-      - "src/crypto_autopilot/binance_funding.py"
-      - "config/binance_funding_v0_1.json"
+      - "research/receipts/2026-08-18-binance-funding-source-proof.json"
 
 permissions:
   contents: read
 
-concurrency:
-  group: binance-funding-source-proof-v0-1-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  proof:
+  validate-retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
         with:
-          python-version: "3.12"
-
-      - name: Install package
-        run: python -m pip install -e .
-
-      - name: Run read-only Binance Funding source proof
+          persist-credentials: false
+      - name: Validate frozen Funding source authority without provider access
         run: |
-          python scripts/prove_binance_funding_source.py \
-            --config config/binance_funding_v0_1.json \
-            --output artifacts/binance-funding-source-proof.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
 
-      - name: Upload Binance Funding source proof evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: binance-funding-source-proof-${{ github.run_id }}
-          path: artifacts/binance-funding-source-proof.json
-          if-no-files-found: warn
-          retention-days: 90
+          receipt = json.loads(Path('research/receipts/2026-08-18-binance-funding-source-proof.json').read_text(encoding='utf-8'))
+          assert receipt['status'] == 'PASS'
+          assert receipt['stage'] == 'BINANCE_FUNDING_SOURCE_PROOF_PASS'
+          assert receipt['proof_scope']['symbol_count'] == 3
+          assert receipt['proof_scope']['total_rows'] == 279
+          boundary = receipt['authority_boundary']
+          assert boundary['authorizes_funding_r2_writes'] is False
+          assert boundary['authorizes_source_switch'] is False
+          assert boundary['authorizes_live_trading'] is False
+          print('RETIRED_NO_EXECUTION')
+          print('provider_requests_performed=0')
+          print('r2_client_constructed=false')
+          print('r2_reads_performed=false')
+          print('r2_writes_performed=false')
+          print('holdout_candles_accessed=false')
+          print('source_switch_authorized=false')
+          print('live_trading_authorized=false')
+          PY
