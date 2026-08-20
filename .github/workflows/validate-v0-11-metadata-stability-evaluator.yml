@@ -9,10 +9,12 @@ on:
       - "src/crypto_autopilot/provider_metadata_stability_v0_11.py"
       - "tests/test_provider_metadata_stability_v0_11.py"
       - "tests/test_provider_metadata_stability_prepared_receipt_v0_11.py"
+      - "tests/test_ci_dependency_constraints.py"
       - ".github/workflows/validate-v0-11-metadata-stability-evaluator.yml"
       - "config/provider_equivalence_v0_2_metadata_capture_v0_2.json"
       - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
       - "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
+      - "requirements/ci-constraints.txt"
       - "PROJECT_STATUS.md"
 
 permissions:
@@ -33,10 +35,10 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
-      - name: Install package and pytest
+      - name: Install package and pytest from frozen CI constraints
         run: |
-          python -m pip install -e .
-          python -m pip install pytest
+          python -m pip install -c requirements/ci-constraints.txt -e .
+          python -m pip install -c requirements/ci-constraints.txt pytest
       - name: Run V0.11 synthetic stability regressions
         run: |
           python -m pytest -q \
