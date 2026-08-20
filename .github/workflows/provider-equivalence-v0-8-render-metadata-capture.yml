@@ -6,10 +6,12 @@ on:
     paths:
       - ".github/workflows/provider-equivalence-v0-8-render-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
+      - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - ".github/workflows/automate-v0-3-cloud-transport-follow-up.yml"
       - ".github/workflows/diagnose-v0-3-cloudflare-container-binance-transport.yml"
       - ".github/workflows/dispatch-v0-3-cloud-transport-from-authority-marker.yml"
       - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
+      - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
       - "research/receipts/2026-08-19-provider-equivalence-v0-8-render-metadata-cutover-prepared.json"
       - "research/receipts/2026-08-19-provider-equivalence-v0-8-shared-relay-secret-handshake-pass.json"
       - "research/receipts/2026-08-20-provider-equivalence-v0-8-successor-runtime-prepared.json"
@@ -51,7 +53,7 @@ jobs:
           python scripts/check_provider_equivalence_v0_8_cutover.py \
             --mode validate \
             --output /tmp/v0-8-cutover-validation.json
-      - name: Prove successor capture remains hard-disabled before any secret or provider access
+      - name: Prove V0.8 successor capture remains hard-disabled before any secret or provider access
         run: |
           python scripts/check_provider_equivalence_v0_8_cutover.py \
             --mode guard \
@@ -78,21 +80,30 @@ jobs:
             tests/test_project_authority_hygiene_v0_8.py \
             tests/test_render_metadata_capture_protocol_v0_7.py \
             tests/test_render_shared_secret_handshake_receipt_v0_8.py
-      - name: Assert runtime exists but both successor execution gates remain false
+      - name: Assert V0.8 remains frozen while V0.10 owns the final schedule topology
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
+          import json
           from pathlib import Path
-          successor = Path('.github/workflows/provider-equivalence-v0-8-render-metadata-capture.yml').read_text().splitlines()
+
+          v08_workflow = Path('.github/workflows/provider-equivalence-v0-8-render-metadata-capture.yml').read_text().splitlines()
           old = Path('.github/workflows/provider-equivalence-v0-2-metadata-capture.yml').read_text().splitlines()
+          v010_workflow = Path('.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml').read_text().splitlines()
           runtime = Path('src/crypto_autopilot/provider_metadata_capture_v0_8_successor.py').read_text()
           guard = Path('src/crypto_autopilot/provider_metadata_capture_v0_8.py').read_text()
-          assert not any(line == '  schedule:' for line in successor)
-          assert any(line == '  schedule:' for line in old)
+          cutover = json.loads(Path('config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json').read_text())
+
+          assert not any(line == '  schedule:' for line in v08_workflow)
+          assert not any(line == '  schedule:' for line in old)
+          assert any(line == '  schedule:' for line in v010_workflow)
           assert 'def execute_successor_capture(' in runtime
           assert 'SUCCESSOR_RUNTIME_EXECUTION_AUTHORIZED = False' in runtime
           assert 'V0_8_CAPTURE_EXECUTION_AUTHORIZED = False' in guard
+          assert cutover['atomic_repository_cutover']['old_schedule_removed_in_same_change'] is True
+          assert cutover['atomic_repository_cutover']['successor_schedule_enabled_in_same_change'] is True
+          assert cutover['atomic_repository_cutover']['concurrent_old_and_new_capture_paths_authorized'] is False
           PY
       - name: Validate current dashboard safe fixture
         run: python scripts/validate_dashboard_static.py
