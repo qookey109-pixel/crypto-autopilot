@@ -11,6 +11,7 @@ on:
       - "tests/test_v0_10_capture_window_operations.py"
       - "tests/test_v0_10_capture_window_operations_receipt.py"
       - "tests/test_v0_10_mid_window_emergency_change_template.py"
+      - "tests/test_v0_10_mid_window_emergency_template_receipt.py"
       - "research/receipts/2026-08-21-v0-10-capture-window-operations-prepared.json"
       - "research/receipts/2026-08-21-v0-10-mid-window-emergency-template-prepared.json"
       - "web/data/operational-status.json"
@@ -46,7 +47,8 @@ jobs:
           python -m pytest -q \
             tests/test_v0_10_capture_window_operations.py \
             tests/test_v0_10_capture_window_operations_receipt.py \
-            tests/test_v0_10_mid_window_emergency_change_template.py
+            tests/test_v0_10_mid_window_emergency_change_template.py \
+            tests/test_v0_10_mid_window_emergency_template_receipt.py
       - name: Assert validation workflow itself has no production execution surface
         shell: bash
         run: |
