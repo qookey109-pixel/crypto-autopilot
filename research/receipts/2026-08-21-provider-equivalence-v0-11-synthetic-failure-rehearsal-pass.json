@@ -1,0 +1,65 @@
+{
+  "schema": "provider-equivalence-v0-11-synthetic-failure-rehearsal-pass-v0.1",
+  "status": "PASS",
+  "stage": "PROVIDER_EQUIVALENCE_V0_11_SYNTHETIC_FAILURE_REHEARSAL_PASS",
+  "date": "2026-08-21",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "SYNTHETIC_REGRESSION_REHEARSAL_ONLY_NO_PRODUCTION_EVIDENCE",
+  "implementation": {
+    "pull_request": 153,
+    "pr_head_sha": "461d4236f1db90bdc51e9b64a7dc6dbd431cf891",
+    "merge_commit": "3050e8d4cd91895c4e0a29cb2be67443c98d612f",
+    "protocol": "config/provider_equivalence_v0_11_synthetic_failure_rehearsal_v0_1.json"
+  },
+  "github_actions_evidence": {
+    "workflow_name": "Validate V0.11 Metadata Stability Evaluator",
+    "workflow_run_id": 32406756458,
+    "job_id": 96547529797,
+    "job_conclusion": "success",
+    "artifact_id": 9420558148,
+    "artifact_name": "v0-11-synthetic-failure-rehearsal-32406756458",
+    "artifact_digest": "sha256:0accb74e825444aa286dee35469bd39799d1270bd209589fa9aa404270df99ce"
+  },
+  "required_ci": {
+    "full_ci_run_id": 32406756474,
+    "test_3_12": "PASS",
+    "test_3_13": "PASS"
+  },
+  "result": {
+    "scenario_count": 12,
+    "scenario_ids": [
+      "stable_194_slot_control",
+      "same_slot_identical_duplicate",
+      "missing_hour",
+      "same_slot_vector_disagreement",
+      "cross_window_vector_drift",
+      "normalized_vector_sha_mismatch",
+      "receipt_claims_holdout_access",
+      "receipt_key_outside_allowlist",
+      "prepared_production_entrypoint",
+      "v0_10_r2_headroom_block",
+      "v0_10_outside_window",
+      "v0_10_stale_schedule_guard_contract"
+    ],
+    "synthetic_fixtures_only": true,
+    "production_metadata_evidence_consumed": false,
+    "r2_client_constructed": false,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "provider_requests_performed": 0,
+    "render_requests_performed": 0,
+    "capture_artifacts_read": false,
+    "holdout_candles_accessed": false,
+    "holdout_evaluated": false
+  },
+  "interpretation": {
+    "rehearsal_pass_is_production_metadata_stability_pass": false,
+    "production_r2_evaluation_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "w1_materialization_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "next_stage": "PREPARE_POST_WINDOW_V0_11_EXECUTION_PACKAGE_WITH_EXECUTION_STILL_NOT_AUTHORIZED"
+}
