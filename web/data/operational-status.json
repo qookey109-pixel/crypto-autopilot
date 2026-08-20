@@ -1,0 +1,90 @@
+{
+  "schema": "qookey-dashboard-operational-status-v0.1",
+  "authority": false,
+  "locale": "zh-Hant-TW",
+  "snapshotType": "READ_ONLY_REPOSITORY_OPERATIONAL_STATUS_PROJECTION",
+  "snapshotLabel": "V0.10 開窗前作業狀態 · V0.11 預備進度",
+  "sourceAuthorities": [
+    "research/receipts/2026-08-20-pre-window-readiness-v0-1.json",
+    "research/receipts/2026-08-20-v0-10-scheduled-capture-observer-prepared.json",
+    "config/v0_10_critical_path_freeze_v0_1.json",
+    "research/receipts/2026-08-21-provider-equivalence-v0-11-synthetic-failure-rehearsal-pass.json",
+    "config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json",
+    "config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json"
+  ],
+  "project": {
+    "preWindowReadinessState": "PASS",
+    "v0_10ScheduledObserverState": "PREPARED",
+    "v0_10CriticalPathFreezeGuardState": "PASS_FROZEN",
+    "v0_11SyntheticFailureRehearsalState": "PASS",
+    "v0_11SyntheticScenarioCount": 12,
+    "v0_11PostWindowExecutionPackageState": "PREPARED",
+    "v0_11ProductionR2EvaluationState": "NOT_AUTHORIZED",
+    "metadataStabilityState": "NOT_YET_RUN",
+    "replacementHoldoutState": "FROZEN_UNOPENED",
+    "metadataCaptureStartUtc": "2026-08-27T00:00:00Z",
+    "metadataCaptureEndUtc": "2026-09-04T01:59:59.999Z",
+    "metadataCaptureHourlySlotCount": 194,
+    "metadataCaptureScheduledMinutesUtc": [17, 47],
+    "sourceSwitchAuthorized": false,
+    "tradeKlineW1MaterializationAuthorized": false,
+    "realMoneyOrderAuthorized": false,
+    "liveTradingAuthorized": false
+  },
+  "pipelineItems": [
+    {
+      "name": "Pre-window Readiness",
+      "detail": "GitHub 必要 secrets presence 與 GitHub ↔ Render shared-secret handshake 已安全驗證 PASS；未輸出 secret 值、未讀 R2、未打 provider。",
+      "status": "PASS"
+    },
+    {
+      "name": "V0.10 Scheduled Capture Observer",
+      "detail": "唯讀 observer 已準備完成；只檢查 GitHub Actions run / job / step metadata，不讀 R2、provider、holdout。",
+      "status": "PREPARED"
+    },
+    {
+      "name": "V0.10 Critical Path Freeze Guard",
+      "detail": "Production-critical 執行鏈已以 pre-window baseline 凍結監看；drift 只告警，不自動修復或 deploy。",
+      "status": "PASS"
+    },
+    {
+      "name": "V0.11 Synthetic Failure Rehearsal",
+      "detail": "12/12 synthetic 情境已在 CI PASS，涵蓋 missing slot、SHA mismatch、same-slot disagreement、cross-window drift、R2 BLOCKED 與 stale guard；未消耗 production evidence。",
+      "status": "PASS"
+    },
+    {
+      "name": "V0.11 Post-window Execution Package",
+      "detail": "9/4 完整窗口結束後的 receipt-only 評估程序已預先凍結；目前仍不是 production execution authority。",
+      "status": "PREPARED"
+    }
+  ],
+  "gateItems": [
+    {
+      "name": "V0.11 Production R2 Evaluation",
+      "detail": "目前 NOT_AUTHORIZED；完整 V0.10 window 結束後仍必須先建立並 merge 獨立 versioned execution authority，才可 list/read allowlisted receipt.json。",
+      "status": "NOT_AUTHORIZED",
+      "tone": "blocked",
+      "critical": true
+    },
+    {
+      "name": "V0.11 Synthetic Rehearsal",
+      "detail": "Synthetic regression PASS 只證明 fail-closed 行為；不是 production metadata-stability PASS，也不授權 holdout。",
+      "status": "PASS",
+      "tone": "pass",
+      "critical": false
+    }
+  ],
+  "securityBoundary": {
+    "containsSecrets": false,
+    "readsProductionR2": false,
+    "readsProviderData": false,
+    "readsCaptureArtifacts": false,
+    "readsHoldout": false,
+    "authorizesProductionR2Evaluation": false,
+    "authorizesHoldoutAccess": false,
+    "authorizesSourceSwitch": false,
+    "authorizesW1Materialization": false,
+    "authorizesRealMoneyOrders": false,
+    "authorizesLiveTrading": false
+  }
+}

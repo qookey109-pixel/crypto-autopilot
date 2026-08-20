@@ -5,11 +5,13 @@ from pathlib import Path
 
 
 ROOT = Path("web")
+OPERATIONAL_STATUS = ROOT / "data" / "operational-status.json"
 REQUIRED = (
     ROOT / "index.html",
     ROOT / "styles.css",
     ROOT / "app.js",
     ROOT / "data" / "dashboard.json",
+    OPERATIONAL_STATUS,
     ROOT / "_headers",
 )
 
@@ -109,6 +111,49 @@ def main() -> int:
     if project.get("sourceSwitchAuthorized") is not False:
         raise RuntimeError("dashboard fixture must keep source switching forbidden")
 
+    operational = json.loads(OPERATIONAL_STATUS.read_text(encoding="utf-8"))
+    if operational.get("schema") != "qookey-dashboard-operational-status-v0.1":
+        raise RuntimeError("dashboard operational status schema changed")
+    if operational.get("authority") is not False:
+        raise RuntimeError("dashboard operational status must declare authority=false")
+    if operational.get("locale") != "zh-Hant-TW":
+        raise RuntimeError("dashboard operational status locale changed")
+    op_project = operational.get("project") or {}
+    if op_project.get("preWindowReadinessState") != "PASS":
+        raise RuntimeError("dashboard must reflect pre-window readiness PASS")
+    if op_project.get("v0_10ScheduledObserverState") != "PREPARED":
+        raise RuntimeError("dashboard must reflect V0.10 observer PREPARED")
+    if op_project.get("v0_10CriticalPathFreezeGuardState") != "PASS_FROZEN":
+        raise RuntimeError("dashboard must reflect frozen V0.10 critical-path guard")
+    if op_project.get("v0_11SyntheticFailureRehearsalState") != "PASS":
+        raise RuntimeError("dashboard must reflect V0.11 synthetic rehearsal PASS")
+    if op_project.get("v0_11SyntheticScenarioCount") != 12:
+        raise RuntimeError("dashboard V0.11 synthetic scenario count changed")
+    if op_project.get("v0_11PostWindowExecutionPackageState") != "PREPARED":
+        raise RuntimeError("dashboard must reflect V0.11 post-window package PREPARED")
+    if op_project.get("v0_11ProductionR2EvaluationState") != "NOT_AUTHORIZED":
+        raise RuntimeError("dashboard must keep V0.11 production R2 evaluation unauthorized")
+    if op_project.get("metadataStabilityState") != "NOT_YET_RUN":
+        raise RuntimeError("dashboard operational metadata stability must remain not-run")
+    if op_project.get("replacementHoldoutState") != "FROZEN_UNOPENED":
+        raise RuntimeError("dashboard operational holdout must remain unopened")
+    if op_project.get("metadataCaptureHourlySlotCount") != 194:
+        raise RuntimeError("dashboard operational V0.10 slot count changed")
+    if op_project.get("metadataCaptureScheduledMinutesUtc") != [17, 47]:
+        raise RuntimeError("dashboard operational scheduled minutes changed")
+    for key in (
+        "sourceSwitchAuthorized",
+        "tradeKlineW1MaterializationAuthorized",
+        "realMoneyOrderAuthorized",
+        "liveTradingAuthorized",
+    ):
+        if op_project.get(key) is not False:
+            raise RuntimeError(f"dashboard operational safety boundary changed: {key}")
+    op_security = operational.get("securityBoundary") or {}
+    for key, value in op_security.items():
+        if value is not False:
+            raise RuntimeError(f"dashboard operational security boundary changed: {key}")
+
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     if '<html lang="zh-Hant-TW">' not in html:
         raise RuntimeError("dashboard HTML must declare zh-Hant-TW")
@@ -138,6 +183,14 @@ def main() -> int:
     ):
         if label not in app_js:
             raise RuntimeError(f"dashboard status label missing: {label}")
+    for token in (
+        "./data/operational-status.json",
+        "mergeOperationalStatus",
+        "operational.pipelineItems",
+        "operational.gateItems",
+    ):
+        if token not in app_js:
+            raise RuntimeError(f"dashboard operational merge logic missing: {token}")
 
     headers = (ROOT / "_headers").read_text(encoding="utf-8")
     for header in (
@@ -153,17 +206,20 @@ def main() -> int:
         json.dumps(
             {
                 "status": "PASS",
-                "stage": "DASHBOARD_ZH_HANT_STATIC_SAFETY_V0_10_PASS",
+                "stage": "DASHBOARD_ZH_HANT_STATIC_SAFETY_V0_11_OPERATIONAL_PASS",
                 "required_files": len(REQUIRED),
                 "views": 8,
                 "locale": "zh-Hant-TW",
                 "authority_fixture": False,
+                "operational_authority": False,
                 "paper_only": True,
                 "equivalence_v0_1": project["providerEquivalenceGateState"],
                 "render_v0_10": project["renderMetadataV0_10CutoverState"],
                 "metadata_capture_authorized": True,
-                "metadata_stability": project["metadataStabilityState"],
-                "holdout": project["replacementHoldoutState"],
+                "metadata_stability": op_project["metadataStabilityState"],
+                "v0_11_synthetic_rehearsal": op_project["v0_11SyntheticFailureRehearsalState"],
+                "v0_11_production_r2_evaluation": op_project["v0_11ProductionR2EvaluationState"],
+                "holdout": op_project["replacementHoldoutState"],
                 "live_execution_surface": False,
             },
             sort_keys=True,

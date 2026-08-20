@@ -90,6 +90,34 @@ function renderMarkets(items) {
   `).join("");
 }
 
+function upsertByName(items, additions) {
+  const merged = [...items];
+  additions.forEach(addition => {
+    const index = merged.findIndex(item => item.name === addition.name);
+    if (index >= 0) {
+      merged[index] = addition;
+    } else {
+      merged.push(addition);
+    }
+  });
+  return merged;
+}
+
+function mergeOperationalStatus(data, operational) {
+  if (!operational || operational.authority !== false) return data;
+  const merged = {
+    ...data,
+    project: {
+      ...(data.project || {}),
+      operationalStatus: operational.project || {},
+    },
+    pipeline: upsertByName(data.pipeline || [], operational.pipelineItems || []),
+    gates: upsertByName(data.gates || [], operational.gateItems || []),
+    operationalStatus: operational,
+  };
+  return merged;
+}
+
 function render(data) {
   state.data = data;
   document.querySelector("#snapshot-label").textContent = data.snapshotLabel;
@@ -102,12 +130,22 @@ function render(data) {
   renderMarkets(data.markets || []);
 }
 
+async function fetchJson(path) {
+  const response = await fetch(path, { cache: "no-store" });
+  if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
+  return response.json();
+}
+
 async function loadData() {
   try {
-    const response = await fetch("./data/dashboard.json", { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    render(data);
+    const data = await fetchJson("./data/dashboard.json");
+    let operational = null;
+    try {
+      operational = await fetchJson("./data/operational-status.json");
+    } catch (error) {
+      console.warn("Operational status projection unavailable", error);
+    }
+    render(mergeOperationalStatus(data, operational));
   } catch (error) {
     console.error("Dashboard snapshot load failed", error);
     render(FALLBACK);
