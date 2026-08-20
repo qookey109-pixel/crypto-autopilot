@@ -178,7 +178,7 @@ This retirement does not delete or invalidate their historical scripts/configs/r
 
 ## Workflow reproducibility and supply-chain hardening
 
-PRs #136–#143 are maintenance authorities for execution-environment reproducibility, repository hygiene and CI/supply-chain hardening; they do not change scientific thresholds, metadata scope, provider authority, holdout authority or trading authority.
+PRs #136–#145 are maintenance authorities for execution-environment reproducibility, repository hygiene, CI/supply-chain hardening and repository ruleset validation; they do not change scientific thresholds, metadata scope, provider authority, holdout authority or trading authority.
 
 Current hardening:
 
@@ -191,9 +191,12 @@ Current hardening:
 - PR #141 made Ruff a real read-only CI gate with `ruff==0.16.0` and explicit core correctness rules `E4` / `E7` / `E9` / `F`; its first run exposed four pre-existing lint findings, each manually reviewed and fixed without changing frozen scientific semantics;
 - PR #142 limited the main CI `push` trigger to `main` while preserving all `pull_request` validation, preventing an extra broad-push CI run on ordinary feature-branch updates;
 - PR #143 expanded full main CI to **Python 3.12 and Python 3.13** with `fail-fast: false`; both `test (3.12)` and `test (3.13)` were observed PASS with constrained install, Ruff, full unit tests and R2 budget gates;
+- the active `Protect main` ruleset targets the default branch, requires pull requests, requires the always-running `test (3.12)` and `test (3.13)` checks, restricts deletion, blocks force pushes, and has no configured bypass list;
+- ruleset validation on 2026-08-20 confirmed a direct `main` contents write is rejected with a rule violation requiring a pull request and 2/2 required checks; PR #145 then exercised the docs-only PR path with both required CI matrix jobs;
+- path-scoped V0.10/V0.11/Dashboard checks remain intentionally excluded from global required checks;
 - regression tests protect these boundaries from silent downgrade.
 
-Repository branch protection/ruleset configuration is external GitHub state, not a file-based scientific authority. GitHub API still reported `protected=false` during the 2026-08-20 audit; Issue #139 tracks enabling protection and requiring the always-running `test (3.12)` and `test (3.13)` checks. Path-scoped V0.10/V0.11/Dashboard checks must not be made globally required merely because they exist.
+Repository branch protection/ruleset configuration is external GitHub state, not a file-based scientific authority. Direct GitHub verification on 2026-08-20 reports `main` as `protected=true`; the active ruleset and PR #145 provide the repository-level security validation tracked by Issue #139.
 
 ## Non-negotiable provider and safety boundaries
 
