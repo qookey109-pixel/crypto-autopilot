@@ -74,8 +74,9 @@ class CIDependencyConstraintsTests(unittest.TestCase):
         ):
             with self.subTest(workflow=name):
                 text = (WORKFLOWS / name).read_text(encoding="utf-8")
-                self.assertIn('      - "requirements/ci-constraints.txt"', text)
-                self.assertIn('      - "tests/test_ci_dependency_constraints.py"', text)
+                trigger_section = text.split("permissions:", 1)[0]
+                self.assertIn("requirements/ci-constraints.txt", trigger_section)
+                self.assertIn("tests/test_ci_dependency_constraints.py", trigger_section)
 
     def test_v0_10_capture_pins_python_before_freshness_and_provider_access(self) -> None:
         text = (WORKFLOWS / "provider-equivalence-v0-10-render-metadata-capture.yml").read_text(
