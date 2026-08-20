@@ -1,0 +1,54 @@
+{
+  "schema": "qookey-v0-10-scheduled-capture-observer-prepared-v0.1",
+  "status": "PREPARED",
+  "stage": "V0_10_SCHEDULED_CAPTURE_OBSERVER_PREPARED",
+  "prepared_at_utc": "2026-08-20T15:29:00Z",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "source_workflow": ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+  "observer_workflow": ".github/workflows/observe-v0-10-scheduled-capture.yml",
+  "scope": {
+    "trigger": "workflow_run.completed",
+    "source_event_required": "schedule",
+    "source_workflow_name": "Provider Equivalence V0.10 Render Metadata Capture",
+    "frozen_window_start_utc": "2026-08-27T00:00:00Z",
+    "frozen_window_end_utc": "2026-09-04T01:59:59.999Z",
+    "reads_github_actions_run_job_step_metadata_only": true,
+    "reads_capture_artifact": false,
+    "reads_provider_data": false,
+    "constructs_r2_client": false,
+    "reads_r2": false,
+    "writes_r2": false,
+    "accesses_replacement_holdout": false,
+    "runs_v0_11_evaluation": false,
+    "source_switches": false,
+    "places_real_money_orders": false,
+    "enables_live_trading": false
+  },
+  "expected_pipeline_health_checks": {
+    "jobs": [
+      "validate-atomic-cutover",
+      "window-gate",
+      "capture"
+    ],
+    "capture_steps": [
+      "Reject stale scheduled runs before provider or R2 access",
+      "Capture frozen provider metadata through V0.10 successor path",
+      "Assert V0.10 capture boundary"
+    ]
+  },
+  "interpretation_boundary": {
+    "pipeline_health_pass_is_provider_metadata_pass": false,
+    "pipeline_health_pass_is_v0_11_metadata_stability_pass": false,
+    "production_capture_authority_changed": false,
+    "v0_11_production_r2_evaluation_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "trade_kline_w1_materialization_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "effectivity": {
+    "requires_merge_to_main": true,
+    "observer_is_operational_only": true
+  }
+}
