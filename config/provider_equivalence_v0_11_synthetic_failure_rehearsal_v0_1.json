@@ -1,0 +1,105 @@
+{
+  "schema_version": "provider_equivalence_v0_11_synthetic_failure_rehearsal_v0_1",
+  "status": "SYNTHETIC_REHEARSAL_PROTOCOL_FROZEN_NO_PRODUCTION_EVIDENCE",
+  "date": "2026-08-21",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "purpose": "Exercise the already-frozen V0.11 metadata-stability evaluator and adjacent V0.10 fail-closed operational boundaries with synthetic fixtures only before production metadata evidence exists, without reading R2, providers, Render, or the replacement holdout.",
+  "lineage": {
+    "v0_11_protocol": "config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json",
+    "v0_11_runtime": "src/crypto_autopilot/provider_metadata_stability_v0_11.py",
+    "v0_10_runtime": "src/crypto_autopilot/provider_metadata_capture_v0_10.py",
+    "v0_10_workflow": ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+    "existing_v0_11_regressions": "tests/test_provider_metadata_stability_v0_11.py",
+    "existing_v0_10_regressions": "tests/test_final_atomic_cutover_v0_10.py",
+    "historical_authorities_mutated": false
+  },
+  "rehearsal_matrix": [
+    {
+      "id": "stable_194_slot_control",
+      "expected_outcome": "PASS_SYNTHETIC_CONTROL_ONLY",
+      "pytest_selector": "tests/test_provider_metadata_stability_v0_11.py::test_complete_194_slot_exactly_stable_receipts_pass_without_emitting_values"
+    },
+    {
+      "id": "same_slot_identical_duplicate",
+      "expected_outcome": "PASS_SYNTHETIC_CONTROL_ONLY",
+      "pytest_selector": "tests/test_provider_metadata_stability_v0_11.py::test_same_slot_duplicate_with_identical_vectors_is_allowed"
+    },
+    {
+      "id": "missing_hour",
+      "expected_outcome": "FAIL_CLOSED_NO_HOLDOUT_AUTHORITY",
+      "pytest_selector": "tests/test_provider_metadata_stability_v0_11.py::test_missing_hour_fails_closed_and_never_authorizes_holdout"
+    },
+    {
+      "id": "same_slot_vector_disagreement",
+      "expected_outcome": "FAIL_CLOSED_NO_HOLDOUT_AUTHORITY",
+      "pytest_selector": "tests/test_provider_metadata_stability_v0_11.py::test_same_slot_vector_disagreement_fails_closed"
+    },
+    {
+      "id": "cross_window_vector_drift",
+      "expected_outcome": "FAIL_CLOSED_NO_HOLDOUT_AUTHORITY",
+      "pytest_selector": "tests/test_provider_metadata_stability_v0_11.py::test_cross_window_vector_drift_fails_closed"
+    },
+    {
+      "id": "normalized_vector_sha_mismatch",
+      "expected_outcome": "FAIL_CLOSED_INVALID_RECEIPT",
+      "pytest_selector": "tests/test_provider_metadata_stability_v0_11.py::test_corrupt_vector_sha_is_invalid_receipt_and_fails_closed"
+    },
+    {
+      "id": "receipt_claims_holdout_access",
+      "expected_outcome": "FAIL_CLOSED_INVALID_RECEIPT",
+      "pytest_selector": "tests/test_provider_metadata_stability_v0_11.py::test_receipt_claiming_holdout_access_is_invalid_and_fails_closed"
+    },
+    {
+      "id": "receipt_key_outside_allowlist",
+      "expected_outcome": "FAIL_CLOSED_INVALID_RECEIPT",
+      "pytest_selector": "tests/test_provider_metadata_stability_v0_11.py::test_wrong_namespace_receipt_key_is_invalid_and_cannot_pass"
+    },
+    {
+      "id": "prepared_production_entrypoint",
+      "expected_outcome": "SKIP_BEFORE_R2_CONSTRUCTION",
+      "pytest_selector": "tests/test_provider_metadata_stability_v0_11.py::test_production_entrypoint_stops_before_r2_client_construction"
+    },
+    {
+      "id": "v0_10_r2_headroom_block",
+      "expected_outcome": "BLOCKED_BEFORE_ANY_WRITE",
+      "pytest_selector": "tests/test_final_atomic_cutover_v0_10.py::test_v010_r2_headroom_blocks_before_any_write"
+    },
+    {
+      "id": "v0_10_outside_window",
+      "expected_outcome": "SKIP_BEFORE_PROVIDER_AND_R2",
+      "pytest_selector": "tests/test_final_atomic_cutover_v0_10.py::test_v010_outside_window_stops_before_provider_and_r2"
+    },
+    {
+      "id": "v0_10_stale_schedule_guard_contract",
+      "expected_outcome": "SKIP_BEFORE_PROVIDER_AND_R2",
+      "pytest_selector": "tests/test_v0_11_synthetic_failure_rehearsal.py::test_stale_freshness_guard_contract_is_fail_closed_before_provider_or_r2"
+    }
+  ],
+  "required_synthetic_scenario_count": 12,
+  "interpretation_boundary": {
+    "synthetic_control_pass_is_production_metadata_stability_pass": false,
+    "rehearsal_pass_authorizes_production_r2_evaluation": false,
+    "rehearsal_pass_authorizes_holdout_access": false,
+    "rehearsal_pass_authorizes_source_switch": false,
+    "rehearsal_pass_authorizes_w1_materialization": false,
+    "rehearsal_pass_authorizes_strategy_change": false,
+    "rehearsal_pass_authorizes_real_money_orders": false,
+    "rehearsal_pass_authorizes_live_trading": false
+  },
+  "execution_boundary": {
+    "synthetic_fixtures_only": true,
+    "production_metadata_evidence_consumed": false,
+    "r2_client_construction_authorized": false,
+    "r2_reads_authorized": false,
+    "r2_writes_authorized": false,
+    "provider_requests_authorized": false,
+    "render_requests_authorized": false,
+    "capture_artifact_reads_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
