@@ -125,6 +125,22 @@ def main() -> int:
         raise RuntimeError("dashboard must reflect V0.10 observer PREPARED")
     if op_project.get("v0_10CriticalPathFreezeGuardState") != "PASS_FROZEN":
         raise RuntimeError("dashboard must reflect frozen V0.10 critical-path guard")
+    if op_project.get("v0_10CaptureWindowOperationsState") != "PREPARED":
+        raise RuntimeError("dashboard must reflect V0.10 capture-window operations PREPARED")
+    if op_project.get("v0_10MidWindowEmergencyTemplateState") != "PREPARED_NOT_AUTHORITY":
+        raise RuntimeError("dashboard must reflect emergency template as prepared but not authority")
+    if op_project.get("v0_10ScheduledAttemptCount") != 388:
+        raise RuntimeError("dashboard V0.10 scheduled attempt count changed")
+    if op_project.get("manualCaptureBackfillAuthorized") is not False:
+        raise RuntimeError("dashboard must keep manual capture backfill unauthorized")
+    if op_project.get("retroactiveSlotBackfillAuthorized") is not False:
+        raise RuntimeError("dashboard must keep retroactive slot backfill unauthorized")
+    if op_project.get("midWindowCriticalMutationDefaultAuthorized") is not False:
+        raise RuntimeError("dashboard must keep mid-window critical mutation unauthorized by default")
+    if op_project.get("emergencyCriticalPathChangeRequiresVersionedAuthority") is not True:
+        raise RuntimeError("dashboard emergency change must require separate versioned authority")
+    if op_project.get("emergencyCriticalPathChangeRequiresProtectedMainPr") is not True:
+        raise RuntimeError("dashboard emergency change must require protected-main PR")
     if op_project.get("v0_11SyntheticFailureRehearsalState") != "PASS":
         raise RuntimeError("dashboard must reflect V0.11 synthetic rehearsal PASS")
     if op_project.get("v0_11SyntheticScenarioCount") != 12:
@@ -153,6 +169,10 @@ def main() -> int:
     for key, value in op_security.items():
         if value is not False:
             raise RuntimeError(f"dashboard operational security boundary changed: {key}")
+
+    source_authorities = operational.get("sourceAuthorities") or []
+    if "config/v0_10_mid_window_emergency_change_template_v0_1.json" not in source_authorities:
+        raise RuntimeError("dashboard emergency-template lineage missing")
 
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     if '<html lang="zh-Hant-TW">' not in html:
@@ -216,6 +236,8 @@ def main() -> int:
                 "equivalence_v0_1": project["providerEquivalenceGateState"],
                 "render_v0_10": project["renderMetadataV0_10CutoverState"],
                 "metadata_capture_authorized": True,
+                "capture_window_operations": op_project["v0_10CaptureWindowOperationsState"],
+                "mid_window_emergency_template": op_project["v0_10MidWindowEmergencyTemplateState"],
                 "metadata_stability": op_project["metadataStabilityState"],
                 "v0_11_synthetic_rehearsal": op_project["v0_11SyntheticFailureRehearsalState"],
                 "v0_11_production_r2_evaluation": op_project["v0_11ProductionR2EvaluationState"],
