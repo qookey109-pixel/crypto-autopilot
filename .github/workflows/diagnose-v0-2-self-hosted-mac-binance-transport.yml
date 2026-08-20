@@ -22,7 +22,8 @@ jobs:
           from pathlib import Path
           receipt = json.loads(Path('research/receipts/2026-08-19-provider-equivalence-v0-2-self-hosted-mac-transport-pass.json').read_text())
           assert receipt['status'] == 'PASS'
-          assert receipt['transport'] == 'github_self_hosted_mac'
+          assert receipt['execution_evidence']['transport'] == 'github_self_hosted_mac'
+          assert receipt['execution_evidence']['http_status'] == 200
           print('RETIRED_NO_EXECUTION')
           print('provider_requests_performed=0')
           print('r2_writes_performed=false')
