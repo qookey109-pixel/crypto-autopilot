@@ -1,0 +1,41 @@
+{
+  "schema": "pre-window-maintenance-hygiene-prepared-v0.1",
+  "status": "PREPARED_NOT_AUTHORITY_FOR_SCIENTIFIC_RESULT",
+  "date": "2026-08-20",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "purpose": "Document maintenance-only cleanup before the V0.10 frozen metadata window without changing scientific scope, capture authority, holdout state, source-switch state, or trading authority.",
+  "retired_historical_execution_workflows": [
+    "historical-backfill-pilot.yml",
+    "diagnose-v0-2-self-hosted-mac-binance-transport.yml",
+    "binance-2025-r2-pilot.yml",
+    "binance-vision-live-proof.yml",
+    "binance-vision-r2-proof.yml",
+    "binance-funding-r2-v0-2-preflight.yml",
+    "binance-funding-r2-v0-2-materialize.yml",
+    "m1b-m1a-dataset-upload.yml",
+    "m1b-r2-roundtrip.yml"
+  ],
+  "retirement_policy": {
+    "schedule_allowed": false,
+    "push_production_execution_allowed": false,
+    "manual_production_rerun_allowed": false,
+    "provider_requests_allowed": false,
+    "r2_secret_binding_allowed": false,
+    "r2_writes_allowed": false,
+    "self_hosted_execution_allowed": false,
+    "historical_receipts_mutated": false,
+    "reactivation_requires_new_versioned_authority": true
+  },
+  "current_authority_preserved": {
+    "v0_10_metadata_capture_effective": true,
+    "v0_10_schedule_changed": false,
+    "v0_11_evaluator_prepared_only": true,
+    "v0_11_production_r2_evaluation_authorized": false,
+    "replacement_holdout_state": "FROZEN_UNOPENED",
+    "metadata_stability_state": "NOT_YET_RUN",
+    "source_switch_authorized": false,
+    "trade_kline_w1_materialization_authorized": false,
+    "live_trading_authorized": false
+  },
+  "note": "This receipt documents maintenance intent only. It does not create or expand scientific, data-access, trading, or execution authority."
+}
