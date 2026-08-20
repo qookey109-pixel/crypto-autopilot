@@ -152,7 +152,7 @@ V0.8 remains **HISTORICAL** preparation evidence; it must not be rewritten to lo
 
 Frozen proof/materialization evidence must not be routinely re-executed just because its historical workflow file still exists.
 
-The following historical workflows are validation-only / `RETIRED_NO_EXECUTION`:
+The following **17 historical workflows** are validation-only / `RETIRED_NO_EXECUTION`:
 
 - `historical-backfill-pilot.yml`;
 - `diagnose-v0-2-self-hosted-mac-binance-transport.yml`;
@@ -162,11 +162,34 @@ The following historical workflows are validation-only / `RETIRED_NO_EXECUTION`:
 - `binance-funding-r2-v0-2-preflight.yml`;
 - `binance-funding-r2-v0-2-materialize.yml`;
 - `m1b-m1a-dataset-upload.yml`;
-- `m1b-r2-roundtrip.yml`.
+- `m1b-r2-roundtrip.yml`;
+- `binance-2025-coverage-scan.yml`;
+- `binance-funding-source-proof.yml`;
+- `binance-funding-coverage.yml`;
+- `binance-max-coverage-discovery.yml`;
+- `m1a-acquisition.yml`;
+- `pionex-binance-equivalence-proof.yml`;
+- `pionex-binance-equivalence-v0-1-forensics.yml`;
+- `historical-universe-long-horizon-review.yml`.
 
 They must have no schedule, no push-triggered production execution, no manual production rerun, no R2 secret binding, no self-hosted runner, and no real provider/materializer command. Reactivation requires a new versioned authority.
 
 This retirement does not delete or invalidate their historical scripts/configs/receipts.
+
+## Workflow reproducibility and supply-chain hardening
+
+PR #136 and PR #137 are maintenance authorities for execution-environment reproducibility and critical GitHub Actions supply-chain hygiene; they do not change scientific thresholds, metadata scope, or trading authority.
+
+Current hardening:
+
+- PR #136 added `requirements/ci-constraints.txt`, freezing the validated CI/test dependency snapshot while leaving public `pyproject.toml` compatibility ranges unchanged;
+- V0.10 scheduled capture explicitly selects **Python 3.13** before freshness checks, constrained dependency installation, provider access, or R2 access;
+- PR #137 pins production-critical GitHub Actions to reviewed **immutable 40-character commit SHAs** rather than mutable major tags;
+- critical checkout steps keep `persist-credentials: false`;
+- the critical artifact / GitHub Pages stack uses the reviewed Node 24 generation;
+- regression tests protect these boundaries from silent downgrade.
+
+Repository branch protection/ruleset configuration is external GitHub state, not a file-based scientific authority. It must be verified directly in GitHub settings before assuming `main` is protected.
 
 ## Non-negotiable provider and safety boundaries
 
