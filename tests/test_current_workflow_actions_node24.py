@@ -20,33 +20,54 @@ CURRENT = (
 
 
 class CurrentWorkflowActionsNode24Tests(unittest.TestCase):
-    def test_current_workflows_use_checkout_v6_with_nonpersistent_credentials(self) -> None:
-        for name in CURRENT:
-            with self.subTest(workflow=name):
-                text = (WORKFLOWS / name).read_text(encoding="utf-8")
-                checkout_count = text.count("uses: actions/checkout@v6")
-                self.assertGreater(checkout_count, 0)
-                self.assertNotIn("actions/checkout@v4", text)
-                self.assertNotIn("actions/checkout@v5", text)
+    def test_all_workflows_use_checkout_v6_with_nonpersistent_credentials(self) -> None:
+        for path in sorted(WORKFLOWS.glob("*.yml")):
+            with self.subTest(workflow=path.name):
+                text = path.read_text(encoding="utf-8")
+                checkout_lines = [
+                    line.strip()
+                    for line in text.splitlines()
+                    if line.strip().startswith("- uses: actions/checkout@")
+                ]
+                if not checkout_lines:
+                    continue
+                self.assertTrue(
+                    all(line == "- uses: actions/checkout@v6" for line in checkout_lines),
+                    f"{path.name}: checkout actions must use v6: {checkout_lines}",
+                )
                 self.assertEqual(
                     text.count("persist-credentials: false"),
-                    checkout_count,
-                    f"{name}: every checkout must explicitly avoid persisted git credentials",
+                    len(checkout_lines),
+                    f"{path.name}: every checkout must explicitly avoid persisted git credentials",
                 )
 
-    def test_python_setup_users_are_on_v6(self) -> None:
+    def test_all_setup_python_users_are_on_v6(self) -> None:
+        for path in sorted(WORKFLOWS.glob("*.yml")):
+            with self.subTest(workflow=path.name):
+                setup_lines = [
+                    line.strip()
+                    for line in path.read_text(encoding="utf-8").splitlines()
+                    if line.strip().startswith("- uses: actions/setup-python@")
+                ]
+                self.assertTrue(
+                    all(line == "- uses: actions/setup-python@v6" for line in setup_lines),
+                    f"{path.name}: setup-python actions must use v6: {setup_lines}",
+                )
+
+    def test_current_workflows_remain_in_global_node24_scope(self) -> None:
         for name in CURRENT:
             with self.subTest(workflow=name):
                 text = (WORKFLOWS / name).read_text(encoding="utf-8")
+                self.assertIn("uses: actions/checkout@v6", text)
+                self.assertNotIn("actions/checkout@v4", text)
                 self.assertNotIn("actions/setup-python@v5", text)
-                if "actions/setup-python@" in text:
-                    self.assertIn("actions/setup-python@v6", text)
 
     def test_v0_10_capture_schedule_and_authority_markers_are_unchanged(self) -> None:
         text = (WORKFLOWS / "provider-equivalence-v0-10-render-metadata-capture.yml").read_text(
             encoding="utf-8"
         )
         self.assertEqual(text.count("uses: actions/checkout@v6"), 3)
+        self.assertEqual(text.count("persist-credentials: false"), 3)
         self.assertIn('    - cron: "17,47 * 27-31 8 *"', text)
         self.assertIn('    - cron: "17,47 * 1-3 9 *"', text)
         self.assertIn('    - cron: "17,47 0-1 4 9 *"', text)
