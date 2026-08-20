@@ -9,6 +9,7 @@
     "research/receipts/2026-08-20-v0-10-scheduled-capture-observer-prepared.json",
     "config/v0_10_critical_path_freeze_v0_1.json",
     "config/v0_10_capture_window_operations_v0_1.json",
+    "config/v0_10_mid_window_emergency_change_template_v0_1.json",
     "research/receipts/2026-08-21-provider-equivalence-v0-11-synthetic-failure-rehearsal-pass.json",
     "config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json",
     "config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json"
@@ -18,11 +19,13 @@
     "v0_10ScheduledObserverState": "PREPARED",
     "v0_10CriticalPathFreezeGuardState": "PASS_FROZEN",
     "v0_10CaptureWindowOperationsState": "PREPARED",
+    "v0_10MidWindowEmergencyTemplateState": "PREPARED_NOT_AUTHORITY",
     "v0_10ScheduledAttemptCount": 388,
     "manualCaptureBackfillAuthorized": false,
     "retroactiveSlotBackfillAuthorized": false,
     "midWindowCriticalMutationDefaultAuthorized": false,
     "emergencyCriticalPathChangeRequiresVersionedAuthority": true,
+    "emergencyCriticalPathChangeRequiresProtectedMainPr": true,
     "v0_11SyntheticFailureRehearsalState": "PASS",
     "v0_11SyntheticScenarioCount": 12,
     "v0_11PostWindowExecutionPackageState": "PREPARED",
@@ -60,6 +63,11 @@
       "status": "PREPARED"
     },
     {
+      "name": "V0.10 Mid-window Emergency Change Template",
+      "detail": "緊急變更所需 incident evidence、pre/post SHA、protected-main PR、測試與 Render deploy lineage 已預先定義；模板本身不是 authority。",
+      "status": "PREPARED"
+    },
+    {
       "name": "V0.11 Synthetic Failure Rehearsal",
       "detail": "12/12 synthetic 情境已在 CI PASS，涵蓋 missing slot、SHA mismatch、same-slot disagreement、cross-window drift、R2 BLOCKED 與 stale guard；未消耗 production evidence。",
       "status": "PASS"
@@ -74,6 +82,13 @@
     {
       "name": "Manual / Retroactive Metadata Backfill",
       "detail": "NOT_AUTHORIZED；任一失敗或缺失 hourly slot 必須保留為科學證據，不得人工補跑、改寫 slot time 或隱藏 failed runs。",
+      "status": "NOT_AUTHORIZED",
+      "tone": "blocked",
+      "critical": true
+    },
+    {
+      "name": "Mid-window Production-critical Change",
+      "detail": "預設 NOT_AUTHORIZED；只有觀察到真正 production-critical incident 且下一個 frozen scheduled attempt 不足時，才可另建 versioned emergency authority + protected-main PR。",
       "status": "NOT_AUTHORIZED",
       "tone": "blocked",
       "critical": true
@@ -101,6 +116,8 @@
     "readsHoldout": false,
     "authorizesManualCaptureBackfill": false,
     "authorizesRetroactiveSlotBackfill": false,
+    "authorizesMidWindowCriticalChange": false,
+    "authorizesRenderRedeploy": false,
     "authorizesProductionR2Evaluation": false,
     "authorizesHoldoutAccess": false,
     "authorizesSourceSwitch": false,
