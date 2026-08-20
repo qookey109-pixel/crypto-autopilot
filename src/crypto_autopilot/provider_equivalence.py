@@ -265,17 +265,17 @@ def compare_provider_pair(
     left_closes: list[float] = []
     right_closes: list[float] = []
     for time_ms in ordered_times:
-        l = left_by_time[time_ms]
-        r = right_by_time[time_ms]
-        open_diff = _symmetric_bps(l.open, r.open)
-        high_diff = _symmetric_bps(l.high, r.high)
-        low_diff = _symmetric_bps(l.low, r.low)
-        close_diff = _symmetric_bps(l.close, r.close)
+        left_candle = left_by_time[time_ms]
+        right_candle = right_by_time[time_ms]
+        open_diff = _symmetric_bps(left_candle.open, right_candle.open)
+        high_diff = _symmetric_bps(left_candle.high, right_candle.high)
+        low_diff = _symmetric_bps(left_candle.low, right_candle.low)
+        close_diff = _symmetric_bps(left_candle.close, right_candle.close)
         ohlc_diffs.extend((open_diff, high_diff, low_diff, close_diff))
         open_close_diffs.extend((open_diff, close_diff))
         high_low_diffs.extend((high_diff, low_diff))
-        left_closes.append(l.close)
-        right_closes.append(r.close)
+        left_closes.append(left_candle.close)
+        right_closes.append(right_candle.close)
 
     median_ohlc = _percentile(ohlc_diffs, 0.50)
     p95_open_close = _percentile(open_close_diffs, 0.95)
