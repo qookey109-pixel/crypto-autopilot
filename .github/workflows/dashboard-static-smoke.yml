@@ -1,4 +1,4 @@
-name: Dashboard D1 Static Smoke
+name: Dashboard Static Smoke
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: dashboard-d1-static-smoke-${{ github.ref }}
+  group: dashboard-static-smoke-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -20,9 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
