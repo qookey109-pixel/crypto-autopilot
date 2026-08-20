@@ -1,0 +1,105 @@
+{
+  "schema_version": "v0_10_capture_window_operations_prepared_receipt_v0_1",
+  "status": "PASS",
+  "stage": "V0_10_CAPTURE_WINDOW_OPERATIONS_PREPARED_PASS",
+  "date": "2026-08-21",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "PRE_WINDOW_OPERATIONAL_RESPONSE_POLICY_AND_VALIDATION_ONLY",
+  "source_pr": 156,
+  "source_pr_head_sha": "9c2109e8273e0c8248d7030a2e200f5b4b1f284e",
+  "source_pr_merge_sha": "21ea11e01b08929da925cfa9d965f8ebebd8d078",
+  "source_main_before_merge": "fc742679f2736c9e64177676431a553e60656251",
+  "artifacts": {
+    "operations_policy": "config/v0_10_capture_window_operations_v0_1.json",
+    "runbook": "docs/V0_10_CAPTURE_WINDOW_OPERATIONS_RUNBOOK.md",
+    "regression_tests": "tests/test_v0_10_capture_window_operations.py",
+    "validation_workflow": ".github/workflows/validate-v0-10-capture-window-operations.yml",
+    "dashboard_projection": "web/data/operational-status.json"
+  },
+  "frozen_window": {
+    "start_utc": "2026-08-27T00:00:00Z",
+    "end_utc": "2026-09-04T01:59:59.999Z",
+    "hourly_slot_count": 194,
+    "scheduled_minutes_utc": [17, 47],
+    "scheduled_attempt_count": 388,
+    "first_scheduled_attempt_utc": "2026-08-27T00:17:00Z",
+    "last_scheduled_attempt_utc": "2026-09-04T01:47:00Z"
+  },
+  "ci_evidence": {
+    "dedicated_validation": {
+      "workflow_run_id": 32408849173,
+      "job_id": 96554283712,
+      "conclusion": "success",
+      "regression_test_count": 7,
+      "regression_test_result": "PASS",
+      "production_execution_surface_assertion": "PASS"
+    },
+    "full_ci": {
+      "workflow_run_id": 32408849225,
+      "python_3_12_job_id": 96554284140,
+      "python_3_12_conclusion": "success",
+      "python_3_13_job_id": 96554283798,
+      "python_3_13_conclusion": "success"
+    },
+    "dashboard": {
+      "zh_hant_snapshot_run_id": 32408849172,
+      "zh_hant_snapshot_conclusion": "success",
+      "static_smoke_run_id": 32408849212,
+      "static_smoke_conclusion": "success",
+      "pages_pr_build_run_id": 32408849274,
+      "pages_pr_build_conclusion": "success"
+    },
+    "historical_v0_8_scaffold_regression": {
+      "workflow_run_id": 32408849198,
+      "conclusion": "success",
+      "production_execution_reactivated": false
+    }
+  },
+  "validated_fail_closed_rules": {
+    "manual_capture_backfill_authorized": false,
+    "retroactive_slot_backfill_authorized": false,
+    "failed_or_missing_slots_remain_scientific_evidence": true,
+    "automatic_repair_authorized": false,
+    "automatic_redeploy_authorized": false,
+    "automatic_secret_rotation_authorized": false,
+    "automatic_budget_override_authorized": false,
+    "r2_headroom_block_may_be_bypassed": false,
+    "stale_run_freshness_guard_may_be_bypassed": false,
+    "critical_path_drift_may_be_silently_accepted": false,
+    "mid_window_production_critical_mutation_default_authorized": false,
+    "emergency_critical_path_change_requires_separate_versioned_authority": true,
+    "emergency_critical_path_change_requires_protected_main_pr": true,
+    "emergency_change_may_retroactively_validate_missing_slots": false,
+    "emergency_change_may_change_frozen_thresholds_or_scope": false,
+    "emergency_change_may_open_holdout": false
+  },
+  "execution_evidence": {
+    "production_metadata_evidence_consumed": false,
+    "provider_requests_performed": 0,
+    "render_requests_performed": 0,
+    "r2_client_constructed": false,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "capture_artifacts_read": false,
+    "holdout_candles_accessed": false,
+    "holdout_evaluated": false,
+    "v0_11_production_r2_evaluation_performed": false
+  },
+  "authorization_boundary": {
+    "receipt_is_new_v0_10_capture_authority": false,
+    "manual_capture_authorized": false,
+    "v0_11_production_r2_evaluation_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "note": "PASS means the capture-window incident-response policy and its fail-closed validation are prepared. It is not production metadata evidence, metadata-stability PASS, holdout authority, source-switch authority, or trading authority."
+}

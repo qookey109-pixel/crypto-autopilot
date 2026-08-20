@@ -7,6 +7,7 @@ on:
       - "config/v0_10_capture_window_operations_v0_1.json"
       - "docs/V0_10_CAPTURE_WINDOW_OPERATIONS_RUNBOOK.md"
       - "tests/test_v0_10_capture_window_operations.py"
+      - "tests/test_v0_10_capture_window_operations_receipt.py"
       - "research/receipts/2026-08-21-v0-10-capture-window-operations-prepared.json"
       - "web/data/operational-status.json"
       - ".github/workflows/validate-v0-10-capture-window-operations.yml"
@@ -36,8 +37,11 @@ jobs:
         run: |
           python -m pip install -c requirements/ci-constraints.txt -e .
           python -m pip install -c requirements/ci-constraints.txt pytest
-      - name: Validate capture-window operations and fail-closed incident matrix
-        run: python -m pytest -q tests/test_v0_10_capture_window_operations.py
+      - name: Validate capture-window operations, receipt, and fail-closed incident matrix
+        run: |
+          python -m pytest -q \
+            tests/test_v0_10_capture_window_operations.py \
+            tests/test_v0_10_capture_window_operations_receipt.py
       - name: Assert validation workflow itself has no production execution surface
         shell: bash
         run: |
