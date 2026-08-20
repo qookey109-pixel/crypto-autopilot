@@ -1,0 +1,125 @@
+name: V0.10 Scheduled Capture Observer
+
+on:
+  workflow_run:
+    workflows:
+      - "Provider Equivalence V0.10 Render Metadata Capture"
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  observe-scheduled-capture:
+    if: github.event.workflow_run.event == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect V0.10 scheduled run metadata only
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+          SOURCE_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          SOURCE_CREATED_AT: ${{ github.event.workflow_run.created_at }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from urllib.request import Request, urlopen
+
+          start = datetime.fromisoformat('2026-08-27T00:00:00+00:00')
+          end = datetime.fromisoformat('2026-09-04T01:59:59.999000+00:00')
+          created_at = datetime.fromisoformat(os.environ['SOURCE_CREATED_AT'].replace('Z', '+00:00'))
+
+          base = {
+              'schema': 'qookey-v0-10-scheduled-capture-observer-v0.1',
+              'source_run_id': int(os.environ['SOURCE_RUN_ID']),
+              'source_created_at_utc': created_at.astimezone(timezone.utc).isoformat(),
+              'provider_data_read': False,
+              'capture_artifact_read': False,
+              'r2_client_constructed': False,
+              'r2_reads_performed': False,
+              'r2_writes_performed': False,
+              'holdout_accessed': False,
+              'v0_11_evaluation_performed': False,
+              'source_switch_performed': False,
+              'live_trading_performed': False,
+          }
+
+          if not (start <= created_at <= end):
+              payload = {
+                  **base,
+                  'status': 'NO_ACTION',
+                  'stage': 'SOURCE_RUN_OUTSIDE_FROZEN_WINDOW',
+              }
+              print(json.dumps(payload, sort_keys=True))
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as handle:
+                  handle.write('## V0.10 scheduled capture observer\n\n')
+                  handle.write('Source scheduled run was outside the frozen production window; no evaluation performed.\n')
+              raise SystemExit(0)
+
+          repository = os.environ['GITHUB_REPOSITORY']
+          run_id = os.environ['SOURCE_RUN_ID']
+          request = Request(
+              f'https://api.github.com/repos/{repository}/actions/runs/{run_id}/jobs?per_page=100',
+              headers={
+                  'Accept': 'application/vnd.github+json',
+                  'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
+                  'X-GitHub-Api-Version': '2022-11-28',
+                  'User-Agent': 'qookey-v0-10-scheduled-capture-observer/0.1',
+              },
+          )
+          with urlopen(request, timeout=20) as response:
+              jobs_payload = json.loads(response.read().decode('utf-8'))
+
+          jobs = {job['name']: job for job in jobs_payload.get('jobs', [])}
+          expected_jobs = ('validate-atomic-cutover', 'window-gate', 'capture')
+          missing_jobs = [name for name in expected_jobs if name not in jobs]
+          if missing_jobs:
+              raise AssertionError(f'missing expected V0.10 jobs: {missing_jobs}')
+
+          if os.environ['SOURCE_CONCLUSION'] != 'success':
+              raise AssertionError(f"source workflow conclusion={os.environ['SOURCE_CONCLUSION']}")
+
+          for name in expected_jobs:
+              conclusion = jobs[name].get('conclusion')
+              if conclusion != 'success':
+                  raise AssertionError(f'{name} conclusion={conclusion}')
+
+          capture_steps = {step['name']: step for step in jobs['capture'].get('steps', [])}
+          expected_steps = (
+              'Reject stale scheduled runs before provider or R2 access',
+              'Capture frozen provider metadata through V0.10 successor path',
+              'Assert V0.10 capture boundary',
+          )
+          missing_steps = [name for name in expected_steps if name not in capture_steps]
+          if missing_steps:
+              raise AssertionError(f'missing expected capture steps: {missing_steps}')
+
+          for name in expected_steps:
+              conclusion = capture_steps[name].get('conclusion')
+              if conclusion != 'success':
+                  raise AssertionError(f'{name} conclusion={conclusion}')
+
+          payload = {
+              **base,
+              'status': 'PASS',
+              'stage': 'V0_10_SCHEDULED_PIPELINE_EXECUTION_HEALTH_PASS',
+              'source_workflow_conclusion': os.environ['SOURCE_CONCLUSION'],
+              'expected_jobs_completed_successfully': list(expected_jobs),
+              'expected_capture_steps_completed_successfully': list(expected_steps),
+              'capture_evidence_interpreted': False,
+              'note': 'Operational pipeline-health PASS only; not a provider-metadata or V0.11 stability result.',
+          }
+          print(json.dumps(payload, sort_keys=True))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as handle:
+              handle.write('## V0.10 scheduled capture observer\n\n')
+              handle.write('**Pipeline execution health: PASS**\n\n')
+              handle.write('This observer inspected GitHub Actions run/job/step metadata only. ') 
+              handle.write('It did not read capture artifacts, R2, provider data, or holdout data, and did not run V0.11.\n')
+          PY
