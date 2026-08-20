@@ -4,7 +4,7 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 
 > **Current mode: PAPER-ONLY.** No real-money order path is authorized. `trade_plan_authorized=false` and `live_trading_authorized=false` remain mandatory. For the detailed current authority index, always read [`PROJECT_STATUS.md`](PROJECT_STATUS.md) first.
 
-## Current authority snapshot — 2026-08-19
+## Current authority snapshot — 2026-08-20
 
 The repository has moved beyond the original V0.1 implementation baseline while preserving its scientific history:
 
@@ -14,13 +14,17 @@ The repository has moved beyond the original V0.1 implementation baseline while 
 - Pionex ↔ Binance Equivalence V0.1: **definitive FAIL** — 45 pairs = 18 PASS / 18 REVIEW / 9 FAIL. The frozen result must not be regraded by changing thresholds or scope.
 - `source_switch_authorized=false`; Binance evidence remains `provider=binance_usdm` and must never be relabeled as Pionex-native evidence.
 - V0.5 Render Free / Frankfurt Binance public-metadata transport: **PASS**.
-- V0.6 Render transport authority transition: **PASS**, while historical V0.2 Self-Hosted Mac authority remains preserved.
-- V0.7 successor Render metadata-capture protocol: **PREPARED / EXECUTION_NOT_AUTHORIZED**.
-- V0.8 atomic execution-cutover contract: **PREPARED / EXECUTION_NOT_AUTHORIZED**.
+- V0.6 Render transport authority transition: **PASS**, while historical V0.2 Self-Hosted Mac transport authority remains preserved.
+- V0.7 successor Render metadata-capture protocol: historical **PREPARED / EXECUTION_NOT_AUTHORIZED** authority, preserved unchanged.
+- V0.8 shared relay secret handshake: **PASS**; V0.8 prepared cutover contract and hard-disabled scaffold remain historical preparation authorities.
+- V0.9 authenticated Render relay smoke: **PASS** — HTTP 200 / valid JSON / `symbol_count=872` / zero R2 writes / zero holdout access.
+- V0.10 final atomic metadata-capture cutover: **EFFECTIVE / AUTHORIZED** after merged PR #127 at `8fce944da479dbda0e2899f9b30b9de62351fa27`.
+- V0.2 self-hosted scheduled metadata capture is now **RETIRED AS EXECUTION PATH**; its receipts remain immutable historical evidence.
+- V0.10 GitHub-hosted Ubuntu scheduled metadata capture is the current authorized metadata-capture execution path.
 - Replacement holdout `2026-08-28` through `2026-09-03`: **FROZEN_UNOPENED**; candle access and evaluation remain unauthorized.
-- Metadata stability gate: **NOT_YET_RUN**.
+- Metadata stability gate: **NOT_YET_RUN**. The next scientific stage is the frozen 194-slot metadata-stability capture window beginning `2026-08-27T00:00:00Z`.
 
-The existing V0.2 `[self-hosted, macOS, ARM64]` workflow remains the only metadata-capture execution path already authorized until a separate versioned activation authority performs an atomic old/new cutover. V0.8 deliberately does **not** enable the Render relay, enable a successor schedule, disable the current V0.2 schedule, write metadata to R2, or access the holdout.
+The V0.10 cutover authorizes only the frozen public-provider metadata capture phase and metadata-only R2 writes inside the exact window. It does **not** authorize replacement holdout candles, source switching, Historical Universe membership, W1 materialization, backtest admission, strategy changes, trade plans, real-money orders, or live trading.
 
 ## FREE-ONLY cloud policy
 
@@ -30,9 +34,27 @@ The current cloud policy is frozen in [`config/cloud_free_tier_policy_v0_1.json`
 - no paid fallback, automatic subscription change, or payment-method upgrade path;
 - Cloudflare Containers are retired for this project because they require Workers Paid;
 - Koyeb V0.4 is superseded and is not a current transport candidate;
-- the current Mac-independent Binance public-metadata transport is the existing **Render Free / Frankfurt** web service;
-- future metadata R2 writes must pass the FREE-ONLY operational 8 GB hard-stop/headroom gate first;
-- Render must never receive R2 credentials.
+- the current Mac-independent Binance public-metadata transport is **Render Free / Frankfurt**;
+- every V0.10 metadata R2 write must pass a fresh whole-bucket FREE-ONLY **8 GB hard-stop/headroom gate** before write;
+- Render must never receive R2 credentials; R2 credentials remain in GitHub Actions secrets only.
+
+## V0.10 metadata capture execution boundary
+
+Current authorized metadata-capture orchestration:
+
+- workflow: `.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml`;
+- runner: `ubuntu-latest`;
+- Pionex metadata leg: direct public HTTPS from GitHub Actions;
+- Binance USD-M metadata leg: authenticated Render Free Frankfurt path `/metadata/v0-10/binance-exchange-info`;
+- exact metadata window: `2026-08-27T00:00:00Z` through `2026-09-04T01:59:59.999Z`;
+- 194 UTC hourly slots, scheduled attempts at minute `:17` and `:47`;
+- schedule is date-window scoped to avoid unnecessary free-tier runs;
+- scheduled runs are serialized; stale queued runs fail closed before provider/R2 access;
+- each complete capture uses 3 immutable run-scoped R2 objects, with receipt written last and post-write SHA-256 readback;
+- V0.7 historical raw relay path remains disabled;
+- V0.2 self-hosted scheduled execution remains retired and is not an automatic fallback.
+
+The shared `METADATA_RELAY_TOKEN` is provisioned out of band in Render and GitHub Actions. Its value must never be committed, logged, posted in issues, artifacts, or chat.
 
 ## V0.1 strategy scope
 
@@ -86,9 +108,9 @@ Paper Broker -> Private Execution Adapter
 
 Current zero-cost infrastructure split:
 
-- GitHub: source, CI, authority receipts, scheduled orchestration and validation jobs;
-- Render Free / Frankfurt: successor Binance public-metadata transport leg only;
-- Cloudflare R2 Standard Free: immutable historical/provider metadata storage under explicit write authority;
+- GitHub: source, CI, versioned authority, V0.10 scheduled metadata orchestration, validation jobs and R2 credentials;
+- Render Free / Frankfurt: authenticated Binance public-metadata transport leg only;
+- Cloudflare R2 Standard Free: immutable historical/provider metadata storage under explicit metadata-only write authority;
 - GitHub Pages / static assets: read-only Traditional Chinese dashboard;
 - Cloudflare Free services may be used only within the frozen FREE-ONLY policy and only where they are not transport-blocked.
 
@@ -117,10 +139,11 @@ Bulk historical data is not stored in GitHub; canonical storage evidence is kept
 
 - Never commit Pionex/Binance API keys, relay tokens, Cloudflare tokens, R2 credentials, or other secrets.
 - `.env.example` contains variable names only.
-- A shared future `METADATA_RELAY_TOKEN` must be provisioned out of band in Render and GitHub Actions; its value must not be committed or pasted into issues/logs/chat.
+- `METADATA_RELAY_TOKEN` is an out-of-band shared secret between Render and GitHub Actions; never expose its value.
 - No martingale, loss-doubling, unlimited averaging down, cross-margin dependency, or liquidation-as-stop.
 - Provider provenance remains explicit; provider splicing, silent interpolation and Pionex-native relabeling are forbidden.
-- Render relay/successor scheduling must not be enabled before a separate atomic activation authority disables the old V0.2 scheduled path in the same cutover.
+- V0.10 metadata capture authorization is **not** trading authorization.
+- Replacement holdout candle access/evaluation remains forbidden until a separate post-stability authority exists.
 - No live order path is authorized.
 
 ## Quick start

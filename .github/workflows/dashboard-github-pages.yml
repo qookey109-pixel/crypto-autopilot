@@ -7,9 +7,13 @@ on:
       - "web/**"
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/apply_dashboard_latest_authority.py"
+      - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
       - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
+      - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
+      - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
+      - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - "PROJECT_STATUS.md"
       - ".github/workflows/dashboard-github-pages.yml"
   pull_request:
@@ -17,9 +21,13 @@ on:
       - "web/**"
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/apply_dashboard_latest_authority.py"
+      - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
       - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
+      - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
+      - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
+      - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - "PROJECT_STATUS.md"
       - ".github/workflows/dashboard-github-pages.yml"
   workflow_dispatch:
@@ -58,7 +66,7 @@ jobs:
             --output _site/data/dashboard.json
           touch _site/.nojekyll
 
-      - name: Assert latest authority, V0.8 cutover and PAPER-ONLY boundary
+      - name: Assert latest V0.10 authority and PAPER-ONLY boundary
         shell: bash
         run: |
           set -euo pipefail
@@ -69,7 +77,7 @@ jobs:
           project = data['project']
           assert data['authority'] is False
           assert data['locale'] == 'zh-Hant-TW'
-          assert data['schema'] == 'qookey-dashboard-authority-snapshot-v0.6'
+          assert data['schema'] == 'qookey-dashboard-authority-snapshot-v0.10'
           assert project['fundingMaterializationComplete'] is True
           assert project['fundingMaterializationState'] == 'PASS'
           assert project['fundingV0_2R2Identities'] == 192
@@ -84,18 +92,27 @@ jobs:
           ) == (18, 18, 9)
           assert project['renderTransportV0_5State'] == 'PASS'
           assert project['renderTransportV0_6AuthorityState'] == 'PASS'
-          assert project['renderMetadataV0_7State'] == 'PREPARED_EXECUTION_NOT_AUTHORIZED'
-          assert project['renderMetadataV0_8CutoverState'] == 'PREPARED_EXECUTION_NOT_AUTHORIZED'
-          assert project['currentMetadataCaptureExecutionPath'] == 'github_self_hosted_mac'
-          assert project['successorMetadataCaptureExecutionAuthorized'] is False
-          assert project['successorMetadataScheduleEnabled'] is False
+          assert project['renderMetadataV0_8SharedSecretState'] == 'PASS_FROZEN'
+          assert project['renderMetadataV0_9SmokeState'] == 'PASS_FROZEN'
+          assert project['renderMetadataV0_10CutoverState'] == 'EFFECTIVE_AUTHORIZED'
+          assert project['currentMetadataCaptureExecutionPath'] == 'github_hosted_ubuntu_v0_10'
+          assert project['oldV0_2ScheduledExecutionAuthorized'] is False
+          assert project['successorMetadataCaptureExecutionAuthorized'] is True
+          assert project['successorMetadataScheduleEnabled'] is True
           assert project['metadataCapturePathsConcurrentAuthorized'] is False
           assert project['replacementHoldoutState'] == 'FROZEN_UNOPENED'
           assert project['metadataStabilityState'] == 'NOT_YET_RUN'
           assert project['cloudRuntimeMonthlyBudgetUsd'] == 0
           assert project['mode'] == 'PAPER-ONLY'
+          assert project['sourceSwitchAuthorized'] is False
           assert project['tradePlanAuthorized'] is False
           assert project['liveTradingAuthorized'] is False
+          security = data['securityBoundary']
+          assert security['containsSecrets'] is False
+          assert security['authorizesMetadataCapture'] is True
+          assert security['authorizesHoldoutAccess'] is False
+          assert security['authorizesTradePlans'] is False
+          assert security['authorizesLiveTrading'] is False
           PY
 
       - name: Upload PR build evidence

@@ -6,16 +6,12 @@ on:
     paths:
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/apply_dashboard_latest_authority.py"
+      - "scripts/validate_dashboard_static.py"
       - ".github/workflows/dashboard-authority-snapshot.yml"
       - "web/**"
       - "PROJECT_STATUS.md"
       - "research/receipts/2026-08-17-m1a-pionex.json"
       - "research/receipts/2026-08-18-binance-2025-r2-pilot.json"
-      - "research/receipts/2026-08-18-binance-funding-source-proof.json"
-      - "research/receipts/2026-08-18-binance-funding-coverage.json"
-      - "research/receipts/2026-08-19-binance-funding-interior-continuity-review.json"
-      - "research/receipts/2026-08-19-binance-funding-materialization-authority-v0-2.json"
-      - "research/receipts/2026-08-19-binance-funding-r2-v0-2-full-preflight.json"
       - "research/receipts/2026-08-19-binance-funding-r2-v0-2-materialization.json"
       - "research/receipts/2026-08-19-r2-bucket-usage.json"
       - "research/receipts/2026-08-19-pionex-binance-equivalence-v0-1.json"
@@ -24,6 +20,12 @@ on:
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
       - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
       - "research/receipts/2026-08-19-provider-equivalence-v0-8-render-metadata-cutover-prepared.json"
+      - "research/receipts/2026-08-19-provider-equivalence-v0-8-shared-relay-secret-handshake-pass.json"
+      - "research/receipts/2026-08-20-provider-equivalence-v0-9-render-relay-smoke-pass.json"
+      - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
+      - "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
+      - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
+      - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - "research/receipts/2026-08-18-historical-universe-long-horizon-review.json"
 
 permissions:
@@ -58,7 +60,7 @@ jobs:
             --input artifacts/dashboard-site/data/dashboard.json \
             --output artifacts/dashboard-site/data/dashboard.json
 
-      - name: Assert latest authority snapshot through V0.8
+      - name: Assert latest authority snapshot through V0.10
         shell: bash
         run: |
           set -euo pipefail
@@ -72,7 +74,7 @@ jobs:
           assert data['authority'] is False
           assert data['locale'] == 'zh-Hant-TW'
           assert data['snapshotType'] == 'NORMALIZED_VIEW_OF_FROZEN_REPOSITORY_AUTHORITIES'
-          assert data['schema'] == 'qookey-dashboard-authority-snapshot-v0.6'
+          assert data['schema'] == 'qookey-dashboard-authority-snapshot-v0.10'
           assert project['mode'] == 'PAPER-ONLY'
           assert project['fundingMaterializationComplete'] is True
           assert project['fundingMaterializationState'] == 'PASS'
@@ -88,17 +90,23 @@ jobs:
           ) == (18, 18, 9)
           assert project['renderTransportV0_5State'] == 'PASS'
           assert project['renderTransportV0_6AuthorityState'] == 'PASS'
-          assert project['renderMetadataV0_7State'] == 'PREPARED_EXECUTION_NOT_AUTHORIZED'
-          assert project['renderMetadataV0_8CutoverState'] == 'PREPARED_EXECUTION_NOT_AUTHORIZED'
-          assert project['currentMetadataCaptureExecutionPath'] == 'github_self_hosted_mac'
-          assert project['successorMetadataCaptureExecutionAuthorized'] is False
-          assert project['successorMetadataScheduleEnabled'] is False
+          assert project['renderMetadataV0_7State'] == 'HISTORICAL_PREPARED_EXECUTION_NOT_AUTHORIZED'
+          assert project['renderMetadataV0_8CutoverState'] == 'HISTORICAL_PREPARED_EXECUTION_NOT_AUTHORIZED'
+          assert project['renderMetadataV0_8SharedSecretState'] == 'PASS_FROZEN'
+          assert project['renderMetadataV0_9SmokeState'] == 'PASS_FROZEN'
+          assert project['renderMetadataV0_10CutoverState'] == 'EFFECTIVE_AUTHORIZED'
+          assert project['currentMetadataCaptureExecutionPath'] == 'github_hosted_ubuntu_v0_10'
+          assert project['oldV0_2ScheduledExecutionAuthorized'] is False
+          assert project['successorMetadataCaptureExecutionAuthorized'] is True
+          assert project['successorMetadataScheduleEnabled'] is True
           assert project['metadataCapturePathsConcurrentAuthorized'] is False
           assert project['replacementHoldoutState'] == 'FROZEN_UNOPENED'
           assert project['metadataStabilityState'] == 'NOT_YET_RUN'
           assert project['tradePlanAuthorized'] is False
           assert project['liveTradingAuthorized'] is False
           assert data['securityBoundary']['containsSecrets'] is False
+          assert data['securityBoundary']['authorizesMetadataCapture'] is True
+          assert data['securityBoundary']['authorizesHoldoutAccess'] is False
           assert data['securityBoundary']['authorizesSourceSwitch'] is False
           assert data['securityBoundary']['authorizesPionexNativeRelabeling'] is False
           assert data['securityBoundary']['authorizesTradePlans'] is False
@@ -106,14 +114,17 @@ jobs:
           pipeline = {row['name']: row['status'] for row in data['pipeline']}
           assert pipeline['Funding V0.2 實際 R2 Materialization'] == 'PASS'
           assert pipeline['Pionex ↔ Binance 等價性'] == 'FAIL'
-          assert pipeline['Render Free Binance Transport'] == 'PASS'
-          assert pipeline['Render Metadata V0.7 Protocol'] == 'PREPARED'
-          assert pipeline['Render Metadata V0.8 Cutover'] == 'PREPARED'
+          assert pipeline['V0.10 Metadata Atomic Cutover'] == 'AUTHORIZED'
+          assert pipeline['Metadata Stability 194 Slots'] == 'PENDING'
           gates = {row['name']: row['status'] for row in data['gates']}
-          assert gates['Render Metadata Cutover'] == 'NOT_AUTHORIZED'
+          assert gates['V0.10 Metadata Cutover'] == 'AUTHORIZED'
+          assert gates['Metadata Stability'] == 'PENDING'
           assert gates['Replacement Holdout'] == 'NOT_AUTHORIZED'
           text = path.read_text(encoding='utf-8')
-          for token in ('R2_SECRET_ACCESS_KEY', 'R2_ACCESS_KEY_ID', 'PIONEX_API_SECRET', 'BEGIN PRIVATE KEY'):
+          for token in (
+              'R2_SECRET_ACCESS_KEY', 'R2_ACCESS_KEY_ID', 'PIONEX_API_SECRET',
+              'METADATA_RELAY_TOKEN=', 'BEGIN PRIVATE KEY'
+          ):
               assert token not in text
           PY
 
@@ -141,10 +152,11 @@ jobs:
           assert '績效中心' in html
           assert '風險與閘門' in html
           assert data['project']['mode'] == 'PAPER-ONLY'
-          assert data['project']['fundingMaterializationState'] == 'PASS'
           assert data['project']['providerEquivalenceGateState'] == 'FAIL'
-          assert data['project']['renderMetadataV0_8CutoverState'] == 'PREPARED_EXECUTION_NOT_AUTHORIZED'
-          assert data['project']['successorMetadataCaptureExecutionAuthorized'] is False
+          assert data['project']['renderMetadataV0_10CutoverState'] == 'EFFECTIVE_AUTHORIZED'
+          assert data['project']['successorMetadataCaptureExecutionAuthorized'] is True
+          assert data['project']['replacementHoldoutState'] == 'FROZEN_UNOPENED'
+          assert data['project']['liveTradingAuthorized'] is False
           PY
 
       - name: Upload deployable Chinese dashboard evidence
