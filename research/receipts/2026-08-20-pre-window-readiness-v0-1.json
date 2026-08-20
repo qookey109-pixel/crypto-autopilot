@@ -1,0 +1,64 @@
+{
+  "schema": "qookey-pre-window-readiness-v0.1",
+  "status": "PASS",
+  "stage": "PRE_WINDOW_READINESS_V0_1_PASS",
+  "observed_at_utc": "2026-08-20T09:48:00Z",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "base_main_sha": "3484941a32a4a4bae768b7d7c4574e6e12448176",
+  "pull_request": 146,
+  "github_actions": {
+    "workflow": ".github/workflows/pre-window-readiness-v0-1.yml",
+    "workflow_run_id": 32355693751,
+    "job_id": 96384274839,
+    "required_secret_presence": {
+      "METADATA_RELAY_TOKEN": true,
+      "CLOUDFLARE_ACCOUNT_ID": true,
+      "R2_BUCKET_NAME": true,
+      "R2_ACCESS_KEY_ID": true,
+      "R2_SECRET_ACCESS_KEY": true
+    },
+    "secret_values_emitted": false,
+    "render_shared_secret_match": true,
+    "provider_requests_performed": 0,
+    "r2_client_constructed": false,
+    "r2_writes_performed": false,
+    "holdout_candles_accessed": false,
+    "source_switch_performed": false,
+    "live_trading_performed": false
+  },
+  "render": {
+    "workspace": "My Workspace",
+    "service_id": "srv-da2qlb67bikc73bibobg",
+    "service_slug": "qookey-binance-transport-v0-5",
+    "plan": "free",
+    "region": "frankfurt",
+    "suspended": false,
+    "maintenance_mode": false,
+    "auto_deploy": false,
+    "auto_deploy_trigger": "off",
+    "live_deploy_id": "dep-da35gfoae00c73fpff8g",
+    "live_deploy_commit": "8fce944da479dbda0e2899f9b30b9de62351fa27",
+    "live_deploy_status": "live",
+    "unexpected_redeploy_after_v0_10_activation": false
+  },
+  "v0_10_readiness": {
+    "production_window_start_utc": "2026-08-27T00:00:00Z",
+    "production_window_end_utc": "2026-09-04T01:59:59.999Z",
+    "hourly_slot_count": 194,
+    "attempt_minutes_utc": [17, 47],
+    "old_v0_2_schedule_retired": true,
+    "exact_window_gate_present": true,
+    "scheduled_run_freshness_guard_minutes": 30,
+    "r2_free_only_hard_stop_bytes": 8000000000
+  },
+  "authorization_boundary": {
+    "readiness_maintenance_only": true,
+    "manual_v0_10_production_capture_authorized": false,
+    "v0_11_production_r2_evaluation_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "trade_kline_w1_materialization_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
