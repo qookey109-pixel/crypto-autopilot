@@ -1,0 +1,68 @@
+name: Validate V0.10 Capture Window Operations
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "config/v0_10_capture_window_operations_v0_1.json"
+      - "docs/V0_10_CAPTURE_WINDOW_OPERATIONS_RUNBOOK.md"
+      - "tests/test_v0_10_capture_window_operations.py"
+      - "research/receipts/2026-08-21-v0-10-capture-window-operations-prepared.json"
+      - "web/data/operational-status.json"
+      - ".github/workflows/validate-v0-10-capture-window-operations.yml"
+      - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+      - ".github/workflows/observe-v0-10-scheduled-capture.yml"
+      - "config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v0-10-capture-window-operations-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-operations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+      - name: Install package and pytest from frozen CI constraints
+        run: |
+          python -m pip install -c requirements/ci-constraints.txt -e .
+          python -m pip install -c requirements/ci-constraints.txt pytest
+      - name: Validate capture-window operations and fail-closed incident matrix
+        run: python -m pytest -q tests/test_v0_10_capture_window_operations.py
+      - name: Assert validation workflow itself has no production execution surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          workflow = Path('.github/workflows/validate-v0-10-capture-window-operations.yml').read_text(encoding='utf-8')
+          assert not any(line == '  schedule:' for line in workflow.splitlines())
+          assert 'permissions:\n  contents: read' in workflow
+          prefix = '$' + '{{ secrets.'
+          for secret in (
+              'R2_ACCESS_KEY_ID',
+              'R2_SECRET_ACCESS_KEY',
+              'CLOUDFLARE_ACCOUNT_ID',
+              'R2_BUCKET_NAME',
+              'METADATA_RELAY_TOKEN',
+          ):
+              assert prefix + secret not in workflow
+          for forbidden in (
+              'aws s3',
+              'boto3',
+              'fapi.binance.com',
+              'api.pionex.com',
+              '/metadata/v0-10/binance-exchange-info',
+          ):
+              assert forbidden not in workflow
+          PY
