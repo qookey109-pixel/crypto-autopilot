@@ -12,6 +12,7 @@
     "config/v0_10_mid_window_emergency_change_template_v0_1.json",
     "research/receipts/2026-08-21-provider-equivalence-v0-11-synthetic-failure-rehearsal-pass.json",
     "config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json",
+    "config/provider_equivalence_v0_11_production_evaluation_authority_template_v0_1.json",
     "config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json"
   ],
   "project": {
@@ -29,6 +30,7 @@
     "v0_11SyntheticFailureRehearsalState": "PASS",
     "v0_11SyntheticScenarioCount": 12,
     "v0_11PostWindowExecutionPackageState": "PREPARED",
+    "v0_11ProductionEvaluationAuthorityTemplateState": "PREPARED_NOT_AUTHORITY",
     "v0_11ProductionR2EvaluationState": "NOT_AUTHORIZED",
     "metadataStabilityState": "NOT_YET_RUN",
     "replacementHoldoutState": "FROZEN_UNOPENED",
@@ -75,6 +77,11 @@
     {
       "name": "V0.11 Post-window Execution Package",
       "detail": "9/4 完整窗口結束後的 receipt-only 評估程序已預先凍結；目前仍不是 production execution authority。",
+      "status": "PREPARED"
+    },
+    {
+      "name": "V0.11 Production Evaluation Authority Template",
+      "detail": "未來 one-shot receipt-only R2 evaluation authority 的 exact protocol/runtime SHA、protected-main PR、R2 read-only 與 downstream false boundaries 已預先定義；模板不是 authority。",
       "status": "PREPARED"
     }
   ],
