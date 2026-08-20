@@ -178,18 +178,22 @@ This retirement does not delete or invalidate their historical scripts/configs/r
 
 ## Workflow reproducibility and supply-chain hardening
 
-PR #136 and PR #137 are maintenance authorities for execution-environment reproducibility and critical GitHub Actions supply-chain hygiene; they do not change scientific thresholds, metadata scope, or trading authority.
+PRs #136–#143 are maintenance authorities for execution-environment reproducibility, repository hygiene and CI/supply-chain hardening; they do not change scientific thresholds, metadata scope, provider authority, holdout authority or trading authority.
 
 Current hardening:
 
-- PR #136 added `requirements/ci-constraints.txt`, freezing the validated CI/test dependency snapshot while leaving public `pyproject.toml` compatibility ranges unchanged;
+- PR #136 added `requirements/ci-constraints.txt`, freezing the reviewed CI/test dependency snapshot while leaving public `pyproject.toml` compatibility ranges unchanged;
 - V0.10 scheduled capture explicitly selects **Python 3.13** before freshness checks, constrained dependency installation, provider access, or R2 access;
 - PR #137 pins production-critical GitHub Actions to reviewed **immutable 40-character commit SHAs** rather than mutable major tags;
 - critical checkout steps keep `persist-credentials: false`;
 - the critical artifact / GitHub Pages stack uses the reviewed Node 24 generation;
+- PR #140 removed the unused stale `D1_DATABASE_ID` placeholder from `.env.example`; regression prevents that retired D1 placeholder from reappearing as current configuration;
+- PR #141 made Ruff a real read-only CI gate with `ruff==0.16.0` and explicit core correctness rules `E4` / `E7` / `E9` / `F`; its first run exposed four pre-existing lint findings, each manually reviewed and fixed without changing frozen scientific semantics;
+- PR #142 limited the main CI `push` trigger to `main` while preserving all `pull_request` validation, preventing an extra broad-push CI run on ordinary feature-branch updates;
+- PR #143 expanded full main CI to **Python 3.12 and Python 3.13** with `fail-fast: false`; both `test (3.12)` and `test (3.13)` were observed PASS with constrained install, Ruff, full unit tests and R2 budget gates;
 - regression tests protect these boundaries from silent downgrade.
 
-Repository branch protection/ruleset configuration is external GitHub state, not a file-based scientific authority. It must be verified directly in GitHub settings before assuming `main` is protected.
+Repository branch protection/ruleset configuration is external GitHub state, not a file-based scientific authority. GitHub API still reported `protected=false` during the 2026-08-20 audit; Issue #139 tracks enabling protection and requiring the always-running `test (3.12)` and `test (3.13)` checks. Path-scoped V0.10/V0.11/Dashboard checks must not be made globally required merely because they exist.
 
 ## Non-negotiable provider and safety boundaries
 
