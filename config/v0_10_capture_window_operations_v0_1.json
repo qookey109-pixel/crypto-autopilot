@@ -1,0 +1,167 @@
+{
+  "schema_version": "v0_10_capture_window_operations_v0_1",
+  "status": "CAPTURE_WINDOW_OPERATIONS_PREPARED_NO_NEW_EXECUTION_AUTHORITY",
+  "date": "2026-08-21",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "purpose": "Freeze the operational response rules for the V0.10 metadata capture window without changing the V0.10 scientific protocol, capture authority, provider scope, storage policy, or any downstream authorization boundary.",
+  "lineage": {
+    "v0_10_cutover_protocol": "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
+    "v0_10_capture_workflow": ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+    "scheduled_observer": ".github/workflows/observe-v0-10-scheduled-capture.yml",
+    "critical_path_freeze": "config/v0_10_critical_path_freeze_v0_1.json",
+    "v0_11_post_window_package": "config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json",
+    "historical_authorities_mutated": false
+  },
+  "frozen_window": {
+    "start_utc": "2026-08-27T00:00:00Z",
+    "end_utc": "2026-09-04T01:59:59.999Z",
+    "hourly_slot_count": 194,
+    "scheduled_minutes_utc": [17, 47],
+    "scheduled_attempt_count": 388,
+    "first_scheduled_attempt_utc": "2026-08-27T00:17:00Z",
+    "last_scheduled_attempt_utc": "2026-09-04T01:47:00Z",
+    "required_coverage": "AT_LEAST_ONE_COMPLETE_VALID_CAPTURE_PER_UTC_HOURLY_SLOT",
+    "duplicate_attempts_within_slot": "EXPECTED_REDUNDANCY_AND_ALLOWED_ONLY_IF_NORMALIZED_PROVIDER_VECTORS_AGREE"
+  },
+  "operational_principles": {
+    "scheduled_runs_are_primary_execution_path": true,
+    "manual_capture_backfill_authorized": false,
+    "retroactive_slot_backfill_authorized": false,
+    "missed_slots_must_remain_observed_failures": true,
+    "observer_may_read_github_actions_metadata_only": true,
+    "observer_may_read_capture_artifacts": false,
+    "observer_may_read_r2": false,
+    "observer_may_read_provider_data": false,
+    "observer_may_read_holdout": false,
+    "automatic_repair_authorized": false,
+    "automatic_redeploy_authorized": false,
+    "automatic_secret_rotation_authorized": false,
+    "automatic_budget_override_authorized": false
+  },
+  "incident_matrix": [
+    {
+      "incident": "FIRST_ATTEMPT_17_FAILS_SECOND_47_NOT_YET_RUN",
+      "severity": "WATCH",
+      "allowed_response": [
+        "PRESERVE_FAILURE_EVIDENCE",
+        "OBSERVE_GITHUB_ACTIONS_METADATA_ONLY",
+        "ALLOW_FROZEN_47_MINUTE_SCHEDULED_ATTEMPT_TO_RUN_NORMALLY"
+      ],
+      "forbidden_response": [
+        "MANUAL_CAPTURE_BACKFILL",
+        "CHANGE_THRESHOLDS",
+        "OPEN_HOLDOUT"
+      ]
+    },
+    {
+      "incident": "BOTH_SCHEDULED_ATTEMPTS_FAIL_WITHIN_ONE_UTC_HOUR",
+      "severity": "SCIENTIFIC_FAILURE_CANDIDATE",
+      "allowed_response": [
+        "PRESERVE_BOTH_FAILURES",
+        "CONTINUE_LATER_FROZEN_SCHEDULED_SLOTS_IF_CRITICAL_PATH_REMAINS_VALID",
+        "FLAG_SLOT_AS_POTENTIALLY_MISSING_FOR_POST_WINDOW_V0_11"
+      ],
+      "forbidden_response": [
+        "RETROACTIVE_BACKFILL",
+        "REWRITE_SLOT_TIME",
+        "DROP_FAILED_RUNS_FROM_LINEAGE",
+        "OPEN_HOLDOUT"
+      ]
+    },
+    {
+      "incident": "R2_FREE_ONLY_HEADROOM_GATE_BLOCKED",
+      "severity": "HARD_BLOCK",
+      "allowed_response": [
+        "PRESERVE_BLOCKED_RESULT",
+        "STOP_BEFORE_WRITE",
+        "REVIEW_FROZEN_FREE_ONLY_POLICY_OUTSIDE_CAPTURE_EXECUTION"
+      ],
+      "forbidden_response": [
+        "RAISE_8GB_HARD_STOP_DURING_RUN",
+        "DELETE_R2_OBJECTS_TO_FORCE_CAPTURE_THROUGH",
+        "BYPASS_HEADROOM_GATE",
+        "WRITE_PARTIAL_CAPTURE"
+      ]
+    },
+    {
+      "incident": "RENDER_OR_PROVIDER_TRANSPORT_FAILURE",
+      "severity": "OPERATIONAL_FAILURE",
+      "allowed_response": [
+        "PRESERVE_FAILURE_EVIDENCE",
+        "OBSERVE_ONLY_UNTIL_NEXT_FROZEN_SCHEDULED_ATTEMPT",
+        "REQUIRE_SEPARATE_VERSIONED_EMERGENCY_AUTHORITY_BEFORE_ANY_CRITICAL_PATH_MUTATION"
+      ],
+      "forbidden_response": [
+        "UNREVIEWED_RUNTIME_CHANGE",
+        "UNREVIEWED_SECRET_CHANGE",
+        "UNREVIEWED_PROVIDER_SUBSTITUTION",
+        "SOURCE_SPLICING",
+        "MANUAL_BACKFILL"
+      ]
+    },
+    {
+      "incident": "STALE_SCHEDULED_RUN_OVER_30_MINUTES",
+      "severity": "HARD_SKIP",
+      "allowed_response": [
+        "PRESERVE_STALE_SKIP",
+        "STOP_BEFORE_PROVIDER_OR_R2_ACCESS"
+      ],
+      "forbidden_response": [
+        "OVERRIDE_FRESHNESS_GUARD",
+        "REWRITE_CREATED_AT",
+        "MANUAL_BACKFILL"
+      ]
+    },
+    {
+      "incident": "CRITICAL_PATH_DRIFT_DETECTED",
+      "severity": "FREEZE_VIOLATION",
+      "allowed_response": [
+        "PRESERVE_DRIFT_EVIDENCE",
+        "BLOCK_UNREVIEWED_FIXES",
+        "REQUIRE_PROTECTED_MAIN_PR_AND_SEPARATE_VERSIONED_EMERGENCY_AUTHORITY_BEFORE_ANY_PRODUCTION_CRITICAL_CHANGE"
+      ],
+      "forbidden_response": [
+        "AUTO_FIX",
+        "AUTO_DEPLOY",
+        "SILENT_BASELINE_UPDATE",
+        "IGNORE_DRIFT"
+      ]
+    }
+  ],
+  "mid_window_change_policy": {
+    "default_state": "NO_PRODUCTION_CRITICAL_MUTATION",
+    "emergency_change_requires_separate_versioned_authority": true,
+    "emergency_change_requires_protected_main_pr": true,
+    "emergency_change_must_record_pre_change_and_post_change_sha": true,
+    "emergency_change_must_not_retroactively_validate_prior_missing_slots": true,
+    "emergency_change_must_not_change_frozen_thresholds_or_scope": true,
+    "emergency_change_must_not_open_holdout": true
+  },
+  "post_window_handoff": {
+    "window_must_fully_end_before_v0_11_execution_authority_creation": true,
+    "v0_11_production_r2_evaluation_remains_not_authorized": true,
+    "future_v0_11_input_scope": "V0_10_RECEIPT_JSON_ONLY_AFTER_SEPARATE_AUTHORITY",
+    "missing_slots_must_not_be_backfilled": true,
+    "replacement_holdout_must_remain_frozen_unopened": true
+  },
+  "current_authorization_boundary": {
+    "this_document_changes_v0_10_capture_authority": false,
+    "this_document_authorizes_manual_capture": false,
+    "this_document_authorizes_r2_reads": false,
+    "this_document_authorizes_r2_writes": false,
+    "this_document_authorizes_provider_requests": false,
+    "this_document_authorizes_render_requests": false,
+    "this_document_authorizes_v0_11_production_evaluation": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
