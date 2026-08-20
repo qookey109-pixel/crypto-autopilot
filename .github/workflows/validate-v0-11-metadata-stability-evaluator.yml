@@ -1,0 +1,97 @@
+name: Validate V0.11 Metadata Stability Evaluator
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json"
+      - "research/receipts/2026-08-20-provider-equivalence-v0-11-metadata-stability-evaluator-prepared.json"
+      - "src/crypto_autopilot/provider_metadata_stability_v0_11.py"
+      - "tests/test_provider_metadata_stability_v0_11.py"
+      - ".github/workflows/validate-v0-11-metadata-stability-evaluator.yml"
+      - "config/provider_equivalence_v0_2_metadata_capture_v0_2.json"
+      - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
+      - "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
+      - "PROJECT_STATUS.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: provider-equivalence-v0-11-stability-evaluator-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-prepared-evaluator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install package and pytest
+        run: |
+          python -m pip install -e .
+          python -m pip install pytest
+      - name: Run V0.11 synthetic stability regressions
+        run: |
+          python -m pytest -q \
+            tests/test_provider_metadata_stability_v0_11.py \
+            tests/test_final_atomic_cutover_v0_10.py \
+            tests/test_project_authority_hygiene_v0_8.py
+      - name: Assert evaluator is validation-only and production R2 execution remains hard-disabled
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          cfg = json.loads(Path('config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json').read_text())
+          runtime = Path('src/crypto_autopilot/provider_metadata_stability_v0_11.py').read_text()
+          workflow = Path('.github/workflows/validate-v0-11-metadata-stability-evaluator.yml').read_text()
+
+          assert cfg['status'] == 'EVALUATOR_PROTOCOL_FROZEN_EXECUTION_NOT_AUTHORIZED'
+          assert cfg['frozen_scope']['expected_hourly_slot_count'] == 194
+          assert cfg['frozen_scope']['replacement_holdout_state'] == 'FROZEN_UNOPENED'
+          assert cfg['execution_boundary']['production_r2_evaluation_execution_authorized_by_this_protocol'] is False
+          assert cfg['execution_boundary']['r2_client_construction_authorized_by_this_protocol'] is False
+          assert cfg['execution_boundary']['r2_receipt_reads_authorized_by_this_protocol'] is False
+          assert cfg['execution_boundary']['holdout_candle_access_authorized'] is False
+          assert cfg['execution_boundary']['holdout_evaluation_authorized'] is False
+          assert cfg['execution_boundary']['source_switch_authorized'] is False
+          assert cfg['execution_boundary']['live_trading_authorized'] is False
+          assert cfg['workflow_boundary']['scheduled_evaluation_enabled'] is False
+          assert cfg['workflow_boundary']['automatic_post_window_evaluation_enabled'] is False
+          assert cfg['workflow_boundary']['workflow_dispatch_production_evaluation_enabled'] is False
+          assert 'V0_11_R2_EVALUATION_EXECUTION_AUTHORIZED = False' in runtime
+          assert not any(line == '  schedule:' for line in workflow.splitlines())
+          for secret in ('R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_ACCOUNT_ID', 'R2_BUCKET_NAME', 'METADATA_RELAY_TOKEN'):
+              assert '${{ secrets.' + secret not in workflow
+          PY
+      - name: Prove prepared production entrypoint stops before R2 construction
+        run: |
+          python - <<'PY'
+          from crypto_autopilot import provider_metadata_stability_v0_11 as v11
+
+          called = False
+          def forbidden_store():
+              global called
+              called = True
+              raise AssertionError('prepared V0.11 evaluator constructed R2')
+
+          result = v11.run_v0_11_r2_evaluation(store_factory=forbidden_store)
+          assert result['status'] == 'SKIP'
+          assert result['stage'] == 'V0_11_METADATA_STABILITY_R2_EVALUATION_NOT_AUTHORIZED'
+          assert result['r2_client_constructed'] is False
+          assert result['r2_receipt_reads_performed'] == 0
+          assert result['r2_writes_performed'] is False
+          assert result['provider_requests_performed'] == 0
+          assert result['render_requests_performed'] == 0
+          assert result['holdout_candles_accessed'] is False
+          assert result['holdout_evaluated'] is False
+          assert result['source_switch_authorized'] is False
+          assert result['live_trading_authorized'] is False
+          assert called is False
+          PY
