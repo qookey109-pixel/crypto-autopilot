@@ -43,6 +43,20 @@ class AuthorityStatusSyncTests(unittest.TestCase):
             "immutable 40-character commit SHAs",
             "PR #136",
             "PR #137",
+            "PR #140",
+            "D1_DATABASE_ID",
+            "PR #141",
+            "ruff==0.16.0",
+            "E4",
+            "E7",
+            "E9",
+            "PR #142",
+            "pull_request",
+            "PR #143",
+            "Python 3.12 and Python 3.13",
+            "test (3.12)",
+            "test (3.13)",
+            "Issue #139",
         ):
             self.assertIn(marker, status, marker)
 
