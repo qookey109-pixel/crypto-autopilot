@@ -5,10 +5,13 @@ on:
   pull_request:
     paths:
       - "config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json"
+      - "config/provider_equivalence_v0_11_synthetic_failure_rehearsal_v0_1.json"
       - "research/receipts/2026-08-20-provider-equivalence-v0-11-metadata-stability-evaluator-prepared.json"
       - "src/crypto_autopilot/provider_metadata_stability_v0_11.py"
+      - "scripts/run_v0_11_synthetic_failure_rehearsal.py"
       - "tests/test_provider_metadata_stability_v0_11.py"
       - "tests/test_provider_metadata_stability_prepared_receipt_v0_11.py"
+      - "tests/test_v0_11_synthetic_failure_rehearsal.py"
       - "tests/test_ci_dependency_constraints.py"
       - ".github/workflows/validate-v0-11-metadata-stability-evaluator.yml"
       - "config/provider_equivalence_v0_2_metadata_capture_v0_2.json"
@@ -44,8 +47,19 @@ jobs:
           python -m pytest -q \
             tests/test_provider_metadata_stability_v0_11.py \
             tests/test_provider_metadata_stability_prepared_receipt_v0_11.py \
+            tests/test_v0_11_synthetic_failure_rehearsal.py \
             tests/test_final_atomic_cutover_v0_10.py \
             tests/test_project_authority_hygiene_v0_8.py
+      - name: Run explicit V0.11 synthetic failure rehearsal matrix
+        run: |
+          python scripts/run_v0_11_synthetic_failure_rehearsal.py \
+            --output artifacts/v0-11-synthetic-failure-rehearsal.json
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: v0-11-synthetic-failure-rehearsal-${{ github.run_id }}
+          path: artifacts/v0-11-synthetic-failure-rehearsal.json
+          retention-days: 30
+          if-no-files-found: error
       - name: Assert evaluator is validation-only and production R2 execution remains hard-disabled
         shell: bash
         run: |
@@ -55,6 +69,7 @@ jobs:
           from pathlib import Path
 
           cfg = json.loads(Path('config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json').read_text())
+          rehearsal = json.loads(Path('config/provider_equivalence_v0_11_synthetic_failure_rehearsal_v0_1.json').read_text())
           runtime = Path('src/crypto_autopilot/provider_metadata_stability_v0_11.py').read_text()
           workflow = Path('.github/workflows/validate-v0-11-metadata-stability-evaluator.yml').read_text()
 
@@ -71,6 +86,12 @@ jobs:
           assert cfg['workflow_boundary']['scheduled_evaluation_enabled'] is False
           assert cfg['workflow_boundary']['automatic_post_window_evaluation_enabled'] is False
           assert cfg['workflow_boundary']['workflow_dispatch_production_evaluation_enabled'] is False
+          assert rehearsal['execution_boundary']['synthetic_fixtures_only'] is True
+          assert rehearsal['execution_boundary']['production_metadata_evidence_consumed'] is False
+          assert rehearsal['execution_boundary']['r2_reads_authorized'] is False
+          assert rehearsal['execution_boundary']['provider_requests_authorized'] is False
+          assert rehearsal['execution_boundary']['holdout_candle_access_authorized'] is False
+          assert rehearsal['required_synthetic_scenario_count'] == 12
           assert 'V0_11_R2_EVALUATION_EXECUTION_AUTHORIZED = False' in runtime
           assert not any(line == '  schedule:' for line in workflow.splitlines())
           expression_prefix = '$' + '{{ secrets.'
