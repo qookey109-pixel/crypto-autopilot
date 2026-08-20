@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-08-20
+Updated: 2026-08-21
 
 ## Project
 
@@ -14,7 +14,7 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ## Current formal stage
 
-**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
+**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
 
 No live-money authorization exists. `trade_plan_authorized=false`, `real_money_order_authorized=false`, and `live_trading_authorized=false` remain mandatory.
 
@@ -42,10 +42,14 @@ Inherited scientific scope is unchanged:
 - metadata capture: `2026-08-27T00:00:00Z` through `2026-09-04T01:59:59.999Z`;
 - 194 UTC hourly slots;
 - attempts at UTC `:17` and `:47`;
+- 388 scheduled attempts total;
+- first scheduled attempt: `2026-08-27T00:17:00Z`;
+- last scheduled attempt: `2026-09-04T01:47:00Z`;
 - current date-scoped schedules:
   - `17,47 * 27-31 8 *`
   - `17,47 * 1-3 9 *`
   - `17,47 0-1 4 9 *`
+- required coverage: at least one complete valid capture per UTC hourly slot;
 - 15 candidate symbols / 45 mapped pairs;
 - replacement holdout: `2026-08-28T00:00:00Z` through `2026-09-03T23:59:59.999Z`;
 - replacement holdout state: **FROZEN_UNOPENED**.
@@ -54,14 +58,48 @@ Each complete V0.10 capture uses 3 immutable run-scoped R2 objects. Receipt is w
 
 No provider/R2 metadata capture is authorized outside the exact frozen window.
 
+## Pre-window readiness and capture-window operations — PREPARED PASS
+
+PRs #153–#157 completed the remaining pre-window testing, failure rehearsal, post-window preparation, read-only operational dashboard projection, and capture-window incident policy without consuming production metadata evidence.
+
+Key authorities and evidence:
+
+- `research/receipts/2026-08-20-pre-window-readiness-v0-1.json`
+- `research/receipts/2026-08-20-v0-10-scheduled-capture-observer-prepared.json`
+- `config/v0_10_critical_path_freeze_v0_1.json`
+- `config/v0_10_capture_window_operations_v0_1.json`
+- `docs/V0_10_CAPTURE_WINDOW_OPERATIONS_RUNBOOK.md`
+- `research/receipts/2026-08-21-v0-10-capture-window-operations-prepared.json`
+- `config/provider_equivalence_v0_11_synthetic_failure_rehearsal_v0_1.json`
+- `research/receipts/2026-08-21-provider-equivalence-v0-11-synthetic-failure-rehearsal-pass.json`
+- `config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json`
+- `web/data/operational-status.json`
+
+Frozen operational rules:
+
+- the existing V0.10 scheduled workflow remains the only normal production metadata-capture execution path;
+- manual metadata-capture backfill is **NOT_AUTHORIZED**;
+- retroactive hourly-slot backfill is **NOT_AUTHORIZED**;
+- if the `:17` attempt fails, preserve the failure and allow the frozen `:47` scheduled attempt to run normally;
+- if both attempts in one UTC hour fail, preserve both failures and keep that hour as a potential missing slot for post-window V0.11 evaluation; do not manufacture replacement evidence;
+- an R2 FREE-ONLY headroom `BLOCKED` result must stop before write and may not be bypassed by raising the 8 GB gate, deleting evidence, or performing partial writes;
+- a stale scheduled run over the frozen freshness limit remains a skip and may not bypass the freshness guard;
+- observer scope remains GitHub Actions run/job/step metadata only; it does not read capture artifacts, production R2, provider payloads, Render payloads, or holdout data;
+- automatic repair, automatic redeploy, automatic secret rotation, and automatic budget override remain unauthorized;
+- default mid-window state is **NO PRODUCTION-CRITICAL MUTATION**;
+- any unavoidable production-critical mid-window intervention requires a separate versioned emergency authority plus protected-main PR, must record pre/post-change lineage, and may not change frozen thresholds/scope, open holdout, or retroactively validate prior missing slots.
+
+The PR #153 synthetic rehearsal covered 12/12 scenarios and passed in CI. That PASS proves fail-closed behavior only; it is not production metadata-stability evidence and grants no downstream authority.
+
 ## V0.11 metadata stability evaluator — PREPARED ONLY
 
-PR #131 froze the evaluator rules and implementation before production stability evidence is read.
+PR #131 froze the evaluator rules and implementation before production stability evidence is read. PR #154 additionally prepared the exact post-window execution sequence without granting execution authority.
 
 Authorities:
 
 - `config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json`
 - `research/receipts/2026-08-20-provider-equivalence-v0-11-metadata-stability-evaluator-prepared.json`
+- `config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json`
 - `src/crypto_autopilot/provider_metadata_stability_v0_11.py`
 - `.github/workflows/validate-v0-11-metadata-stability-evaluator.yml`
 
@@ -71,7 +109,7 @@ Frozen evaluator semantics:
 - duplicate captures inside a slot are valid only if each provider's normalized 15-symbol vector matches exactly;
 - Pionex and Binance USD-M vectors must each remain exactly stable across the entire capture window;
 - missing slot, invalid receipt, normalized-vector SHA mismatch, same-slot disagreement, or cross-window drift => FAIL CLOSED;
-- no post-hoc deadband, provider splicing, or symbol-scope shrink.
+- no post-hoc deadband, provider splicing, symbol-scope shrink, or retroactive slot backfill.
 
 Current execution boundary:
 
@@ -80,7 +118,11 @@ Current execution boundary:
 - production receipt listing/reading has not run under V0.11;
 - provider and Render requests are not authorized by the prepared evaluator;
 - raw provider objects and holdout objects may not be listed/read;
+- the prepared post-window package is not execution authority;
+- no V0.11 execution authority may be created before the full metadata capture window ends;
 - metadata stability remains **NOT_YET_RUN**.
+
+After the full window ends, the frozen sequence is: verify window completion and critical-path lineage without reading production R2; create a separate versioned V0.11 production-evaluation execution authority; merge it through protected `main` after CI; only then list/read allowlisted V0.10 `receipt.json` objects and run the exact evaluator.
 
 Even a future metadata-stability PASS will not itself authorize holdout access. A separate versioned holdout-access authority is required.
 
@@ -178,7 +220,7 @@ This retirement does not delete or invalidate their historical scripts/configs/r
 
 ## Workflow reproducibility and supply-chain hardening
 
-PRs #136–#145 are maintenance authorities for execution-environment reproducibility, repository hygiene, CI/supply-chain hardening and repository ruleset validation; they do not change scientific thresholds, metadata scope, provider authority, holdout authority or trading authority.
+PRs #136–#157 include maintenance authorities for execution-environment reproducibility, repository hygiene, CI/supply-chain hardening, repository ruleset validation, pre-window rehearsal, post-window preparation, Dashboard operational projection, and capture-window incident-response preparation. They do not change scientific thresholds, metadata scope, provider authority, holdout authority or trading authority.
 
 Current hardening:
 
@@ -193,10 +235,15 @@ Current hardening:
 - PR #143 expanded full main CI to **Python 3.12 and Python 3.13** with `fail-fast: false`; both `test (3.12)` and `test (3.13)` were observed PASS with constrained install, Ruff, full unit tests and R2 budget gates;
 - the active `Protect main` ruleset targets the default branch, requires pull requests, requires the always-running `test (3.12)` and `test (3.13)` checks, restricts deletion, blocks force pushes, and has no configured bypass list;
 - ruleset validation on 2026-08-20 confirmed a direct `main` contents write is rejected with a rule violation requiring a pull request and 2/2 required checks; PR #145 then exercised the docs-only PR path with both required CI matrix jobs;
+- PR #153 froze and executed a 12-scenario synthetic V0.11 failure rehearsal; 12/12 passed without production metadata evidence;
+- PR #154 prepared the exact post-window V0.11 execution sequence while keeping production R2 evaluation hard-disabled;
+- PR #155 added a read-only `authority=false` operational Dashboard projection;
+- PR #156 froze capture-window incident-response rules, including no manual/retroactive backfill and separate emergency authority for any production-critical mid-window mutation;
+- PR #157 froze the exact #156 PASS evidence as a Repository receipt and validated that receipt in CI;
 - path-scoped V0.10/V0.11/Dashboard checks remain intentionally excluded from global required checks;
 - regression tests protect these boundaries from silent downgrade.
 
-Repository branch protection/ruleset configuration is external GitHub state, not a file-based scientific authority. Direct GitHub verification on 2026-08-20 reports `main` as `protected=true`; the active ruleset and PR #145 provide the repository-level security validation tracked by Issue #139.
+Repository branch protection/ruleset configuration is external GitHub state, not a file-based scientific authority. Direct GitHub verification continues to report `main` as `protected=true`; the active ruleset and PR #145 provide the repository-level security validation tracked by Issue #139.
 
 ## Non-negotiable provider and safety boundaries
 
@@ -205,7 +252,8 @@ Repository branch protection/ruleset configuration is external GitHub state, not
 - Provider mapping never converts provenance.
 - No provider splicing, silent interpolation, Pionex-native relabeling, or post-hoc provenance rewrite.
 - V0.10 metadata authority is not strategy/backtest/trade/live authority.
-- V0.11 prepared evaluator is not production stability authority.
+- V0.10 capture-window operations preparation is not new capture authority and does not authorize manual/retroactive backfill.
+- V0.11 prepared evaluator and post-window package are not production stability authority.
 - No staged Trade-Kline W1 materialization yet.
 - Historical Universe membership remains NOT_READY.
 - SState frozen core must not be modified by this phase.
@@ -229,16 +277,22 @@ Before `2026-08-27T00:00:00Z`: readiness/maintenance validation only. Do not man
 
 During the frozen window:
 
-1. Let the existing V0.10 schedule run at `:17/:47`.
-2. Preserve the exact 194-slot / 15-symbol / 45-pair scope.
-3. Keep the replacement holdout unopened.
-4. Require the exact window/freshness gate and authenticated Render transport.
-5. Require fresh R2 headroom before each write; never overwrite evidence.
-6. After the full window, create a separate versioned V0.11 production evaluation authority **before any R2 receipt read for stability evaluation**.
+1. Let the existing V0.10 schedule run at `:17/:47`; do not create a second execution path.
+2. Preserve the exact 194-slot / 388-attempt / 15-symbol / 45-pair scope.
+3. Preserve every failed, blocked, skipped, stale, or missing attempt as evidence; do not manually or retroactively backfill it.
+4. If `:17` fails, let the existing frozen `:47` attempt run normally rather than manually retrying.
+5. Keep the replacement holdout unopened.
+6. Require the exact window/freshness gate and authenticated Render transport.
+7. Require fresh R2 headroom before each write; never overwrite, delete, or bypass evidence to force a capture through.
+8. Keep production-critical code/runtime/secrets frozen by default; any unavoidable intervention requires a separate versioned emergency authority and protected-main PR.
+9. After the full window, create a separate versioned V0.11 production evaluation authority **before any R2 receipt read for stability evaluation**.
 
 ## Explicitly forbidden next actions
 
 - Do not manually run V0.10 production metadata capture before the frozen window.
+- Do not manually or retroactively backfill failed/missing V0.10 attempts or hourly slots during or after the frozen window.
+- Do not bypass the 30-minute freshness guard or 8 GB FREE-ONLY R2 headroom gate.
+- Do not make an unreviewed production-critical mid-window code, runtime, secret, transport, or provider change.
 - Do not manually run V0.11 production R2 stability evaluation under the prepared authority.
 - Do not reactivate retired historical proof/materialization workflows without new authority.
 - Do not re-enable the V0.2 self-hosted schedule or create a second concurrent metadata path.
