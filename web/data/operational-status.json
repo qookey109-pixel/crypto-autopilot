@@ -10,9 +10,12 @@
     "config/v0_10_critical_path_freeze_v0_1.json",
     "config/v0_10_capture_window_operations_v0_1.json",
     "config/v0_10_mid_window_emergency_change_template_v0_1.json",
+    "research/receipts/2026-08-21-v0-10-mid-window-emergency-template-prepared.json",
+    "research/receipts/2026-08-21-v0-10-render-final-pre-window-readonly-recheck.json",
     "research/receipts/2026-08-21-provider-equivalence-v0-11-synthetic-failure-rehearsal-pass.json",
     "config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json",
     "config/provider_equivalence_v0_11_production_evaluation_authority_template_v0_1.json",
+    "research/receipts/2026-08-21-provider-equivalence-v0-11-production-evaluation-authority-template-prepared.json",
     "config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json"
   ],
   "project": {
@@ -21,6 +24,9 @@
     "v0_10CriticalPathFreezeGuardState": "PASS_FROZEN",
     "v0_10CaptureWindowOperationsState": "PREPARED",
     "v0_10MidWindowEmergencyTemplateState": "PREPARED_NOT_AUTHORITY",
+    "v0_10RenderFinalPreWindowRecheckState": "PASS",
+    "v0_10RenderAutoDeployState": "OFF",
+    "v0_10RenderUnexpectedRedeploy": false,
     "v0_10ScheduledAttemptCount": 388,
     "manualCaptureBackfillAuthorized": false,
     "retroactiveSlotBackfillAuthorized": false,
@@ -31,6 +37,7 @@
     "v0_11SyntheticScenarioCount": 12,
     "v0_11PostWindowExecutionPackageState": "PREPARED",
     "v0_11ProductionEvaluationAuthorityTemplateState": "PREPARED_NOT_AUTHORITY",
+    "v0_11ProductionEvaluationAuthorityTemplateReceiptState": "PASS",
     "v0_11ProductionR2EvaluationState": "NOT_AUTHORIZED",
     "metadataStabilityState": "NOT_YET_RUN",
     "replacementHoldoutState": "FROZEN_UNOPENED",
@@ -70,6 +77,11 @@
       "status": "PREPARED"
     },
     {
+      "name": "V0.10 Render Final Pre-window Recheck",
+      "detail": "唯讀複核 PASS：Auto-Deploy OFF、Free/Frankfurt、最新 live deploy 仍為 V0.10 activation commit，未因後續 maintenance/docs merge 發生非預期 redeploy。",
+      "status": "PASS"
+    },
+    {
       "name": "V0.11 Synthetic Failure Rehearsal",
       "detail": "12/12 synthetic 情境已在 CI PASS，涵蓋 missing slot、SHA mismatch、same-slot disagreement、cross-window drift、R2 BLOCKED 與 stale guard；未消耗 production evidence。",
       "status": "PASS"
@@ -81,7 +93,7 @@
     },
     {
       "name": "V0.11 Production Evaluation Authority Template",
-      "detail": "未來 one-shot receipt-only R2 evaluation authority 的 exact protocol/runtime SHA、protected-main PR、R2 read-only 與 downstream false boundaries 已預先定義；模板不是 authority。",
+      "detail": "未來 one-shot receipt-only R2 evaluation authority 的 exact protocol/runtime SHA、protected-main PR、R2 read-only 與 downstream false boundaries 已預先定義並取得 template-validation PASS；模板不是 authority。",
       "status": "PREPARED"
     }
   ],

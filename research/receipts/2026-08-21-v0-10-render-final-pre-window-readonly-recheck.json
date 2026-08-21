@@ -1,0 +1,61 @@
+{
+  "schema": "qookey-v0-10-render-final-pre-window-readonly-recheck-v0.1",
+  "status": "PASS",
+  "stage": "V0_10_RENDER_FINAL_PRE_WINDOW_READONLY_RECHECK_PASS",
+  "date": "2026-08-21",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "workspace": "My Workspace",
+  "service": {
+    "service_id": "srv-da2qlb67bikc73bibobg",
+    "slug": "qookey-binance-transport-v0-5",
+    "repo": "https://github.com/qookey109-pixel/crypto-autopilot",
+    "branch": "main",
+    "root_dir": "infra/render/binance-transport-free",
+    "runtime": "docker",
+    "plan": "free",
+    "region": "frankfurt",
+    "health_check_path": "/health",
+    "maintenance_mode_enabled": false,
+    "suspended": false,
+    "auto_deploy": false,
+    "auto_deploy_trigger": "off"
+  },
+  "live_deploy": {
+    "deploy_id": "dep-da35gfoae00c73fpff8g",
+    "commit_sha": "8fce944da479dbda0e2899f9b30b9de62351fa27",
+    "status": "live",
+    "trigger": "new_commit",
+    "is_v0_10_activation_commit": true,
+    "unexpected_redeploy_after_v0_10_activation": false,
+    "latest_deploy_still_v0_10_activation": true
+  },
+  "read_only_observation_boundary": {
+    "render_deploy_triggered": false,
+    "render_environment_values_read": false,
+    "render_environment_values_changed": false,
+    "provider_requests_performed": 0,
+    "production_r2_client_constructed": false,
+    "production_r2_reads_performed": false,
+    "production_r2_writes_performed": false,
+    "capture_artifacts_read": false,
+    "replacement_holdout_accessed": false,
+    "v0_11_production_evaluation_performed": false
+  },
+  "authorization_boundary": {
+    "this_receipt_authorizes_render_deploy": false,
+    "manual_v0_10_capture_authorized": false,
+    "v0_11_production_r2_evaluation_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "trade_kline_w1_materialization_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "interpretation": {
+    "pass_means_render_runtime_lineage_is_still_frozen_to_v0_10_activation": true,
+    "pass_means_auto_deploy_is_off": true,
+    "pass_means_service_is_on_free_plan_in_frankfurt": true,
+    "pass_means_live_http_health_check_was_executed": false,
+    "pass_means_provider_metadata_capture_was_executed": false
+  }
+}
