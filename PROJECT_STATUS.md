@@ -14,7 +14,7 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ## Current formal stage
 
-**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
+**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
 
 No live-money authorization exists. `trade_plan_authorized=false`, `real_money_order_authorized=false`, and `live_trading_authorized=false` remain mandatory.
 
@@ -34,6 +34,21 @@ Current metadata-capture path:
 - Render receives R2 credentials: false.
 
 Render remains FREE / Frankfurt. Current runtime budget is `0 USD/month`.
+
+Final read-only pre-window Render recheck on 2026-08-21 confirms:
+
+- service Auto-Deploy: **OFF** (`autoDeploy=no`, trigger `off`);
+- service plan: **free**;
+- service region: **frankfurt**;
+- service maintenance mode: disabled;
+- service suspension: none;
+- current/latest live deploy: `dep-da35gfoae00c73fpff8g`;
+- current/latest live deploy commit: `8fce944da479dbda0e2899f9b30b9de62351fa27` (the V0.10 activation merge);
+- no unexpected redeploy occurred after V0.10 activation despite later maintenance/docs merges.
+
+Authority receipt: `research/receipts/2026-08-21-v0-10-render-final-pre-window-readonly-recheck.json`.
+
+This recheck was observation-only: it did not trigger a Render deploy, read/change Render environment values, hit providers, construct/read/write production R2, read capture artifacts, open holdout data, or run V0.11 production evaluation.
 
 ## Frozen metadata scope
 
@@ -60,7 +75,7 @@ No provider/R2 metadata capture is authorized outside the exact frozen window.
 
 ## Pre-window readiness and capture-window operations — PREPARED PASS
 
-PRs #153–#157 completed the remaining pre-window testing, failure rehearsal, post-window preparation, read-only operational dashboard projection, and capture-window incident policy without consuming production metadata evidence.
+PRs #153–#161 completed the remaining pre-window testing, failure rehearsal, post-window preparation, read-only operational dashboard projection, capture-window incident policy, mid-window emergency template, and future V0.11 production-evaluation authority template without consuming production metadata evidence.
 
 Key authorities and evidence:
 
@@ -70,9 +85,16 @@ Key authorities and evidence:
 - `config/v0_10_capture_window_operations_v0_1.json`
 - `docs/V0_10_CAPTURE_WINDOW_OPERATIONS_RUNBOOK.md`
 - `research/receipts/2026-08-21-v0-10-capture-window-operations-prepared.json`
+- `config/v0_10_mid_window_emergency_change_template_v0_1.json`
+- `docs/V0_10_MID_WINDOW_EMERGENCY_CHANGE_TEMPLATE.md`
+- `research/receipts/2026-08-21-v0-10-mid-window-emergency-template-prepared.json`
+- `research/receipts/2026-08-21-v0-10-render-final-pre-window-readonly-recheck.json`
 - `config/provider_equivalence_v0_11_synthetic_failure_rehearsal_v0_1.json`
 - `research/receipts/2026-08-21-provider-equivalence-v0-11-synthetic-failure-rehearsal-pass.json`
 - `config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json`
+- `config/provider_equivalence_v0_11_production_evaluation_authority_template_v0_1.json`
+- `docs/V0_11_PRODUCTION_EVALUATION_AUTHORITY_TEMPLATE.md`
+- `research/receipts/2026-08-21-provider-equivalence-v0-11-production-evaluation-authority-template-prepared.json`
 - `web/data/operational-status.json`
 
 Frozen operational rules:
@@ -87,19 +109,23 @@ Frozen operational rules:
 - observer scope remains GitHub Actions run/job/step metadata only; it does not read capture artifacts, production R2, provider payloads, Render payloads, or holdout data;
 - automatic repair, automatic redeploy, automatic secret rotation, and automatic budget override remain unauthorized;
 - default mid-window state is **NO PRODUCTION-CRITICAL MUTATION**;
-- any unavoidable production-critical mid-window intervention requires a separate versioned emergency authority plus protected-main PR, must record pre/post-change lineage, and may not change frozen thresholds/scope, open holdout, or retroactively validate prior missing slots.
+- any unavoidable production-critical mid-window intervention requires a separate versioned emergency authority plus protected-main PR, must record pre/post-change lineage, and may not change frozen thresholds/scope, open holdout, or retroactively validate prior missing slots;
+- the prepared emergency-change template is `TEMPLATE_PREPARED_NOT_AUTHORITY`; it does not itself authorize any intervention or Render redeploy.
 
 The PR #153 synthetic rehearsal covered 12/12 scenarios and passed in CI. That PASS proves fail-closed behavior only; it is not production metadata-stability evidence and grants no downstream authority.
 
 ## V0.11 metadata stability evaluator — PREPARED ONLY
 
-PR #131 froze the evaluator rules and implementation before production stability evidence is read. PR #154 additionally prepared the exact post-window execution sequence without granting execution authority.
+PR #131 froze the evaluator rules and implementation before production stability evidence is read. PR #154 prepared the exact post-window execution sequence without granting execution authority. PR #161 additionally prepared and validated the exact future production-evaluation authority template while leaving the runtime hard-disabled.
 
 Authorities:
 
 - `config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json`
 - `research/receipts/2026-08-20-provider-equivalence-v0-11-metadata-stability-evaluator-prepared.json`
 - `config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json`
+- `config/provider_equivalence_v0_11_production_evaluation_authority_template_v0_1.json`
+- `docs/V0_11_PRODUCTION_EVALUATION_AUTHORITY_TEMPLATE.md`
+- `research/receipts/2026-08-21-provider-equivalence-v0-11-production-evaluation-authority-template-prepared.json`
 - `src/crypto_autopilot/provider_metadata_stability_v0_11.py`
 - `.github/workflows/validate-v0-11-metadata-stability-evaluator.yml`
 
@@ -119,10 +145,13 @@ Current execution boundary:
 - provider and Render requests are not authorized by the prepared evaluator;
 - raw provider objects and holdout objects may not be listed/read;
 - the prepared post-window package is not execution authority;
-- no V0.11 execution authority may be created before the full metadata capture window ends;
+- the prepared production-evaluation authority template is not execution authority;
+- no actual V0.11 production evaluation authority may be created or merged before the full metadata capture window ends at `2026-09-04T01:59:59.999Z`;
 - metadata stability remains **NOT_YET_RUN**.
 
-After the full window ends, the frozen sequence is: verify window completion and critical-path lineage without reading production R2; create a separate versioned V0.11 production-evaluation execution authority; merge it through protected `main` after CI; only then list/read allowlisted V0.10 `receipt.json` objects and run the exact evaluator.
+The future authority template locks the only eligible execution delta after a separate post-window protected-main authority merge to a one-shot reviewed path: construct the R2 client, list/read allowlisted V0.10 `receipt.json` objects, and run the already-frozen evaluator. It must remain receipt-only/read-only: no R2 writes/deletes, no raw provider-object reads, no provider/Render requests, no `METADATA_RELAY_TOKEN`, no holdout listing/access, no scheduled/automatic evaluation, and no source-switch/W1/backtest/strategy/trading authority.
+
+After the full window ends, the frozen sequence is: verify window completion and critical-path lineage without reading production R2; create a separate versioned V0.11 production-evaluation execution authority from the prepared template; merge it through protected `main` after required CI; only then list/read allowlisted V0.10 `receipt.json` objects and run the exact evaluator.
 
 Even a future metadata-stability PASS will not itself authorize holdout access. A separate versioned holdout-access authority is required.
 
@@ -187,6 +216,7 @@ Key authorities:
 - `research/receipts/2026-08-20-provider-equivalence-v0-9-render-relay-smoke-pass.json`
 - `config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json`
 - `research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json`
+- `research/receipts/2026-08-21-v0-10-render-final-pre-window-readonly-recheck.json`
 
 V0.8 remains **HISTORICAL** preparation evidence; it must not be rewritten to look like current V0.10 execution authority.
 
@@ -220,7 +250,7 @@ This retirement does not delete or invalidate their historical scripts/configs/r
 
 ## Workflow reproducibility and supply-chain hardening
 
-PRs #136–#157 include maintenance authorities for execution-environment reproducibility, repository hygiene, CI/supply-chain hardening, repository ruleset validation, pre-window rehearsal, post-window preparation, Dashboard operational projection, and capture-window incident-response preparation. They do not change scientific thresholds, metadata scope, provider authority, holdout authority or trading authority.
+PRs #136–#161 include maintenance authorities for execution-environment reproducibility, repository hygiene, CI/supply-chain hardening, repository ruleset validation, pre-window rehearsal, post-window preparation, Dashboard operational projection, capture-window incident-response preparation, mid-window emergency-template preparation, and future V0.11 authority-template preparation. They do not change scientific thresholds, metadata scope, provider authority, holdout authority or trading authority.
 
 Current hardening:
 
@@ -240,6 +270,10 @@ Current hardening:
 - PR #155 added a read-only `authority=false` operational Dashboard projection;
 - PR #156 froze capture-window incident-response rules, including no manual/retroactive backfill and separate emergency authority for any production-critical mid-window mutation;
 - PR #157 froze the exact #156 PASS evidence as a Repository receipt and validated that receipt in CI;
+- PR #158 synchronized the pre-window operational authority index;
+- PR #159 prepared a machine-readable/human-readable mid-window emergency-change template while keeping it `NOT_AUTHORITY`;
+- PR #160 froze the exact #159 template-preparation PASS as Repository evidence;
+- PR #161 prepared and validated the exact future V0.11 production-evaluation authority template while keeping current V0.11 production R2 evaluation hard-disabled;
 - path-scoped V0.10/V0.11/Dashboard checks remain intentionally excluded from global required checks;
 - regression tests protect these boundaries from silent downgrade.
 
@@ -253,7 +287,8 @@ Repository branch protection/ruleset configuration is external GitHub state, not
 - No provider splicing, silent interpolation, Pionex-native relabeling, or post-hoc provenance rewrite.
 - V0.10 metadata authority is not strategy/backtest/trade/live authority.
 - V0.10 capture-window operations preparation is not new capture authority and does not authorize manual/retroactive backfill.
-- V0.11 prepared evaluator and post-window package are not production stability authority.
+- V0.10 emergency-change template is not authority and does not authorize a mid-window mutation or Render redeploy.
+- V0.11 prepared evaluator, post-window package, and production-evaluation authority template are not production stability authority.
 - No staged Trade-Kline W1 materialization yet.
 - Historical Universe membership remains NOT_READY.
 - SState frozen core must not be modified by this phase.
@@ -285,7 +320,7 @@ During the frozen window:
 6. Require the exact window/freshness gate and authenticated Render transport.
 7. Require fresh R2 headroom before each write; never overwrite, delete, or bypass evidence to force a capture through.
 8. Keep production-critical code/runtime/secrets frozen by default; any unavoidable intervention requires a separate versioned emergency authority and protected-main PR.
-9. After the full window, create a separate versioned V0.11 production evaluation authority **before any R2 receipt read for stability evaluation**.
+9. After the full window has ended at `2026-09-04T01:59:59.999Z`, verify critical-path lineage without production R2 reads, then create a separate versioned V0.11 production evaluation authority from the prepared template **before any R2 receipt read for stability evaluation**.
 
 ## Explicitly forbidden next actions
 
@@ -293,7 +328,10 @@ During the frozen window:
 - Do not manually or retroactively backfill failed/missing V0.10 attempts or hourly slots during or after the frozen window.
 - Do not bypass the 30-minute freshness guard or 8 GB FREE-ONLY R2 headroom gate.
 - Do not make an unreviewed production-critical mid-window code, runtime, secret, transport, or provider change.
-- Do not manually run V0.11 production R2 stability evaluation under the prepared authority.
+- Do not treat the prepared emergency-change template as an intervention authority.
+- Do not create or merge the actual V0.11 production-evaluation authority before `2026-09-04T01:59:59.999Z`.
+- Do not manually run V0.11 production R2 stability evaluation under the prepared protocol/template.
+- Do not list/read production V0.10 R2 receipts for stability evaluation before a separate post-window authority is merged.
 - Do not reactivate retired historical proof/materialization workflows without new authority.
 - Do not re-enable the V0.2 self-hosted schedule or create a second concurrent metadata path.
 - Do not access/evaluate replacement holdout candles.
