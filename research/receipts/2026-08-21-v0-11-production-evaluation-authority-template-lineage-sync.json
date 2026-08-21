@@ -1,0 +1,52 @@
+{
+  "schema_version": "v0_11_production_evaluation_authority_template_lineage_sync_v0_1",
+  "status": "PASS",
+  "stage": "V0_11_PRODUCTION_EVALUATION_AUTHORITY_TEMPLATE_LINEAGE_SYNC_PASS",
+  "date": "2026-08-21",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "source_main_sha": "5cd1d7a129f5d4a57bf2a3d368f781077650784b",
+  "source_pr": 161,
+  "source_pr_head_sha": "e2c1ceada6194989a2962bfa3568a3302c3cd49d",
+  "source_pr_merge_sha": "5cd1d7a129f5d4a57bf2a3d368f781077650784b",
+  "existing_authorities_confirmed": [
+    "config/provider_equivalence_v0_11_production_evaluation_authority_template_v0_1.json",
+    "research/receipts/2026-08-21-provider-equivalence-v0-11-production-evaluation-authority-template-prepared.json",
+    "research/receipts/2026-08-21-v0-10-render-final-pre-window-readonly-recheck.json",
+    "PROJECT_STATUS.md"
+  ],
+  "render_readonly_recheck": {
+    "service_id": "srv-da2qlb67bikc73bibobg",
+    "plan": "free",
+    "region": "frankfurt",
+    "auto_deploy": false,
+    "auto_deploy_trigger": "off",
+    "suspended": false,
+    "maintenance_mode_enabled": false,
+    "latest_live_deploy_id": "dep-da35gfoae00c73fpff8g",
+    "latest_live_deploy_commit_sha": "8fce944da479dbda0e2899f9b30b9de62351fa27",
+    "unexpected_redeploy_after_v0_10_activation": false
+  },
+  "current_boundary": {
+    "production_metadata_evidence_consumed": false,
+    "provider_requests_performed": 0,
+    "render_deploy_triggered": false,
+    "r2_client_constructed": false,
+    "r2_receipts_listed": false,
+    "r2_receipts_read": false,
+    "r2_writes_performed": false,
+    "capture_artifacts_read": false,
+    "replacement_holdout_accessed": false,
+    "v0_11_production_r2_evaluation_performed": false,
+    "v0_11_production_r2_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "trade_kline_w1_materialization_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "interpretation": {
+    "pass_means_lineage_and_render_freeze_are_consistent": true,
+    "pass_means_v0_11_production_evaluation_is_authorized": false,
+    "pass_means_production_r2_may_be_read": false,
+    "pass_means_holdout_access_is_authorized": false
+  }
+}
