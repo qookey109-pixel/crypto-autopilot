@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "status": "LOCAL_RESEARCH_AUTHORIZED",
+  "status": "RETIRED_SUPERSEDED_BY_R2_ONLY_V0_3",
   "provider": "binance_spot",
   "delivery": "binance_public_rest",
   "market_data_base_url": "https://data-api.binance.vision",
@@ -33,8 +33,9 @@
   },
   "authority": {
     "local_public_market_reads_authorized": true,
-    "local_artifact_write_authorized": true,
-    "github_pages_read_only_projection_authorized": true,
+    "local_artifact_write_authorized": false,
+    "github_actions_ephemeral_workspace_authorized": true,
+    "github_pages_read_only_projection_authorized": false,
     "production_r2_access_authorized": false,
     "provider_splicing_authorized": false,
     "pionex_native_relabel_authorized": false,

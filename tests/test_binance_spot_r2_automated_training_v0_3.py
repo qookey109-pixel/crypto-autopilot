@@ -23,6 +23,11 @@ class BinanceSpotR2AutomatedTrainingV03Tests(unittest.TestCase):
         self.workflow = Path(
             ".github/workflows/binance-spot-r2-automated-training-v0-3.yml"
         ).read_text()
+        self.retirement = json.loads(
+            Path(
+                "research/receipts/2026-08-22-r2-only-local-artifact-retirement-v0-3.json"
+            ).read_text()
+        )
 
     def test_exact_online_authority_and_no_trade_boundary(self) -> None:
         self.assertEqual(
@@ -34,6 +39,10 @@ class BinanceSpotR2AutomatedTrainingV03Tests(unittest.TestCase):
             "https://data-api.binance.vision",
         )
         boundary = self.config["authority"]
+        storage = self.config["storage"]
+        self.assertEqual(storage["persistent_store"], "cloudflare_r2_only")
+        self.assertFalse(storage["local_persistent_artifacts_authorized"])
+        self.assertTrue(storage["github_actions_ephemeral_workspace_authorized"])
         self.assertTrue(boundary["production_r2_writes_authorized_for_exact_namespaces"])
         self.assertTrue(boundary["automated_research_model_training_authorized"])
         for key in (
@@ -53,6 +62,10 @@ class BinanceSpotR2AutomatedTrainingV03Tests(unittest.TestCase):
         self.assertLess(guard, secret)
         self.assertIn("secrets.R2_SECRET_ACCESS_KEY", self.workflow)
         self.assertNotIn("web/data/binance-spot", self.workflow)
+        evidence = self.workflow.index("Upload secret-free run evidence")
+        cleanup = self.workflow.index("Remove ephemeral workspace outputs")
+        self.assertLess(evidence, cleanup)
+        self.assertIn("rm -rf -- online-training", self.workflow)
 
     def test_online_pass_records_verified_r2_publish_without_trade_authority(self) -> None:
         self.assertEqual(self.online_pass["status"], "PASS")
@@ -63,6 +76,16 @@ class BinanceSpotR2AutomatedTrainingV03Tests(unittest.TestCase):
             self.online_pass["r2_publish"]["all_objects_round_trip_sha256_verified"]
         )
         self.assertFalse(self.online_pass["authority"]["live_trading_authorized"])
+
+    def test_local_artifact_retirement_is_bound_to_verified_r2_run(self) -> None:
+        self.assertEqual(self.retirement["status"], "PASS")
+        self.assertEqual(self.retirement["removed_local_generated_files"], 759)
+        self.assertEqual(self.retirement["removed_local_generated_file_bytes"], 207898718)
+        self.assertEqual(
+            self.retirement["canonical_r2_dataset_sha256"],
+            self.online_pass["dataset"]["parquet_sha256"],
+        )
+        self.assertFalse(self.retirement["authority"]["local_persistent_artifacts_authorized"])
 
 
 if __name__ == "__main__":

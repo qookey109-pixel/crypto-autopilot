@@ -1,7 +1,8 @@
 # Binance Internal Training Universe V0.2
 
-This is a local-only research archive for model training. It is not a
-deployment feed, a Pionex replacement, a trade plan, or a live-order surface.
+This is the historical V0.2 research baseline. Its local-only storage role is
+retired and superseded by the R2-only V0.3 pipeline. It is not a deployment
+feed, a Pionex replacement, a trade plan, or a live-order surface.
 
 ## Scope
 
@@ -38,12 +39,14 @@ listing date rather than being backfilled to 2020.
 
 ## Storage and boundaries
 
-The catalog, per-market checkpoints, CSV gzip, Parquet, and receipt are written
-under ignored `artifacts/binance-internal-training-v0-2/`. The website does not
-load or display these records. There is no GitHub Pages projection, R2 access,
-provider splice, Pionex relabel, holdout access, W1 materialization, trade plan,
-real-money order, or live-trading authority.
+The former ignored local catalog, checkpoints, CSV gzip, Parquet, and receipt
+were removed after the corresponding online R2 run passed round-trip SHA-256
+verification. New builds may exist only in a GitHub Actions disposable workspace
+or a system temporary directory and must be published to R2 for persistence.
+The website does not load or display these records. There is no provider splice,
+Pionex relabel, holdout access, W1 materialization, trade plan, real-money order,
+or live-trading authority.
 
-`receipt.json` is the run manifest and records hashes, counts, audit failures,
-coverage date, and all authority flags. Per-market checkpoints make public API
-timeouts resumable without guessing or interpolating missing data.
+The online dataset receipt records hashes, counts, audit failures, coverage date,
+and all authority flags. Ephemeral per-market checkpoints make public API timeouts
+resumable within a run without creating a local persistent archive.

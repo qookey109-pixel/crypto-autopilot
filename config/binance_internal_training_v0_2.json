@@ -1,6 +1,6 @@
 {
   "version": "0.2.0",
-  "status": "LOCAL_INTERNAL_TRAINING_AUTHORIZED",
+  "status": "SUPERSEDED_BY_R2_ONLY_V0_3",
   "provider": "binance_spot",
   "delivery": "binance_public_rest",
   "market_data_base_url": "https://data-api.binance.vision",
@@ -14,7 +14,8 @@
   "website_projection_authorized": false,
   "authority": {
     "local_public_market_reads_authorized": true,
-    "local_artifact_write_authorized": true,
+    "local_artifact_write_authorized": false,
+    "github_actions_ephemeral_workspace_authorized": true,
     "website_projection_authorized": false,
     "production_r2_access_authorized": false,
     "provider_splicing_authorized": false,

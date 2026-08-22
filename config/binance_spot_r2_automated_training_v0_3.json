@@ -21,6 +21,10 @@
   },
   "storage": {
     "backend": "cloudflare_r2",
+    "persistent_store": "cloudflare_r2_only",
+    "local_persistent_artifacts_authorized": false,
+    "github_actions_ephemeral_workspace_authorized": true,
+    "github_actions_artifact_evidence_authorized": true,
     "dataset_runs_namespace": "market-data/binance_spot/internal-training/v0.3/runs",
     "training_namespace": "training/binance_spot/daily-direction/v0.3",
     "latest_training_pointer_key": "training/binance_spot/daily-direction/v0.3/latest.json",

@@ -18,8 +18,10 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ### Binance Spot R2 Automated Training V0.3 — ONLINE PASS
 
-- Cloudflare R2 becomes the canonical online store for immutable Binance Spot 1D
-  internal-training snapshots; local V0.2 artifacts remain rebuildable caches.
+- Cloudflare R2 is the only persistent generated-data store for immutable Binance
+  Spot 1D internal-training snapshots. GitHub runner files are ephemeral and are
+  explicitly removed after online evidence upload; local repository artifacts
+  are forbidden.
 - GitHub Actions performs a daily public catalog/history refresh, deterministic
   research-only model training, fresh whole-bucket 8 GB headroom gate, exact R2
   uploads and SHA-256 round-trip verification.
@@ -39,19 +41,19 @@ Repository branch `main` is the live formal authority and is intentionally not s
   last. The secret-free evidence is frozen in
   `research/receipts/2026-08-22-binance-spot-r2-automated-training-v0-3-pass.json`.
 
-### Binance Internal Training Universe V0.2 — LOCAL BASELINE PASS
+### Binance Internal Training Universe V0.2 — HISTORICAL BASELINE / LOCAL COPY RETIRED
 
-- Active Binance Spot markets are discovered from the public exchange catalog and
-  retained as provider-separated local training inputs.
+- The V0.2 result remains historical evidence; its ignored local generated copy
+  was removed after the R2 V0.3 snapshot passed exact SHA-256 round-trip checks.
 - The 2026-08-22 local pass discovered 748 USDT/USDC markets and wrote 701,275
   daily rows through 2026-08-21 UTC; 723 markets pass continuity audit and 25
   are retained with `audit_ok=false` for explicit downstream filtering.
 - Crypto, tokenized-stock candidates and other assets are classified explicitly;
   heuristic classifications never promote an asset into a trading universe.
-- Historical records are internal-only ignored artifacts and are not projected to
-  GitHub Pages. V0.3 supersedes the local-only storage policy for canonical online
-  storage while preserving Pionex-native relabeling, source switching, W1,
-  holdout-access and trading prohibitions.
+- Historical records remain internal-only in R2 and are not projected to GitHub
+  Pages. V0.3 forbids persistent local generated artifacts while preserving
+  Pionex-native relabeling, source switching, W1, holdout-access and trading
+  prohibitions.
 
 ### Pionex Public Paper Training V0.1
 
