@@ -1,0 +1,43 @@
+{
+  "version": "0.1.0",
+  "status": "RESEARCH_ONLY",
+  "scope": "offline lineage, evaluation integrity, experiment comparison and bounded resource-aware proposal ordering",
+  "authority": {
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "trade_plan_authorized": false,
+    "promotion_authority": 0,
+    "deployment_authority": 0,
+    "r2_write_authority": 0,
+    "v0_10_production_critical_path_mutation": false
+  },
+  "contracts": {
+    "lineage_schema": "0.1.0",
+    "evaluation_integrity_schema": "0.1.0",
+    "experiment_registry_schema": "0.1.0",
+    "resource_planning_schema": "0.1.0"
+  },
+  "comparison_key": [
+    "provider",
+    "symbol_universe_sha256",
+    "interval_set",
+    "feature_config_sha256",
+    "evaluation_fingerprint",
+    "primary_metric",
+    "direction"
+  ],
+  "resource_limits": {
+    "maximum_configured_cost_weight": 0.35,
+    "minimum_adaptive_utility_weight": 0.65,
+    "missing_estimate_normalized_cost": 0.5,
+    "scheduler_budget_authority": 0
+  },
+  "holdout_policy": {
+    "required_roles": ["update", "validation", "holdout"],
+    "maximum_record_overlap_fraction": 0.0,
+    "maximum_source_overlap_fraction": 0.0,
+    "require_disjoint_seeds": true,
+    "require_frozen_holdout": true,
+    "holdout_access_requires_separate_authority": true
+  }
+}

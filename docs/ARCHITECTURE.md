@@ -70,6 +70,26 @@ immutable run-scoped metadata objects
 
 The V0.10 path is authorized only inside the frozen metadata window. Historical V0.2 self-hosted scheduled execution is retired and is not an automatic fallback.
 
+## Pionex public paper-training path
+
+```text
+GitHub Actions (hourly, bounded before 2026-08-27 UTC)
+  -> Pionex public futures market endpoints only
+  -> audited 15M / 60M / 4H / 8H / 1D closed candles
+  -> causal technical + volatility + market-state features
+  -> fixed, versioned candidate gates (no parameter search)
+  -> deterministic Repository Paper Broker
+  -> run-scoped artifact + secret-free forward-state cache
+  -> read-only GitHub Pages projection
+  -> up to three Pionex Demo samples for manual review only
+```
+
+This path is independent of the frozen V0.10 production-critical workflow. It
+does not read or write R2, inspect the replacement holdout, switch providers,
+call private Pionex endpoints or create any exchange order. Current order-book,
+recent-trade, funding, basis and open-interest features describe only the
+forward run state; they are not injected into historical replay bars.
+
 V0.11 metadata-stability evaluator rules are frozen before production evidence is read, but production R2 evaluation remains hard-disabled. Its prepared authority does not construct R2 clients, read production receipts, call providers/Render, or access the replacement holdout.
 
 ## Workflow lifecycle
@@ -97,3 +117,18 @@ Strategy and risk code must not call Pionex-specific APIs directly. Exchange-spe
 - Replacement holdout remains `FROZEN_UNOPENED` until a separate holdout-access authority exists.
 - No LLM or runtime may bypass deterministic risk, provenance, storage, authority or kill-switch rules.
 - If live trading is ever separately authorized, the exchange becomes authoritative for actual balances, positions, orders and fills, and internal state must reconcile after restart/API uncertainty.
+
+## Research governance layer V0.1
+
+Offline research may use the separate governance layer in
+`docs/RESEARCH_GOVERNANCE_V0_1.md`:
+
+```text
+lineage manifest → partition integrity → immutable experiment registry
+                                      ↘ bounded resource-aware ordering
+```
+
+This layer records input/config/environment fingerprints and compares only
+compatible runs. It has no provider, R2, holdout, trade-plan, promotion or
+deployment authority. The V0.10 production-critical path and the paper-only
+boundary remain unchanged.

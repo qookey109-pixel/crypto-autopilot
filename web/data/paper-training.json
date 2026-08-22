@@ -1,0 +1,40 @@
+{
+  "schema": "pionex-public-paper-training-run-v0.1",
+  "status": "PREPARED",
+  "mode": "PAPER_TRAINING_ONLY",
+  "runId": "safe-static-fixture",
+  "observedAtUtc": null,
+  "authority": {
+    "publicMarketDataReadAuthorized": true,
+    "paperCandidateGenerationAuthorized": true,
+    "repositoryPaperBrokerAuthorized": true,
+    "formalTradePlanAuthorized": false,
+    "pionexDemoAutomationAuthorized": false,
+    "privateApiUsed": false,
+    "r2ReadsPerformed": false,
+    "r2WritesPerformed": false,
+    "holdoutAccessed": false,
+    "sourceSwitchAuthorized": false,
+    "realMoneyOrderAuthorized": false,
+    "liveTradingAuthorized": false
+  },
+  "latestCandidates": [],
+  "paperTrades": [],
+  "trainingRecords": [],
+  "manualPionexDemoSamples": [],
+  "metrics": {
+    "trade_count": 0,
+    "win_count": 0,
+    "loss_count": 0,
+    "win_rate": 0.0,
+    "net_pnl_usd": 0.0,
+    "return_pct": 0.0,
+    "max_drawdown_pct": 0.0,
+    "profit_factor": null,
+    "trade_sharpe": null,
+    "total_fees_usd": 0.0,
+    "total_funding_usd": 0.0,
+    "total_slippage_cost_usd": 0.0
+  },
+  "interpretation": "Safe static fixture only; no provider request or trade was performed."
+}

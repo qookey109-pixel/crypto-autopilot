@@ -90,6 +90,61 @@ function renderMarkets(items) {
   `).join("");
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function number(value, digits = 2) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric.toLocaleString("zh-TW", { maximumFractionDigits: digits }) : "—";
+}
+
+function renderPaperTraining(report) {
+  if (!report || report.mode !== "PAPER_TRAINING_ONLY") return;
+  const authority = report.authority || {};
+  if (authority.liveTradingAuthorized === true || authority.realMoneyOrderAuthorized === true) {
+    console.error("Unsafe paper-training projection rejected");
+    return;
+  }
+  const metrics = report.metrics || {};
+  const status = report.status || "PREPARED";
+  document.querySelector("#paper-training-status").textContent = displayStatus(status);
+  document.querySelector("#paper-training-summary").textContent =
+    `${number(metrics.trade_count, 0)} 筆模擬交易 · 淨損益 ${number(metrics.net_pnl_usd)} USD · ${report.runId || "fixture"}`;
+  document.querySelector("#paper-return").textContent = `${number(metrics.return_pct)}%`;
+  document.querySelector("#paper-win-rate").textContent = `${number(Number(metrics.win_rate || 0) * 100)}%`;
+  document.querySelector("#paper-profit-factor").textContent = metrics.profit_factor == null ? "—" : number(metrics.profit_factor);
+  document.querySelector("#paper-drawdown").textContent = `${number(metrics.max_drawdown_pct)}%`;
+  document.querySelector("#paper-performance-note").textContent = report.interpretation || "Paper-only research evidence.";
+
+  const signals = report.latestCandidates || [];
+  document.querySelector("#paper-signal-table").innerHTML = signals.length ? signals.map(item => `
+    <tr>
+      <td><strong>${escapeHtml(item.symbol)}</strong></td>
+      <td>${number(item.score)}</td>
+      <td><span class="badge ${item.eligible ? "pass" : "pending"}">${item.eligible ? "候選" : "略過"}</span></td>
+      <td>${number(item.reference_price, 8)}</td>
+      <td>${number(item.stop_price, 8)}</td>
+      <td>${number(item.target_price, 8)}</td>
+    </tr>`).join("") : '<tr><td colspan="6">目前沒有已完成暖機的候選訊號</td></tr>';
+
+  const trades = report.paperTrades || [];
+  document.querySelector("#paper-trade-table").innerHTML = trades.length ? trades.slice(-50).reverse().map(item => `
+    <tr>
+      <td><strong>${escapeHtml(item.symbol)}</strong></td>
+      <td>${number(item.entry_price, 8)}</td>
+      <td>${number(item.exit_price, 8)}</td>
+      <td>${escapeHtml(item.exit_reason)}</td>
+      <td class="${Number(item.net_pnl_usd) >= 0 ? "cell-pass" : "cell-pending"}">${number(item.net_pnl_usd)} USD</td>
+      <td>${number(item.r_multiple)}</td>
+    </tr>`).join("") : '<tr><td colspan="6">目前沒有模擬成交</td></tr>';
+}
+
 function upsertByName(items, additions) {
   const merged = [...items];
   additions.forEach(addition => {
@@ -140,12 +195,19 @@ async function loadData() {
   try {
     const data = await fetchJson("./data/dashboard.json");
     let operational = null;
+    let paperTraining = null;
     try {
       operational = await fetchJson("./data/operational-status.json");
     } catch (error) {
       console.warn("Operational status projection unavailable", error);
     }
+    try {
+      paperTraining = await fetchJson("./data/paper-training.json");
+    } catch (error) {
+      console.warn("Paper training projection unavailable", error);
+    }
     render(mergeOperationalStatus(data, operational));
+    renderPaperTraining(paperTraining);
   } catch (error) {
     console.error("Dashboard snapshot load failed", error);
     render(FALLBACK);

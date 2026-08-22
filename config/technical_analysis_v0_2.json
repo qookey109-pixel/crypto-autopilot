@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "mode": "feature_engineering_research_only",
+  "supported_intervals": ["4H", "60M", "15M"],
+  "indicators": {
+    "ema_periods": [20, 50, 200],
+    "ema_slope_period": 20,
+    "atr_period": 14,
+    "volume_sma_period": 20,
+    "rsi_period": 14,
+    "macd_fast_period": 12,
+    "macd_slow_period": 26,
+    "macd_signal_period": 9,
+    "bollinger_period": 20,
+    "bollinger_stddev_multiplier": 2.0,
+    "bollinger_stddev_mode": "population"
+  },
+  "market_structure": {
+    "rolling_window": 20,
+    "swing_left": 2,
+    "swing_right": 2,
+    "pivot_tie_policy": "strict_no_ties",
+    "states": ["UP", "DOWN", "RANGE", "INDETERMINATE"]
+  },
+  "authority": {
+    "no_lookahead": true,
+    "closed_bars_only": true,
+    "candle_repair_authorized": false,
+    "interpolation_authorized": false,
+    "provider_splicing_authorized": false,
+    "strategy_gate_change_authorized": false,
+    "holdout_access_authorized": false,
+    "production_r2_access_authorized": false,
+    "v0_10_path_change_authorized": false,
+    "trade_plan_authorized": false,
+    "live_trading_authorized": false
+  }
+}

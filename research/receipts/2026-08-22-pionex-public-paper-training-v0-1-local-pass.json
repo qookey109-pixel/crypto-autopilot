@@ -1,0 +1,55 @@
+{
+  "schema": "qookey-pionex-public-paper-training-v0.1-local-verification",
+  "status": "PASS",
+  "stage": "PIONEX_PUBLIC_PAPER_TRAINING_V0_1_LOCAL_PASS",
+  "date": "2026-08-22",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "run_id": "local-public-verification-final-20260822",
+  "observed_at_utc": "2026-08-22T06:54:19.559000+00:00",
+  "execution_evidence": {
+    "provider": "pionex_public_futures",
+    "requested_symbol_count": 15,
+    "successful_symbol_count": 15,
+    "provider_error_count": 0,
+    "candidate_count": 1440,
+    "eligible_candidate_count": 174,
+    "paper_trade_count": 6,
+    "manual_pionex_demo_sample_count": 3,
+    "input_fingerprint": "375c38f4453ba85e1784c9315d9e0a490c3580356a26a258883aa129b3bfecba",
+    "lineage_fingerprint": "5bfd45fdbe7935b95872d4bf091f64f0b0b76920edaba455e25697b791edd972"
+  },
+  "paper_metrics": {
+    "initial_equity_usd": 10000.0,
+    "return_pct": 2.24974231,
+    "net_pnl_usd": 224.97423131,
+    "max_drawdown_pct": 2.12329241,
+    "win_rate": 0.5,
+    "profit_factor": 1.69330461,
+    "total_fees_usd": 43.82507995,
+    "total_funding_usd": 2.00128506,
+    "total_slippage_cost_usd": 17.53004351
+  },
+  "storage_boundary": {
+    "run_output_path": "/tmp/crypto-autopilot-paper-training-live.json",
+    "state_output_path": "/tmp/crypto-autopilot-paper-training-state.json",
+    "repository_market_data_committed": false,
+    "contains_secrets": false,
+    "production_r2_client_constructed": false,
+    "production_r2_reads_performed": false,
+    "production_r2_writes_performed": false
+  },
+  "authorization_boundary": {
+    "public_market_data_read_authorized": true,
+    "paper_candidate_generation_authorized": true,
+    "repository_paper_broker_authorized": true,
+    "pionex_demo_manual_sampling_only": true,
+    "pionex_demo_automation_authorized": false,
+    "private_api_used": false,
+    "formal_trade_plan_authorized": false,
+    "replacement_holdout_accessed": false,
+    "source_switch_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "interpretation": "PASS proves one bounded public-data Paper Broker run completed locally. The reported metrics are one research replay, not a profitability claim, strategy promotion, Pionex Demo fill, formal trade plan or live-trading authority."
+}
