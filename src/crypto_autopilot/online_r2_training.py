@@ -37,6 +37,7 @@ def build_online_objects(
     model: bytes,
     metrics: bytes,
     weekly_review: bytes | None = None,
+    governance_evidence: dict[str, Any] | None = None,
     generated_at_utc: str,
 ) -> tuple[OnlineObject, ...]:
     if not _RUN_ID_RE.fullmatch(run_id):
@@ -63,6 +64,8 @@ def build_online_objects(
             )
         )
     schema_version = str(storage.get("schema_version", "v0.3"))
+    if schema_version == "v0.5" and not isinstance(governance_evidence, dict):
+        raise ValueError("V0.5 online objects require persistent governance evidence")
     manifest = {
         "schema": f"binance-spot-r2-automated-training-run-{schema_version}",
         "status": "PASS",
@@ -87,6 +90,8 @@ def build_online_objects(
             "live_trading_authorized": False,
         },
     }
+    if governance_evidence is not None:
+        manifest["governance"] = governance_evidence
     manifest_payload = json_bytes(manifest)
     manifest_object = OnlineObject(
         f"{run_prefix}/manifest.json",
@@ -110,7 +115,12 @@ def build_online_objects(
         "dataset_receipt_sha256": sha256_bytes(dataset_receipt),
         "model_key": f"{run_prefix}/model.json",
         "model_sha256": sha256_bytes(model),
+        "metrics_key": f"{run_prefix}/metrics.json",
+        "metrics_sha256": sha256_bytes(metrics),
     }
+    if governance_evidence is not None:
+        latest["governance"] = governance_evidence
+        latest["governance_sha256"] = sha256_bytes(json_bytes(governance_evidence))
     if weekly_review is not None:
         latest["weekly_review_key"] = f"{run_prefix}/weekly-review.json"
         latest["weekly_review_sha256"] = sha256_bytes(weekly_review)
@@ -124,10 +134,19 @@ def build_online_objects(
     return tuple([*base, manifest_object, latest_object])
 
 
-def current_bucket_bytes(store: Any) -> int:
+def current_bucket_bytes(
+    store: Any, *, before_access: Callable[[], None] | None = None
+) -> int:
     paginator = store.client.get_paginator("list_objects_v2")
     total = 0
-    for page in paginator.paginate(Bucket=store.bucket):
+    pages = iter(paginator.paginate(Bucket=store.bucket))
+    while True:
+        if before_access is not None:
+            before_access()
+        try:
+            page = next(pages)
+        except StopIteration:
+            break
         for item in page.get("Contents", []) or []:
             total += int(item.get("Size", 0))
     return total
@@ -139,10 +158,17 @@ def publish_online_objects(
     objects: tuple[OnlineObject, ...],
     hard_stop_bytes: int,
     inventory_fn: Callable[[Any], int] = current_bucket_bytes,
+    before_access: Callable[[], None] | None = None,
+    before_write: Callable[[], None] | None = None,
     pass_stage: str = "BINANCE_SPOT_R2_AUTOMATED_TRAINING_PUBLISHED_V0_3",
     metadata_version: str = "v0.3",
 ) -> dict[str, Any]:
-    current_bytes = inventory_fn(store)
+    if inventory_fn is current_bucket_bytes:
+        current_bytes = current_bucket_bytes(store, before_access=before_access)
+    else:
+        if before_access is not None:
+            before_access()
+        current_bytes = inventory_fn(store)
     planned_bytes = sum(len(item.payload) for item in objects)
     projected_bytes = current_bytes + planned_bytes
     if projected_bytes > hard_stop_bytes:
@@ -159,12 +185,16 @@ def publish_online_objects(
     for item in objects:
         if not item.immutable:
             continue
+        if before_access is not None:
+            before_access()
         existing = store.get_bytes_if_exists(item.key)
         if existing is not None and existing != item.payload:
             raise RuntimeError(f"immutable R2 training object conflict: {item.key}")
 
     receipts = []
     for item in objects:
+        if before_access is not None:
+            before_access()
         existing = store.get_bytes_if_exists(item.key) if item.immutable else None
         if existing == item.payload:
             action = "VERIFY_EXISTING"
@@ -178,6 +208,10 @@ def publish_online_objects(
             }
         else:
             action = "UPLOAD"
+            if before_write is not None:
+                before_write()
+            if before_access is not None:
+                before_access()
             uploaded = store.put_bytes(
                 item.key,
                 item.payload,
@@ -185,6 +219,8 @@ def publish_online_objects(
                 metadata={"provider": "binance_spot", "role": item.role, "version": metadata_version},
             )
             receipt = asdict(uploaded)
+        if before_access is not None:
+            before_access()
         verified = store.get_bytes_verified(item.key, expected_sha256=str(receipt["sha256"]))
         if verified != item.payload:
             raise RuntimeError(f"R2 exact-byte round trip mismatch: {item.key}")

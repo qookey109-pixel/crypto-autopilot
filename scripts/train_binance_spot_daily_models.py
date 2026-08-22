@@ -10,12 +10,16 @@ import pyarrow.parquet as pq
 
 from crypto_autopilot.online_training import train_daily_direction_models
 from crypto_autopilot.ephemeral_storage import require_ephemeral_output
+from crypto_autopilot.training_quality import load_v0_5_authority_pair
 from crypto_autopilot.weekly_model_review import build_weekly_model_review
+
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Train deterministic research models from Binance Spot 1D Parquet")
-    parser.add_argument("--config", default="config/binance_spot_r2_automated_training_v0_3.json")
+    parser.add_argument("--config", default="config/binance_spot_r2_training_governance_v0_5.json")
     parser.add_argument("--dataset", required=True)
     parser.add_argument("--model-output", required=True)
     parser.add_argument("--metrics-output", required=True)
@@ -27,19 +31,15 @@ def main() -> int:
         require_ephemeral_output(args.review_output) if args.review_output else None
     )
 
-    config = json.loads(Path(args.config).read_text(encoding="utf-8"))
-    allowed_statuses = {
-        "R2_FIRST_AUTOMATED_TRAINING_AUTHORIZED_ON_MAIN_MERGE",
-        "R2_ONLY_WEEKLY_MODEL_REVIEW_AUTHORIZED_ON_MAIN_MERGE",
-    }
-    if config.get("status") not in allowed_statuses:
-        raise RuntimeError("automated training authority is not active")
-    authority = config.get("authority") or {}
-    if authority.get("automated_research_model_training_authorized") is not True:
-        raise RuntimeError("automated research training is not authorized")
-    for key in ("automatic_trade_plan_authorized", "real_money_order_authorized", "live_trading_authorized"):
-        if authority.get(key) is not False:
-            raise RuntimeError(f"unsafe V0.3 authority boundary: {key}")
+    config_path = Path(args.config)
+    config_payload = config_path.read_bytes()
+    config = json.loads(config_payload)
+    load_v0_5_authority_pair(
+        config,
+        config_path=config_path,
+        config_payload=config_payload,
+        repository_root=REPOSITORY_ROOT,
+    )
 
     dataset_path = Path(args.dataset)
     payload = dataset_path.read_bytes()
@@ -73,7 +73,7 @@ def main() -> int:
         path_value.write_bytes(payload)
     if "weekly_review" in config:
         if review_output is None:
-            raise RuntimeError("weekly review output is required by V0.4")
+            raise RuntimeError("weekly review output is required by V0.5")
         review = build_weekly_model_review(
             rows,
             training_config=config["training"],

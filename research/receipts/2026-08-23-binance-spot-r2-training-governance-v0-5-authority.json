@@ -1,0 +1,61 @@
+{
+  "schema": "binance-spot-r2-training-governance-authority-v0.5",
+  "status": "TRAINING_GOVERNANCE_V0_5_AUTHORIZED_ON_MAIN_MERGE",
+  "config_version": "0.5.0",
+  "authorized_config": {
+    "path": "config/binance_spot_r2_training_governance_v0_5.json",
+    "sha256": "e045626a4b80c563fea93929e92e4dabc5cf37414625123c3aa0c69ca8ee9991"
+  },
+  "provider": "binance_spot",
+  "storage_schema_version": "v0.5",
+  "authorized_at_utc": "2026-08-22T16:14:54Z",
+  "request": "Debug and organize the training automation, apply useful OODA and GameAI governance patterns, and define schedule improvements without changing trading authority or the frozen V0.10 path.",
+  "supersedes_execution": "binance-spot-r2-weekly-training-v0.4",
+  "weekly_schedule_utc": "37 2 * * 0",
+  "monthly_schedule_utc": "37 3 1 * *",
+  "provider_read_stop_utc": "2026-08-27T00:00:00Z",
+  "automatic_resume_after_stop": false,
+  "monthly_initial_activation": {
+    "mode": "ONE_TIME_MANUAL_WORKFLOW_DISPATCH",
+    "purpose": "CREATE_INITIAL_V0_5_MONTHLY_BASELINE",
+    "required": true,
+    "must_complete_before_utc": "2026-08-27T00:00:00Z",
+    "push_trigger_authorized": false,
+    "repeat_manual_activation_authorized": false
+  },
+  "exact_namespaces": {
+    "dataset_runs_namespace": "market-data/binance_spot/internal-training/v0.5/runs",
+    "training_namespace": "training/binance_spot/daily-direction/v0.5",
+    "latest_training_pointer_key": "training/binance_spot/daily-direction/v0.5/latest.json",
+    "monthly_namespace": "research/binance_spot/universe-review/v0.5",
+    "monthly_latest_pointer_key": "research/binance_spot/universe-review/v0.5/latest.json"
+  },
+  "bootstrap_baseline": {
+    "path": "research/receipts/2026-08-22-binance-spot-r2-automated-training-v0-3-pass.json",
+    "sha256": "c319dd3a721b58f9db216d24e2bdee739bcc5853251de1c3c2eb750ef1576deb",
+    "schema": "binance-spot-r2-automated-training-pass-v0.3",
+    "provider": "binance_spot",
+    "market_count_requested": 748,
+    "market_count_audited": 723,
+    "row_count": 701275
+  },
+  "persistent_generated_data_store": "cloudflare_r2_only",
+  "authority": {
+    "v0_4_execution_retirement_authorized": true,
+    "v0_5_exact_namespaces_authorized": true,
+    "pre_publish_contract_validation_authorized": true,
+    "dataset_tail_and_collapse_gates_authorized": true,
+    "weekly_baseline_cost_drawdown_exposure_gate_authorized": true,
+    "monthly_catalog_collapse_gate_authorized": true,
+    "monthly_one_time_manual_activation_authorized": true,
+    "formal_backtest_admission_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "v0_10_production_critical_path_mutation": false
+  }
+}

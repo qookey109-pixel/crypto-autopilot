@@ -56,6 +56,7 @@ class BinanceSpotR2AutomatedTrainingV03Tests(unittest.TestCase):
 
     def test_daily_workflow_is_retired_without_provider_or_r2_execution(self) -> None:
         self.assertIn("V0.3 — RETIRED", self.workflow)
+        self.assertIn("V0.5 governance", self.workflow)
         self.assertNotIn("schedule:", self.workflow)
         self.assertNotIn("CLOUDFLARE_ACCOUNT_ID", self.workflow)
         self.assertNotIn("discover_binance_training_universe.py", self.workflow)

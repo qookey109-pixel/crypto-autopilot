@@ -1,112 +1,31 @@
-name: Binance Spot R2 Monthly Universe Review V0.4
+name: Binance Spot R2 Monthly Universe Review V0.4 — RETIRED
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/binance-spot-r2-monthly-universe-review-v0-4.yml"
-      - "config/binance_spot_r2_weekly_training_v0_4.json"
-      - "research/receipts/2026-08-22-binance-spot-r2-weekly-training-v0-4-authority.json"
-      - "scripts/check_binance_spot_training_window.py"
-      - "scripts/discover_binance_training_universe.py"
-      - "scripts/review_binance_spot_universe_monthly.py"
-      - "src/crypto_autopilot/binance_training_catalog.py"
-      - "src/crypto_autopilot/ephemeral_storage.py"
-      - "src/crypto_autopilot/monthly_universe_review.py"
-      - "src/crypto_autopilot/online_r2_training.py"
-  schedule:
-    - cron: "37 3 1 * *"
   workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: binance-spot-r2-research-v0-4
-  cancel-in-progress: false
-
 jobs:
-  review-publish:
+  validate-retirement:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
 
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-        with:
-          python-version: "3.13"
-
-      - name: Check frozen holdout boundary before provider or R2 access
-        id: window
-        run: |
-          python scripts/check_binance_spot_training_window.py \
-            --config config/binance_spot_r2_weekly_training_v0_4.json \
-            --github-output "$GITHUB_OUTPUT"
-
-      - name: Install constrained runtime
-        if: steps.window.outputs.run_allowed == 'true'
-        run: python -m pip install -c requirements/ci-constraints.txt .
-
-      - name: Discover current public Binance Spot catalog
-        if: steps.window.outputs.run_allowed == 'true'
-        run: |
-          python scripts/discover_binance_training_universe.py \
-            --output online-review/market-catalog.json \
-            --quotes USDT USDC
-
-      - name: Compare prior monthly snapshot and publish review to R2
-        if: steps.window.outputs.run_allowed == 'true'
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: |
-          python scripts/review_binance_spot_universe_monthly.py \
-            --config config/binance_spot_r2_weekly_training_v0_4.json \
-            --catalog online-review/market-catalog.json \
-            --run-id "github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
-            --review-output online-review/universe-review.json \
-            --receipt-output online-review/publish-receipt.json
-
-      - name: Assert monthly review boundaries
-        if: steps.window.outputs.run_allowed == 'true'
+      - name: Assert V0.4 monthly execution is retired without provider or R2 access
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
 
-          review = json.loads(Path("online-review/universe-review.json").read_text())
-          receipt = json.loads(Path("online-review/publish-receipt.json").read_text())
-          assert review["status"] == "PASS"
-          assert review["mode"] == "RESEARCH_CATALOG_REVIEW_ONLY"
-          assert review["survivorship_bias_review"]["status"] == "REVIEW_REQUIRED"
-          assert review["survivorship_bias_review"]["absence_from_current_catalog_is_delisting_proof"] is False
-          assert receipt["status"] == "PASS"
-          assert receipt["historical_universe_membership_authorized"] is False
-          assert receipt["formal_backtest_admission_authorized"] is False
-          assert receipt["automatic_model_promotion_authorized"] is False
-          assert receipt["live_trading_authorized"] is False
+          current = json.loads(
+              Path("config/binance_spot_r2_training_governance_v0_5.json").read_text()
+          )
+          assert current["monthly_universe_review"]["schema_version"] == "v0.5"
+          assert current["monthly_universe_review"]["cron_utc"] == "37 3 1 * *"
+          assert current["authority"]["historical_universe_membership_authorized"] is False
+          assert current["authority"]["live_trading_authorized"] is False
           PY
-
-      - name: Upload secret-free monthly evidence
-        if: steps.window.outputs.run_allowed == 'true'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          name: binance-spot-r2-monthly-universe-review-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            online-review/universe-review.json
-            online-review/publish-receipt.json
-          retention-days: 365
-          if-no-files-found: error
-
-      - name: Record intentional frozen-window skip
-        if: steps.window.outputs.run_allowed != 'true'
-        run: |
-          echo "Monthly universe review skipped before provider and R2 access: ${{ steps.window.outputs.stage }}"
-
-      - name: Remove ephemeral workspace outputs
-        if: always()
-        run: rm -rf -- online-review

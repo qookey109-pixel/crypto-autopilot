@@ -9,6 +9,27 @@ from typing import Any
 
 
 DAY_MS = 86_400_000
+DAILY_DIRECTION_FEATURE_NAMES = (
+    "return_1d",
+    "return_3d",
+    "return_7d",
+    "close_vs_ma7",
+    "quote_volume_vs_ma7",
+)
+
+
+def require_daily_direction_feature_contract(
+    training_config: dict[str, Any],
+) -> tuple[str, ...]:
+    """Fail closed if configured labels drift from the implemented feature order."""
+
+    configured = tuple(str(value) for value in training_config.get("feature_names", ()))
+    if configured != DAILY_DIRECTION_FEATURE_NAMES:
+        raise ValueError(
+            "daily-direction feature contract mismatch: expected exact ordered names "
+            f"{list(DAILY_DIRECTION_FEATURE_NAMES)}, received {list(configured)}"
+        )
+    return configured
 
 
 @dataclass(frozen=True, slots=True)
@@ -132,6 +153,9 @@ def fit_daily_direction_examples(
 ) -> dict[str, Any]:
     if not items:
         raise ValueError("cannot fit a model without examples")
+    configured_names = require_daily_direction_feature_contract(training_config)
+    if tuple(feature_names) != configured_names:
+        raise ValueError("feature_names must match the validated training feature contract")
     means, stds = _normalization(items)
     weights = [0.0] * len(feature_names)
     positive_rate = sum(item.label for item in items) / len(items)
@@ -199,7 +223,10 @@ def train_daily_direction_models(
     end_exclusive_ms: int,
     generated_at_utc: str,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    feature_names = list(training_config["feature_names"])
+    feature_names = list(require_daily_direction_feature_contract(training_config))
+    output_schema_version = str(training_config.get("output_schema_version", "v0.3"))
+    if output_schema_version not in {"v0.3", "v0.5"}:
+        raise ValueError("unsupported daily-direction output schema version")
     examples = build_daily_direction_examples(rows, end_exclusive_ms=end_exclusive_ms)
     models: dict[str, Any] = {}
     class_metrics: dict[str, Any] = {}
@@ -253,15 +280,22 @@ def train_daily_direction_models(
 
     status = "PASS" if models.get("crypto", {}).get("status") == "PASS" else "NOT_READY"
     model = {
-        "schema": "binance-spot-daily-direction-model-v0.3",
+        "schema": f"binance-spot-daily-direction-model-{output_schema_version}",
         "status": status,
         "mode": "RESEARCH_TRAINING_ONLY",
         "generated_at_utc": generated_at_utc,
         "provider": "binance_spot",
         "data_sha256": data_sha256,
         "target": training_config["target"],
+        "feature_contract": {
+            "schema": "binance-spot-daily-direction-features-v0.3",
+            "ordered_names": feature_names,
+        },
         "models": models,
         "authority": {
+            "source_switch_authorized": False,
+            "holdout_accessed": False,
+            "automatic_model_promotion_authorized": False,
             "automatic_trade_plan_authorized": False,
             "real_money_order_authorized": False,
             "live_trading_authorized": False,
@@ -271,13 +305,22 @@ def train_daily_direction_models(
         (json.dumps(model, sort_keys=True, separators=(",", ":")) + "\n").encode()
     ).hexdigest()
     metrics = {
-        "schema": "binance-spot-daily-direction-training-metrics-v0.3",
+        "schema": f"binance-spot-daily-direction-training-metrics-{output_schema_version}",
         "status": status,
+        "mode": "RESEARCH_DIAGNOSTICS_ONLY",
         "generated_at_utc": generated_at_utc,
         "provider": "binance_spot",
         "data_sha256": data_sha256,
         "model_canonical_sha256": model_canonical_sha256,
         "classes": class_metrics,
         "interpretation": "Research diagnostics only; no strategy promotion or trading authority.",
+        "authority": {
+            "source_switch_authorized": False,
+            "holdout_accessed": False,
+            "automatic_model_promotion_authorized": False,
+            "automatic_trade_plan_authorized": False,
+            "real_money_order_authorized": False,
+            "live_trading_authorized": False,
+        },
     }
     return model, metrics

@@ -4,7 +4,7 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 
 > **Current mode: PAPER-ONLY.** No real-money order path is authorized. `trade_plan_authorized=false` and `live_trading_authorized=false` remain mandatory. For the detailed current authority index, always read [`PROJECT_STATUS.md`](PROJECT_STATUS.md) first.
 
-## Current authority snapshot — 2026-08-22
+## Current authority snapshot — 2026-08-23
 
 The repository has moved beyond the original V0.1 implementation baseline while preserving its scientific history:
 
@@ -35,16 +35,27 @@ frozen V0.10/holdout window. Pionex Demo remains manual sampling only; no privat
 API, automated demo order, formal trade plan, real-money order or live-trading
 authority is introduced.
 
-The **Binance Spot R2 Weekly Training and Review V0.4** path discovers the active public
+The **Binance Spot R2 Training Governance V0.5** path discovers the active public
 Spot catalog, builds provider-separated daily history, trains deterministic
 research models and publishes the canonical dataset/model lineage to Cloudflare
 R2 each Sunday at `02:37 UTC` (`10:37 Asia/Taipei`). The same run performs
 expanding-window walk-forward diagnostics, fee/slippage sensitivity, diagnostic
-maximum drawdown and model-signal exposure checks. A separate first-day monthly
+maximum drawdown and model-signal exposure checks. Pipeline completion is now
+reported separately from a baseline/cost/drawdown/concentration model-quality
+gate, so rejected research remains evidence without looking approved. Payload
+contracts and market/audited/row-depth collapse gates run before any R2 write.
+A separate first-day monthly
 review compares active markets, catalog absences, survivorship-bias limitations
-and heuristic tokenized-stock classifications. R2 is the only persistent
+and heuristic tokenized-stock classifications; repository pushes do not run
+either production workflow. The next weekly cron remains inside the authority
+window; the initial monthly V0.5 baseline requires one manual `workflow_dispatch`
+before `2026-08-27T00:00:00Z`. Repeated monthly manual activation and push
+activation are not authorized. The generated review carries the exact
+config/comparison governance evidence and is contract-validated before R2 writes.
+R2 is the only persistent
 generated-data store; raw training history is not projected to GitHub Pages.
-V0.3 daily execution is retired. No source-switch, formal backtest admission,
+V0.3 daily and V0.4 weekly/monthly execution are retired. V0.5 uses separate
+authority and R2 namespaces. No source-switch, formal backtest admission,
 automatic model promotion, W1, holdout or trading authority is introduced.
 
 ## FREE-ONLY cloud policy
@@ -215,9 +226,9 @@ PYTHONPATH=src .venv/bin/python scripts/fetch_binance_internal_training.py \
 ```
 
 The online R2-first pipeline is defined by
-[`config/binance_spot_r2_weekly_training_v0_4.json`](config/binance_spot_r2_weekly_training_v0_4.json),
-[`.github/workflows/binance-spot-r2-weekly-training-v0-4.yml`](.github/workflows/binance-spot-r2-weekly-training-v0-4.yml),
-and [`.github/workflows/binance-spot-r2-monthly-universe-review-v0-4.yml`](.github/workflows/binance-spot-r2-monthly-universe-review-v0-4.yml).
+[`config/binance_spot_r2_training_governance_v0_5.json`](config/binance_spot_r2_training_governance_v0_5.json),
+[`.github/workflows/binance-spot-r2-training-governance-v0-5.yml`](.github/workflows/binance-spot-r2-training-governance-v0-5.yml),
+and [`.github/workflows/binance-spot-r2-monthly-governance-v0-5.yml`](.github/workflows/binance-spot-r2-monthly-governance-v0-5.yml).
 It uses GitHub Actions secrets for R2 credentials, never retains generated data
 in the local repository, and never exposes raw history through the website.
 
@@ -234,5 +245,9 @@ Read in this order for current work:
 The offline research governance extension is documented in
 [`docs/RESEARCH_GOVERNANCE_V0_1.md`](docs/RESEARCH_GOVERNANCE_V0_1.md) and
 configured by [`config/research_governance_v0_1.json`](config/research_governance_v0_1.json).
+
+Current cadence, evidence checks and non-activated post-window recommendations
+are indexed in
+[`docs/RESEARCH_AUTOMATION_SCHEDULE_V0_1.md`](docs/RESEARCH_AUTOMATION_SCHEDULE_V0_1.md).
 
 Historical receipts remain immutable evidence even when a later version supersedes their execution role.

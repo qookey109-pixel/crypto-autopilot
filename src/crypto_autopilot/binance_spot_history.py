@@ -7,6 +7,7 @@ import re
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -23,6 +24,10 @@ _SYMBOL_RE = re.compile(r"^[A-Z0-9]{5,24}$")
 
 class BinanceSpotHistoryError(RuntimeError):
     pass
+
+
+class ProviderReadDeadlineExceeded(RuntimeError):
+    """Raised before a provider request that would start at or after the stop."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -59,6 +64,45 @@ class BinanceSpotSeries:
     candles: tuple[BinanceSpotCandle, ...]
 
     @property
+    def expected_last_open_time_ms(self) -> int:
+        step_ms = BINANCE_SPOT_INTERVAL_MS[self.interval]
+        return self.requested_end_ms - (self.requested_end_ms % step_ms)
+
+    @property
+    def actual_first_open_time_ms(self) -> int | None:
+        return self.candles[0].open_time_ms if self.candles else None
+
+    @property
+    def actual_last_open_time_ms(self) -> int | None:
+        return self.candles[-1].open_time_ms if self.candles else None
+
+    @property
+    def tail_missing_bars(self) -> int:
+        step_ms = BINANCE_SPOT_INTERVAL_MS[self.interval]
+        actual_last = self.actual_last_open_time_ms
+        if actual_last is not None:
+            return max(0, (self.expected_last_open_time_ms - actual_last) // step_ms)
+
+        expected_first = self.requested_start_ms + (
+            -self.requested_start_ms % step_ms
+        )
+        if expected_first > self.expected_last_open_time_ms:
+            return 0
+        return (self.expected_last_open_time_ms - expected_first) // step_ms + 1
+
+    @property
+    def audit_evidence(self) -> dict[str, int | bool | None]:
+        return {
+            "expected_last_open_time_ms": self.expected_last_open_time_ms,
+            "actual_first_open_time_ms": self.actual_first_open_time_ms,
+            "actual_last_open_time_ms": self.actual_last_open_time_ms,
+            "tail_missing_bars": self.tail_missing_bars,
+            "tail_complete": (
+                self.actual_last_open_time_ms == self.expected_last_open_time_ms
+            ),
+        }
+
+    @property
     def audit_ok(self) -> bool:
         if not self.candles:
             return False
@@ -66,10 +110,80 @@ class BinanceSpotSeries:
             [candle.as_candle() for candle in self.candles],
             PROJECT_INTERVAL[self.interval],
         )
-        return audit.ok
+        return audit.ok and self.actual_last_open_time_ms == self.expected_last_open_time_ms
 
 
 Transport = Callable[[str, float], bytes]
+Clock = Callable[[], float]
+
+
+def provider_read_stop_ms_from_v0_5_config(config: object) -> int:
+    """Return the governed provider stop after validating the V0.5 identity."""
+
+    if not isinstance(config, dict):
+        raise ValueError("V0.5 provider configuration must be an object")
+    if (
+        config.get("version") != "0.5.0"
+        or config.get("status")
+        != "R2_ONLY_TRAINING_GOVERNANCE_V0_5_AUTHORIZED_ON_MAIN_MERGE"
+        or config.get("provider") != "binance_spot"
+        or config.get("delivery") != "binance_public_rest"
+        or config.get("dataset") != "spot_1d_internal_training"
+    ):
+        raise ValueError("V0.5 provider configuration identity mismatch")
+
+    schedule = config.get("schedule")
+    authority = config.get("authority")
+    if not isinstance(schedule, dict):
+        raise ValueError("V0.5 provider schedule is missing")
+    if (
+        not isinstance(authority, dict)
+        or authority.get("binance_public_market_reads_authorized") is not True
+    ):
+        raise ValueError("V0.5 Binance public market reads are not authorized")
+    if schedule.get("automatic_resume_after_stop") is not False:
+        raise ValueError("V0.5 provider stop must not resume automatically")
+
+    stop_utc = schedule.get("provider_read_stop_utc")
+    if not isinstance(stop_utc, str) or not stop_utc.endswith("Z"):
+        raise ValueError("V0.5 provider_read_stop_utc must be an explicit UTC timestamp")
+    try:
+        stop = datetime.fromisoformat(stop_utc.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError("V0.5 provider_read_stop_utc is invalid") from exc
+    if stop.tzinfo is None or stop.utcoffset() != UTC.utcoffset(stop):
+        raise ValueError("V0.5 provider_read_stop_utc must use UTC")
+    return int(stop.timestamp() * 1000)
+
+
+def require_provider_request_before_deadline(
+    *,
+    provider_read_stop_ms: int | None,
+    clock_fn: Clock = time.time,
+) -> None:
+    """Fail closed immediately before each provider transport invocation."""
+
+    if provider_read_stop_ms is None:
+        return
+    if (
+        isinstance(provider_read_stop_ms, bool)
+        or not isinstance(provider_read_stop_ms, int)
+        or provider_read_stop_ms < 0
+    ):
+        raise ValueError("provider_read_stop_ms must be a non-negative integer")
+    try:
+        observed_seconds = float(clock_fn())
+    except (TypeError, ValueError) as exc:
+        raise ValueError("provider deadline clock must return epoch seconds") from exc
+    if not math.isfinite(observed_seconds):
+        raise ValueError("provider deadline clock must return finite epoch seconds")
+    if observed_seconds * 1000 >= provider_read_stop_ms:
+        observed = datetime.fromtimestamp(observed_seconds, tz=UTC)
+        stop = datetime.fromtimestamp(provider_read_stop_ms / 1000, tz=UTC)
+        raise ProviderReadDeadlineExceeded(
+            "provider request blocked at or after governed stop "
+            f"(observed={observed.isoformat()}, stop={stop.isoformat()})"
+        )
 
 
 def _validate_symbol(symbol: str) -> str:
@@ -138,6 +252,8 @@ def fetch_spot_history(
     transport: Transport = public_http_transport,
     sleep_fn: Callable[[float], None] = time.sleep,
     random_fn: Callable[[], float] = random.random,
+    provider_read_stop_ms: int | None = None,
+    clock_fn: Clock = time.time,
 ) -> BinanceSpotSeries:
     symbol = _validate_symbol(symbol)
     if interval not in BINANCE_SPOT_INTERVAL_MS:
@@ -171,6 +287,10 @@ def fetch_spot_history(
         payload: bytes | None = None
         for attempt in range(max_retries + 1):
             try:
+                require_provider_request_before_deadline(
+                    provider_read_stop_ms=provider_read_stop_ms,
+                    clock_fn=clock_fn,
+                )
                 payload = transport(url, timeout_seconds)
                 break
             except HTTPError as exc:

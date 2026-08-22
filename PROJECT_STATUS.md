@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-08-21
+Updated: 2026-08-23
 
 ## Project
 
@@ -14,19 +14,26 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ## Current formal stage
 
-**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 WEEKLY TRAINING V0.4 AUTHORIZED / BINANCE SPOT MONTHLY UNIVERSE REVIEW V0.4 AUTHORIZED / V0.3 DAILY TRAINING RETIRED / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 AUTHORIZED BOUNDED / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
+**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 TRAINING GOVERNANCE V0.5 AUTHORIZED / V0.4 WEEKLY AND MONTHLY EXECUTION RETIRED / V0.3 DAILY TRAINING RETIRED / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 AUTHORIZED BOUNDED / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
 
-### Binance Spot R2 Weekly Training and Review V0.4 — AUTHORIZED
+### Binance Spot R2 Training Governance V0.5 — AUTHORIZED
 
-- V0.3 daily execution is retired. V0.4 trains once per week at Sunday
+- V0.3 daily and V0.4 weekly/monthly execution are retired. V0.5 trains once per week at Sunday
   `02:37 UTC` (`10:37 Asia/Taipei`).
-- Each weekly run rebuilds the provider-separated dataset, trains the deterministic
-  daily-direction model, and writes an immutable weekly review containing expanding
-  walk-forward folds, fee/slippage sensitivity, diagnostic maximum drawdown and
-  model-signal exposure concentration.
+- The next scheduled weekly slot is inside the V0.5 authority window and may
+  create the first V0.5 training baseline; production push execution is absent.
+- Each weekly run rebuilds the provider-separated dataset, checks complete tails,
+  catalog/audited coverage, feature order and chronological partitions, trains the
+  deterministic daily-direction model, and writes immutable V0.5 evidence.
 - Monthly universe review runs on day 1 at `03:37 UTC` (`11:37 Asia/Taipei`). It
   compares active-market snapshots, catalog absences and heuristic tokenized-stock
   classification changes. Catalog absence is not treated as proof of delisting.
+- Because the first scheduled monthly slot falls after the V0.5 stop, creation of
+  the initial V0.5 monthly baseline requires one successful manual
+  `workflow_dispatch` before `2026-08-27T00:00:00Z`. It is not recurring manual
+  authority: once a verified V0.5 review exists, another manual activation fails
+  before publication. Scheduled reviews remain separate, and the workflow has no
+  push trigger.
 - The current-active catalog cannot authorize historical universe membership;
   survivorship bias remains `REVIEW_REQUIRED` and formal backtest admission remains
   false.
@@ -36,6 +43,40 @@ Repository branch `main` is the live formal authority and is intentionally not s
   evidence is retained online and runner workspaces are removed at the end.
 - Model promotion, source switching, holdout access, trade plans, real-money orders
   and live trading remain unauthorized.
+- Pre-publish validation completes before any R2 client is constructed. A missing
+  or unsafe review contract cannot update R2 or its latest pointer.
+- The executable V0.5 config is exact-byte bound to its versioned authority
+  receipt. The first V0.5 weekly/monthly comparison uses the SHA-256-verified
+  V0.3 online PASS counts (748 requested / 723 audited / 701,275 rows); a malformed existing
+  V0.5 pointer fails closed instead of falling back.
+- Dataset receipts bind the exact catalog and Parquet SHA/size; Parquet provider,
+  schema, OHLCV bounds, row/symbol/audit and tail evidence are checked before any
+  R2 write. Total rows must retain at least 80% of the comparison baseline.
+  Model/metrics provider, feature, target, authority and raw/canonical hash
+  contracts are likewise checked before publication.
+- Evidence-correctness hardening rejects stale-tail series, enforces the exact
+  ordered feature contract, records chronological train/validation fingerprints,
+  compares every configured class with ready folds against a train-prevalence
+  baseline, and separates
+  successful pipeline execution from the research-only model-quality result.
+- The quality gate checks configured costs, net growth, maximum drawdown and symbol
+  concentration. A rejected model is still published as evidence; it is never
+  promoted automatically.
+- Monthly R2 pointer reads are namespace/schema/provider/run-id/SHA allowlisted.
+  Monthly catalog collapse is blocked; the current review is governance-bound and
+  contract-validated before R2 writes, and the stop window is checked again before
+  every actual upload. Push execution is absent so changes do not replace the
+  prior-month comparison baseline.
+- Operations index and post-window recommendations:
+  `docs/RESEARCH_AUTOMATION_SCHEDULE_V0_1.md`.
+
+### Binance Spot R2 Weekly Training and Review V0.4 — HISTORICAL / EXECUTION RETIRED
+
+- V0.4 config, receipt, namespaces and prior R2 objects remain immutable historical
+  evidence. They were not rewritten into V0.5 semantics.
+- V0.4 workflow files are manual validation-only retirement checks: no schedule,
+  provider access, R2 secrets or R2 writes.
+- V0.5 uses separate config, authority receipt, workflow names and R2 namespaces.
 
 ### Binance Spot R2 Automated Training V0.3 — HISTORICAL ONLINE PASS / DAILY RETIRED
 
@@ -43,8 +84,8 @@ Repository branch `main` is the live formal authority and is intentionally not s
   Spot 1D internal-training snapshots. GitHub runner files are ephemeral and are
   explicitly removed after online evidence upload; local repository artifacts
   are forbidden.
-- Its successful online runs remain immutable evidence. V0.4 supersedes the daily
-  schedule with weekly training and monthly catalog review.
+- Its successful online runs remain immutable evidence. V0.5 is now the current
+  weekly training and monthly catalog-governance execution path.
 - R2 credentials remain in GitHub Actions secrets only. Raw history is not
   projected to GitHub Pages.
 - The latest training pointer is written only after immutable dataset,

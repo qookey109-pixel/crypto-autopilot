@@ -1,0 +1,108 @@
+name: Binance Spot R2 Monthly Governance V0.5
+
+on:
+  schedule:
+    - cron: "37 3 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binance-spot-r2-research-v0-5
+  cancel-in-progress: false
+
+jobs:
+  review-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Check frozen holdout boundary before provider or R2 access
+        id: window
+        env:
+          PYTHONPATH: src
+        run: |
+          python scripts/check_binance_spot_training_window.py \
+            --config config/binance_spot_r2_training_governance_v0_5.json \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Install constrained runtime
+        if: steps.window.outputs.run_allowed == 'true'
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Discover current public Binance Spot catalog
+        if: steps.window.outputs.run_allowed == 'true'
+        run: |
+          python scripts/discover_binance_training_universe.py \
+            --output online-review/market-catalog.json \
+            --quotes USDT USDC
+
+      - name: Validate catalog then publish monthly V0.5 review to R2
+        if: steps.window.outputs.run_allowed == 'true'
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          V0_5_MONTHLY_ACTIVATION_MODE: ${{ github.event_name == 'workflow_dispatch' && 'ONE_TIME_MANUAL_WORKFLOW_DISPATCH' || 'SCHEDULED_REVIEW' }}
+        run: |
+          python scripts/review_binance_spot_universe_monthly.py \
+            --config config/binance_spot_r2_training_governance_v0_5.json \
+            --catalog online-review/market-catalog.json \
+            --run-id "github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --event-name "${GITHUB_EVENT_NAME}" \
+            --activation-mode "${V0_5_MONTHLY_ACTIVATION_MODE}" \
+            --review-output online-review/universe-review.json \
+            --receipt-output online-review/publish-receipt.json
+
+      - name: Assert monthly review boundaries
+        if: steps.window.outputs.run_allowed == 'true'
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          review = json.loads(Path("online-review/universe-review.json").read_text())
+          receipt = json.loads(Path("online-review/publish-receipt.json").read_text())
+          assert review["schema"] == "binance-spot-monthly-universe-review-v0.5"
+          assert review["status"] == "PASS"
+          assert review["governance"]["config"]["status"] == "PASS"
+          assert review["survivorship_bias_review"]["status"] == "REVIEW_REQUIRED"
+          assert receipt["status"] == "PASS"
+          assert receipt["execution_route"]["event_name"] in {"schedule", "workflow_dispatch"}
+          assert receipt["governance_contract"]["status"] == "PASS"
+          assert receipt["monthly_review_contract"]["status"] == "PASS"
+          assert receipt["comparison_baseline"]["market_count"] >= 500
+          assert receipt["catalog_quality_gate"]["status"] == "PASS"
+          assert receipt["historical_universe_membership_authorized"] is False
+          assert receipt["automatic_model_promotion_authorized"] is False
+          assert receipt["live_trading_authorized"] is False
+          PY
+
+      - name: Upload secret-free monthly evidence
+        if: steps.window.outputs.run_allowed == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: binance-spot-r2-monthly-v0-5-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            online-review/universe-review.json
+            online-review/publish-receipt.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Record intentional frozen-window skip
+        if: steps.window.outputs.run_allowed != 'true'
+        run: |
+          echo "V0.5 monthly review skipped before provider and R2 access: ${{ steps.window.outputs.stage }}"
+
+      - name: Remove ephemeral workspace outputs
+        if: always()
+        run: rm -rf -- online-review

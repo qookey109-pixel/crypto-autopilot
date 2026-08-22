@@ -1,0 +1,138 @@
+{
+  "version": "0.5.0",
+  "status": "R2_ONLY_TRAINING_GOVERNANCE_V0_5_AUTHORIZED_ON_MAIN_MERGE",
+  "authority_receipt": "research/receipts/2026-08-23-binance-spot-r2-training-governance-v0-5-authority.json",
+  "provider": "binance_spot",
+  "delivery": "binance_public_rest",
+  "dataset": "spot_1d_internal_training",
+  "schedule": {
+    "cron_utc": "37 2 * * 0",
+    "timezone_display": "Asia/Taipei Sunday 10:37",
+    "workflow_dispatch_enabled": true,
+    "provider_read_stop_utc": "2026-08-27T00:00:00Z",
+    "automatic_resume_after_stop": false,
+    "stop_reason": "Preserve the frozen V0.10 replacement-holdout boundary until a separate post-window authority exists."
+  },
+  "source": {
+    "market_data_base_url": "https://data-api.binance.vision",
+    "start_utc": "2020-01-01T00:00:00Z",
+    "end_policy": "LAST_COMPLETE_UTC_DAY",
+    "interval": "1d",
+    "quotes": ["USDT", "USDC"],
+    "requests_per_second": 5
+  },
+  "data_quality": {
+    "baseline_evidence": "research/receipts/2026-08-22-binance-spot-r2-automated-training-v0-3-pass.json",
+    "baseline_evidence_sha256": "c319dd3a721b58f9db216d24e2bdee739bcc5853251de1c3c2eb750ef1576deb",
+    "minimum_catalog_market_count": 500,
+    "minimum_audited_market_fraction": 0.9,
+    "maximum_provider_error_count": 0,
+    "minimum_market_count_fraction_of_previous": 0.8,
+    "minimum_audited_count_fraction_of_previous": 0.8,
+    "minimum_row_count_fraction_of_previous": 0.8
+  },
+  "storage": {
+    "backend": "cloudflare_r2",
+    "persistent_store": "cloudflare_r2_only",
+    "local_persistent_artifacts_authorized": false,
+    "github_actions_ephemeral_workspace_authorized": true,
+    "github_actions_artifact_evidence_authorized": true,
+    "schema_version": "v0.5",
+    "dataset_runs_namespace": "market-data/binance_spot/internal-training/v0.5/runs",
+    "training_namespace": "training/binance_spot/daily-direction/v0.5",
+    "latest_training_pointer_key": "training/binance_spot/daily-direction/v0.5/latest.json",
+    "publish_pass_stage": "BINANCE_SPOT_R2_TRAINING_GOVERNANCE_PUBLISHED_V0_5",
+    "free_only_hard_stop_bytes": 8000000000,
+    "fresh_whole_bucket_inventory_before_write": true,
+    "round_trip_sha256_verification_required": true,
+    "credentials_location": "github_actions_secrets_only"
+  },
+  "training": {
+    "output_schema_version": "v0.5",
+    "model_family": "deterministic_logistic_regression",
+    "target": "next_complete_daily_close_up",
+    "feature_names": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7"],
+    "asset_classes": ["crypto", "stablecoin", "tokenized_stock_candidate", "other"],
+    "audit_ok_required": true,
+    "minimum_train_samples": 200,
+    "minimum_test_samples": 50,
+    "max_train_samples_per_class": 200000,
+    "max_test_samples_per_class": 100000,
+    "epochs": 8,
+    "learning_rate": 0.08,
+    "l2": 0.0001,
+    "website_projection_authorized": false
+  },
+  "weekly_review": {
+    "schema_version": "v0.5",
+    "walk_forward_train_fractions": [0.6, 0.7, 0.8],
+    "minimum_fold_train_samples": 200,
+    "minimum_fold_validation_samples": 50,
+    "long_probability_threshold": 0.5,
+    "diagnostic_initial_equity_usd": 10000.0,
+    "quality_gate": {
+      "required_baseline_improvements": ["log_loss", "brier_score"],
+      "cost_scenario_name": "configured_base",
+      "minimum_net_growth_pct": 0.0,
+      "maximum_diagnostic_drawdown_pct": 50.0,
+      "maximum_symbol_signal_share": 0.1
+    },
+    "cost_scenarios": [
+      {
+        "name": "zero_cost_reference",
+        "taker_fee_bps_each_side": 0.0,
+        "slippage_bps_each_fill": 0.0
+      },
+      {
+        "name": "configured_base",
+        "taker_fee_bps_each_side": 5.0,
+        "slippage_bps_each_fill": 2.0
+      },
+      {
+        "name": "high_cost_stress",
+        "taker_fee_bps_each_side": 10.0,
+        "slippage_bps_each_fill": 5.0
+      }
+    ]
+  },
+  "monthly_universe_review": {
+    "schema_version": "v0.5",
+    "cron_utc": "37 3 1 * *",
+    "timezone_display": "Asia/Taipei first day 11:37",
+    "namespace": "research/binance_spot/universe-review/v0.5",
+    "latest_pointer_key": "research/binance_spot/universe-review/v0.5/latest.json",
+    "initial_activation": {
+      "mode": "ONE_TIME_MANUAL_WORKFLOW_DISPATCH",
+      "purpose": "CREATE_INITIAL_V0_5_MONTHLY_BASELINE",
+      "required": true,
+      "must_complete_before_utc": "2026-08-27T00:00:00Z",
+      "push_trigger_authorized": false,
+      "repeat_manual_activation_authorized": false
+    },
+    "current_catalog_absence_is_delisting_proof": false,
+    "historical_universe_membership_authorized": false
+  },
+  "authority": {
+    "github_actions_weekly_sync_authorized": true,
+    "github_actions_monthly_universe_review_authorized": true,
+    "binance_public_market_reads_authorized": true,
+    "production_r2_client_construction_authorized": true,
+    "production_r2_reads_authorized": true,
+    "production_r2_writes_authorized_for_exact_namespaces": true,
+    "automated_research_model_training_authorized": true,
+    "dataset_quality_gates_authorized": true,
+    "walk_forward_research_diagnostics_authorized": true,
+    "cost_drawdown_exposure_diagnostics_authorized": true,
+    "monthly_classification_review_authorized": true,
+    "formal_backtest_admission_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "source_switch_authorized": false,
+    "holdout_access_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

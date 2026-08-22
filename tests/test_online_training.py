@@ -3,7 +3,11 @@ from __future__ import annotations
 import math
 import unittest
 
-from crypto_autopilot.online_training import DAY_MS, train_daily_direction_models
+from crypto_autopilot.online_training import (
+    DAILY_DIRECTION_FEATURE_NAMES,
+    DAY_MS,
+    train_daily_direction_models,
+)
 
 
 class OnlineTrainingTests(unittest.TestCase):
@@ -60,8 +64,15 @@ class OnlineTrainingTests(unittest.TestCase):
         self.assertEqual(model["status"], "PASS")
         self.assertEqual(model["models"]["crypto"]["status"], "PASS")
         self.assertEqual(model["models"]["tokenized_stock_candidate"]["status"], "NOT_READY")
+        self.assertEqual(
+            model["feature_contract"]["ordered_names"],
+            list(DAILY_DIRECTION_FEATURE_NAMES),
+        )
         self.assertGreater(metrics["classes"]["crypto"]["test"]["samples"], 40)
         self.assertFalse(model["authority"]["live_trading_authorized"])
+        self.assertEqual(metrics["mode"], "RESEARCH_DIAGNOSTICS_ONLY")
+        self.assertFalse(metrics["authority"]["automatic_model_promotion_authorized"])
+        self.assertFalse(metrics["authority"]["live_trading_authorized"])
 
     def test_rejects_rows_marked_audit_false(self) -> None:
         rows = [
@@ -76,7 +87,7 @@ class OnlineTrainingTests(unittest.TestCase):
             for day in range(500)
         ]
         config = {
-            "feature_names": ["a", "b", "c", "d", "e"],
+            "feature_names": list(DAILY_DIRECTION_FEATURE_NAMES),
             "asset_classes": ["crypto"],
             "minimum_train_samples": 10,
             "minimum_test_samples": 5,
@@ -95,6 +106,28 @@ class OnlineTrainingTests(unittest.TestCase):
             generated_at_utc="2026-08-22T00:00:00Z",
         )
         self.assertEqual(model["status"], "NOT_READY")
+
+    def test_feature_contract_rejects_reordered_or_renamed_labels(self) -> None:
+        config = {
+            "feature_names": list(reversed(DAILY_DIRECTION_FEATURE_NAMES)),
+            "asset_classes": ["crypto"],
+            "minimum_train_samples": 10,
+            "minimum_test_samples": 5,
+            "max_train_samples_per_class": 100,
+            "max_test_samples_per_class": 100,
+            "epochs": 1,
+            "learning_rate": 0.1,
+            "l2": 0.0,
+            "target": "next_complete_daily_close_up",
+        }
+        with self.assertRaisesRegex(ValueError, "feature contract mismatch"):
+            train_daily_direction_models(
+                [],
+                training_config=config,
+                data_sha256="c" * 64,
+                end_exclusive_ms=600 * DAY_MS,
+                generated_at_utc="2026-08-22T00:00:00Z",
+            )
 
 
 if __name__ == "__main__":
