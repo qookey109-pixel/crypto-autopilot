@@ -190,4 +190,8 @@ Read in this order for current work:
 4. [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 5. [`docs/STRATEGY_V0_1.md`](docs/STRATEGY_V0_1.md) and [`config/strategy_v0_1.json`](config/strategy_v0_1.json)
 
+The offline research governance extension is documented in
+[`docs/RESEARCH_GOVERNANCE_V0_1.md`](docs/RESEARCH_GOVERNANCE_V0_1.md) and
+configured by [`config/research_governance_v0_1.json`](config/research_governance_v0_1.json).
+
 Historical receipts remain immutable evidence even when a later version supersedes their execution role.

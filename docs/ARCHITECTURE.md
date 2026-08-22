@@ -97,3 +97,18 @@ Strategy and risk code must not call Pionex-specific APIs directly. Exchange-spe
 - Replacement holdout remains `FROZEN_UNOPENED` until a separate holdout-access authority exists.
 - No LLM or runtime may bypass deterministic risk, provenance, storage, authority or kill-switch rules.
 - If live trading is ever separately authorized, the exchange becomes authoritative for actual balances, positions, orders and fills, and internal state must reconcile after restart/API uncertainty.
+
+## Research governance layer V0.1
+
+Offline research may use the separate governance layer in
+`docs/RESEARCH_GOVERNANCE_V0_1.md`:
+
+```text
+lineage manifest → partition integrity → immutable experiment registry
+                                      ↘ bounded resource-aware ordering
+```
+
+This layer records input/config/environment fingerprints and compares only
+compatible runs. It has no provider, R2, holdout, trade-plan, promotion or
+deployment authority. The V0.10 production-critical path and the paper-only
+boundary remain unchanged.
