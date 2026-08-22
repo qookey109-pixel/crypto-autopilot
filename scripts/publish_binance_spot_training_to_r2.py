@@ -32,6 +32,7 @@ def main() -> int:
     parser.add_argument("--dataset-receipt", required=True)
     parser.add_argument("--model", required=True)
     parser.add_argument("--metrics", required=True)
+    parser.add_argument("--weekly-review")
     parser.add_argument("--run-id", default=os.getenv("GITHUB_RUN_ID") or "local")
     parser.add_argument("--output", required=True)
     parser.add_argument("--dry-run", action="store_true")
@@ -39,11 +40,19 @@ def main() -> int:
     output = require_ephemeral_output(args.output)
 
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
-    authority = json.loads(AUTHORITY_PATH.read_text(encoding="utf-8"))
-    if config.get("status") != "R2_FIRST_AUTOMATED_TRAINING_AUTHORIZED_ON_MAIN_MERGE":
-        raise RuntimeError("V0.3 R2-first configuration is not authorized")
-    if authority.get("status") != "AUTHORIZED_ON_MAIN_MERGE":
-        raise RuntimeError("V0.3 R2-first authority receipt is not active")
+    authority_path = Path(config.get("authority_receipt") or AUTHORITY_PATH)
+    authority = json.loads(authority_path.read_text(encoding="utf-8"))
+    allowed_statuses = {
+        "R2_FIRST_AUTOMATED_TRAINING_AUTHORIZED_ON_MAIN_MERGE",
+        "R2_ONLY_WEEKLY_MODEL_REVIEW_AUTHORIZED_ON_MAIN_MERGE",
+    }
+    if config.get("status") not in allowed_statuses:
+        raise RuntimeError("R2-first configuration is not authorized")
+    if authority.get("status") not in {
+        "AUTHORIZED_ON_MAIN_MERGE",
+        "WEEKLY_MODEL_REVIEW_AUTHORIZED_ON_MAIN_MERGE",
+    }:
+        raise RuntimeError("R2-first authority receipt is not active")
     boundary = config.get("authority") or {}
     for key in (
         "production_r2_client_construction_authorized",
@@ -73,6 +82,8 @@ def main() -> int:
             ("metrics", args.metrics),
         )
     }
+    if args.weekly_review:
+        payloads["weekly_review"] = Path(args.weekly_review).read_bytes()
     dataset_receipt = json.loads(payloads["dataset_receipt"])
     model = json.loads(payloads["model"])
     metrics = json.loads(payloads["metrics"])
@@ -91,6 +102,15 @@ def main() -> int:
         or metrics.get("model_file_sha256") != actual_model_sha
     ):
         raise RuntimeError("training metrics lineage does not match the publish payloads")
+    weekly_review = None
+    if "weekly_review" in config:
+        weekly_review = json.loads(payloads.get("weekly_review") or b"{}")
+        if (
+            weekly_review.get("status") != "PASS"
+            or weekly_review.get("mode") != "RESEARCH_DIAGNOSTICS_ONLY"
+            or weekly_review.get("data_sha256") != actual_data_sha
+        ):
+            raise RuntimeError("weekly model review lineage is not a research-only PASS")
 
     generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
     objects = build_online_objects(
@@ -101,12 +121,14 @@ def main() -> int:
         dataset_receipt=payloads["dataset_receipt"],
         model=payloads["model"],
         metrics=payloads["metrics"],
+        weekly_review=payloads.get("weekly_review"),
         generated_at_utc=generated_at,
     )
     if args.dry_run:
+        schema_version = str(config["storage"].get("schema_version", "v0.3"))
         result = {
             "status": "PREPARED",
-            "stage": "BINANCE_SPOT_R2_AUTOMATED_TRAINING_DRY_RUN_V0_3",
+            "stage": f"BINANCE_SPOT_R2_TRAINING_DRY_RUN_{schema_version.upper()}",
             "planned_write_bytes": sum(len(item.payload) for item in objects),
             "objects": [
                 {
@@ -133,6 +155,13 @@ def main() -> int:
             store=store,
             objects=objects,
             hard_stop_bytes=int(config["storage"]["free_only_hard_stop_bytes"]),
+            pass_stage=str(
+                config["storage"].get(
+                    "publish_pass_stage",
+                    "BINANCE_SPOT_R2_AUTOMATED_TRAINING_PUBLISHED_V0_3",
+                )
+            ),
+            metadata_version=str(config["storage"].get("schema_version", "v0.3")),
         )
     result.update(
         {

@@ -17,6 +17,7 @@ class Example:
     time_ms: int
     features: tuple[float, ...]
     label: int
+    forward_return: float
 
 
 def _ratio(current: float, reference: float) -> float:
@@ -25,7 +26,9 @@ def _ratio(current: float, reference: float) -> float:
     return current / reference - 1.0
 
 
-def _examples(rows: list[dict[str, Any]], *, end_exclusive_ms: int) -> dict[str, list[Example]]:
+def build_daily_direction_examples(
+    rows: list[dict[str, Any]], *, end_exclusive_ms: int
+) -> dict[str, list[Example]]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
         if row.get("audit_ok") is not True:
@@ -64,12 +67,13 @@ def _examples(rows: list[dict[str, Any]], *, end_exclusive_ms: int) -> dict[str,
                     time_ms=int(current["open_time_ms"]),
                     features=features,
                     label=int(float(next_row["close"]) > close),
+                    forward_return=_ratio(float(next_row["close"]), close),
                 )
             )
     return result
 
 
-def _bounded(items: list[Example], limit: int) -> list[Example]:
+def bound_daily_direction_examples(items: list[Example], limit: int) -> list[Example]:
     ordered = sorted(items, key=lambda item: (item.time_ms, item.symbol))
     if len(ordered) <= limit:
         return ordered
@@ -123,6 +127,70 @@ def _metrics(
     }
 
 
+def fit_daily_direction_examples(
+    items: list[Example], *, training_config: dict[str, Any], feature_names: list[str]
+) -> dict[str, Any]:
+    if not items:
+        raise ValueError("cannot fit a model without examples")
+    means, stds = _normalization(items)
+    weights = [0.0] * len(feature_names)
+    positive_rate = sum(item.label for item in items) / len(items)
+    bias = math.log(max(1e-6, positive_rate) / max(1e-6, 1.0 - positive_rate))
+    learning_rate = float(training_config["learning_rate"])
+    l2 = float(training_config["l2"])
+    epochs = int(training_config["epochs"])
+    for epoch in range(epochs):
+        gradients = [0.0] * len(weights)
+        bias_gradient = 0.0
+        for item in items:
+            features = _normalized(item, means, stds)
+            prediction = _sigmoid(
+                bias + sum(weight * value for weight, value in zip(weights, features))
+            )
+            error = prediction - item.label
+            bias_gradient += error
+            for index, value in enumerate(features):
+                gradients[index] += error * value
+        rate = learning_rate / (1.0 + epoch * 0.25)
+        bias -= rate * bias_gradient / len(items)
+        for index in range(len(weights)):
+            weights[index] -= rate * (
+                gradients[index] / len(items) + l2 * weights[index]
+            )
+    return {
+        "feature_names": feature_names,
+        "feature_means": means,
+        "feature_standard_deviations": stds,
+        "weights": weights,
+        "bias": bias,
+    }
+
+
+def predict_daily_direction_probability(item: Example, model: dict[str, Any]) -> float:
+    features = _normalized(
+        item,
+        list(model["feature_means"]),
+        list(model["feature_standard_deviations"]),
+    )
+    return _sigmoid(
+        float(model["bias"])
+        + sum(
+            float(weight) * value
+            for weight, value in zip(model["weights"], features)
+        )
+    )
+
+
+def daily_direction_metrics(items: list[Example], model: dict[str, Any]) -> dict[str, float | int]:
+    return _metrics(
+        items,
+        list(model["weights"]),
+        float(model["bias"]),
+        list(model["feature_means"]),
+        list(model["feature_standard_deviations"]),
+    )
+
+
 def train_daily_direction_models(
     rows: list[dict[str, Any]],
     *,
@@ -132,7 +200,7 @@ def train_daily_direction_models(
     generated_at_utc: str,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     feature_names = list(training_config["feature_names"])
-    examples = _examples(rows, end_exclusive_ms=end_exclusive_ms)
+    examples = build_daily_direction_examples(rows, end_exclusive_ms=end_exclusive_ms)
     models: dict[str, Any] = {}
     class_metrics: dict[str, Any] = {}
 
@@ -146,11 +214,11 @@ def train_daily_direction_models(
             continue
         timestamps = sorted(item.time_ms for item in items)
         split_time_ms = timestamps[min(len(timestamps) - 1, int(len(timestamps) * 0.8))]
-        train = _bounded(
+        train = bound_daily_direction_examples(
             [item for item in items if item.time_ms < split_time_ms],
             int(training_config["max_train_samples_per_class"]),
         )
-        test = _bounded(
+        test = bound_daily_direction_examples(
             [item for item in items if item.time_ms >= split_time_ms],
             int(training_config["max_test_samples_per_class"]),
         )
@@ -165,44 +233,22 @@ def train_daily_direction_models(
             }
             continue
 
-        means, stds = _normalization(train)
-        weights = [0.0] * len(feature_names)
-        positive_rate = sum(item.label for item in train) / len(train)
-        bias = math.log(max(1e-6, positive_rate) / max(1e-6, 1.0 - positive_rate))
-        learning_rate = float(training_config["learning_rate"])
-        l2 = float(training_config["l2"])
-        epochs = int(training_config["epochs"])
-        for epoch in range(epochs):
-            gradients = [0.0] * len(weights)
-            bias_gradient = 0.0
-            for item in train:
-                features = _normalized(item, means, stds)
-                prediction = _sigmoid(
-                    bias + sum(weight * value for weight, value in zip(weights, features))
-                )
-                error = prediction - item.label
-                bias_gradient += error
-                for index, value in enumerate(features):
-                    gradients[index] += error * value
-            rate = learning_rate / (1.0 + epoch * 0.25)
-            bias -= rate * bias_gradient / len(train)
-            for index in range(len(weights)):
-                weights[index] -= rate * (gradients[index] / len(train) + l2 * weights[index])
+        fitted = fit_daily_direction_examples(
+            train,
+            training_config=training_config,
+            feature_names=feature_names,
+        )
 
         models[str(asset_class)] = {
             "status": "PASS",
             "split_time_ms": split_time_ms,
-            "feature_names": feature_names,
-            "feature_means": means,
-            "feature_standard_deviations": stds,
-            "weights": weights,
-            "bias": bias,
+            **fitted,
         }
         class_metrics[str(asset_class)] = {
             "status": "PASS",
             "examples": len(items),
-            "train": _metrics(train, weights, bias, means, stds),
-            "test": _metrics(test, weights, bias, means, stds),
+            "train": daily_direction_metrics(train, fitted),
+            "test": daily_direction_metrics(test, fitted),
         }
 
     status = "PASS" if models.get("crypto", {}).get("status") == "PASS" else "NOT_READY"

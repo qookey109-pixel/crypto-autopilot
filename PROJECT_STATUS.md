@@ -14,17 +14,37 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ## Current formal stage
 
-**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 AUTHORIZED BOUNDED / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
+**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 WEEKLY TRAINING V0.4 AUTHORIZED / BINANCE SPOT MONTHLY UNIVERSE REVIEW V0.4 AUTHORIZED / V0.3 DAILY TRAINING RETIRED / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 AUTHORIZED BOUNDED / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
 
-### Binance Spot R2 Automated Training V0.3 — ONLINE PASS
+### Binance Spot R2 Weekly Training and Review V0.4 — AUTHORIZED
+
+- V0.3 daily execution is retired. V0.4 trains once per week at Sunday
+  `02:37 UTC` (`10:37 Asia/Taipei`).
+- Each weekly run rebuilds the provider-separated dataset, trains the deterministic
+  daily-direction model, and writes an immutable weekly review containing expanding
+  walk-forward folds, fee/slippage sensitivity, diagnostic maximum drawdown and
+  model-signal exposure concentration.
+- Monthly universe review runs on day 1 at `03:37 UTC` (`11:37 Asia/Taipei`). It
+  compares active-market snapshots, catalog absences and heuristic tokenized-stock
+  classification changes. Catalog absence is not treated as proof of delisting.
+- The current-active catalog cannot authorize historical universe membership;
+  survivorship bias remains `REVIEW_REQUIRED` and formal backtest admission remains
+  false.
+- Both schedules stop before provider or R2 access at
+  `2026-08-27T00:00:00Z`. Automatic post-window resume is not authorized.
+- Cloudflare R2 remains the only persistent generated-data store. Secret-free
+  evidence is retained online and runner workspaces are removed at the end.
+- Model promotion, source switching, holdout access, trade plans, real-money orders
+  and live trading remain unauthorized.
+
+### Binance Spot R2 Automated Training V0.3 — HISTORICAL ONLINE PASS / DAILY RETIRED
 
 - Cloudflare R2 is the only persistent generated-data store for immutable Binance
   Spot 1D internal-training snapshots. GitHub runner files are ephemeral and are
   explicitly removed after online evidence upload; local repository artifacts
   are forbidden.
-- GitHub Actions performs a daily public catalog/history refresh, deterministic
-  research-only model training, fresh whole-bucket 8 GB headroom gate, exact R2
-  uploads and SHA-256 round-trip verification.
+- Its successful online runs remain immutable evidence. V0.4 supersedes the daily
+  schedule with weekly training and monthly catalog review.
 - R2 credentials remain in GitHub Actions secrets only. Raw history is not
   projected to GitHub Pages.
 - The latest training pointer is written only after immutable dataset,

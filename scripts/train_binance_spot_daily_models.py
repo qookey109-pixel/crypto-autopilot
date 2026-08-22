@@ -10,6 +10,7 @@ import pyarrow.parquet as pq
 
 from crypto_autopilot.online_training import train_daily_direction_models
 from crypto_autopilot.ephemeral_storage import require_ephemeral_output
+from crypto_autopilot.weekly_model_review import build_weekly_model_review
 
 
 def main() -> int:
@@ -18,13 +19,21 @@ def main() -> int:
     parser.add_argument("--dataset", required=True)
     parser.add_argument("--model-output", required=True)
     parser.add_argument("--metrics-output", required=True)
+    parser.add_argument("--review-output")
     args = parser.parse_args()
     model_output = require_ephemeral_output(args.model_output)
     metrics_output = require_ephemeral_output(args.metrics_output)
+    review_output = (
+        require_ephemeral_output(args.review_output) if args.review_output else None
+    )
 
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
-    if config.get("status") != "R2_FIRST_AUTOMATED_TRAINING_AUTHORIZED_ON_MAIN_MERGE":
-        raise RuntimeError("V0.3 automated training authority is not active")
+    allowed_statuses = {
+        "R2_FIRST_AUTOMATED_TRAINING_AUTHORIZED_ON_MAIN_MERGE",
+        "R2_ONLY_WEEKLY_MODEL_REVIEW_AUTHORIZED_ON_MAIN_MERGE",
+    }
+    if config.get("status") not in allowed_statuses:
+        raise RuntimeError("automated training authority is not active")
     authority = config.get("authority") or {}
     if authority.get("automated_research_model_training_authorized") is not True:
         raise RuntimeError("automated research training is not authorized")
@@ -62,6 +71,24 @@ def main() -> int:
     ):
         path_value.parent.mkdir(parents=True, exist_ok=True)
         path_value.write_bytes(payload)
+    if "weekly_review" in config:
+        if review_output is None:
+            raise RuntimeError("weekly review output is required by V0.4")
+        review = build_weekly_model_review(
+            rows,
+            training_config=config["training"],
+            review_config=config["weekly_review"],
+            data_sha256=data_sha256,
+            end_exclusive_ms=int(stop.timestamp() * 1000),
+            generated_at_utc=generated,
+        )
+        review_output.parent.mkdir(parents=True, exist_ok=True)
+        review_output.write_text(
+            json.dumps(review, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        if review["status"] != "PASS":
+            return 2
     print(json.dumps({"status": model["status"], "data_sha256": data_sha256, "classes": list(model["models"])}, ensure_ascii=False))
     return 0 if model["status"] == "PASS" else 2
 

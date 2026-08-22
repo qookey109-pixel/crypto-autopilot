@@ -36,6 +36,7 @@ def build_online_objects(
     dataset_receipt: bytes,
     model: bytes,
     metrics: bytes,
+    weekly_review: bytes | None = None,
     generated_at_utc: str,
 ) -> tuple[OnlineObject, ...]:
     if not _RUN_ID_RE.fullmatch(run_id):
@@ -51,8 +52,19 @@ def build_online_objects(
         OnlineObject(f"{run_prefix}/model.json", model, "application/json", True, "model"),
         OnlineObject(f"{run_prefix}/metrics.json", metrics, "application/json", True, "metrics"),
     ]
+    if weekly_review is not None:
+        base.append(
+            OnlineObject(
+                f"{run_prefix}/weekly-review.json",
+                weekly_review,
+                "application/json",
+                True,
+                "weekly_review",
+            )
+        )
+    schema_version = str(storage.get("schema_version", "v0.3"))
     manifest = {
-        "schema": "binance-spot-r2-automated-training-run-v0.3",
+        "schema": f"binance-spot-r2-automated-training-run-{schema_version}",
         "status": "PASS",
         "mode": "RESEARCH_TRAINING_ONLY",
         "provider": "binance_spot",
@@ -84,7 +96,7 @@ def build_online_objects(
         "manifest",
     )
     latest = {
-        "schema": "binance-spot-r2-automated-training-latest-v0.3",
+        "schema": f"binance-spot-r2-automated-training-latest-{schema_version}",
         "provider": "binance_spot",
         "run_id": run_id,
         "generated_at_utc": generated_at_utc,
@@ -99,6 +111,9 @@ def build_online_objects(
         "model_key": f"{run_prefix}/model.json",
         "model_sha256": sha256_bytes(model),
     }
+    if weekly_review is not None:
+        latest["weekly_review_key"] = f"{run_prefix}/weekly-review.json"
+        latest["weekly_review_sha256"] = sha256_bytes(weekly_review)
     latest_object = OnlineObject(
         str(storage["latest_training_pointer_key"]),
         json_bytes(latest),
@@ -124,6 +139,8 @@ def publish_online_objects(
     objects: tuple[OnlineObject, ...],
     hard_stop_bytes: int,
     inventory_fn: Callable[[Any], int] = current_bucket_bytes,
+    pass_stage: str = "BINANCE_SPOT_R2_AUTOMATED_TRAINING_PUBLISHED_V0_3",
+    metadata_version: str = "v0.3",
 ) -> dict[str, Any]:
     current_bytes = inventory_fn(store)
     planned_bytes = sum(len(item.payload) for item in objects)
@@ -165,7 +182,7 @@ def publish_online_objects(
                 item.key,
                 item.payload,
                 content_type=item.content_type,
-                metadata={"provider": "binance_spot", "role": item.role, "version": "v0.3"},
+                metadata={"provider": "binance_spot", "role": item.role, "version": metadata_version},
             )
             receipt = asdict(uploaded)
         verified = store.get_bytes_verified(item.key, expected_sha256=str(receipt["sha256"]))
@@ -175,7 +192,7 @@ def publish_online_objects(
 
     return {
         "status": "PASS",
-        "stage": "BINANCE_SPOT_R2_AUTOMATED_TRAINING_PUBLISHED_V0_3",
+        "stage": pass_stage,
         "current_bucket_bytes_before_write": current_bytes,
         "planned_write_bytes": planned_bytes,
         "hard_stop_bytes": hard_stop_bytes,

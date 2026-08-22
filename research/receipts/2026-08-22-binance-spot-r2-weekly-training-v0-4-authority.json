@@ -1,0 +1,26 @@
+{
+  "schema": "binance-spot-r2-weekly-training-authority-v0.4",
+  "status": "WEEKLY_MODEL_REVIEW_AUTHORIZED_ON_MAIN_MERGE",
+  "authorized_at_utc": "2026-08-22T14:20:27Z",
+  "request": "Change model training to weekly, add weekly walk-forward/cost/drawdown/exposure diagnostics, and add monthly market-list/delisting/survivorship/tokenized-stock classification review.",
+  "weekly_schedule_utc": "37 2 * * 0",
+  "monthly_schedule_utc": "37 3 1 * *",
+  "provider_read_stop_utc": "2026-08-27T00:00:00Z",
+  "persistent_generated_data_store": "cloudflare_r2_only",
+  "authority": {
+    "weekly_research_model_training_authorized": true,
+    "weekly_walk_forward_diagnostics_authorized": true,
+    "weekly_cost_drawdown_exposure_diagnostics_authorized": true,
+    "monthly_universe_review_authorized": true,
+    "formal_backtest_admission_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "current_catalog_absence_is_delisting_proof": false,
+    "historical_universe_membership_authorized": false,
+    "website_raw_history_projection_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
