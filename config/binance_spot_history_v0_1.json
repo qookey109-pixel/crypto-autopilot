@@ -3,6 +3,7 @@
   "status": "LOCAL_RESEARCH_AUTHORIZED",
   "provider": "binance_spot",
   "delivery": "binance_public_rest",
+  "market_data_base_url": "https://data-api.binance.vision",
   "start_utc": "2020-01-01T00:00:00Z",
   "end_policy": "LAST_COMPLETE_UTC_DAY",
   "interval": "1d",
