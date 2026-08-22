@@ -6,7 +6,8 @@ deployment feed, a Pionex replacement, a trade plan, or a live-order surface.
 ## Scope
 
 - Provider: `binance_spot` public REST API.
-- Catalog endpoint: `https://api.binance.com/api/v3/exchangeInfo`.
+- Catalog endpoint: Binance's official public-market-data-only endpoint,
+  `https://data-api.binance.vision/api/v3/exchangeInfo`.
 - K-lines: `1d`, from `2020-01-01T00:00:00Z` through the latest complete UTC day.
 - Default quote assets: `USDT` and `USDC`.
 - The catalog retains current `TRADING` markets with spot trading enabled and

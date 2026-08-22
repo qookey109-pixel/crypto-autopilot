@@ -14,6 +14,7 @@ class BinanceSpotHistoryConfigTests(unittest.TestCase):
             (ROOT / "config" / "binance_spot_history_v0_1.json").read_text(encoding="utf-8")
         )
         self.assertEqual(config["provider"], "binance_spot")
+        self.assertEqual(config["market_data_base_url"], "https://data-api.binance.vision")
         self.assertEqual(config["start_utc"], "2020-01-01T00:00:00Z")
         self.assertEqual(config["interval"], "1d")
         self.assertEqual(len(config["symbols"]), 15)

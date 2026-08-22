@@ -14,7 +14,7 @@ from crypto_autopilot.binance_training_catalog import (
 )
 
 
-ENDPOINT = "https://api.binance.com/api/v3/exchangeInfo"
+ENDPOINT = "https://data-api.binance.vision/api/v3/exchangeInfo"
 
 
 def fetch_exchange_info(timeout_seconds: float = 30.0) -> dict:

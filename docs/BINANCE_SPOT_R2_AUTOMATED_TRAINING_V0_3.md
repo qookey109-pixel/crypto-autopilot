@@ -10,7 +10,7 @@ truth.
 ```text
 GitHub Actions daily schedule / manual dispatch
   -> frozen-window guard (before provider or R2 access)
-  -> Binance public Spot catalog (USDT + USDC)
+  -> Binance market-data-only Spot catalog (USDT + USDC)
   -> complete 1D history build and audit
   -> deterministic time-split research model training
   -> fresh whole-bucket R2 inventory / 8 GB hard stop

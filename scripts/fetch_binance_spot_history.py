@@ -131,7 +131,7 @@ def projection(config: dict[str, object], series: list[BinanceSpotSeries], gener
         "interval": str(config["interval"]),
         "requestedStartUtc": str(config["start_utc"]),
         "generatedAtUtc": generated_at,
-        "sourceEndpoint": "https://api.binance.com/api/v3/klines",
+        "sourceEndpoint": "https://data-api.binance.vision/api/v3/klines",
         "interpretation": "Binance Spot research projection; not Pionex-native and not a trade signal.",
         "markets": markets,
         "authorityBoundary": config["authority"],

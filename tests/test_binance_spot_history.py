@@ -5,6 +5,7 @@ import unittest
 from urllib.parse import parse_qs, urlparse
 
 from crypto_autopilot.binance_spot_history import (
+    BINANCE_SPOT_KLINES_URL,
     BinanceSpotHistoryError,
     fetch_spot_history,
     parse_spot_kline,
@@ -32,6 +33,12 @@ def row(timestamp: int, close: str = "101") -> list[object]:
 
 
 class BinanceSpotHistoryTests(unittest.TestCase):
+    def test_uses_official_market_data_only_endpoint(self) -> None:
+        self.assertEqual(
+            BINANCE_SPOT_KLINES_URL,
+            "https://data-api.binance.vision/api/v3/klines",
+        )
+
     def test_parse_spot_kline_preserves_provider_fields(self) -> None:
         candle = parse_spot_kline("BTCUSDT", row(1_577_836_800_000))
         self.assertEqual(candle.symbol, "BTCUSDT")

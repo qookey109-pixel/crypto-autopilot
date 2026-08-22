@@ -148,7 +148,7 @@ def catalog_payload(
         "status": "LOCAL_INTERNAL_TRAINING_AUTHORIZED",
         "provider": "binance_spot",
         "market_type": "spot",
-        "source_endpoint": "https://api.binance.com/api/v3/exchangeInfo",
+        "source_endpoint": "https://data-api.binance.vision/api/v3/exchangeInfo",
         "retrieved_at_utc": retrieved_at_utc,
         "quote_filter": {"all_quotes": all_quotes, "quotes": quotes},
         "classification_note": "Tokenized stock labels are heuristic candidates only; exchangeInfo does not establish equity equivalence.",

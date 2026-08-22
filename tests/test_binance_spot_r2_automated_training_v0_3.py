@@ -24,6 +24,10 @@ class BinanceSpotR2AutomatedTrainingV03Tests(unittest.TestCase):
             self.config["status"], "R2_FIRST_AUTOMATED_TRAINING_AUTHORIZED_ON_MAIN_MERGE"
         )
         self.assertEqual(self.authority["status"], "AUTHORIZED_ON_MAIN_MERGE")
+        self.assertEqual(
+            self.config["source"]["market_data_base_url"],
+            "https://data-api.binance.vision",
+        )
         boundary = self.config["authority"]
         self.assertTrue(boundary["production_r2_writes_authorized_for_exact_namespaces"])
         self.assertTrue(boundary["automated_research_model_training_authorized"])

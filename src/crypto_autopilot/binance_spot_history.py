@@ -15,7 +15,7 @@ from .historical import audit_candles
 from .models import Candle
 
 
-BINANCE_SPOT_KLINES_URL = "https://api.binance.com/api/v3/klines"
+BINANCE_SPOT_KLINES_URL = "https://data-api.binance.vision/api/v3/klines"
 BINANCE_SPOT_INTERVAL_MS = {"1d": 24 * 60 * 60 * 1000}
 PROJECT_INTERVAL = {"1d": "1D"}
 _SYMBOL_RE = re.compile(r"^[A-Z0-9]{5,24}$")
