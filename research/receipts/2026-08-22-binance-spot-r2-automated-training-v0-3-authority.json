@@ -1,0 +1,43 @@
+{
+  "schema": "binance-spot-r2-automated-training-authority-v0.3",
+  "status": "AUTHORIZED_ON_MAIN_MERGE",
+  "stage": "BINANCE_SPOT_R2_FIRST_AUTOMATED_TRAINING_V0_3",
+  "date": "2026-08-22",
+  "provider": "binance_spot",
+  "execution_exchange": "pionex",
+  "native_to_execution_exchange": false,
+  "authority_source": "User explicitly requested online-first R2 storage and automated training on 2026-08-22.",
+  "config": "config/binance_spot_r2_automated_training_v0_3.json",
+  "authorized_scope": {
+    "public_catalog_and_1d_history_reads": true,
+    "quotes": ["USDT", "USDC"],
+    "cloudflare_r2_immutable_dataset_snapshot_writes": true,
+    "github_actions_daily_schedule": true,
+    "deterministic_research_model_training": true,
+    "training_model_and_metrics_r2_writes": true,
+    "website_raw_history_projection": false
+  },
+  "mandatory_guards": {
+    "free_only_hard_stop_bytes": 8000000000,
+    "fresh_whole_bucket_inventory_before_each_write": true,
+    "r2_round_trip_sha256_verification": true,
+    "r2_credentials_in_github_actions_secrets_only": true,
+    "provider_read_stop_utc": "2026-08-27T00:00:00Z",
+    "automatic_resume_after_stop": false,
+    "audit_failures_retained_with_explicit_flag": true,
+    "dataset_snapshot_objects_immutable": true,
+    "latest_pointer_written_last": true
+  },
+  "explicitly_not_authorized": {
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "source_switch_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "private_exchange_api_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

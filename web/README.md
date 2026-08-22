@@ -63,6 +63,10 @@ artifact with its latest bounded public-data replay. The browser only renders
 candidate signals, simulated trades and aggregate metrics. It cannot contact
 Pionex, submit Demo orders or mutate Repository state.
 
+Historical Binance and other provider datasets are kept in ignored local
+research artifacts for internal training only. They are not copied into the
+dashboard and must remain provider-separated from Pionex evidence.
+
 ## Views
 
 - Overview

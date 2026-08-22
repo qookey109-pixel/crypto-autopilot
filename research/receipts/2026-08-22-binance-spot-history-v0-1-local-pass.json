@@ -1,0 +1,48 @@
+{
+  "schema": "binance-spot-history-local-pass-v0.1",
+  "status": "PASS",
+  "stage": "BINANCE_SPOT_LOCAL_RESEARCH_PASS",
+  "date": "2026-08-22",
+  "provider": "binance_spot",
+  "delivery": "binance_public_rest",
+  "requested_start_utc": "2020-01-01T00:00:00Z",
+  "captured_through_utc": "2026-08-21T00:00:00Z",
+  "requested_symbol_count": 15,
+  "available_symbol_count": 14,
+  "no_data_symbols": ["HYPEUSDT"],
+  "row_count": 31402,
+  "local_artifacts": {
+    "git_ignored": true,
+    "csv_gzip": {
+      "path": "artifacts/binance-spot-history-v0-1/binance-spot-daily-2020-to-present.csv.gz",
+      "sha256": "ba07775135d768432d949d9761bacb517218db34feb82c5ea26144699f7483bb",
+      "bytes": 1078700
+    },
+    "parquet": {
+      "path": "artifacts/binance-spot-history-v0-1/binance-spot-daily-2020-to-present.parquet",
+      "sha256": "11df663e4768b6c698c438543f038ca14687868f3e03e656dcb3b779b5a39847",
+      "bytes": 1440351
+    }
+  },
+  "validation": {
+    "available_series_audit_ok": true,
+    "duplicate_timestamps_forbidden": true,
+    "strict_timestamp_order_required": true,
+    "daily_alignment_required": true,
+    "gaps_forbidden_after_listing": true,
+    "invalid_ohlcv_forbidden": true,
+    "silent_interpolation_used": false,
+    "provider_splicing_used": false
+  },
+  "authority_boundary": {
+    "dashboard_projection_authority": false,
+    "production_r2_access_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "source_switch_authorized": false,
+    "holdout_access_authorized": false,
+    "trade_kline_w1_materialization_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
