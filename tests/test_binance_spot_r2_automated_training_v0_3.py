@@ -15,6 +15,11 @@ class BinanceSpotR2AutomatedTrainingV03Tests(unittest.TestCase):
                 "research/receipts/2026-08-22-binance-spot-r2-automated-training-v0-3-authority.json"
             ).read_text()
         )
+        self.online_pass = json.loads(
+            Path(
+                "research/receipts/2026-08-22-binance-spot-r2-automated-training-v0-3-pass.json"
+            ).read_text()
+        )
         self.workflow = Path(
             ".github/workflows/binance-spot-r2-automated-training-v0-3.yml"
         ).read_text()
@@ -48,6 +53,16 @@ class BinanceSpotR2AutomatedTrainingV03Tests(unittest.TestCase):
         self.assertLess(guard, secret)
         self.assertIn("secrets.R2_SECRET_ACCESS_KEY", self.workflow)
         self.assertNotIn("web/data/binance-spot", self.workflow)
+
+    def test_online_pass_records_verified_r2_publish_without_trade_authority(self) -> None:
+        self.assertEqual(self.online_pass["status"], "PASS")
+        self.assertEqual(self.online_pass["workflow_run"]["conclusion"], "success")
+        self.assertEqual(self.online_pass["dataset"]["row_count"], 701275)
+        self.assertTrue(self.online_pass["r2_publish"]["latest_pointer_written_last"])
+        self.assertTrue(
+            self.online_pass["r2_publish"]["all_objects_round_trip_sha256_verified"]
+        )
+        self.assertFalse(self.online_pass["authority"]["live_trading_authorized"])
 
 
 if __name__ == "__main__":

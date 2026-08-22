@@ -25,6 +25,11 @@ Changes to the V0.3 workflow, configuration, or its exact dataset/training code
 paths on `main` also trigger one run, which makes first deployment and subsequent
 pipeline updates self-verifying without retraining for unrelated site changes.
 
+The first online run, GitHub Actions `32564110756`, completed with `PASS` on
+2026-08-22. It uploaded and round-trip verified seven R2 objects for 748 markets
+and 701,275 daily rows. The corresponding secret-free receipt is
+`research/receipts/2026-08-22-binance-spot-r2-automated-training-v0-3-pass.json`.
+
 ## R2 layout
 
 ```text
