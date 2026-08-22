@@ -37,6 +37,7 @@ class BinanceSpotR2AutomatedTrainingV03Tests(unittest.TestCase):
             self.assertFalse(boundary[key])
 
     def test_workflow_is_scheduled_and_guards_before_secrets(self) -> None:
+        self.assertIn("branches: [main]", self.workflow)
         self.assertIn('cron: "37 2 * * *"', self.workflow)
         guard = self.workflow.index("Check frozen holdout boundary")
         secret = self.workflow.index("CLOUDFLARE_ACCOUNT_ID")
