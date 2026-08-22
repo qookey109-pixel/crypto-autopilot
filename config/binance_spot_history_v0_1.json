@@ -1,0 +1,47 @@
+{
+  "version": "0.1.0",
+  "status": "LOCAL_RESEARCH_AUTHORIZED",
+  "provider": "binance_spot",
+  "delivery": "binance_public_rest",
+  "start_utc": "2020-01-01T00:00:00Z",
+  "end_policy": "LAST_COMPLETE_UTC_DAY",
+  "interval": "1d",
+  "page_limit": 1000,
+  "requests_per_second": 5,
+  "minimum_symbols": 10,
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "HYPEUSDT",
+    "ADAUSDT",
+    "BNBUSDT",
+    "UNIUSDT",
+    "XRPUSDT",
+    "LTCUSDT",
+    "LINKUSDT",
+    "DOGEUSDT",
+    "AAVEUSDT",
+    "AVAXUSDT",
+    "INJUSDT",
+    "SUIUSDT"
+  ],
+  "projection": {
+    "sample_every_days": 7,
+    "locale": "zh-Hant-TW"
+  },
+  "authority": {
+    "local_public_market_reads_authorized": true,
+    "local_artifact_write_authorized": true,
+    "github_pages_read_only_projection_authorized": true,
+    "production_r2_access_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "source_switch_authorized": false,
+    "holdout_access_authorized": false,
+    "trade_kline_w1_materialization_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

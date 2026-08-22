@@ -35,6 +35,14 @@ frozen V0.10/holdout window. Pionex Demo remains manual sampling only; no privat
 API, automated demo order, formal trade plan, real-money order or live-trading
 authority is introduced.
 
+The **Binance Spot R2 Automated Training V0.3** path discovers the active public
+Spot catalog, builds provider-separated daily history, trains deterministic
+research models and publishes the canonical dataset/model lineage to Cloudflare
+R2 on a daily GitHub Actions schedule. Local artifacts are rebuildable caches;
+raw training history is not projected to GitHub Pages. Tokenized-stock labels
+remain heuristic and no source-switch, W1, holdout or trading authority is
+introduced.
+
 ## FREE-ONLY cloud policy
 
 The current cloud policy is frozen in [`config/cloud_free_tier_policy_v0_1.json`](config/cloud_free_tier_policy_v0_1.json):
@@ -187,6 +195,21 @@ Fetch a public Pionex sample (no API key required):
 ```bash
 python scripts/fetch_pionex_sample.py BTC_USDT_PERP 15M
 ```
+
+Discover/fetch the local Binance internal training archive (no API key required):
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/discover_binance_training_universe.py
+PYTHONPATH=src .venv/bin/python scripts/fetch_binance_internal_training.py \
+  --catalog artifacts/binance-internal-training-v0-2/market-catalog.json \
+  --output-dir artifacts/binance-internal-training-v0-2
+```
+
+The online R2-first pipeline is defined by
+[`config/binance_spot_r2_automated_training_v0_3.json`](config/binance_spot_r2_automated_training_v0_3.json)
+and [`.github/workflows/binance-spot-r2-automated-training-v0-3.yml`](.github/workflows/binance-spot-r2-automated-training-v0-3.yml).
+It uses GitHub Actions secrets for R2 credentials and never exposes raw history
+through the website.
 
 ## Authority and documentation
 

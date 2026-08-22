@@ -209,6 +209,9 @@ tempCodeRunnerFile.py
 # PyPI configuration file
 .pypirc
 
+# Local research outputs. Small, reviewed dashboard projections live under web/data.
+artifacts/
+
 # Marimo
 marimo/_static/
 marimo/_lsp/
