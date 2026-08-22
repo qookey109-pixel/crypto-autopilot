@@ -1,6 +1,21 @@
 name: Binance Spot R2 Automated Training V0.3
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/binance-spot-r2-automated-training-v0-3.yml"
+      - "config/binance_spot_r2_automated_training_v0_3.json"
+      - "research/receipts/2026-08-22-binance-spot-r2-automated-training-v0-3-authority.json"
+      - "scripts/check_binance_spot_training_window.py"
+      - "scripts/discover_binance_training_universe.py"
+      - "scripts/fetch_binance_internal_training.py"
+      - "scripts/publish_binance_spot_training_to_r2.py"
+      - "scripts/train_binance_spot_daily_models.py"
+      - "src/crypto_autopilot/binance_spot_history.py"
+      - "src/crypto_autopilot/binance_training_catalog.py"
+      - "src/crypto_autopilot/online_r2_training.py"
+      - "src/crypto_autopilot/online_training.py"
   schedule:
     - cron: "37 2 * * *"
   workflow_dispatch:

@@ -21,6 +21,9 @@ GitHub Actions daily schedule / manual dispatch
 
 The workflow is `.github/workflows/binance-spot-r2-automated-training-v0-3.yml`
 and runs at `02:37 UTC` daily. It also supports `workflow_dispatch`.
+Changes to the V0.3 workflow, configuration, or its exact dataset/training code
+paths on `main` also trigger one run, which makes first deployment and subsequent
+pipeline updates self-verifying without retraining for unrelated site changes.
 
 ## R2 layout
 
