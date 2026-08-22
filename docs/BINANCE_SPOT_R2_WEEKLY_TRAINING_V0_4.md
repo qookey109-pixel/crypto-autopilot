@@ -1,11 +1,12 @@
 # Binance Spot R2 Weekly Training and Review V0.4
 
-V0.4 replaces daily model training with one run per week at Sunday `02:37 UTC`
-(`10:37 Asia/Taipei`). A monthly universe review runs on day 1 at `03:37 UTC`
-(`11:37 Asia/Taipei`). Push-scoped first-deployment runs verify both pipelines
-when their exact implementation or authority files change.
+V0.4 replaced daily model training with one run per week at Sunday `02:37 UTC`
+(`10:37 Asia/Taipei`) and a monthly universe review on day 1 at `03:37 UTC`
+(`11:37 Asia/Taipei`). Its provider/R2 execution path is now retired in favor
+of V0.5. The V0.4 config, receipt, namespaces and prior R2 objects remain
+historical evidence and are not rewritten.
 
-## Weekly flow
+## Historical weekly flow
 
 ```text
 frozen-window guard
@@ -22,29 +23,18 @@ frozen-window guard
   -> ephemeral runner cleanup
 ```
 
-The walk-forward folds use only earlier samples for fitting and later,
-non-overlapping samples for validation. Cost scenarios are zero-cost reference,
-the configured 5 bps taker fee plus 2 bps slippage per fill, and a 10/5 bps
-stress case. Drawdown and exposure values are out-of-fold model-signal proxies,
-not executed portfolio results or profitability claims.
+V0.4 pipeline `PASS` meant that diagnostics completed; it was not a model
+approval. V0.5 introduced the versioned baseline and quality-gate semantics
+without mutating historical V0.4 objects.
 
-## Monthly universe review
+## Historical monthly review
 
-The monthly run compares the current active catalog with the preceding monthly
-snapshot and records additions, absences, asset-class changes and heuristic
-tokenized-stock candidate changes. Absence from a current active catalog is not
-proof of delisting. A current-membership snapshot cannot reconstruct historical
-membership, so survivorship bias remains `REVIEW_REQUIRED` and Historical
-Universe membership remains unauthorized.
+The V0.4 monthly run compared active-market snapshots, catalog absences and
+heuristic tokenized-stock classification changes. Absence was never proof of
+delisting, and current membership never authorized historical membership.
 
-## Storage and safety
+## Retirement boundary
 
-Cloudflare R2 is the only persistent generated-data store. Weekly and monthly
-objects use V0.4 namespaces and exact SHA-256 round-trip verification. GitHub
-Actions keeps only secret-free evidence and deletes its disposable workspace.
-Raw history is not projected to GitHub Pages.
-
-Both workflows stop before provider or R2 access at
-`2026-08-27T00:00:00Z`. They do not automatically resume. Formal strategy
-backtest admission, automatic model promotion, source switching, replacement
-holdout access, trade plans, real-money orders and live trading remain false.
+The V0.4 workflow files are manual validation-only retirement checks. They have
+no schedule, provider call, R2 credential binding or write path. V0.5 remains
+subject to the same `2026-08-27T00:00:00Z` stop and no automatic resume.

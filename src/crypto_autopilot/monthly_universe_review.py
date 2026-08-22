@@ -28,13 +28,17 @@ def build_monthly_universe_review(
     *,
     previous_review: dict[str, Any] | None,
     generated_at_utc: str,
+    schema_version: str = "v0.4",
 ) -> dict[str, Any]:
+    if schema_version not in {"v0.4", "v0.5"}:
+        raise ValueError("unsupported monthly universe review schema version")
     current = _market_snapshot(current_catalog)
+    baseline_created = previous_review is None
     previous = (previous_review or {}).get("market_snapshot") or {}
     current_symbols = set(current)
     previous_symbols = set(previous)
-    added = sorted(current_symbols - previous_symbols)
-    absent = sorted(previous_symbols - current_symbols)
+    added = [] if baseline_created else sorted(current_symbols - previous_symbols)
+    absent = [] if baseline_created else sorted(previous_symbols - current_symbols)
     classification_changes = []
     for symbol in sorted(current_symbols & previous_symbols):
         before = previous[symbol]
@@ -57,19 +61,23 @@ def build_monthly_universe_review(
         for symbol, item in current.items()
         if item["asset_class"] == "tokenized_stock_candidate"
     )
-    previous_tokenized = {
-        symbol
-        for symbol, item in previous.items()
-        if item.get("asset_class") == "tokenized_stock_candidate"
-    }
+    previous_tokenized = (
+        set(tokenized)
+        if baseline_created
+        else {
+            symbol
+            for symbol, item in previous.items()
+            if item.get("asset_class") == "tokenized_stock_candidate"
+        }
+    )
     return {
-        "schema": "binance-spot-monthly-universe-review-v0.4",
+        "schema": f"binance-spot-monthly-universe-review-{schema_version}",
         "status": "PASS",
         "mode": "RESEARCH_CATALOG_REVIEW_ONLY",
         "provider": "binance_spot",
         "generated_at_utc": generated_at_utc,
         "current_catalog_retrieved_at_utc": current_catalog.get("retrieved_at_utc"),
-        "baseline_created": previous_review is None,
+        "baseline_created": baseline_created,
         "market_count": len(current),
         "asset_class_counts": dict(
             sorted(Counter(item["asset_class"] for item in current.values()).items())
@@ -122,6 +130,9 @@ def build_monthly_universe_objects(
     if not _RUN_ID_RE.fullmatch(run_id):
         raise ValueError("run_id must be a safe 1-96 character object-key component")
     monthly = config["monthly_universe_review"]
+    schema_version = str(monthly.get("schema_version", "v0.4"))
+    if schema_version not in {"v0.4", "v0.5"}:
+        raise ValueError("unsupported monthly universe object schema version")
     prefix = str(monthly["namespace"]).rstrip("/")
     run_prefix = f"{prefix}/runs/run={run_id}"
     catalog_object = OnlineObject(
@@ -139,7 +150,7 @@ def build_monthly_universe_objects(
         "monthly_universe_review",
     )
     latest = {
-        "schema": "binance-spot-monthly-universe-review-latest-v0.4",
+        "schema": f"binance-spot-monthly-universe-review-latest-{schema_version}",
         "provider": "binance_spot",
         "run_id": run_id,
         "generated_at_utc": generated_at_utc,

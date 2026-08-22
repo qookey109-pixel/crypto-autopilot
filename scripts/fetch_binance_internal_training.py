@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import csv
-import gzip
 import hashlib
 import json
 from collections import Counter
@@ -18,8 +16,10 @@ from crypto_autopilot.binance_spot_history import (
     BinanceSpotHistoryError,
     BinanceSpotSeries,
     fetch_spot_history,
+    provider_read_stop_ms_from_v0_5_config,
 )
 from crypto_autopilot.ephemeral_storage import require_ephemeral_output
+from crypto_autopilot.training_quality import load_v0_5_authority_pair
 
 
 FORBIDDEN_AUTHORITY_KEYS = (
@@ -32,6 +32,10 @@ FORBIDDEN_AUTHORITY_KEYS = (
     "formal_trade_plan_authorized",
     "real_money_order_authorized",
     "live_trading_authorized",
+)
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_CONFIG = (
+    REPOSITORY_ROOT / "config/binance_spot_r2_training_governance_v0_5.json"
 )
 
 
@@ -82,21 +86,16 @@ def rows_for(series: list[BinanceSpotSeries], metadata: dict[str, dict]) -> list
     return rows
 
 
-def write_outputs(output_dir: Path, rows: list[dict[str, object]]) -> tuple[Path, Path, int]:
+def write_outputs(output_dir: Path, rows: list[dict[str, object]]) -> tuple[Path, int]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    csv_path = output_dir / "binance-spot-internal-training-1d.csv.gz"
     parquet_path = output_dir / "binance-spot-internal-training-1d.parquet"
-    fields = list(rows[0]) if rows else []
-    with gzip.open(csv_path, "wt", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
-        writer.writeheader()
-        writer.writerows(rows)
     pq.write_table(pa.Table.from_pylist(rows), parquet_path, compression="zstd")
-    return csv_path, parquet_path, len(rows)
+    return parquet_path, len(rows)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build ephemeral Binance Spot history for R2 publishing")
+    parser.add_argument("--config", default=str(DEFAULT_CONFIG))
     parser.add_argument("--catalog", required=True)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--start-utc", default="2020-01-01T00:00:00Z")
@@ -106,8 +105,19 @@ def main() -> int:
     parser.add_argument("--asset-classes", nargs="*")
     args = parser.parse_args()
     output_dir = require_ephemeral_output(args.output_dir)
+    config_path = Path(args.config)
+    config_payload = config_path.read_bytes()
+    config = json.loads(config_payload)
+    load_v0_5_authority_pair(
+        config,
+        config_path=config_path,
+        config_payload=config_payload,
+        repository_root=REPOSITORY_ROOT,
+    )
+    provider_read_stop_ms = provider_read_stop_ms_from_v0_5_config(config)
 
-    catalog = json.loads(Path(args.catalog).read_text(encoding="utf-8"))
+    catalog_payload = Path(args.catalog).read_bytes()
+    catalog = json.loads(catalog_payload)
     if catalog.get("schema") != "binance-internal-training-market-catalog-v0.2":
         raise RuntimeError("unsupported training catalog schema")
     authority = catalog.get("authority") or {}
@@ -135,6 +145,7 @@ def main() -> int:
         symbol = str(item["symbol"])
         cache_path = cache_dir / f"{symbol}.json"
         result: BinanceSpotSeries | None = None
+        cache_hit = False
         if cache_path.is_file():
             try:
                 cached = json.loads(cache_path.read_text(encoding="utf-8"))
@@ -154,6 +165,7 @@ def main() -> int:
                     )
                     if cached.get("error"):
                         errors[symbol] = str(cached["error"])
+                    cache_hit = True
             except (OSError, TypeError, ValueError, json.JSONDecodeError):
                 result = None
         if result is None:
@@ -165,6 +177,7 @@ def main() -> int:
                     interval=args.interval,
                     page_limit=1000,
                     requests_per_second=args.requests_per_second,
+                    provider_read_stop_ms=provider_read_stop_ms,
                 )
             except (BinanceSpotHistoryError, ValueError, TimeoutError, OSError) as exc:
                 errors[symbol] = str(exc)
@@ -189,7 +202,7 @@ def main() -> int:
         print(
             f"[{index}/{len(selected)}] {symbol}: {len(result.candles)} rows / "
             f"audit={result.audit_ok} / error={errors.get(symbol, 'none')} / "
-            f"{'cached' if cache_path.is_file() and result is not None else 'fetched'}",
+            f"{'cached' if cache_hit else 'fetched'}",
             flush=True,
         )
 
@@ -198,7 +211,7 @@ def main() -> int:
     if not audited:
         raise RuntimeError("no audited Binance Spot history was fetched")
     rows = rows_for(with_rows, metadata)
-    csv_path, parquet_path, row_count = write_outputs(output_dir, rows)
+    parquet_path, row_count = write_outputs(output_dir, rows)
     generated_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
     receipt = {
         "schema": "binance-internal-training-run-v0.2",
@@ -216,8 +229,15 @@ def main() -> int:
         "asset_class_counts": dict(Counter(metadata[item.symbol]["asset_class"] for item in with_rows)),
         "quote_asset_counts": dict(Counter(metadata[item.symbol]["quote_asset"] for item in with_rows)),
         "audit_failures": [item.symbol for item in with_rows if not item.audit_ok],
+        "market_audit_evidence": {
+            item.symbol: {**item.audit_evidence, "audit_ok": item.audit_ok}
+            for item in sorted(series, key=lambda value: value.symbol)
+        },
         "errors": errors,
-        "csv_gzip": {"path": str(csv_path), "sha256": sha256_file(csv_path), "bytes": csv_path.stat().st_size},
+        "catalog": {
+            "sha256": hashlib.sha256(catalog_payload).hexdigest(),
+            "bytes": len(catalog_payload),
+        },
         "parquet": {"path": str(parquet_path), "sha256": sha256_file(parquet_path), "bytes": parquet_path.stat().st_size},
         "website_projection": {"authorized": False, "written": False},
         "authority": authority,

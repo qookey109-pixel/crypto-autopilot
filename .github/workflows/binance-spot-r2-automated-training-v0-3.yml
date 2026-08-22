@@ -15,16 +15,16 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Assert V0.3 daily execution is retired in favor of V0.4 weekly training
+      - name: Assert V0.3 daily execution is retired in favor of V0.5 governance
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
 
           config = json.loads(
-              Path("config/binance_spot_r2_weekly_training_v0_4.json").read_text()
+              Path("config/binance_spot_r2_training_governance_v0_5.json").read_text()
           )
-          assert config["status"] == "R2_ONLY_WEEKLY_MODEL_REVIEW_AUTHORIZED_ON_MAIN_MERGE"
+          assert config["status"] == "R2_ONLY_TRAINING_GOVERNANCE_V0_5_AUTHORIZED_ON_MAIN_MERGE"
           assert config["schedule"]["cron_utc"] == "37 2 * * 0"
           assert config["authority"]["live_trading_authorized"] is False
           PY
