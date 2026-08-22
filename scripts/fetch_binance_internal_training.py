@@ -19,6 +19,7 @@ from crypto_autopilot.binance_spot_history import (
     BinanceSpotSeries,
     fetch_spot_history,
 )
+from crypto_autopilot.ephemeral_storage import require_ephemeral_output
 
 
 FORBIDDEN_AUTHORITY_KEYS = (
@@ -95,15 +96,16 @@ def write_outputs(output_dir: Path, rows: list[dict[str, object]]) -> tuple[Path
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Fetch Binance Spot history into local internal training artifacts")
-    parser.add_argument("--catalog", default="artifacts/binance-internal-training-v0-2/market-catalog.json")
-    parser.add_argument("--output-dir", default="artifacts/binance-internal-training-v0-2")
+    parser = argparse.ArgumentParser(description="Build ephemeral Binance Spot history for R2 publishing")
+    parser.add_argument("--catalog", required=True)
+    parser.add_argument("--output-dir", required=True)
     parser.add_argument("--start-utc", default="2020-01-01T00:00:00Z")
     parser.add_argument("--interval", default="1d", choices=("1d",))
     parser.add_argument("--requests-per-second", type=float, default=5.0)
     parser.add_argument("--now-ms", type=int)
     parser.add_argument("--asset-classes", nargs="*")
     args = parser.parse_args()
+    output_dir = require_ephemeral_output(args.output_dir)
 
     catalog = json.loads(Path(args.catalog).read_text(encoding="utf-8"))
     if catalog.get("schema") != "binance-internal-training-market-catalog-v0.2":
@@ -125,7 +127,6 @@ def main() -> int:
     if end_ms < start_ms:
         raise RuntimeError("no complete UTC day exists inside requested range")
 
-    output_dir = Path(args.output_dir)
     cache_dir = output_dir / "series-cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
     series: list[BinanceSpotSeries] = []

@@ -196,20 +196,25 @@ Fetch a public Pionex sample (no API key required):
 python scripts/fetch_pionex_sample.py BTC_USDT_PERP 15M
 ```
 
-Discover/fetch the local Binance internal training archive (no API key required):
+Binance history and model outputs are online-first. Cloudflare R2 is the only
+persistent generated-data store; GitHub Actions builds in a disposable workspace
+and deletes it after upload. A local diagnostic run must use a system temporary
+directory and is not retained:
 
 ```bash
-PYTHONPATH=src .venv/bin/python scripts/discover_binance_training_universe.py
+run_dir="$(mktemp -d)"
+PYTHONPATH=src .venv/bin/python scripts/discover_binance_training_universe.py \
+  --output "$run_dir/market-catalog.json"
 PYTHONPATH=src .venv/bin/python scripts/fetch_binance_internal_training.py \
-  --catalog artifacts/binance-internal-training-v0-2/market-catalog.json \
-  --output-dir artifacts/binance-internal-training-v0-2
+  --catalog "$run_dir/market-catalog.json" \
+  --output-dir "$run_dir/dataset"
 ```
 
 The online R2-first pipeline is defined by
 [`config/binance_spot_r2_automated_training_v0_3.json`](config/binance_spot_r2_automated_training_v0_3.json)
 and [`.github/workflows/binance-spot-r2-automated-training-v0-3.yml`](.github/workflows/binance-spot-r2-automated-training-v0-3.yml).
-It uses GitHub Actions secrets for R2 credentials and never exposes raw history
-through the website.
+It uses GitHub Actions secrets for R2 credentials, never retains generated data
+in the local repository, and never exposes raw history through the website.
 
 ## Authority and documentation
 

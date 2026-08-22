@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from crypto_autopilot.online_r2_training import build_online_objects, publish_online_objects
+from crypto_autopilot.ephemeral_storage import require_ephemeral_output
 from crypto_autopilot.storage.r2 import R2Store
 
 
@@ -35,6 +36,7 @@ def main() -> int:
     parser.add_argument("--output", required=True)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
+    output = require_ephemeral_output(args.output)
 
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
     authority = json.loads(AUTHORITY_PATH.read_text(encoding="utf-8"))
@@ -144,7 +146,6 @@ def main() -> int:
             "live_trading_authorized": False,
         }
     )
-    output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"status": result["status"], "stage": result["stage"], "objects": len(result.get("objects", []))}))

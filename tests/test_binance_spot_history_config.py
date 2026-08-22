@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BinanceSpotHistoryConfigTests(unittest.TestCase):
-    def test_local_research_scope_is_provider_separated_and_non_trading(self) -> None:
+    def test_retired_local_scope_is_provider_separated_and_non_trading(self) -> None:
         config = json.loads(
             (ROOT / "config" / "binance_spot_history_v0_1.json").read_text(encoding="utf-8")
         )
@@ -20,7 +20,9 @@ class BinanceSpotHistoryConfigTests(unittest.TestCase):
         self.assertEqual(len(config["symbols"]), 15)
         authority = config["authority"]
         self.assertTrue(authority["local_public_market_reads_authorized"])
-        self.assertTrue(authority["local_artifact_write_authorized"])
+        self.assertFalse(authority["local_artifact_write_authorized"])
+        self.assertTrue(authority["github_actions_ephemeral_workspace_authorized"])
+        self.assertFalse(authority["github_pages_read_only_projection_authorized"])
         for key in (
             "production_r2_access_authorized",
             "provider_splicing_authorized",

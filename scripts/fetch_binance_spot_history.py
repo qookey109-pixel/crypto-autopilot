@@ -16,6 +16,7 @@ from crypto_autopilot.binance_spot_history import (
     BinanceSpotSeries,
     fetch_spot_history,
 )
+from crypto_autopilot.ephemeral_storage import require_ephemeral_output
 
 
 def parse_utc_ms(value: str) -> int:
@@ -141,10 +142,12 @@ def projection(config: dict[str, object], series: list[BinanceSpotSeries], gener
 def main() -> int:
     parser = argparse.ArgumentParser(description="Fetch provider-separated Binance Spot daily history")
     parser.add_argument("--config", default="config/binance_spot_history_v0_1.json")
-    parser.add_argument("--output-dir", default="artifacts/binance-spot-history-v0-1")
-    parser.add_argument("--web-output", default="web/data/binance-spot-history.json")
+    parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--web-output", required=True)
     parser.add_argument("--now-ms", type=int)
     args = parser.parse_args()
+    output_dir = require_ephemeral_output(args.output_dir)
+    web_path = require_ephemeral_output(args.web_output)
 
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
     authority = config.get("authority") or {}
@@ -205,12 +208,10 @@ def main() -> int:
             f"only {len(available)} audited Binance Spot markets; minimum is {config['minimum_symbols']}"
         )
 
-    output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     csv_path = output_dir / "binance-spot-daily-2020-to-present.csv.gz"
     parquet_path = output_dir / "binance-spot-daily-2020-to-present.parquet"
     receipt_path = output_dir / "receipt.json"
-    web_path = Path(args.web_output)
     web_path.parent.mkdir(parents=True, exist_ok=True)
 
     csv_rows = write_csv(csv_path, all_series)

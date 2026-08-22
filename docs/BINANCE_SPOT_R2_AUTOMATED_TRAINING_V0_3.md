@@ -2,8 +2,9 @@
 
 V0.3 makes Cloudflare R2 the canonical online store for the Binance Spot
 internal-training dataset and the output of scheduled research model training.
-Local files remain rebuildable caches and test inputs, not the online source of
-truth.
+R2 is the only persistent generated-data store. GitHub Actions files are
+disposable intermediates, deleted after online evidence upload; local repository
+artifacts are rejected by the command-line tools.
 
 ## Daily flow
 
@@ -17,6 +18,8 @@ GitHub Actions daily schedule / manual dispatch
   -> immutable dataset snapshot + catalog + receipt upload
   -> immutable model + metrics + manifest upload
   -> latest.json pointer written last
+  -> secret-free GitHub run evidence upload
+  -> disposable workspace cleanup
 ```
 
 The workflow is `.github/workflows/binance-spot-r2-automated-training-v0-3.yml`

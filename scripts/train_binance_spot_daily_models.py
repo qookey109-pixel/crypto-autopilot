@@ -9,6 +9,7 @@ from pathlib import Path
 import pyarrow.parquet as pq
 
 from crypto_autopilot.online_training import train_daily_direction_models
+from crypto_autopilot.ephemeral_storage import require_ephemeral_output
 
 
 def main() -> int:
@@ -18,6 +19,8 @@ def main() -> int:
     parser.add_argument("--model-output", required=True)
     parser.add_argument("--metrics-output", required=True)
     args = parser.parse_args()
+    model_output = require_ephemeral_output(args.model_output)
+    metrics_output = require_ephemeral_output(args.metrics_output)
 
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
     if config.get("status") != "R2_FIRST_AUTOMATED_TRAINING_AUTHORIZED_ON_MAIN_MERGE":
@@ -54,12 +57,11 @@ def main() -> int:
     metrics["model_file_sha256"] = hashlib.sha256(model_payload).hexdigest()
     metrics_payload = (json.dumps(metrics, ensure_ascii=False, indent=2) + "\n").encode()
     for path_value, payload in (
-        (args.model_output, model_payload),
-        (args.metrics_output, metrics_payload),
+        (model_output, model_payload),
+        (metrics_output, metrics_payload),
     ):
-        path = Path(path_value)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(payload)
+        path_value.parent.mkdir(parents=True, exist_ok=True)
+        path_value.write_bytes(payload)
     print(json.dumps({"status": model["status"], "data_sha256": data_sha256, "classes": list(model["models"])}, ensure_ascii=False))
     return 0 if model["status"] == "PASS" else 2
 

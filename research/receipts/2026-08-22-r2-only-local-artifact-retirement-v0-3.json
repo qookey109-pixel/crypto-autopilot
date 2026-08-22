@@ -1,0 +1,27 @@
+{
+  "schema": "r2-only-local-artifact-retirement-v0.3",
+  "status": "PASS",
+  "recorded_at_utc": "2026-08-22T09:34:00Z",
+  "reason": "User explicitly requested online-only generated data with no persistent local artifact copies.",
+  "removed_local_path": "artifacts/",
+  "removed_local_generated_files": 759,
+  "removed_local_generated_file_bytes": 207898718,
+  "removed_local_disk_usage_kib_before_removal": 205324,
+  "canonical_online_store": "cloudflare_r2",
+  "canonical_r2_bucket": "qookey-crypto-autopilot-data",
+  "canonical_r2_dataset_sha256": "5fbe8edf1f56596bd6be78c99a841bb8ce0751311b925bd2c22e4ca588fe0cdf",
+  "verified_online_workflow_run_id": 32564110756,
+  "verified_online_receipt": "research/receipts/2026-08-22-binance-spot-r2-automated-training-v0-3-pass.json",
+  "recovery": "Regenerate through GitHub Actions and retrieve canonical immutable objects from R2; no local generated-data copy is retained.",
+  "authority": {
+    "cloudflare_r2_persistent_generated_data_authorized": true,
+    "github_actions_ephemeral_workspace_authorized": true,
+    "github_actions_secret_free_evidence_authorized": true,
+    "local_persistent_artifacts_authorized": false,
+    "website_raw_history_projection_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

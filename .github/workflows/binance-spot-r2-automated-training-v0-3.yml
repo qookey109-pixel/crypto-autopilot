@@ -14,6 +14,7 @@ on:
       - "scripts/train_binance_spot_daily_models.py"
       - "src/crypto_autopilot/binance_spot_history.py"
       - "src/crypto_autopilot/binance_training_catalog.py"
+      - "src/crypto_autopilot/ephemeral_storage.py"
       - "src/crypto_autopilot/online_r2_training.py"
       - "src/crypto_autopilot/online_training.py"
   schedule:
@@ -125,3 +126,7 @@ jobs:
         if: steps.window.outputs.run_allowed != 'true'
         run: |
           echo "Training sync skipped before provider and R2 access: ${{ steps.window.outputs.stage }}"
+
+      - name: Remove ephemeral workspace outputs
+        if: always()
+        run: rm -rf -- online-training

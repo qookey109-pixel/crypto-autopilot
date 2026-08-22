@@ -145,7 +145,7 @@ def catalog_payload(
 ) -> dict[str, Any]:
     return {
         "schema": "binance-internal-training-market-catalog-v0.2",
-        "status": "LOCAL_INTERNAL_TRAINING_AUTHORIZED",
+        "status": "EPHEMERAL_BUILD_FOR_R2_AUTHORIZED",
         "provider": "binance_spot",
         "market_type": "spot",
         "source_endpoint": "https://data-api.binance.vision/api/v3/exchangeInfo",
@@ -155,7 +155,8 @@ def catalog_payload(
         "markets": [market.as_dict() for market in markets],
         "authority": {
             "local_public_market_reads_authorized": True,
-            "local_artifact_write_authorized": True,
+            "local_artifact_write_authorized": False,
+            "github_actions_ephemeral_workspace_authorized": True,
             "website_projection_authorized": False,
             "production_r2_access_authorized": False,
             "provider_splicing_authorized": False,
