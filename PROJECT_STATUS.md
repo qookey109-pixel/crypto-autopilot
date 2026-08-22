@@ -16,7 +16,7 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 **PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 AUTHORIZED BOUNDED / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
 
-### Binance Spot R2 Automated Training V0.3 — AUTHORIZED ON MAIN MERGE
+### Binance Spot R2 Automated Training V0.3 — ONLINE PASS
 
 - Cloudflare R2 becomes the canonical online store for immutable Binance Spot 1D
   internal-training snapshots; local V0.2 artifacts remain rebuildable caches.
@@ -32,6 +32,12 @@ Repository branch `main` is the live formal authority and is intentionally not s
   access at `2026-08-27T00:00:00Z`; automatic resume is not authorized.
 - Model output remains research evidence. Source switching, Historical Universe
   membership, backtest admission, trade plans and trading remain unauthorized.
+- GitHub Actions run
+  [`32564110756`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/32564110756)
+  completed successfully on `main`: 748 markets, 701,275 rows through 2026-08-21,
+  seven R2 objects uploaded and round-trip verified, with `latest.json` written
+  last. The secret-free evidence is frozen in
+  `research/receipts/2026-08-22-binance-spot-r2-automated-training-v0-3-pass.json`.
 
 ### Binance Internal Training Universe V0.2 — LOCAL BASELINE PASS
 
