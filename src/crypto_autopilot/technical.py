@@ -26,6 +26,20 @@ class TechnicalSnapshot:
     volume_ratio: float | None
     previous_high: float | None
     extension_from_ema20_atr: float | None
+    ema200: float | None = None
+    ema20_ema50_distance_fraction: float | None = None
+    ema50_ema200_distance_fraction: float | None = None
+    ema20_slope_atr: float | None = None
+    rsi14: float | None = None
+    macd: float | None = None
+    macd_signal: float | None = None
+    macd_histogram: float | None = None
+    atr14_fraction: float | None = None
+    bollinger_mid: float | None = None
+    bollinger_upper: float | None = None
+    bollinger_lower: float | None = None
+    bollinger_bandwidth: float | None = None
+    bollinger_position: float | None = None
 
     @property
     def ready(self) -> bool:
@@ -41,6 +55,47 @@ class TechnicalSnapshot:
                 self.previous_high,
             )
         )
+
+    @property
+    def ready_v0_2(self) -> bool:
+        """Whether the full V0.2 indicator set is genuinely warmed up."""
+        return self.ready and all(
+            value is not None
+            for value in (
+                self.ema200,
+                self.ema20_ema50_distance_fraction,
+                self.ema50_ema200_distance_fraction,
+                self.ema20_slope_atr,
+                self.rsi14,
+                self.macd,
+                self.macd_signal,
+                self.macd_histogram,
+                self.atr14_fraction,
+                self.bollinger_mid,
+                self.bollinger_upper,
+                self.bollinger_lower,
+                self.bollinger_bandwidth,
+                self.bollinger_position,
+            )
+        )
+
+    @property
+    def normalized_features(self) -> dict[str, float | None]:
+        """Feature-only view for downstream research consumers.
+
+        This intentionally contains no strategy or order decision fields.
+        """
+        return {
+            "ema20_ema50_distance_fraction": self.ema20_ema50_distance_fraction,
+            "ema50_ema200_distance_fraction": self.ema50_ema200_distance_fraction,
+            "ema20_slope_atr": self.ema20_slope_atr,
+            "atr14_fraction": self.atr14_fraction,
+            "rsi14": self.rsi14,
+            "macd_histogram": self.macd_histogram,
+            "bollinger_bandwidth": self.bollinger_bandwidth,
+            "bollinger_position": self.bollinger_position,
+            "volume_ratio": self.volume_ratio,
+        }
 
 
 def _ema(values: tuple[float, ...], period: int) -> tuple[float | None, ...]:
@@ -72,6 +127,23 @@ def _rolling_sma(values: tuple[float, ...], period: int) -> tuple[float | None, 
     for index in range(period, len(values)):
         running += values[index] - values[index - period]
         output[index] = running / period
+    return tuple(output)
+
+
+def _rolling_population_stddev(
+    values: tuple[float, ...], period: int
+) -> tuple[float | None, ...]:
+    if period < 1:
+        raise ValueError("period must be positive")
+    output: list[float | None] = [None] * len(values)
+    if len(values) < period:
+        return tuple(output)
+
+    for index in range(period - 1, len(values)):
+        window = values[index - period + 1 : index + 1]
+        mean = sum(window) / period
+        variance = sum((value - mean) ** 2 for value in window) / period
+        output[index] = variance**0.5
     return tuple(output)
 
 
@@ -107,6 +179,76 @@ def _wilder(values: tuple[float, ...], period: int) -> tuple[float | None, ...]:
     return tuple(output)
 
 
+def _rsi_wilder(values: tuple[float, ...], period: int) -> tuple[float | None, ...]:
+    """Return RSI using Wilder's smoothed gains/losses.
+
+    The first value is available after ``period`` price changes, therefore at
+    candle index ``period``. A flat series is defined as RSI 50.
+    """
+    if period < 1:
+        raise ValueError("period must be positive")
+    output: list[float | None] = [None] * len(values)
+    if len(values) <= period:
+        return tuple(output)
+
+    gains: list[float] = []
+    losses: list[float] = []
+    for index in range(1, period + 1):
+        change = values[index] - values[index - 1]
+        gains.append(max(change, 0.0))
+        losses.append(max(-change, 0.0))
+
+    average_gain = sum(gains) / period
+    average_loss = sum(losses) / period
+
+    def calculate(gain: float, loss: float) -> float:
+        if loss == 0.0:
+            return 50.0 if gain == 0.0 else 100.0
+        relative_strength = gain / loss
+        return 100.0 - (100.0 / (1.0 + relative_strength))
+
+    output[period] = calculate(average_gain, average_loss)
+    for index in range(period + 1, len(values)):
+        change = values[index] - values[index - 1]
+        gain = max(change, 0.0)
+        loss = max(-change, 0.0)
+        average_gain = (average_gain * (period - 1) + gain) / period
+        average_loss = (average_loss * (period - 1) + loss) / period
+        output[index] = calculate(average_gain, average_loss)
+    return tuple(output)
+
+
+def _macd_series(
+    values: tuple[float, ...],
+    *,
+    fast_period: int = 12,
+    slow_period: int = 26,
+    signal_period: int = 9,
+) -> tuple[tuple[float | None, ...], tuple[float | None, ...], tuple[float | None, ...]]:
+    if not 1 <= fast_period <= slow_period:
+        raise ValueError("MACD periods must satisfy 1 <= fast_period <= slow_period")
+    fast = _ema(values, fast_period)
+    slow = _ema(values, slow_period)
+    macd: list[float | None] = [None] * len(values)
+    for index, (fast_value, slow_value) in enumerate(zip(fast, slow)):
+        if fast_value is not None and slow_value is not None:
+            macd[index] = fast_value - slow_value
+
+    signal_values = tuple(value for value in macd if value is not None)
+    signal_ema = _ema(signal_values, signal_period)
+    signal: list[float | None] = [None] * len(values)
+    signal_offset = next((index for index, value in enumerate(macd) if value is not None), len(values))
+    for offset, value in enumerate(signal_ema):
+        if signal_offset + offset < len(signal):
+            signal[signal_offset + offset] = value
+
+    histogram: list[float | None] = [None] * len(values)
+    for index, (macd_value, signal_value) in enumerate(zip(macd, signal)):
+        if macd_value is not None and signal_value is not None:
+            histogram[index] = macd_value - signal_value
+    return tuple(macd), tuple(signal), tuple(histogram)
+
+
 def build_technical_series(
     candles: list[Candle] | tuple[Candle, ...],
     interval: str,
@@ -133,6 +275,11 @@ def build_technical_series(
     ema50 = _ema(closes, 50)
     atr14 = _wilder(_true_ranges(source), 14)
     volume_sma20 = _rolling_sma(volumes, 20)
+    ema200 = _ema(closes, 200)
+    rsi14 = _rsi_wilder(closes, 14)
+    macd, macd_signal, macd_histogram = _macd_series(closes)
+    bollinger_mid = _rolling_sma(closes, 20)
+    bollinger_stddev = _rolling_population_stddev(closes, 20)
     interval_ms = INTERVAL_MS[interval]
 
     output: list[TechnicalSnapshot] = []
@@ -152,6 +299,39 @@ def build_technical_series(
         if current_ema20 is not None and current_atr14 is not None and current_atr14 > 0:
             extension = (candle.close - current_ema20) / current_atr14
 
+        distance_20_50 = None
+        current_ema50 = ema50[index]
+        if current_ema20 is not None and current_ema50 is not None and candle.close != 0:
+            distance_20_50 = (current_ema20 - current_ema50) / candle.close
+
+        distance_50_200 = None
+        current_ema200 = ema200[index]
+        if current_ema50 is not None and current_ema200 is not None and candle.close != 0:
+            distance_50_200 = (current_ema50 - current_ema200) / candle.close
+
+        slope_atr = None
+        if slope is not None and current_atr14 is not None and current_atr14 > 0:
+            slope_atr = slope / current_atr14
+
+        atr_fraction = None
+        if current_atr14 is not None and candle.close != 0:
+            atr_fraction = current_atr14 / candle.close
+
+        current_bollinger_mid = bollinger_mid[index]
+        current_bollinger_stddev = bollinger_stddev[index]
+        bollinger_upper = None
+        bollinger_lower = None
+        bollinger_bandwidth = None
+        bollinger_position = None
+        if current_bollinger_mid is not None and current_bollinger_stddev is not None:
+            bollinger_upper = current_bollinger_mid + 2.0 * current_bollinger_stddev
+            bollinger_lower = current_bollinger_mid - 2.0 * current_bollinger_stddev
+            if current_bollinger_mid != 0:
+                bollinger_bandwidth = (bollinger_upper - bollinger_lower) / current_bollinger_mid
+            band_range = bollinger_upper - bollinger_lower
+            if band_range != 0:
+                bollinger_position = (candle.close - bollinger_lower) / band_range
+
         output.append(
             TechnicalSnapshot(
                 bar_time_ms=candle.time_ms,
@@ -166,6 +346,20 @@ def build_technical_series(
                 volume_ratio=volume_ratio,
                 previous_high=source[index - 1].high if index > 0 else None,
                 extension_from_ema20_atr=extension,
+                ema200=current_ema200,
+                ema20_ema50_distance_fraction=distance_20_50,
+                ema50_ema200_distance_fraction=distance_50_200,
+                ema20_slope_atr=slope_atr,
+                rsi14=rsi14[index],
+                macd=macd[index],
+                macd_signal=macd_signal[index],
+                macd_histogram=macd_histogram[index],
+                atr14_fraction=atr_fraction,
+                bollinger_mid=current_bollinger_mid,
+                bollinger_upper=bollinger_upper,
+                bollinger_lower=bollinger_lower,
+                bollinger_bandwidth=bollinger_bandwidth,
+                bollinger_position=bollinger_position,
             )
         )
     return tuple(output)
