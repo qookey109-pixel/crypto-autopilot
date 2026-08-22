@@ -6,7 +6,6 @@ import unittest
 from pathlib import Path
 
 from crypto_autopilot.evaluation_integrity import (
-    EvaluationIntegrityPolicy,
     EvaluationUsage,
     PartitionAccessGuard,
     PartitionRole,
@@ -23,7 +22,6 @@ from crypto_autopilot.experiment_registry import (
 from crypto_autopilot.lineage import (
     LineageProtocolError,
     build_lineage_manifest,
-    sha256_json,
 )
 from crypto_autopilot.resource_planning import (
     ResourceEstimate,
