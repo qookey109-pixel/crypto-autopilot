@@ -35,13 +35,17 @@ frozen V0.10/holdout window. Pionex Demo remains manual sampling only; no privat
 API, automated demo order, formal trade plan, real-money order or live-trading
 authority is introduced.
 
-The **Binance Spot R2 Automated Training V0.3** path discovers the active public
+The **Binance Spot R2 Weekly Training and Review V0.4** path discovers the active public
 Spot catalog, builds provider-separated daily history, trains deterministic
 research models and publishes the canonical dataset/model lineage to Cloudflare
-R2 on a daily GitHub Actions schedule. Local artifacts are rebuildable caches;
-raw training history is not projected to GitHub Pages. Tokenized-stock labels
-remain heuristic and no source-switch, W1, holdout or trading authority is
-introduced.
+R2 each Sunday at `02:37 UTC` (`10:37 Asia/Taipei`). The same run performs
+expanding-window walk-forward diagnostics, fee/slippage sensitivity, diagnostic
+maximum drawdown and model-signal exposure checks. A separate first-day monthly
+review compares active markets, catalog absences, survivorship-bias limitations
+and heuristic tokenized-stock classifications. R2 is the only persistent
+generated-data store; raw training history is not projected to GitHub Pages.
+V0.3 daily execution is retired. No source-switch, formal backtest admission,
+automatic model promotion, W1, holdout or trading authority is introduced.
 
 ## FREE-ONLY cloud policy
 
@@ -211,8 +215,9 @@ PYTHONPATH=src .venv/bin/python scripts/fetch_binance_internal_training.py \
 ```
 
 The online R2-first pipeline is defined by
-[`config/binance_spot_r2_automated_training_v0_3.json`](config/binance_spot_r2_automated_training_v0_3.json)
-and [`.github/workflows/binance-spot-r2-automated-training-v0-3.yml`](.github/workflows/binance-spot-r2-automated-training-v0-3.yml).
+[`config/binance_spot_r2_weekly_training_v0_4.json`](config/binance_spot_r2_weekly_training_v0_4.json),
+[`.github/workflows/binance-spot-r2-weekly-training-v0-4.yml`](.github/workflows/binance-spot-r2-weekly-training-v0-4.yml),
+and [`.github/workflows/binance-spot-r2-monthly-universe-review-v0-4.yml`](.github/workflows/binance-spot-r2-monthly-universe-review-v0-4.yml).
 It uses GitHub Actions secrets for R2 credentials, never retains generated data
 in the local repository, and never exposes raw history through the website.
 

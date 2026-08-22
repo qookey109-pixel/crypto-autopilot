@@ -68,6 +68,24 @@ class OnlineR2TrainingTests(unittest.TestCase):
         self.assertEqual(store.write_order[-1], "training/binance_spot/v0.3/latest.json")
         self.assertTrue(result["latest_pointer_written_last"])
 
+    def test_weekly_review_is_immutable_and_linked_from_latest(self) -> None:
+        objects = build_online_objects(
+            config=self.config(),
+            run_id="github-weekly-1",
+            dataset=b"parquet",
+            catalog=b"{}\n",
+            dataset_receipt=b"{}\n",
+            model=b"{}\n",
+            metrics=b"{}\n",
+            weekly_review=b'{"status":"PASS"}\n',
+            generated_at_utc="2026-08-22T00:00:00Z",
+        )
+        review = next(item for item in objects if item.role == "weekly_review")
+        self.assertTrue(review.immutable)
+        self.assertTrue(review.key.endswith("/weekly-review.json"))
+        latest = __import__("json").loads(objects[-1].payload)
+        self.assertEqual(latest["weekly_review_key"], review.key)
+
     def test_headroom_blocks_before_any_write(self) -> None:
         objects = build_online_objects(
             config=self.config(),

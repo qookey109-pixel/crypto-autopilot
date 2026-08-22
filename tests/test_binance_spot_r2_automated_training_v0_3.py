@@ -54,18 +54,12 @@ class BinanceSpotR2AutomatedTrainingV03Tests(unittest.TestCase):
         ):
             self.assertFalse(boundary[key])
 
-    def test_workflow_is_scheduled_and_guards_before_secrets(self) -> None:
-        self.assertIn("branches: [main]", self.workflow)
-        self.assertIn('cron: "37 2 * * *"', self.workflow)
-        guard = self.workflow.index("Check frozen holdout boundary")
-        secret = self.workflow.index("CLOUDFLARE_ACCOUNT_ID")
-        self.assertLess(guard, secret)
-        self.assertIn("secrets.R2_SECRET_ACCESS_KEY", self.workflow)
-        self.assertNotIn("web/data/binance-spot", self.workflow)
-        evidence = self.workflow.index("Upload secret-free run evidence")
-        cleanup = self.workflow.index("Remove ephemeral workspace outputs")
-        self.assertLess(evidence, cleanup)
-        self.assertIn("rm -rf -- online-training", self.workflow)
+    def test_daily_workflow_is_retired_without_provider_or_r2_execution(self) -> None:
+        self.assertIn("V0.3 — RETIRED", self.workflow)
+        self.assertNotIn("schedule:", self.workflow)
+        self.assertNotIn("CLOUDFLARE_ACCOUNT_ID", self.workflow)
+        self.assertNotIn("discover_binance_training_universe.py", self.workflow)
+        self.assertIn("37 2 * * 0", self.workflow)
 
     def test_online_pass_records_verified_r2_publish_without_trade_authority(self) -> None:
         self.assertEqual(self.online_pass["status"], "PASS")

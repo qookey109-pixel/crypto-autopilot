@@ -1,12 +1,16 @@
 # Binance Spot R2 Automated Training V0.3
 
+Status: **HISTORICAL ONLINE PASS / DAILY EXECUTION RETIRED**. V0.4 supersedes
+this schedule with weekly model training and monthly universe review. The V0.3
+R2 objects and receipts remain immutable evidence.
+
 V0.3 makes Cloudflare R2 the canonical online store for the Binance Spot
 internal-training dataset and the output of scheduled research model training.
 R2 is the only persistent generated-data store. GitHub Actions files are
 disposable intermediates, deleted after online evidence upload; local repository
 artifacts are rejected by the command-line tools.
 
-## Daily flow
+## Historical daily flow
 
 ```text
 GitHub Actions daily schedule / manual dispatch
@@ -22,11 +26,10 @@ GitHub Actions daily schedule / manual dispatch
   -> disposable workspace cleanup
 ```
 
-The workflow is `.github/workflows/binance-spot-r2-automated-training-v0-3.yml`
-and runs at `02:37 UTC` daily. It also supports `workflow_dispatch`.
-Changes to the V0.3 workflow, configuration, or its exact dataset/training code
-paths on `main` also trigger one run, which makes first deployment and subsequent
-pipeline updates self-verifying without retraining for unrelated site changes.
+The workflow `.github/workflows/binance-spot-r2-automated-training-v0-3.yml`
+is now validation-only and has no schedule, provider command, or R2 credentials.
+Its former `02:37 UTC` daily execution must not be reactivated while V0.4 owns
+the current training schedule.
 
 The first online run, GitHub Actions `32564110756`, completed with `PASS` on
 2026-08-22. It uploaded and round-trip verified seven R2 objects for 748 markets
