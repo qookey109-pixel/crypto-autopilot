@@ -4,7 +4,7 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 
 > **Current mode: PAPER-ONLY.** No real-money order path is authorized. `trade_plan_authorized=false` and `live_trading_authorized=false` remain mandatory. For the detailed current authority index, always read [`PROJECT_STATUS.md`](PROJECT_STATUS.md) first.
 
-## Current authority snapshot — 2026-08-20
+## Current authority snapshot — 2026-08-22
 
 The repository has moved beyond the original V0.1 implementation baseline while preserving its scientific history:
 
@@ -26,6 +26,14 @@ The repository has moved beyond the original V0.1 implementation baseline while 
 - Metadata stability gate: **NOT_YET_RUN**. The next scientific stage is the frozen 194-slot metadata-stability capture window beginning `2026-08-27T00:00:00Z`.
 
 The V0.10 cutover authorizes only the frozen public-provider metadata capture phase and metadata-only R2 writes inside the exact window. V0.11 currently authorizes only evaluator preparation and synthetic validation. Neither stage authorizes replacement holdout candles, source switching, Historical Universe membership, W1 materialization, backtest admission, strategy changes, trade plans, real-money orders, or live trading.
+
+The separate **Pionex Public Paper Training V0.1** path is authorized for bounded
+public-market reads, fixed-rule candidate generation, deterministic Repository
+Paper Broker replay, secret-free training evidence and a read-only GitHub Pages
+projection. It stops all provider requests at `2026-08-27T00:00:00Z` to avoid the
+frozen V0.10/holdout window. Pionex Demo remains manual sampling only; no private
+API, automated demo order, formal trade plan, real-money order or live-trading
+authority is introduced.
 
 ## FREE-ONLY cloud policy
 
@@ -189,5 +197,9 @@ Read in this order for current work:
 3. current versioned protocol/config and receipt for the stage being changed
 4. [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 5. [`docs/STRATEGY_V0_1.md`](docs/STRATEGY_V0_1.md) and [`config/strategy_v0_1.json`](config/strategy_v0_1.json)
+
+The offline research governance extension is documented in
+[`docs/RESEARCH_GOVERNANCE_V0_1.md`](docs/RESEARCH_GOVERNANCE_V0_1.md) and
+configured by [`config/research_governance_v0_1.json`](config/research_governance_v0_1.json).
 
 Historical receipts remain immutable evidence even when a later version supersedes their execution role.

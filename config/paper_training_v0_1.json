@@ -1,0 +1,95 @@
+{
+  "version": "0.1.0",
+  "status": "PAPER_TRAINING_AUTHORIZED",
+  "provider": {
+    "name": "pionex_public_futures",
+    "public_only": true,
+    "timeout_seconds": 20,
+    "requests_per_second": 3,
+    "kline_limit": 500,
+    "funding_limit": 100,
+    "recent_trade_limit": 500,
+    "depth_limit": 20,
+    "basis_history_limit": 100,
+    "minimum_symbols": 10
+  },
+  "symbols": [
+    "BTC_USDT_PERP",
+    "ETH_USDT_PERP",
+    "SOL_USDT_PERP",
+    "HYPE_USDT_PERP",
+    "ADA_USDT_PERP",
+    "BNB_USDT_PERP",
+    "UNI_USDT_PERP",
+    "XRP_USDT_PERP",
+    "LTC_USDT_PERP",
+    "LINK_USDT_PERP",
+    "DOGE_USDT_PERP",
+    "AAVE_USDT_PERP",
+    "AVAX_USDT_PERP",
+    "INJ_USDT_PERP",
+    "SUI_USDT_PERP"
+  ],
+  "intervals": ["15M", "60M", "4H", "8H", "1D"],
+  "features": {
+    "advanced_technical_version": "0.1.0",
+    "adx_period": 14,
+    "rolling_vwap_period": 20,
+    "relative_volume_period": 20,
+    "donchian_period": 20,
+    "percentile_period": 100,
+    "realized_volatility_period": 20,
+    "kaufman_efficiency_period": 10,
+    "choppiness_period": 14,
+    "order_book_depth_levels": 20,
+    "slippage_reference_usd": 1000
+  },
+  "candidate_thresholds": {
+    "minimum_trend_agreement": 0.75,
+    "minimum_adx14": 18.0,
+    "minimum_rsi14": 45.0,
+    "maximum_rsi14": 75.0,
+    "minimum_donchian_position": 0.80,
+    "minimum_volume_zscore": -0.50,
+    "minimum_efficiency_ratio": 0.20,
+    "minimum_candidate_score": 65.0
+  },
+  "paper_risk": {
+    "initial_equity_usd": 10000.0,
+    "risk_fraction_per_trade": 0.01,
+    "maximum_leverage": 3.0,
+    "maximum_new_trades_per_day": 3,
+    "daily_loss_limit_r": 3.0,
+    "stop_atr_multiple": 1.5,
+    "target_atr_multiple": 3.0,
+    "taker_fee_bps": 5.0,
+    "slippage_bps": 2.0
+  },
+  "replay": {
+    "fifteen_minute_bars": 96,
+    "parameter_search_authorized": false,
+    "automatic_promotion_authorized": false
+  },
+  "holdout_guard": {
+    "blocked_from_utc": "2026-08-27T00:00:00Z",
+    "blocked_from_ms": 1787788800000,
+    "reason": "Avoid V0.10 capture-window contention and prevent replacement-holdout candle access.",
+    "resume_requires_new_versioned_authority": true
+  },
+  "authority": {
+    "github_actions_public_market_reads_authorized": true,
+    "paper_candidate_generation_authorized": true,
+    "repository_paper_broker_authorized": true,
+    "github_pages_read_only_projection_authorized": true,
+    "pionex_demo_manual_sampling_only": true,
+    "pionex_demo_automation_authorized": false,
+    "private_api_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "production_r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "v0_10_path_change_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

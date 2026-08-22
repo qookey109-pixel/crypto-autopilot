@@ -58,6 +58,11 @@ The browser and generated fixture must never receive:
 
 The dashboard is display-only. It has no authority or control surface to trigger V0.10 capture, run V0.11 production evaluation, change schedules, write R2, open holdout data, switch providers, create trade plans or enable live execution.
 
+The paper-training workflow may replace `data/paper-training.json` in the Pages
+artifact with its latest bounded public-data replay. The browser only renders
+candidate signals, simulated trades and aggregate metrics. It cannot contact
+Pionex, submit Demo orders or mutate Repository state.
+
 ## Views
 
 - Overview

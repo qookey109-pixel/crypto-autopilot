@@ -111,9 +111,9 @@
             <div class="panel-header">
               <div>
                 <p class="card-kicker">模擬績效</p>
-                <h3>資產曲線預覽</h3>
+                <h3>Paper Training 最新結果</h3>
               </div>
-              <span class="badge pending">等待模擬券商完成</span>
+              <span class="badge pending" id="paper-training-status">等待首次執行</span>
             </div>
             <svg class="equity-chart" viewBox="0 0 800 260" role="img" aria-label="模擬績效預覽圖">
               <defs>
@@ -126,7 +126,7 @@
               <path class="area" d="M0 190 C70 180,100 160,150 168 S245 120,300 132 S390 104,440 112 S520 80,575 92 S665 58,720 68 S770 52,800 48 L800 260 L0 260 Z" />
               <path class="line" d="M0 190 C70 180,100 160,150 168 S245 120,300 132 S390 104,440 112 S520 80,575 92 S665 58,720 68 S770 52,800 48" />
             </svg>
-            <p class="empty-note">正式的模擬 P&amp;L 會在 production-grade paper broker lifecycle 通過授權後顯示。</p>
+            <p class="empty-note" id="paper-training-summary">只顯示 Repository Paper Broker；不代表正式交易建議。</p>
           </article>
 
           <article class="panel">
@@ -178,10 +178,17 @@
       </section>
 
       <section class="view" id="view-signals">
-        <div class="empty-state panel">
-          <div class="empty-icon">⌁</div>
-          <h3>交易訊號頁已準備好接安全 API</h3>
-          <p>目前介面沒有下單按鈕；策略輸出只會以唯讀方式顯示。</p>
+        <div class="panel">
+          <div class="panel-header">
+            <div><p class="card-kicker">Paper Training</p><h3>最新候選訊號</h3></div>
+            <span class="badge neutral">唯讀 · 不自動下單</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>標的</th><th>分數</th><th>狀態</th><th>參考價</th><th>停損</th><th>目標</th></tr></thead>
+              <tbody id="paper-signal-table"><tr><td colspan="6">等待首次 Paper Training 執行</td></tr></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -194,24 +201,31 @@
       </section>
 
       <section class="view" id="view-trades">
-        <div class="empty-state panel">
-          <div class="empty-icon">↗</div>
-          <h3>模擬交易紀錄尚未接入</h3>
-          <p>此網站目前刻意不提供私人交易所 API 或真實下單端點。</p>
+        <div class="panel">
+          <div class="panel-header">
+            <div><p class="card-kicker">Repository Paper Broker</p><h3>最新模擬成交</h3></div>
+            <span class="badge neutral">非 Pionex 真實訂單</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>標的</th><th>進場</th><th>出場</th><th>原因</th><th>淨損益</th><th>R</th></tr></thead>
+              <tbody id="paper-trade-table"><tr><td colspan="6">目前沒有模擬成交</td></tr></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
       <section class="view" id="view-performance">
         <div class="metrics-row">
-          <article class="metric-card"><p class="card-kicker">報酬率</p><strong>—</strong><span>等待模擬交易資料</span></article>
-          <article class="metric-card"><p class="card-kicker">勝率</p><strong>—</strong><span>等待模擬交易資料</span></article>
-          <article class="metric-card"><p class="card-kicker">獲利因子</p><strong>—</strong><span>等待模擬交易資料</span></article>
-          <article class="metric-card"><p class="card-kicker">最大回撤</p><strong>—</strong><span>等待模擬交易資料</span></article>
+          <article class="metric-card"><p class="card-kicker">報酬率</p><strong id="paper-return">0.00%</strong><span>成本後 Paper 報酬</span></article>
+          <article class="metric-card"><p class="card-kicker">勝率</p><strong id="paper-win-rate">0.00%</strong><span>已結束模擬交易</span></article>
+          <article class="metric-card"><p class="card-kicker">獲利因子</p><strong id="paper-profit-factor">—</strong><span>無虧損時不定義</span></article>
+          <article class="metric-card"><p class="card-kicker">最大回撤</p><strong id="paper-drawdown">0.00%</strong><span>Trade-close equity</span></article>
         </div>
         <div class="empty-state panel">
           <div class="empty-icon">∿</div>
-          <h3>績效中心介面已完成</h3>
-          <p>之後會接入資產曲線、P&amp;L、回撤、多空表現、各標的貢獻與 Funding 貢獻。</p>
+          <h3>公開資料 Paper Training</h3>
+          <p id="paper-performance-note">結果僅用於研究與前向訓練，不構成獲利或真實交易證明。</p>
         </div>
       </section>
 

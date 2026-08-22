@@ -80,15 +80,19 @@ def test_blocked_or_unsanitized_results_fail_closed() -> None:
         raise AssertionError("unsanitized increment metadata must be rejected")
 
 
-def test_follow_up_workflow_only_trusts_manual_main_diagnostic_runs() -> None:
+def test_follow_up_workflow_is_retired_without_automatic_or_write_authority() -> None:
     text = WORKFLOW.read_text()
-    assert "workflow_run:" in text
-    assert "Diagnose V0.3 Cloudflare Container Binance Transport" in text
-    assert "github.event.workflow_run.event == 'workflow_dispatch'" in text
-    assert "github.event.workflow_run.head_branch == 'main'" in text
-    assert "github.event.workflow_run.conclusion == 'success'" in text
-    assert "github.event.workflow_run.conclusion != 'success'" in text
-    assert "actions: read" in text
-    assert "contents: write" in text
-    assert "pull-requests: write" in text
-    assert "issues: write" in text
+    assert "name: Retired V0.3 Cloudflare Container Follow-up" in text
+    assert "workflow_dispatch:" in text
+    assert "workflow_run:" not in text
+    assert "push:" not in text
+    assert "contents: read" in text
+    assert "contents: write" not in text
+    assert "pull-requests: write" not in text
+    assert "issues: write" not in text
+    assert "status=RETIRED_NO_EXECUTION" in text
+    assert "provider_requests_performed=0" in text
+    assert "r2_writes_performed=false" in text
+    assert "holdout_candles_accessed=false" in text
+    assert "source_switch_authorized=false" in text
+    assert "live_trading_authorized=false" in text

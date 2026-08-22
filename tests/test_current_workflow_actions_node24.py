@@ -13,6 +13,7 @@ UPLOAD_ARTIFACT_V7_SHA = "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
 UPLOAD_PAGES_ARTIFACT_V5_SHA = "fc324d3547104276b827a68afc52ff2a11cc49c9"
 CONFIGURE_PAGES_V6_SHA = "45bfe0192ca1faeb007ade9deae92b16b8254a0d"
 DEPLOY_PAGES_V5_SHA = "cd2ce8fcbc39b97be8ca5fce6e763baed58fa128"
+CACHE_V5_SHA = "caa296126883cff596d87d8935842f9db880ef25"
 
 APPROVED_CRITICAL_ACTIONS = {
     "actions/checkout": CHECKOUT_V6_SHA,
@@ -21,6 +22,7 @@ APPROVED_CRITICAL_ACTIONS = {
     "actions/upload-pages-artifact": UPLOAD_PAGES_ARTIFACT_V5_SHA,
     "actions/configure-pages": CONFIGURE_PAGES_V6_SHA,
     "actions/deploy-pages": DEPLOY_PAGES_V5_SHA,
+    "actions/cache": CACHE_V5_SHA,
 }
 
 CURRENT = (
@@ -32,6 +34,7 @@ CURRENT = (
     "dashboard-authority-snapshot.yml",
     "dashboard-github-pages.yml",
     "dashboard-static-smoke.yml",
+    "pionex-public-paper-training-v0-1.yml",
 )
 
 PINNED_CRITICAL = (
@@ -41,6 +44,7 @@ PINNED_CRITICAL = (
     "dashboard-authority-snapshot.yml",
     "dashboard-github-pages.yml",
     "dashboard-static-smoke.yml",
+    "pionex-public-paper-training-v0-1.yml",
 )
 
 

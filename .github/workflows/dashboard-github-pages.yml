@@ -36,7 +36,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: dashboard-pages-${{ github.ref }}
+  group: github-pages-production
   cancel-in-progress: true
 
 jobs:

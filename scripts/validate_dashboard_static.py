@@ -12,6 +12,7 @@ REQUIRED = (
     ROOT / "app.js",
     ROOT / "data" / "dashboard.json",
     OPERATIONAL_STATUS,
+    ROOT / "data" / "paper-training.json",
     ROOT / "_headers",
 )
 
@@ -205,12 +206,34 @@ def main() -> int:
             raise RuntimeError(f"dashboard status label missing: {label}")
     for token in (
         "./data/operational-status.json",
+        "./data/paper-training.json",
         "mergeOperationalStatus",
+        "renderPaperTraining",
         "operational.pipelineItems",
         "operational.gateItems",
     ):
         if token not in app_js:
             raise RuntimeError(f"dashboard operational merge logic missing: {token}")
+
+    paper = json.loads((ROOT / "data" / "paper-training.json").read_text(encoding="utf-8"))
+    if paper.get("schema") != "pionex-public-paper-training-run-v0.1":
+        raise RuntimeError("dashboard paper-training schema changed")
+    if paper.get("mode") != "PAPER_TRAINING_ONLY":
+        raise RuntimeError("dashboard paper-training fixture must remain paper-only")
+    paper_authority = paper.get("authority") or {}
+    for key in (
+        "formalTradePlanAuthorized",
+        "pionexDemoAutomationAuthorized",
+        "privateApiUsed",
+        "r2ReadsPerformed",
+        "r2WritesPerformed",
+        "holdoutAccessed",
+        "sourceSwitchAuthorized",
+        "realMoneyOrderAuthorized",
+        "liveTradingAuthorized",
+    ):
+        if paper_authority.get(key) is not False:
+            raise RuntimeError(f"dashboard paper-training safety boundary changed: {key}")
 
     headers = (ROOT / "_headers").read_text(encoding="utf-8")
     for header in (
