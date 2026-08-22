@@ -1,0 +1,68 @@
+{
+  "schema_version": "v0_10_scheduled_capture_observer_synthetic_rehearsal_v0_1",
+  "status": "PREPARED_VALIDATION_ONLY",
+  "date": "2026-08-22",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "purpose": "Exercise the embedded read-only V0.10 scheduled-capture observer against synthetic GitHub Actions run/job/step metadata without reading capture artifacts, provider data, Render payloads, R2, or holdout data.",
+  "source_workflow": ".github/workflows/observe-v0-10-scheduled-capture.yml",
+  "scenario_count": 8,
+  "scenarios": [
+    {
+      "id": "PIPELINE_HEALTH_PASS",
+      "expected": "PASS"
+    },
+    {
+      "id": "SOURCE_WORKFLOW_FAILURE",
+      "expected": "FAIL_CLOSED"
+    },
+    {
+      "id": "MISSING_CAPTURE_JOB",
+      "expected": "FAIL_CLOSED"
+    },
+    {
+      "id": "MISSING_CAPTURE_BOUNDARY_STEP",
+      "expected": "FAIL_CLOSED"
+    },
+    {
+      "id": "STALE_PATH_CAPTURE_STEP_SKIPPED",
+      "expected": "FAIL_CLOSED"
+    },
+    {
+      "id": "FIRST_ATTEMPT_FAIL_SECOND_ATTEMPT_PASS",
+      "expected": "FIRST_FAIL_CLOSED_SECOND_PASS"
+    },
+    {
+      "id": "BOTH_ATTEMPTS_FAIL",
+      "expected": "BOTH_FAIL_CLOSED"
+    },
+    {
+      "id": "R2_BLOCKED_VISIBILITY_BOUNDARY",
+      "expected": "NOT_CLASSIFIABLE_FROM_GITHUB_EXECUTION_METADATA_ONLY"
+    }
+  ],
+  "observer_visibility_boundary": {
+    "may_read_github_run_job_step_metadata": true,
+    "may_read_capture_artifacts": false,
+    "may_read_provider_payloads": false,
+    "may_read_render_payloads": false,
+    "may_construct_r2_client": false,
+    "may_list_or_read_r2": false,
+    "may_read_holdout": false,
+    "may_run_v0_11": false,
+    "pipeline_health_pass_is_provider_metadata_pass": false,
+    "pipeline_health_pass_is_metadata_stability_pass": false,
+    "r2_blocked_must_be_classified_by_artifact_aware_monitor_not_observer": true
+  },
+  "execution_boundary": {
+    "synthetic_fixtures_only": true,
+    "production_metadata_evidence_consumed": false,
+    "provider_requests_authorized": false,
+    "render_requests_authorized": false,
+    "r2_reads_authorized": false,
+    "r2_writes_authorized": false,
+    "holdout_access_authorized": false,
+    "v0_11_production_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "live_trading_authorized": false
+  }
+}
