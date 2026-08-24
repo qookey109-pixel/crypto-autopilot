@@ -84,7 +84,7 @@ main { min-width: 0; }
 .section-number { margin: -3px 0 0; color: var(--mint); font-size: 24px; font-weight: 600; }
 .section-heading h2 { margin: 0 0 14px; font-size: 40px; line-height: 1.15; }
 .section-heading p:last-child { max-width: 650px; margin: 0; color: var(--muted); font-size: 16px; }
-.view { display: none; padding-top: 48px; }
+.view { display: none; }
 .view.active { display: block; }
 .subview-active .site-header { position: sticky; color: var(--ink); background: rgba(255,255,255,.96); border-bottom: 1px solid var(--line); backdrop-filter: blur(14px); }
 .subview-active .brand-copy small { color: var(--muted); }
