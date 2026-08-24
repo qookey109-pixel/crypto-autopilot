@@ -83,6 +83,14 @@ V0.5 quality gate rejected the current model. It records calibration and
 descriptive regime evidence only; it cannot read providers, write R2, access
 the holdout, promote a model or trade. See
 [`docs/BINANCE_SPOT_SHADOW_V0_6.md`](docs/BINANCE_SPOT_SHADOW_V0_6.md).
+
+The prepared Research Signal Layer keeps current closed candles, append-only
+historical evidence and timestamped KOL forecasts separate. It enforces
+close-time and publication-time boundaries, rejects revisions and provider
+mixing, and evaluates KOL accuracy, Brier score and baseline lift as
+descriptive challenger evidence only. It does not fetch external KOL sources,
+write production R2, promote a model or trigger a trade. See
+[`docs/RESEARCH_SIGNAL_LAYER_V0_1.md`](docs/RESEARCH_SIGNAL_LAYER_V0_1.md).
 The current time-ordered operating handoff is
 [`docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`](docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md).
 
