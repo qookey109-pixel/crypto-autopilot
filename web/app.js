@@ -39,28 +39,39 @@ function statusDot(status) {
   return `<span class="status-dot ${className}"></span>`;
 }
 
-function renderPipeline(items) {
-  const root = document.querySelector("#pipeline-list");
-  root.innerHTML = items.map(item => `
+function pipelineRow(item) {
+  return `
     <div class="pipeline-row">
       ${statusDot(item.status)}
       <div>
-        <strong>${item.name}</strong>
-        <span>${item.detail}</span>
+        <strong>${escapeHtml(item.name)}</strong>
+        <span>${escapeHtml(item.detail)}</span>
       </div>
-      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${item.status}">${displayStatus(item.status)}</span>
+      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${escapeHtml(item.status)}">${displayStatus(item.status)}</span>
     </div>
-  `).join("");
+  `;
+}
+
+function renderPipeline(items) {
+  const root = document.querySelector("#pipeline-list");
+  const visible = items.slice(0, 6);
+  const remaining = items.slice(6);
+  root.innerHTML = visible.map(pipelineRow).join("") + (remaining.length ? `
+    <details class="pipeline-more">
+      <summary>展開其餘 ${remaining.length} 項 authority 與準備狀態</summary>
+      <div>${remaining.map(pipelineRow).join("")}</div>
+    </details>
+  ` : "");
 }
 
 function renderCriticalGates(items) {
-  const selected = items.filter(item => item.critical);
+  const selected = items.filter(item => item.critical).slice(0, 4);
   const root = document.querySelector("#critical-gates");
   root.innerHTML = selected.map(item => `
     <div class="gate ${item.tone || "pending"}">
-      <strong>${item.name}</strong>
-      <small>${item.detail}</small>
-      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${item.status}">${displayStatus(item.status)}</span>
+      <strong>${escapeHtml(item.name)}</strong>
+      <small>${escapeHtml(item.detail)}</small>
+      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${escapeHtml(item.status)}">${displayStatus(item.status)}</span>
     </div>
   `).join("");
 }
@@ -69,9 +80,9 @@ function renderAllGates(items) {
   const root = document.querySelector("#all-gates");
   root.innerHTML = items.map(item => `
     <div class="gate ${item.tone || "pending"}">
-      <strong>${item.name}</strong>
-      <small>${item.detail}</small>
-      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${item.status}">${displayStatus(item.status)}</span>
+      <strong>${escapeHtml(item.name)}</strong>
+      <small>${escapeHtml(item.detail)}</small>
+      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${escapeHtml(item.status)}">${displayStatus(item.status)}</span>
     </div>
   `).join("");
 }
@@ -226,17 +237,99 @@ const titles = {
   gates: "風險與閘門"
 };
 
-document.querySelectorAll(".nav-item").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
-    document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
-    button.classList.add("active");
-    const view = button.dataset.view;
-    document.querySelector(`#view-${view}`).classList.add("active");
-    document.querySelector("#page-title").textContent = titles[view] || view;
-    window.scrollTo({ top: 0, behavior: "smooth" });
+function activateView(view) {
+  const target = document.querySelector(`#view-${view}`);
+  if (!target) return;
+  document.querySelectorAll(".nav-item").forEach(item => {
+    const active = item.dataset.view === view;
+    item.classList.toggle("active", active);
+    if (active) item.setAttribute("aria-current", "page");
+    else item.removeAttribute("aria-current");
   });
+  document.querySelectorAll(".view").forEach(item => item.classList.remove("active"));
+  target.classList.add("active");
+  document.querySelector("#page-title").textContent = titles[view] || view;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.querySelectorAll(".nav-item, .view-link").forEach(button => {
+  button.addEventListener("click", () => activateView(button.dataset.view));
 });
 
+function startParticleField() {
+  const canvas = document.querySelector("#particle-field");
+  if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const context = canvas.getContext("2d");
+  if (!context) return;
+
+  let width = 0;
+  let height = 0;
+  let frame = 0;
+  let particles = [];
+
+  function seed() {
+    const density = Math.max(30, Math.min(78, Math.round((width * height) / 26000)));
+    particles = Array.from({ length: density }, (_, index) => ({
+      x: (index * 89.7 + Math.random() * width) % width,
+      y: (index * 53.2 + Math.random() * height) % height,
+      radius: .7 + Math.random() * 1.5,
+      velocityX: (Math.random() - .5) * .09,
+      velocityY: (Math.random() - .5) * .07,
+      alpha: .12 + Math.random() * .28,
+    }));
+  }
+
+  function resize() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    seed();
+  }
+
+  function draw() {
+    context.clearRect(0, 0, width, height);
+    particles.forEach((particle, index) => {
+      particle.x = (particle.x + particle.velocityX + width) % width;
+      particle.y = (particle.y + particle.velocityY + height) % height;
+      context.beginPath();
+      context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+      context.fillStyle = `rgba(31, 90, 45, ${particle.alpha})`;
+      context.fill();
+
+      for (let otherIndex = index + 1; otherIndex < particles.length; otherIndex += 1) {
+        const other = particles[otherIndex];
+        const dx = particle.x - other.x;
+        const dy = particle.y - other.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance < 105) {
+          context.beginPath();
+          context.moveTo(particle.x, particle.y);
+          context.lineTo(other.x, other.y);
+          context.strokeStyle = `rgba(23, 49, 13, ${.045 * (1 - distance / 105)})`;
+          context.stroke();
+        }
+      }
+    });
+    frame = window.requestAnimationFrame(draw);
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      window.cancelAnimationFrame(frame);
+    } else {
+      draw();
+    }
+  });
+  window.addEventListener("resize", resize, { passive: true });
+  resize();
+  draw();
+}
+
 document.querySelector("#refresh-button").addEventListener("click", loadData);
+startParticleField();
 loadData();

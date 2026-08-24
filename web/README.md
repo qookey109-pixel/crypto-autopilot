@@ -63,9 +63,24 @@ artifact with its latest bounded public-data replay. The browser only renders
 candidate signals, simulated trades and aggregate metrics. It cannot contact
 Pionex, submit Demo orders or mutate Repository state.
 
-Historical Binance and other provider datasets are kept in ignored local
-research artifacts for internal training only. They are not copied into the
-dashboard and must remain provider-separated from Pionex evidence.
+Persistent generated historical datasets are kept online in the authorized R2
+namespaces; GitHub Actions runner files are disposable and removed after
+verified publication. Raw training history is not copied into the dashboard and
+must remain provider-separated from Pionex evidence.
+
+## Interface direction
+
+The V0.2 visual shell is a light editorial research console: warm paper
+surfaces, high-contrast forest ink, sparse status color, generous whitespace
+and a subtle reduced-motion-safe particle field. The generated constellation
+art at `web/assets/research-constellation-v1.jpg` is decorative only and has no
+authority or model-input role.
+
+The overview deliberately summarizes the evidence pipeline and critical gates;
+the remaining eight views preserve the complete read-only inspection surface.
+The continuous-learning timeline is sourced from Repository state and
+`docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`, but remains a normalized roadmap
+view rather than execution authority.
 
 ## Views
 

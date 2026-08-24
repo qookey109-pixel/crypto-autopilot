@@ -146,6 +146,9 @@ Repository branch `main` is the live formal authority and is intentionally not s
 - A post-window four-hour/weekly/monthly successor cadence is recorded as
   `PREPARED_NOT_ACTIVE`. It has no workflow and grants zero provider, R2,
   holdout, model-promotion or trading authority.
+- The research-only continuous-learning completion target is documented in
+  `docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`. Its `2026-09-30` engineering
+  target is a roadmap, not execution authority or a profitability promise.
 
 ### Binance Spot R2 Weekly Training and Review V0.4 — HISTORICAL / EXECUTION RETIRED
 
