@@ -13,6 +13,7 @@ model or authorize trading.
 | Sunday 02:37 UTC | Binance Spot R2 training governance V0.5 | First run completed; pipeline `PASS`, model quality `REJECT`; no push trigger |
 | Day 1 03:37 UTC | Binance Spot monthly governance V0.5 | One-time manual baseline completed; repeat manual activation is forbidden |
 | Hourly at `:07` | Pionex public paper training V0.1 | Repository Paper Broker only; Pionex Demo stays manual |
+| Daily 02:17 UTC | Research Signal Layer V0.2 | Public HTTPS source metadata and structured KOL challenger evidence to dedicated R2 namespace; no trading |
 | Every 6 hours at `:23`, 2026-09-04 through 2026-09-30 | Binance USD-M Detailed History V0.1.1 | One serialized incomplete 10-market shard; 250-market / 48-month target; R2-only |
 | Sunday 04:37 UTC | Binance USD-M Detailed Training V0.1.1 | Skips until all detailed-history shards are complete; research evidence only |
 
@@ -20,6 +21,11 @@ The Binance weekly and monthly jobs stop before provider or R2 access at
 `2026-08-27T00:00:00Z`; the Pionex paper job also stops provider requests at
 that boundary. A green post-stop skip is intentional. No automatic resume is
 authorized.
+
+Research Signal Layer V0.2 is independent of the frozen Binance/Pionex stop
+window. Its collector performs a fresh FREE-ONLY R2 headroom gate before any
+source fetch and before every write. A source that exposes only HTML prose is
+recorded as metadata evidence; it is never converted into a guessed direction.
 
 The Detailed History cron syntax recurs annually because GitHub cron has no
 year field. A frozen `2026-10-01T00:00:00Z` backfill stop makes every later

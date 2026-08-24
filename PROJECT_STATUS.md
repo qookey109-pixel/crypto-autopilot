@@ -126,6 +126,14 @@ Repository branch `main` is the live formal authority and is intentionally not s
   model or trigger a trade. External KOL ingestion remains disabled until a
   separately versioned authority names sources, retention and rate limits.
   See `docs/RESEARCH_SIGNAL_LAYER_V0_1.md`.
+- Research Signal Layer V0.2 is active on merge: a daily `02:17 UTC` GitHub
+  Actions collector reads only the three configured public HTTPS sources,
+  accepts structured JSON forecasts without prose inference, and publishes
+  immutable source metadata/forecast evidence to the dedicated R2 namespace.
+  It performs fresh 8 GB FREE-ONLY headroom gates before fetch and write. It
+  cannot append historical candles, promote a model or trigger a trade. See
+  `docs/RESEARCH_SIGNAL_LAYER_V0_2.md` and
+  `.github/workflows/research-signal-layer-v0-2.yml`.
 
 ### Binance Spot R2 Weekly Training and Review V0.4 — HISTORICAL / EXECUTION RETIRED
 

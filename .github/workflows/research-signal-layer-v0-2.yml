@@ -1,0 +1,66 @@
+name: Research Signal Layer V0.2
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: research-signal-layer-v0-2
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Collect public research sources and publish R2 evidence
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          python scripts/run_research_signal_layer_v0_2.py \
+            --config config/research_signal_layer_v0_2.json \
+            --run-id "github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --output research-signal-output/signals.json \
+            --publish-r2
+
+      - name: Assert research-only authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path("research-signal-output/signals.json").read_text())
+          authority = report["authority"]
+          assert report["mode"] == "RESEARCH_ONLY"
+          assert authority["automatic_model_promotion"] is False
+          assert authority["direct_trade_trigger"] is False
+          assert authority["real_money_order"] is False
+          assert authority["live_trading"] is False
+          for source in report["source_snapshots"]:
+              assert source["source_url"].startswith("https://")
+          PY
+
+      - name: Upload secret-free evidence artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: research-signal-layer-${{ github.run_id }}-${{ github.run_attempt }}
+          path: research-signal-output/signals.json
+          retention-days: 90
+          if-no-files-found: error
