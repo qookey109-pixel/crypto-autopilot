@@ -240,8 +240,10 @@ const titles = {
 function activateView(view) {
   const target = document.querySelector(`#view-${view}`);
   if (!target) return;
+  const isOverview = view === "overview";
   const hero = document.querySelector(".mint-hero");
-  if (hero) hero.classList.toggle("is-hidden", view !== "overview");
+  if (hero) hero.classList.toggle("is-hidden", !isOverview);
+  document.body.classList.toggle("subview-active", !isOverview);
   document.querySelectorAll(".nav-item").forEach(item => {
     const active = item.dataset.view === view;
     item.classList.toggle("active", active);
@@ -251,7 +253,7 @@ function activateView(view) {
   document.querySelectorAll(".view").forEach(item => item.classList.remove("active"));
   target.classList.add("active");
   document.querySelector("#page-title").textContent = titles[view] || view;
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 }
 
 document.querySelectorAll(".nav-item, .view-link").forEach(button => {
