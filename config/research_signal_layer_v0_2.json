@@ -1,0 +1,67 @@
+{
+  "schema": "research-signal-layer-v0.2",
+  "status": "ACTIVE_ON_MERGE",
+  "purpose": "Bounded public KOL evidence and latest closed-market research snapshots",
+  "sources": [
+    {
+      "source_id": "capafy_category_11",
+      "url": "https://capafy.ai/zh-hant/?category=11",
+      "enabled": true,
+      "parse_mode": "structured_json_only"
+    },
+    {
+      "source_id": "capafy_btc_cycle_radar",
+      "url": "https://capafy.ai/zh-hant/agent/bitcoin-cycle-radar-btc-health-buzz/8672024464",
+      "enabled": true,
+      "parse_mode": "structured_json_only"
+    },
+    {
+      "source_id": "x_aleabitoreddit",
+      "url": "https://x.com/aleabitoreddit",
+      "enabled": true,
+      "parse_mode": "metadata_only"
+    }
+  ],
+  "fetch": {
+    "timeout_seconds": 20,
+    "max_bytes_per_source": 500000,
+    "max_sources_per_run": 3,
+    "retries": 0,
+    "no_login_or_authentication": true,
+    "no_scraping_bypass": true,
+    "prose_direction_inference": false
+  },
+  "schedule": {
+    "daily_collection_cron_utc": "17 2 * * *",
+    "manual_dispatch": true,
+    "concurrency_group": "research-signal-layer-v0-2"
+  },
+  "storage": {
+    "provider": "cloudflare_r2",
+    "namespace": "research/signal-layer/v0-2",
+    "hard_stop_bytes": 8000000000,
+    "max_planned_write_bytes": 2500000,
+    "fresh_headroom_check_before_fetch": true,
+    "fresh_headroom_check_before_write": true,
+    "r2_write_authorized": true,
+    "raw_provider_payloads_persisted": false,
+    "latest_pointer_key": "research/signal-layer/v0-2/latest.json"
+  },
+  "authority": {
+    "research_only": true,
+    "automatic_model_promotion": false,
+    "direct_trade_trigger": false,
+    "trade_plan": false,
+    "real_money_order": false,
+    "live_trading": false,
+    "holdout_access": false,
+    "provider_relabeling": false
+  },
+  "quality_target": {
+    "data_integrity_target": "100_percent",
+    "no_lookahead": true,
+    "prediction_accuracy_guaranteed": false,
+    "structured_forecast_required": true,
+    "unparsed_prose_is_evidence_only": true
+  }
+}

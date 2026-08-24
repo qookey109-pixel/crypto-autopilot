@@ -91,6 +91,12 @@ mixing, and evaluates KOL accuracy, Brier score and baseline lift as
 descriptive challenger evidence only. It does not fetch external KOL sources,
 write production R2, promote a model or trigger a trade. See
 [`docs/RESEARCH_SIGNAL_LAYER_V0_1.md`](docs/RESEARCH_SIGNAL_LAYER_V0_1.md).
+V0.2 connects this contract to a daily bounded public-source collector. It
+stores source metadata and only explicitly structured JSON forecasts in a
+dedicated R2 namespace, with fresh FREE-ONLY headroom gates and no prose
+direction inference. It remains challenger evidence only; the existing
+Pionex hourly paper path and Binance weekly historical trainer remain separate.
+See [`docs/RESEARCH_SIGNAL_LAYER_V0_2.md`](docs/RESEARCH_SIGNAL_LAYER_V0_2.md).
 The current time-ordered operating handoff is
 [`docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`](docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md).
 
