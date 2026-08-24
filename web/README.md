@@ -70,21 +70,20 @@ must remain provider-separated from Pionex evidence.
 
 ## Interface direction
 
-The V0.4 visual shell is a warm editorial research journal: a paper-white and
-linen canvas, a restrained graphite UI, large serif display type, hairline
-dividers and pill controls. The overview uses a bronze gallery block to stage
-the original sculptural market artwork while the evidence pipeline, calendar,
-provider provenance and critical gates remain readable and explicitly
-non-authoritative.
+The V0.5 visual shell follows a Mintlify-inspired documentation-product rhythm:
+a white canvas, universal Inter typography, one Mint Green functional accent,
+square 4px controls, restrained 16px cards and a full-bleed teal hero. A
+floating research-product mockup bridges the hero and the austere evidence
+sections below it.
 
-The original generated artwork at `web/assets/research-orbit-v3.jpg` is
-decorative only and has no authority or model-input role. Earlier dashboard
-assets are retained as historical design material but are no longer rendered
-by the current shell.
+The original generated cloud-garden artwork at
+`web/assets/cloud-garden-v4.jpg` is decorative only and has no authority or
+model-input role. Earlier dashboard assets are retained as historical design
+material but are no longer rendered by the current shell.
 
 The overview deliberately summarizes the evidence pipeline and critical gates;
 the remaining eight views preserve the complete read-only inspection surface.
-The learning calendar is sourced from Repository state and
+The research calendar is sourced from Repository state and
 `docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`, but remains a normalized roadmap
 view rather than execution authority.
 
