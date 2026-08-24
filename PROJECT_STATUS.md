@@ -119,6 +119,13 @@ Repository branch `main` is the live formal authority and is intentionally not s
   groups locally with calibration and descriptive regime slices. It has no
   provider reads, R2 writes, holdout access, promotion or trading authority.
   See `docs/BINANCE_SPOT_SHADOW_V0_6.md`.
+- Research Signal Layer V0.1 is now prepared as a separate, research-only
+  contract for appending only closed latest candles and evaluating timestamped
+  KOL forecasts without lookahead. It is idempotent, rejects historical
+  revisions and provider mixing, and cannot write production R2, promote a
+  model or trigger a trade. External KOL ingestion remains disabled until a
+  separately versioned authority names sources, retention and rate limits.
+  See `docs/RESEARCH_SIGNAL_LAYER_V0_1.md`.
 
 ### Binance Spot R2 Weekly Training and Review V0.4 — HISTORICAL / EXECUTION RETIRED
 
