@@ -13,6 +13,8 @@ class DetailedHistoryWorkflowTests(unittest.TestCase):
             ROOT / ".github/workflows/binance-usdm-detailed-history-v0-1.yml"
         ).read_text()
         self.assertIn('cron: "23 */6 4-30 9 *"', text)
+        self.assertIn("binance_usdm_detailed_history_v0_1_1.json", text)
+        self.assertIn("v0-1-1-bounded-authority.json", text)
         self.assertIn("cancel-in-progress: false", text)
         self.assertIn("persist-credentials: false", text)
         self.assertIn("R2_SECRET_ACCESS_KEY", text)
@@ -26,6 +28,7 @@ class DetailedHistoryWorkflowTests(unittest.TestCase):
             ROOT / ".github/workflows/binance-usdm-detailed-training-v0-1.yml"
         ).read_text()
         self.assertIn('cron: "37 4 * * 0"', text)
+        self.assertIn("binance_usdm_detailed_history_v0_1_1.json", text)
         self.assertIn("train_binance_detailed_history_models.py", text)
         self.assertIn("automatic_model_promotion_authorized", text)
         self.assertIn("live_trading_authorized", text)

@@ -13,13 +13,18 @@ model or authorize trading.
 | Sunday 02:37 UTC | Binance Spot R2 training governance V0.5 | First run completed; pipeline `PASS`, model quality `REJECT`; no push trigger |
 | Day 1 03:37 UTC | Binance Spot monthly governance V0.5 | One-time manual baseline completed; repeat manual activation is forbidden |
 | Hourly at `:07` | Pionex public paper training V0.1 | Repository Paper Broker only; Pionex Demo stays manual |
-| Every 6 hours at `:23`, 2026-09-04 through 2026-09-30 | Binance USD-M Detailed History V0.1 | One serialized incomplete 10-market shard; 250-market / 48-month target; R2-only |
-| Sunday 04:37 UTC | Binance USD-M Detailed Training V0.1 | Skips until all detailed-history shards are complete; research evidence only |
+| Every 6 hours at `:23`, 2026-09-04 through 2026-09-30 | Binance USD-M Detailed History V0.1.1 | One serialized incomplete 10-market shard; 250-market / 48-month target; R2-only |
+| Sunday 04:37 UTC | Binance USD-M Detailed Training V0.1.1 | Skips until all detailed-history shards are complete; research evidence only |
 
 The Binance weekly and monthly jobs stop before provider or R2 access at
 `2026-08-27T00:00:00Z`; the Pionex paper job also stops provider requests at
 that boundary. A green post-stop skip is intentional. No automatic resume is
 authorized.
+
+The Detailed History cron syntax recurs annually because GitHub cron has no
+year field. A frozen `2026-10-01T00:00:00Z` backfill stop makes every later
+occurrence exit before provider or R2 access. The separate completed-dataset
+weekly trainer is not subject to that backfill-only expiration.
 
 The initial V0.5 monthly baseline was created successfully by run `32589005957`
 at `2026-08-23 01:51 Asia/Taipei`. The first weekly run `32615608243` completed
@@ -37,7 +42,7 @@ The requested retention policy is recorded in
 
 - Binance Spot `1d` training history remains `2020-01-01` through the latest
   complete UTC day under the existing V0.5 authority.
-- Detailed History V0.1 authorizes a fixed 2022-08 through 2026-07 Binance USD-M
+- Detailed History V0.1.1 authorizes a fixed 2022-08 through 2026-07 Binance USD-M
   `15m` / `1h` / `4h` dataset for 250 markets after the V0.10 window.
 - Future rolling updates and the broader derivative-state series still need a
   separately authorized materialization path.
@@ -45,7 +50,7 @@ The requested retention policy is recorded in
   another full duplicate dataset.
 
 The detailed backfill is versioned separately in
-`config/binance_usdm_detailed_history_v0_1.json`. It does not authorize
+`config/binance_usdm_detailed_history_v0_1_1.json`. It does not authorize
 deletion/compaction of frozen evidence, holdout access, source switching or
 trading.
 

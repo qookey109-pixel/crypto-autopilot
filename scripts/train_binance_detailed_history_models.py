@@ -32,10 +32,10 @@ from crypto_autopilot.storage.r2 import R2Store
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_CONFIG = ROOT / "config/binance_usdm_detailed_history_v0_1.json"
+DEFAULT_CONFIG = ROOT / "config/binance_usdm_detailed_history_v0_1_1.json"
 DEFAULT_AUTHORITY = (
     ROOT
-    / "research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-authority.json"
+    / "research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-1-bounded-authority.json"
 )
 SAFE_RUN_ID = re.compile(r"^[A-Za-z0-9._-]{1,96}$")
 
@@ -348,7 +348,7 @@ def main() -> int:
     )
     generated_at = observed.astimezone(UTC).isoformat().replace("+00:00", "Z")
     try:
-        require_execution_window(config, observed_at=observed)
+        require_execution_window(config, observed_at=observed, operation="training")
     except DetailedHistoryAuthorityError as exc:
         if "blocked until the V0.10 window has ended" not in str(exc):
             raise

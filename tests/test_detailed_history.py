@@ -27,8 +27,13 @@ from crypto_autopilot.detailed_history import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CONFIG = ROOT / "config/binance_usdm_detailed_history_v0_1.json"
+CONFIG = ROOT / "config/binance_usdm_detailed_history_v0_1_1.json"
 AUTHORITY = (
+    ROOT
+    / "research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-1-bounded-authority.json"
+)
+V0_1_CONFIG = ROOT / "config/binance_usdm_detailed_history_v0_1.json"
+V0_1_AUTHORITY = (
     ROOT
     / "research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-authority.json"
 )
@@ -160,7 +165,12 @@ class DetailedHistoryTests(unittest.TestCase):
         config, receipt, config_bytes = load_authority_pair(CONFIG, AUTHORITY)
         self.assertEqual(receipt["config_sha256"], hashlib.sha256(config_bytes).hexdigest())
         validate_authority_config(config)
+        self.assertEqual(config["version"], "0.1.1")
         self.assertEqual(config["scope"]["target_market_count"], 250)
+        self.assertEqual(
+            config["execution"]["backfill_stop_exclusive_utc"],
+            "2026-10-01T00:00:00Z",
+        )
         self.assertEqual(len(month_range("2022-08", "2026-07")), 48)
         for name in (
             "replacement_holdout_access_authorized",
@@ -177,6 +187,29 @@ class DetailedHistoryTests(unittest.TestCase):
         require_execution_window(
             config, observed_at=datetime(2026, 9, 4, 2, 0, 0, tzinfo=UTC)
         )
+        with self.assertRaisesRegex(DetailedHistoryAuthorityError, "authority expired"):
+            require_execution_window(
+                config, observed_at=datetime(2026, 10, 1, 0, 0, 0, tzinfo=UTC)
+            )
+        require_execution_window(
+            config,
+            observed_at=datetime(2027, 9, 4, 2, 0, 0, tzinfo=UTC),
+            operation="training",
+        )
+
+    def test_v0_1_authority_is_immutable_and_v0_1_1_delta_is_bounded(self) -> None:
+        old_bytes = V0_1_CONFIG.read_bytes()
+        old_receipt = json.loads(V0_1_AUTHORITY.read_text())
+        self.assertEqual(
+            hashlib.sha256(old_bytes).hexdigest(),
+            "c3698f945dfdfe4436e602aeb2b7f25f2b9b32790a8d67e76f732d5cfaf89b70",
+        )
+        self.assertEqual(old_receipt["config_sha256"], hashlib.sha256(old_bytes).hexdigest())
+        old_config = json.loads(old_bytes)
+        current = json.loads(CONFIG.read_text())
+        current["version"] = "0.1.0"
+        current["execution"].pop("backfill_stop_exclusive_utc")
+        self.assertEqual(current, old_config)
 
     def test_pre_window_script_skips_without_constructing_r2_or_reading_provider(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -215,6 +248,47 @@ class DetailedHistoryTests(unittest.TestCase):
             )
             report = json.loads(output.read_text())
         self.assertEqual(report["status"], "SKIPPED")
+        self.assertEqual(report["provider_requests_performed"], 0)
+        self.assertFalse(report["r2_access_performed"])
+
+    def test_expired_backfill_skips_before_r2_or_provider(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "report.json"
+            env = dict(os.environ)
+            env["PYTHONPATH"] = str(ROOT / "src")
+            for name in (
+                "CLOUDFLARE_ACCOUNT_ID",
+                "R2_BUCKET_NAME",
+                "R2_ACCESS_KEY_ID",
+                "R2_SECRET_ACCESS_KEY",
+            ):
+                env.pop(name, None)
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "scripts/run_binance_detailed_history.py"),
+                    "--config",
+                    str(CONFIG),
+                    "--authority",
+                    str(AUTHORITY),
+                    "--mode",
+                    "auto",
+                    "--run-id",
+                    "expired-window-test",
+                    "--now-utc",
+                    "2026-10-01T00:00:00Z",
+                    "--output",
+                    str(output),
+                ],
+                check=True,
+                cwd=ROOT,
+                env=env,
+                capture_output=True,
+                text=True,
+            )
+            report = json.loads(output.read_text())
+        self.assertEqual(report["status"], "SKIPPED")
+        self.assertEqual(report["stage"], "DETAILED_HISTORY_AUTHORITY_EXPIRED")
         self.assertEqual(report["provider_requests_performed"], 0)
         self.assertFalse(report["r2_access_performed"])
 

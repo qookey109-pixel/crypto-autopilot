@@ -522,7 +522,7 @@ def _parse_utc(value: str) -> datetime:
 
 def validate_authority_config(config: Mapping[str, Any]) -> None:
     if (
-        config.get("version") != "0.1.0"
+        config.get("version") != "0.1.1"
         or config.get("status") != "EXECUTION_AUTHORIZED_AFTER_V0_10_WINDOW"
         or config.get("provider") != "binance_usdm"
         or config.get("delivery") != "binance_vision"
@@ -550,6 +550,9 @@ def validate_authority_config(config: Mapping[str, Any]) -> None:
     not_before = _parse_utc(str(execution["not_before_utc"]))
     if not_before < _parse_utc("2026-09-04T02:00:00Z"):
         raise DetailedHistoryAuthorityError("detailed-history execution may not overlap V0.10")
+    backfill_stop = _parse_utc(str(execution["backfill_stop_exclusive_utc"]))
+    if backfill_stop != _parse_utc("2026-10-01T00:00:00Z") or not_before >= backfill_stop:
+        raise DetailedHistoryAuthorityError("detailed-history backfill stop is invalid")
     if int(storage.get("free_only_hard_stop_bytes", 0)) != 8_000_000_000:
         raise DetailedHistoryAuthorityError("detailed-history R2 hard stop must remain 8 GB")
     if int(storage.get("maximum_projected_dataset_bytes", 0)) <= 0:
@@ -573,13 +576,27 @@ def validate_authority_config(config: Mapping[str, Any]) -> None:
             raise DetailedHistoryAuthorityError(f"detailed-history authority drift: {name}")
 
 
-def require_execution_window(config: Mapping[str, Any], *, observed_at: datetime) -> None:
+def require_execution_window(
+    config: Mapping[str, Any],
+    *,
+    observed_at: datetime,
+    operation: str = "backfill",
+) -> None:
     validate_authority_config(config)
     if observed_at.tzinfo is None:
         raise ValueError("execution clock must be timezone-aware")
-    if observed_at.astimezone(UTC) < _parse_utc(str(config["execution"]["not_before_utc"])):
+    if operation not in {"backfill", "training"}:
+        raise ValueError("unsupported detailed-history operation")
+    observed_utc = observed_at.astimezone(UTC)
+    if observed_utc < _parse_utc(str(config["execution"]["not_before_utc"])):
         raise DetailedHistoryAuthorityError(
             "detailed-history execution is blocked until the V0.10 window has ended"
+        )
+    if operation == "backfill" and observed_utc >= _parse_utc(
+        str(config["execution"]["backfill_stop_exclusive_utc"])
+    ):
+        raise DetailedHistoryAuthorityError(
+            "detailed-history backfill authority expired before provider or R2 access"
         )
 
 
@@ -592,11 +609,24 @@ def load_authority_pair(
     receipt = json.loads(Path(receipt_path).read_text(encoding="utf-8"))
     validate_authority_config(config)
     digest = sha256_bytes(config_bytes)
+    supersession = receipt.get("supersession")
+    execution_boundary = receipt.get("execution_boundary")
     if (
-        receipt.get("status") != "AUTHORIZED"
-        or receipt.get("stage") != "BINANCE_USDM_DETAILED_HISTORY_V0_1_AUTHORIZED"
+        receipt.get("schema")
+        != "binance-usdm-detailed-history-execution-authority-v0.1.1"
+        or receipt.get("status") != "AUTHORIZED"
+        or receipt.get("stage") != "BINANCE_USDM_DETAILED_HISTORY_V0_1_1_AUTHORIZED"
+        or receipt.get("config")
+        != "config/binance_usdm_detailed_history_v0_1_1.json"
         or receipt.get("config_sha256") != digest
         or not _SHA256_RE.fullmatch(str(receipt.get("config_sha256") or ""))
+        or not isinstance(supersession, dict)
+        or supersession.get("superseded_authority_mutated") is not False
+        or supersession.get("v0_1_provider_requests_performed") != 0
+        or supersession.get("v0_1_r2_access_performed") is not False
+        or not isinstance(execution_boundary, dict)
+        or execution_boundary.get("backfill_stop_exclusive_utc")
+        != config["execution"]["backfill_stop_exclusive_utc"]
     ):
         raise DetailedHistoryAuthorityError("detailed-history config/receipt binding mismatch")
     return config, receipt, config_bytes

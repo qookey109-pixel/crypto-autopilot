@@ -4,7 +4,7 @@ Status date: `2026-08-24` (`Asia/Taipei`).
 
 This handoff is an operations guide, not execution authority. Repository
 `main`, versioned configs and receipts remain authoritative. Detailed History
-V0.1 has its own post-window R2 authority; this handoff does not independently
+V0.1.1 has its own post-window R2 authority; this handoff does not independently
 enable R2 access, holdout access, model promotion, trade plans, real-money
 orders or live trading.
 
@@ -51,9 +51,9 @@ and cost contracts.
 
 ## Current implementation handoff
 
-The prepared V0.6 Shadow implementation and Detailed History V0.1 are on the
-`codex/expand-detailed-history-v0-1` delivery branch. They are not merged into
-Repository `main` yet.
+The prepared V0.6 Shadow implementation and Detailed History V0.1 were merged
+to Repository `main` by PR #177. Detailed History V0.1.1 supersedes V0.1 before
+the first provider request or R2 access and adds the bounded cron stop.
 
 It provides:
 
@@ -68,7 +68,7 @@ The runner may use only an already-authorized ephemeral Parquet input. The
 prepared V0.6 config does not authorize downloading the production R2 dataset
 or adding a GitHub Actions schedule.
 
-Detailed History V0.1 separately provides:
+Detailed History V0.1.1 separately provides:
 
 - an official Binance Vision archive-directory catalog with 817 currently
   observed eligible markets and a deterministic 250-market selection;
@@ -79,7 +79,10 @@ Detailed History V0.1 separately provides:
 - a weekly causal intraday trainer with chronological baseline, cost, drawdown
   and exposure diagnostics after dataset completion;
 - an execution not-before guard at `2026-09-04T02:00:00Z`, so the frozen V0.10
-  window and replacement holdout remain untouched.
+  window and replacement holdout remain untouched;
+- a backfill stop at `2026-10-01T00:00:00Z`, so future annual cron occurrences
+  exit before provider or R2 access while weekly completed-dataset training can
+  continue.
 
 ## Operational schedule
 
@@ -91,8 +94,8 @@ Detailed History V0.1 separately provides:
 | Hourly at `:07` until 2026-08-27 08:00 | Existing Pionex public paper training | Existing bounded paper authority only; Pionex Demo remains manual |
 | 2026-08-27 08:00 | V0.5 Binance and Pionex provider-read stop | Automatic post-stop resume is forbidden |
 | 2026-08-27 08:00 through 2026-09-04 09:59:59.999 | V0.10 frozen metadata capture window | Existing `:17` / `:47` attempts only; no second path or manual backfill |
-| 2026-09-04 10:00 onward, Sep 4-30 every six hours at `:23` | Detailed History V0.1 catalog then next incomplete shard | Serialized R2-only backfill; source ends 2026-07 |
-| Sunday 12:37 after detailed dataset completion | Detailed Training V0.1 | Walk-forward research; `REJECT` is retained and never promoted |
+| 2026-09-04 14:23 first eligible cron, then every six hours through Sep 30 | Detailed History V0.1.1 catalog then next incomplete shard | Serialized R2-only backfill; source ends 2026-07; expires Oct 1 08:00 |
+| Sunday 12:37 after detailed dataset completion | Detailed Training V0.1.1 | Walk-forward research; `REJECT` is retained and never promoted |
 | After 2026-09-04 09:59:59.999 | Prepare and merge separate V0.11 production-evaluation authority | Do not read production V0.10 R2 receipts before authority exists |
 | After V0.11 evaluation | Review exact 194-slot completeness and provider-vector stability | Any missing slot, disagreement or drift fails closed |
 | Only after a future V0.11 PASS | Consider a separate replacement-holdout access authority | Stability PASS alone does not open holdout candles |
@@ -126,9 +129,8 @@ run independent crons that can race:
 - [x] Preserve first monthly baseline evidence; do not repeat manual activation.
 - [x] Preserve first weekly pipeline `PASS` and model `REJECT` separately.
 - [x] Prepare V0.6 Shadow code, tests, config and experiment registry locally.
-- [ ] Push `codex/expand-detailed-history-v0-1`, open the PR and require CI
-  green before merge.
-- [ ] Preserve V0.6 as local-only; Detailed History V0.1 may use R2 only under
+- [x] Merge PR #177 after all seven GitHub checks pass.
+- [x] Preserve V0.6 as research-only; Detailed History V0.1.1 may use R2 only under
   its exact post-window authority.
 - [ ] At `2026-08-27 08:00 Asia/Taipei`, verify V0.5/Pionex jobs fail closed
   before provider access and leave V0.10 as the only metadata capture path.
