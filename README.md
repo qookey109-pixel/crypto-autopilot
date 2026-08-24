@@ -97,6 +97,15 @@ dedicated R2 namespace, with fresh FREE-ONLY headroom gates and no prose
 direction inference. It remains challenger evidence only; the existing
 Pionex hourly paper path and Binance weekly historical trainer remain separate.
 See [`docs/RESEARCH_SIGNAL_LAYER_V0_2.md`](docs/RESEARCH_SIGNAL_LAYER_V0_2.md).
+Two read-only guardrails now sit beside that collector: a daily `02:47 UTC`
+signal-lineage/quality check and a GitHub Actions health monitor every three
+hours at `:47`. They distinguish formal scheduled/manual runs from PR checks,
+verify the exact R2 latest-to-manifest-to-payload chain without listing or
+writing R2, and do not open the holdout or affect models/trades. See
+[`docs/RESEARCH_AUTOMATION_HEALTH_V0_1.md`](docs/RESEARCH_AUTOMATION_HEALTH_V0_1.md).
+The proposed rolling four-hour data refresh, weekly Shadow ablation and monthly
+drift review remain prepared but inactive pending a separate post-window
+authority.
 The current time-ordered operating handoff is
 [`docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`](docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md).
 

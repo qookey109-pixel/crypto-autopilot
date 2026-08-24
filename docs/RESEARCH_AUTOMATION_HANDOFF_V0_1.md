@@ -92,6 +92,9 @@ Detailed History V0.1.1 separately provides:
 | 2026-08-23 11:32 | First weekly V0.5 data, training and review | **DONE / PIPELINE PASS / MODEL REJECT**; retain all evidence |
 | 2026-08-23 through 2026-08-26 | Finish local V0.6 review, PR delivery and documentation | Local/synthetic only; no V0.6 provider or R2 access |
 | Hourly at `:07` until 2026-08-27 08:00 | Existing Pionex public paper training | Existing bounded paper authority only; Pionex Demo remains manual |
+| Daily 10:17 | Public KOL research collection | Dedicated R2 namespace; structured forecasts only, prose stays metadata |
+| Daily 10:47 | KOL research quality check | Three exact R2 reads; lineage/time/authority verification; no list/write |
+| Every three hours at `:47` | Research automation health | GitHub Actions metadata only; alerts on stale, failed or missing jobs |
 | 2026-08-27 08:00 | V0.5 Binance and Pionex provider-read stop | Automatic post-stop resume is forbidden |
 | 2026-08-27 08:00 through 2026-09-04 09:59:59.999 | V0.10 frozen metadata capture window | Existing `:17` / `:47` attempts only; no second path or manual backfill |
 | 2026-09-04 14:23 first eligible cron, then every six hours through Sep 30 | Detailed History V0.1.1 catalog then next incomplete shard | Serialized R2-only backfill; source ends 2026-07; expires Oct 1 08:00 |
@@ -132,6 +135,8 @@ run independent crons that can race:
 - [x] Merge PR #177 after all seven GitHub checks pass.
 - [x] Preserve V0.6 as research-only; Detailed History V0.1.1 may use R2 only under
   its exact post-window authority.
+- [x] Add event-aware automation health and daily KOL evidence quality schedules
+  without changing V0.10, holdout or trading authority.
 - [ ] At `2026-08-27 08:00 Asia/Taipei`, verify V0.5/Pionex jobs fail closed
   before provider access and leave V0.10 as the only metadata capture path.
 - [ ] After the full metadata window ends, create the separate V0.11 production

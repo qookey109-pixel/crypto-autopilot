@@ -1,0 +1,67 @@
+name: Research Automation Health V0.1
+
+on:
+  schedule:
+    - cron: "47 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: research-automation-health-v0-1
+  cancel-in-progress: false
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Check versioned research automations
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/check_research_automation_health.py \
+            --config config/research_automation_health_v0_1.json \
+            --repository "${GITHUB_REPOSITORY}" \
+            --output research-health-output/health.json \
+            --fail-on-alert
+
+      - name: Assert monitor has no provider, storage or trading authority
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path("research-health-output/health.json").read_text())
+          authority = report["authority"]
+          assert authority["provider_access"] is False
+          assert authority["r2_access"] is False
+          assert authority["holdout_access"] is False
+          assert authority["automatic_model_promotion"] is False
+          assert authority["trade_plan"] is False
+          assert authority["real_money_order"] is False
+          assert authority["live_trading"] is False
+          PY
+
+      - name: Upload secret-free health evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: research-automation-health-${{ github.run_id }}-${{ github.run_attempt }}
+          path: research-health-output/health.json
+          retention-days: 90
+          if-no-files-found: error
+

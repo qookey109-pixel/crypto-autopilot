@@ -14,6 +14,8 @@ model or authorize trading.
 | Day 1 03:37 UTC | Binance Spot monthly governance V0.5 | One-time manual baseline completed; repeat manual activation is forbidden |
 | Hourly at `:07` | Pionex public paper training V0.1 | Repository Paper Broker only; Pionex Demo stays manual |
 | Daily 02:17 UTC | Research Signal Layer V0.2 | Public HTTPS source metadata and structured KOL challenger evidence to dedicated R2 namespace; no trading |
+| Daily 02:47 UTC | Research Signal Quality V0.1 | Exact latest/manifest/payload R2 reads with SHA/time/authority checks; no list or write |
+| Every three hours at `:47` | Research Automation Health V0.1 | GitHub Actions metadata-only stale/failure/missing-run monitor; no provider or R2 access |
 | Every 6 hours at `:23`, 2026-09-04 through 2026-09-30 | Binance USD-M Detailed History V0.1.1 | One serialized incomplete 10-market shard; 250-market / 48-month target; R2-only |
 | Sunday 04:37 UTC | Binance USD-M Detailed Training V0.1.1 | Skips until all detailed-history shards are complete; research evidence only |
 
@@ -26,6 +28,10 @@ Research Signal Layer V0.2 is independent of the frozen Binance/Pionex stop
 window. Its collector performs a fresh FREE-ONLY R2 headroom gate before any
 source fetch and before every write. A source that exposes only HTML prose is
 recorded as metadata evidence; it is never converted into a guessed direction.
+The daily quality job starts 30 minutes after collection and reports metadata-
+only evidence truthfully instead of treating prose as a forecast. The health
+job filters allowed workflow events so pull-request checks cannot satisfy a
+formal scheduled-run expectation.
 
 The Detailed History cron syntax recurs annually because GitHub cron has no
 year field. A frozen `2026-10-01T00:00:00Z` backfill stop makes every later
@@ -93,6 +99,12 @@ Even a model-quality `PASS` has zero promotion, backtest-admission or trading
 authority.
 
 ## Recommended post-window successor schedule (not activated)
+
+The exact proposal is machine-readable in
+`config/post_window_research_successor_schedule_v0_1.json`: closed-candle
+roll-forward every four hours at UTC `01:17/05:17/09:17/13:17/17:17/21:17`,
+weekly Shadow ablation Sunday `05:17 UTC`, and monthly drift/universe review on
+day 2 at `03:17 UTC`. It has no workflow and is not execution authority.
 
 1. Every training run: authority, R2 headroom, catalog/audited/row-depth collapse,
    tail completeness, OHLCV bounds, feature contract and partition-integrity gates.
