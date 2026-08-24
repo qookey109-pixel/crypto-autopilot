@@ -1,0 +1,59 @@
+{
+  "version": "0.1.0",
+  "status": "PREPARED_NOT_ACTIVE",
+  "purpose": "Separate long-horizon daily Spot training history from shorter detailed research history.",
+  "authority": {
+    "provider_reads_authorized": false,
+    "r2_writes_authorized": false,
+    "automatic_backfill_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "storage": {
+    "backend": "cloudflare_r2_only",
+    "local_persistent_artifacts_authorized": false,
+    "raw_history_projected_to_website": false,
+    "free_only_hard_stop_bytes": 8000000000,
+    "retention_applies_only_to_new_materializations": true,
+    "frozen_evidence_is_immutable": true
+  },
+  "datasets": {
+    "spot_daily": {
+      "provider": "binance_spot",
+      "market_type": "spot",
+      "interval": "1d",
+      "start_policy": "FIXED_2020_01_01_UTC",
+      "end_policy": "LAST_COMPLETE_UTC_DAY",
+      "retention_years": null,
+      "authority_reference": "config/binance_spot_r2_training_governance_v0_5.json"
+    },
+    "detailed_candles": {
+      "provider_scope": ["pionex_native_perp", "binance_usdm_proxy"],
+      "market_type": "perp",
+      "intervals": ["15m", "1h", "4h"],
+      "start_policy": "FOUR_YEARS_BEFORE_LATEST_COMPLETE_UTC_DAY",
+      "end_policy": "LAST_COMPLETE_UTC_DAY",
+      "retention_years": 4,
+      "provider_splicing_allowed": false,
+      "pionex_native_relabel_authorized": false
+    },
+    "derivatives_market_state": {
+      "provider_scope": ["pionex_native_perp", "binance_usdm"],
+      "series": ["funding_rate", "mark_index_basis", "open_interest"],
+      "start_policy": "FOUR_YEARS_BEFORE_LATEST_COMPLETE_UTC_DAY",
+      "end_policy": "LAST_COMPLETE_UTC_DAY",
+      "retention_years": 4,
+      "provider_splicing_allowed": false,
+      "derived_indicator_persistence": "RECOMPUTE_FROM_PROVIDER_SERIES"
+    },
+    "derived_features": {
+      "start_policy": "FOUR_YEARS_BEFORE_LATEST_COMPLETE_UTC_DAY",
+      "retention_years": 4,
+      "persist_separate_copy": false,
+      "recompute_from_canonical_inputs": true
+    }
+  },
+  "activation_rule": "A future execution authority must name this exact policy and add provider, namespace, request-window, schema and deletion/compaction gates before any detailed backfill or retention job is scheduled."
+}

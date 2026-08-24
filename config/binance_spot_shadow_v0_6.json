@@ -1,0 +1,36 @@
+{
+  "schema": "binance-spot-shadow-ablation-v0.6",
+  "version": "0.6.0",
+  "status": "PREPARED_NOT_ACTIVE",
+  "purpose": "Bounded local Shadow Model feature-group comparison after V0.5 quality rejection.",
+  "input_authority": "config/binance_spot_r2_training_governance_v0_5.json",
+  "provider": "binance_spot",
+  "market_type": "spot",
+  "interval": "1d",
+  "authority": {
+    "provider_reads_authorized": false,
+    "r2_writes_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "holdout_accessed": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "training": {
+    "warmup_bars": 100,
+    "train_fraction": 0.7,
+    "minimum_samples_per_split": 50,
+    "regime_minimum_samples": 50,
+    "calibration_bins": 10,
+    "epochs": 8,
+    "learning_rate": 0.08,
+    "l2": 0.0001,
+    "groups": {
+      "baseline": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7"],
+      "trend": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7", "adx14", "plus_di14", "minus_di14"],
+      "price_volume": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7", "vwap_distance_fraction", "volume_zscore20", "donchian_position20"],
+      "volatility": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7", "atr_percentile100", "bollinger_bandwidth_percentile100", "realized_volatility20", "parkinson_volatility20"]
+    }
+  },
+  "interpretation": "Shadow evidence only. A result cannot promote a model, authorize R2, open holdout data or authorize trading. Funding, mark-index basis and open interest remain outside this Spot scope."
+}

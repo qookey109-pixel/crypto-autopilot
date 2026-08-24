@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "status": "PREPARED_CAPACITY_ESTIMATE_NOT_EXECUTION_AUTHORITY",
+  "policy": "config/data_retention_policy_v0_1.json",
+  "basis": "research/estimates/2026-08-18-historical-capacity.json",
+  "assumptions": {
+    "detailed_history_years": 4,
+    "market_design_target": 250,
+    "native_intervals": ["15M", "60M", "4H"],
+    "linear_scaling_from_eight_year_estimate": true,
+    "daily_spot_training_snapshot_not_included": true,
+    "funding_basis_open_interest_not_included": true
+  },
+  "storage_gb": {
+    "detailed_canonical_only": 1.47794061905,
+    "detailed_canonical_plus_retained_staging": 2.9558812381,
+    "detailed_three_x_stress": 4.43382185715
+  },
+  "interpretation": {
+    "daily_spot": "Keep 2020-01-01 through the latest complete UTC day under the separate Binance Spot V0.5 authority.",
+    "detailed_data": "Keep only the rolling four years for future 15M/1H/4H and derivative-state materializations.",
+    "existing_frozen_evidence": "Do not delete or rewrite older frozen receipts, configs or proof objects.",
+    "headroom": "The detailed-data estimate is below the 8 GB project hard stop before adding unrelated existing R2 usage; every future write still requires the fresh account-level headroom gate."
+  }
+}

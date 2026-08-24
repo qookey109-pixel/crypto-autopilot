@@ -4,13 +4,14 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 
 > **Current mode: PAPER-ONLY.** No real-money order path is authorized. `trade_plan_authorized=false` and `live_trading_authorized=false` remain mandatory. For the detailed current authority index, always read [`PROJECT_STATUS.md`](PROJECT_STATUS.md) first.
 
-## Current authority snapshot — 2026-08-23
+## Current authority snapshot — 2026-08-24
 
 The repository has moved beyond the original V0.1 implementation baseline while preserving its scientific history:
 
 - Pionex M1/M1A historical-data foundation: **PASS**.
 - Cloudflare R2 historical storage and Binance 2025 pilot: **PASS**.
 - Binance Funding V0.2 R2 materialization: **PASS** — 192/192 authorized object identities verified after write.
+- Binance USD-M Detailed History V0.1: **AUTHORIZED AFTER V0.10 WINDOW / NOT STARTED** — 250-market target, fixed 2022-08 through 2026-07 window, native 15m/1h/4h archives, R2-only persistence and bounded intraday research training.
 - Pionex ↔ Binance Equivalence V0.1: **definitive FAIL** — 45 pairs = 18 PASS / 18 REVIEW / 9 FAIL. The frozen result must not be regraded by changing thresholds or scope.
 - `source_switch_authorized=false`; Binance evidence remains `provider=binance_usdm` and must never be relabeled as Pionex-native evidence.
 - V0.5 Render Free / Frankfurt Binance public-metadata transport: **PASS**.
@@ -47,16 +48,41 @@ contracts and market/audited/row-depth collapse gates run before any R2 write.
 A separate first-day monthly
 review compares active markets, catalog absences, survivorship-bias limitations
 and heuristic tokenized-stock classifications; repository pushes do not run
-either production workflow. The next weekly cron remains inside the authority
-window; the initial monthly V0.5 baseline requires one manual `workflow_dispatch`
-before `2026-08-27T00:00:00Z`. Repeated monthly manual activation and push
-activation are not authorized. The generated review carries the exact
+either production workflow. The initial monthly V0.5 baseline completed in run
+`32589005957`, consuming the one-time manual activation. The first weekly run
+`32615608243` also completed; its pipeline passed and its model-quality gate
+returned `REJECT`. Repeated monthly manual activation and push activation are
+not authorized. The generated review carries the exact
 config/comparison governance evidence and is contract-validated before R2 writes.
 R2 is the only persistent
 generated-data store; raw training history is not projected to GitHub Pages.
 V0.3 daily and V0.4 weekly/monthly execution are retired. V0.5 uses separate
 authority and R2 namespaces. No source-switch, formal backtest admission,
 automatic model promotion, W1, holdout or trading authority is introduced.
+
+Data retention is intentionally split: the V0.5 Binance Spot `1d` training
+history remains from `2020-01-01` to the latest complete UTC day, while future
+detailed `15m`/`1h`/`4h` and derivative-state materializations are planned as a
+rolling four-year window. The prepared, inactive policy is documented in
+[`docs/DATA_RETENTION_POLICY_V0_1.md`](docs/DATA_RETENTION_POLICY_V0_1.md).
+
+The separate **Binance USD-M Detailed History V0.1** path expands detailed
+research coverage beyond the original 15-contract basket. It builds a
+deterministic 250-market provider-separated catalog from official Binance
+Vision archive coverage, then materializes 48 complete months of native
+15m/1h/4h candles in serialized R2 shards. Execution begins only after
+`2026-09-04T02:00:00Z`; its source ends at 2026-07 and cannot read the
+replacement holdout. After all shards complete, a weekly research trainer runs
+causal multi-timeframe walk-forward, cost, drawdown and exposure diagnostics.
+See [`docs/BINANCE_USDM_DETAILED_HISTORY_V0_1.md`](docs/BINANCE_USDM_DETAILED_HISTORY_V0_1.md).
+
+The prepared V0.6 Shadow Model compares feature groups locally after the first
+V0.5 quality gate rejected the current model. It records calibration and
+descriptive regime evidence only; it cannot read providers, write R2, access
+the holdout, promote a model or trade. See
+[`docs/BINANCE_SPOT_SHADOW_V0_6.md`](docs/BINANCE_SPOT_SHADOW_V0_6.md).
+The current time-ordered operating handoff is
+[`docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`](docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md).
 
 ## FREE-ONLY cloud policy
 

@@ -231,3 +231,79 @@ class JsonExperimentRegistry:
         finally:
             if os.path.exists(temporary):
                 os.unlink(temporary)
+
+
+def build_experiment_registry_entry(
+    *,
+    comparison_key: str,
+    dataset_sha256: str,
+    config_sha256: str,
+    trainer: dict[str, str],
+    environment: dict[str, str],
+    evaluation: dict[str, Any],
+) -> dict[str, Any]:
+    """Build a content-addressed registry entry without any write side effect.
+
+    Rejected or weak experiments remain recordable as evidence. The registry
+    never contains a promotion or deployment capability.
+    """
+
+    if not comparison_key or comparison_key.strip() != comparison_key:
+        raise ValueError("comparison_key must be a non-empty trimmed string")
+    if not trainer.get("name") or not trainer.get("version"):
+        raise ValueError("trainer name and version are required")
+    if not environment:
+        raise ValueError("environment fingerprint inputs are required")
+    assert_no_secret_fields({"trainer": trainer, "environment": environment, "evaluation": evaluation})
+    identity = {
+        "schema": "crypto-autopilot-experiment-registry-v0.1",
+        "comparison_key": comparison_key,
+        "dataset_sha256": assert_sha256(dataset_sha256, "dataset_sha256"),
+        "config_sha256": assert_sha256(config_sha256, "config_sha256"),
+        "trainer": dict(sorted(trainer.items())),
+        "environment": dict(sorted(environment.items())),
+        "evaluation": evaluation,
+    }
+    experiment_id = sha256_json(identity)
+    environment_sha256 = sha256_json(identity["environment"])
+    lineage_sha256 = sha256_json(identity)
+    return {
+        **identity,
+        "experiment_id": experiment_id,
+        "environment_sha256": environment_sha256,
+        "lineage_sha256": lineage_sha256,
+        "status": "RECORDED",
+        "retention": "IMMUTABLE_RESEARCH_EVIDENCE",
+        "challenger_only": True,
+        "promotion_eligible": False,
+        "deployment_authorized": False,
+        "trading_authorized": False,
+        "rejected_runs_retained": True,
+    }
+
+
+def validate_experiment_registry_entry(entry: dict[str, Any]) -> None:
+    """Fail closed on fields that make an experiment comparable and safe."""
+
+    if entry.get("schema") != "crypto-autopilot-experiment-registry-v0.1":
+        raise ValueError("experiment registry schema mismatch")
+    assert_sha256(str(entry.get("dataset_sha256", "")), "dataset_sha256")
+    assert_sha256(str(entry.get("config_sha256", "")), "config_sha256")
+    for key in ("challenger_only", "promotion_eligible", "deployment_authorized", "trading_authorized"):
+        expected = True if key == "challenger_only" else False
+        if entry.get(key) is not expected:
+            raise ValueError(f"experiment registry safety field {key} is unsafe")
+    expected = build_experiment_registry_entry(
+        comparison_key=str(entry.get("comparison_key", "")),
+        dataset_sha256=str(entry["dataset_sha256"]),
+        config_sha256=str(entry["config_sha256"]),
+        trainer=dict(entry.get("trainer", {})),
+        environment=dict(entry.get("environment", {})),
+        evaluation=dict(entry.get("evaluation", {})),
+    )
+    if entry.get("experiment_id") != expected["experiment_id"]:
+        raise ValueError("experiment registry experiment_id mismatch")
+    if entry.get("environment_sha256") != expected["environment_sha256"]:
+        raise ValueError("experiment registry environment fingerprint mismatch")
+    if entry.get("lineage_sha256") != expected["lineage_sha256"]:
+        raise ValueError("experiment registry lineage fingerprint mismatch")

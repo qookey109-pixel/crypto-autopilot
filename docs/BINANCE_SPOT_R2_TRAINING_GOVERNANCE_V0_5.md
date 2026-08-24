@@ -3,13 +3,13 @@
 V0.5 supersedes V0.4 execution without changing its frozen evidence. Weekly
 training remains Sunday `02:37 UTC` (`10:37 Asia/Taipei`); monthly universe
 review remains day 1 at `03:37 UTC` (`11:37 Asia/Taipei`). The monthly workflow
-and weekly production workflow have no push trigger. The next weekly cron is
-inside the authority window and may create the first training baseline. The
-initial monthly V0.5 baseline requires one successful manual `workflow_dispatch`
-before `2026-08-27T00:00:00Z`. That activation is not a recurring manual-run
-authority: a manual event is rejected before publication when a verified V0.5
-monthly review already exists. Scheduled runs remain distinct, and push
-execution remains explicitly unauthorized.
+and weekly production workflow have no push trigger. Monthly run `32589005957`
+successfully created the one-time V0.5 baseline at `2026-08-23 01:51
+Asia/Taipei`; that manual activation is consumed and must not be repeated.
+Weekly run `32615608243` completed at `2026-08-23 11:32 Asia/Taipei`; its
+evidence pipeline passed and its model-quality gate returned `REJECT`.
+Scheduled runs remain distinct, and push execution remains explicitly
+unauthorized.
 
 ## Weekly flow
 
