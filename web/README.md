@@ -70,17 +70,21 @@ must remain provider-separated from Pionex evidence.
 
 ## Interface direction
 
-The V0.2 visual shell is a light editorial research console: warm paper
-surfaces, high-contrast forest ink, sparse status color, generous whitespace
-and a subtle reduced-motion-safe particle field. The generated constellation
-art at `web/assets/research-constellation-v1.jpg` is decorative only and has no
-authority or model-input role.
+The V0.3 visual shell is a dark evidence terminal with three distinct regions:
+a narrow command rail, a central research workspace and a persistent authority
+rail. Near-black surfaces, inset hairlines and one cool-blue accent keep the
+interface dense without reducing the larger Traditional Chinese body type.
+
+The original generated market-state artwork at
+`web/assets/market-orbit-v2.jpg` is decorative only and has no authority or
+model-input role. The earlier V0.2 constellation asset is retained as historical
+design material but is no longer rendered by the current shell.
 
 The overview deliberately summarizes the evidence pipeline and critical gates;
 the remaining eight views preserve the complete read-only inspection surface.
-The continuous-learning timeline is sourced from Repository state and
-`docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`, but remains a normalized roadmap
-view rather than execution authority.
+The right-side learning windows are sourced from Repository state and
+`docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`, but remain a normalized roadmap view
+rather than execution authority.
 
 ## Views
 
