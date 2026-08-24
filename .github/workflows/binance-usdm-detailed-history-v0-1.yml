@@ -1,0 +1,92 @@
+name: Binance USD-M Detailed History V0.1
+
+on:
+  schedule:
+    - cron: "23 */6 4-30 9 *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "auto discovers once, then materializes the next incomplete shard"
+        type: choice
+        required: true
+        default: auto
+        options:
+          - auto
+          - discover
+          - backfill
+      shard_index:
+        description: "Optional governed shard index for a manual backfill run"
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: binance-usdm-detailed-history-v0-1
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Run serialized R2-only detailed-history step
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          REQUESTED_MODE: ${{ inputs.mode || 'auto' }}
+          REQUESTED_SHARD: ${{ inputs.shard_index }}
+        run: |
+          args=(
+            --config config/binance_usdm_detailed_history_v0_1.json
+            --authority research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-authority.json
+            --mode "$REQUESTED_MODE"
+            --run-id "github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+            --output detailed-history-output/report.json
+          )
+          if [[ -n "$REQUESTED_SHARD" ]]; then
+            args+=(--shard-index "$REQUESTED_SHARD")
+          fi
+          python scripts/run_binance_detailed_history.py "${args[@]}"
+
+      - name: Assert research-only provider separation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("detailed-history-output/report.json").read_text())
+          authority = report.get("authority", {})
+          assert authority.get("holdout_accessed", False) is False
+          assert authority.get("pionex_native_relabel_authorized", False) is False
+          assert authority.get("source_switch_authorized", False) is False
+          assert authority.get("automatic_model_promotion_authorized", False) is False
+          assert authority.get("real_money_order_authorized", False) is False
+          assert authority.get("live_trading_authorized", False) is False
+          PY
+
+      - name: Upload secret-free run report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: binance-usdm-detailed-history-${{ github.run_id }}-${{ github.run_attempt }}
+          path: detailed-history-output/report.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf detailed-history-output

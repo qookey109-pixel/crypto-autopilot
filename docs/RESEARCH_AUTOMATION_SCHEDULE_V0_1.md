@@ -10,20 +10,50 @@ model or authorize trading.
 | Cadence | Current job | Evidence boundary |
 | --- | --- | --- |
 | Pull request / push | Repository CI and synthetic fault tests | No provider, production R2, holdout or trading access |
-| Sunday 02:37 UTC | Binance Spot R2 training governance V0.5 | Next cron is before the stop; provider-separated 1D research evidence; no push trigger |
-| Day 1 03:37 UTC | Binance Spot monthly governance V0.5 | One-time manual baseline activation before the stop, then scheduled only; no push-triggered activation or rewrite |
+| Sunday 02:37 UTC | Binance Spot R2 training governance V0.5 | First run completed; pipeline `PASS`, model quality `REJECT`; no push trigger |
+| Day 1 03:37 UTC | Binance Spot monthly governance V0.5 | One-time manual baseline completed; repeat manual activation is forbidden |
 | Hourly at `:07` | Pionex public paper training V0.1 | Repository Paper Broker only; Pionex Demo stays manual |
+| Every 6 hours at `:23`, 2026-09-04 through 2026-09-30 | Binance USD-M Detailed History V0.1 | One serialized incomplete 10-market shard; 250-market / 48-month target; R2-only |
+| Sunday 04:37 UTC | Binance USD-M Detailed Training V0.1 | Skips until all detailed-history shards are complete; research evidence only |
 
 The Binance weekly and monthly jobs stop before provider or R2 access at
 `2026-08-27T00:00:00Z`; the Pionex paper job also stops provider requests at
 that boundary. A green post-stop skip is intentional. No automatic resume is
 authorized.
 
-The initial V0.5 monthly baseline must be created by one successful manual
-`workflow_dispatch` before that stop because the next day-1 slot is later. This
-is a one-time activation authority, not permission for repeated manual runs.
-The next weekly slot is still inside the window. Repository push is not a
-production workflow trigger.
+The initial V0.5 monthly baseline was created successfully by run `32589005957`
+at `2026-08-23 01:51 Asia/Taipei`. The first weekly run `32615608243` completed
+at `2026-08-23 11:32 Asia/Taipei`; the evidence pipeline passed while the model
+quality gate rejected the candidate. Do not repeat the monthly manual activation
+or reinterpret the model rejection as an execution failure. Repository push is
+not a production workflow trigger. The current execution handoff is recorded in
+`docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`.
+
+## Data retention split (partially active)
+
+The requested retention policy is recorded in
+`config/data_retention_policy_v0_1.json` and
+`docs/DATA_RETENTION_POLICY_V0_1.md`:
+
+- Binance Spot `1d` training history remains `2020-01-01` through the latest
+  complete UTC day under the existing V0.5 authority.
+- Detailed History V0.1 authorizes a fixed 2022-08 through 2026-07 Binance USD-M
+  `15m` / `1h` / `4h` dataset for 250 markets after the V0.10 window.
+- Future rolling updates and the broader derivative-state series still need a
+  separately authorized materialization path.
+- Derived indicators are recomputed from canonical inputs rather than stored as
+  another full duplicate dataset.
+
+The detailed backfill is versioned separately in
+`config/binance_usdm_detailed_history_v0_1.json`. It does not authorize
+deletion/compaction of frozen evidence, holdout access, source switching or
+trading.
+
+The prepared V0.6 Shadow Model is likewise local-only. Its bounded ablation
+runner may consume an already available Parquet fixture, compare four feature
+groups, and emit calibration/regime evidence. It must not be added to the
+production schedule until a separate post-window authority names its exact
+config and namespace.
 
 ## Evidence-correctness hardening
 
