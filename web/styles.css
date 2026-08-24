@@ -112,8 +112,8 @@ h1, h2, h3 { font-family: var(--font-ui); font-weight: 600; letter-spacing: -.02
 .provider-tag { width: max-content; height: max-content; padding: 5px 8px; border: 1px solid var(--cloud); border-radius: var(--radius-tag); color: var(--muted); font-size: 10px; font-weight: 600; }
 .provider-tag.pionex { color: var(--mint); border-color: rgba(12,140,94,.35); }
 .learning-timeline { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
-.learning-timeline li { min-height: 126px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--paper); }
-.learning-timeline li:first-child { border-color: rgba(216,239,229,.78); background: rgba(255,255,255,.94); box-shadow: inset 3px 0 0 var(--mint); }
+.learning-timeline li { min-height: 126px; padding: 18px; border: 1px solid rgba(216,239,229,.78); border-radius: var(--radius-card); background: rgba(255,255,255,.94); box-shadow: inset 3px 0 0 rgba(12,140,94,.55); }
+.learning-timeline li:first-child { box-shadow: inset 3px 0 0 var(--mint); }
 .learning-timeline span, .learning-timeline strong, .learning-timeline small { display: block; }
 .learning-timeline span { margin-bottom: 13px; color: var(--mint); font-size: 11px; font-weight: 600; letter-spacing: .04em; }
 .learning-timeline strong { margin-bottom: 6px; font-size: 15px; font-weight: 600; }
