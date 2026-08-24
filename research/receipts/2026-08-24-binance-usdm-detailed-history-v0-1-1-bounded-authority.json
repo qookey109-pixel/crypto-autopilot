@@ -1,0 +1,69 @@
+{
+  "schema": "binance-usdm-detailed-history-execution-authority-v0.1.1",
+  "status": "AUTHORIZED",
+  "stage": "BINANCE_USDM_DETAILED_HISTORY_V0_1_1_AUTHORIZED",
+  "date": "2026-08-24",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "config": "config/binance_usdm_detailed_history_v0_1_1.json",
+  "config_sha256": "e02a046520764221e7fcaf8ebe0a7c53149ec7da53e94b4f9aa5c4caddaf6524",
+  "request_basis": "Expand the historical training scope beyond the original 15-contract basket and bound the yearless GitHub cron before any provider or R2 execution.",
+  "supersession": {
+    "supersedes": "BINANCE_USDM_DETAILED_HISTORY_V0_1_AUTHORIZED",
+    "superseded_config": "config/binance_usdm_detailed_history_v0_1.json",
+    "superseded_receipt": "research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-authority.json",
+    "superseded_authority_mutated": false,
+    "v0_1_provider_requests_performed": 0,
+    "v0_1_r2_access_performed": false,
+    "reason": "GitHub cron has no year field; V0.1.1 adds a fail-closed 2026 backfill expiration before the first eligible execution."
+  },
+  "execution_boundary": {
+    "not_before_utc": "2026-09-04T02:00:00Z",
+    "backfill_stop_exclusive_utc": "2026-10-01T00:00:00Z",
+    "later_annual_cron_exits_before_provider_or_r2": true,
+    "weekly_training_may_continue_after_backfill_stop": true,
+    "source_month_start": "2022-08",
+    "source_month_end": "2026-07",
+    "source_end_exclusive_utc": "2026-08-01T00:00:00Z",
+    "replacement_holdout_start_utc": "2026-08-28T00:00:00Z",
+    "replacement_holdout_access_authorized": false
+  },
+  "authorized_scope": {
+    "provider": "binance_usdm",
+    "delivery": "binance_vision",
+    "target_market_count": 250,
+    "intervals": ["15m", "1h", "4h"],
+    "history_months": 48,
+    "r2_only_persistent_generated_data": true,
+    "resumable_serialized_shards": true,
+    "strategy_model_training_after_dataset_complete": true,
+    "fresh_whole_bucket_8gb_hard_stop_required": true,
+    "read_only_directory_verification": {
+      "eligible_format_usdt_prefixes": 829,
+      "markets_with_common_three_interval_coverage": 817,
+      "heuristic_tokenized_stock_candidates": 39,
+      "historical_absence_candidates": 19,
+      "window_end_candidates": 798,
+      "all_observed_historical_absence_candidates_retained": true
+    }
+  },
+  "evidence_semantics": {
+    "binance_data_is_pionex_native": false,
+    "tokenized_stock_classification_is_heuristic": true,
+    "current_or_archive_catalog_is_historical_membership_authority": false,
+    "pipeline_pass_is_profitability_proof": false,
+    "model_quality_reject_may_be_preserved_as_valid_research_evidence": true
+  },
+  "explicitly_not_authorized": {
+    "v0_10_production_critical_path_change_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "source_switch_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "private_api_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

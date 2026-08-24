@@ -40,10 +40,10 @@ from crypto_autopilot.storage.r2 import R2Store
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_CONFIG = ROOT / "config/binance_usdm_detailed_history_v0_1.json"
+DEFAULT_CONFIG = ROOT / "config/binance_usdm_detailed_history_v0_1_1.json"
 DEFAULT_AUTHORITY = (
     ROOT
-    / "research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-authority.json"
+    / "research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-1-bounded-authority.json"
 )
 BUCKET_LIST_URL = "https://s3-ap-northeast-1.amazonaws.com/data.binance.vision"
 OBJECT_BASE_URL = "https://data.binance.vision/"
@@ -646,16 +646,27 @@ def main() -> int:
     )
     generated_at = observed.astimezone(UTC).isoformat().replace("+00:00", "Z")
     try:
-        require_execution_window(config, observed_at=observed)
+        require_execution_window(config, observed_at=observed, operation="backfill")
     except DetailedHistoryAuthorityError as exc:
-        if "blocked until the V0.10 window has ended" not in str(exc):
+        reason = str(exc)
+        if not any(
+            marker in reason
+            for marker in (
+                "blocked until the V0.10 window has ended",
+                "backfill authority expired before provider or R2 access",
+            )
+        ):
             raise
         report = {
             "status": "SKIPPED",
-            "stage": "DETAILED_HISTORY_NOT_BEFORE_GUARD",
+            "stage": (
+                "DETAILED_HISTORY_AUTHORITY_EXPIRED"
+                if "expired" in reason
+                else "DETAILED_HISTORY_NOT_BEFORE_GUARD"
+            ),
             "mode": args.mode,
             "observed_at_utc": generated_at,
-            "reason": str(exc),
+            "reason": reason,
             "provider_requests_performed": 0,
             "r2_access_performed": False,
             "authority": {

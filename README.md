@@ -11,7 +11,7 @@ The repository has moved beyond the original V0.1 implementation baseline while 
 - Pionex M1/M1A historical-data foundation: **PASS**.
 - Cloudflare R2 historical storage and Binance 2025 pilot: **PASS**.
 - Binance Funding V0.2 R2 materialization: **PASS** — 192/192 authorized object identities verified after write.
-- Binance USD-M Detailed History V0.1: **AUTHORIZED AFTER V0.10 WINDOW / NOT STARTED** — 250-market target, fixed 2022-08 through 2026-07 window, native 15m/1h/4h archives, R2-only persistence and bounded intraday research training.
+- Binance USD-M Detailed History V0.1.1: **AUTHORIZED AFTER V0.10 WINDOW / NOT STARTED** — 250-market target, fixed 2022-08 through 2026-07 window, native 15m/1h/4h archives, R2-only persistence, bounded intraday research training and a fail-closed 2026 backfill stop. V0.1 was superseded before execution and remains immutable.
 - Pionex ↔ Binance Equivalence V0.1: **definitive FAIL** — 45 pairs = 18 PASS / 18 REVIEW / 9 FAIL. The frozen result must not be regraded by changing thresholds or scope.
 - `source_switch_authorized=false`; Binance evidence remains `provider=binance_usdm` and must never be relabeled as Pionex-native evidence.
 - V0.5 Render Free / Frankfurt Binance public-metadata transport: **PASS**.
@@ -66,7 +66,7 @@ detailed `15m`/`1h`/`4h` and derivative-state materializations are planned as a
 rolling four-year window. The prepared, inactive policy is documented in
 [`docs/DATA_RETENTION_POLICY_V0_1.md`](docs/DATA_RETENTION_POLICY_V0_1.md).
 
-The separate **Binance USD-M Detailed History V0.1** path expands detailed
+The separate **Binance USD-M Detailed History V0.1.1** path expands detailed
 research coverage beyond the original 15-contract basket. It builds a
 deterministic 250-market provider-separated catalog from official Binance
 Vision archive coverage, then materializes 48 complete months of native
@@ -74,7 +74,9 @@ Vision archive coverage, then materializes 48 complete months of native
 `2026-09-04T02:00:00Z`; its source ends at 2026-07 and cannot read the
 replacement holdout. After all shards complete, a weekly research trainer runs
 causal multi-timeframe walk-forward, cost, drawdown and exposure diagnostics.
-See [`docs/BINANCE_USDM_DETAILED_HISTORY_V0_1.md`](docs/BINANCE_USDM_DETAILED_HISTORY_V0_1.md).
+See the current [`docs/BINANCE_USDM_DETAILED_HISTORY_V0_1_1.md`](docs/BINANCE_USDM_DETAILED_HISTORY_V0_1_1.md)
+addendum and the preserved full design in
+[`docs/BINANCE_USDM_DETAILED_HISTORY_V0_1.md`](docs/BINANCE_USDM_DETAILED_HISTORY_V0_1.md).
 
 The prepared V0.6 Shadow Model compares feature groups locally after the first
 V0.5 quality gate rejected the current model. It records calibration and
