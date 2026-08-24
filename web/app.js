@@ -240,6 +240,8 @@ const titles = {
 function activateView(view) {
   const target = document.querySelector(`#view-${view}`);
   if (!target) return;
+  const hero = document.querySelector(".mint-hero");
+  if (hero) hero.classList.toggle("is-hidden", view !== "overview");
   document.querySelectorAll(".nav-item").forEach(item => {
     const active = item.dataset.view === view;
     item.classList.toggle("active", active);
