@@ -1,0 +1,68 @@
+name: Research Signal Quality V0.1
+
+on:
+  schedule:
+    - cron: "47 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: research-signal-quality-v0-1
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Verify latest research signal evidence
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          python scripts/check_research_signal_quality.py \
+            --config config/research_signal_quality_v0_1.json \
+            --output research-signal-quality-output/quality.json
+
+      - name: Assert read-only research authority
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path("research-signal-quality-output/quality.json").read_text())
+          authority = report["authority"]
+          assert authority["r2_list"] is False
+          assert authority["r2_write"] is False
+          assert authority["provider_access"] is False
+          assert authority["holdout_access"] is False
+          assert authority["automatic_model_promotion"] is False
+          assert authority["direct_trade_trigger"] is False
+          assert authority["real_money_order"] is False
+          assert authority["live_trading"] is False
+          PY
+
+      - name: Upload secret-free quality evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: research-signal-quality-${{ github.run_id }}-${{ github.run_attempt }}
+          path: research-signal-quality-output/quality.json
+          retention-days: 90
+          if-no-files-found: error
+

@@ -1,0 +1,102 @@
+{
+  "schema": "research-automation-health-v0.1",
+  "status": "AUTHORIZED_READ_ONLY_ON_MERGE",
+  "purpose": "Detect stale, failed or unexpectedly missing research automations from GitHub Actions metadata only",
+  "schedule": {
+    "cron_utc": "47 */3 * * *",
+    "manual_dispatch": true,
+    "fail_on_alert": true
+  },
+  "inventory_warn_thresholds": {
+    "retired_pull_request_workflows": 18
+  },
+  "workflows": [
+    {
+      "workflow": "pionex-public-paper-training-v0-1.yml",
+      "label": "Pionex hourly paper training",
+      "mode": "bounded",
+      "active_from_utc": "2026-08-21T00:00:00Z",
+      "active_until_utc": "2026-08-27T00:00:00Z",
+      "max_age_seconds": 10800,
+      "allowed_events": ["schedule", "workflow_dispatch"],
+      "allowed_conclusions": ["success"]
+    },
+    {
+      "workflow": "research-signal-layer-v0-2.yml",
+      "label": "Daily public research signals",
+      "mode": "continuous",
+      "active_from_utc": "2026-08-24T03:47:45Z",
+      "max_age_seconds": 108000,
+      "allowed_events": ["schedule", "workflow_dispatch"],
+      "allowed_conclusions": ["success"]
+    },
+    {
+      "workflow": "research-signal-quality-v0-1.yml",
+      "label": "Daily research signal quality",
+      "mode": "continuous",
+      "active_from_utc": "2026-08-24T00:00:00Z",
+      "max_age_seconds": 108000,
+      "allowed_events": ["schedule", "workflow_dispatch"],
+      "allowed_conclusions": ["success"]
+    },
+    {
+      "workflow": "binance-spot-r2-training-governance-v0-5.yml",
+      "label": "Binance Spot weekly V0.5",
+      "mode": "bounded",
+      "active_from_utc": "2026-08-23T00:00:00Z",
+      "active_until_utc": "2026-08-27T00:00:00Z",
+      "max_age_seconds": 691200,
+      "allowed_events": ["schedule", "workflow_dispatch"],
+      "allowed_conclusions": ["success"]
+    },
+    {
+      "workflow": "binance-spot-r2-monthly-governance-v0-5.yml",
+      "label": "Binance Spot monthly governance V0.5",
+      "mode": "bounded",
+      "active_from_utc": "2026-08-23T00:00:00Z",
+      "active_until_utc": "2026-08-27T00:00:00Z",
+      "max_age_seconds": 3456000,
+      "allowed_events": ["schedule", "workflow_dispatch"],
+      "allowed_conclusions": ["success"]
+    },
+    {
+      "workflow": "provider-equivalence-v0-10-render-metadata-capture.yml",
+      "label": "V0.10 metadata capture window",
+      "mode": "bounded",
+      "active_from_utc": "2026-08-27T00:00:00Z",
+      "active_until_utc": "2026-09-04T02:00:00Z",
+      "max_age_seconds": 7200,
+      "allowed_events": ["schedule"],
+      "allowed_conclusions": ["success"]
+    },
+    {
+      "workflow": "binance-usdm-detailed-history-v0-1.yml",
+      "label": "Binance USD-M detailed history V0.1.1",
+      "mode": "bounded",
+      "active_from_utc": "2026-09-04T02:00:00Z",
+      "active_until_utc": "2026-10-01T00:00:00Z",
+      "max_age_seconds": 32400,
+      "allowed_events": ["schedule", "workflow_dispatch"],
+      "allowed_conclusions": ["success"]
+    },
+    {
+      "workflow": "binance-usdm-detailed-training-v0-1.yml",
+      "label": "Binance USD-M detailed training V0.1.1",
+      "mode": "conditional",
+      "active_from_utc": "2026-09-04T02:00:00Z",
+      "max_age_seconds": 691200,
+      "allowed_events": ["schedule", "workflow_dispatch"],
+      "allowed_conclusions": ["success", "skipped"]
+    }
+  ],
+  "authority": {
+    "github_actions_metadata_read_only": true,
+    "provider_access": false,
+    "r2_access": false,
+    "holdout_access": false,
+    "automatic_model_promotion": false,
+    "trade_plan": false,
+    "real_money_order": false,
+    "live_trading": false
+  }
+}

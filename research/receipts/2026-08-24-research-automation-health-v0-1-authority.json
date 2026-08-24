@@ -1,0 +1,59 @@
+{
+  "schema": "research-automation-health-authority-v0.1",
+  "status": "AUTHORIZED_ON_MERGE",
+  "stage": "RESEARCH_AUTOMATION_HEALTH_AND_SIGNAL_QUALITY_V0_1_AUTHORIZED",
+  "date": "2026-08-24",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "request_basis": "Add stronger automation schedules for research continuity and KOL evidence quality without changing frozen production, holdout, model or trading authority.",
+  "bound_files": [
+    {
+      "path": "config/research_automation_health_v0_1.json",
+      "sha256": "db44ba00ebd96056d31f81fc435a034bedd16e2c93314fa43787fb5344dc2df0"
+    },
+    {
+      "path": "config/research_signal_quality_v0_1.json",
+      "sha256": "b99938e41d6fb95a37e9296155f5f669b6b5e939d5e8fd8d04bb8a5675228457"
+    },
+    {
+      "path": "config/post_window_research_successor_schedule_v0_1.json",
+      "sha256": "c8838d4ce8af638b7e436c4b30ac6106674af40a2353d1c1b376f97cf51fa55b"
+    },
+    {
+      "path": ".github/workflows/research-automation-health-v0-1.yml",
+      "sha256": "64da84b0966b74de3939605873dc0e4edd2147a7eb276ad6e5afe2d23bd72b68"
+    },
+    {
+      "path": ".github/workflows/research-signal-quality-v0-1.yml",
+      "sha256": "12378d8345f930486a77e598d5547c8eea297e61f21a3cbfb4762ff1284ac49b"
+    }
+  ],
+  "authorized_scope": {
+    "github_actions_metadata_read_only": true,
+    "research_signal_exact_r2_object_reads": 3,
+    "research_signal_r2_namespace": "research/signal-layer/v0-2",
+    "research_signal_r2_list_authorized": false,
+    "research_signal_r2_write_authorized": false,
+    "automation_health_cron_utc": "47 */3 * * *",
+    "research_signal_quality_cron_utc": "47 2 * * *",
+    "secret_values_recorded": false
+  },
+  "prepared_not_active_scope": {
+    "post_window_schedule_configured": true,
+    "post_window_workflow_created": false,
+    "automatic_activation": false,
+    "separate_versioned_execution_authority_required": true
+  },
+  "explicitly_not_authorized": {
+    "v0_10_production_critical_path_change_authorized": false,
+    "v0_11_production_receipt_read_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "provider_source_switch_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "private_api_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

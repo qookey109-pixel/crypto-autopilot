@@ -1,0 +1,29 @@
+{
+  "schema": "research-signal-quality-v0.1",
+  "status": "AUTHORIZED_READ_ONLY_ON_MERGE",
+  "purpose": "Verify the latest public research signal lineage and report whether it contains forecasts, metadata only or no usable data",
+  "schedule": {
+    "cron_utc": "47 2 * * *",
+    "manual_dispatch": true
+  },
+  "storage": {
+    "namespace": "research/signal-layer/v0-2",
+    "latest_key": "research/signal-layer/v0-2/latest.json",
+    "max_exact_objects_read": 3,
+    "r2_list_authorized": false,
+    "r2_write_authorized": false
+  },
+  "quality": {
+    "max_age_seconds": 129600,
+    "forecast_ready_required": false,
+    "metadata_only_is_valid_evidence": true
+  },
+  "authority": {
+    "provider_access": false,
+    "holdout_access": false,
+    "automatic_model_promotion": false,
+    "direct_trade_trigger": false,
+    "real_money_order": false,
+    "live_trading": false
+  }
+}
