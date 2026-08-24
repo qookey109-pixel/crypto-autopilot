@@ -106,6 +106,11 @@ writing R2, and do not open the holdout or affect models/trades. See
 The proposed rolling four-hour data refresh, weekly Shadow ablation and monthly
 drift review remain prepared but inactive pending a separate post-window
 authority.
+The research-only continuous-learning implementation target and its exact
+completion gates are recorded in
+[`docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`](docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md).
+The `2026-09-30` target is a prepared engineering roadmap, not execution
+authority, automatic model promotion or a profitability promise.
 The current time-ordered operating handoff is
 [`docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`](docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md).
 
