@@ -13,6 +13,7 @@ REQUIRED = (
     ROOT / "data" / "dashboard.json",
     OPERATIONAL_STATUS,
     ROOT / "data" / "paper-training.json",
+    ROOT / "data" / "strategy.json",
     ROOT / "_headers",
 )
 
@@ -45,6 +46,7 @@ REQUIRED_ZH_HANT_LABELS = (
     "總覽",
     "資料健康度",
     "交易訊號",
+    "策略",
     "模擬持倉",
     "模擬交易",
     "績效中心",
@@ -68,6 +70,11 @@ def main() -> int:
             raise RuntimeError(f"dashboard contains forbidden live/concurrent execution phrase: {phrase}")
 
     data = json.loads((ROOT / "data" / "dashboard.json").read_text(encoding="utf-8"))
+    strategy = json.loads((ROOT / "data" / "strategy.json").read_text(encoding="utf-8"))
+    if strategy.get("version") != "0.1.0":
+        raise RuntimeError("dashboard strategy version changed without a strategy update")
+    if strategy.get("mode") != "paper" or strategy.get("direction") != "LONG_ONLY":
+        raise RuntimeError("dashboard strategy must remain paper LONG_ONLY")
     if data.get("authority") is not False:
         raise RuntimeError("dashboard fixture must explicitly declare authority=false")
     if data.get("locale") != "zh-Hant-TW":
@@ -185,6 +192,7 @@ def main() -> int:
         "overview",
         "data-health",
         "signals",
+        "strategy",
         "positions",
         "trades",
         "performance",
@@ -251,7 +259,7 @@ def main() -> int:
                 "status": "PASS",
                 "stage": "DASHBOARD_ZH_HANT_STATIC_SAFETY_V0_11_OPERATIONAL_PASS",
                 "required_files": len(REQUIRED),
-                "views": 8,
+                "views": 9,
                 "locale": "zh-Hant-TW",
                 "authority_fixture": False,
                 "operational_authority": False,
