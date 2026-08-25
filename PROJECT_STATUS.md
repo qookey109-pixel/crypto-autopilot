@@ -146,6 +146,14 @@ Repository branch `main` is the live formal authority and is intentionally not s
 - A post-window four-hour/weekly/monthly successor cadence is recorded as
   `PREPARED_NOT_ACTIVE`. It has no workflow and grants zero provider, R2,
   holdout, model-promotion or trading authority.
+- Paper LONG/SHORT Challenger V0.2 is now prepared as an isolated,
+  `PREPARED_LOCAL_REPLAY_ONLY` research path. It evaluates long and short
+  directional samples separately with bounded 0.25% sample risk, 3x maximum
+  leverage, and explicit opposite funding accounting. It does not alter the
+  V0.1 LONG_ONLY baseline, does not schedule provider reads, does not read or
+  write R2, and cannot promote a model or create a trade plan. See
+  `config/paper_long_short_challenger_v0_2.json` and
+  `docs/PAPER_LONG_SHORT_CHALLENGER_V0_2.md`.
 - The research-only continuous-learning completion target is documented in
   `docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`. Its `2026-09-30` engineering
   target is a roadmap, not execution authority or a profitability promise.
