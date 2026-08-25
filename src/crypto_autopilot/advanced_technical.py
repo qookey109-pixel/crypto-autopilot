@@ -30,6 +30,13 @@ class AdvancedTechnicalSnapshot:
     kaufman_efficiency_ratio10: float | None
     choppiness_index14: float | None
     volatility_adjusted_momentum20: float | None
+    stoch_rsi14: float | None
+    williams_r14: float | None
+    cci20: float | None
+    awesome_oscillator: float | None
+    ultimate_oscillator: float | None
+    hull_ma9_distance_fraction: float | None
+    ichimoku_base26_distance_fraction: float | None
 
     @property
     def ready(self) -> bool:
@@ -71,7 +78,36 @@ class AdvancedTechnicalSnapshot:
             "kaufman_efficiency_ratio10": self.kaufman_efficiency_ratio10,
             "choppiness_index14": self.choppiness_index14,
             "volatility_adjusted_momentum20": self.volatility_adjusted_momentum20,
+            "stoch_rsi14": self.stoch_rsi14,
+            "williams_r14": self.williams_r14,
+            "cci20": self.cci20,
+            "awesome_oscillator": self.awesome_oscillator,
+            "ultimate_oscillator": self.ultimate_oscillator,
+            "hull_ma9_distance_fraction": self.hull_ma9_distance_fraction,
+            "ichimoku_base26_distance_fraction": self.ichimoku_base26_distance_fraction,
         }
+
+    @property
+    def extended_ready(self) -> bool:
+        """Whether the optional indicator extension is fully warmed up.
+
+        ``ready`` intentionally keeps the original V0.2 contract so existing
+        paper signals do not change their admission window.  Challenger
+        experiments can opt into this stricter readiness gate explicitly.
+        """
+
+        return self.ready and all(
+            value is not None
+            for value in (
+                self.stoch_rsi14,
+                self.williams_r14,
+                self.cci20,
+                self.awesome_oscillator,
+                self.ultimate_oscillator,
+                self.hull_ma9_distance_fraction,
+                self.ichimoku_base26_distance_fraction,
+            )
+        )
 
 
 def _mean(values: Sequence[float]) -> float:
@@ -81,6 +117,123 @@ def _mean(values: Sequence[float]) -> float:
 def _population_stddev(values: Sequence[float]) -> float:
     mean = _mean(values)
     return math.sqrt(sum((value - mean) ** 2 for value in values) / len(values))
+
+
+def _wma(values: Sequence[float | None], period: int) -> tuple[float | None, ...]:
+    """Causal weighted moving average with strict warm-up semantics."""
+
+    if period <= 0:
+        raise ValueError("period must be positive")
+    output: list[float | None] = [None] * len(values)
+    denominator = period * (period + 1) / 2.0
+    for index in range(period - 1, len(values)):
+        window = values[index - period + 1 : index + 1]
+        if any(value is None for value in window):
+            continue
+        output[index] = sum(
+            float(value) * weight
+            for weight, value in enumerate(window, start=1)
+            if value is not None
+        ) / denominator
+    return tuple(output)
+
+
+def _sma(values: Sequence[float], period: int) -> tuple[float | None, ...]:
+    output: list[float | None] = [None] * len(values)
+    for index in range(period - 1, len(values)):
+        output[index] = _mean(values[index - period + 1 : index + 1])
+    return tuple(output)
+
+
+def _hull_ma(values: Sequence[float], period: int) -> tuple[float | None, ...]:
+    """Causal Hull moving average, using the standard WMA construction."""
+
+    half_period = max(1, period // 2)
+    root_period = max(1, int(math.sqrt(period)))
+    half = _wma(values, half_period)
+    full = _wma(values, period)
+    difference: list[float | None] = [
+        None
+        if half[index] is None or full[index] is None
+        else 2.0 * float(half[index]) - float(full[index])
+        for index in range(len(values))
+    ]
+    return _wma(difference, root_period)
+
+
+def _stoch_rsi(
+    rsi_values: Sequence[float | None], period: int = 14
+) -> tuple[float | None, ...]:
+    output: list[float | None] = [None] * len(rsi_values)
+    for index in range(period - 1, len(rsi_values)):
+        window = rsi_values[index - period + 1 : index + 1]
+        if any(value is None for value in window):
+            continue
+        numeric = [float(value) for value in window if value is not None]
+        low = min(numeric)
+        high = max(numeric)
+        output[index] = 0.5 if high == low else (numeric[-1] - low) / (high - low)
+    return tuple(output)
+
+
+def _williams_r(candles: Sequence[Candle], period: int = 14) -> tuple[float | None, ...]:
+    output: list[float | None] = [None] * len(candles)
+    for index in range(period - 1, len(candles)):
+        window = candles[index - period + 1 : index + 1]
+        highest = max(item.high for item in window)
+        lowest = min(item.low for item in window)
+        output[index] = -50.0 if highest == lowest else -100.0 * (highest - candles[index].close) / (highest - lowest)
+    return tuple(output)
+
+
+def _cci(candles: Sequence[Candle], period: int = 20) -> tuple[float | None, ...]:
+    typical = tuple((item.high + item.low + item.close) / 3.0 for item in candles)
+    output: list[float | None] = [None] * len(candles)
+    for index in range(period - 1, len(candles)):
+        window = typical[index - period + 1 : index + 1]
+        average = _mean(window)
+        deviation = _mean(tuple(abs(value - average) for value in window))
+        output[index] = 0.0 if deviation == 0 else (typical[index] - average) / (0.015 * deviation)
+    return tuple(output)
+
+
+def _awesome_oscillator(candles: Sequence[Candle]) -> tuple[float | None, ...]:
+    median = tuple((item.high + item.low) / 2.0 for item in candles)
+    fast = _sma(median, 5)
+    slow = _sma(median, 34)
+    return tuple(
+        None if fast[index] is None or slow[index] is None else float(fast[index]) - float(slow[index])
+        for index in range(len(candles))
+    )
+
+
+def _ultimate_oscillator(candles: Sequence[Candle]) -> tuple[float | None, ...]:
+    buying_pressure: list[float] = []
+    true_range: list[float] = []
+    for index, candle in enumerate(candles):
+        previous_close = candle.close if index == 0 else candles[index - 1].close
+        buying_pressure.append(candle.close - min(candle.low, previous_close))
+        true_range.append(max(candle.high, previous_close) - min(candle.low, previous_close))
+    output: list[float | None] = [None] * len(candles)
+    for index in range(27, len(candles)):
+        def ratio(period: int) -> float:
+            start = index - period + 1
+            pressure = sum(buying_pressure[start : index + 1])
+            ranges = sum(true_range[start : index + 1])
+            return 0.0 if ranges == 0 else pressure / ranges
+
+        output[index] = 100.0 * (4.0 * ratio(7) + 2.0 * ratio(14) + ratio(28)) / 7.0
+    return tuple(output)
+
+
+def _ichimoku_base_distance(candles: Sequence[Candle], period: int = 26) -> tuple[float | None, ...]:
+    output: list[float | None] = [None] * len(candles)
+    for index in range(period - 1, len(candles)):
+        window = candles[index - period + 1 : index + 1]
+        baseline = (max(item.high for item in window) + min(item.low for item in window)) / 2.0
+        if baseline != 0:
+            output[index] = (candles[index].close - baseline) / baseline
+    return tuple(output)
 
 
 def _wilder(values: Sequence[float], period: int) -> tuple[float | None, ...]:
@@ -180,6 +333,20 @@ def build_advanced_technical_series(
     adx14, plus_di14, minus_di14 = _adx(source, 14)
     atr_fractions = tuple(item.atr14_fraction for item in technical)
     bandwidths = tuple(item.bollinger_bandwidth for item in technical)
+    stoch_rsi14 = _stoch_rsi(tuple(item.rsi14 for item in technical), 14)
+    williams_r14 = _williams_r(source, 14)
+    cci20 = _cci(source, 20)
+    awesome_oscillator = _awesome_oscillator(source)
+    ultimate_oscillator = _ultimate_oscillator(source)
+    closes = tuple(item.close for item in source)
+    hull_ma9 = _hull_ma(closes, 9)
+    hull_ma9_distance: tuple[float | None, ...] = tuple(
+        None
+        if hull_ma9[index] in (None, 0.0)
+        else (source[index].close - float(hull_ma9[index])) / float(hull_ma9[index])
+        for index in range(len(source))
+    )
+    ichimoku_base26_distance = _ichimoku_base_distance(source, 26)
     log_returns: list[float | None] = [None]
     for index in range(1, len(source)):
         log_returns.append(math.log(source[index].close / source[index - 1].close))
@@ -284,6 +451,13 @@ def build_advanced_technical_series(
                 kaufman_efficiency_ratio10=efficiency,
                 choppiness_index14=choppiness,
                 volatility_adjusted_momentum20=volatility_adjusted_momentum,
+                stoch_rsi14=stoch_rsi14[index],
+                williams_r14=williams_r14[index],
+                cci20=cci20[index],
+                awesome_oscillator=awesome_oscillator[index],
+                ultimate_oscillator=ultimate_oscillator[index],
+                hull_ma9_distance_fraction=hull_ma9_distance[index],
+                ichimoku_base26_distance_fraction=ichimoku_base26_distance[index],
             )
         )
     return tuple(output)

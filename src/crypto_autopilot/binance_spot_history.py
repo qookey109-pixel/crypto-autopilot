@@ -42,6 +42,8 @@ class BinanceSpotCandle:
     close_time_ms: int
     quote_volume: float
     trade_count: int
+    taker_buy_base_volume: float | None = None
+    taker_buy_quote_volume: float | None = None
 
     def as_candle(self) -> Candle:
         return Candle(
@@ -213,6 +215,8 @@ def parse_spot_kline(symbol: str, row: object) -> BinanceSpotCandle:
             close_time_ms=int(row[6]),
             quote_volume=float(row[7]),
             trade_count=int(row[8]),
+            taker_buy_base_volume=float(row[9]) if len(row) > 9 else None,
+            taker_buy_quote_volume=float(row[10]) if len(row) > 10 else None,
         )
     except (TypeError, ValueError) as exc:
         raise BinanceSpotHistoryError("invalid Binance Spot kline value") from exc
@@ -227,6 +231,26 @@ def parse_spot_kline(symbol: str, row: object) -> BinanceSpotCandle:
         raise BinanceSpotHistoryError("Binance Spot kline contains invalid volume")
     if candle.trade_count < 0 or candle.close_time_ms < candle.open_time_ms:
         raise BinanceSpotHistoryError("Binance Spot kline contains invalid metadata")
+    taker_values = (
+        candle.taker_buy_base_volume,
+        candle.taker_buy_quote_volume,
+    )
+    if any(value is None for value in taker_values) and not all(
+        value is None for value in taker_values
+    ):
+        raise BinanceSpotHistoryError("Binance Spot kline has partial taker-buy volume")
+    if all(value is not None for value in taker_values):
+        taker_base = float(candle.taker_buy_base_volume or 0.0)
+        taker_quote = float(candle.taker_buy_quote_volume or 0.0)
+        if (
+            not _finite_non_negative(taker_base)
+            or not _finite_non_negative(taker_quote)
+            or taker_base > candle.base_volume + 1e-12
+            or taker_quote > candle.quote_volume + 1e-12
+        ):
+            raise BinanceSpotHistoryError(
+                "Binance Spot kline contains invalid taker-buy volume"
+            )
     return candle
 
 

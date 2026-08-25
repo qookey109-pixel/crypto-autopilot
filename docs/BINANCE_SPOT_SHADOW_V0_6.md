@@ -16,6 +16,17 @@ touches any trading authority.
   Donchian position;
 - `volatility`: baseline plus ATR percentile, Bollinger bandwidth percentile,
   realized volatility and Parkinson volatility.
+- `oscillators`: baseline plus Stoch RSI, Williams %R, CCI, Awesome Oscillator
+  and Ultimate Oscillator;
+- `trend_structure`: baseline plus Hull MA and Ichimoku base distances;
+- `orderflow`: baseline plus taker-buy ratio, normalized buy/sell volume delta,
+  taker-buy volume Z-score and rolling CVD;
+- `extended_technical`: the combined deterministic technical set, excluding
+  external context and order-flow so those effects remain separately testable.
+
+Legacy datasets without taker-buy base/quote fields continue to produce the
+baseline and technical groups. Their `orderflow` group remains empty rather
+than substituting zero or inferring buyer direction from price candles.
 
 Each group uses the same causal warm-up, chronological split and deterministic
 logistic trainer. Results include test log loss, Brier score, accuracy, ECE/MCE

@@ -30,20 +30,27 @@ def main() -> int:
     config["generated_at_utc"] = datetime.now(UTC).isoformat().replace("+00:00", "Z")
     dataset_path = Path(args.dataset)
     dataset_payload = dataset_path.read_bytes()
+    required_columns = [
+        "asset_class",
+        "symbol",
+        "audit_ok",
+        "open_time_ms",
+        "open",
+        "high",
+        "low",
+        "close",
+        "base_volume",
+        "quote_volume",
+    ]
+    optional_orderflow_columns = [
+        "taker_buy_base_volume",
+        "taker_buy_quote_volume",
+    ]
+    schema_names = set(pq.read_schema(dataset_path).names)
     rows = pq.read_table(
         dataset_path,
-        columns=[
-            "asset_class",
-            "symbol",
-            "audit_ok",
-            "open_time_ms",
-            "open",
-            "high",
-            "low",
-            "close",
-            "base_volume",
-            "quote_volume",
-        ],
+        columns=required_columns
+        + [name for name in optional_orderflow_columns if name in schema_names],
     ).to_pylist()
     result = run_shadow_ablation(
         rows,

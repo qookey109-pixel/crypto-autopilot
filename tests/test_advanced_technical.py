@@ -36,8 +36,20 @@ class AdvancedTechnicalTests(unittest.TestCase):
         source = _candles(240)
         baseline = build_advanced_technical_series(source, "15M")
         self.assertTrue(baseline[-1].ready)
+        self.assertTrue(baseline[-1].extended_ready)
         self.assertGreater(baseline[-1].adx14 or 0.0, 0.0)
         self.assertGreater(baseline[-1].rolling_vwap20 or 0.0, 0.0)
+        for name in (
+            "stoch_rsi14",
+            "williams_r14",
+            "cci20",
+            "awesome_oscillator",
+            "ultimate_oscillator",
+            "hull_ma9_distance_fraction",
+            "ichimoku_base26_distance_fraction",
+        ):
+            self.assertIn(name, baseline[-1].normalized_features)
+            self.assertIsNotNone(baseline[-1].normalized_features[name])
         self.assertEqual(
             baseline[-1].available_at_ms,
             source[-1].time_ms + INTERVAL_MS["15M"],
