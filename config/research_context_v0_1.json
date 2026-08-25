@@ -1,0 +1,48 @@
+{
+  "schema": "research-context-config-v0.1",
+  "status": "PREPARED_NOT_ACTIVE",
+  "purpose": "Structured, timestamped research context for Challenger analysis only",
+  "source_adapters": [
+    {
+      "source_id": "capafy_tv_radar",
+      "source_url": "https://capafy.ai/zh-hant/agent/%E6%8A%80%E8%A1%93%E9%9D%A2%E9%9B%B7%E9%81%94-tv-radar/7626172340",
+      "horizons": ["daily"],
+      "field_groups": ["oscillators", "trend", "moving_average", "contradiction_flags"],
+      "ingestion": "structured_source_required"
+    },
+    {
+      "source_id": "capafy_technical_analysis_v2",
+      "source_url": "https://capafy.ai/ar/agent/technical-analysis-v2-multi-timeframe-quant/4510067088?languageCode=en",
+      "horizons": ["daily", "weekly"],
+      "field_groups": ["moving_average", "rsi", "macd", "bollinger", "atr", "volume", "support_resistance"],
+      "ingestion": "structured_source_required"
+    },
+    {
+      "source_id": "capafy_stockhammer",
+      "source_url": "https://capafy.ai/fr/agent/stockhammer/3566733573?languageCode=en",
+      "horizons": ["daily", "weekly"],
+      "field_groups": ["multi_timeframe", "relative_strength", "risk_statistics", "source_freshness"],
+      "ingestion": "structured_source_required"
+    },
+    {
+      "source_id": "capafy_market_force_field",
+      "source_url": "https://capafy.ai/similar/1769771384",
+      "horizons": ["weekly", "monthly", "quarterly", "annual"],
+      "field_groups": ["bull_factors", "bear_factors", "catalysts", "scenarios", "inflection_events"],
+      "ingestion": "structured_source_required"
+    },
+    {
+      "source_id": "capafy_btc_cycle_radar",
+      "source_url": "https://capafy.ai/zh-hant/agent/bitcoin-cycle-radar-btc-health-buzz/8672024464",
+      "horizons": ["daily", "weekly"],
+      "field_groups": ["ma200", "momentum", "fear_greed", "etf_flow", "dominance", "network_activity", "buzz"],
+      "ingestion": "structured_source_required"
+    }
+  ],
+  "research_only": true,
+  "automatic_model_promotion_authorized": false,
+  "direct_trade_trigger_authorized": false,
+  "trade_plan_authorized": false,
+  "live_trading_authorized": false,
+  "activation_requires": "separate_post_window_versioned_authority"
+}
