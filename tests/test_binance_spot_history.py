@@ -47,6 +47,14 @@ class BinanceSpotHistoryTests(unittest.TestCase):
         self.assertEqual(candle.close, 101.0)
         self.assertEqual(candle.quote_volume, 1262.5)
         self.assertEqual(candle.trade_count, 42)
+        self.assertEqual(candle.taker_buy_base_volume, 6.0)
+        self.assertEqual(candle.taker_buy_quote_volume, 606.0)
+
+    def test_taker_buy_volume_cannot_exceed_total_volume(self) -> None:
+        invalid = row(1_577_836_800_000)
+        invalid[10] = "2000"
+        with self.assertRaisesRegex(BinanceSpotHistoryError, "taker-buy"):
+            parse_spot_kline("BTCUSDT", invalid)
 
     def test_forward_pagination_deduplicates_and_audits(self) -> None:
         start = 1_577_836_800_000
