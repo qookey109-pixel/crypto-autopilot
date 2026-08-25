@@ -29,7 +29,11 @@
       "baseline": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7"],
       "trend": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7", "adx14", "plus_di14", "minus_di14"],
       "price_volume": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7", "vwap_distance_fraction", "volume_zscore20", "donchian_position20"],
-      "volatility": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7", "atr_percentile100", "bollinger_bandwidth_percentile100", "realized_volatility20", "parkinson_volatility20"]
+      "volatility": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7", "atr_percentile100", "bollinger_bandwidth_percentile100", "realized_volatility20", "parkinson_volatility20"],
+      "oscillators": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7", "stoch_rsi14", "williams_r14", "cci20", "awesome_oscillator", "ultimate_oscillator"],
+      "trend_structure": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7", "hull_ma9_distance_fraction", "ichimoku_base26_distance_fraction"],
+      "orderflow": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7", "taker_buy_ratio", "buy_sell_volume_delta_fraction", "taker_buy_volume_zscore20", "rolling_cvd20_fraction"],
+      "extended_technical": ["return_1d", "return_3d", "return_7d", "close_vs_ma7", "quote_volume_vs_ma7", "adx14", "plus_di14", "minus_di14", "vwap_distance_fraction", "volume_zscore20", "donchian_position20", "atr_percentile100", "bollinger_bandwidth_percentile100", "realized_volatility20", "parkinson_volatility20", "stoch_rsi14", "williams_r14", "cci20", "awesome_oscillator", "ultimate_oscillator", "hull_ma9_distance_fraction", "ichimoku_base26_distance_fraction"]
     }
   },
   "interpretation": "Shadow evidence only. A result cannot promote a model, authorize R2, open holdout data or authorize trading. Funding, mark-index basis and open interest remain outside this Spot scope."
