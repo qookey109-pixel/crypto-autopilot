@@ -156,6 +156,19 @@ function renderPaperTraining(report) {
     </tr>`).join("") : '<tr><td colspan="6">目前沒有模擬成交</td></tr>';
 }
 
+
+function renderStrategy(strategy) {
+  if (!strategy) return;
+  const setText = (selector, value) => { const node = document.querySelector(selector); if (node) node.textContent = value; };
+  const timeframe = strategy.timeframes || {}, sstate = strategy.sstate || {}, score = strategy.score || {}, risk = strategy.risk || {}, exit = strategy.exit || {};
+  setText("#strategy-version", `V${strategy.version || "0.1.0"}`); setText("#strategy-mode", `${strategy.mode === "paper" ? "PAPER-ONLY" : strategy.mode} · ${strategy.direction || "LONG_ONLY"}`); setText("#strategy-universe", `${Number(strategy.universe_target || 0)} 個候選市場`);
+  setText("#strategy-context-timeframe", timeframe.market_context || "—"); setText("#strategy-setup-timeframe", timeframe.setup || "—"); setText("#strategy-entry-timeframe", timeframe.entry || "—"); setText("#strategy-states", (sstate.allowed_states || []).join(" / ")); setText("#strategy-probability", `${number(Number(sstate.minimum_probability || 0) * 100)}%（背景閘門）`); setText("#strategy-samples", `${number(sstate.minimum_samples || 0, 0)} 筆`);
+  setText("#strategy-min-score", `${number(score.minimum_entry_score || 0, 0)} / 100`);
+  const weights = score.weights || {}, labels = { sstate_quality: "SState 品質", historical_probability: "歷史機率", trend_1h: "1H 趨勢", entry_15m: "15m 進場", reward_risk: "報酬／風險", liquidity_funding: "流動性／Funding" }, root = document.querySelector("#strategy-score-list");
+  if (root) root.innerHTML = Object.entries(weights).map(([key, value]) => `<div class="strategy-score-row"><span>${labels[key] || key}</span><strong>${number(value, 0)}</strong><div class="strategy-score-track"><i style="width:${Math.max(0, Math.min(100, Number(value) * 4))}%"></i></div></div>`).join("");
+  setText("#strategy-risk", `${number(Number(risk.risk_fraction_per_trade || 0) * 100)}% equity / 交易`); setText("#strategy-leverage", `${number(risk.max_leverage || 0)}x 上限 · 結構停損 ≤ ${number(risk.max_structural_stop_atr || 0)} ATR`); setText("#strategy-daily-trades", `${number(strategy.max_new_trades_per_day || 0, 0)} 筆新交易`); setText("#strategy-daily-loss", `每日停止於 -${number(risk.daily_loss_limit_r || 0)}R`); setText("#strategy-partial", `+${number(exit.partial_at_r || 0)}R 先實現 ${number(Number(exit.partial_fraction || 0) * 100)}%`); setText("#strategy-runner", `Runner ${number(Number(exit.runner_fraction || 0) * 100)}%`); setText("#strategy-holding", `最長持有 ${number(exit.max_holding_hours || 0, 0)} 小時`);
+}
+
 function upsertByName(items, additions) {
   const merged = [...items];
   additions.forEach(addition => {
@@ -217,8 +230,15 @@ async function loadData() {
     } catch (error) {
       console.warn("Paper training projection unavailable", error);
     }
+    let strategy = null;
+    try {
+      strategy = await fetchJson("./data/strategy.json");
+    } catch (error) {
+      console.warn("Strategy projection unavailable", error);
+    }
     render(mergeOperationalStatus(data, operational));
     renderPaperTraining(paperTraining);
+    renderStrategy(strategy);
   } catch (error) {
     console.error("Dashboard snapshot load failed", error);
     render(FALLBACK);
@@ -230,6 +250,7 @@ const titles = {
   overview: "總覽",
   "data-health": "資料健康度",
   signals: "交易訊號",
+  strategy: "策略",
   positions: "模擬持倉",
   trades: "模擬交易",
   performance: "績效中心",
