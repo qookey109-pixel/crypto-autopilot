@@ -1,0 +1,52 @@
+{
+  "schema": "tokenized-equity-challenger-config-v0.1",
+  "version": "0.1.0",
+  "status": "PREPARED_LOCAL_REPLAY_ONLY",
+  "asset_class": "tokenized_stock_candidate",
+  "strategy_source": "config/paper_training_v0_1.json",
+  "purpose": "Evaluate the crypto technical scoring baseline on provider-verified tokenized-equity perpetual candidates without mixing asset classes.",
+  "market_policy": {
+    "required_intervals": ["15M", "60M", "4H", "8H", "1D"],
+    "require_session_model_verified": true,
+    "require_corporate_action_policy": true,
+    "maximum_spread_bps": 40.0
+  },
+  "candidate_thresholds": {
+    "minimum_trend_agreement": 0.75,
+    "minimum_adx14": 18.0,
+    "minimum_rsi14": 45.0,
+    "maximum_rsi14": 75.0,
+    "minimum_donchian_position": 0.80,
+    "minimum_volume_zscore": -0.50,
+    "minimum_efficiency_ratio": 0.20,
+    "minimum_candidate_score": 65.0
+  },
+  "paper_risk": {
+    "initial_equity_usd": 10000.0,
+    "risk_fraction_per_trade": 0.01,
+    "maximum_leverage": 3.0,
+    "maximum_new_trades_per_day": 3,
+    "daily_loss_limit_r": 3.0,
+    "stop_atr_multiple": 1.5,
+    "target_atr_multiple": 3.0,
+    "taker_fee_bps": 5.0,
+    "slippage_bps": 2.0
+  },
+  "interpretation": {
+    "same_crypto_indicator_logic": true,
+    "asset_class_isolated": true,
+    "corporate_action_and_session_adjustments_required": true,
+    "tokenized_classification_is_not_proof_of_tradability": true,
+    "promotion_requires_separate_authority": true
+  },
+  "authority": {
+    "provider_reads_authorized": false,
+    "r2_reads_authorized": false,
+    "r2_writes_authorized": false,
+    "schedule_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
