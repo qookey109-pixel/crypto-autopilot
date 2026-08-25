@@ -38,6 +38,39 @@ FEATURE_GROUPS: dict[str, tuple[str, ...]] = {
         "realized_volatility20",
         "parkinson_volatility20",
     ),
+    "oscillators": BASELINE_FEATURES
+    + (
+        "stoch_rsi14",
+        "williams_r14",
+        "cci20",
+        "awesome_oscillator",
+        "ultimate_oscillator",
+    ),
+    "trend_structure": BASELINE_FEATURES
+    + (
+        "hull_ma9_distance_fraction",
+        "ichimoku_base26_distance_fraction",
+    ),
+    "extended_technical": BASELINE_FEATURES
+    + (
+        "adx14",
+        "plus_di14",
+        "minus_di14",
+        "vwap_distance_fraction",
+        "volume_zscore20",
+        "donchian_position20",
+        "atr_percentile100",
+        "bollinger_bandwidth_percentile100",
+        "realized_volatility20",
+        "parkinson_volatility20",
+        "stoch_rsi14",
+        "williams_r14",
+        "cci20",
+        "awesome_oscillator",
+        "ultimate_oscillator",
+        "hull_ma9_distance_fraction",
+        "ichimoku_base26_distance_fraction",
+    ),
 }
 
 
