@@ -115,6 +115,22 @@ function number(value, digits = 2) {
   return Number.isFinite(numeric) ? numeric.toLocaleString("zh-TW", { maximumFractionDigits: digits }) : "—";
 }
 
+function formatTradeTime(value) {
+  const raw = String(value ?? "").trim();
+  const numeric = /^\d+$/.test(raw) ? Number(raw) : NaN;
+  const date = Number.isFinite(numeric) ? new Date(numeric) : new Date(raw);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat("zh-TW", {
+    timeZone: "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+}
+
 function renderPaperTraining(report) {
   if (!report || report.mode !== "PAPER_TRAINING_ONLY") return;
   const authority = report.authority || {};
@@ -148,12 +164,14 @@ function renderPaperTraining(report) {
   document.querySelector("#paper-trade-table").innerHTML = trades.length ? trades.slice(-50).reverse().map(item => `
     <tr>
       <td><strong>${escapeHtml(item.symbol)}</strong></td>
+      <td><time>${formatTradeTime(item.entry_time_ms ?? item.entryTimeMs ?? item.signal_time_ms)}</time></td>
+      <td><time>${formatTradeTime(item.exit_time_ms ?? item.exitTimeMs ?? item.entry_time_ms ?? item.signal_time_ms)}</time></td>
       <td>${number(item.entry_price, 8)}</td>
       <td>${number(item.exit_price, 8)}</td>
       <td>${escapeHtml(item.exit_reason)}</td>
       <td class="${Number(item.net_pnl_usd) >= 0 ? "cell-pass" : "cell-pending"}">${number(item.net_pnl_usd)} USD</td>
       <td>${number(item.r_multiple)}</td>
-    </tr>`).join("") : '<tr><td colspan="6">目前沒有模擬成交</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="8">目前沒有模擬成交</td></tr>';
 }
 
 
