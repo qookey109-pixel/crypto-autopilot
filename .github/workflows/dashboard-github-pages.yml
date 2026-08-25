@@ -15,6 +15,7 @@ on:
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - "PROJECT_STATUS.md"
+      - "config/strategy_v0_1.json"
       - ".github/workflows/dashboard-github-pages.yml"
   pull_request:
     paths:
@@ -29,6 +30,7 @@ on:
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - "PROJECT_STATUS.md"
+      - "config/strategy_v0_1.json"
       - ".github/workflows/dashboard-github-pages.yml"
   workflow_dispatch:
 
@@ -61,6 +63,7 @@ jobs:
           rm -rf _site
           mkdir -p _site/data
           cp -R web/. _site/
+          cp config/strategy_v0_1.json _site/data/strategy.json
           python scripts/build_dashboard_authority_snapshot.py \
             --output _site/data/dashboard.json
           python scripts/apply_dashboard_latest_authority.py \
