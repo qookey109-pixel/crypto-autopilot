@@ -174,17 +174,54 @@ function renderPaperTraining(report) {
     </tr>`).join("") : '<tr><td colspan="8">目前沒有模擬成交</td></tr>';
 }
 
-
 function renderStrategy(strategy) {
-  if (!strategy) return;
-  const setText = (selector, value) => { const node = document.querySelector(selector); if (node) node.textContent = value; };
-  const timeframe = strategy.timeframes || {}, sstate = strategy.sstate || {}, score = strategy.score || {}, risk = strategy.risk || {}, exit = strategy.exit || {};
-  setText("#strategy-version", `V${strategy.version || "0.1.0"}`); setText("#strategy-mode", `${strategy.mode === "paper" ? "PAPER-ONLY" : strategy.mode} · ${strategy.direction || "LONG_ONLY"}`); setText("#strategy-universe", `${Number(strategy.universe_target || 0)} 個候選市場`);
-  setText("#strategy-context-timeframe", timeframe.market_context || "—"); setText("#strategy-setup-timeframe", timeframe.setup || "—"); setText("#strategy-entry-timeframe", timeframe.entry || "—"); setText("#strategy-states", (sstate.allowed_states || []).join(" / ")); setText("#strategy-probability", `${number(Number(sstate.minimum_probability || 0) * 100)}%（背景閘門）`); setText("#strategy-samples", `${number(sstate.minimum_samples || 0, 0)} 筆`);
-  setText("#strategy-min-score", `${number(score.minimum_entry_score || 0, 0)} / 100`);
-  const weights = score.weights || {}, labels = { sstate_quality: "SState 品質", historical_probability: "歷史機率", trend_1h: "1H 趨勢", entry_15m: "15m 進場", reward_risk: "報酬／風險", liquidity_funding: "流動性／Funding" }, root = document.querySelector("#strategy-score-list");
-  if (root) root.innerHTML = Object.entries(weights).map(([key, value]) => `<div class="strategy-score-row"><span>${labels[key] || key}</span><strong>${number(value, 0)}</strong><div class="strategy-score-track"><i style="width:${Math.max(0, Math.min(100, Number(value) * 4))}%"></i></div></div>`).join("");
-  setText("#strategy-risk", `${number(Number(risk.risk_fraction_per_trade || 0) * 100)}% equity / 交易`); setText("#strategy-leverage", `${number(risk.max_leverage || 0)}x 上限 · 結構停損 ≤ ${number(risk.max_structural_stop_atr || 0)} ATR`); setText("#strategy-daily-trades", `${number(strategy.max_new_trades_per_day || 0, 0)} 筆新交易`); setText("#strategy-daily-loss", `每日停止於 -${number(risk.daily_loss_limit_r || 0)}R`); setText("#strategy-partial", `+${number(exit.partial_at_r || 0)}R 先實現 ${number(Number(exit.partial_fraction || 0) * 100)}%`); setText("#strategy-runner", `Runner ${number(Number(exit.runner_fraction || 0) * 100)}%`); setText("#strategy-holding", `最長持有 ${number(exit.max_holding_hours || 0, 0)} 小時`);
+  if (!strategy || typeof strategy !== "object") return;
+  const setText = (id, value) => {
+    const element = document.querySelector(`#${id}`);
+    if (element) element.textContent = value;
+  };
+  const timeframes = strategy.timeframes || {};
+  const sstate = strategy.sstate || {};
+  const score = strategy.score || {};
+  const risk = strategy.risk || {};
+  const exit = strategy.exit || {};
+  const direction = String(strategy.direction || "LONG_ONLY");
+  setText("strategy-name", strategy.name || "SState Intraday Wave");
+  setText("strategy-mode", `${String(strategy.mode || "paper").toUpperCase()} · ${direction}`);
+  setText("strategy-version", `V${strategy.version || "0.1.0"} · Repository config`);
+  setText("strategy-context-timeframe", timeframes.market_context || "4H");
+  setText("strategy-setup-timeframe", timeframes.setup || "60M");
+  setText("strategy-entry-timeframe", timeframes.entry || "15M");
+  setText("strategy-states", (sstate.allowed_states || []).join(" · "));
+  setText("strategy-probability", `${number(Number(sstate.minimum_probability || 0) * 100, 0)}%`);
+  setText("strategy-samples", number(sstate.minimum_samples, 0));
+  setText("strategy-min-score", number(score.minimum_entry_score, 0));
+  setText("strategy-risk", `${number(Number(risk.risk_fraction_per_trade || 0) * 100, 2)}% equity`);
+  setText("strategy-leverage", `${number(risk.max_leverage, 1)}x`);
+  setText("strategy-daily-trades", `${number(strategy.max_new_trades_per_day, 0)} 筆`);
+  setText("strategy-daily-loss", `-${number(risk.daily_loss_limit_r, 0)}R`);
+  setText("strategy-partial", `+${number(exit.partial_at_r, 1)}R · ${number(Number(exit.partial_fraction || 0) * 100, 0)}%`);
+  setText("strategy-runner", `${number(Number(exit.runner_fraction || 0) * 100, 0)}%`);
+  setText("strategy-holding", `${number(exit.max_holding_hours, 0)} 小時`);
+
+  const labels = {
+    sstate_quality: "SState 品質",
+    historical_probability: "歷史機率",
+    trend_1h: "1H 趨勢",
+    entry_15m: "15m 進場",
+    reward_risk: "報酬／風險",
+    liquidity_funding: "流動性／Funding"
+  };
+  const root = document.querySelector("#strategy-score-list");
+  if (root) {
+    root.innerHTML = Object.entries(score.weights || {}).map(([key, value]) => `
+      <div class="strategy-score-row">
+        <span>${escapeHtml(labels[key] || key)}</span>
+        <div class="strategy-score-track"><i style="width:${Math.max(0, Math.min(100, Number(value) || 0))}%"></i></div>
+        <strong>${number(value, 0)}</strong>
+      </div>
+    `).join("");
+  }
 }
 
 function upsertByName(items, additions) {
@@ -248,15 +285,14 @@ async function loadData() {
     } catch (error) {
       console.warn("Paper training projection unavailable", error);
     }
-    let strategy = null;
     try {
-      strategy = await fetchJson("./data/strategy.json");
+      const strategy = await fetchJson("./data/strategy.json");
+      renderStrategy(strategy);
     } catch (error) {
       console.warn("Strategy projection unavailable", error);
     }
     render(mergeOperationalStatus(data, operational));
     renderPaperTraining(paperTraining);
-    renderStrategy(strategy);
   } catch (error) {
     console.error("Dashboard snapshot load failed", error);
     render(FALLBACK);
@@ -280,8 +316,6 @@ function activateView(view) {
   const target = document.querySelector(`#view-${view}`);
   if (!target) return;
   const isOverview = view === "overview";
-  const hero = document.querySelector(".mint-hero");
-  if (hero) hero.classList.toggle("is-hidden", !isOverview);
   document.body.classList.toggle("subview-active", !isOverview);
   document.querySelectorAll(".nav-item").forEach(item => {
     const active = item.dataset.view === view;
