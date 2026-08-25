@@ -1,0 +1,30 @@
+{
+  "schema": "paper-exploration-config-v0.2",
+  "version": "0.2.0",
+  "status": "PREPARED_LOCAL_REPLAY_ONLY",
+  "purpose": "Increase independent paper-training samples without changing the governed V0.1 portfolio broker.",
+  "limits": {
+    "max_samples_per_utc_day": 12,
+    "max_samples_per_symbol_per_utc_day": 2,
+    "risk_fraction_per_sample": 0.0025,
+    "initial_equity_usd": 10000.0,
+    "max_leverage": 3.0,
+    "taker_fee_bps": 5.0,
+    "slippage_bps": 2.0
+  },
+  "interpretation": {
+    "independent_samples_not_portfolio_equity": true,
+    "overlapping_samples_allowed": true,
+    "formal_v0_1_paper_limit_unchanged": true
+  },
+  "authority": {
+    "provider_reads_authorized": false,
+    "r2_reads_authorized": false,
+    "r2_writes_authorized": false,
+    "schedule_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
