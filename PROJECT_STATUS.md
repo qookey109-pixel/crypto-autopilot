@@ -146,6 +146,13 @@ Repository branch `main` is the live formal authority and is intentionally not s
 - A post-window four-hour/weekly/monthly successor cadence is recorded as
   `PREPARED_NOT_ACTIVE`. It has no workflow and grants zero provider, R2,
   holdout, model-promotion or trading authority.
+- Tokenized Equity Challenger V0.1 is prepared as a separate
+  `PREPARED_LOCAL_REPLAY_ONLY` path that reuses the crypto technical scorer
+  only after explicit tokenized-stock asset-class, session, corporate-action,
+  interval and spread gates pass. It remains outside the formal crypto
+  universe, has no schedule or R2 access, and cannot promote a model or create
+  a trade plan. See `config/tokenized_equity_challenger_v0_1.json` and
+  `docs/TOKENIZED_EQUITY_CHALLENGER_V0_1.md`.
 - The research-only continuous-learning completion target is documented in
   `docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`. Its `2026-09-30` engineering
   target is a roadmap, not execution authority or a profitability promise.
