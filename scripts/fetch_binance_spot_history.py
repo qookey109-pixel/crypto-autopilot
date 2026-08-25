@@ -52,6 +52,8 @@ def write_csv(path: Path, series: list[BinanceSpotSeries]) -> int:
                 "base_volume",
                 "quote_volume",
                 "trade_count",
+                "taker_buy_base_volume",
+                "taker_buy_quote_volume",
             ]
         )
         for item in series:
@@ -69,6 +71,8 @@ def write_csv(path: Path, series: list[BinanceSpotSeries]) -> int:
                         candle.base_volume,
                         candle.quote_volume,
                         candle.trade_count,
+                        candle.taker_buy_base_volume,
+                        candle.taker_buy_quote_volume,
                     ]
                 )
                 count += 1
@@ -91,6 +95,8 @@ def write_parquet(path: Path, series: list[BinanceSpotSeries]) -> int:
                 "base_volume": candle.base_volume,
                 "quote_volume": candle.quote_volume,
                 "trade_count": candle.trade_count,
+                "taker_buy_base_volume": candle.taker_buy_base_volume,
+                "taker_buy_quote_volume": candle.taker_buy_quote_volume,
             }
             for candle in item.candles
         )
