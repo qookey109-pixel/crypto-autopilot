@@ -225,10 +225,25 @@ def _structural_candidate(
     atr = float(technical.atr14 or 0.0)
     if atr <= 0:
         return candidate, "INVALID_ATR", 0.0
+    minimum_atr = float(policy["minimum_distance_atr"])
+    maximum_atr = float(policy["maximum_distance_atr"])
+    buffer_atr = float(policy["structure_buffer_atr"])
+    half_band_fraction = float(policy["bollinger_half_band_fraction"])
+    if not 0 < minimum_atr <= maximum_atr:
+        raise ValueError("invalid structural-stop ATR bounds")
+    if buffer_atr < 0:
+        raise ValueError("structural-stop ATR buffer cannot be negative")
+    if not 0 <= half_band_fraction <= 1:
+        raise ValueError("Bollinger half-band fraction must be between zero and one")
     side = candidate.plan.side
     reference = float(technical.close)
-    values: list[tuple[str, float]] = [("DIRECTIONAL_ATR", candidate.plan.stop_price)]
+    configured_sources = set(policy["candidate_sources"])
+    values: list[tuple[str, float]] = []
+    if "DIRECTIONAL_ATR" in configured_sources:
+        values.append(("DIRECTIONAL_ATR", candidate.plan.stop_price))
     for name, attribute in (("EMA20", "ema20"), ("BOLLINGER_MID", "bollinger_mid")):
+        if name not in configured_sources:
+            continue
         value = getattr(technical, attribute, None)
         if value is None:
             continue
@@ -237,16 +252,35 @@ def _structural_candidate(
             side == "SHORT" and numeric > reference
         ):
             values.append((name, numeric))
+    if "BOLLINGER_HALF_BAND" in configured_sources:
+        mid = getattr(technical, "bollinger_mid", None)
+        outer = (
+            getattr(technical, "bollinger_lower", None)
+            if side == "LONG"
+            else getattr(technical, "bollinger_upper", None)
+        )
+        if mid is not None and outer is not None:
+            half_band = float(mid) + (float(outer) - float(mid)) * half_band_fraction
+            if (side == "LONG" and 0 < half_band < reference) or (
+                side == "SHORT" and half_band > reference
+            ):
+                values.append(("BOLLINGER_HALF_BAND", half_band))
+    if not values:
+        return candidate, "NO_VALID_STRUCTURAL_SOURCE", 0.0
     source, raw_stop = (
         min(values, key=lambda item: item[1])
         if side == "LONG"
         else max(values, key=lambda item: item[1])
     )
-    minimum = atr * float(policy["minimum_distance_atr"])
-    maximum = atr * float(policy["maximum_distance_atr"])
-    distance = min(max(abs(reference - raw_stop), minimum), maximum)
+    buffer = atr * buffer_atr
+    buffered_stop = raw_stop - buffer if side == "LONG" else raw_stop + buffer
+    if buffer > 0:
+        source = f"{source}_BUFFERED"
+    minimum = atr * minimum_atr
+    maximum = atr * maximum_atr
+    distance = min(max(abs(reference - buffered_stop), minimum), maximum)
     stop = reference - distance if side == "LONG" else reference + distance
-    if not math.isclose(stop, raw_stop, abs_tol=1e-12):
+    if not math.isclose(stop, buffered_stop, abs_tol=1e-12):
         source = f"{source}_ATR_BOUNDED"
     plan = DirectionalPlan(
         plan_id=candidate.plan.plan_id,
@@ -320,6 +354,11 @@ def build_integrated_candidates(
             reasons.extend(_short_sstate_reasons(opportunity, bridge))
         if not candidate.eligible:
             reasons.extend(f"technical_{reason}" for reason in candidate.reasons)
+        if stop_distance_atr <= 0 or stop_source in {
+            "INVALID_ATR",
+            "NO_VALID_STRUCTURAL_SOURCE",
+        }:
+            reasons.append("structural_stop_unavailable")
         reasons = list(dict.fromkeys(reasons))
         output.append(
             IntegratedCandidate(

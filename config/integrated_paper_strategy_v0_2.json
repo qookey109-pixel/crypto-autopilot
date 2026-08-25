@@ -1,6 +1,6 @@
 {
   "schema": "integrated-paper-strategy-challenger-config-v0.2",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "status": "PREPARED_LOCAL_REPLAY_ONLY",
   "purpose": "Bridge SState context, directional technical candidates, asset-class admission and deterministic paper risk/exit evidence without changing the governed V0.1 strategy.",
   "baseline_sources": {
@@ -50,8 +50,10 @@
     "tokenized_corporate_action_policy_required": true
   },
   "stop_policy": {
-    "mode": "WIDEST_VALID_WITH_ATR_BOUNDS",
-    "candidate_sources": ["DIRECTIONAL_ATR", "EMA20", "BOLLINGER_MID"],
+    "mode": "WIDEST_VALID_STRUCTURE_WITH_BUFFER_AND_ATR_BOUNDS",
+    "candidate_sources": ["DIRECTIONAL_ATR", "EMA20", "BOLLINGER_MID", "BOLLINGER_HALF_BAND"],
+    "bollinger_half_band_fraction": 0.5,
+    "structure_buffer_atr": 0.10,
     "minimum_distance_atr": 0.75,
     "maximum_distance_atr": 2.5,
     "fixed_percentage_stop_authorized": false
@@ -64,7 +66,9 @@
     "daily_loss_limit_r": 3.0,
     "maximum_concurrent_positions": 1,
     "leverage_conflict_policy": "REJECT_PLAN",
-    "record_effective_risk_and_leverage_rejections": true
+    "record_effective_risk_and_leverage_rejections": true,
+    "risk_budget_interpretation": "MAXIMUM_EQUITY_LOSS_AT_INITIAL_STOP_NOT_STOP_DISTANCE",
+    "position_size_scales_inverse_to_stop_distance": true
   },
   "cost_model": {
     "taker_fee_bps": 5.0,

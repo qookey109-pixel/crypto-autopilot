@@ -2,7 +2,7 @@
 
 ## Status
 
-`PREPARED_LOCAL_REPLAY_ONLY`. This is an isolated research integration. It
+`PREPARED_LOCAL_REPLAY_ONLY` (`0.2.1`). This is an isolated research integration. It
 does not replace `SState Intraday Wave V0.1`, change the formal LONG-only
 strategy, authorize a provider request, read or write R2, open the replacement
 holdout, schedule a job, promote a model, create a formal trade plan or place
@@ -61,16 +61,21 @@ availability. Tokenized results remain isolated from the crypto portfolio.
 
 ## Risk and structural stop
 
-The reference paper risk budget is at most 1% of current paper equity. Position
-notional is derived from the actual stop distance. If the required leverage is
-above 3x, the plan is rejected; the engine does not silently reduce the
-position or widen the risk budget. The output records evaluated leverage,
-leverage-cap rejections and accepted effective-risk fractions.
+The reference paper risk budget is at most 1% of current paper equity. This is
+the maximum account loss at the initial stop, **not** a stop placed 1% away from
+entry. Position notional is derived inversely from the actual stop distance:
+a wider structural stop produces a smaller position while keeping the maximum
+initial paper loss at 1%. If the required leverage is above 3x, the plan is
+rejected; the engine does not silently reduce the position or widen the risk
+budget. The output records evaluated leverage, leverage-cap rejections and
+accepted effective-risk fractions.
 
-The structural stop adapter compares the directional ATR stop, EMA20 and
-Bollinger midline when each is valid for the side. It selects the widest valid
-invalidation and bounds its distance to 0.75–2.5 ATR. No fixed-percentage stop
-is authorized.
+The structural stop adapter compares the directional ATR stop, EMA20,
+Bollinger midline and the halfway point between the Bollinger midline and the
+side-specific outer band. For LONG this is halfway from the midline toward the
+lower band; for SHORT it is halfway toward the upper band. It selects the
+widest valid invalidation, adds a 0.10 ATR noise buffer, and bounds the final
+distance to 0.75–2.5 ATR. No fixed-percentage stop is authorized.
 
 Portfolio scope remains conservative:
 
@@ -116,4 +121,3 @@ changes trading authority.
 - `config/challenger_promotion_protocol_v0_1.json`
 - `src/crypto_autopilot/challenger_promotion_v0_1.py`
 - `docs/CHALLENGER_PROMOTION_PROTOCOL_V0_1.md`
-

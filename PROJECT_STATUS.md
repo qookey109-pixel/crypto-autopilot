@@ -164,9 +164,12 @@ Repository branch `main` is the live formal authority and is intentionally not s
 - Integrated Paper Strategy Challenger V0.2 is prepared locally on top of the
   two isolated challengers. It bridges the unmodified formal SState V0.1 LONG
   decision, context-only SHORT research, directional technical candidates,
-  crypto/tokenized asset gates, bounded structural stops, leverage-rejection
+  crypto/tokenized asset gates, bounded ATR/EMA20/Bollinger midline and
+  half-band structural stops, leverage-rejection
   diagnostics, +1R partial/runner handling and a hard 12-hour exit. SState and
   technical scores remain separate, research context cannot affect eligibility,
+  and the 1% equity setting is an initial-loss budget rather than a fixed stop
+  distance; wider stops reduce paper position size.
   and the formal V0.1 broker/strategy remain unchanged. Challenger Promotion
   Protocol V0.1 freezes quantitative walk-forward, sample, cost, drawdown,
   concentration and regime gates, but a PASS means human review only. Neither

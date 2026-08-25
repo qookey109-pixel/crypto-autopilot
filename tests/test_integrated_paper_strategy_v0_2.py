@@ -180,9 +180,26 @@ class IntegratedPaperStrategyCandidateTests(unittest.TestCase):
             config=self.config,
         )
         long = next(item for item in candidates if item.directional.plan.side == "LONG")
-        self.assertEqual(long.stop_source, "BOLLINGER_MID_ATR_BOUNDED")
+        self.assertEqual(long.stop_source, "BOLLINGER_MID_BUFFERED_ATR_BOUNDED")
         self.assertEqual(long.stop_distance_atr, 2.5)
         self.assertEqual(long.directional.plan.stop_price, 97.0)
+
+    def test_structural_stop_can_use_half_of_lower_bollinger_channel(self) -> None:
+        technical = _technical("LONG")
+        technical.bollinger_mid = 100.0
+        technical.bollinger_lower = 96.0
+        candidates = build_integrated_candidates(
+            market=_market(),
+            opportunity=_opportunity(),
+            technical=technical,
+            advanced=_advanced("LONG"),
+            higher=(technical, technical, technical, technical),
+            config=self.config,
+        )
+        long = next(item for item in candidates if item.directional.plan.side == "LONG")
+        self.assertEqual(long.stop_source, "BOLLINGER_HALF_BAND_BUFFERED")
+        self.assertAlmostEqual(long.directional.plan.stop_price, 97.8)
+        self.assertAlmostEqual(long.stop_distance_atr, 2.1)
 
     def test_short_uses_context_only_bridge_not_long_setup_score(self) -> None:
         technical = _technical("SHORT")
@@ -302,6 +319,29 @@ class IntegratedPaperStrategyReplayTests(unittest.TestCase):
         )
         self.assertEqual(result["riskDiagnostics"]["leverage_rejection_fraction"], 1.0)
 
+    def test_wider_stop_reduces_position_size_without_increasing_equity_risk(self) -> None:
+        candles = (
+            Candle(STEP, 100.0, 101.0, 99.0, 100.5, 10.0),
+            Candle(2 * STEP, 100.5, 111.0, 99.0, 110.0, 10.0),
+        )
+        narrow = run_integrated_paper_replay(
+            candidates=(
+                _manual_candidate(plan_id="narrow", stop_price=96.0, target_price=110.0),
+            ),
+            candles_by_symbol={"BTC_USDT_PERP": candles},
+            config=self.config,
+        )["paperTrades"][0]
+        wide = run_integrated_paper_replay(
+            candidates=(
+                _manual_candidate(plan_id="wide", stop_price=94.0, target_price=110.0),
+            ),
+            candles_by_symbol={"BTC_USDT_PERP": candles},
+            config=self.config,
+        )["paperTrades"][0]
+        self.assertLess(wide["quantity"], narrow["quantity"])
+        self.assertAlmostEqual(wide["risk_usd"], narrow["risk_usd"])
+        self.assertEqual(wide["effective_risk_fraction"], 0.01)
+
     def test_portfolio_remains_single_position(self) -> None:
         candles = (
             Candle(STEP, 100.0, 101.0, 99.0, 100.5, 10.0),
@@ -342,7 +382,7 @@ class IntegratedPaperStrategyReplayTests(unittest.TestCase):
                 ROOT
                 / "research"
                 / "receipts"
-                / "2026-08-26-integrated-paper-strategy-challenger-v0-2-prepared.json"
+                / "2026-08-26-integrated-paper-strategy-challenger-v0-2-1-structural-stop-amendment-prepared.json"
             ).read_text(encoding="utf-8")
         )
         for relative_path, expected_hash in receipt["sha256"].items():
