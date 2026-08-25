@@ -17,6 +17,7 @@ from typing import Any, Sequence
 from .advanced_technical import AdvancedTechnicalSnapshot, build_advanced_technical_series
 from .experiment_registry import build_experiment_registry_entry
 from .models import Candle
+from .orderflow import OrderFlowSnapshot, build_spot_orderflow_series
 
 DAY_MS = 86_400_000
 BASELINE_FEATURES = (
@@ -50,6 +51,13 @@ FEATURE_GROUPS: dict[str, tuple[str, ...]] = {
     + (
         "hull_ma9_distance_fraction",
         "ichimoku_base26_distance_fraction",
+    ),
+    "orderflow": BASELINE_FEATURES
+    + (
+        "taker_buy_ratio",
+        "buy_sell_volume_delta_fraction",
+        "taker_buy_volume_zscore20",
+        "rolling_cvd20_fraction",
     ),
     "extended_technical": BASELINE_FEATURES
     + (
@@ -133,7 +141,10 @@ def _segments(rows: Sequence[dict[str, Any]]) -> list[list[dict[str, Any]]]:
 
 
 def _feature_values(
-    items: Sequence[dict[str, Any]], index: int, advanced: AdvancedTechnicalSnapshot
+    items: Sequence[dict[str, Any]],
+    index: int,
+    advanced: AdvancedTechnicalSnapshot,
+    orderflow: OrderFlowSnapshot,
 ) -> dict[str, float]:
     closes = [_finite(items[offset]["close"]) for offset in range(index - 6, index + 1)]
     volumes = [_finite(items[offset].get("quote_volume", items[offset].get("base_volume", 0.0))) for offset in range(index - 6, index + 1)]
@@ -145,6 +156,9 @@ def _feature_values(
         "quote_volume_vs_ma7": _ratio(volumes[-1], sum(volumes) / len(volumes)),
     }
     for name, value in advanced.normalized_features.items():
+        if value is not None:
+            values[name] = float(value)
+    for name, value in orderflow.normalized_features.items():
         if value is not None:
             values[name] = float(value)
     return values
@@ -187,13 +201,17 @@ def build_shadow_examples(
                 continue
             candles = tuple(_candle(row) for row in segment)
             advanced = build_advanced_technical_series(candles, "1D")
+            orderflow = build_spot_orderflow_series(segment)
             asset_class = str(segment[0]["asset_class"])
             for index in range(warmup_bars, len(segment) - 1):
                 current = segment[index]
                 next_row = segment[index + 1]
-                values = _feature_values(segment, index, advanced[index])
-                if any(name not in values for names in selected_groups.values() for name in names):
-                    continue
+                values = _feature_values(
+                    segment,
+                    index,
+                    advanced[index],
+                    orderflow[index],
+                )
                 regimes = _regimes(values)
                 base = dict(
                     symbol=symbol,
@@ -204,6 +222,8 @@ def build_shadow_examples(
                     regimes=regimes,
                 )
                 for group, names in selected_groups.items():
+                    if any(name not in values for name in names):
+                        continue
                     result[group].append(
                         ShadowExample(features=tuple(values[name] for name in names), **base)
                     )
