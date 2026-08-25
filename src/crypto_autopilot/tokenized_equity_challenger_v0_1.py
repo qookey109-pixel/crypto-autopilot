@@ -61,7 +61,7 @@ class TokenizedEquityCandidate:
         }
 
 
-def _market_reasons(
+def tokenized_market_reasons(
     market: TokenizedEquityMarket,
     *,
     required_intervals: Sequence[str],
@@ -95,7 +95,7 @@ def score_tokenized_equity_candidate(
 ) -> TokenizedEquityCandidate:
     """Apply the crypto candidate scorer only after tokenized-market gates pass."""
     policy = config["market_policy"]
-    reasons = _market_reasons(
+    reasons = tokenized_market_reasons(
         market,
         required_intervals=policy["required_intervals"],
         maximum_spread_bps=float(policy["maximum_spread_bps"]),

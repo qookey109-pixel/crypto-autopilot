@@ -84,6 +84,18 @@ descriptive regime evidence only; it cannot read providers, write R2, access
 the holdout, promote a model or trade. See
 [`docs/BINANCE_SPOT_SHADOW_V0_6.md`](docs/BINANCE_SPOT_SHADOW_V0_6.md).
 
+The prepared **Integrated Paper Strategy Challenger V0.2** keeps the governed
+V0.1 strategy unchanged while joining its formal LONG SState decision with the
+separate directional technical, LONG/SHORT and tokenized-equity research
+adapters. Its local replay implements bounded structural stops, explicit
+leverage-cap rejection diagnostics, +1R partial/runner handling and a hard
+12-hour exit. SState and technical scores are not added, SHORT remains
+context-only research, and KOL/sentiment context cannot affect eligibility. A
+separate quantitative promotion protocol can produce only
+`EVIDENCE_READY_FOR_HUMAN_REVIEW`; it cannot promote or trade. There is no
+workflow, provider/R2/holdout access or execution authority. See
+[`docs/INTEGRATED_PAPER_STRATEGY_CHALLENGER_V0_2.md`](docs/INTEGRATED_PAPER_STRATEGY_CHALLENGER_V0_2.md).
+
 The prepared Research Signal Layer keeps current closed candles, append-only
 historical evidence and timestamped KOL forecasts separate. It enforces
 close-time and publication-time boundaries, rejects revisions and provider

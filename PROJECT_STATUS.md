@@ -161,6 +161,19 @@ Repository branch `main` is the live formal authority and is intentionally not s
   universe, has no schedule or R2 access, and cannot promote a model or create
   a trade plan. See `config/tokenized_equity_challenger_v0_1.json` and
   `docs/TOKENIZED_EQUITY_CHALLENGER_V0_1.md`.
+- Integrated Paper Strategy Challenger V0.2 is prepared locally on top of the
+  two isolated challengers. It bridges the unmodified formal SState V0.1 LONG
+  decision, context-only SHORT research, directional technical candidates,
+  crypto/tokenized asset gates, bounded structural stops, leverage-rejection
+  diagnostics, +1R partial/runner handling and a hard 12-hour exit. SState and
+  technical scores remain separate, research context cannot affect eligibility,
+  and the formal V0.1 broker/strategy remain unchanged. Challenger Promotion
+  Protocol V0.1 freezes quantitative walk-forward, sample, cost, drawdown,
+  concentration and regime gates, but a PASS means human review only. Neither
+  file grants a workflow, provider/R2/holdout access, promotion, trade-plan or
+  trading authority. See `config/integrated_paper_strategy_v0_2.json`,
+  `config/challenger_promotion_protocol_v0_1.json` and
+  `docs/INTEGRATED_PAPER_STRATEGY_CHALLENGER_V0_2.md`.
 - The research-only continuous-learning completion target is documented in
   `docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`. Its `2026-09-30` engineering
   target is a roadmap, not execution authority or a profitability promise.
