@@ -1,0 +1,35 @@
+{
+  "schema": "short-score-calibration-protocol-v0.1",
+  "version": "0.1.0",
+  "status": "PREPARED_CALIBRATION_ONLY",
+  "purpose": "Validate a side-specific SHORT paper score without mirroring the formal LONG score or granting formal SHORT authority.",
+  "baseline_source": "src/crypto_autopilot/paper_long_short_challenger_v0_2.py",
+  "requirements": {
+    "formal_long_weights_may_be_mirrored": false,
+    "minimum_short_out_of_sample_trades": 100,
+    "minimum_short_trades_per_regime": 30,
+    "funding_stress_required": true,
+    "basis_context_required_when_time_aligned": true,
+    "open_interest_context_required_when_time_aligned": true,
+    "short_squeeze_regime_required": true,
+    "borrow_or_tokenized_session_assumptions_must_be_asset_specific": true,
+    "cost_adjusted_expectancy_must_be_positive": true,
+    "calibration_metrics": ["brier_score", "log_loss", "ece", "mce"]
+  },
+  "result_semantics": {
+    "passing_status": "SHORT_SCORE_EVIDENCE_READY_FOR_HUMAN_REVIEW",
+    "formal_short_score_created": false,
+    "formal_short_authority_granted": false
+  },
+  "authority": {
+    "provider_reads_authorized": false,
+    "r2_reads_authorized": false,
+    "r2_writes_authorized": false,
+    "holdout_access_authorized": false,
+    "formal_strategy_change_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

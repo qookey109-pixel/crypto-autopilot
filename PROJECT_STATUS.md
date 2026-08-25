@@ -177,6 +177,19 @@ Repository branch `main` is the live formal authority and is intentionally not s
   trading authority. See `config/integrated_paper_strategy_v0_2.json`,
   `config/challenger_promotion_protocol_v0_1.json` and
   `docs/INTEGRATED_PAPER_STRATEGY_CHALLENGER_V0_2.md`.
+- Integrated Paper Strategy Challenger V0.3 is prepared as a successor evidence
+  layer. It keeps executable single-position portfolio evidence separate from
+  overlapping fixed-equity signal samples, explicitly forbids treating sample
+  PnL as portfolio PnL, and adds stop-distance, planned R:R, stop-source and
+  leverage-rejection diagnostics. Promotion Protocol V0.2 preserves V0.1 gates
+  while adding 180 OOS calendar days, 28 prospective paper days, stationary
+  block-bootstrap confidence, a locked family registry SHA-256 and
+  Holm-Bonferroni control. SState 0.60/50 remains unchanged but cannot reach
+  review without the separate calibration protocol; SHORT remains paper-only
+  and requires independent calibration, funding stress and squeeze-regime
+  evidence. No provider/R2/holdout/workflow, formal strategy, promotion,
+  trade-plan or trading authority is added. See
+  `docs/INTEGRATED_PAPER_STRATEGY_CHALLENGER_V0_3.md`.
 - The research-only continuous-learning completion target is documented in
   `docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`. Its `2026-09-30` engineering
   target is a roadmap, not execution authority or a profitability promise.
