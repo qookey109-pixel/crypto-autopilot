@@ -37,6 +37,26 @@ scripts/apply_dashboard_latest_authority.py
 _site/data/dashboard.json
 ```
 
+CI also rebuilds the non-authoritative research calendar from the current
+versioned Repository sources before publishing:
+
+```text
+V0.10 cutover + Detailed History V0.1.1 + prepared successor schedule
+       + continuous-learning roadmap + SState evidence boundary
+                 |
+                 v
+scripts/build_research_calendar_projection.py
+                 |
+                 v
+_site/data/research-calendar.json
+```
+
+Both generated projections contain an explicit UTC generation time. The UI
+converts only that supplied value to Asia/Taipei. It never substitutes the
+browser load time when the source timestamp is missing. Paper observation time
+comes only from `paper-training.json.observedAtUtc`; a missing value remains
+visibly unavailable.
+
 The generated deployed snapshot also declares `authority=false`. It is a **read-only normalized view** of Repository authority, not a new authority source. If the dashboard conflicts with `PROJECT_STATUS.md` or a frozen receipt/config, the Repository authority wins.
 
 Current generated status includes Funding V0.2 materialization PASS, frozen R2 usage inventory, Equivalence V0.1 definitive FAIL, Render V0.5/V0.6 transport evidence, V0.8 shared-secret PASS, V0.9 authenticated relay-smoke PASS, **V0.10 effective metadata-capture cutover**, metadata stability `NOT_YET_RUN`, replacement holdout `FROZEN_UNOPENED`, and PAPER-ONLY trading boundaries.
@@ -83,24 +103,60 @@ material but are no longer rendered by the current shell.
 
 The overview deliberately summarizes the evidence pipeline and critical gates;
 the remaining eight views preserve the complete read-only inspection surface.
-The research calendar is sourced from Repository state and
-`docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`, but remains a normalized roadmap
-view rather than execution authority.
+The research calendar is rendered from the safe, non-authoritative
+`web/data/research-calendar.json` projection. That file records its Repository
+lineage, exact Asia/Taipei windows and safety boundary. Client-side time logic
+may label a stage as upcoming, in progress or past its window, but it never
+infers that evidence passed. `docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md` remains
+the roadmap source and Repository authorities still win every conflict.
+
+The Strategy view also explains SState in plain language. It distinguishes the
+4H market-context gate from a trade signal or per-trade win probability and
+keeps incomplete historical SState evidence visibly `NOT READY`.
+
+`web/data/research-evidence.json` defines the fail-closed display contract for
+Paper Positions and Backtest Evidence. The checked-in fixture contains no
+positions or backtests and keeps backtest admission false. Future generated
+evidence may populate those arrays only when its Repository lineage and
+paper-only safety boundary are supplied; the browser rejects an unsafe contract
+instead of inferring data from other research artifacts.
+
+`web/data/research-evidence.schema.json` freezes that browser contract. It
+requires `authority=false`, provider and dataset lineage for backtests, a
+64-character run SHA, and an all-false safety boundary. The schema does not
+authorize a producer, R2 access, holdout access, backtest admission, trade plans
+or live trading. Until a separately versioned Repository authority exists, CI
+publishes only the fail-closed empty fixture.
 
 ## Views
 
 - Overview
 - Data Health
 - Signals shell
-- Paper Positions shell
+- Strategy and SState boundary
+- Paper Positions evidence contract
 - Paper Trades shell
 - Performance Center shell
-- Backtests shell
+- Backtests evidence contract
 - Risk & Gates
 
 ## Deployment shape
 
 The `web/` directory is intentionally static. GitHub Actions builds the normalized authority view and deploys it to GitHub Pages. No client-side private API or secret-bearing backend is required.
+
+GitHub Pages does not apply the Netlify/Cloudflare-style rules in
+`web/_headers`. That file is retained only as a defense-in-depth template for a
+future header-aware static host. The Pages deployment instead enforces the
+policies that HTML can enforce directly: a restrictive Content Security Policy
+meta element and `Referrer-Policy: no-referrer` through the document's referrer
+meta element. Response-header-only controls such as `frame-ancestors`,
+`X-Frame-Options`, `X-Content-Type-Options` and `Permissions-Policy` are not
+claimed as enforced on GitHub Pages.
+
+Earlier unused design images remain in Repository history/source for design
+traceability, but the Pages build omits them from the deployed artifact. The
+active cloud-garden image remains the only large visual asset published by this
+workflow.
 
 ## Safety
 

@@ -2,6 +2,7 @@
   "schema": "qookey-dashboard-safe-fixture-v0.10",
   "authority": false,
   "locale": "zh-Hant-TW",
+  "generatedAtUtc": null,
   "snapshotLabel": "安全測試資料 · 非正式 Authority · V0.10 effective shape",
   "project": {
     "name": "Qookey Crypto Autopilot",

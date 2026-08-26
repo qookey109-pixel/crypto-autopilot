@@ -6,12 +6,17 @@ on:
     paths:
       - "web/**"
       - "scripts/build_dashboard_authority_snapshot.py"
+      - "scripts/build_research_calendar_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
       - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
       - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
       - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
+      - "config/binance_usdm_detailed_history_v0_1_1.json"
+      - "config/post_window_research_successor_schedule_v0_1.json"
+      - "docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md"
+      - "docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md"
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - "PROJECT_STATUS.md"
@@ -21,12 +26,17 @@ on:
     paths:
       - "web/**"
       - "scripts/build_dashboard_authority_snapshot.py"
+      - "scripts/build_research_calendar_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
       - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
       - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
       - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
+      - "config/binance_usdm_detailed_history_v0_1_1.json"
+      - "config/post_window_research_successor_schedule_v0_1.json"
+      - "docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md"
+      - "docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md"
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - "PROJECT_STATUS.md"
@@ -63,9 +73,17 @@ jobs:
           rm -rf _site
           mkdir -p _site/data
           cp -R web/. _site/
+          # Keep historical design sources in the Repository while avoiding
+          # unused multi-megabyte images in the public Pages artifact.
+          rm -f \
+            _site/assets/market-orbit-v2.jpg \
+            _site/assets/research-constellation-v1.jpg \
+            _site/assets/research-orbit-v3.jpg
           cp config/strategy_v0_1.json _site/data/strategy.json
           python scripts/build_dashboard_authority_snapshot.py \
             --output _site/data/dashboard.json
+          python scripts/build_research_calendar_projection.py \
+            --output _site/data/research-calendar.json
           python scripts/apply_dashboard_latest_authority.py \
             --input _site/data/dashboard.json \
             --output _site/data/dashboard.json
@@ -77,8 +95,11 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           import json
+          from datetime import datetime
           from pathlib import Path
           data = json.loads(Path('_site/data/dashboard.json').read_text(encoding='utf-8'))
+          calendar = json.loads(Path('_site/data/research-calendar.json').read_text(encoding='utf-8'))
+          evidence = json.loads(Path('_site/data/research-evidence.json').read_text(encoding='utf-8'))
           project = data['project']
           assert data['authority'] is False
           assert data['locale'] == 'zh-Hant-TW'
@@ -112,6 +133,22 @@ jobs:
           assert project['sourceSwitchAuthorized'] is False
           assert project['tradePlanAuthorized'] is False
           assert project['liveTradingAuthorized'] is False
+          datetime.fromisoformat(data['generatedAtUtc'].replace('Z', '+00:00'))
+          assert calendar['authority'] is False
+          assert calendar['safetyBoundary']['backtestAdmissionAuthorized'] is False
+          datetime.fromisoformat(calendar['projectionGeneratedAtUtc'].replace('Z', '+00:00'))
+          assert evidence['authority'] is False
+          assert evidence['positions'] == []
+          assert evidence['backtests'] == []
+          assert evidence['safetyBoundary']['backtestAdmissionAuthorized'] is False
+          schema = json.loads(Path('_site/data/research-evidence.schema.json').read_text(encoding='utf-8'))
+          assert schema['properties']['authority']['const'] is False
+          for unused_asset in (
+              'market-orbit-v2.jpg',
+              'research-constellation-v1.jpg',
+              'research-orbit-v3.jpg',
+          ):
+              assert not Path('_site/assets', unused_asset).exists()
           security = data['securityBoundary']
           assert security['containsSecrets'] is False
           assert security['authorizesMetadataCapture'] is True

@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qookey109-pixel.github.io/crypto-autopilot/data/research-evidence.schema.json",
+  "title": "Qookey dashboard research evidence projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "authority",
+    "locale",
+    "mode",
+    "projectedAtUtc",
+    "positionsState",
+    "backtestsState",
+    "positions",
+    "backtests",
+    "sourceAuthorities",
+    "safetyBoundary"
+  ],
+  "properties": {
+    "schema": {"const": "qookey-dashboard-research-evidence-v0.1"},
+    "authority": {"const": false},
+    "locale": {"const": "zh-Hant-TW"},
+    "mode": {"const": "PAPER_ONLY_READ_ONLY"},
+    "projectedAtUtc": {
+      "oneOf": [
+        {"type": "string", "format": "date-time"},
+        {"type": "null"}
+      ]
+    },
+    "positionsState": {
+      "enum": ["NOT_READY", "READY", "PASS", "REVIEW_REQUIRED"]
+    },
+    "backtestsState": {
+      "enum": ["NOT_AUTHORIZED", "NOT_READY", "READY", "PASS", "REJECT"]
+    },
+    "positions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "symbol",
+          "side",
+          "openedAtUtc",
+          "entryPrice",
+          "referencePrice",
+          "unrealizedPnlUsd",
+          "stopPrice",
+          "lifecycleState"
+        ],
+        "properties": {
+          "symbol": {"type": "string", "minLength": 1},
+          "side": {"enum": ["LONG", "SHORT"]},
+          "openedAtUtc": {"type": "string", "format": "date-time"},
+          "entryPrice": {"type": "number", "exclusiveMinimum": 0},
+          "referencePrice": {"type": "number", "exclusiveMinimum": 0},
+          "unrealizedPnlUsd": {"type": "number"},
+          "stopPrice": {"type": "number", "exclusiveMinimum": 0},
+          "lifecycleState": {
+            "enum": ["OPEN", "PARTIAL_EXIT", "RUNNER", "CLOSING"]
+          }
+        }
+      }
+    },
+    "backtests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "provider",
+          "datasetAuthority",
+          "period",
+          "strategyVersion",
+          "runSha",
+          "admission",
+          "resultStatus"
+        ],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "provider": {"type": "string", "minLength": 1},
+          "datasetAuthority": {"type": "string", "minLength": 1},
+          "period": {"type": "string", "minLength": 1},
+          "strategyVersion": {"type": "string", "minLength": 1},
+          "runSha": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "admission": {
+            "enum": ["NOT_AUTHORIZED", "NOT_READY", "REVIEW_REQUIRED", "PASS", "REJECT"]
+          },
+          "resultStatus": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "sourceAuthorities": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "safetyBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "providerReadsPerformed",
+        "r2ReadsPerformed",
+        "r2WritesPerformed",
+        "holdoutAccessed",
+        "backtestAdmissionAuthorized",
+        "tradePlanAuthorized",
+        "realMoneyOrderAuthorized",
+        "liveTradingAuthorized"
+      ],
+      "properties": {
+        "providerReadsPerformed": {"const": false},
+        "r2ReadsPerformed": {"const": false},
+        "r2WritesPerformed": {"const": false},
+        "holdoutAccessed": {"const": false},
+        "backtestAdmissionAuthorized": {"const": false},
+        "tradePlanAuthorized": {"const": false},
+        "realMoneyOrderAuthorized": {"const": false},
+        "liveTradingAuthorized": {"const": false}
+      }
+    }
+  }
+}

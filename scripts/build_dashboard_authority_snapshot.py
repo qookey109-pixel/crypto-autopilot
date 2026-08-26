@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 
@@ -56,7 +57,19 @@ def gate(name: str, detail: str, status: str, tone: str, critical: bool) -> dict
     }
 
 
-def build_snapshot() -> dict[str, object]:
+def normalize_generated_at(value: str | None) -> str:
+    if value is None:
+        return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise RuntimeError(f"invalid --generated-at-utc: {value}") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() != timezone.utc.utcoffset(parsed):
+        raise RuntimeError("--generated-at-utc must be a UTC timestamp")
+    return parsed.isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def build_snapshot(*, generated_at_utc: str | None = None) -> dict[str, object]:
     m1a = load_json(M1A)
     binance_2025 = load_json(BINANCE_2025)
     funding_source = load_json(FUNDING_SOURCE)
@@ -213,6 +226,7 @@ def build_snapshot() -> dict[str, object]:
         "schema": "qookey-dashboard-authority-snapshot-v0.3",
         "authority": False,
         "locale": "zh-Hant-TW",
+        "generatedAtUtc": generated_at_utc,
         "snapshotType": "NORMALIZED_VIEW_OF_FROZEN_REPOSITORY_AUTHORITIES",
         "snapshotLabel": "Repository 正式 Authority 狀態快照",
         "project": {
@@ -367,8 +381,9 @@ def build_snapshot() -> dict[str, object]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default="artifacts/dashboard/dashboard.json")
+    parser.add_argument("--generated-at-utc")
     args = parser.parse_args()
-    snapshot = build_snapshot()
+    snapshot = build_snapshot(generated_at_utc=normalize_generated_at(args.generated_at_utc))
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(snapshot, sort_keys=True, indent=2) + "\n", encoding="utf-8")

@@ -1,0 +1,26 @@
+{
+  "schema": "qookey-dashboard-research-evidence-v0.1",
+  "authority": false,
+  "locale": "zh-Hant-TW",
+  "mode": "PAPER_ONLY_READ_ONLY",
+  "projectedAtUtc": null,
+  "positionsState": "NOT_READY",
+  "backtestsState": "NOT_AUTHORIZED",
+  "positions": [],
+  "backtests": [],
+  "sourceAuthorities": [
+    "PROJECT_STATUS.md",
+    "config/binance_usdm_detailed_history_v0_1_1.json",
+    "docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md"
+  ],
+  "safetyBoundary": {
+    "providerReadsPerformed": false,
+    "r2ReadsPerformed": false,
+    "r2WritesPerformed": false,
+    "holdoutAccessed": false,
+    "backtestAdmissionAuthorized": false,
+    "tradePlanAuthorized": false,
+    "realMoneyOrderAuthorized": false,
+    "liveTradingAuthorized": false
+  }
+}
