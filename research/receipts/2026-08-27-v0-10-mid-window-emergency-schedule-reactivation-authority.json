@@ -12,12 +12,36 @@
   "authority": "config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json",
   "incident_observation": {
     "detected_at_utc": "2026-08-27T03:40:07Z",
-    "reconfirmed_at_utc": "2026-08-27T07:38:17Z",
-    "schedule_runs_observed": 0,
-    "expected_frozen_attempts_at_reconfirmation": 15,
+    "reconfirmed_at_utc": "2026-08-27T10:52:32Z",
+    "schedule_runs_observed": 1,
+    "expected_frozen_attempts_at_reconfirmation": 22,
+    "schedule_delivery_state": "INTERMITTENT_ONE_OF_22_TRIGGER_INSTANTS_INSTANTIATED",
     "direct_root_cause": "UNCONFIRMED",
     "github_schedule_delivery_documentation_reviewed": true,
     "github_status_context_is_direct_causal_proof": false
+  },
+  "subsequent_scheduled_execution_observation": {
+    "run_id": 33060180846,
+    "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/33060180846",
+    "created_at_utc": "2026-08-27T09:47:47Z",
+    "head_sha": "49c6bedb1e79e20963519b7f344762129669feb9",
+    "conclusion": "failure",
+    "window_gate": "PASS",
+    "atomic_cutover_validation": "PASS",
+    "freshness_guard": "PASS",
+    "capture_step": "FAIL_CLOSED",
+    "sanitized_failure_class": "PIONEX_METADATA_MISSING_ALL_15_FROZEN_SYMBOLS",
+    "provider_failure_root_cause": "UNCONFIRMED_PROVIDER_PAYLOAD_NOT_READ_UNDER_OBSERVER_AUTHORITY",
+    "provider_payload_or_capture_artifact_read_by_observer": false,
+    "r2_client_construction_point_reached": false,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "holdout_candles_accessed": false,
+    "subsequent_expected_instants_without_runs_at_reconfirmation": [
+      "2026-08-27T10:17:00Z",
+      "2026-08-27T10:47:00Z"
+    ],
+    "interpretation": "This is both preserved fail-closed provider-scope evidence and proof that schedule delivery was intermittent, not proof that schedule delivery recovered. It authorizes no provider-payload inspection, critical-path repair, backfill, source substitution, holdout access or trading action."
   },
   "change_evidence": {
     "original_schedule": [

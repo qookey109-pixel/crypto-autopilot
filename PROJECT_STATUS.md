@@ -229,16 +229,27 @@ Current metadata-capture path:
 
 Render remains FREE / Frankfurt. Current runtime budget is `0 USD/month`.
 
-### V0.10 mid-window schedule non-delivery — PR #201 DRAFT / NOT EFFECTIVE
+### V0.10 intermittent schedule delivery — PR #201 DRAFT / NOT EFFECTIVE
 
 - Read-only GitHub Actions API observations at `2026-08-27T03:40:07Z` and
   `2026-08-27T07:38:17Z` returned zero V0.10 `schedule` runs. Under the frozen
   timetable, 7 and 15 attempts respectively should already have been emitted.
+- A later scheduled run `33060180846` instantiated at `2026-08-27T09:47:47Z`
+  on the unchanged protected `main` SHA. Window, atomic-cutover and freshness
+  guards passed, then capture failed closed because the Pionex response did not
+  contain any of the 15 frozen symbols. The observer did not read the provider
+  payload or a capture artifact; provider-payload root cause remains
+  **UNCONFIRMED**. The failure occurred before R2 client construction or write,
+  and no holdout data was accessed.
+- At `2026-08-27T10:52:32Z`, that remained the only emitted run out of 22
+  expected trigger instants; the immediately subsequent `10:17` and `10:47`
+  instants produced no run. Schedule delivery is therefore intermittent, not
+  recovered.
 - The workflow remained active on default branch `main`, while other Repository
   schedules had run. The direct cause is **UNCONFIRMED**; GitHub documents that
   scheduled events can be delayed or dropped, but that fact alone does not prove
   the cause of this Repository-specific non-delivery.
-- Draft PR #201 proposes only a semantically equivalent POSIX cron text rewrite
+- Draft PR #201 still proposes only a semantically equivalent POSIX cron text rewrite
   to make GitHub re-register the existing schedule. It does not change UTC
   `:17/:47`, the frozen window, 194 slots, 388 attempts, provider/symbol scope,
   freshness, R2 hard stop, runtime, endpoint, secret or execution authority.

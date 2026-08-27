@@ -80,8 +80,22 @@ def test_emergency_authority_is_bound_to_observed_incident_and_protected_pr() ->
     assert lineage["protected_main_pr_number"] == 201
     assert lineage["post_merge_main_sha"] is None
     assert observed["incident_detected_at_utc"] == "2026-08-27T03:40:07Z"
-    assert observed["last_confirmed_at_utc"] == "2026-08-27T07:38:17Z"
-    assert observed["schedule_runs_observed"] == 0
+    assert observed["last_confirmed_at_utc"] == "2026-08-27T10:52:32Z"
+    assert observed["incident_classification"] == (
+        "GITHUB_ACTIONS_INTERMITTENT_SCHEDULE_TRIGGER_DELIVERY"
+    )
+    assert observed["schedule_runs_observed"] == 1
+    assert observed["expected_attempts_at_last_confirmation"] == 22
+    run = observed["observed_schedule_run"]
+    assert isinstance(run, dict)
+    assert run["run_id"] == 33060180846
+    assert run["capture_step"] == "FAIL_CLOSED"
+    assert run["sanitized_failure_class"] == (
+        "PIONEX_METADATA_MISSING_ALL_15_FROZEN_SYMBOLS"
+    )
+    assert run["r2_client_construction_point_reached"] is False
+    assert run["r2_writes_performed"] is False
+    assert observed["provider_payload_or_capture_artifact_read_by_observer"] is False
     assert observed["direct_root_cause"] == "UNCONFIRMED"
     assert observed["github_documented_schedule_delivery_risk_is_causal_proof"] is False
     assert effectivity["effective_before_merge"] is False
@@ -175,6 +189,20 @@ def test_receipt_is_pending_and_records_zero_external_execution() -> None:
     assert effectivity["draft_pr_authorizes_execution"] is False
     assert effectivity["requires_merge_to_protected_main"] is True
     assert all(value is False or value == 0 for value in execution.values())
+
+    observed_run = receipt["subsequent_scheduled_execution_observation"]
+    assert isinstance(observed_run, dict)
+    assert observed_run["run_id"] == 33060180846
+    assert observed_run["conclusion"] == "failure"
+    assert observed_run["window_gate"] == "PASS"
+    assert observed_run["atomic_cutover_validation"] == "PASS"
+    assert observed_run["freshness_guard"] == "PASS"
+    assert observed_run["capture_step"] == "FAIL_CLOSED"
+    assert observed_run["provider_payload_or_capture_artifact_read_by_observer"] is False
+    assert observed_run["r2_client_construction_point_reached"] is False
+    assert observed_run["r2_reads_performed"] is False
+    assert observed_run["r2_writes_performed"] is False
+    assert observed_run["holdout_candles_accessed"] is False
 
 
 def test_emergency_change_does_not_expand_science_or_trading_authority() -> None:

@@ -4,7 +4,7 @@
   "date": "2026-08-27",
   "repository": "qookey109-pixel/crypto-autopilot",
   "incident_id": "V0_10_GITHUB_SCHEDULE_NON_DELIVERY_2026_08_27",
-  "purpose": "Authorize the minimum protected-main change needed to re-register the already-authorized V0.10 GitHub Actions schedule after repeated schedule-event non-delivery, without changing frozen scientific or execution scope.",
+  "purpose": "Authorize the minimum protected-main change needed to re-register the already-authorized V0.10 GitHub Actions schedule after intermittent schedule-event delivery, without changing frozen scientific or execution scope.",
   "lineage": {
     "emergency_template": "config/v0_10_mid_window_emergency_change_template_v0_1.json",
     "capture_window_operations": "config/v0_10_capture_window_operations_v0_1.json",
@@ -19,19 +19,40 @@
   },
   "observed_incident": {
     "incident_detected_at_utc": "2026-08-27T03:40:07Z",
-    "last_confirmed_at_utc": "2026-08-27T07:38:17Z",
-    "incident_classification": "GITHUB_ACTIONS_SCHEDULE_TRIGGER_NON_DELIVERY",
+    "last_confirmed_at_utc": "2026-08-27T10:52:32Z",
+    "incident_classification": "GITHUB_ACTIONS_INTERMITTENT_SCHEDULE_TRIGGER_DELIVERY",
     "direct_root_cause": "UNCONFIRMED",
     "workflow_state_observed": "ACTIVE_ON_DEFAULT_BRANCH_MAIN",
-    "schedule_runs_observed": 0,
+    "schedule_runs_observed": 1,
     "expected_attempts_at_detection": 7,
-    "expected_attempts_at_last_confirmation": 15,
+    "expected_attempts_at_last_confirmation": 22,
+    "observed_schedule_run": {
+      "run_id": 33060180846,
+      "created_at_utc": "2026-08-27T09:47:47Z",
+      "head_sha": "49c6bedb1e79e20963519b7f344762129669feb9",
+      "conclusion": "failure",
+      "window_gate": "PASS",
+      "atomic_cutover_validation": "PASS",
+      "freshness_guard": "PASS",
+      "capture_step": "FAIL_CLOSED",
+      "sanitized_failure_class": "PIONEX_METADATA_MISSING_ALL_15_FROZEN_SYMBOLS",
+      "r2_client_construction_point_reached": false,
+      "r2_writes_performed": false,
+      "holdout_candles_accessed": false
+    },
+    "subsequent_expected_instants_without_runs_at_last_confirmation": [
+      "2026-08-27T10:17:00Z",
+      "2026-08-27T10:47:00Z"
+    ],
+    "provider_failure_root_cause": "UNCONFIRMED_PROVIDER_PAYLOAD_NOT_READ_UNDER_OBSERVER_AUTHORITY",
+    "provider_payload_or_capture_artifact_read_by_observer": false,
     "affected_critical_paths": [
       ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml:on.schedule"
     ],
     "observed_failure_evidence_refs": [
       "https://api.github.com/repos/qookey109-pixel/crypto-autopilot/actions/workflows/provider-equivalence-v0-10-render-metadata-capture.yml/runs?event=schedule&per_page=100",
       "https://github.com/qookey109-pixel/crypto-autopilot/actions/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+      "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/33060180846",
       "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows"
     ],
     "github_documented_schedule_delivery_risk_is_causal_proof": false,
@@ -39,7 +60,7 @@
   },
   "necessity": {
     "normal_scheduled_execution_was_considered_first": true,
-    "why_next_frozen_scheduled_attempt_is_insufficient": "Fifteen consecutive frozen trigger instants produced no schedule run by the last read-only observation. Leaving identical schedule registration text unchanged provides no evidence that a later event will be instantiated, and no later attempt can repair the already missing scientific slots.",
+    "why_next_frozen_scheduled_attempt_is_insufficient": "Only one of 22 frozen trigger instants produced a schedule run by the last read-only observation, and the two immediately subsequent trigger instants again produced no run. Leaving identical schedule registration text unchanged provides no evidence that later events will be instantiated, and no later attempt can repair the already missing scientific slots.",
     "minimum_change_description": "Rewrite only the three active POSIX cron date fields from range notation to explicit comma-separated values so GitHub re-registers an exactly equivalent schedule.",
     "second_execution_path_created": false,
     "manual_dispatch_used_as_capture": false,
