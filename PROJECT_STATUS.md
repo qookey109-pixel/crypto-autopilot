@@ -14,7 +14,7 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ## Current formal stage
 
-**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 TRAINING GOVERNANCE V0.5 AUTHORIZED / BINANCE USD-M DETAILED HISTORY V0.1.1 AUTHORIZED AFTER V0.10 WINDOW NOT_STARTED / DETAILED HISTORY V0.1 SUPERSEDED BEFORE EXECUTION / V0.4 WEEKLY AND MONTHLY EXECUTION RETIRED / V0.3 DAILY TRAINING RETIRED / RESEARCH SIGNAL LAYER V0.2 ACTIVE / RESEARCH SIGNAL QUALITY V0.1 AUTHORIZED READ_ONLY / RESEARCH AUTOMATION HEALTH V0.1 AUTHORIZED READ_ONLY / POST-WINDOW RESEARCH SUCCESSOR SCHEDULE V0.1 PREPARED_NOT_ACTIVE / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 AUTHORIZED BOUNDED / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION PR #201 DRAFT NOT_EFFECTIVE / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
+**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 TRAINING GOVERNANCE V0.5 AUTHORIZED / BINANCE USD-M DETAILED HISTORY V0.1.1 AUTHORIZED AFTER V0.10 WINDOW NOT_STARTED / DETAILED HISTORY V0.1 SUPERSEDED BEFORE EXECUTION / V0.4 WEEKLY AND MONTHLY EXECUTION RETIRED / V0.3 DAILY TRAINING RETIRED / RESEARCH SIGNAL LAYER V0.2 ACTIVE / RESEARCH SIGNAL QUALITY V0.1 AUTHORIZED READ_ONLY / RESEARCH AUTOMATION HEALTH V0.1 AUTHORIZED READ_ONLY / POST-WINDOW RESEARCH SUCCESSOR SCHEDULE V0.1 PREPARED_NOT_ACTIVE / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 AUTHORIZED BOUNDED / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION EFFECTIVE / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
 
 ### Binance USD-M Detailed History V0.1.1 — AUTHORIZED AFTER WINDOW / NOT STARTED
 
@@ -229,7 +229,7 @@ Current metadata-capture path:
 
 Render remains FREE / Frankfurt. Current runtime budget is `0 USD/month`.
 
-### V0.10 intermittent schedule delivery — PR #201 DRAFT / NOT EFFECTIVE
+### V0.10 intermittent schedule delivery — PR #201 MERGED / REGISTRATION EFFECTIVE
 
 - Read-only GitHub Actions API observations at `2026-08-27T03:40:07Z` and
   `2026-08-27T07:38:17Z` returned zero V0.10 `schedule` runs. Under the frozen
@@ -241,25 +241,35 @@ Render remains FREE / Frankfurt. Current runtime budget is `0 USD/month`.
   payload or a capture artifact; provider-payload root cause remains
   **UNCONFIRMED**. The failure occurred before R2 client construction or write,
   and no holdout data was accessed.
-- At `2026-08-27T10:52:32Z`, that remained the only emitted run out of 22
-  expected trigger instants; the immediately subsequent `10:17` and `10:47`
-  instants produced no run. Schedule delivery is therefore intermittent, not
-  recovered.
+- At `2026-08-27T13:18:53Z`, that remained the only emitted run out of the
+  first 26 elapsed trigger instants through `12:47`; the immediately subsequent
+  `10:17` and `10:47` instants had also produced no run. Schedule delivery was
+  therefore intermittent, not recovered before the re-registration merge.
 - The workflow remained active on default branch `main`, while other Repository
   schedules had run. The direct cause is **UNCONFIRMED**; GitHub documents that
   scheduled events can be delayed or dropped, but that fact alone does not prove
   the cause of this Repository-specific non-delivery.
-- Draft PR #201 still proposes only a semantically equivalent POSIX cron text rewrite
-  to make GitHub re-register the existing schedule. It does not change UTC
+- PR #201 merged to protected `main` at `2026-08-27T13:26:40Z`; merge SHA
+  `cf83b6320bc0f0817d8e6ae15d88fe304b933330`. It applies only a semantically
+  equivalent POSIX cron text rewrite so GitHub re-registers the existing schedule.
+  It does not change UTC
   `:17/:47`, the frozen window, 194 slots, 388 attempts, provider/symbol scope,
   freshness, R2 hard stop, runtime, endpoint, secret or execution authority.
-- PR #201 is not effective before required CI, protected-main review and merge.
-  Earlier missed attempts remain scientific failures and may not be manually or
-  retroactively backfilled.
-- Proposed authority/config:
+- Required CI and protected-main review passed before merge. Registration text
+  is now effective, but this does not prove future GitHub schedule delivery and
+  does not resolve the Pionex metadata failure. Earlier missed attempts remain
+  scientific failures and may not be manually or retroactively backfilled.
+- The first post-merge trigger instant was `2026-08-27T13:47:00Z`. A read-only
+  Actions API observation at `13:51:28Z` still returned only the single
+  pre-merge run, so no post-merge run was visible four minutes after the trigger.
+  GitHub-side delay remained possible at that observation; delivery recovery is
+  **NOT_CONFIRMED**.
+- Historical pre-merge authority/config:
   `config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json`.
-  Incident receipt:
+  Historical pre-merge incident receipt:
   `research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-authority.json`.
+  Post-merge effectivity receipt:
+  `research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-effective.json`.
 
 Final read-only pre-window Render recheck on 2026-08-21 confirms:
 
@@ -290,7 +300,7 @@ Inherited scientific scope is unchanged:
   - `17,47 * 27-31 8 *`
   - `17,47 * 1-3 9 *`
   - `17,47 0-1 4 9 *`
-- PR #201 proposed semantically equivalent registration text:
+- PR #201 effective semantically equivalent registration text:
   - `17,47 * 27,28,29,30,31 8 *`
   - `17,47 * 1,2,3 9 *`
   - `17,47 0,1 4 9 *`
