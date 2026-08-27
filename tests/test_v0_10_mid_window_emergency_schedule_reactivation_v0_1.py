@@ -5,6 +5,8 @@ import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import scripts.apply_dashboard_latest_authority as dashboard_authority
+
 
 ROOT = Path(__file__).resolve().parents[1]
 AUTHORITY = ROOT / "config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json"
@@ -130,16 +132,30 @@ def test_exact_change_set_is_bounded_and_reviewable() -> None:
     authority = _load(AUTHORITY)
     assert set(authority["exact_files_allowed_to_change"]) == {
         ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+        ".github/workflows/v0-10-critical-path-freeze-guard.yml",
         "PROJECT_STATUS.md",
         "config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json",
         "research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-authority.json",
+        "scripts/apply_dashboard_latest_authority.py",
         "tests/test_current_workflow_actions_node24.py",
         "tests/test_final_atomic_cutover_v0_10.py",
         "tests/test_retired_execution_workflows_hygiene.py",
+        "tests/test_v0_10_critical_path_freeze_guard.py",
         "tests/test_v0_10_capture_window_operations.py",
         "tests/test_v0_10_mid_window_emergency_schedule_reactivation_v0_1.py",
     }
-    assert len(authority["reviewed_test_plan"]) == 5
+    assert len(authority["reviewed_test_plan"]) == 7
+
+
+def test_dashboard_projection_accepts_only_the_authorized_schedule_registration() -> None:
+    lineage = dashboard_authority.validate_render_lineage()
+    emergency = lineage["v10_emergency_schedule_authority"]
+    assert isinstance(emergency, dict)
+    assert emergency["status"] == (
+        "AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE"
+    )
+    assert emergency["effectivity"]["effective_on_draft_pr"] is False
+    assert all(value is False for value in emergency["authorization_boundary"].values())
 
 
 def test_receipt_is_pending_and_records_zero_external_execution() -> None:

@@ -66,12 +66,15 @@
   },
   "exact_files_allowed_to_change": [
     ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+    ".github/workflows/v0-10-critical-path-freeze-guard.yml",
     "PROJECT_STATUS.md",
     "config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json",
     "research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-authority.json",
+    "scripts/apply_dashboard_latest_authority.py",
     "tests/test_current_workflow_actions_node24.py",
     "tests/test_final_atomic_cutover_v0_10.py",
     "tests/test_retired_execution_workflows_hygiene.py",
+    "tests/test_v0_10_critical_path_freeze_guard.py",
     "tests/test_v0_10_capture_window_operations.py",
     "tests/test_v0_10_mid_window_emergency_schedule_reactivation_v0_1.py"
   ],
@@ -80,6 +83,8 @@
     "Require exactly 194 hourly slots and only UTC minutes 17 and 47.",
     "Require the retired V0.2 schedule to remain absent and the V0.10 workflow to remain the only scheduled capture path.",
     "Require frozen provider scope, freshness guard, R2 hard stop, holdout and downstream authorization boundaries to remain unchanged.",
+    "Require the critical-path freeze guard to accept only the exact emergency-authorized workflow drift while retaining fail-closed behavior for every other drift.",
+    "Require the read-only Dashboard projection to validate the emergency schedule authority without treating the Draft PR as effective execution authority.",
     "Run the complete Repository pytest suite on Python 3.12 and 3.13 through protected-main CI."
   ],
   "effectivity": {

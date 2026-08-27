@@ -37,8 +37,8 @@
   },
   "required_validation": {
     "local_targeted_tests": "PASS_29_TESTS_141_SUBTESTS",
-    "full_local_pytest": "PASS_SPLIT_CONTEXT_565_UNIQUE_TESTS_203_SUBTESTS",
-    "full_local_pytest_detail": "562 tests and 203 subtests passed from the isolated private-tmp clone; the 3-test ephemeral-storage guard passed separately from a non-temporary cwd so its repository-path rejection branch remained testable.",
+    "full_local_pytest": "PASS_SPLIT_CONTEXT_566_UNIQUE_TESTS_203_SUBTESTS",
+    "full_local_pytest_detail": "563 tests and 203 subtests passed from the isolated private-tmp clone; the 3-test ephemeral-storage guard passed separately from a non-temporary cwd so its repository-path rejection branch remained testable.",
     "local_ruff": "PASS_ALL_CHECKS",
     "test_3_12": "PENDING",
     "test_3_13": "PENDING",

@@ -64,6 +64,12 @@ def test_v0_10_critical_path_guard_is_read_only_and_not_scheduled() -> None:
     assert "fetch-depth: 0" in text
     assert "V0_10_CRITICAL_PATH_DRIFT_DETECTED" in text
     assert "V0_10_CRITICAL_PATH_FREEZE_GUARD_PASS" in text
+    assert "V0_10_AUTHORIZED_EMERGENCY_SCHEDULE_REREGISTRATION_REVIEW_PASS" in text
+    assert "v0_10_mid_window_emergency_schedule_reactivation_v0_1.json" in text
+    assert "protected_main_pr_number" in text
+    assert "replacement_attempts != original_attempts" in text
+    assert "len(replacement_attempts) != 388" in text
+    assert "prior_missing_attempts_remain_failures': True" in text
     assert "provider_requests_performed': 0" in text
     assert "r2_reads_performed': False" in text
     assert "r2_writes_performed': False" in text
