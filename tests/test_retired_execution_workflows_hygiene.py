@@ -83,9 +83,9 @@ class RetiredExecutionWorkflowHygieneTests(unittest.TestCase):
         self.assertTrue(any(line == "  schedule:" for line in current.splitlines()))
         self.assertFalse(any(line == "  schedule:" for line in old.splitlines()))
         for cron in (
-            '    - cron: "17,47 * 27-31 8 *"',
-            '    - cron: "17,47 * 1-3 9 *"',
-            '    - cron: "17,47 0-1 4 9 *"',
+            '    - cron: "17,47 * 27,28,29,30,31 8 *"',
+            '    - cron: "17,47 * 1,2,3 9 *"',
+            '    - cron: "17,47 0,1 4 9 *"',
         ):
             self.assertIn(cron, current)
 

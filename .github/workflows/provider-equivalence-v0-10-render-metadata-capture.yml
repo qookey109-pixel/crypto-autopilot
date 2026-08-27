@@ -16,9 +16,9 @@ on:
       - "tests/test_ci_dependency_constraints.py"
       - "requirements/ci-constraints.txt"
   schedule:
-    - cron: "17,47 * 27-31 8 *"
-    - cron: "17,47 * 1-3 9 *"
-    - cron: "17,47 0-1 4 9 *"
+    - cron: "17,47 * 27,28,29,30,31 8 *"
+    - cron: "17,47 * 1,2,3 9 *"
+    - cron: "17,47 0,1 4 9 *"
 
 permissions:
   actions: read
@@ -68,9 +68,9 @@ jobs:
           assert not any('runs-on: [self-hosted' in line for line in old)
           assert any(line == '  schedule:' for line in new)
           expected_crons = {
-              '    - cron: "17,47 * 27-31 8 *"',
-              '    - cron: "17,47 * 1-3 9 *"',
-              '    - cron: "17,47 0-1 4 9 *"',
+              '    - cron: "17,47 * 27,28,29,30,31 8 *"',
+              '    - cron: "17,47 * 1,2,3 9 *"',
+              '    - cron: "17,47 0,1 4 9 *"',
           }
           assert expected_crons.issubset(set(new))
           assert cfg['atomic_repository_cutover']['successor_cron_utc'] == [
