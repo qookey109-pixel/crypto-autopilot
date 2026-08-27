@@ -127,15 +127,15 @@ class CurrentWorkflowActionsNode24Tests(unittest.TestCase):
                 self.assertNotIn("actions/checkout@v4", text)
                 self.assertNotIn("actions/setup-python@v5", text)
 
-    def test_v0_10_capture_schedule_and_authority_markers_are_unchanged(self) -> None:
+    def test_v0_10_capture_schedule_and_authority_markers_are_preserved(self) -> None:
         text = (WORKFLOWS / "provider-equivalence-v0-10-render-metadata-capture.yml").read_text(
             encoding="utf-8"
         )
         self.assertEqual(_action_refs(text, "actions/checkout").count(CHECKOUT_V6_SHA), 3)
         self.assertEqual(text.count("persist-credentials: false"), 3)
-        self.assertIn('    - cron: "17,47 * 27-31 8 *"', text)
-        self.assertIn('    - cron: "17,47 * 1-3 9 *"', text)
-        self.assertIn('    - cron: "17,47 0-1 4 9 *"', text)
+        self.assertIn('    - cron: "17,47 * 27,28,29,30,31 8 *"', text)
+        self.assertIn('    - cron: "17,47 * 1,2,3 9 *"', text)
+        self.assertIn('    - cron: "17,47 0,1 4 9 *"', text)
         self.assertIn("METADATA_RELAY_TOKEN: ${{ secrets.METADATA_RELAY_TOKEN }}", text)
         self.assertIn("--mode capture", text)
         self.assertIn("holdout_candles_accessed", text)

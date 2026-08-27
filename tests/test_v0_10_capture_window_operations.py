@@ -34,9 +34,9 @@ def test_capture_window_operations_timing_matches_frozen_v0_10_schedule() -> Non
 
     workflow = CAPTURE_WORKFLOW.read_text(encoding="utf-8")
     for cron in (
-        'cron: "17,47 * 27-31 8 *"',
-        'cron: "17,47 * 1-3 9 *"',
-        'cron: "17,47 0-1 4 9 *"',
+        'cron: "17,47 * 27,28,29,30,31 8 *"',
+        'cron: "17,47 * 1,2,3 9 *"',
+        'cron: "17,47 0,1 4 9 *"',
     ):
         assert cron in workflow
 
