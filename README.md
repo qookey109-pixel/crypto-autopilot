@@ -4,7 +4,7 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 
 > **Current mode: PAPER-ONLY.** No real-money order path is authorized. `trade_plan_authorized=false` and `live_trading_authorized=false` remain mandatory. For the detailed current authority index, always read [`PROJECT_STATUS.md`](PROJECT_STATUS.md) first.
 
-## Current authority snapshot — 2026-08-24
+## Current authority snapshot — 2026-08-28
 
 The repository has moved beyond the original V0.1 implementation baseline while preserving its scientific history:
 
@@ -111,6 +111,21 @@ completion gates are recorded in
 [`docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`](docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md).
 The `2026-09-30` target is a prepared engineering roadmap, not execution
 authority, automatic model promotion or a profitability promise.
+The prepared, research-only
+[`Strategy Edge Validation V0.1`](docs/STRATEGY_EDGE_VALIDATION_V0_1.md)
+adds deterministic anti-overfitting gates after UPDATE-only parameter
+selection: stationary bootstrap, Deflated Sharpe, PBO/CSCV, Romano-Wolf
+stepdown, disjoint-validation Sharpe retention and signal-alignment
+permutation. It requires the complete trial family and partition-integrity
+evidence, fails closed on missing inputs, and grants no provider, R2, holdout,
+promotion or trading authority.
+[`Strategy Research Loop V0.1`](docs/STRATEGY_RESEARCH_LOOP_V0_1.md) wraps that
+gate with a deterministic 120-hypothesis registry and a cost-complete
+Repository paper-ledger audit. It reports expectancy, profit factor,
+drawdown, concentration and stationary-bootstrap Monte Carlo fragility while
+binding exact candidate/provider/fingerprint lineage. It is synthetic-only,
+creates no workflow or second broker, and can reach only human-review
+eligibility with zero promotion or trading authority.
 The current time-ordered operating handoff is
 [`docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`](docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md).
 
