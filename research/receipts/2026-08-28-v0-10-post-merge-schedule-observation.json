@@ -1,0 +1,55 @@
+{
+  "schema_version": "v0_10_post_merge_schedule_observation_receipt_v0_1",
+  "status": "OBSERVED_FAIL_CLOSED",
+  "stage": "V0_10_POST_MERGE_SCHEDULE_RUN_OBSERVATION",
+  "date": "2026-08-28",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority_type": "READ_ONLY_OPERATIONAL_OBSERVATION",
+  "source_workflow": ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+  "source_run": {
+    "run_id": 33124856368,
+    "run_number": 23,
+    "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/33124856368",
+    "created_at_utc": "2026-08-27T23:03:07Z",
+    "observed_at_utc": "2026-08-28T01:28:05Z",
+    "head_branch": "main",
+    "head_sha": "a325728cf92c2885ef0611fc1a57f45389de6b77",
+    "event": "schedule",
+    "status": "completed",
+    "conclusion": "failure"
+  },
+  "step_observations": {
+    "window_gate": "PASS",
+    "atomic_cutover_validation": "PASS",
+    "stale_run_guard": "PASS",
+    "capture_step": "FAIL",
+    "capture_boundary_assertion": "SKIPPED",
+    "artifact_upload": "SKIPPED"
+  },
+  "coverage_observation": {
+    "schedule_runs_observed_total": 2,
+    "pre_merge_runs_observed": 1,
+    "post_merge_runs_observed": 1,
+    "post_merge_schedule_instantiated": true,
+    "post_merge_capture_succeeded": false,
+    "delivery_recovery_status": "NOT_CONFIRMED"
+  },
+  "observer_boundary": {
+    "workflow_run_metadata_read": true,
+    "job_and_step_summaries_read": true,
+    "workflow_logs_read": false,
+    "provider_payload_read": false,
+    "capture_artifact_read": false,
+    "r2_client_or_object_access_observed": false,
+    "manual_dispatch_used": false,
+    "retroactive_backfill_used": false
+  },
+  "interpretation": {
+    "capture_failure_root_cause": "UNCONFIRMED",
+    "post_merge_run_proves_schedule_delivery_for_this_attempt_only": true,
+    "post_merge_run_proves_metadata_stability": false,
+    "post_merge_run_authorizes_provider_payload_or_log_inspection": false,
+    "post_merge_run_authorizes_holdout_access": false,
+    "post_merge_run_authorizes_trading": false
+  }
+}

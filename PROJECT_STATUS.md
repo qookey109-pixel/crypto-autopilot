@@ -264,12 +264,21 @@ Render remains FREE / Frankfurt. Current runtime budget is `0 USD/month`.
   pre-merge run, so no post-merge run was visible four minutes after the trigger.
   GitHub-side delay remained possible at that observation; delivery recovery is
   **NOT_CONFIRMED**.
+- A later read-only Actions API observation at `2026-08-28T01:28:05Z` found a
+  post-merge scheduled run `33124856368` on `main` SHA
+  `a325728cf92c2885ef0611fc1a57f45389de6b77` (created `2026-08-27T23:03:07Z`).
+  Its window gate, atomic-cutover validation and stale-run guard passed, but the
+  capture step failed. No workflow log, provider payload or capture artifact was
+  read; the failure root cause remains **UNCONFIRMED**. This proves delivery for
+  that attempt only, not metadata stability or full schedule recovery.
 - Historical pre-merge authority/config:
   `config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json`.
   Historical pre-merge incident receipt:
   `research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-authority.json`.
   Post-merge effectivity receipt:
   `research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-effective.json`.
+  Post-merge run observation receipt:
+  `research/receipts/2026-08-28-v0-10-post-merge-schedule-observation.json`.
 
 Final read-only pre-window Render recheck on 2026-08-21 confirms:
 
