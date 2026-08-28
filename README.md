@@ -119,6 +119,13 @@ stepdown, disjoint-validation Sharpe retention and signal-alignment
 permutation. It requires the complete trial family and partition-integrity
 evidence, fails closed on missing inputs, and grants no provider, R2, holdout,
 promotion or trading authority.
+[`Strategy Research Loop V0.1`](docs/STRATEGY_RESEARCH_LOOP_V0_1.md) wraps that
+gate with a deterministic 120-hypothesis registry and a cost-complete
+Repository paper-ledger audit. It reports expectancy, profit factor,
+drawdown, concentration and stationary-bootstrap Monte Carlo fragility while
+binding exact candidate/provider/fingerprint lineage. It is synthetic-only,
+creates no workflow or second broker, and can reach only human-review
+eligibility with zero promotion or trading authority.
 The current time-ordered operating handoff is
 [`docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`](docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md).
 

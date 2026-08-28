@@ -1,0 +1,75 @@
+{
+  "schema": "qookey-strategy-research-loop-preparation-receipt-v0.1",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "prepared_at_utc": "2026-08-28T00:00:00Z",
+  "outcome": "A deterministic bounded candidate registry, Strategy Edge V0.1 composition gate and cost-complete synthetic paper-performance audit are prepared as one Repository-native research loop.",
+  "artifacts": {
+    "config": {
+      "path": "config/strategy_research_loop_v0_1.json",
+      "sha256": "1d57bcb358971940b0b617c1580bf54938ebd04598e689fb2ab51990e0a3e655"
+    },
+    "implementation": {
+      "path": "src/crypto_autopilot/strategy_research_loop.py",
+      "sha256": "0360f3f360979127a97a8841fb39a7c66213cae9895437cebc9778c9b014b359"
+    },
+    "cli": {
+      "path": "scripts/run_strategy_research_loop.py",
+      "sha256": "3d426780b0ef42885d631d0ebf582c778e8008dbf46b8cb6a2be1b285e987922"
+    },
+    "contract": {
+      "path": "docs/STRATEGY_RESEARCH_LOOP_V0_1.md",
+      "sha256": "a09dad4612bfdc8298460efdd5d494ea94aad6342d416ae1ceeabb0431e9c835"
+    },
+    "tests": {
+      "path": "tests/test_strategy_research_loop.py",
+      "sha256": "52d151b3f5624bbc1481108dcf5b36375e5d452a2edfeac7b505990688471e05"
+    }
+  },
+  "prepared_capabilities": {
+    "deterministic_candidate_count": 120,
+    "candidate_family_count": 4,
+    "horizons": ["INTRADAY", "MULTIDAY", "SWING"],
+    "candidate_return_materialization": false,
+    "complete_registry_sha256_binding": true,
+    "strategy_edge_v0_1_composition": true,
+    "cost_complete_paper_ledger_audit": true,
+    "deterministic_r_multiple_monte_carlo": true,
+    "existing_repository_backtest_adapter": true,
+    "second_broker_created": false,
+    "external_code_copied": false
+  },
+  "validation": {
+    "focused_unit_tests": "13 PASS including exact artifact hash verification",
+    "registry_cli": "PREPARED_NOT_EXECUTED / 120 candidates / live_trading_authorized=false",
+    "ruff_0_16_0": "PASS",
+    "diff_check": "PASS",
+    "fixtures": "SYNTHETIC_ONLY"
+  },
+  "external_influences": [
+    {
+      "name": "Capafy Strategy Discovery Lab",
+      "use": "Conceptual influence for bounded strategy families, honest out-of-sample survival and anti-overfitting reporting; no package installed and no source copied."
+    },
+    {
+      "name": "mars-tw/anti-gambling-trader-tw",
+      "license_observed": "MIT",
+      "use": "Conceptual influence for cost-complete journaling, expectancy, profit factor, drawdown, concentration and Monte Carlo risk; implementation remains independent and no source copied."
+    }
+  ],
+  "authority": {
+    "v0_10_production_critical_path_mutated": false,
+    "sstate_core_mutated": false,
+    "workflow_created": false,
+    "schedule_created": false,
+    "provider_requests_authorized": false,
+    "production_dataset_execution_authorized": false,
+    "r2_list_read_write_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "backtest_admission_authorized": false,
+    "model_promotion_authority": 0,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

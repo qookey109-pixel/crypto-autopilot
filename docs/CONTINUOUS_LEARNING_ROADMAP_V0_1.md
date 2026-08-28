@@ -16,9 +16,10 @@ The intended loop is:
 ```text
 latest closed candles + append-only history + timestamped KOL evidence
   -> causal feature build
-  -> bounded Shadow challengers
+  -> bounded Shadow challengers and immutable candidate registry
   -> walk-forward / calibration / cost / drawdown / exposure / drift checks
-  -> immutable PASS or REJECT evidence
+  -> Strategy Edge Validation + cost-complete paper-performance audit
+  -> immutable PASS, REJECT or REVIEW evidence
   -> Repository Paper Broker only
 ```
 
@@ -78,9 +79,16 @@ true:
 4. calibration, cost, drawdown, exposure and drift outputs are persisted online;
 5. the complete trial family and disjoint-validation evidence produce a
    deterministic Strategy Edge `PASS` or `REJECT` without automatic promotion;
-6. automation health distinguishes expected waiting from stale or failed runs;
-7. the dashboard projects the latest safe status without becoming authority;
-8. model promotion, holdout access and trading remain separately gated.
+6. selected-candidate, provider and SHA-256 lineage match a complete paper
+   ledger whose fees, funding, slippage, expectancy, drawdown, concentration
+   and Monte Carlo fragility remain visible;
+7. automation health distinguishes expected waiting from stale or failed runs;
+8. the dashboard projects the latest safe status without becoming authority;
+9. model promotion, holdout access and trading remain separately gated.
+
+The synthetic-only research-loop contract that prepares items 5 and 6 is
+documented in `docs/STRATEGY_RESEARCH_LOOP_V0_1.md`. It does not activate the
+post-window workflow or grant production-data execution.
 
 The date `2026-09-30` is an engineering target, not a profitability promise.
 No system can credibly target 100% predictive accuracy; the objective is better
