@@ -322,3 +322,27 @@ are indexed in
 [`docs/RESEARCH_AUTOMATION_SCHEDULE_V0_1.md`](docs/RESEARCH_AUTOMATION_SCHEDULE_V0_1.md).
 
 Historical receipts remain immutable evidence even when a later version supersedes their execution role.
+
+## Engineering agent tools
+
+The Repository-local
+[`change-walkthrough`](.agents/skills/change-walkthrough/SKILL.md) skill gives
+PRs, commits and selected local diffs a paced, read-only explanation. It fixes
+remote changes to immutable SHAs, keeps staged/unstaged/untracked evidence
+separate and never edits, reviews, pushes, merges or grants authority.
+
+New agent-facing interfaces follow three convergence rules:
+
+- one canonical Python domain action owns validation and behavior;
+- UI, CLI, HTTP or future agent adapters may expose that action but cannot
+  bypass its Repository authority checks;
+- every adapter preserves the same deterministic JSON evidence or receipt.
+
+Interface parity by itself does not justify a second runtime, database,
+framework or deployment surface. External agent frameworks remain design
+references unless a separate bounded change demonstrates a concrete need.
+This independent policy was informed by the read-only tour pattern in
+[`sirius-skills/walkthrough-me`](https://github.com/sirius-cc-wu/sirius-skills/tree/main/skills/walkthrough-me)
+and the shared-action idea in
+[`BuilderIO/agent-native`](https://github.com/BuilderIO/agent-native); no
+external instructions, source code or runtime dependency are vendored.
