@@ -35,6 +35,12 @@ V10_CONFIG = Path("config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.j
 V10_AUTHORITY = Path(
     "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
 )
+V10_EMERGENCY_SCHEDULE_AUTHORITY = Path(
+    "config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json"
+)
+V10_EMERGENCY_SCHEDULE_EFFECTIVE = Path(
+    "research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-effective.json"
+)
 OLD_V02_WORKFLOW = Path(
     ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
 )
@@ -46,10 +52,15 @@ EXPECTED_SCOPE_SHA = "1e0ff54daeec8e5e47376fedb631c663687dd6fb6a4c297d269c33acdf
 EXPECTED_CHECKSUM_SHA = "881c14d3b3c780b8a0d56ca2f7fd57d2abff310fcd7cb4b13dc01f506b9b64f3"
 EXPECTED_EQUIVALENCE_ARTIFACT_SHA = "16975dfcdc34c621b7abe8326cb3cdab0aebffcee27dce2720a8db7f28640af0"
 EXPECTED_EQUIVALENCE_RESULT_SHA = "c4ddf68700b03c907fbf43101e9a8a39ead12fa80d395119aa53d3b52e527353"
-EXPECTED_V10_CRONS = (
+EXPECTED_FROZEN_V10_CRONS = (
     '    - cron: "17,47 * 27-31 8 *"',
     '    - cron: "17,47 * 1-3 9 *"',
     '    - cron: "17,47 0-1 4 9 *"',
+)
+EXPECTED_EMERGENCY_REGISTRATION_CRONS = (
+    '    - cron: "17,47 * 27,28,29,30,31 8 *"',
+    '    - cron: "17,47 * 1,2,3 9 *"',
+    '    - cron: "17,47 0,1 4 9 *"',
 )
 
 
@@ -198,6 +209,8 @@ def validate_render_lineage() -> dict[str, object]:
     smoke = load(V09_SMOKE)
     v10 = load(V10_CONFIG)
     v10_authority = load(V10_AUTHORITY)
+    emergency = load(V10_EMERGENCY_SCHEDULE_AUTHORITY)
+    emergency_effective = load(V10_EMERGENCY_SCHEDULE_EFFECTIVE)
 
     if v05.get("status") != "PASS" or v05.get("stage") != (
         "PROVIDER_EQUIVALENCE_V0_5_RENDER_FREE_BINANCE_TRANSPORT_PASS"
@@ -371,8 +384,71 @@ def validate_render_lineage() -> dict[str, object]:
         raise RuntimeError("V0.2 workflow still has a schedule trigger")
     if not any(line == "  schedule:" for line in new_lines):
         raise RuntimeError("V0.10 workflow has no schedule trigger")
-    if not set(EXPECTED_V10_CRONS).issubset(set(new_lines)):
-        raise RuntimeError("V0.10 schedule topology changed")
+    if emergency.get("status") != (
+        "AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE"
+    ):
+        raise RuntimeError("V0.10 emergency schedule authority is invalid")
+    emergency_lineage = require_dict(emergency.get("lineage") or {}, "V0.10 emergency lineage")
+    emergency_schedule = require_dict(
+        emergency.get("schedule_equivalence") or {}, "V0.10 emergency schedule"
+    )
+    emergency_boundary = require_dict(
+        emergency.get("authorization_boundary") or {}, "V0.10 emergency boundary"
+    )
+    if emergency_lineage.get("protected_main_pr_number") != 201:
+        raise RuntimeError("V0.10 emergency PR binding changed")
+    if emergency_lineage.get("pre_change_main_sha") != (
+        "49c6bedb1e79e20963519b7f344762129669feb9"
+    ):
+        raise RuntimeError("V0.10 emergency pre-change main SHA changed")
+    if emergency_schedule.get("original_authorized_crons") != [
+        cron.split('"', 2)[1] for cron in EXPECTED_FROZEN_V10_CRONS
+    ]:
+        raise RuntimeError("V0.10 frozen cron lineage changed")
+    if emergency_schedule.get("original_authorized_crons") != v10_cutover.get(
+        "successor_cron_utc"
+    ):
+        raise RuntimeError("V0.10 original cron authority changed")
+    if emergency_schedule.get("replacement_registration_crons") != [
+        cron.split('"', 2)[1] for cron in EXPECTED_EMERGENCY_REGISTRATION_CRONS
+    ]:
+        raise RuntimeError("V0.10 emergency cron registration scope changed")
+    if not set(EXPECTED_EMERGENCY_REGISTRATION_CRONS).issubset(set(new_lines)):
+        raise RuntimeError("V0.10 emergency schedule registration changed")
+    if any(value is not False for value in emergency_boundary.values()):
+        raise RuntimeError("V0.10 emergency schedule expanded downstream authority")
+    if emergency.get("render_boundary", {}).get("transport_affected") is not False:
+        raise RuntimeError("V0.10 emergency schedule unexpectedly affects Render")
+    if emergency_effective.get("status") != "PASS" or emergency_effective.get(
+        "stage"
+    ) != "V0_10_MID_WINDOW_EMERGENCY_SCHEDULE_REACTIVATION_EFFECTIVE_ON_PROTECTED_MAIN":
+        raise RuntimeError("V0.10 emergency schedule post-merge receipt is not PASS")
+    if (
+        emergency_effective.get("source_authority")
+        != str(V10_EMERGENCY_SCHEDULE_AUTHORITY)
+        or emergency_effective.get("source_pr") != 201
+        or emergency_effective.get("source_pr_head_sha")
+        != "5148161fecd3a0939e51a6ad94db3ec475ae95a2"
+        or emergency_effective.get("post_merge_main_sha")
+        != "cf83b6320bc0f0817d8e6ae15d88fe304b933330"
+    ):
+        raise RuntimeError("V0.10 emergency schedule post-merge lineage changed")
+    effective_change = require_dict(
+        emergency_effective.get("validated_change") or {},
+        "V0.10 emergency effective change",
+    )
+    effective_boundary = require_dict(
+        emergency_effective.get("authorization_boundary") or {},
+        "V0.10 emergency effective boundary",
+    )
+    if effective_change.get("effective_registration_crons") != [
+        cron.split('"', 2)[1] for cron in EXPECTED_EMERGENCY_REGISTRATION_CRONS
+    ]:
+        raise RuntimeError("V0.10 effective schedule registration changed")
+    if effective_change.get("semantic_attempt_set_equal") is not True:
+        raise RuntimeError("V0.10 schedule semantic equivalence is not PASS")
+    if any(value is not False for value in effective_boundary.values()):
+        raise RuntimeError("V0.10 post-merge receipt expanded downstream authority")
 
     return {
         "v05": v05,
@@ -383,6 +459,8 @@ def validate_render_lineage() -> dict[str, object]:
         "smoke": smoke,
         "v10": v10,
         "v10_authority": v10_authority,
+        "v10_emergency_schedule_authority": emergency,
+        "v10_emergency_schedule_effective": emergency_effective,
     }
 
 
@@ -434,6 +512,10 @@ def main() -> int:
             "renderMetadataV0_8SharedSecretState": "PASS_FROZEN",
             "renderMetadataV0_9SmokeState": "PASS_FROZEN",
             "renderMetadataV0_10CutoverState": "EFFECTIVE_AUTHORIZED",
+            "v0_10EmergencyScheduleRegistrationState": "EFFECTIVE",
+            "v0_10EmergencyScheduleRegistrationMergeSha": (
+                "cf83b6320bc0f0817d8e6ae15d88fe304b933330"
+            ),
             "metadataStabilityState": "NOT_YET_RUN",
             "replacementHoldoutState": "FROZEN_UNOPENED",
             "currentMetadataCaptureExecutionPath": "github_hosted_ubuntu_v0_10",
@@ -455,7 +537,8 @@ def main() -> int:
     dashboard["schema"] = "qookey-dashboard-authority-snapshot-v0.10"
     dashboard["snapshotLabel"] = (
         "Repository 正式 Authority 狀態快照 · Equivalence V0.1 FAIL / "
-        "Funding V0.2 R2 PASS / V0.10 Metadata Cutover EFFECTIVE"
+        "Funding V0.2 R2 PASS / V0.10 Metadata Cutover EFFECTIVE / "
+        "Schedule Re-registration EFFECTIVE"
     )
 
     source_authorities = dashboard.get("sourceAuthorities") or []
@@ -471,6 +554,8 @@ def main() -> int:
         V09_SMOKE,
         V10_CONFIG,
         V10_AUTHORITY,
+        V10_EMERGENCY_SCHEDULE_AUTHORITY,
+        V10_EMERGENCY_SCHEDULE_EFFECTIVE,
         OLD_V02_WORKFLOW,
         V10_WORKFLOW,
     ):
@@ -530,6 +615,12 @@ def main() -> int:
         "V0.10 Metadata Atomic Cutover",
         "PR #127 已合併；V0.2 self-hosted schedule 已退役，V0.10 GitHub-hosted schedule 已成為 current metadata execution path。",
         "AUTHORIZED",
+    )
+    replace_pipeline_item(
+        pipeline,
+        "V0.10 Schedule Re-registration",
+        "PR #201 已合併至 protected main；等價的 :17/:47 schedule registration text 已生效。先前缺漏與失敗仍保留，Pionex failure root cause 仍未確認。",
+        "EFFECTIVE",
     )
     replace_pipeline_item(
         pipeline,
@@ -622,6 +713,9 @@ def main() -> int:
                 "equivalence_gate_state": project["providerEquivalenceGateState"],
                 "render_v0_9": project["renderMetadataV0_9SmokeState"],
                 "render_v0_10": project["renderMetadataV0_10CutoverState"],
+                "v0_10_schedule_registration": project[
+                    "v0_10EmergencyScheduleRegistrationState"
+                ],
                 "current_capture_path": project["currentMetadataCaptureExecutionPath"],
                 "successor_capture_authorized": project[
                     "successorMetadataCaptureExecutionAuthorized"

@@ -25,8 +25,11 @@ on:
       - "requirements/ci-constraints.txt"
       - "pyproject.toml"
       - "config/v0_10_critical_path_freeze_v0_1.json"
+      - "config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json"
+      - "research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-authority.json"
       - ".github/workflows/v0-10-critical-path-freeze-guard.yml"
       - "tests/test_v0_10_critical_path_freeze_guard.py"
+      - "tests/test_v0_10_mid_window_emergency_schedule_reactivation_v0_1.py"
   push:
     branches:
       - main
@@ -49,7 +52,9 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           import json
+          import os
           import subprocess
+          from datetime import datetime, timedelta, timezone
           from pathlib import Path
 
           manifest = json.loads(Path('config/v0_10_critical_path_freeze_v0_1.json').read_text())
@@ -87,11 +92,134 @@ jobs:
           )
           changed = [line.strip() for line in result.stdout.splitlines() if line.strip()]
           if changed:
+              emergency_path = Path(
+                  'config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json'
+              )
+              expected_changed = [
+                  '.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml'
+              ]
+              if not emergency_path.is_file() or changed != expected_changed:
+                  print(json.dumps({
+                      'status': 'FAIL',
+                      'stage': 'V0_10_CRITICAL_PATH_DRIFT_DETECTED',
+                      'baseline_main_sha': baseline,
+                      'changed_critical_paths': changed,
+                      'automatic_repair_authorized': False,
+                      'manual_v0_10_capture_authorized': False,
+                      'provider_requests_performed': 0,
+                      'render_requests_performed': 0,
+                      'r2_client_constructed': False,
+                      'r2_reads_performed': False,
+                      'r2_writes_performed': False,
+                      'holdout_accessed': False,
+                      'v0_11_production_evaluation_performed': False,
+                      'source_switch_authorized': False,
+                      'live_trading_authorized': False,
+                  }, sort_keys=True))
+                  raise SystemExit(
+                      'V0.10 critical path drift detected; reviewed versioned authority required'
+                  )
+
+              emergency = json.loads(emergency_path.read_text())
+              if emergency['status'] != (
+                  'AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE'
+              ):
+                  raise SystemExit('V0.10 emergency authority status is invalid')
+              lineage = emergency['lineage']
+              if lineage['protected_main_pr_number'] != 201:
+                  raise SystemExit('V0.10 emergency authority PR binding changed')
+              if lineage['pre_change_main_sha'] != (
+                  '49c6bedb1e79e20963519b7f344762129669feb9'
+              ):
+                  raise SystemExit('V0.10 emergency pre-change main SHA changed')
+              change_sha = str(lineage['minimum_operational_change_commit_sha'])
+              subprocess.run(
+                  ['git', 'merge-base', '--is-ancestor', change_sha, 'HEAD'], check=True
+              )
+
+              event_name = os.environ.get('GITHUB_EVENT_NAME', '')
+              if event_name == 'pull_request':
+                  event = json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
+                  if event['number'] != lineage['protected_main_pr_number']:
+                      raise SystemExit('V0.10 emergency authority is used by the wrong PR')
+                  if event['pull_request']['base']['sha'] != lineage['pre_change_main_sha']:
+                      raise SystemExit('V0.10 emergency PR base SHA changed')
+
+              if changed[0] not in emergency['exact_files_allowed_to_change']:
+                  raise SystemExit('changed V0.10 path is outside the emergency allowlist')
+              if any(value is not False for value in emergency['authorization_boundary'].values()):
+                  raise SystemExit('V0.10 emergency downstream boundary changed')
+              if emergency['render_boundary']['transport_affected'] is not False:
+                  raise SystemExit('V0.10 emergency unexpectedly affects Render transport')
+
+              schedule = emergency['schedule_equivalence']
+              frozen = json.loads(
+                  Path('config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json').read_text()
+              )
+              original = schedule['original_authorized_crons']
+              replacement = schedule['replacement_registration_crons']
+              if original != frozen['atomic_repository_cutover']['successor_cron_utc']:
+                  raise SystemExit('V0.10 frozen cron lineage changed')
+              new_lines = Path(expected_changed[0]).read_text().splitlines()
+              active = [
+                  line.split('"', 2)[1]
+                  for line in new_lines
+                  if line.strip().startswith('- cron: "')
+              ]
+              if active != replacement:
+                  raise SystemExit('V0.10 active cron text differs from emergency authority')
+
+              def field_values(field, lower, upper):
+                  if field == '*':
+                      return set(range(lower, upper + 1))
+                  values = set()
+                  for item in field.split(','):
+                      if '-' in item:
+                          start, end = item.split('-', 1)
+                          values.update(range(int(start), int(end) + 1))
+                      else:
+                          values.add(int(item))
+                  if not values or min(values) < lower or max(values) > upper:
+                      raise SystemExit('invalid V0.10 emergency cron field')
+                  return values
+
+              def matches(cron, instant):
+                  minute, hour, day, month, weekday = cron.split()
+                  if weekday != '*':
+                      raise SystemExit('V0.10 emergency weekday scope changed')
+                  return (
+                      instant.minute in field_values(minute, 0, 59)
+                      and instant.hour in field_values(hour, 0, 23)
+                      and instant.day in field_values(day, 1, 31)
+                      and instant.month in field_values(month, 1, 12)
+                  )
+
+              def expand(crons):
+                  cursor = datetime(2026, 8, 27, 0, 0, tzinfo=timezone.utc)
+                  final_attempt = datetime(2026, 9, 4, 1, 47, tzinfo=timezone.utc)
+                  attempts = []
+                  while cursor <= final_attempt:
+                      if any(matches(cron, cursor) for cron in crons):
+                          attempts.append(cursor)
+                      cursor += timedelta(minutes=1)
+                  return attempts
+
+              original_attempts = expand(original)
+              replacement_attempts = expand(replacement)
+              if replacement_attempts != original_attempts or len(replacement_attempts) != 388:
+                  raise SystemExit('V0.10 emergency cron set is not semantically equivalent')
+              if len({instant.replace(minute=0) for instant in replacement_attempts}) != 194:
+                  raise SystemExit('V0.10 emergency hourly-slot count changed')
+
               print(json.dumps({
-                  'status': 'FAIL',
-                  'stage': 'V0_10_CRITICAL_PATH_DRIFT_DETECTED',
+                  'status': 'PASS',
+                  'stage': 'V0_10_AUTHORIZED_EMERGENCY_SCHEDULE_REREGISTRATION_REVIEW_PASS',
                   'baseline_main_sha': baseline,
                   'changed_critical_paths': changed,
+                  'protected_main_pr_number': lineage['protected_main_pr_number'],
+                  'scheduled_attempt_count': len(replacement_attempts),
+                  'hourly_slot_count': 194,
+                  'prior_missing_attempts_remain_failures': True,
                   'automatic_repair_authorized': False,
                   'manual_v0_10_capture_authorized': False,
                   'provider_requests_performed': 0,
@@ -104,7 +232,7 @@ jobs:
                   'source_switch_authorized': False,
                   'live_trading_authorized': False,
               }, sort_keys=True))
-              raise SystemExit('V0.10 critical path drift detected; reviewed versioned authority required')
+              raise SystemExit(0)
 
           print(json.dumps({
               'status': 'PASS',

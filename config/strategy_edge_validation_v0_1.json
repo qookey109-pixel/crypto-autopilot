@@ -1,0 +1,66 @@
+{
+  "schema_version": "strategy_edge_validation_v0_1",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "purpose": "Reject statistically fragile Challenger results before human promotion review without opening the replacement holdout or changing any trading authority.",
+  "policy": {
+    "alpha": 0.05,
+    "maximum_pbo": 0.2,
+    "minimum_update_observations": 120,
+    "minimum_validation_observations": 60,
+    "minimum_trials": 5,
+    "cscv_partitions": 8,
+    "bootstrap_samples": 999,
+    "stationary_bootstrap_mean_block_length": 10.0,
+    "minimum_validation_sharpe": 0.0,
+    "minimum_oos_sharpe_retention": 0.25,
+    "permutation_samples": 999,
+    "deterministic_seed": 20260828
+  },
+  "required_evidence": {
+    "complete_trial_registry": true,
+    "disjoint_partition_integrity_pass_required": true,
+    "evaluation_integrity_sha256_required": true,
+    "candidate_return_matrix_role": "UPDATE_ONLY",
+    "selected_candidate_return_role": "DISJOINT_VALIDATION_ONLY",
+    "provider_separation_required": true,
+    "aligned_benchmark_required": true,
+    "aligned_market_returns_and_positions_required": true,
+    "cost_slippage_drawdown_exposure_gate_remains_separate": true
+  },
+  "methods": [
+    "stationary_bootstrap_one_sided_mean",
+    "deflated_sharpe_ratio",
+    "combinatorially_symmetric_cross_validation",
+    "romano_wolf_stationary_bootstrap_stepdown",
+    "disjoint_validation_sharpe_retention",
+    "circular_shift_signal_alignment_permutation"
+  ],
+  "decision": {
+    "all_applicable_gates_must_pass": true,
+    "missing_or_invalid_evidence": "REJECT",
+    "failed_method": "REJECT",
+    "pass_state": "EDGE_EVIDENCE_READY_FOR_HUMAN_REVIEW",
+    "automatic_model_promotion": false
+  },
+  "execution": {
+    "repository_validation_and_synthetic_fixtures_authorized": true,
+    "production_dataset_execution_authorized": false,
+    "workflow_created": false,
+    "schedule_created": false,
+    "provider_requests_authorized": false,
+    "r2_list_read_write_authorized": false,
+    "persistent_local_training_artifacts_authorized": false
+  },
+  "authority": {
+    "v0_10_production_critical_path_mutation": false,
+    "sstate_core_mutation": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "trade_plan_authorized": false,
+    "model_promotion_authority": 0,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

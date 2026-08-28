@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-08-24
+Updated: 2026-08-28
 
 ## Project
 
@@ -14,7 +14,53 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ## Current formal stage
 
-**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 TRAINING GOVERNANCE V0.5 AUTHORIZED / BINANCE USD-M DETAILED HISTORY V0.1.1 AUTHORIZED AFTER V0.10 WINDOW NOT_STARTED / DETAILED HISTORY V0.1 SUPERSEDED BEFORE EXECUTION / V0.4 WEEKLY AND MONTHLY EXECUTION RETIRED / V0.3 DAILY TRAINING RETIRED / RESEARCH SIGNAL LAYER V0.2 ACTIVE / RESEARCH SIGNAL QUALITY V0.1 AUTHORIZED READ_ONLY / RESEARCH AUTOMATION HEALTH V0.1 AUTHORIZED READ_ONLY / POST-WINDOW RESEARCH SUCCESSOR SCHEDULE V0.1 PREPARED_NOT_ACTIVE / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 AUTHORIZED BOUNDED / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
+**PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 TRAINING GOVERNANCE V0.5 AUTHORIZED / BINANCE USD-M DETAILED HISTORY V0.1.1 AUTHORIZED AFTER V0.10 WINDOW NOT_STARTED / DETAILED HISTORY V0.1 SUPERSEDED BEFORE EXECUTION / V0.4 WEEKLY AND MONTHLY EXECUTION RETIRED / V0.3 DAILY TRAINING RETIRED / RESEARCH SIGNAL LAYER V0.2 ACTIVE / RESEARCH SIGNAL QUALITY V0.1 AUTHORIZED READ_ONLY / RESEARCH AUTOMATION HEALTH V0.1 AUTHORIZED READ_ONLY / STRATEGY EDGE VALIDATION V0.1 PREPARED RESEARCH_ONLY / STRATEGY RESEARCH LOOP V0.1 PREPARED SYNTHETIC_ONLY / POST-WINDOW RESEARCH SUCCESSOR SCHEDULE V0.1 PREPARED_NOT_ACTIVE / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 AUTHORIZED BOUNDED / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION EFFECTIVE / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
+
+### Strategy Research Loop V0.1 — PREPARED / SYNTHETIC ONLY
+
+- One project-native contract now joins a deterministic 120-hypothesis
+  candidate registry, Strategy Edge Validation V0.1 and a cost-complete paper
+  performance audit. It does not install either referenced external tool or
+  create a parallel broker/governance path.
+- The registry covers trend, mean-reversion, breakout and volume-flow families
+  across intraday, multiday and swing horizons. Candidate and complete-registry
+  SHA-256 lineage is frozen before evidence exists; no candidate is executed.
+- Paper evidence records direction, holding time, gross/net PnL, fees, funding,
+  observed slippage and initial risk. Audit outputs include expectancy, profit
+  factor, Sharpe/Sortino, drawdown, consecutive losses, winner concentration
+  and deterministic stationary-bootstrap Monte Carlo fragility.
+- The existing Repository `BacktestResult` is adapted into this ledger; no
+  second broker and no invented SHORT execution path are introduced.
+- Candidate order, registry SHA, provider, selected candidate and edge-input
+  fingerprint must match across every layer. Edge failure or lineage mismatch
+  returns `REJECT`; fragile/insufficient paper evidence remains review-only.
+- Even the strongest output is only `EVIDENCE_READY_FOR_HUMAN_REVIEW` with
+  zero promotion/trading authority. V0.1 accepts synthetic fixtures only and
+  creates no workflow or schedule.
+- Config: `config/strategy_research_loop_v0_1.json`; contract:
+  `docs/STRATEGY_RESEARCH_LOOP_V0_1.md`; receipt:
+  `research/receipts/2026-08-28-strategy-research-loop-v0-1-prepared.json`.
+
+### Strategy Edge Validation V0.1 — PREPARED / RESEARCH ONLY
+
+- A deterministic anti-overfitting layer now accepts only a complete UPDATE
+  candidate-return family plus one already-selected candidate's disjoint
+  VALIDATION evidence.
+- Frozen gates cover stationary bootstrap, Deflated Sharpe, PBO/CSCV,
+  Romano-Wolf stepdown, validation Sharpe retention and circular-shift signal
+  alignment permutation.
+- Complete immutable trial-registry and disjoint-partition integrity evidence
+  are mandatory. Missing, partial, misaligned or invalid evidence returns
+  `REJECT`; validation cannot reselect a candidate.
+- Existing fee/slippage, drawdown, exposure and causal/no-lookahead checks
+  remain separate mandatory gates and cannot be overridden by a statistical
+  PASS.
+- Repository implementation and synthetic fixtures are prepared. No workflow,
+  schedule, provider request, R2 operation, production return evaluation,
+  holdout access, model promotion or trading is authorized.
+- Config: `config/strategy_edge_validation_v0_1.json`; operating contract:
+  `docs/STRATEGY_EDGE_VALIDATION_V0_1.md`; preparation receipt:
+  `research/receipts/2026-08-28-strategy-edge-validation-v0-1-prepared.json`.
 
 ### Binance USD-M Detailed History V0.1.1 — AUTHORIZED AFTER WINDOW / NOT STARTED
 
@@ -229,6 +275,57 @@ Current metadata-capture path:
 
 Render remains FREE / Frankfurt. Current runtime budget is `0 USD/month`.
 
+### V0.10 intermittent schedule delivery — PR #201 MERGED / REGISTRATION EFFECTIVE
+
+- Read-only GitHub Actions API observations at `2026-08-27T03:40:07Z` and
+  `2026-08-27T07:38:17Z` returned zero V0.10 `schedule` runs. Under the frozen
+  timetable, 7 and 15 attempts respectively should already have been emitted.
+- A later scheduled run `33060180846` instantiated at `2026-08-27T09:47:47Z`
+  on the unchanged protected `main` SHA. Window, atomic-cutover and freshness
+  guards passed, then capture failed closed because the Pionex response did not
+  contain any of the 15 frozen symbols. The observer did not read the provider
+  payload or a capture artifact; provider-payload root cause remains
+  **UNCONFIRMED**. The failure occurred before R2 client construction or write,
+  and no holdout data was accessed.
+- At `2026-08-27T13:18:53Z`, that remained the only emitted run out of the
+  first 26 elapsed trigger instants through `12:47`; the immediately subsequent
+  `10:17` and `10:47` instants had also produced no run. Schedule delivery was
+  therefore intermittent, not recovered before the re-registration merge.
+- The workflow remained active on default branch `main`, while other Repository
+  schedules had run. The direct cause is **UNCONFIRMED**; GitHub documents that
+  scheduled events can be delayed or dropped, but that fact alone does not prove
+  the cause of this Repository-specific non-delivery.
+- PR #201 merged to protected `main` at `2026-08-27T13:26:40Z`; merge SHA
+  `cf83b6320bc0f0817d8e6ae15d88fe304b933330`. It applies only a semantically
+  equivalent POSIX cron text rewrite so GitHub re-registers the existing schedule.
+  It does not change UTC
+  `:17/:47`, the frozen window, 194 slots, 388 attempts, provider/symbol scope,
+  freshness, R2 hard stop, runtime, endpoint, secret or execution authority.
+- Required CI and protected-main review passed before merge. Registration text
+  is now effective, but this does not prove future GitHub schedule delivery and
+  does not resolve the Pionex metadata failure. Earlier missed attempts remain
+  scientific failures and may not be manually or retroactively backfilled.
+- The first post-merge trigger instant was `2026-08-27T13:47:00Z`. A read-only
+  Actions API observation at `13:51:28Z` still returned only the single
+  pre-merge run, so no post-merge run was visible four minutes after the trigger.
+  GitHub-side delay remained possible at that observation; delivery recovery is
+  **NOT_CONFIRMED**.
+- A later read-only Actions API observation at `2026-08-28T01:28:05Z` found a
+  post-merge scheduled run `33124856368` on `main` SHA
+  `a325728cf92c2885ef0611fc1a57f45389de6b77` (created `2026-08-27T23:03:07Z`).
+  Its window gate, atomic-cutover validation and stale-run guard passed, but the
+  capture step failed. No workflow log, provider payload or capture artifact was
+  read; the failure root cause remains **UNCONFIRMED**. This proves delivery for
+  that attempt only, not metadata stability or full schedule recovery.
+- Historical pre-merge authority/config:
+  `config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json`.
+  Historical pre-merge incident receipt:
+  `research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-authority.json`.
+  Post-merge effectivity receipt:
+  `research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-effective.json`.
+  Post-merge run observation receipt:
+  `research/receipts/2026-08-28-v0-10-post-merge-schedule-observation.json`.
+
 Final read-only pre-window Render recheck on 2026-08-21 confirms:
 
 - service Auto-Deploy: **OFF** (`autoDeploy=no`, trigger `off`);
@@ -254,10 +351,14 @@ Inherited scientific scope is unchanged:
 - 388 scheduled attempts total;
 - first scheduled attempt: `2026-08-27T00:17:00Z`;
 - last scheduled attempt: `2026-09-04T01:47:00Z`;
-- current date-scoped schedules:
+- frozen semantic date-scoped schedules:
   - `17,47 * 27-31 8 *`
   - `17,47 * 1-3 9 *`
   - `17,47 0-1 4 9 *`
+- PR #201 effective semantically equivalent registration text:
+  - `17,47 * 27,28,29,30,31 8 *`
+  - `17,47 * 1,2,3 9 *`
+  - `17,47 0,1 4 9 *`
 - required coverage: at least one complete valid capture per UTC hourly slot;
 - 15 candidate symbols / 45 mapped pairs;
 - replacement holdout: `2026-08-28T00:00:00Z` through `2026-09-03T23:59:59.999Z`;

@@ -139,9 +139,9 @@ def test_atomic_workflow_cutover_has_no_old_schedule_and_window_scoped_new_sched
     assert not any("runs-on: [self-hosted" in line for line in old)
     assert any(line == "  schedule:" for line in new)
     for cron in (
-        '    - cron: "17,47 * 27-31 8 *"',
-        '    - cron: "17,47 * 1-3 9 *"',
-        '    - cron: "17,47 0-1 4 9 *"',
+        '    - cron: "17,47 * 27,28,29,30,31 8 *"',
+        '    - cron: "17,47 * 1,2,3 9 *"',
+        '    - cron: "17,47 0,1 4 9 *"',
     ):
         assert cron in new
     assert "runs-on: ubuntu-latest" in NEW_WORKFLOW.read_text(encoding="utf-8")

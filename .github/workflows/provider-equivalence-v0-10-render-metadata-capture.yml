@@ -7,18 +7,21 @@ on:
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
       - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
+      - "config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json"
       - "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
       - "research/receipts/2026-08-20-provider-equivalence-v0-9-render-relay-smoke-pass.json"
+      - "research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-authority.json"
       - "src/crypto_autopilot/provider_metadata_capture_v0_10.py"
       - "scripts/capture_provider_equivalence_v0_10_metadata.py"
       - "infra/render/binance-transport-free/server.py"
       - "tests/test_final_atomic_cutover_v0_10.py"
+      - "tests/test_v0_10_mid_window_emergency_schedule_reactivation_v0_1.py"
       - "tests/test_ci_dependency_constraints.py"
       - "requirements/ci-constraints.txt"
   schedule:
-    - cron: "17,47 * 27-31 8 *"
-    - cron: "17,47 * 1-3 9 *"
-    - cron: "17,47 0-1 4 9 *"
+    - cron: "17,47 * 27,28,29,30,31 8 *"
+    - cron: "17,47 * 1,2,3 9 *"
+    - cron: "17,47 0,1 4 9 *"
 
 permissions:
   actions: read
@@ -68,9 +71,9 @@ jobs:
           assert not any('runs-on: [self-hosted' in line for line in old)
           assert any(line == '  schedule:' for line in new)
           expected_crons = {
-              '    - cron: "17,47 * 27-31 8 *"',
-              '    - cron: "17,47 * 1-3 9 *"',
-              '    - cron: "17,47 0-1 4 9 *"',
+              '    - cron: "17,47 * 27,28,29,30,31 8 *"',
+              '    - cron: "17,47 * 1,2,3 9 *"',
+              '    - cron: "17,47 0,1 4 9 *"',
           }
           assert expected_crons.issubset(set(new))
           assert cfg['atomic_repository_cutover']['successor_cron_utc'] == [

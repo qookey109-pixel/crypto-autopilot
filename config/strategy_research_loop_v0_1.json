@@ -1,0 +1,91 @@
+{
+  "schema_version": "strategy_research_loop_v0_1",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "purpose": "Unify bounded strategy discovery, frozen anti-overfitting evidence and Repository paper-performance audit without creating a second broker or changing authority.",
+  "candidate_search": {
+    "hard_candidate_cap": 4096,
+    "expected_candidate_count": 120,
+    "execution_authorized": false,
+    "families": [
+      {
+        "id": "trend_following",
+        "horizons": ["INTRADAY", "MULTIDAY", "SWING"],
+        "parameter_grid": {
+          "confirmation_bars": [1, 2],
+          "fast_window": [10, 20],
+          "slow_window": [50, 100]
+        }
+      },
+      {
+        "id": "mean_reversion",
+        "horizons": ["INTRADAY", "MULTIDAY", "SWING"],
+        "parameter_grid": {
+          "exit_window": [5, 10],
+          "lookback": [20, 40],
+          "z_entry": [1.5, 2.0, 2.5]
+        }
+      },
+      {
+        "id": "breakout",
+        "horizons": ["INTRADAY", "MULTIDAY", "SWING"],
+        "parameter_grid": {
+          "atr_stop": [1.5, 2.0, 2.5],
+          "donchian_window": [20, 55],
+          "minimum_volume_z": [0.0, 1.0]
+        }
+      },
+      {
+        "id": "volume_flow",
+        "horizons": ["INTRADAY", "MULTIDAY", "SWING"],
+        "parameter_grid": {
+          "cvd_window": [10, 20],
+          "minimum_taker_buy_ratio": [0.52, 0.56],
+          "minimum_volume_z": [0.5, 1.0]
+        }
+      }
+    ]
+  },
+  "paper_performance_audit": {
+    "minimum_trades": 30,
+    "minimum_expectancy_r": 0.0,
+    "minimum_profit_factor": 1.0,
+    "maximum_largest_winner_share": 0.35,
+    "maximum_actual_drawdown_fraction": 0.5,
+    "monte_carlo_samples": 999,
+    "monte_carlo_mean_block_length": 5.0,
+    "monte_carlo_ruin_drawdown_fraction": 0.5,
+    "maximum_monte_carlo_ruin_probability": 0.1,
+    "deterministic_seed": 20260828
+  },
+  "composition": {
+    "candidate_order_must_match_edge_input": true,
+    "registry_sha256_must_match": true,
+    "provider_and_input_fingerprint_must_match": true,
+    "strategy_edge_pass_required": true,
+    "acceptable_paper_audit_required": true,
+    "pass_state": "EVIDENCE_READY_FOR_HUMAN_REVIEW",
+    "automatic_promotion": false
+  },
+  "execution": {
+    "repository_validation_and_synthetic_fixtures_authorized": true,
+    "production_dataset_execution_authorized": false,
+    "candidate_return_materialization_authorized": false,
+    "workflow_created": false,
+    "schedule_created": false,
+    "provider_requests_authorized": false,
+    "r2_list_read_write_authorized": false,
+    "second_broker_created": false
+  },
+  "authority": {
+    "v0_10_production_critical_path_mutation": false,
+    "sstate_core_mutation": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "trade_plan_authorized": false,
+    "model_promotion_authority": 0,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

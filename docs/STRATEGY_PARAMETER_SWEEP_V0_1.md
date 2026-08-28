@@ -104,6 +104,13 @@ The frozen result records:
 - validation evidence reference;
 - validation metric/trade-count/drawdown evidence.
 
+Parameter-freeze PASS is necessary but no longer sufficient for Challenger
+promotion review. When a complete aligned return matrix exists, the selected
+candidate must also pass the separately versioned `Strategy Edge Validation
+V0.1` statistical gates. That layer consumes the complete trial family, never
+reselects on validation and grants zero automatic promotion authority. See
+`docs/STRATEGY_EDGE_VALIDATION_V0_1.md`.
+
 ## Primary metrics
 
 V0.1 framework supports:

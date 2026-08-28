@@ -4,7 +4,7 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 
 > **Current mode: PAPER-ONLY.** No real-money order path is authorized. `trade_plan_authorized=false` and `live_trading_authorized=false` remain mandatory. For the detailed current authority index, always read [`PROJECT_STATUS.md`](PROJECT_STATUS.md) first.
 
-## Current authority snapshot — 2026-08-24
+## Current authority snapshot — 2026-08-28
 
 The repository has moved beyond the original V0.1 implementation baseline while preserving its scientific history:
 
@@ -111,6 +111,21 @@ completion gates are recorded in
 [`docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`](docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md).
 The `2026-09-30` target is a prepared engineering roadmap, not execution
 authority, automatic model promotion or a profitability promise.
+The prepared, research-only
+[`Strategy Edge Validation V0.1`](docs/STRATEGY_EDGE_VALIDATION_V0_1.md)
+adds deterministic anti-overfitting gates after UPDATE-only parameter
+selection: stationary bootstrap, Deflated Sharpe, PBO/CSCV, Romano-Wolf
+stepdown, disjoint-validation Sharpe retention and signal-alignment
+permutation. It requires the complete trial family and partition-integrity
+evidence, fails closed on missing inputs, and grants no provider, R2, holdout,
+promotion or trading authority.
+[`Strategy Research Loop V0.1`](docs/STRATEGY_RESEARCH_LOOP_V0_1.md) wraps that
+gate with a deterministic 120-hypothesis registry and a cost-complete
+Repository paper-ledger audit. It reports expectancy, profit factor,
+drawdown, concentration and stationary-bootstrap Monte Carlo fragility while
+binding exact candidate/provider/fingerprint lineage. It is synthetic-only,
+creates no workflow or second broker, and can reach only human-review
+eligibility with zero promotion or trading authority.
 The current time-ordered operating handoff is
 [`docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`](docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md).
 
@@ -307,3 +322,27 @@ are indexed in
 [`docs/RESEARCH_AUTOMATION_SCHEDULE_V0_1.md`](docs/RESEARCH_AUTOMATION_SCHEDULE_V0_1.md).
 
 Historical receipts remain immutable evidence even when a later version supersedes their execution role.
+
+## Engineering agent tools
+
+The Repository-local
+[`change-walkthrough`](.agents/skills/change-walkthrough/SKILL.md) skill gives
+PRs, commits and selected local diffs a paced, read-only explanation. It fixes
+remote changes to immutable SHAs, keeps staged/unstaged/untracked evidence
+separate and never edits, reviews, pushes, merges or grants authority.
+
+New agent-facing interfaces follow three convergence rules:
+
+- one canonical Python domain action owns validation and behavior;
+- UI, CLI, HTTP or future agent adapters may expose that action but cannot
+  bypass its Repository authority checks;
+- every adapter preserves the same deterministic JSON evidence or receipt.
+
+Interface parity by itself does not justify a second runtime, database,
+framework or deployment surface. External agent frameworks remain design
+references unless a separate bounded change demonstrates a concrete need.
+This independent policy was informed by the read-only tour pattern in
+[`sirius-skills/walkthrough-me`](https://github.com/sirius-cc-wu/sirius-skills/tree/main/skills/walkthrough-me)
+and the shared-action idea in
+[`BuilderIO/agent-native`](https://github.com/BuilderIO/agent-native); no
+external instructions, source code or runtime dependency are vendored.
