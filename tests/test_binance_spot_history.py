@@ -5,7 +5,7 @@ import unittest
 from urllib.error import URLError
 from urllib.parse import parse_qs, urlparse
 
-from crypto_autopilot.binance_spot_history import (
+from crypto_autopilot.binance.spot_history import (
     BINANCE_SPOT_KLINES_URL,
     BinanceSpotHistoryError,
     ProviderReadDeadlineExceeded,

@@ -11,7 +11,7 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from crypto_autopilot.binance_coverage import (
+from crypto_autopilot.binance.coverage import (
     SERIES,
     attach_audited_boundaries,
     build_archive_keys,
@@ -21,7 +21,7 @@ from crypto_autopilot.binance_coverage import (
     summarize_symbol_boundaries,
 )
 from crypto_autopilot.binance_historical import pionex_perp_to_binance_usdm
-from crypto_autopilot.binance_vision import (
+from crypto_autopilot.binance.vision import (
     BinanceVisionArchiveKey,
     ingest_kline_archive,
     ingest_mark_price_archive,

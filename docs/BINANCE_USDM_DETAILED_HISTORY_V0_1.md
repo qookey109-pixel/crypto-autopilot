@@ -91,11 +91,11 @@ GitHub contains the versioned strategy and training authority:
 - baseline strategy: `docs/STRATEGY_V0_1.md`, `config/strategy_v0_1.json` and
   `src/crypto_autopilot/strategy.py`;
 - public paper candidate engine: `config/paper_training_v0_1.json`,
-  `src/crypto_autopilot/paper_training.py` and
-  `src/crypto_autopilot/advanced_technical.py`;
-- Spot daily research model: `src/crypto_autopilot/online_training.py` and
-  `src/crypto_autopilot/training_quality.py`;
-- detailed intraday research model: `src/crypto_autopilot/detailed_training.py`;
+  `src/crypto_autopilot/paper/training.py` and
+  `src/crypto_autopilot/features/advanced.py`;
+- Spot daily research model: `src/crypto_autopilot/training/online.py` and
+  `src/crypto_autopilot/training/quality.py`;
+- detailed intraday research model: `src/crypto_autopilot/training/detailed.py`;
 - orchestration: `.github/workflows/binance-usdm-detailed-history-v0-1.yml` and
   `.github/workflows/binance-usdm-detailed-training-v0-1.yml`.
 

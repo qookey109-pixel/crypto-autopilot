@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 from crypto_autopilot.binance_funding_materialization_plan_v0_2 import build_v0_2_scope
-from crypto_autopilot.binance_funding_materializer_v0_2 import (
+from crypto_autopilot.binance.funding_materializer_v0_2 import (
     AUTHORITY_PATH,
     CONFIG_PATH,
     PREFLIGHT_AUTHORITY_PATH,

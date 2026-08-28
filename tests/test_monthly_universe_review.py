@@ -12,12 +12,12 @@ from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from crypto_autopilot.binance_training_catalog import TrainingMarket, catalog_payload
-from crypto_autopilot.monthly_universe_review import (
+from crypto_autopilot.binance.training_catalog import TrainingMarket, catalog_payload
+from crypto_autopilot.training.monthly_universe_review import (
     build_monthly_universe_objects,
     build_monthly_universe_review,
 )
-from crypto_autopilot.training_quality import (
+from crypto_autopilot.training.quality import (
     TrainingQualityError,
     V0_3_BASELINE_EVIDENCE_SHA256,
     load_v0_5_authority_pair,

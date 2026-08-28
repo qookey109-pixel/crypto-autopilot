@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from crypto_autopilot.orderflow import (
+from crypto_autopilot.features.orderflow import (
     OrderFlowDataError,
     build_spot_orderflow_series,
 )

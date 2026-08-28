@@ -16,7 +16,7 @@ import pyarrow.parquet as pq
 
 import scripts.publish_binance_spot_training_to_r2 as publisher
 from crypto_autopilot.lineage import sha256_json
-from crypto_autopilot.training_quality import (
+from crypto_autopilot.training.quality import (
     TrainingQualityError,
     validate_catalog_quality,
     validate_dataset_receipt_quality,

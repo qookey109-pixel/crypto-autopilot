@@ -4,7 +4,7 @@ import json
 import unittest
 from io import BytesIO
 
-from crypto_autopilot.research_signal_ingest_v0_2 import (
+from crypto_autopilot.research.signal_ingest_v0_2 import (
     build_signal_payload,
     collect_sources,
     parse_source_payload,

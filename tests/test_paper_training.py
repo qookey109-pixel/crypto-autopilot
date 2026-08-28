@@ -7,7 +7,7 @@ from pathlib import Path
 
 from crypto_autopilot.historical import INTERVAL_MS
 from crypto_autopilot.models import Candle
-from crypto_autopilot.paper_training import REQUIRED_INTERVALS, run_paper_training_replay
+from crypto_autopilot.paper.training import REQUIRED_INTERVALS, run_paper_training_replay
 
 
 ROOT = Path(__file__).resolve().parents[1]

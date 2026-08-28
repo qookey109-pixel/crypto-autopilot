@@ -5,7 +5,7 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
-from crypto_autopilot.training_quality import (
+from crypto_autopilot.training.quality import (
     load_v0_3_bootstrap_baseline,
     load_v0_5_authority_pair,
 )

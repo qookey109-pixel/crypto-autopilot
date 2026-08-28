@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import unittest
 
-from crypto_autopilot.binance_funding_coverage import (
+from crypto_autopilot.binance.funding_coverage import (
     COVERAGE_EDGE_CADENCE_JITTER_TOLERANCE_MS,
     BinanceFundingCoverageError,
     attach_funding_boundaries,

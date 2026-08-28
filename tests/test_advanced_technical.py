@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import unittest
 
-from crypto_autopilot.advanced_technical import build_advanced_technical_series
+from crypto_autopilot.features.advanced import build_advanced_technical_series
 from crypto_autopilot.historical import INTERVAL_MS
-from crypto_autopilot.market_features import (
+from crypto_autopilot.features.market import (
     DerivativeIndexSnapshot,
     FundingRateObservation,
     OrderBookSnapshot,

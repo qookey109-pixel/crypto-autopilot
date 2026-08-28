@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from ..models import BookTicker, Candle, MarketTicker
-from ..market_features import (
+from crypto_autopilot.features.market import (
     DerivativeIndexSnapshot,
     FundingRateObservation,
     OrderBookSnapshot,

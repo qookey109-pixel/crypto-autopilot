@@ -11,7 +11,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from crypto_autopilot.detailed_history import (
+from crypto_autopilot.history.detailed import (
     DetailedHistoryAuthorityError,
     canonical_json_bytes,
     load_authority_pair,
@@ -19,14 +19,14 @@ from crypto_autopilot.detailed_history import (
     sha256_bytes,
     validate_catalog,
 )
-from crypto_autopilot.detailed_training import (
+from crypto_autopilot.training.detailed import (
     IntradayExample,
     bound_examples,
     build_intraday_examples,
     run_intraday_training,
 )
-from crypto_autopilot.ephemeral_storage import require_ephemeral_output
-from crypto_autopilot.online_r2_training import current_bucket_bytes
+from crypto_autopilot.storage.ephemeral import require_ephemeral_output
+from crypto_autopilot.training.online_r2 import current_bucket_bytes
 from crypto_autopilot.storage.parquet import parquet_to_candles
 from crypto_autopilot.storage.r2 import R2Store
 

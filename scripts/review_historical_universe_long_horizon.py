@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 
-from crypto_autopilot.historical_universe_review import (
+from crypto_autopilot.history.universe_review import (
     build_membership_contract,
     review_target_wave,
 )

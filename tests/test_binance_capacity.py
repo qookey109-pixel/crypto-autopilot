@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from crypto_autopilot.binance_capacity import estimate_binance_observed_capacity
+from crypto_autopilot.binance.capacity import estimate_binance_observed_capacity
 
 
 class BinanceObservedCapacityTests(unittest.TestCase):

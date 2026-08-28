@@ -102,7 +102,7 @@ The two providers may later be compared by an overlap/equivalence gate, but they
 
 ## Implementation
 
-`src/crypto_autopilot/binance_vision.py` provides:
+`src/crypto_autopilot/binance/vision.py` provides:
 
 - deterministic archive URL/key generation;
 - CHECKSUM parsing and SHA-256 verification;

@@ -16,8 +16,8 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from crypto_autopilot.binance_vision import BinanceVisionArchiveKey, ingest_kline_archive
-from crypto_autopilot.detailed_history import (
+from crypto_autopilot.binance.vision import BinanceVisionArchiveKey, ingest_kline_archive
+from crypto_autopilot.history.detailed import (
     DetailedHistoryAuthorityError,
     DetailedMarketCoverage,
     build_catalog,
@@ -33,8 +33,8 @@ from crypto_autopilot.detailed_history import (
     symbols_from_root_prefixes,
     validate_catalog,
 )
-from crypto_autopilot.ephemeral_storage import require_ephemeral_output
-from crypto_autopilot.online_r2_training import current_bucket_bytes
+from crypto_autopilot.storage.ephemeral import require_ephemeral_output
+from crypto_autopilot.training.online_r2 import current_bucket_bytes
 from crypto_autopilot.storage.parquet import candles_to_parquet, parquet_to_candles
 from crypto_autopilot.storage.r2 import R2Store
 

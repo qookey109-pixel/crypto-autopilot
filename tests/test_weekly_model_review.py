@@ -3,8 +3,8 @@ from __future__ import annotations
 import math
 import unittest
 
-from crypto_autopilot.online_training import DAILY_DIRECTION_FEATURE_NAMES, DAY_MS
-from crypto_autopilot.weekly_model_review import build_weekly_model_review
+from crypto_autopilot.training.online import DAILY_DIRECTION_FEATURE_NAMES, DAY_MS
+from crypto_autopilot.training.weekly_review import build_weekly_model_review
 
 
 class WeeklyModelReviewTests(unittest.TestCase):

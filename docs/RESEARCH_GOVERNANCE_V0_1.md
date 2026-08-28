@@ -30,12 +30,12 @@ or alter the V0.10 production-critical path.
 
 - `src/crypto_autopilot/lineage.py` — canonical JSON, SHA-256 fingerprints,
   secret-like metadata rejection and zero-authority research manifests.
-- `src/crypto_autopilot/evaluation_integrity.py` — partition metadata,
+- `src/crypto_autopilot/research/evaluation_integrity.py` — partition metadata,
   overlap/seed checks and a guard that denies frozen-holdout access by default.
-- `src/crypto_autopilot/experiment_registry.py` — atomic local JSON registry;
+- `src/crypto_autopilot/research/experiment_registry.py` — atomic local JSON registry;
   experiment IDs are immutable and comparisons fail closed when provider,
   universe, intervals, features or evaluation fingerprints differ.
-- `src/crypto_autopilot/resource_planning.py` — proposal ordering using bounded
+- `src/crypto_autopilot/research/resource_planning.py` — proposal ordering using bounded
   cost evidence. Adaptive utility remains at least 65%; missing estimates are
   neutral; no scheduler, promotion or trade authority is exposed.
 

@@ -11,7 +11,7 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
-from crypto_autopilot.binance_spot_history import (
+from crypto_autopilot.binance.spot_history import (
     BinanceSpotCandle,
     BinanceSpotSeries,
     ProviderReadDeadlineExceeded,

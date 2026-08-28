@@ -6,7 +6,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-from crypto_autopilot.research_signal_quality import (
+from crypto_autopilot.research.signal_quality import (
     ResearchSignalQualityError,
     evaluate_research_signal_quality,
 )

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from crypto_autopilot.historical_universe import (
+from crypto_autopilot.history.universe import (
     HistoricalMarketRecord,
     HistoricalUniverseConflictError,
     HistoricalUniverseIndex,

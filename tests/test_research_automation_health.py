@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 from datetime import datetime, timezone
 
-from crypto_autopilot.research_automation_health import (
+from crypto_autopilot.research.automation_health import (
     WorkflowExpectation,
     evaluate_automation_health,
     evaluate_workflow,

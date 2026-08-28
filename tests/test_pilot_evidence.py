@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from crypto_autopilot.pilot_evidence import aggregate_pilot_evidence
+from crypto_autopilot.research.pilot_evidence import aggregate_pilot_evidence
 
 
 class PilotEvidenceTest(unittest.TestCase):

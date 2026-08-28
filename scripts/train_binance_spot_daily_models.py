@@ -8,10 +8,10 @@ from pathlib import Path
 
 import pyarrow.parquet as pq
 
-from crypto_autopilot.online_training import train_daily_direction_models
-from crypto_autopilot.ephemeral_storage import require_ephemeral_output
-from crypto_autopilot.training_quality import load_v0_5_authority_pair
-from crypto_autopilot.weekly_model_review import build_weekly_model_review
+from crypto_autopilot.training.online import train_daily_direction_models
+from crypto_autopilot.storage.ephemeral import require_ephemeral_output
+from crypto_autopilot.training.quality import load_v0_5_authority_pair
+from crypto_autopilot.training.weekly_review import build_weekly_model_review
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]

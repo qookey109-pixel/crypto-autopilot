@@ -11,9 +11,9 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from crypto_autopilot.binance_historical import pionex_perp_to_binance_usdm
-from crypto_autopilot.binance_vision import BinanceVisionArchiveKey, ingest_kline_archive
-from crypto_autopilot.equivalence_forensics import analyze_direction_mismatches
-from crypto_autopilot.provider_equivalence import (
+from crypto_autopilot.binance.vision import BinanceVisionArchiveKey, ingest_kline_archive
+from crypto_autopilot.providers.equivalence_forensics import analyze_direction_mismatches
+from crypto_autopilot.providers.equivalence import (
     ProviderEquivalencePolicy,
     aggregate_provider_equivalence,
     compare_provider_pair,

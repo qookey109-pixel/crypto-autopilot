@@ -35,6 +35,30 @@ Exchange adapters -----> Historical / metadata store (R2)
 
 Provider identity is part of the data contract. Binance evidence must never be relabeled as Pionex-native evidence, and provider splicing/source switching requires separate authority.
 
+## Python package boundaries
+
+The implementation is organized by responsibility rather than one flat module
+directory:
+
+```text
+src/crypto_autopilot/
+├── binance/    # Binance research data and catalogs
+├── exchanges/  # public/provider and paper exchange adapters
+├── features/   # technical, market-state and order-flow features
+├── history/    # admission, liquidity, replay and universe history
+├── paper/      # paper-only exploration, simulation and training
+├── providers/  # provider comparison and non-authoritative helpers
+├── research/   # experiment, signal and evaluation governance
+├── storage/    # R2, Parquet, layout and ephemeral-output policy
+└── training/   # training, ablation, quality and review
+```
+
+Stable cross-domain APIs and versioned workflow/receipt-bound modules remain at
+the package root. New domain modules must be added to the matching package;
+they must not extend the root allowlist merely for import convenience. The
+full map and dependency rules are in
+[`PACKAGE_STRUCTURE_V0_1.md`](PACKAGE_STRUCTURE_V0_1.md).
+
 ## Current zero-cost infrastructure
 
 The current deployed/repository architecture is:

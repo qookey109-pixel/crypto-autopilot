@@ -5,7 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
-from crypto_autopilot.pilot_evidence import aggregate_pilot_evidence
+from crypto_autopilot.research.pilot_evidence import aggregate_pilot_evidence
 
 
 def parse_args() -> argparse.Namespace:

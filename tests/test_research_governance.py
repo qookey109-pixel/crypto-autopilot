@@ -5,14 +5,14 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from crypto_autopilot.evaluation_integrity import (
+from crypto_autopilot.research.evaluation_integrity import (
     EvaluationUsage,
     PartitionAccessGuard,
     PartitionRole,
     build_partition_evidence,
     evaluate_partition_integrity,
 )
-from crypto_autopilot.experiment_registry import (
+from crypto_autopilot.research.experiment_registry import (
     ExperimentComparisonKey,
     ExperimentCost,
     ExperimentRecord,
@@ -23,7 +23,7 @@ from crypto_autopilot.lineage import (
     LineageProtocolError,
     build_lineage_manifest,
 )
-from crypto_autopilot.resource_planning import (
+from crypto_autopilot.research.resource_planning import (
     ResourceEstimate,
     ResourcePlanningError,
     ResourcePlanningPolicy,

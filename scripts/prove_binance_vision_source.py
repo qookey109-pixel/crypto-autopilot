@@ -10,7 +10,7 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from crypto_autopilot.binance_vision import (
+from crypto_autopilot.binance.vision import (
     BinanceVisionArchiveKey,
     ingest_kline_archive,
     ingest_mark_price_archive,

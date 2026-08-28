@@ -4,8 +4,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from crypto_autopilot.binance_capacity import estimate_binance_observed_capacity
-from crypto_autopilot.r2_budget import R2Guardrails, R2Pricing, R2ProjectedUsage, evaluate_r2_budget
+from crypto_autopilot.binance.capacity import estimate_binance_observed_capacity
+from crypto_autopilot.storage.budget import R2Guardrails, R2Pricing, R2ProjectedUsage, evaluate_r2_budget
 
 
 POLICY = Path("config/r2_budget_v0_1.json")

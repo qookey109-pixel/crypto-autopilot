@@ -226,6 +226,14 @@ Future, separately gated only:
 Paper Broker -> Private Execution Adapter
 ```
 
+The Python source tree is grouped by responsibility under
+`src/crypto_autopilot/`: `binance`, `features`, `history`, `paper`,
+`providers`, `research`, `storage`, `training` and `exchanges`. A small set of
+stable core APIs and versioned workflow/receipt-bound modules intentionally
+remain at the package root. See
+[`docs/PACKAGE_STRUCTURE_V0_1.md`](docs/PACKAGE_STRUCTURE_V0_1.md) for the
+dependency rules and the complete exception list.
+
 Current zero-cost infrastructure split:
 
 - GitHub: source, CI, versioned authority, V0.10 scheduled metadata orchestration, validation jobs and R2 credentials;

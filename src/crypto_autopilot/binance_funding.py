@@ -10,7 +10,7 @@ from datetime import date
 from io import BytesIO
 from typing import Iterable
 
-from .binance_vision import BINANCE_VISION_BASE_URL, parse_checksum, sha256_bytes
+from crypto_autopilot.binance.vision import BINANCE_VISION_BASE_URL, parse_checksum, sha256_bytes
 
 
 FUNDING_CADENCE_JITTER_TOLERANCE_MS = 10

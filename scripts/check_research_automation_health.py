@@ -6,7 +6,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-from crypto_autopilot.research_automation_health import (
+from crypto_autopilot.research.automation_health import (
     audit_workflow_inventory,
     evaluate_automation_health,
     expectation_from_config,

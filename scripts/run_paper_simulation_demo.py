@@ -5,7 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
-from crypto_autopilot.paper_simulation_demo import build_demo_payload
+from crypto_autopilot.paper.simulation_demo import build_demo_payload
 
 
 def main() -> int:
