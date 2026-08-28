@@ -47,6 +47,14 @@ OLD_V02_WORKFLOW = Path(
 V10_WORKFLOW = Path(
     ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
 )
+STRATEGY_EDGE_CONFIG = Path("config/strategy_edge_validation_v0_1.json")
+STRATEGY_EDGE_RECEIPT = Path(
+    "research/receipts/2026-08-28-strategy-edge-validation-v0-1-prepared.json"
+)
+STRATEGY_RESEARCH_CONFIG = Path("config/strategy_research_loop_v0_1.json")
+STRATEGY_RESEARCH_RECEIPT = Path(
+    "research/receipts/2026-08-28-strategy-research-loop-v0-1-prepared.json"
+)
 
 EXPECTED_SCOPE_SHA = "1e0ff54daeec8e5e47376fedb631c663687dd6fb6a4c297d269c33acdf99ad58"
 EXPECTED_CHECKSUM_SHA = "881c14d3b3c780b8a0d56ca2f7fd57d2abff310fcd7cb4b13dc01f506b9b64f3"
@@ -464,6 +472,89 @@ def validate_render_lineage() -> dict[str, object]:
     }
 
 
+def validate_strategy_research_lineage() -> dict[str, object]:
+    edge = load(STRATEGY_EDGE_CONFIG)
+    edge_receipt = load(STRATEGY_EDGE_RECEIPT)
+    research = load(STRATEGY_RESEARCH_CONFIG)
+    research_receipt = load(STRATEGY_RESEARCH_RECEIPT)
+
+    for payload, label in (
+        (edge, "Strategy Edge config"),
+        (edge_receipt, "Strategy Edge receipt"),
+        (research, "Strategy Research Loop config"),
+        (research_receipt, "Strategy Research Loop receipt"),
+    ):
+        if payload.get("status") != "PREPARED_RESEARCH_ONLY":
+            raise RuntimeError(f"{label} is not PREPARED_RESEARCH_ONLY")
+
+    candidate_search = require_dict(
+        research.get("candidate_search") or {}, "strategy candidate search"
+    )
+    families = candidate_search.get("families") or []
+    if candidate_search.get("expected_candidate_count") != 120:
+        raise RuntimeError("Strategy Research Loop candidate count changed")
+    if candidate_search.get("execution_authorized") is not False:
+        raise RuntimeError("Strategy Research Loop candidate execution became authorized")
+    if not isinstance(families, list) or len(families) != 4:
+        raise RuntimeError("Strategy Research Loop family contract changed")
+    horizons = {
+        str(horizon)
+        for family in families
+        for horizon in require_dict(family, "strategy family").get("horizons", [])
+    }
+    if horizons != {"INTRADAY", "MULTIDAY", "SWING"}:
+        raise RuntimeError("Strategy Research Loop horizon contract changed")
+
+    edge_methods = edge.get("methods") or []
+    if not isinstance(edge_methods, list) or len(edge_methods) != 6:
+        raise RuntimeError("Strategy Edge method contract changed")
+    for payload, label in (
+        (require_dict(edge.get("authority") or {}, "Strategy Edge authority"), "edge"),
+        (
+            require_dict(research.get("authority") or {}, "Strategy Research authority"),
+            "research",
+        ),
+    ):
+        for key in (
+            "replacement_holdout_access_authorized",
+            "source_switch_authorized",
+            "historical_universe_membership_authorized",
+            "backtest_admission_authorized",
+            "trade_plan_authorized",
+            "real_money_order_authorized",
+            "live_trading_authorized",
+        ):
+            if payload.get(key) is not False:
+                raise RuntimeError(f"Strategy {label} authority changed: {key}")
+        if payload.get("model_promotion_authority") != 0:
+            raise RuntimeError(f"Strategy {label} model promotion authority changed")
+
+    receipt_authority = require_dict(
+        research_receipt.get("authority") or {}, "Strategy Research receipt authority"
+    )
+    for key in (
+        "workflow_created",
+        "schedule_created",
+        "provider_requests_authorized",
+        "production_dataset_execution_authorized",
+        "r2_list_read_write_authorized",
+        "replacement_holdout_access_authorized",
+        "backtest_admission_authorized",
+        "trade_plan_authorized",
+        "real_money_order_authorized",
+        "live_trading_authorized",
+    ):
+        if receipt_authority.get(key) is not False:
+            raise RuntimeError(f"Strategy Research receipt boundary changed: {key}")
+
+    return {
+        "candidate_count": int(candidate_search["expected_candidate_count"]),
+        "family_count": len(families),
+        "horizon_count": len(horizons),
+        "edge_method_count": len(edge_methods),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=Path, required=True)
@@ -473,6 +564,7 @@ def main() -> int:
     dashboard = load(args.input)
     materialization, usage, equivalence = validate_foundation()
     lineage = validate_render_lineage()
+    strategy_research = validate_strategy_research_lineage()
 
     require_dict(materialization.get("exact_scope") or {}, "funding exact scope")
     postwrite = require_dict(materialization.get("postwrite_results") or {}, "funding postwrite")
@@ -529,6 +621,14 @@ def main() -> int:
             "metadataCaptureHourlySlotCount": int(v10_scope["hourly_slot_count"]),
             "metadataCaptureScheduledMinutesUtc": list(v10_scope["scheduled_minutes_utc"]),
             "cloudRuntimeMonthlyBudgetUsd": 0,
+            "strategyResearchLoopState": "PREPARED_RESEARCH_ONLY",
+            "strategyResearchCandidateCount": strategy_research["candidate_count"],
+            "strategyResearchFamilyCount": strategy_research["family_count"],
+            "strategyResearchHorizonCount": strategy_research["horizon_count"],
+            "strategyEdgeValidationState": "PREPARED_RESEARCH_ONLY",
+            "strategyEdgeMethodCount": strategy_research["edge_method_count"],
+            "strategyResearchExecutionAuthorized": False,
+            "strategyModelPromotionAuthority": 0,
             "tradePlanAuthorized": False,
             "liveTradingAuthorized": False,
         }
@@ -538,7 +638,7 @@ def main() -> int:
     dashboard["snapshotLabel"] = (
         "Repository 正式 Authority 狀態快照 · Equivalence V0.1 FAIL / "
         "Funding V0.2 R2 PASS / V0.10 Metadata Cutover EFFECTIVE / "
-        "Schedule Re-registration EFFECTIVE"
+        "Schedule Re-registration EFFECTIVE / Strategy Research Loop PREPARED"
     )
 
     source_authorities = dashboard.get("sourceAuthorities") or []
@@ -556,6 +656,10 @@ def main() -> int:
         V10_AUTHORITY,
         V10_EMERGENCY_SCHEDULE_AUTHORITY,
         V10_EMERGENCY_SCHEDULE_EFFECTIVE,
+        STRATEGY_EDGE_CONFIG,
+        STRATEGY_EDGE_RECEIPT,
+        STRATEGY_RESEARCH_CONFIG,
+        STRATEGY_RESEARCH_RECEIPT,
         OLD_V02_WORKFLOW,
         V10_WORKFLOW,
     ):
@@ -628,6 +732,18 @@ def main() -> int:
         "Frozen window 2026-08-27 至 2026-09-04；完整 194-slot stability evidence 尚未完成。",
         "PENDING",
     )
+    replace_pipeline_item(
+        pipeline,
+        "Strategy Research Loop V0.1",
+        "PR #204 已合併：120 個預註冊候選、4 類策略、短線／中線／波段三種週期；目前只允許 synthetic fixtures。",
+        "PREPARED",
+    )
+    replace_pipeline_item(
+        pipeline,
+        "Strategy Edge Validation V0.1",
+        "六項 anti-overfitting 與驗證方法已準備；最強結果也只進入人工審查，不會自動晉升模型。",
+        "PREPARED",
+    )
     dashboard["pipeline"] = pipeline
 
     gates_raw = dashboard.get("gates") or []
@@ -649,6 +765,14 @@ def main() -> int:
         "FAIL",
         "danger",
         True,
+    )
+    upsert_gate(
+        gates,
+        "Funding R2 Materialization",
+        "正式 run 32168151926 已完成 192/192 identities post-write 驗證；HYPEUSDT 2026 仍維持 deferred。",
+        "PASS",
+        "pass",
+        False,
     )
     upsert_gate(
         gates,
@@ -678,6 +802,22 @@ def main() -> int:
         gates,
         "Replacement Holdout",
         "2026-08-28 至 2026-09-03 維持 FROZEN_UNOPENED；metadata capture 不等於 holdout-access authority。",
+        "NOT_AUTHORIZED",
+        "blocked",
+        True,
+    )
+    upsert_gate(
+        gates,
+        "策略研究執行",
+        "Strategy Research Loop 僅準備合成測試；沒有 production dataset、provider、R2、workflow 或 schedule 執行權限。",
+        "NOT_AUTHORIZED",
+        "blocked",
+        True,
+    )
+    upsert_gate(
+        gates,
+        "策略自動晉升",
+        "Edge PASS 也只能產生人工審查資格；model promotion authority 維持 0。",
         "NOT_AUTHORIZED",
         "blocked",
         True,

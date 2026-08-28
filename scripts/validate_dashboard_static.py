@@ -112,8 +112,8 @@ def main() -> int:
             raise RuntimeError("dashboard research calendar generation time is invalid") from exc
     calendar_items = calendar.get("items") or []
     expected_calendar_ids = {
-        "bounded-dual-track",
         "v0-10-metadata-window",
+        "strategy-research-loop-v0-1",
         "detailed-history-backfill",
         "sstate-evidence-calibration",
         "continuous-learning-target",
@@ -133,6 +133,8 @@ def main() -> int:
     for required_source in (
         "PROJECT_STATUS.md",
         "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
+        "config/strategy_edge_validation_v0_1.json",
+        "config/strategy_research_loop_v0_1.json",
         "docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md",
         "docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md",
     ):

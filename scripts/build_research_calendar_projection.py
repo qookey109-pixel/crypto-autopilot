@@ -13,6 +13,8 @@ SUCCESSOR_SCHEDULE = Path("config/post_window_research_successor_schedule_v0_1.j
 PROJECT_STATUS = Path("PROJECT_STATUS.md")
 ROADMAP = Path("docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md")
 SSTATE_INGESTION = Path("docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md")
+STRATEGY_EDGE = Path("config/strategy_edge_validation_v0_1.json")
+STRATEGY_RESEARCH_LOOP = Path("config/strategy_research_loop_v0_1.json")
 
 SOURCE_AUTHORITIES = (
     PROJECT_STATUS,
@@ -21,6 +23,8 @@ SOURCE_AUTHORITIES = (
     SUCCESSOR_SCHEDULE,
     ROADMAP,
     SSTATE_INGESTION,
+    STRATEGY_EDGE,
+    STRATEGY_RESEARCH_LOOP,
 )
 
 
@@ -75,6 +79,8 @@ def build_projection(*, generated_at_utc: str | None = None) -> dict[str, object
     v0_10 = load_json(V0_10_CUTOVER)
     detailed = load_json(DETAILED_HISTORY)
     successor = load_json(SUCCESSOR_SCHEDULE)
+    strategy_edge = load_json(STRATEGY_EDGE)
+    strategy_research = load_json(STRATEGY_RESEARCH_LOOP)
     project_status = PROJECT_STATUS.read_text(encoding="utf-8")
     roadmap = ROADMAP.read_text(encoding="utf-8")
     sstate = SSTATE_INGESTION.read_text(encoding="utf-8")
@@ -120,6 +126,31 @@ def build_projection(*, generated_at_utc: str | None = None) -> dict[str, object
     if not successor_authority or any(value is not False for value in successor_authority.values()):
         raise RuntimeError("prepared successor schedule gained runtime authority")
 
+    if strategy_edge.get("status") != "PREPARED_RESEARCH_ONLY":
+        raise RuntimeError("Strategy Edge state changed")
+    if strategy_research.get("status") != "PREPARED_RESEARCH_ONLY":
+        raise RuntimeError("Strategy Research Loop state changed")
+    candidate_search = require_dict(
+        strategy_research.get("candidate_search"), "strategy candidate_search"
+    )
+    if candidate_search.get("expected_candidate_count") != 120:
+        raise RuntimeError("Strategy Research Loop candidate count changed")
+    if candidate_search.get("execution_authorized") is not False:
+        raise RuntimeError("Strategy Research Loop execution became authorized")
+    for payload, label in (
+        (require_dict(strategy_edge.get("authority"), "strategy edge authority"), "edge"),
+        (
+            require_dict(strategy_research.get("authority"), "strategy research authority"),
+            "research",
+        ),
+    ):
+        if payload.get("replacement_holdout_access_authorized") is not False:
+            raise RuntimeError(f"Strategy {label} unexpectedly authorizes holdout access")
+        if payload.get("backtest_admission_authorized") is not False:
+            raise RuntimeError(f"Strategy {label} unexpectedly authorizes backtest admission")
+        if payload.get("live_trading_authorized") is not False:
+            raise RuntimeError(f"Strategy {label} unexpectedly authorizes live trading")
+
     required_status_markers = (
         "V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE",
         "REPLACEMENT HOLDOUT FROZEN_UNOPENED",
@@ -144,24 +175,24 @@ def build_projection(*, generated_at_utc: str | None = None) -> dict[str, object
         "sourceAuthorities": [str(path) for path in SOURCE_AUTHORITIES],
         "items": [
             {
-                "id": "bounded-dual-track",
-                "windowLabel": "NOW → 08/27 08:00",
-                "title": "既有雙軌研究",
-                "detail": "Pionex 紙上訓練與 Binance Spot 研究維持既有邊界；到時停止 provider 讀取。",
-                "status": "AUTHORIZED",
-                "startsAtUtc": None,
-                "endsAtUtc": v0_start.isoformat().replace("+00:00", "Z"),
-                "kind": "window",
-            },
-            {
                 "id": "v0-10-metadata-window",
-                "windowLabel": "08/27 08:00 → 09/04 09:59",
-                "title": "V0.10 Metadata-only",
-                "detail": "Frozen window；只收集版本化 metadata，不開啟 holdout candle 或第二條執行路徑。",
+                "windowLabel": "CURRENT · 08/27 08:00 → 09/04 09:59",
+                "title": "V0.10 Metadata Capture",
+                "detail": "目前正式階段；PR #201 的 :17／:47 排程重註冊已生效，但缺漏與失敗仍保留為證據。只收集 metadata，不開啟 holdout candle。",
                 "status": "AUTHORIZED",
                 "startsAtUtc": v0_start.isoformat().replace("+00:00", "Z"),
                 "endsAtUtc": v0_end.isoformat(timespec="milliseconds").replace("+00:00", "Z"),
                 "kind": "window",
+            },
+            {
+                "id": "strategy-research-loop-v0-1",
+                "windowLabel": "PR #204 MERGED · SYNTHETIC ONLY",
+                "title": "策略研究閉環 V0.1",
+                "detail": "120 個預註冊候選、4 類策略與短線／中線／波段三週期已準備；目前沒有 production dataset 執行或模型晉升權限。",
+                "status": "PREPARED",
+                "startsAtUtc": None,
+                "endsAtUtc": None,
+                "kind": "dependency",
             },
             {
                 "id": "detailed-history-backfill",

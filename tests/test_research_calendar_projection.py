@@ -47,6 +47,14 @@ def test_checked_in_calendar_is_derived_from_versioned_sources() -> None:
     detailed = next(
         item for item in checked_in["items"] if item["id"] == "detailed-history-backfill"
     )
+    current = checked_in["items"][0]
+    assert current["id"] == "v0-10-metadata-window"
+    assert current["status"] == "AUTHORIZED"
+    strategy_loop = next(
+        item for item in checked_in["items"] if item["id"] == "strategy-research-loop-v0-1"
+    )
+    assert strategy_loop["status"] == "PREPARED"
+    assert "120" in strategy_loop["detail"]
     assert detailed["startsAtUtc"] == "2026-09-04T06:23:00Z"
     assert detailed["endsAtUtc"] == "2026-10-01T00:00:00Z"
 
@@ -62,6 +70,19 @@ def test_calendar_fails_closed_if_prepared_successor_gains_authority(
 
     with pytest.raises(RuntimeError, match="gained runtime authority"):
         calendar_builder.build_projection(generated_at_utc="2026-08-26T00:00:00Z")
+
+
+def test_calendar_fails_closed_if_strategy_research_execution_is_enabled(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = json.loads(calendar_builder.STRATEGY_RESEARCH_LOOP.read_text(encoding="utf-8"))
+    source["candidate_search"]["execution_authorized"] = True
+    changed = tmp_path / "strategy-research.json"
+    changed.write_text(json.dumps(source), encoding="utf-8")
+    monkeypatch.setattr(calendar_builder, "STRATEGY_RESEARCH_LOOP", changed)
+
+    with pytest.raises(RuntimeError, match="execution became authorized"):
+        calendar_builder.build_projection(generated_at_utc="2026-08-28T00:00:00Z")
 
 
 def test_dashboard_generation_time_must_be_explicit_utc() -> None:

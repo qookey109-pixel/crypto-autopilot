@@ -24,6 +24,10 @@ on:
       - "research/receipts/2026-08-20-provider-equivalence-v0-9-render-relay-smoke-pass.json"
       - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
       - "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
+      - "config/strategy_edge_validation_v0_1.json"
+      - "research/receipts/2026-08-28-strategy-edge-validation-v0-1-prepared.json"
+      - "config/strategy_research_loop_v0_1.json"
+      - "research/receipts/2026-08-28-strategy-research-loop-v0-1-prepared.json"
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - "research/receipts/2026-08-18-historical-universe-long-horizon-review.json"
@@ -104,6 +108,14 @@ jobs:
           assert project['metadataCapturePathsConcurrentAuthorized'] is False
           assert project['replacementHoldoutState'] == 'FROZEN_UNOPENED'
           assert project['metadataStabilityState'] == 'NOT_YET_RUN'
+          assert project['strategyResearchLoopState'] == 'PREPARED_RESEARCH_ONLY'
+          assert project['strategyResearchCandidateCount'] == 120
+          assert project['strategyResearchFamilyCount'] == 4
+          assert project['strategyResearchHorizonCount'] == 3
+          assert project['strategyEdgeValidationState'] == 'PREPARED_RESEARCH_ONLY'
+          assert project['strategyEdgeMethodCount'] == 6
+          assert project['strategyResearchExecutionAuthorized'] is False
+          assert project['strategyModelPromotionAuthority'] == 0
           assert project['tradePlanAuthorized'] is False
           assert project['liveTradingAuthorized'] is False
           assert data['securityBoundary']['containsSecrets'] is False

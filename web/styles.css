@@ -91,6 +91,7 @@ h1, h2, h3 { font-family: var(--font-ui); font-weight: 600; letter-spacing: -.02
 .strategy-summary { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; background: rgba(255,255,255,.95); }
 .strategy-summary h2 { margin: 0 0 10px; font-size: 36px; line-height: 1.12; }
 .strategy-summary p:last-child { max-width: 680px; margin: 0; color: var(--muted); font-size: 16px; }
+.research-loop-summary { margin-top: 16px; background: rgba(255,255,255,.95); box-shadow: inset 4px 0 0 var(--accent-contrast), var(--shadow-sm); }
 .strategy-meta { display: grid; justify-items: end; gap: 10px; }
 .strategy-meta small { color: var(--muted); font-size: 13px; }
 .sstate-explainer { margin-top: 16px; display: grid; grid-template-columns: minmax(260px,.78fr) minmax(0,1.4fr); gap: 28px; background: rgba(255,255,255,.95); }

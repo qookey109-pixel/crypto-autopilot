@@ -1,78 +1,80 @@
 {
-  "schema": "qookey-research-calendar-projection-v0.1",
   "authority": false,
+  "items": [
+    {
+      "detail": "目前正式階段；PR #201 的 :17／:47 排程重註冊已生效，但缺漏與失敗仍保留為證據。只收集 metadata，不開啟 holdout candle。",
+      "endsAtUtc": "2026-09-04T01:59:59.999Z",
+      "id": "v0-10-metadata-window",
+      "kind": "window",
+      "startsAtUtc": "2026-08-27T00:00:00Z",
+      "status": "AUTHORIZED",
+      "title": "V0.10 Metadata Capture",
+      "windowLabel": "CURRENT · 08/27 08:00 → 09/04 09:59"
+    },
+    {
+      "detail": "120 個預註冊候選、4 類策略與短線／中線／波段三週期已準備；目前沒有 production dataset 執行或模型晉升權限。",
+      "endsAtUtc": null,
+      "id": "strategy-research-loop-v0-1",
+      "kind": "dependency",
+      "startsAtUtc": null,
+      "status": "PREPARED",
+      "title": "策略研究閉環 V0.1",
+      "windowLabel": "PR #204 MERGED · SYNTHETIC ONLY"
+    },
+    {
+      "detail": "已授權、尚未開始；25 個可續跑分片，Binance USD-M 15m／1h／4h 資料只進 R2。",
+      "endsAtUtc": "2026-10-01T00:00:00Z",
+      "id": "detailed-history-backfill",
+      "kind": "window",
+      "startsAtUtc": "2026-09-04T06:23:00Z",
+      "status": "AUTHORIZED",
+      "title": "250 市場歷史回補",
+      "windowLabel": "首個符合排程 09/04 14:23"
+    },
+    {
+      "detail": "必須先取得具真實可用時間的歷史 SState 證據；不得補造狀態，也不得把 60% 當交易勝率。",
+      "endsAtUtc": null,
+      "id": "sstate-evidence-calibration",
+      "kind": "dependency",
+      "startsAtUtc": null,
+      "status": "NOT_READY",
+      "title": "SState 證據與校準",
+      "windowLabel": "DEPENDENCY GATE"
+    },
+    {
+      "detail": "工程目標，不是執行 authority、獲利承諾或模型自動晉升；完成仍需逐項證據。",
+      "id": "continuous-learning-target",
+      "kind": "target",
+      "status": "PREPARED",
+      "targetAtUtc": "2026-09-30T15:59:59.999Z",
+      "title": "研究型閉環",
+      "windowLabel": "ENGINEERING TARGET 09/30"
+    }
+  ],
   "locale": "zh-Hant-TW",
-  "timezone": "Asia/Taipei",
   "projectionGeneratedAtUtc": null,
+  "safetyBoundary": {
+    "automaticActivation": false,
+    "automaticModelPromotionAuthorized": false,
+    "backtestAdmissionAuthorized": false,
+    "holdoutAccessAuthorized": false,
+    "liveTradingAuthorized": false,
+    "providerAccessAuthorized": false,
+    "r2ReadAuthorized": false,
+    "r2WriteAuthorized": false,
+    "realMoneyOrderAuthorized": false,
+    "tradePlanAuthorized": false
+  },
+  "schema": "qookey-research-calendar-projection-v0.1",
   "sourceAuthorities": [
     "PROJECT_STATUS.md",
     "config/binance_usdm_detailed_history_v0_1_1.json",
     "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
     "config/post_window_research_successor_schedule_v0_1.json",
     "docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md",
-    "docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md"
+    "docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md",
+    "config/strategy_edge_validation_v0_1.json",
+    "config/strategy_research_loop_v0_1.json"
   ],
-  "items": [
-    {
-      "id": "bounded-dual-track",
-      "windowLabel": "NOW → 08/27 08:00",
-      "title": "既有雙軌研究",
-      "detail": "Pionex 紙上訓練與 Binance Spot 研究維持既有邊界；到時停止 provider 讀取。",
-      "status": "AUTHORIZED",
-      "startsAtUtc": null,
-      "endsAtUtc": "2026-08-27T00:00:00Z",
-      "kind": "window"
-    },
-    {
-      "id": "v0-10-metadata-window",
-      "windowLabel": "08/27 08:00 → 09/04 09:59",
-      "title": "V0.10 Metadata-only",
-      "detail": "Frozen window；只收集版本化 metadata，不開啟 holdout candle 或第二條執行路徑。",
-      "status": "AUTHORIZED",
-      "startsAtUtc": "2026-08-27T00:00:00Z",
-      "endsAtUtc": "2026-09-04T01:59:59.999Z",
-      "kind": "window"
-    },
-    {
-      "id": "detailed-history-backfill",
-      "windowLabel": "首個符合排程 09/04 14:23",
-      "title": "250 市場歷史回補",
-      "detail": "已授權、尚未開始；25 個可續跑分片，Binance USD-M 15m／1h／4h 資料只進 R2。",
-      "status": "AUTHORIZED",
-      "startsAtUtc": "2026-09-04T06:23:00Z",
-      "endsAtUtc": "2026-10-01T00:00:00Z",
-      "kind": "window"
-    },
-    {
-      "id": "sstate-evidence-calibration",
-      "windowLabel": "DEPENDENCY GATE",
-      "title": "SState 證據與校準",
-      "detail": "必須先取得具真實可用時間的歷史 SState 證據；不得補造狀態，也不得把 60% 當交易勝率。",
-      "status": "NOT_READY",
-      "startsAtUtc": null,
-      "endsAtUtc": null,
-      "kind": "dependency"
-    },
-    {
-      "id": "continuous-learning-target",
-      "windowLabel": "ENGINEERING TARGET 09/30",
-      "title": "研究型閉環",
-      "detail": "工程目標，不是執行 authority、獲利承諾或模型自動晉升；完成仍需逐項證據。",
-      "status": "PREPARED",
-      "targetAtUtc": "2026-09-30T15:59:59.999Z",
-      "kind": "target"
-    }
-  ],
-  "safetyBoundary": {
-    "automaticActivation": false,
-    "providerAccessAuthorized": false,
-    "r2ReadAuthorized": false,
-    "r2WriteAuthorized": false,
-    "holdoutAccessAuthorized": false,
-    "backtestAdmissionAuthorized": false,
-    "automaticModelPromotionAuthorized": false,
-    "tradePlanAuthorized": false,
-    "realMoneyOrderAuthorized": false,
-    "liveTradingAuthorized": false
-  }
+  "timezone": "Asia/Taipei"
 }

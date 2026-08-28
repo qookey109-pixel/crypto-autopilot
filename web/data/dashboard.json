@@ -1,94 +1,385 @@
 {
-  "schema": "qookey-dashboard-safe-fixture-v0.10",
   "authority": false,
-  "locale": "zh-Hant-TW",
+  "gates": [
+    {
+      "critical": false,
+      "detail": "最新 frozen inventory 22.120404 MB / 457 objects；每次 V0.10 metadata write 前須 fresh whole-bucket inventory，8 GB hard stop fail closed。",
+      "name": "R2 儲存預算",
+      "status": "PASS",
+      "tone": "pass"
+    },
+    {
+      "critical": true,
+      "detail": "V0.1 Gate 正式 FAIL：45 pairs 中 9 FAIL；不得降低 frozen thresholds，也不得以 Binance 改寫 Pionex provenance。",
+      "name": "Provider 等價性",
+      "status": "FAIL",
+      "tone": "danger"
+    },
+    {
+      "critical": false,
+      "detail": "Atomic old/new cutover 已生效；V0.10 只授權 frozen-window metadata capture 與 metadata-only R2 writes。",
+      "name": "V0.10 Metadata Cutover",
+      "status": "AUTHORIZED",
+      "tone": "pass"
+    },
+    {
+      "critical": true,
+      "detail": "194 個 UTC hourly slots 尚未完成；完整 stability review 前不得進入 replacement holdout candle access。",
+      "name": "Metadata Stability",
+      "status": "PENDING",
+      "tone": "pending"
+    },
+    {
+      "critical": true,
+      "detail": "2026-08-28 至 2026-09-03 維持 FROZEN_UNOPENED；metadata capture 不等於 holdout-access authority。",
+      "name": "Replacement Holdout",
+      "status": "NOT_AUTHORIZED",
+      "tone": "blocked"
+    },
+    {
+      "critical": true,
+      "detail": "Review PASS 不等於正式 membership authority。",
+      "name": "歷史 Universe",
+      "status": "NOT_READY",
+      "tone": "pending"
+    },
+    {
+      "critical": false,
+      "detail": "2026 年度 partition 因官方 cadence gap defer，禁止插值或跨 provider 補值。",
+      "name": "HYPEUSDT 2026 Funding",
+      "status": "REVIEW_REQUIRED",
+      "tone": "pending"
+    },
+    {
+      "critical": true,
+      "detail": "沒有真實資金下單或私人 execution route 授權。",
+      "name": "真實交易",
+      "status": "NOT_AUTHORIZED",
+      "tone": "blocked"
+    },
+    {
+      "critical": false,
+      "detail": "V0.10 atomic cutover 已生效：V0.2 schedule retired、V0.10 schedule authorized；concurrent capture path 仍禁止。",
+      "name": "Render Metadata Cutover",
+      "status": "AUTHORIZED",
+      "tone": "pass"
+    },
+    {
+      "critical": true,
+      "detail": "Strategy Research Loop 僅準備合成測試；沒有 production dataset、provider、R2、workflow 或 schedule 執行權限。",
+      "name": "策略研究執行",
+      "status": "NOT_AUTHORIZED",
+      "tone": "blocked"
+    },
+    {
+      "critical": true,
+      "detail": "Edge PASS 也只能產生人工審查資格；model promotion authority 維持 0。",
+      "name": "策略自動晉升",
+      "status": "NOT_AUTHORIZED",
+      "tone": "blocked"
+    },
+    {
+      "critical": false,
+      "detail": "正式 run 32168151926 已完成 192/192 identities post-write 驗證；HYPEUSDT 2026 仍維持 deferred。",
+      "name": "Funding R2 Materialization",
+      "status": "PASS",
+      "tone": "pass"
+    }
+  ],
   "generatedAtUtc": null,
-  "snapshotLabel": "安全測試資料 · 非正式 Authority · V0.10 effective shape",
+  "locale": "zh-Hant-TW",
+  "markets": [
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "BTCUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "ETHUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "SOLUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "REVIEW_REQUIRED",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "REVIEW_REQUIRED",
+      "symbol": "HYPEUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "ADAUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "BNBUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "UNIUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "XRPUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "LTCUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "LINKUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "DOGEUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "AAVEUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "AVAXUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "INJUSDT",
+      "trade": "PASS"
+    },
+    {
+      "funding": "PASS",
+      "mark": "PASS",
+      "provider": "BINANCE USD-M",
+      "status": "READY",
+      "symbol": "SUIUSDT",
+      "trade": "PASS"
+    }
+  ],
+  "pipeline": [
+    {
+      "detail": "15 個標的、15M / 60M / 4H 凍結證據",
+      "name": "Pionex M1A 資料集",
+      "status": "PASS"
+    },
+    {
+      "detail": "2025 Trade-Kline provider-separated R2 pilot 已完成",
+      "name": "Binance 2025 R2 資料",
+      "status": "PASS"
+    },
+    {
+      "detail": "正式 run 32168151926 已完成：192/192 identities post-write 驗證 PASS；HYPEUSDT 2026 仍維持 deferred。",
+      "name": "Funding V0.2 實際 R2 Materialization",
+      "status": "PASS"
+    },
+    {
+      "detail": "最新 frozen read-only inventory：457 objects / 22.120404 MB；V0.10 每次 metadata write 前仍需 fresh whole-bucket headroom check。",
+      "name": "R2 實際使用容量",
+      "status": "PASS"
+    },
+    {
+      "detail": "凍結 V0.1 已完成 45/45 pairs：18 PASS / 18 REVIEW / 9 FAIL；source switch 與 W1 materialization 維持未授權。",
+      "name": "Pionex ↔ Binance 等價性",
+      "status": "FAIL"
+    },
+    {
+      "detail": "V0.5 Frankfurt transport PASS；V0.6 successor transport authority PASS；公開 exchangeInfo sanitized evidence symbol_count=872。",
+      "name": "Render Free Binance Transport",
+      "status": "PASS"
+    },
+    {
+      "detail": "Shared-secret handshake 與 authenticated Render relay smoke 均已 PASS 並凍結為 regression-only evidence。",
+      "name": "V0.8 Shared Secret / V0.9 Smoke",
+      "status": "PASS"
+    },
+    {
+      "detail": "PR #127 已合併；V0.2 self-hosted schedule 已退役，V0.10 GitHub-hosted schedule 已成為 current metadata execution path。",
+      "name": "V0.10 Metadata Atomic Cutover",
+      "status": "AUTHORIZED"
+    },
+    {
+      "detail": "Frozen window 2026-08-27 至 2026-09-04；完整 194-slot stability evidence 尚未完成。",
+      "name": "Metadata Stability 194 Slots",
+      "status": "PENDING"
+    },
+    {
+      "detail": "Long-horizon review 已 PASS，但 membership evidence 尚未完成。",
+      "name": "歷史 Universe Membership",
+      "status": "NOT_READY"
+    },
+    {
+      "detail": "歷史 prepared authority 保留；V0.7 raw relay 仍 hard-disabled，不是 current execution path。",
+      "name": "Render Metadata V0.7 Protocol",
+      "status": "PREPARED"
+    },
+    {
+      "detail": "歷史 prepared contract 保留；shared-secret handshake 已 PASS 並凍結。V0.10 已接手 effective execution authority。",
+      "name": "Render Metadata V0.8 Cutover",
+      "status": "PASS"
+    },
+    {
+      "detail": "PR #201 已合併至 protected main；等價的 :17/:47 schedule registration text 已生效。先前缺漏與失敗仍保留，Pionex failure root cause 仍未確認。",
+      "name": "V0.10 Schedule Re-registration",
+      "status": "EFFECTIVE"
+    },
+    {
+      "detail": "PR #204 已合併：120 個預註冊候選、4 類策略、短線／中線／波段三種週期；目前只允許 synthetic fixtures。",
+      "name": "Strategy Research Loop V0.1",
+      "status": "PREPARED"
+    },
+    {
+      "detail": "六項 anti-overfitting 與驗證方法已準備；最強結果也只進入人工審查，不會自動晉升模型。",
+      "name": "Strategy Edge Validation V0.1",
+      "status": "PREPARED"
+    }
+  ],
   "project": {
-    "name": "Qookey Crypto Autopilot",
-    "mode": "PAPER-ONLY",
-    "marketCount": 15,
-    "fundingMonthsObserved": 1010,
-    "fundingV0_2StorageAuthorized": true,
-    "fundingWriterReady": true,
-    "fundingWriterState": "READY",
+    "cloudRuntimeMonthlyBudgetUsd": 0,
+    "currentMetadataCaptureBinanceTransport": "render_free_frankfurt_v0_10_relay",
+    "currentMetadataCaptureExecutionPath": "github_hosted_ubuntu_v0_10",
     "fundingFullPreflightPass": true,
     "fundingMaterializationComplete": true,
     "fundingMaterializationState": "PASS",
-    "fundingV0_2SourceMonths": 1003,
+    "fundingMonthsObserved": 1010,
     "fundingV0_2AnnualObjects": 94,
-    "fundingV0_2R2Identities": 192,
-    "fundingV0_2UploadedObjectCount": 192,
-    "fundingV0_2Observations": 91747,
     "fundingV0_2LocalParquetBytes": 1138749,
-    "r2BucketObjectCount": 457,
-    "r2BucketBytes": 22120404,
+    "fundingV0_2Observations": 91747,
+    "fundingV0_2R2Identities": 192,
+    "fundingV0_2SourceMonths": 1003,
+    "fundingV0_2StorageAuthorized": true,
+    "fundingV0_2UploadedObjectCount": 192,
+    "fundingV0_2VerifiedExistingObjectCount": 0,
+    "fundingWriterReady": true,
+    "fundingWriterState": "READY",
+    "liveTradingAuthorized": false,
+    "marketCount": 15,
+    "metadataCaptureEndUtc": "2026-09-04T01:59:59.999Z",
+    "metadataCaptureHourlySlotCount": 194,
+    "metadataCapturePathsConcurrentAuthorized": false,
+    "metadataCaptureScheduledMinutesUtc": [
+      17,
+      47
+    ],
+    "metadataCaptureStartUtc": "2026-08-27T00:00:00Z",
+    "metadataStabilityState": "NOT_YET_RUN",
+    "mode": "PAPER-ONLY",
+    "name": "Qookey Crypto Autopilot",
+    "oldV0_2ScheduledExecutionAuthorized": false,
+    "providerEquivalenceFailCount": 9,
     "providerEquivalenceGateState": "FAIL",
     "providerEquivalencePassCount": 18,
     "providerEquivalenceReviewCount": 18,
-    "providerEquivalenceFailCount": 9,
-    "renderTransportV0_5State": "PASS",
-    "renderTransportV0_6AuthorityState": "PASS",
+    "r2BucketBytes": 22120404,
+    "r2BucketMBDecimal": 22.120404,
+    "r2BucketMiBBinary": 21.095661,
+    "r2BucketObjectCount": 457,
+    "renderMetadataV0_10CutoverState": "EFFECTIVE_AUTHORIZED",
     "renderMetadataV0_7State": "HISTORICAL_PREPARED_EXECUTION_NOT_AUTHORIZED",
     "renderMetadataV0_8CutoverState": "HISTORICAL_PREPARED_EXECUTION_NOT_AUTHORIZED",
     "renderMetadataV0_8SharedSecretState": "PASS_FROZEN",
     "renderMetadataV0_9SmokeState": "PASS_FROZEN",
-    "renderMetadataV0_10CutoverState": "EFFECTIVE_AUTHORIZED",
-    "metadataStabilityState": "NOT_YET_RUN",
+    "renderTransportV0_5State": "PASS",
+    "renderTransportV0_6AuthorityState": "PASS",
     "replacementHoldoutState": "FROZEN_UNOPENED",
-    "currentMetadataCaptureExecutionPath": "github_hosted_ubuntu_v0_10",
-    "currentMetadataCaptureBinanceTransport": "render_free_frankfurt_v0_10_relay",
-    "oldV0_2ScheduledExecutionAuthorized": false,
+    "sourceSwitchAuthorized": false,
+    "strategyEdgeMethodCount": 6,
+    "strategyEdgeValidationState": "PREPARED_RESEARCH_ONLY",
+    "strategyModelPromotionAuthority": 0,
+    "strategyResearchCandidateCount": 120,
+    "strategyResearchExecutionAuthorized": false,
+    "strategyResearchFamilyCount": 4,
+    "strategyResearchHorizonCount": 3,
+    "strategyResearchLoopState": "PREPARED_RESEARCH_ONLY",
     "successorMetadataCaptureExecutionAuthorized": true,
     "successorMetadataScheduleEnabled": true,
-    "metadataCapturePathsConcurrentAuthorized": false,
-    "metadataCaptureStartUtc": "2026-08-27T00:00:00Z",
-    "metadataCaptureEndUtc": "2026-09-04T01:59:59.999Z",
-    "metadataCaptureHourlySlotCount": 194,
-    "metadataCaptureScheduledMinutesUtc": [17, 47],
-    "cloudRuntimeMonthlyBudgetUsd": 0,
-    "sourceSwitchAuthorized": false,
     "tradeKlineW1MaterializationAuthorized": false,
     "tradePlanAuthorized": false,
-    "liveTradingAuthorized": false
+    "v0_10EmergencyScheduleRegistrationMergeSha": "cf83b6320bc0f0817d8e6ae15d88fe304b933330",
+    "v0_10EmergencyScheduleRegistrationState": "EFFECTIVE"
   },
-  "pipeline": [
-    {"name":"Pionex M1A 資料集","detail":"15 個標的、15M / 60M / 4H 凍結證據","status":"PASS"},
-    {"name":"Binance 2025 R2 資料","detail":"2025 Trade-Kline provider-separated R2 pilot 已完成","status":"PASS"},
-    {"name":"Funding V0.2 實際 R2 Materialization","detail":"192/192 authorized identities post-write verification 已完成；HYPEUSDT 2026 維持 deferred。","status":"PASS"},
-    {"name":"R2 實際使用容量","detail":"最新 frozen read-only inventory：457 objects / 22.120404 MB；V0.10 每次 metadata write 前仍需 fresh whole-bucket headroom check。","status":"PASS"},
-    {"name":"Pionex ↔ Binance 等價性","detail":"V0.1 45 pairs：18 PASS / 18 REVIEW / 9 FAIL；source switch 未授權。","status":"FAIL"},
-    {"name":"Render Free Binance Transport","detail":"V0.5 Frankfurt transport PASS；V0.6 successor transport authority PASS。","status":"PASS"},
-    {"name":"V0.8 Shared Secret / V0.9 Smoke","detail":"Shared-secret handshake 與 authenticated Render relay smoke 均已 PASS 並凍結為 regression-only evidence。","status":"PASS"},
-    {"name":"V0.10 Metadata Atomic Cutover","detail":"PR #127 已合併；V0.2 self-hosted schedule 已退役，V0.10 GitHub-hosted schedule 已成為 current metadata execution path。","status":"AUTHORIZED"},
-    {"name":"Metadata Stability 194 Slots","detail":"Frozen window 2026-08-27 至 2026-09-04；尚未開始完整 194-slot stability evidence。","status":"PENDING"},
-    {"name":"歷史 Universe Membership","detail":"Long-horizon review 已 PASS，但 membership evidence 尚未完成。","status":"NOT_READY"}
-  ],
-  "gates": [
-    {"name":"R2 儲存預算","detail":"每次 V0.10 metadata write 前必須 fresh whole-bucket inventory，超過 8 GB operational hard stop 即 fail closed。","status":"PASS","tone":"pass","critical":false},
-    {"name":"Provider 等價性","detail":"V0.1 正式 FAIL；不得降低 frozen thresholds 或改變 provenance。","status":"FAIL","tone":"danger","critical":true},
-    {"name":"V0.10 Metadata Cutover","detail":"Atomic old/new cutover 已生效；V0.2 scheduled path retired、V0.10 successor schedule authorized；concurrent path 仍禁止。","status":"AUTHORIZED","tone":"pass","critical":false},
-    {"name":"Metadata Stability","detail":"194 個 UTC hourly slots 尚未完成；在完整 stability review 前不得進入 holdout candle access。","status":"PENDING","tone":"pending","critical":true},
-    {"name":"Replacement Holdout","detail":"2026-08-28 至 2026-09-03 維持 FROZEN_UNOPENED；metadata capture 不等於 holdout access authority。","status":"NOT_AUTHORIZED","tone":"blocked","critical":true},
-    {"name":"歷史 Universe","detail":"Review PASS 不等於正式 membership authority。","status":"NOT_READY","tone":"pending","critical":true},
-    {"name":"HYPEUSDT 2026 Funding","detail":"2026 年度 partition 因官方 cadence gap defer，禁止插值或跨 provider 補值。","status":"REVIEW_REQUIRED","tone":"pending","critical":false},
-    {"name":"真實交易","detail":"沒有真實資金下單或私人 execution route 授權。","status":"NOT_AUTHORIZED","tone":"blocked","critical":true}
-  ],
-  "markets": [
-    {"symbol":"BTCUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"ETHUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"SOLUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"HYPEUSDT","trade":"PASS","mark":"PASS","funding":"REVIEW_REQUIRED","provider":"BINANCE USD-M","status":"REVIEW_REQUIRED"},
-    {"symbol":"ADAUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"BNBUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"UNIUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"XRPUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"LTCUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"LINKUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"DOGEUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"AAVEUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"AVAXUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"INJUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"},
-    {"symbol":"SUIUSDT","trade":"PASS","mark":"PASS","funding":"PASS","provider":"BINANCE USD-M","status":"READY"}
+  "schema": "qookey-dashboard-authority-snapshot-v0.10",
+  "securityBoundary": {
+    "authorizesHoldoutAccess": false,
+    "authorizesLiveTrading": false,
+    "authorizesMetadataCapture": true,
+    "authorizesPionexNativeRelabeling": false,
+    "authorizesSourceSwitch": false,
+    "authorizesTradePlans": false,
+    "containsPrivateExchangeResponses": false,
+    "containsSecrets": false
+  },
+  "snapshotLabel": "Repository 正式 Authority 狀態快照 · Equivalence V0.1 FAIL / Funding V0.2 R2 PASS / V0.10 Metadata Cutover EFFECTIVE / Schedule Re-registration EFFECTIVE / Strategy Research Loop PREPARED",
+  "sourceAuthorities": [
+    "research/receipts/2026-08-19-provider-equivalence-v0-5-render-free-transport-pass.json",
+    "research/receipts/2026-08-19-provider-equivalence-v0-6-render-transport-authority-transition.json",
+    "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json",
+    "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json",
+    "research/receipts/2026-08-19-provider-equivalence-v0-8-render-metadata-cutover-prepared.json",
+    "research/receipts/2026-08-19-provider-equivalence-v0-8-shared-relay-secret-handshake-pass.json",
+    "research/receipts/2026-08-20-provider-equivalence-v0-9-render-relay-smoke-pass.json",
+    "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
+    "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json",
+    "config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json",
+    "research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-effective.json",
+    "config/strategy_edge_validation_v0_1.json",
+    "research/receipts/2026-08-28-strategy-edge-validation-v0-1-prepared.json",
+    "config/strategy_research_loop_v0_1.json",
+    "research/receipts/2026-08-28-strategy-research-loop-v0-1-prepared.json",
+    ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml",
+    ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
   ]
 }

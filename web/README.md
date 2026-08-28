@@ -42,6 +42,7 @@ versioned Repository sources before publishing:
 
 ```text
 V0.10 cutover + Detailed History V0.1.1 + prepared successor schedule
+       + Strategy Research Loop / Edge configs
        + continuous-learning roadmap + SState evidence boundary
                  |
                  v
@@ -59,7 +60,7 @@ visibly unavailable.
 
 The generated deployed snapshot also declares `authority=false`. It is a **read-only normalized view** of Repository authority, not a new authority source. If the dashboard conflicts with `PROJECT_STATUS.md` or a frozen receipt/config, the Repository authority wins.
 
-Current generated status includes Funding V0.2 materialization PASS, frozen R2 usage inventory, Equivalence V0.1 definitive FAIL, Render V0.5/V0.6 transport evidence, V0.8 shared-secret PASS, V0.9 authenticated relay-smoke PASS, **V0.10 effective metadata-capture cutover**, metadata stability `NOT_YET_RUN`, replacement holdout `FROZEN_UNOPENED`, and PAPER-ONLY trading boundaries.
+Current generated status includes Funding V0.2 materialization PASS, frozen R2 usage inventory, Equivalence V0.1 definitive FAIL, Render V0.5/V0.6 transport evidence, V0.8 shared-secret PASS, V0.9 authenticated relay-smoke PASS, **V0.10 effective metadata-capture cutover**, PR #204 Strategy Research Loop / Edge Validation `PREPARED_RESEARCH_ONLY`, metadata stability `NOT_YET_RUN`, replacement holdout `FROZEN_UNOPENED`, and PAPER-ONLY trading boundaries.
 
 V0.11 metadata-stability evaluator rules are already **PREPARED / FROZEN BEFORE PRODUCTION EVIDENCE**, but production R2 evaluation is still unauthorized. Therefore the dashboard must continue to show metadata stability as `NOT_YET_RUN`; evaluator readiness is not a stability result.
 
@@ -113,6 +114,9 @@ the roadmap source and Repository authorities still win every conflict.
 The Strategy view also explains SState in plain language. It distinguishes the
 4H market-context gate from a trade signal or per-trade win probability and
 keeps incomplete historical SState evidence visibly `NOT READY`.
+It separately shows the latest PR #204 research layer: 120 pre-registered
+candidates across four families and three horizons, with six Edge validation
+methods. That layer remains synthetic-only and cannot promote a model.
 
 `web/data/research-evidence.json` defines the fail-closed display contract for
 Paper Positions and Backtest Evidence. The checked-in fixture contains no

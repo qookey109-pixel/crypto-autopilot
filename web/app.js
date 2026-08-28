@@ -388,6 +388,23 @@ function renderStrategy(strategy) {
   }
 }
 
+function renderStrategyResearch(project) {
+  if (!project || typeof project !== "object") return;
+  const setText = (id, value) => {
+    const element = document.querySelector(`#${id}`);
+    if (element) element.textContent = value;
+  };
+  const status = String(project.strategyResearchLoopState || "NOT_READY");
+  setText(
+    "strategy-research-status",
+    status === "PREPARED_RESEARCH_ONLY" ? "PREPARED · SYNTHETIC ONLY" : displayStatus(status)
+  );
+  setText("strategy-research-candidates", number(project.strategyResearchCandidateCount, 0));
+  setText("strategy-research-families", number(project.strategyResearchFamilyCount, 0));
+  setText("strategy-research-horizons", number(project.strategyResearchHorizonCount, 0));
+  setText("strategy-edge-methods", number(project.strategyEdgeMethodCount, 0));
+}
+
 function upsertByName(items, additions) {
   const merged = [...items];
   additions.forEach(addition => {
@@ -428,6 +445,7 @@ function render(data) {
   renderCriticalGates(data.gates || []);
   renderAllGates(data.gates || []);
   renderMarkets(data.markets || []);
+  renderStrategyResearch(data.project || {});
 }
 
 async function fetchJson(path) {
