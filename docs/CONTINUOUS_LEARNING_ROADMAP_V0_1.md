@@ -60,7 +60,8 @@ A separate versioned authority must activate the already prepared cadence:
 - every four hours: append only latest complete candles, with provider/time
   lineage and no historical revision;
 - weekly: bounded V0.6 Shadow feature-group ablation, probability calibration,
-  chronological walk-forward and fee/slippage/drawdown/exposure checks;
+  chronological walk-forward, fee/slippage/drawdown/exposure checks and the
+  prepared Strategy Edge Validation V0.1 anti-overfitting battery;
 - monthly: feature/label drift, market-universe review, catalog absence,
   survivorship limitations and tokenized-stock classification review;
 - ongoing: immutable experiment registry and dataset/config/feature/environment
@@ -75,9 +76,11 @@ true:
 2. rolling closed-candle append authority is effective and idempotent;
 3. Shadow training produces deterministic PASS or REJECT evidence on schedule;
 4. calibration, cost, drawdown, exposure and drift outputs are persisted online;
-5. automation health distinguishes expected waiting from stale or failed runs;
-6. the dashboard projects the latest safe status without becoming authority;
-7. model promotion, holdout access and trading remain separately gated.
+5. the complete trial family and disjoint-validation evidence produce a
+   deterministic Strategy Edge `PASS` or `REJECT` without automatic promotion;
+6. automation health distinguishes expected waiting from stale or failed runs;
+7. the dashboard projects the latest safe status without becoming authority;
+8. model promotion, holdout access and trading remain separately gated.
 
 The date `2026-09-30` is an engineering target, not a profitability promise.
 No system can credibly target 100% predictive accuracy; the objective is better
