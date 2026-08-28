@@ -3,7 +3,8 @@ const FALLBACK = {
   project: { marketCount: 15, fundingMonths: 1010 },
   pipeline: [],
   gates: [],
-  markets: []
+  markets: [],
+  calendar: []
 };
 
 const state = { data: FALLBACK };
@@ -47,7 +48,7 @@ function pipelineRow(item) {
         <strong>${escapeHtml(item.name)}</strong>
         <span>${escapeHtml(item.detail)}</span>
       </div>
-      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${escapeHtml(item.status)}">${displayStatus(item.status)}</span>
+      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${escapeHtml(item.status)}">${escapeHtml(displayStatus(item.status))}</span>
     </div>
   `;
 }
@@ -71,7 +72,7 @@ function renderCriticalGates(items) {
     <div class="gate ${item.tone || "pending"}">
       <strong>${escapeHtml(item.name)}</strong>
       <small>${escapeHtml(item.detail)}</small>
-      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${escapeHtml(item.status)}">${displayStatus(item.status)}</span>
+      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${escapeHtml(item.status)}">${escapeHtml(displayStatus(item.status))}</span>
     </div>
   `).join("");
 }
@@ -82,7 +83,7 @@ function renderAllGates(items) {
     <div class="gate ${item.tone || "pending"}">
       <strong>${escapeHtml(item.name)}</strong>
       <small>${escapeHtml(item.detail)}</small>
-      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${escapeHtml(item.status)}">${displayStatus(item.status)}</span>
+      <span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${escapeHtml(item.status)}">${escapeHtml(displayStatus(item.status))}</span>
     </div>
   `).join("");
 }
@@ -91,12 +92,12 @@ function renderMarkets(items) {
   const root = document.querySelector("#market-table");
   root.innerHTML = items.map(item => `
     <tr>
-      <td><strong>${item.symbol}</strong></td>
-      <td class="${item.trade === "PASS" ? "cell-pass" : "cell-pending"}">${displayStatus(item.trade)}</td>
-      <td class="${item.mark === "PASS" ? "cell-pass" : "cell-pending"}">${displayStatus(item.mark)}</td>
-      <td class="${item.funding === "PASS" ? "cell-pass" : "cell-pending"}">${displayStatus(item.funding)}</td>
-      <td><span class="provider-tag ${item.provider === "PIONEX" ? "pionex" : "binance"}">${item.provider}</span></td>
-      <td><span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${item.status}">${displayStatus(item.status)}</span></td>
+      <td><strong>${escapeHtml(item.symbol)}</strong></td>
+      <td class="${item.trade === "PASS" ? "cell-pass" : "cell-pending"}">${escapeHtml(displayStatus(item.trade))}</td>
+      <td class="${item.mark === "PASS" ? "cell-pass" : "cell-pending"}">${escapeHtml(displayStatus(item.mark))}</td>
+      <td class="${item.funding === "PASS" ? "cell-pass" : "cell-pending"}">${escapeHtml(displayStatus(item.funding))}</td>
+      <td><span class="provider-tag ${item.provider === "PIONEX" ? "pionex" : "binance"}">${escapeHtml(item.provider)}</span></td>
+      <td><span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${escapeHtml(item.status)}">${escapeHtml(displayStatus(item.status))}</span></td>
     </tr>
   `).join("");
 }
@@ -111,6 +112,7 @@ function escapeHtml(value) {
 }
 
 function number(value, digits = 2) {
+  if (value === null || value === undefined || value === "") return "—";
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric.toLocaleString("zh-TW", { maximumFractionDigits: digits }) : "—";
 }
@@ -131,15 +133,105 @@ function formatTradeTime(value) {
   }).format(date);
 }
 
+function formatTrustedTime(value, missingLabel = "尚未提供") {
+  const formatted = formatTradeTime(value);
+  return formatted === "—" ? missingLabel : `${formatted}（台北）`;
+}
+
+function calendarTiming(item, now = Date.now()) {
+  const startsAt = item.startsAtUtc ? Date.parse(item.startsAtUtc) : NaN;
+  const endsAt = item.endsAtUtc ? Date.parse(item.endsAtUtc) : NaN;
+  const targetAt = item.targetAtUtc ? Date.parse(item.targetAtUtc) : NaN;
+  if (item.kind === "dependency") return { label: "依賴閘門", className: "dependency" };
+  if (Number.isFinite(targetAt)) {
+    return now > targetAt
+      ? { label: "目標日已到 · 待驗證", className: "waiting" }
+      : { label: "工程目標", className: "target" };
+  }
+  if (Number.isFinite(startsAt) && now < startsAt) return { label: "尚未開始", className: "upcoming" };
+  if (Number.isFinite(endsAt) && now > endsAt) return { label: "時段已結束 · 待證據", className: "waiting" };
+  if ((!Number.isFinite(startsAt) || now >= startsAt) && (!Number.isFinite(endsAt) || now <= endsAt)) {
+    return { label: "進行中", className: "active" };
+  }
+  return { label: "等待條件", className: "waiting" };
+}
+
+function renderCalendar(calendar) {
+  const root = document.querySelector("#research-calendar");
+  const generatedAt = document.querySelector("#calendar-generated-at");
+  if (!root) return;
+  const items = Array.isArray(calendar?.items) ? calendar.items : [];
+  if (!items.length) {
+    root.innerHTML = '<li class="calendar-loading"><strong>研究時程暫時無法讀取</strong><small>請以 Repository authority 為準</small></li>';
+    if (generatedAt) generatedAt.textContent = "行事曆投影：尚未提供";
+    return;
+  }
+  if (generatedAt) {
+    generatedAt.textContent = `行事曆投影：${formatTrustedTime(calendar.projectionGeneratedAtUtc)}`;
+  }
+  root.innerHTML = items.map(item => {
+    const timing = calendarTiming(item);
+    return `
+      <li class="calendar-card ${timing.className}">
+        <div class="calendar-card-top">
+          <span>${escapeHtml(item.windowLabel)}</span>
+          <span class="badge ${badgeClass(item.status)}">${escapeHtml(displayStatus(item.status))}</span>
+        </div>
+        <strong>${escapeHtml(item.title)}</strong>
+        <small>${escapeHtml(item.detail)}</small>
+        <em>${escapeHtml(timing.label)}</em>
+      </li>
+    `;
+  }).join("");
+}
+
+function renderEquityChart(report) {
+  const chart = document.querySelector("#paper-equity-chart");
+  const line = document.querySelector("#paper-equity-line");
+  const area = document.querySelector("#paper-equity-area");
+  const note = document.querySelector("#paper-equity-note");
+  if (!chart || !line || !area || !note) return;
+  const values = (Array.isArray(report?.equityCurve) ? report.equityCurve : [])
+    .map(Number)
+    .filter(Number.isFinite);
+  if (values.length < 2) {
+    chart.classList.add("no-data");
+    chart.setAttribute("aria-label", "尚無可繪製的模擬資產曲線");
+    line.setAttribute("d", "M0 150 H800");
+    area.setAttribute("d", "M0 150 H800 V230 H0 Z");
+    note.textContent = "完成至少一筆模擬成交後，才顯示真實產生的資產曲線。";
+    return;
+  }
+  const minimum = Math.min(...values);
+  const maximum = Math.max(...values);
+  const spread = maximum - minimum;
+  const x = index => (index / (values.length - 1)) * 800;
+  const y = value => spread === 0 ? 130 : 220 - ((value - minimum) / spread) * 180;
+  const path = values.map((value, index) => `${index === 0 ? "M" : "L"}${x(index).toFixed(2)} ${y(value).toFixed(2)}`).join(" ");
+  chart.classList.remove("no-data");
+  chart.setAttribute("aria-label", `模擬資產曲線，共 ${values.length} 個已記錄節點`);
+  line.setAttribute("d", path);
+  area.setAttribute("d", `${path} L800 230 L0 230 Z`);
+  note.textContent = `Trade-close equity · ${values.length} 個已記錄節點`;
+}
+
 function renderPaperTraining(report) {
-  if (!report || report.mode !== "PAPER_TRAINING_ONLY") return;
+  const observedAt = document.querySelector("#paper-observed-at");
+  if (!report || report.mode !== "PAPER_TRAINING_ONLY") {
+    if (observedAt) observedAt.textContent = "Paper 觀測：尚未完成";
+    return;
+  }
   const authority = report.authority || {};
   if (authority.liveTradingAuthorized === true || authority.realMoneyOrderAuthorized === true) {
     console.error("Unsafe paper-training projection rejected");
+    if (observedAt) observedAt.textContent = "Paper 觀測：資料契約未通過";
     return;
   }
   const metrics = report.metrics || {};
   const status = report.status || "PREPARED";
+  if (observedAt) {
+    observedAt.textContent = `Paper 觀測：${formatTrustedTime(report.observedAtUtc, "尚未完成")}`;
+  }
   document.querySelector("#paper-training-status").textContent = displayStatus(status);
   document.querySelector("#paper-training-summary").textContent =
     `${number(metrics.trade_count, 0)} 筆模擬交易 · 淨損益 ${number(metrics.net_pnl_usd)} USD · ${report.runId || "fixture"}`;
@@ -148,6 +240,7 @@ function renderPaperTraining(report) {
   document.querySelector("#paper-profit-factor").textContent = metrics.profit_factor == null ? "—" : number(metrics.profit_factor);
   document.querySelector("#paper-drawdown").textContent = `${number(metrics.max_drawdown_pct)}%`;
   document.querySelector("#paper-performance-note").textContent = report.interpretation || "Paper-only research evidence.";
+  renderEquityChart(report);
 
   const signals = report.latestCandidates || [];
   document.querySelector("#paper-signal-table").innerHTML = signals.length ? signals.map(item => `
@@ -172,6 +265,77 @@ function renderPaperTraining(report) {
       <td class="${Number(item.net_pnl_usd) >= 0 ? "cell-pass" : "cell-pending"}">${number(item.net_pnl_usd)} USD</td>
       <td>${number(item.r_multiple)}</td>
     </tr>`).join("") : '<tr><td colspan="8">目前沒有模擬成交</td></tr>';
+}
+
+function researchEvidenceIsSafe(evidence) {
+  if (!evidence || evidence.schema !== "qookey-dashboard-research-evidence-v0.1") return false;
+  if (evidence.authority !== false || evidence.mode !== "PAPER_ONLY_READ_ONLY") return false;
+  const boundary = evidence.safetyBoundary || {};
+  const requiredFalse = [
+    "providerReadsPerformed",
+    "r2ReadsPerformed",
+    "r2WritesPerformed",
+    "holdoutAccessed",
+    "backtestAdmissionAuthorized",
+    "tradePlanAuthorized",
+    "realMoneyOrderAuthorized",
+    "liveTradingAuthorized"
+  ];
+  return requiredFalse.every(key => boundary[key] === false)
+    && Array.isArray(evidence.positions)
+    && Array.isArray(evidence.backtests);
+}
+
+function renderResearchEvidence(evidence) {
+  const safe = researchEvidenceIsSafe(evidence);
+  const positions = safe ? evidence.positions : [];
+  const backtests = safe ? evidence.backtests : [];
+  const positionsState = safe ? String(evidence.positionsState || "NOT_READY") : "NOT_READY";
+  const backtestsState = safe ? String(evidence.backtestsState || "NOT_AUTHORIZED") : "NOT_AUTHORIZED";
+  const positionsBadge = document.querySelector("#positions-state");
+  const backtestsBadge = document.querySelector("#backtests-state");
+  const evidenceTime = document.querySelector("#evidence-generated-at");
+  if (positionsBadge) {
+    positionsBadge.textContent = displayStatus(positionsState);
+    positionsBadge.className = `badge ${badgeClass(positionsState)}`;
+  }
+  if (backtestsBadge) {
+    backtestsBadge.textContent = displayStatus(backtestsState);
+    backtestsBadge.className = `badge ${badgeClass(backtestsState)}`;
+  }
+  if (evidenceTime) {
+    evidenceTime.textContent = `研究投影：${safe ? formatTrustedTime(evidence.projectedAtUtc) : "資料契約未通過"}`;
+  }
+
+  const positionsRoot = document.querySelector("#paper-position-table");
+  if (positionsRoot) {
+    positionsRoot.innerHTML = positions.length ? positions.map(item => `
+      <tr>
+        <td><strong>${escapeHtml(item.symbol)}</strong></td>
+        <td>${escapeHtml(item.side)}</td>
+        <td><time>${formatTradeTime(item.openedAtUtc ?? item.opened_at_utc)}</time></td>
+        <td>${number(item.entryPrice ?? item.entry_price, 8)}</td>
+        <td>${number(item.referencePrice ?? item.reference_price, 8)}</td>
+        <td class="${Number(item.unrealizedPnlUsd ?? item.unrealized_pnl_usd) >= 0 ? "cell-pass" : "cell-pending"}">${number(item.unrealizedPnlUsd ?? item.unrealized_pnl_usd)} USD</td>
+        <td>${number(item.stopPrice ?? item.stop_price, 8)}</td>
+        <td>${escapeHtml(item.lifecycleState ?? item.lifecycle_state)}</td>
+      </tr>`).join("") : '<tr><td colspan="8">目前尚無正式模擬持倉資料；未提供資料時不推算持倉。</td></tr>';
+  }
+
+  const backtestsRoot = document.querySelector("#backtest-table");
+  if (backtestsRoot) {
+    backtestsRoot.innerHTML = backtests.length ? backtests.map(item => `
+      <tr>
+        <td><strong>${escapeHtml(item.name)}</strong></td>
+        <td>${escapeHtml(item.provider)}</td>
+        <td>${escapeHtml(item.datasetAuthority)}</td>
+        <td>${escapeHtml(item.period)}</td>
+        <td>${escapeHtml(item.strategyVersion)}</td>
+        <td><code>${escapeHtml(item.runSha)}</code></td>
+        <td><span class="badge ${badgeClass(item.admission)}">${escapeHtml(displayStatus(item.admission))}</span></td>
+        <td>${escapeHtml(item.resultStatus)}</td>
+      </tr>`).join("") : '<tr><td colspan="8">目前沒有取得正式 backtest admission 的證據；不從其他研究結果自行推定。</td></tr>';
+  }
 }
 
 function renderStrategy(strategy) {
@@ -217,11 +381,28 @@ function renderStrategy(strategy) {
     root.innerHTML = Object.entries(score.weights || {}).map(([key, value]) => `
       <div class="strategy-score-row">
         <span>${escapeHtml(labels[key] || key)}</span>
-        <div class="strategy-score-track"><i style="width:${Math.max(0, Math.min(100, Number(value) || 0))}%"></i></div>
+        <progress class="strategy-score-progress" max="100" value="${Math.max(0, Math.min(100, Number(value) || 0))}" aria-label="${escapeHtml(labels[key] || key)}權重"></progress>
         <strong>${number(value, 0)}</strong>
       </div>
     `).join("");
   }
+}
+
+function renderStrategyResearch(project) {
+  if (!project || typeof project !== "object") return;
+  const setText = (id, value) => {
+    const element = document.querySelector(`#${id}`);
+    if (element) element.textContent = value;
+  };
+  const status = String(project.strategyResearchLoopState || "NOT_READY");
+  setText(
+    "strategy-research-status",
+    status === "PREPARED_RESEARCH_ONLY" ? "PREPARED · SYNTHETIC ONLY" : displayStatus(status)
+  );
+  setText("strategy-research-candidates", number(project.strategyResearchCandidateCount, 0));
+  setText("strategy-research-families", number(project.strategyResearchFamilyCount, 0));
+  setText("strategy-research-horizons", number(project.strategyResearchHorizonCount, 0));
+  setText("strategy-edge-methods", number(project.strategyEdgeMethodCount, 0));
 }
 
 function upsertByName(items, additions) {
@@ -255,6 +436,8 @@ function mergeOperationalStatus(data, operational) {
 function render(data) {
   state.data = data;
   document.querySelector("#snapshot-label").textContent = data.snapshotLabel;
+  document.querySelector("#dashboard-generated-at").textContent =
+    `投影建立：${formatTrustedTime(data.generatedAtUtc)}`;
   document.querySelector("#market-count").textContent = Number(data.project.marketCount || 0).toLocaleString("zh-TW");
   const fundingMonths = data.project.fundingMonthsObserved ?? data.project.fundingMonths ?? 0;
   document.querySelector("#funding-months").textContent = Number(fundingMonths).toLocaleString("zh-TW");
@@ -262,6 +445,7 @@ function render(data) {
   renderCriticalGates(data.gates || []);
   renderAllGates(data.gates || []);
   renderMarkets(data.markets || []);
+  renderStrategyResearch(data.project || {});
 }
 
 async function fetchJson(path) {
@@ -271,10 +455,14 @@ async function fetchJson(path) {
 }
 
 async function loadData() {
+  const refreshButton = document.querySelector("#refresh-button");
+  refreshButton?.setAttribute("aria-busy", "true");
+  if (refreshButton) refreshButton.disabled = true;
   try {
     const data = await fetchJson("./data/dashboard.json");
     let operational = null;
     let paperTraining = null;
+    let researchEvidence = null;
     try {
       operational = await fetchJson("./data/operational-status.json");
     } catch (error) {
@@ -286,17 +474,38 @@ async function loadData() {
       console.warn("Paper training projection unavailable", error);
     }
     try {
+      researchEvidence = await fetchJson("./data/research-evidence.json");
+      if (!researchEvidenceIsSafe(researchEvidence)) throw new Error("Research evidence contract rejected");
+    } catch (error) {
+      console.warn("Research evidence projection unavailable", error);
+    }
+    try {
       const strategy = await fetchJson("./data/strategy.json");
       renderStrategy(strategy);
     } catch (error) {
       console.warn("Strategy projection unavailable", error);
     }
+    try {
+      const calendar = await fetchJson("./data/research-calendar.json");
+      if (calendar.authority !== false) throw new Error("Calendar projection must remain non-authoritative");
+      renderCalendar(calendar);
+    } catch (error) {
+      console.warn("Research calendar projection unavailable", error);
+      renderCalendar(null);
+    }
     render(mergeOperationalStatus(data, operational));
     renderPaperTraining(paperTraining);
+    renderResearchEvidence(researchEvidence);
   } catch (error) {
     console.error("Dashboard snapshot load failed", error);
     render(FALLBACK);
+    renderCalendar(null);
+    renderPaperTraining(null);
+    renderResearchEvidence(null);
     document.querySelector("#snapshot-label").textContent = "狀態快照暫時無法讀取";
+  } finally {
+    refreshButton?.removeAttribute("aria-busy");
+    if (refreshButton) refreshButton.disabled = false;
   }
 }
 
@@ -312,7 +521,12 @@ const titles = {
   gates: "風險與閘門"
 };
 
-function activateView(view) {
+function viewFromLocation() {
+  const requested = window.location.hash.replace(/^#/, "");
+  return Object.hasOwn(titles, requested) ? requested : "overview";
+}
+
+function activateView(view, { updateHistory = false } = {}) {
   const target = document.querySelector(`#view-${view}`);
   if (!target) return;
   const isOverview = view === "overview";
@@ -322,16 +536,37 @@ function activateView(view) {
     item.classList.toggle("active", active);
     if (active) item.setAttribute("aria-current", "page");
     else item.removeAttribute("aria-current");
+    if (active) item.scrollIntoView({ block: "nearest", inline: "center" });
   });
   document.querySelectorAll(".view").forEach(item => item.classList.remove("active"));
   target.classList.add("active");
   document.querySelector("#page-title").textContent = titles[view] || view;
-  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  document.title = `${titles[view] || view}｜Qookey Crypto Autopilot`;
+  if (updateHistory) {
+    const targetUrl = view === "overview"
+      ? `${window.location.pathname}${window.location.search}`
+      : `#${view}`;
+    window.history.pushState({ view }, "", targetUrl);
+  }
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
 }
 
 document.querySelectorAll(".nav-item, .view-link").forEach(button => {
-  button.addEventListener("click", () => activateView(button.dataset.view));
+  button.addEventListener("click", event => {
+    event.preventDefault();
+    activateView(button.dataset.view, { updateHistory: true });
+  });
 });
 
+document.querySelectorAll(".table-wrap").forEach((wrap, index) => {
+  const title = wrap.closest(".panel")?.querySelector("h3")?.textContent?.trim() || `資料表 ${index + 1}`;
+  wrap.tabIndex = 0;
+  wrap.setAttribute("role", "region");
+  wrap.setAttribute("aria-label", `${title}；在較窄的畫面可左右滑動查看完整欄位。`);
+});
+
+window.addEventListener("popstate", () => activateView(viewFromLocation()));
+window.addEventListener("hashchange", () => activateView(viewFromLocation()));
 document.querySelector("#refresh-button").addEventListener("click", loadData);
+activateView(viewFromLocation());
 loadData();
