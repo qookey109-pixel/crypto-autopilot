@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 
 
 ROOT = Path("web")
 OPERATIONAL_STATUS = ROOT / "data" / "operational-status.json"
+RESEARCH_CALENDAR = ROOT / "data" / "research-calendar.json"
+RESEARCH_EVIDENCE = ROOT / "data" / "research-evidence.json"
+RESEARCH_EVIDENCE_SCHEMA = ROOT / "data" / "research-evidence.schema.json"
 REQUIRED = (
     ROOT / "index.html",
     ROOT / "styles.css",
@@ -14,6 +18,9 @@ REQUIRED = (
     OPERATIONAL_STATUS,
     ROOT / "data" / "paper-training.json",
     ROOT / "data" / "strategy.json",
+    RESEARCH_CALENDAR,
+    RESEARCH_EVIDENCE,
+    RESEARCH_EVIDENCE_SCHEMA,
     ROOT / "_headers",
 )
 
@@ -55,6 +62,12 @@ REQUIRED_ZH_HANT_LABELS = (
     "回測",
     "風險與閘門",
     "真實交易目前停用",
+    "研究時程與授權狀態",
+    "SState 是 4H 市場狀態與背景准入閘門",
+    "投影建立：尚未提供",
+    "Paper 觀測：尚未完成",
+    "未提供資料時不推算持倉",
+    "研究結果不等於正式准入",
 )
 
 
@@ -81,6 +94,74 @@ def main() -> int:
         raise RuntimeError("dashboard fixture must explicitly declare authority=false")
     if data.get("locale") != "zh-Hant-TW":
         raise RuntimeError("dashboard fixture must declare locale=zh-Hant-TW")
+    if data.get("generatedAtUtc") is not None:
+        raise RuntimeError("checked-in dashboard fixture must not invent a generation time")
+
+    calendar = json.loads(RESEARCH_CALENDAR.read_text(encoding="utf-8"))
+    if calendar.get("schema") != "qookey-research-calendar-projection-v0.1":
+        raise RuntimeError("dashboard research calendar schema changed")
+    if calendar.get("authority") is not False:
+        raise RuntimeError("dashboard research calendar must declare authority=false")
+    if calendar.get("locale") != "zh-Hant-TW" or calendar.get("timezone") != "Asia/Taipei":
+        raise RuntimeError("dashboard research calendar locale/timezone changed")
+    calendar_generated_at = calendar.get("projectionGeneratedAtUtc")
+    if calendar_generated_at is not None:
+        try:
+            datetime.fromisoformat(str(calendar_generated_at).replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise RuntimeError("dashboard research calendar generation time is invalid") from exc
+    calendar_items = calendar.get("items") or []
+    expected_calendar_ids = {
+        "v0-10-metadata-window",
+        "strategy-research-loop-v0-1",
+        "detailed-history-backfill",
+        "sstate-evidence-calibration",
+        "continuous-learning-target",
+    }
+    if {item.get("id") for item in calendar_items} != expected_calendar_ids:
+        raise RuntimeError("dashboard research calendar stages changed without review")
+    allowed_calendar_statuses = {"AUTHORIZED", "NOT_READY", "PREPARED"}
+    for item in calendar_items:
+        if item.get("status") not in allowed_calendar_statuses:
+            raise RuntimeError(f"dashboard calendar status is not allowlisted: {item.get('status')}")
+        if not item.get("windowLabel") or not item.get("title") or not item.get("detail"):
+            raise RuntimeError(f"dashboard calendar item is incomplete: {item.get('id')}")
+    calendar_security = calendar.get("safetyBoundary") or {}
+    if not calendar_security or any(value is not False for value in calendar_security.values()):
+        raise RuntimeError("dashboard research calendar must keep every safety authority false")
+    calendar_sources = set(calendar.get("sourceAuthorities") or [])
+    for required_source in (
+        "PROJECT_STATUS.md",
+        "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
+        "config/strategy_edge_validation_v0_1.json",
+        "config/strategy_research_loop_v0_1.json",
+        "docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md",
+        "docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md",
+    ):
+        if required_source not in calendar_sources:
+            raise RuntimeError(f"dashboard research calendar lineage missing: {required_source}")
+
+    evidence = json.loads(RESEARCH_EVIDENCE.read_text(encoding="utf-8"))
+    evidence_schema = json.loads(RESEARCH_EVIDENCE_SCHEMA.read_text(encoding="utf-8"))
+    if evidence_schema.get("$id") != "https://qookey109-pixel.github.io/crypto-autopilot/data/research-evidence.schema.json":
+        raise RuntimeError("dashboard research evidence schema id changed")
+    if (evidence_schema.get("properties") or {}).get("authority", {}).get("const") is not False:
+        raise RuntimeError("dashboard research evidence schema must freeze authority=false")
+    if evidence.get("schema") != "qookey-dashboard-research-evidence-v0.1":
+        raise RuntimeError("dashboard research evidence schema changed")
+    if evidence.get("authority") is not False or evidence.get("mode") != "PAPER_ONLY_READ_ONLY":
+        raise RuntimeError("dashboard research evidence must remain paper-only and non-authoritative")
+    if evidence.get("projectedAtUtc") is not None:
+        raise RuntimeError("checked-in research evidence fixture must not invent a projection time")
+    if evidence.get("positionsState") != "NOT_READY":
+        raise RuntimeError("dashboard positions fixture must remain NOT_READY")
+    if evidence.get("backtestsState") != "NOT_AUTHORIZED":
+        raise RuntimeError("dashboard backtests fixture must remain NOT_AUTHORIZED")
+    if evidence.get("positions") != [] or evidence.get("backtests") != []:
+        raise RuntimeError("checked-in research evidence fixture must not invent positions or backtests")
+    evidence_security = evidence.get("safetyBoundary") or {}
+    if not evidence_security or any(value is not False for value in evidence_security.values()):
+        raise RuntimeError("dashboard research evidence must keep every safety authority false")
 
     project = data.get("project") or {}
     if project.get("mode") != "PAPER-ONLY":
@@ -187,6 +268,22 @@ def main() -> int:
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     if '<html lang="zh-Hant-TW">' not in html:
         raise RuntimeError("dashboard HTML must declare zh-Hant-TW")
+    if 'http-equiv="Content-Security-Policy"' not in html:
+        raise RuntimeError("dashboard must enforce a CSP meta policy on GitHub Pages")
+    for directive in (
+        "default-src 'self'",
+        "script-src 'self'",
+        "style-src 'self'",
+        "connect-src 'self'",
+        "object-src 'none'",
+        "form-action 'none'",
+    ):
+        if directive not in html:
+            raise RuntimeError(f"dashboard CSP directive missing: {directive}")
+    if '<meta name="referrer" content="no-referrer"' not in html:
+        raise RuntimeError("dashboard must enforce no-referrer through HTML")
+    if 'aria-describedby="nav-scroll-hint"' not in html or 'id="nav-scroll-hint"' not in html:
+        raise RuntimeError("dashboard mobile navigation must expose its horizontal-scroll hint")
     for label in REQUIRED_ZH_HANT_LABELS:
         if label not in html:
             raise RuntimeError(f"dashboard Traditional Chinese label missing: {label}")
@@ -205,6 +302,16 @@ def main() -> int:
             raise RuntimeError(f"dashboard view missing: {view}")
 
     app_js = (ROOT / "app.js").read_text(encoding="utf-8")
+    styles = (ROOT / "styles.css").read_text(encoding="utf-8")
+    if "style=" in html or "style=" in app_js:
+        raise RuntimeError("dashboard CSP forbids inline style attributes")
+    for token in (
+        ".site-header { position: sticky",
+        ".table-wrap:focus-visible",
+        ".strategy-score-progress",
+    ):
+        if token not in styles:
+            raise RuntimeError(f"dashboard responsive/accessibility style missing: {token}")
     for label in (
         "通過 · PASS",
         "已授權 · AUTHORIZED",
@@ -217,8 +324,18 @@ def main() -> int:
     for token in (
         "./data/operational-status.json",
         "./data/paper-training.json",
+        "./data/research-calendar.json",
+        "./data/research-evidence.json",
         "mergeOperationalStatus",
         "renderPaperTraining",
+        "renderEquityChart",
+        "renderCalendar",
+        "calendarTiming",
+        "formatTrustedTime",
+        "researchEvidenceIsSafe",
+        "renderResearchEvidence",
+        "strategy-score-progress",
+        'wrap.setAttribute("role", "region")',
         "operational.pipelineItems",
         "operational.gateItems",
     ):
@@ -259,9 +376,10 @@ def main() -> int:
         json.dumps(
             {
                 "status": "PASS",
-                "stage": "DASHBOARD_ZH_HANT_STATIC_SAFETY_V0_11_OPERATIONAL_PASS",
+                "stage": "DASHBOARD_ZH_HANT_STATIC_SAFETY_V0_13_EVIDENCE_PASS",
                 "required_files": len(REQUIRED),
                 "views": 9,
+                "calendar_items": len(calendar_items),
                 "locale": "zh-Hant-TW",
                 "authority_fixture": False,
                 "operational_authority": False,
@@ -276,6 +394,8 @@ def main() -> int:
                 "v0_11_production_r2_evaluation": op_project["v0_11ProductionR2EvaluationState"],
                 "holdout": op_project["replacementHoldoutState"],
                 "live_execution_surface": False,
+                "github_pages_custom_headers_enforced": False,
+                "html_csp_enforced": True,
             },
             sort_keys=True,
         )
