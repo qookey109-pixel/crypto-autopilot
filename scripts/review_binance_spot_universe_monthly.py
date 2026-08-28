@@ -10,14 +10,14 @@ from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 
-from crypto_autopilot.ephemeral_storage import require_ephemeral_output
-from crypto_autopilot.monthly_universe_review import (
+from crypto_autopilot.storage.ephemeral import require_ephemeral_output
+from crypto_autopilot.training.monthly_universe_review import (
     build_monthly_universe_objects,
     build_monthly_universe_review,
 )
-from crypto_autopilot.online_r2_training import publish_online_objects
+from crypto_autopilot.training.online_r2 import publish_online_objects
 from crypto_autopilot.storage.r2 import R2Store
-from crypto_autopilot.training_quality import (
+from crypto_autopilot.training.quality import (
     TrainingQualityError,
     V0_3_BASELINE_EVIDENCE_SHA256,
     load_v0_3_bootstrap_baseline,

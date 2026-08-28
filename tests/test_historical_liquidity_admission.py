@@ -3,15 +3,15 @@ from __future__ import annotations
 import unittest
 
 from crypto_autopilot.backtest import LongTradePlan
-from crypto_autopilot.historical_admission import admit_plans_by_historical_liquidity
-from crypto_autopilot.historical_liquidity import (
+from crypto_autopilot.history.admission import admit_plans_by_historical_liquidity
+from crypto_autopilot.history.liquidity import (
     HistoricalLiquidityBatch,
     HistoricalLiquidityEvidenceError,
     HistoricalLiquidityIndex,
     HistoricalLiquidityMarket,
     HistoricalLiquidityPolicy,
 )
-from crypto_autopilot.historical_universe import HistoricalMarketRecord, HistoricalUniverseIndex
+from crypto_autopilot.history.universe import HistoricalMarketRecord, HistoricalUniverseIndex
 
 
 class HistoricalLiquidityAdmissionTest(unittest.TestCase):

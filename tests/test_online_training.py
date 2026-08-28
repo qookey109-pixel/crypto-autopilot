@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import unittest
 
-from crypto_autopilot.online_training import (
+from crypto_autopilot.training.online import (
     DAILY_DIRECTION_FEATURE_NAMES,
     DAY_MS,
     train_daily_direction_models,

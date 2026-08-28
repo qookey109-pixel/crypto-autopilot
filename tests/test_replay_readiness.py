@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 
 from crypto_autopilot.models import SStateContext
-from crypto_autopilot.replay_readiness import (
+from crypto_autopilot.history.replay_readiness import (
     GateStatus,
     ReplayGatePolicy,
     assess_replay_readiness,

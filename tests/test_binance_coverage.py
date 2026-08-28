@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 from datetime import date
 
-from crypto_autopilot.binance_coverage import (
+from crypto_autopilot.binance.coverage import (
     attach_audited_boundaries,
     build_archive_keys,
     daily_periods,

@@ -5,11 +5,11 @@ import math
 import unittest
 from pathlib import Path
 
-from crypto_autopilot.experiment_registry import (
+from crypto_autopilot.research.experiment_registry import (
     build_experiment_registry_entry,
     validate_experiment_registry_entry,
 )
-from crypto_autopilot.shadow_ablation import FEATURE_GROUPS, run_shadow_ablation
+from crypto_autopilot.training.shadow_ablation import FEATURE_GROUPS, run_shadow_ablation
 
 
 ROOT = Path(__file__).resolve().parents[1]

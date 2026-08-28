@@ -11,12 +11,12 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from crypto_autopilot.binance_spot_history import (
+from crypto_autopilot.binance.spot_history import (
     BinanceSpotHistoryError,
     BinanceSpotSeries,
     fetch_spot_history,
 )
-from crypto_autopilot.ephemeral_storage import require_ephemeral_output
+from crypto_autopilot.storage.ephemeral import require_ephemeral_output
 
 
 def parse_utc_ms(value: str) -> int:

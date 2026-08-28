@@ -6,7 +6,7 @@ from pathlib import Path
 
 from crypto_autopilot.backtest import LongTradePlan
 from crypto_autopilot.models import Candle
-from crypto_autopilot.paper_exploration import (
+from crypto_autopilot.paper.exploration import (
     PaperExplorationConfig,
     run_paper_exploration,
 )

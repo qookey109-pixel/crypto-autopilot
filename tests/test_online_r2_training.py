@@ -5,8 +5,8 @@ import json
 import unittest
 from unittest.mock import MagicMock
 
-from crypto_autopilot.online_r2_training import build_online_objects, publish_online_objects
-from crypto_autopilot.online_r2_training import current_bucket_bytes
+from crypto_autopilot.training.online_r2 import build_online_objects, publish_online_objects
+from crypto_autopilot.training.online_r2 import current_bucket_bytes
 from crypto_autopilot.storage.r2 import R2ObjectReceipt
 
 

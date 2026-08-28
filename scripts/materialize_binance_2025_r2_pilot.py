@@ -11,7 +11,7 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from crypto_autopilot.binance_2025_pilot import (
+from crypto_autopilot.binance.pilot_2025 import (
     Binance2025PilotAuthorityError,
     Binance2025SymbolCoverage,
     build_partition_plan,
@@ -19,7 +19,7 @@ from crypto_autopilot.binance_2025_pilot import (
     load_coverage_authority,
     source_archive_digest,
 )
-from crypto_autopilot.binance_vision import (
+from crypto_autopilot.binance.vision import (
     BinanceVisionArchiveKey,
     BinanceVisionKlineArchive,
     ingest_kline_archive,

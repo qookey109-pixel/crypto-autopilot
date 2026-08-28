@@ -4,11 +4,11 @@ import copy
 import unittest
 from datetime import datetime
 
-from crypto_autopilot.historical_universe import (
+from crypto_autopilot.history.universe import (
     HistoricalUniverseIndex,
     record_from_partition_receipt,
 )
-from crypto_autopilot.historical_universe_review import (
+from crypto_autopilot.history.universe_review import (
     HistoricalUniverseLongHorizonReviewError,
     build_membership_contract,
     review_target_wave,

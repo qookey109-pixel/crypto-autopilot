@@ -10,7 +10,7 @@ import unittest
 from datetime import UTC, datetime
 from pathlib import Path
 
-from crypto_autopilot.detailed_history import (
+from crypto_autopilot.history.detailed import (
     DetailedHistoryAuthorityError,
     DetailedMarketCoverage,
     build_catalog,

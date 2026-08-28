@@ -11,15 +11,15 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from crypto_autopilot.binance_spot_history import (
+from crypto_autopilot.binance.spot_history import (
     BinanceSpotCandle,
     BinanceSpotHistoryError,
     BinanceSpotSeries,
     fetch_spot_history,
     provider_read_stop_ms_from_v0_5_config,
 )
-from crypto_autopilot.ephemeral_storage import require_ephemeral_output
-from crypto_autopilot.training_quality import load_v0_5_authority_pair
+from crypto_autopilot.storage.ephemeral import require_ephemeral_output
+from crypto_autopilot.training.quality import load_v0_5_authority_pair
 
 
 FORBIDDEN_AUTHORITY_KEYS = (

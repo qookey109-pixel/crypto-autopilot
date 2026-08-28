@@ -9,18 +9,18 @@ from datetime import UTC, datetime
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-from crypto_autopilot.binance_spot_history import (
+from crypto_autopilot.binance.spot_history import (
     Clock,
     provider_read_stop_ms_from_v0_5_config,
     require_provider_request_before_deadline,
 )
-from crypto_autopilot.binance_training_catalog import (
+from crypto_autopilot.binance.training_catalog import (
     DEFAULT_QUOTES,
     catalog_payload,
     parse_exchange_info,
 )
-from crypto_autopilot.ephemeral_storage import require_ephemeral_output
-from crypto_autopilot.training_quality import load_v0_5_authority_pair
+from crypto_autopilot.storage.ephemeral import require_ephemeral_output
+from crypto_autopilot.training.quality import load_v0_5_authority_pair
 
 
 ENDPOINT = "https://data-api.binance.vision/api/v3/exchangeInfo"

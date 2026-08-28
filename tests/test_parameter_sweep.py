@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from crypto_autopilot.parameter_sweep import (
+from crypto_autopilot.research.parameter_sweep import (
     ParameterAxis,
     PrimaryMetric,
     SweepObservation,

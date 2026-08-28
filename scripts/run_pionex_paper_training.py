@@ -8,11 +8,11 @@ from pathlib import Path
 
 from crypto_autopilot.exchanges.pionex_public import PionexPublicClient
 from crypto_autopilot.historical import INTERVAL_MS
-from crypto_autopilot.market_features import (
+from crypto_autopilot.features.market import (
     build_derivative_features,
     build_microstructure_features,
 )
-from crypto_autopilot.paper_training import REQUIRED_INTERVALS, run_paper_training_replay
+from crypto_autopilot.paper.training import REQUIRED_INTERVALS, run_paper_training_replay
 
 
 def _closed_end_ms(now_ms: int, interval: str, maximum_end_ms: int) -> int:

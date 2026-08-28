@@ -10,7 +10,7 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from crypto_autopilot.binance_vision import BinanceVisionArchiveKey, ingest_kline_archive
+from crypto_autopilot.binance.vision import BinanceVisionArchiveKey, ingest_kline_archive
 from crypto_autopilot.storage.layout import HistoricalObjectKey
 from crypto_autopilot.storage.parquet import candles_to_parquet, parquet_to_candles
 from crypto_autopilot.storage.r2 import R2ObjectReceipt, R2Store

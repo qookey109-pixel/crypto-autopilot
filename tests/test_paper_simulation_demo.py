@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from crypto_autopilot.paper_simulation_demo import build_demo_payload
+from crypto_autopilot.paper.simulation_demo import build_demo_payload
 
 
 class PaperSimulationDemoTest(unittest.TestCase):

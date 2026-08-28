@@ -11,7 +11,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from crypto_autopilot.binance_historical import pionex_perp_to_binance_usdm
-from crypto_autopilot.binance_vision import BinanceVisionArchiveKey, parse_checksum
+from crypto_autopilot.binance.vision import BinanceVisionArchiveKey, parse_checksum
 
 
 DEFAULT_AUTHORITY = "research/receipts/2026-08-17-m1a-pionex.json"

@@ -17,7 +17,7 @@ from crypto_autopilot.binance_funding import (
     parquet_to_funding,
 )
 from crypto_autopilot.binance_funding_materialization_plan_v0_2 import build_v0_2_scope
-from crypto_autopilot.binance_funding_materializer_v0_2 import (
+from crypto_autopilot.binance.funding_materializer_v0_2 import (
     AUTHORITY_PATH,
     CADENCE_TOLERANCE_MS,
     CONFIG_PATH,
@@ -26,7 +26,7 @@ from crypto_autopilot.binance_funding_materializer_v0_2 import (
     source_keys_from_scope,
     validate_runtime_authority,
 )
-from crypto_autopilot.binance_vision import parse_checksum
+from crypto_autopilot.binance.vision import parse_checksum
 
 
 COVERAGE_PATH = "research/receipts/2026-08-18-binance-funding-coverage.json"

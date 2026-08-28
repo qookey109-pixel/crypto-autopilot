@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 
-from crypto_autopilot.research_signal_ingest_v0_2 import (
+from crypto_autopilot.research.signal_ingest_v0_2 import (
     ResearchSignalIngestError,
     build_signal_payload,
     collect_sources,

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from crypto_autopilot.binance_training_catalog import (
+from crypto_autopilot.binance.training_catalog import (
     catalog_payload,
     classify_asset,
     parse_exchange_info,

@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 
 from crypto_autopilot.models import Candle
-from crypto_autopilot.provider_equivalence import (
+from crypto_autopilot.providers.equivalence import (
     ProviderEquivalencePolicy,
     aggregate_provider_equivalence,
     compare_provider_pair,

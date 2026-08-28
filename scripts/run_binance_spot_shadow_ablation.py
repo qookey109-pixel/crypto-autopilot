@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pyarrow.parquet as pq
 
-from crypto_autopilot.ephemeral_storage import require_ephemeral_output
-from crypto_autopilot.shadow_ablation import run_shadow_ablation
+from crypto_autopilot.storage.ephemeral import require_ephemeral_output
+from crypto_autopilot.training.shadow_ablation import run_shadow_ablation
 
 
 ROOT = Path(__file__).resolve().parents[1]

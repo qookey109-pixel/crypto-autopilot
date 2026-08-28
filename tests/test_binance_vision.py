@@ -7,7 +7,7 @@ import zipfile
 from dataclasses import replace
 
 from crypto_autopilot.binance_historical import BINANCE_INTERVAL_MS
-from crypto_autopilot.binance_vision import (
+from crypto_autopilot.binance.vision import (
     BinanceVisionArchiveKey,
     BinanceVisionEvidenceError,
     BinanceVisionRevisionConflictError,

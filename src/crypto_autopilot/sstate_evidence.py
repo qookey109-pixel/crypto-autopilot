@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from .historical import INTERVAL_MS
-from .historical_sstate import HistoricalSStatePoint
+from crypto_autopilot.history.sstate import HistoricalSStatePoint
 from .models import SStateContext
 
 

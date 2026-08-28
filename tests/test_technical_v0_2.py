@@ -3,9 +3,9 @@ from __future__ import annotations
 import unittest
 
 from crypto_autopilot.historical import INTERVAL_MS
-from crypto_autopilot.market_structure import build_market_structure_series
+from crypto_autopilot.features.structure import build_market_structure_series
 from crypto_autopilot.models import Candle
-from crypto_autopilot.multi_timeframe_technical import build_multi_timeframe_snapshot
+from crypto_autopilot.features.multi_timeframe import build_multi_timeframe_snapshot
 from crypto_autopilot.technical import TechnicalDataError, build_technical_series
 
 

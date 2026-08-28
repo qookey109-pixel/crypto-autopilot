@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import unittest
 
-from crypto_autopilot.research_context import (
+from crypto_autopilot.research.context import (
     ContextObservation,
     ResearchContextError,
     summarize_context,

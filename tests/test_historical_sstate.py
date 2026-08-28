@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from crypto_autopilot.historical_sstate import (
+from crypto_autopilot.history.sstate import (
     HistoricalSStateConflictError,
     HistoricalSStateNotAvailableError,
     HistoricalSStatePoint,

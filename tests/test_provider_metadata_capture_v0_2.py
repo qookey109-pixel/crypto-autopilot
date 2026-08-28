@@ -5,7 +5,7 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 
-from crypto_autopilot.provider_metadata_capture_suspension_v0_2 import load_transport_blocker
+from crypto_autopilot.providers.metadata_capture_suspension_v0_2 import load_transport_blocker
 from crypto_autopilot.provider_metadata_capture_v0_2 import (
     capture_slot,
     load_and_validate_authority,

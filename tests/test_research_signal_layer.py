@@ -4,7 +4,7 @@ import hashlib
 import unittest
 from dataclasses import replace
 
-from crypto_autopilot.research_signal_layer import (
+from crypto_autopilot.research.signal_layer import (
     ClosedCandleRecord,
     KOLForecast,
     ResearchSignalLayerError,

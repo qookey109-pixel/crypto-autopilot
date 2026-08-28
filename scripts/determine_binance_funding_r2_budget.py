@@ -17,7 +17,7 @@ from crypto_autopilot.binance_funding_budget import (
     project_funding_budget,
     validate_budget_config,
 )
-from crypto_autopilot.r2_budget import (
+from crypto_autopilot.storage.budget import (
     R2Guardrails,
     R2Pricing,
     R2ProjectedUsage,

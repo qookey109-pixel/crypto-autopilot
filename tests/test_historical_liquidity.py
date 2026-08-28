@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from crypto_autopilot.historical_liquidity import (
+from crypto_autopilot.history.liquidity import (
     HistoricalLiquidityBatch,
     HistoricalLiquidityConflictError,
     HistoricalLiquidityEvidenceError,
@@ -10,7 +10,7 @@ from crypto_autopilot.historical_liquidity import (
     HistoricalLiquidityMarket,
     HistoricalLiquidityPolicy,
 )
-from crypto_autopilot.historical_universe import HistoricalMarketRecord, HistoricalUniverseIndex
+from crypto_autopilot.history.universe import HistoricalMarketRecord, HistoricalUniverseIndex
 
 
 class HistoricalLiquidityTest(unittest.TestCase):

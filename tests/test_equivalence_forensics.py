@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import unittest
 
-from crypto_autopilot.equivalence_forensics import (
+from crypto_autopilot.providers.equivalence_forensics import (
     FORENSIC_ABS_RETURN_BPS_BINS,
     analyze_direction_mismatches,
 )

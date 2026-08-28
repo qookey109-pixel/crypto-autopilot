@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import unittest
 
-from crypto_autopilot.detailed_training import (
+from crypto_autopilot.training.detailed import (
     FEATURE_NAMES,
     IntradayExample,
     build_intraday_examples,

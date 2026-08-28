@@ -11,7 +11,7 @@ Freeze a cost boundary for the historical-data plan before expanding beyond the 
 - Capacity basis: `research/estimates/2026-08-18-historical-capacity.json`
 - Budget estimate: `research/estimates/2026-08-18-r2-cost-budget.json`
 - Budget policy: `config/r2_budget_v0_1.json`
-- Gate implementation: `src/crypto_autopilot/r2_budget.py`
+- Gate implementation: `src/crypto_autopilot/storage/budget.py`
 - CI CLI: `scripts/check_r2_budget.py`
 
 ## Current Cloudflare R2 Standard pricing snapshot

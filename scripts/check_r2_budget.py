@@ -5,7 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
-from crypto_autopilot.r2_budget import R2Guardrails, R2Pricing, R2ProjectedUsage, evaluate_r2_budget
+from crypto_autopilot.storage.budget import R2Guardrails, R2Pricing, R2ProjectedUsage, evaluate_r2_budget
 
 
 def load_json(path: Path) -> dict:

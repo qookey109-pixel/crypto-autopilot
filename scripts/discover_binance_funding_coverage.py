@@ -10,9 +10,9 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from crypto_autopilot.binance_coverage import month_periods
+from crypto_autopilot.binance.coverage import month_periods
 from crypto_autopilot.binance_funding import BinanceVisionFundingArchiveKey, ingest_funding_archive
-from crypto_autopilot.binance_funding_coverage import (
+from crypto_autopilot.binance.funding_coverage import (
     COVERAGE_EDGE_CADENCE_JITTER_TOLERANCE_MS,
     attach_funding_boundaries,
     summarize_funding_presence,
@@ -20,7 +20,7 @@ from crypto_autopilot.binance_funding_coverage import (
     validate_source_proof_authority,
 )
 from crypto_autopilot.binance_historical import pionex_perp_to_binance_usdm
-from crypto_autopilot.binance_vision import parse_checksum
+from crypto_autopilot.binance.vision import parse_checksum
 
 
 DEFAULT_CONFIG = "config/binance_funding_coverage_v0_1.json"

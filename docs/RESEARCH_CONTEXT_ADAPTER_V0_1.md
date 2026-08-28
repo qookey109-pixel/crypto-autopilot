@@ -5,12 +5,12 @@ Status: `PREPARED_NOT_ACTIVE`.
 This adapter adds a bounded research vocabulary inspired by the supplied
 technical-radar, multi-timeframe, bull/bear and Bitcoin-cycle references:
 
-- `advanced_technical.py` now exposes causal Stoch RSI, Williams %R, CCI,
+- `features/advanced.py` now exposes causal Stoch RSI, Williams %R, CCI,
   Awesome Oscillator, Ultimate Oscillator, Hull MA distance and Ichimoku base
   distance features.
-- `shadow_ablation.py` evaluates them as isolated `oscillators`,
+- `training/shadow_ablation.py` evaluates them as isolated `oscillators`,
   `trend_structure` and `extended_technical` Challenger groups.
-- `research_context.py` stores timestamped source observations without turning
+- `research/context.py` stores timestamped source observations without turning
   them into a composite buy/sell score.  It rejects future timestamps, invalid
   HTTPS lineage, non-finite values and unavailable observations containing
   fabricated numbers.

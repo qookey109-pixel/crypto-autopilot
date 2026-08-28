@@ -8,7 +8,7 @@ This layer keeps three evidence streams separate:
 2. append-only historical candles for later walk-forward training;
 3. timestamped KOL forecasts for an independent challenger feature.
 
-The implementation in `src/crypto_autopilot/research_signal_layer.py` does not
+The implementation in `src/crypto_autopilot/research/signal_layer.py` does not
 fetch providers, construct an R2 client or trigger a strategy. It validates
 evidence before a future separately authorized ingestion workflow can use it.
 

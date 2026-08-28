@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from crypto_autopilot.binance_spot_history import ProviderReadDeadlineExceeded
+from crypto_autopilot.binance.spot_history import ProviderReadDeadlineExceeded
 
 
 ROOT = Path(__file__).resolve().parents[1]
