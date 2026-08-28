@@ -2,7 +2,7 @@
 
 * { box-sizing: border-box; }
 html { color-scheme: light; scroll-behavior: smooth; background: var(--hero-teal); }
-body { margin: 0; min-width: 320px; min-height: 100vh; color: var(--ink); background: linear-gradient(rgba(7,87,68,.18), rgba(7,87,68,.18)), url("./assets/cloud-garden-v4.jpg") center top / cover fixed; font-family: var(--font-ui); font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+body { margin: 0; min-width: 320px; min-height: 100vh; color: var(--ink); background: linear-gradient(rgba(7,87,68,.18), rgba(7,87,68,.18)), url("../images/cloud-garden-v4.jpg") center top / cover fixed; font-family: var(--font-ui); font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
 button, a { font: inherit; }
 button { color: inherit; }
 button:focus-visible, a:focus-visible { outline: 3px solid var(--accent-contrast-light); outline-offset: 3px; box-shadow: 0 0 0 5px rgba(7,87,68,.82); }
@@ -92,6 +92,12 @@ h1, h2, h3 { font-family: var(--font-ui); font-weight: 600; letter-spacing: -.02
 .strategy-summary h2 { margin: 0 0 10px; font-size: 36px; line-height: 1.12; }
 .strategy-summary p:last-child { max-width: 680px; margin: 0; color: var(--muted); font-size: 16px; }
 .research-loop-summary { margin-top: 16px; background: rgba(255,255,255,.95); box-shadow: inset 4px 0 0 var(--accent-contrast), var(--shadow-sm); }
+.analysis-layer-list { margin-top: 18px; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.analysis-layer { min-width: 0; padding: 13px 14px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; border: 1px solid var(--line-strong); border-radius: var(--radius-tag); background: rgba(255,255,255,.8); box-shadow: inset 3px 0 0 var(--accent-contrast); }
+.analysis-layer strong, .analysis-layer small { display: block; }
+.analysis-layer strong { margin-bottom: 4px; color: var(--ink-soft); font-size: 15px; }
+.analysis-layer small { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.analysis-layer .badge { flex: 0 0 auto; }
 .strategy-meta { display: grid; justify-items: end; gap: 10px; }
 .strategy-meta small { color: var(--muted); font-size: 13px; }
 .sstate-explainer { margin-top: 16px; display: grid; grid-template-columns: minmax(260px,.78fr) minmax(0,1.4fr); gap: 28px; background: rgba(255,255,255,.95); }
@@ -224,7 +230,7 @@ td strong { color: var(--ink); }
   .section-heading { grid-template-columns: 1fr; gap: 6px; margin-top: 62px; }
   .section-number { font-size: 20px; }
   .section-heading h2 { font-size: 36px; }
-  .dashboard-grid.two-one, .gate-grid { grid-template-columns: 1fr; }
+  .dashboard-grid.two-one, .gate-grid, .analysis-layer-list { grid-template-columns: 1fr; }
   .panel { padding: 20px; }
   .panel-header { flex-direction: column; align-items: flex-start; }
   .strategy-summary { flex-direction: column; }

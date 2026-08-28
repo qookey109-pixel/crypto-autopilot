@@ -7,6 +7,7 @@ on:
       - "web/**"
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/build_research_calendar_projection.py"
+      - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
       - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
@@ -17,6 +18,9 @@ on:
       - "config/post_window_research_successor_schedule_v0_1.json"
       - "config/strategy_edge_validation_v0_1.json"
       - "config/strategy_research_loop_v0_1.json"
+      - "config/strategy_parameter_sweep_v0_1.json"
+      - "config/technical_analysis_v0_2.json"
+      - "config/binance_spot_shadow_v0_6.json"
       - "docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md"
       - "docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md"
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
@@ -29,6 +33,7 @@ on:
       - "web/**"
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/build_research_calendar_projection.py"
+      - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
       - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
@@ -39,6 +44,9 @@ on:
       - "config/post_window_research_successor_schedule_v0_1.json"
       - "config/strategy_edge_validation_v0_1.json"
       - "config/strategy_research_loop_v0_1.json"
+      - "config/strategy_parameter_sweep_v0_1.json"
+      - "config/technical_analysis_v0_2.json"
+      - "config/binance_spot_shadow_v0_6.json"
       - "docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md"
       - "docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md"
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
@@ -77,13 +85,8 @@ jobs:
           rm -rf _site
           mkdir -p _site/data
           cp -R web/. _site/
-          # Keep historical design sources in the Repository while avoiding
-          # unused multi-megabyte images in the public Pages artifact.
-          rm -f \
-            _site/assets/market-orbit-v2.jpg \
-            _site/assets/research-constellation-v1.jpg \
-            _site/assets/research-orbit-v3.jpg
-          cp config/strategy_v0_1.json _site/data/strategy.json
+          python scripts/build_strategy_projection.py \
+            --output _site/data/strategy.json
           python scripts/build_dashboard_authority_snapshot.py \
             --output _site/data/dashboard.json
           python scripts/build_research_calendar_projection.py \
@@ -104,6 +107,7 @@ jobs:
           data = json.loads(Path('_site/data/dashboard.json').read_text(encoding='utf-8'))
           calendar = json.loads(Path('_site/data/research-calendar.json').read_text(encoding='utf-8'))
           evidence = json.loads(Path('_site/data/research-evidence.json').read_text(encoding='utf-8'))
+          strategy = json.loads(Path('_site/data/strategy.json').read_text(encoding='utf-8'))
           project = data['project']
           assert data['authority'] is False
           assert data['locale'] == 'zh-Hant-TW'
@@ -153,14 +157,17 @@ jobs:
           assert evidence['positions'] == []
           assert evidence['backtests'] == []
           assert evidence['safetyBoundary']['backtestAdmissionAuthorized'] is False
+          assert strategy['schema'] == 'qookey-dashboard-strategy-projection-v0.1'
+          assert strategy['authority'] is False
+          assert strategy['baseline']['mode'] == 'paper'
+          assert strategy['summary']['candidateCount'] == 120
+          assert strategy['summary']['edgeMethodCount'] == 6
+          assert all(value is False for value in strategy['safetyBoundary'].values())
           schema = json.loads(Path('_site/data/research-evidence.schema.json').read_text(encoding='utf-8'))
           assert schema['properties']['authority']['const'] is False
-          for unused_asset in (
-              'market-orbit-v2.jpg',
-              'research-constellation-v1.jpg',
-              'research-orbit-v3.jpg',
-          ):
-              assert not Path('_site/assets', unused_asset).exists()
+          assert Path('_site/assets/css/styles.css').is_file()
+          assert Path('_site/assets/js/app.js').is_file()
+          assert Path('_site/assets/images/cloud-garden-v4.jpg').is_file()
           security = data['securityBoundary']
           assert security['containsSecrets'] is False
           assert security['authorizesMetadataCapture'] is True

@@ -735,7 +735,7 @@ def main() -> int:
     replace_pipeline_item(
         pipeline,
         "Strategy Research Loop V0.1",
-        "PR #204 已合併：120 個預註冊候選、4 類策略、短線／中線／波段三種週期；目前只允許 synthetic fixtures。",
+        "目前策略研究閉環包含 120 個預註冊候選、4 類策略、短線／中線／波段三種週期；目前只允許 synthetic fixtures。",
         "PREPARED",
     )
     replace_pipeline_item(

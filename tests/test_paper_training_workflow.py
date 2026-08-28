@@ -16,7 +16,9 @@ WORKFLOW = ROOT / ".github" / "workflows" / "pionex-public-paper-training-v0-1.y
 class PaperTrainingWorkflowTests(unittest.TestCase):
     def test_workflow_is_public_paper_only_and_demo_manual(self) -> None:
         text = WORKFLOW.read_text(encoding="utf-8")
-        self.assertIn('cron: "7 * * * *"', text)
+        self.assertNotIn("  schedule:", text)
+        self.assertIn("  workflow_dispatch:", text)
+        self.assertIn("scripts/build_strategy_projection.py", text)
         self.assertIn("permissions:\n  contents: read", text)
         self.assertIn("persist-credentials: false", text)
         self.assertIn("paper-training.json", text)

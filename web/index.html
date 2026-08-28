@@ -10,7 +10,7 @@
   <meta name="description" content="Qookey Crypto Autopilot 紙上交易與研究證據控制台。" />
   <title>Qookey Crypto Autopilot｜Research Space</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23075744'/%3E%3Ccircle cx='32' cy='32' r='21' fill='none' stroke='%23f2b28f' stroke-width='4'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='27' font-weight='700' fill='white'%3EQ%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="./styles.css?v=evidence-v3" />
+  <link rel="stylesheet" href="./assets/css/styles.css?v=convergence-v1" />
 </head>
 <body>
   <header class="site-header">
@@ -53,13 +53,14 @@
         <div class="strategy-meta"><span class="badge pass" id="strategy-mode">PAPER · LONG_ONLY</span><small id="strategy-version">V0.1.0 · Repository config</small></div>
       </article>
       <article class="research-loop-summary panel" aria-labelledby="research-loop-title">
-        <div class="panel-header"><div><p class="card-kicker">LATEST RESEARCH LAYER · PR #204</p><h3 id="research-loop-title">策略探索、Edge 驗證與 Paper 稽核已接成同一條閉環。</h3><p class="panel-intro">這是最新合併的研究層；目前只允許合成資料驗證，不會取代上方正式 Paper 基線。</p></div><span class="badge pending" id="strategy-research-status">PREPARED · SYNTHETIC ONLY</span></div>
+        <div class="panel-header"><div><p class="card-kicker">CURRENT RESEARCH LAYER</p><h3 id="research-loop-title">策略探索、Edge 驗證與 Paper 稽核共用一份版本化投影。</h3><p class="panel-intro">資料由 Repository 的六份策略設定重建；目前只允許合成資料驗證，不會取代上方 Paper 基線。</p></div><span class="badge pending" id="strategy-research-status">PREPARED · SYNTHETIC ONLY</span></div>
         <div class="sstate-meaning-grid">
           <div><span>預註冊候選</span><strong id="strategy-research-candidates">120</strong><small>完整 registry 與 SHA-256 lineage。</small></div>
           <div><span>策略家族</span><strong id="strategy-research-families">4</strong><small>趨勢、均值回歸、突破、量價。</small></div>
           <div><span>研究週期</span><strong id="strategy-research-horizons">3</strong><small>短線、中線、波段分開驗證。</small></div>
           <div><span>Edge 方法</span><strong id="strategy-edge-methods">6</strong><small>通過也只進入人工審查。</small></div>
         </div>
+        <div class="analysis-layer-list" id="strategy-analysis-layers" aria-label="策略分析層"></div>
       </article>
       <article class="sstate-explainer panel" aria-labelledby="sstate-explainer-title">
         <div class="sstate-explainer-heading"><p class="card-kicker">SSTATE IN PLAIN LANGUAGE</p><h3 id="sstate-explainer-title">先判斷市場環境，再決定要不要找進場。</h3><p>SState 是 4H 市場狀態與背景准入閘門，不是單獨的買賣訊號，也不是這筆交易的預測勝率。</p></div>
@@ -85,6 +86,6 @@
     <section class="view" id="view-gates"><article class="panel"><div class="panel-header"><div><p class="card-kicker">FAIL-CLOSED</p><h3>全部專案安全閘門</h3></div><span class="badge danger">無真實交易路徑</span></div><div class="gate-grid" id="all-gates"></div></article></section>
     <footer class="site-footer"><p>這個網站是 Repository authority 的唯讀投影，不是 authority 本身。</p><span>QOOKEY / PAPER-ONLY / 0 USD RUNTIME BUDGET</span></footer>
   </main>
-  <script src="./app.js?v=evidence-v3" defer></script>
+  <script src="./assets/js/app.js?v=convergence-v1" defer></script>
 </body>
 </html>

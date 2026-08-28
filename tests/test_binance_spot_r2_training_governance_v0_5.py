@@ -80,15 +80,17 @@ class BinanceSpotR2TrainingGovernanceV05Tests(unittest.TestCase):
                         config_sha256=self.authority["authorized_config"]["sha256"],
                     )
 
-    def test_weekly_and_monthly_schedules_are_exact_and_stop_is_binding(self) -> None:
+    def test_historical_schedule_contracts_remain_but_expired_crons_are_retired(self) -> None:
         self.assertEqual(self.config["schedule"]["cron_utc"], "37 2 * * 0")
-        self.assertIn('cron: "37 2 * * 0"', self.weekly)
+        self.assertNotIn("  schedule:", self.weekly)
+        self.assertIn("  workflow_dispatch:", self.weekly)
         self.assertNotIn("\n  push:", self.weekly)
         self.assertEqual(
             self.config["monthly_universe_review"]["cron_utc"],
             "37 3 1 * *",
         )
-        self.assertIn('cron: "37 3 1 * *"', self.monthly)
+        self.assertNotIn("  schedule:", self.monthly)
+        self.assertIn("  workflow_dispatch:", self.monthly)
         self.assertNotIn("\n  push:", self.monthly)
         self.assertFalse(self.config["schedule"]["automatic_resume_after_stop"])
 

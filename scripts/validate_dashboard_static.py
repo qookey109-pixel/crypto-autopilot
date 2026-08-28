@@ -6,14 +6,18 @@ from pathlib import Path
 
 
 ROOT = Path("web")
+APP_JS = ROOT / "assets" / "js" / "app.js"
+STYLES = ROOT / "assets" / "css" / "styles.css"
+ACTIVE_IMAGE = ROOT / "assets" / "images" / "cloud-garden-v4.jpg"
 OPERATIONAL_STATUS = ROOT / "data" / "operational-status.json"
 RESEARCH_CALENDAR = ROOT / "data" / "research-calendar.json"
 RESEARCH_EVIDENCE = ROOT / "data" / "research-evidence.json"
 RESEARCH_EVIDENCE_SCHEMA = ROOT / "data" / "research-evidence.schema.json"
 REQUIRED = (
     ROOT / "index.html",
-    ROOT / "styles.css",
-    ROOT / "app.js",
+    STYLES,
+    ROOT / "assets" / "css" / "variables.css",
+    APP_JS,
     ROOT / "data" / "dashboard.json",
     OPERATIONAL_STATUS,
     ROOT / "data" / "paper-training.json",
@@ -75,6 +79,15 @@ def main() -> int:
     missing = [str(path) for path in REQUIRED if not path.is_file()]
     if missing:
         raise RuntimeError(f"dashboard required files missing: {missing}")
+    if not ACTIVE_IMAGE.is_file():
+        raise RuntimeError("dashboard active background image is missing")
+    for retired in (
+        "market-orbit-v2.jpg",
+        "research-constellation-v1.jpg",
+        "research-orbit-v3.jpg",
+    ):
+        if any((ROOT / "assets").rglob(retired)):
+            raise RuntimeError(f"retired dashboard design asset returned: {retired}")
 
     combined = "\n".join(path.read_text(encoding="utf-8") for path in REQUIRED)
     for token in FORBIDDEN_TEXT:
@@ -85,7 +98,16 @@ def main() -> int:
             raise RuntimeError(f"dashboard contains forbidden live/concurrent execution phrase: {phrase}")
 
     data = json.loads((ROOT / "data" / "dashboard.json").read_text(encoding="utf-8"))
-    strategy = json.loads((ROOT / "data" / "strategy.json").read_text(encoding="utf-8"))
+    strategy_projection = json.loads((ROOT / "data" / "strategy.json").read_text(encoding="utf-8"))
+    if strategy_projection.get("schema") != "qookey-dashboard-strategy-projection-v0.1":
+        raise RuntimeError("dashboard strategy projection schema changed")
+    if strategy_projection.get("authority") is not False:
+        raise RuntimeError("dashboard strategy projection must remain non-authoritative")
+    if strategy_projection.get("generatedAtUtc") is not None:
+        raise RuntimeError("checked-in strategy fixture must not invent a generation time")
+    if any(value is not False for value in strategy_projection.get("safetyBoundary", {}).values()):
+        raise RuntimeError("dashboard strategy projection safety boundary changed")
+    strategy = strategy_projection.get("baseline") or {}
     if strategy.get("version") != "0.1.0":
         raise RuntimeError("dashboard strategy version changed without a strategy update")
     if strategy.get("mode") != "paper" or strategy.get("direction") != "LONG_ONLY":
@@ -301,8 +323,8 @@ def main() -> int:
         if f'id="view-{view}"' not in html:
             raise RuntimeError(f"dashboard view missing: {view}")
 
-    app_js = (ROOT / "app.js").read_text(encoding="utf-8")
-    styles = (ROOT / "styles.css").read_text(encoding="utf-8")
+    app_js = APP_JS.read_text(encoding="utf-8")
+    styles = STYLES.read_text(encoding="utf-8")
     if "style=" in html or "style=" in app_js:
         raise RuntimeError("dashboard CSP forbids inline style attributes")
     for token in (
@@ -334,6 +356,8 @@ def main() -> int:
         "formatTrustedTime",
         "researchEvidenceIsSafe",
         "renderResearchEvidence",
+        "qookey-dashboard-strategy-projection-v0.1",
+        "strategy-analysis-layers",
         "strategy-score-progress",
         'wrap.setAttribute("role", "region")',
         "operational.pipelineItems",

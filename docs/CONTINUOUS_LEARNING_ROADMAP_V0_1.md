@@ -31,7 +31,8 @@ loop. A `REJECT` result is retained as evidence and cannot replace a model.
 ### 1. Current bounded research — through 2026-08-27 08:00 Asia/Taipei
 
 - Pionex public paper training produces candidate and simulated-trade evidence.
-- Binance Spot V0.5 remains the current weekly historical research trainer.
+- Binance Spot V0.5 was the bounded weekly historical research trainer; its
+  cron is retired after the 2026-08-27 cutoff and it does not auto-resume.
 - Research Signal Layer V0.2 collects only allowlisted structured public-source
   evidence; signal quality and automation health checks remain read-only.
 - These paths are separate. They do not yet share an automatic rolling dataset,

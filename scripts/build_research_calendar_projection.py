@@ -75,7 +75,9 @@ def first_eligible_run(cron: object, not_before: datetime) -> datetime:
     raise RuntimeError("no eligible detailed-history run exists inside the configured cron window")
 
 
-def build_projection(*, generated_at_utc: str | None = None) -> dict[str, object]:
+def build_projection(
+    *, generated_at_utc: str | None = None, checked_in_fixture: bool = False
+) -> dict[str, object]:
     v0_10 = load_json(V0_10_CUTOVER)
     detailed = load_json(DETAILED_HISTORY)
     successor = load_json(SUCCESSOR_SCHEDULE)
@@ -165,7 +167,7 @@ def build_projection(*, generated_at_utc: str | None = None) -> dict[str, object
         raise RuntimeError("historical SState evidence readiness changed")
 
     target_at = "2026-09-30T15:59:59.999Z"
-    generated = normalized_utc(generated_at_utc)
+    generated = None if checked_in_fixture else normalized_utc(generated_at_utc)
     return {
         "schema": "qookey-research-calendar-projection-v0.1",
         "authority": False,
@@ -186,7 +188,7 @@ def build_projection(*, generated_at_utc: str | None = None) -> dict[str, object
             },
             {
                 "id": "strategy-research-loop-v0-1",
-                "windowLabel": "PR #204 MERGED · SYNTHETIC ONLY",
+                "windowLabel": "CURRENT RESEARCH · SYNTHETIC ONLY",
                 "title": "策略研究閉環 V0.1",
                 "detail": "120 個預註冊候選、4 類策略與短線／中線／波段三週期已準備；目前沒有 production dataset 執行或模型晉升權限。",
                 "status": "PREPARED",
@@ -243,8 +245,12 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default="web/data/research-calendar.json")
     parser.add_argument("--generated-at-utc")
+    parser.add_argument("--checked-in-fixture", action="store_true")
     args = parser.parse_args()
-    projection = build_projection(generated_at_utc=args.generated_at_utc)
+    projection = build_projection(
+        generated_at_utc=args.generated_at_utc,
+        checked_in_fixture=args.checked_in_fixture,
+    )
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
