@@ -192,6 +192,50 @@ Repository branch `main` is the live formal authority and is intentionally not s
 - A post-window four-hour/weekly/monthly successor cadence is recorded as
   `PREPARED_NOT_ACTIVE`. It has no workflow and grants zero provider, R2,
   holdout, model-promotion or trading authority.
+- Paper LONG/SHORT Challenger V0.2 is now prepared as an isolated,
+  `PREPARED_LOCAL_REPLAY_ONLY` research path. It evaluates long and short
+  directional samples separately with bounded 0.25% sample risk, 3x maximum
+  leverage, and explicit opposite funding accounting. It does not alter the
+  V0.1 LONG_ONLY baseline, does not schedule provider reads, does not read or
+  write R2, and cannot promote a model or create a trade plan. See
+  `config/paper_long_short_challenger_v0_2.json` and
+  `docs/PAPER_LONG_SHORT_CHALLENGER_V0_2.md`.
+- Tokenized Equity Challenger V0.1 is prepared as a separate
+  `PREPARED_LOCAL_REPLAY_ONLY` path that reuses the crypto technical scorer
+  only after explicit tokenized-stock asset-class, session, corporate-action,
+  interval and spread gates pass. It remains outside the formal crypto
+  universe, has no schedule or R2 access, and cannot promote a model or create
+  a trade plan. See `config/tokenized_equity_challenger_v0_1.json` and
+  `docs/TOKENIZED_EQUITY_CHALLENGER_V0_1.md`.
+- Integrated Paper Strategy Challenger V0.2 is prepared locally on top of the
+  two isolated challengers. It bridges the unmodified formal SState V0.1 LONG
+  decision, context-only SHORT research, directional technical candidates,
+  crypto/tokenized asset gates, bounded ATR/EMA20/Bollinger midline and
+  half-band structural stops, leverage-rejection
+  diagnostics, +1R partial/runner handling and a hard 12-hour exit. SState and
+  technical scores remain separate, research context cannot affect eligibility,
+  and the 1% equity setting is an initial-loss budget rather than a fixed stop
+  distance; wider stops reduce paper position size.
+  and the formal V0.1 broker/strategy remain unchanged. Challenger Promotion
+  Protocol V0.1 freezes quantitative walk-forward, sample, cost, drawdown,
+  concentration and regime gates, but a PASS means human review only. Neither
+  file grants a workflow, provider/R2/holdout access, promotion, trade-plan or
+  trading authority. See `config/integrated_paper_strategy_v0_2.json`,
+  `config/challenger_promotion_protocol_v0_1.json` and
+  `docs/INTEGRATED_PAPER_STRATEGY_CHALLENGER_V0_2.md`.
+- Integrated Paper Strategy Challenger V0.3 is prepared as a successor evidence
+  layer. It keeps executable single-position portfolio evidence separate from
+  overlapping fixed-equity signal samples, explicitly forbids treating sample
+  PnL as portfolio PnL, and adds stop-distance, planned R:R, stop-source and
+  leverage-rejection diagnostics. Promotion Protocol V0.2 preserves V0.1 gates
+  while adding 180 OOS calendar days, 28 prospective paper days, stationary
+  block-bootstrap confidence, a locked family registry SHA-256 and
+  Holm-Bonferroni control. SState 0.60/50 remains unchanged but cannot reach
+  review without the separate calibration protocol; SHORT remains paper-only
+  and requires independent calibration, funding stress and squeeze-regime
+  evidence. No provider/R2/holdout/workflow, formal strategy, promotion,
+  trade-plan or trading authority is added. See
+  `docs/INTEGRATED_PAPER_STRATEGY_CHALLENGER_V0_3.md`.
 - The research-only continuous-learning completion target is documented in
   `docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`. Its `2026-09-30` engineering
   target is a roadmap, not execution authority or a profitability promise.

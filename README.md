@@ -84,6 +84,32 @@ descriptive regime evidence only; it cannot read providers, write R2, access
 the holdout, promote a model or trade. See
 [`docs/BINANCE_SPOT_SHADOW_V0_6.md`](docs/BINANCE_SPOT_SHADOW_V0_6.md).
 
+The prepared **Integrated Paper Strategy Challenger V0.2** keeps the governed
+V0.1 strategy unchanged while joining its formal LONG SState decision with the
+separate directional technical, LONG/SHORT and tokenized-equity research
+adapters. Its local replay implements bounded ATR/EMA20/Bollinger midline and
+half-band structural stops, explicit
+leverage-cap rejection diagnostics, +1R partial/runner handling and a hard
+12-hour exit. The 1% equity value is a maximum initial-loss budget rather than
+a fixed 1%-distance stop; wider stops reduce position size. SState and
+technical scores are not added, SHORT remains
+context-only research, and KOL/sentiment context cannot affect eligibility. A
+separate quantitative promotion protocol can produce only
+`EVIDENCE_READY_FOR_HUMAN_REVIEW`; it cannot promote or trade. There is no
+workflow, provider/R2/holdout access or execution authority. See
+[`docs/INTEGRATED_PAPER_STRATEGY_CHALLENGER_V0_2.md`](docs/INTEGRATED_PAPER_STRATEGY_CHALLENGER_V0_2.md).
+
+**Integrated Paper Strategy Challenger V0.3** adds two non-interchangeable
+evidence lanes: a one-position portfolio replay and overlapping independent
+signal samples that may never be reported as portfolio PnL. It records stop
+distance and planned R:R distributions, results by stop source, and the quality
+of leverage-rejected candidates. Promotion Protocol V0.2 adds a locked
+experiment family, stationary block-bootstrap confidence, Holm-Bonferroni,
+minimum calendar duration and mandatory SState/SHORT calibration evidence.
+All additions remain local paper research with no workflow, holdout, R2,
+promotion or trading authority. See
+[`docs/INTEGRATED_PAPER_STRATEGY_CHALLENGER_V0_3.md`](docs/INTEGRATED_PAPER_STRATEGY_CHALLENGER_V0_3.md).
+
 The prepared Research Signal Layer keeps current closed candles, append-only
 historical evidence and timestamped KOL forecasts separate. It enforces
 close-time and publication-time boundaries, rejects revisions and provider
