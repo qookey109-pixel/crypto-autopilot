@@ -1,0 +1,37 @@
+{
+  "schema": "post-cutoff-schedule-retirement-v0.1",
+  "status": "EFFECTIVE_ON_MAIN_MERGE",
+  "effective_after_utc": "2026-08-27T00:00:00Z",
+  "purpose": "Stop expired bounded workflows from consuming GitHub Actions runs after their provider-read cutoff while preserving manual fail-closed regression entrypoints and frozen evidence.",
+  "retired_schedule_triggers": [
+    {
+      "workflow": "pionex-public-paper-training-v0-1.yml",
+      "retired_cron_utc": "7 * * * *"
+    },
+    {
+      "workflow": "binance-spot-r2-training-governance-v0-5.yml",
+      "retired_cron_utc": "37 2 * * 0"
+    },
+    {
+      "workflow": "binance-spot-r2-monthly-governance-v0-5.yml",
+      "retired_cron_utc": "37 3 1 * *"
+    }
+  ],
+  "retained_behavior": {
+    "workflow_dispatch_for_fail_closed_regression": true,
+    "original_configs_and_receipts_immutable": true,
+    "historical_schedule_strings_preserved_in_original_configs_and_receipts": true,
+    "automatic_resume": false
+  },
+  "authority": {
+    "provider_access_authorized": false,
+    "r2_list_read_write_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_change_authorized": false,
+    "model_promotion_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

@@ -1,12 +1,116 @@
 {
-  "version": "0.1.0",
-  "mode": "paper",
-  "direction": "LONG_ONLY",
-  "universe_target": 15,
-  "max_new_trades_per_day": 3,
-  "timeframes": {"market_context": "4H", "setup": "60M", "entry": "15M"},
-  "sstate": {"allowed_states": ["S3", "S0.5", "S2", "S1"], "minimum_probability": 0.60, "minimum_samples": 50, "probability_horizon_use": "background_gate_only"},
-  "score": {"minimum_entry_score": 80, "weights": {"sstate_quality": 25, "historical_probability": 20, "trend_1h": 20, "entry_15m": 20, "reward_risk": 10, "liquidity_funding": 5}},
-  "risk": {"risk_fraction_per_trade": 0.01, "max_leverage": 3.0, "daily_loss_limit_r": 3.0, "max_structural_stop_atr": 2.5},
-  "exit": {"partial_at_r": 1.0, "partial_fraction": 0.30, "runner_fraction": 0.70, "max_holding_hours": 12}
+  "schema": "qookey-dashboard-strategy-projection-v0.1",
+  "authority": false,
+  "locale": "zh-Hant-TW",
+  "generatedAtUtc": null,
+  "sourceConfigs": [
+    "config/strategy_v0_1.json",
+    "config/technical_analysis_v0_2.json",
+    "config/strategy_parameter_sweep_v0_1.json",
+    "config/binance_spot_shadow_v0_6.json",
+    "config/strategy_edge_validation_v0_1.json",
+    "config/strategy_research_loop_v0_1.json"
+  ],
+  "baseline": {
+    "version": "0.1.0",
+    "mode": "paper",
+    "direction": "LONG_ONLY",
+    "universe_target": 15,
+    "max_new_trades_per_day": 3,
+    "timeframes": {
+      "market_context": "4H",
+      "setup": "60M",
+      "entry": "15M"
+    },
+    "sstate": {
+      "allowed_states": [
+        "S3",
+        "S0.5",
+        "S2",
+        "S1"
+      ],
+      "minimum_probability": 0.6,
+      "minimum_samples": 50,
+      "probability_horizon_use": "background_gate_only"
+    },
+    "score": {
+      "minimum_entry_score": 80,
+      "weights": {
+        "sstate_quality": 25,
+        "historical_probability": 20,
+        "trend_1h": 20,
+        "entry_15m": 20,
+        "reward_risk": 10,
+        "liquidity_funding": 5
+      }
+    },
+    "risk": {
+      "risk_fraction_per_trade": 0.01,
+      "max_leverage": 3.0,
+      "daily_loss_limit_r": 3.0,
+      "max_structural_stop_atr": 2.5
+    },
+    "exit": {
+      "partial_at_r": 1.0,
+      "partial_fraction": 0.3,
+      "runner_fraction": 0.7,
+      "max_holding_hours": 12
+    }
+  },
+  "summary": {
+    "candidateCount": 120,
+    "familyCount": 4,
+    "horizonCount": 3,
+    "edgeMethodCount": 6,
+    "technicalIntervalCount": 3,
+    "shadowFeatureGroupCount": 8
+  },
+  "analysisLayers": [
+    {
+      "id": "baseline",
+      "name": "Paper 策略基線",
+      "status": "PAPER_BASELINE",
+      "detail": "SState 准入、100 分技術品質與結構風控；目前仍為 LONG_ONLY。"
+    },
+    {
+      "id": "technical",
+      "name": "技術特徵 V0.2",
+      "status": "RESEARCH_ONLY",
+      "detail": "3 個週期；只允許閉合 K 線與因果特徵。"
+    },
+    {
+      "id": "shadow",
+      "name": "Shadow Ablation V0.6",
+      "status": "PREPARED_NOT_ACTIVE",
+      "detail": "8 組特徵逐組比較，不自動晉升模型。"
+    },
+    {
+      "id": "research_loop",
+      "name": "策略研究閉環 V0.1",
+      "status": "PREPARED_RESEARCH_ONLY",
+      "detail": "120 個預註冊候選，synthetic only。"
+    },
+    {
+      "id": "edge",
+      "name": "Edge 驗證 V0.1",
+      "status": "PREPARED_RESEARCH_ONLY",
+      "detail": "6 種抗過擬合方法；通過也只進人工審查。"
+    },
+    {
+      "id": "parameter_sweep",
+      "name": "參數搜尋 V0.1",
+      "status": "FRAMEWORK_ONLY",
+      "detail": "候選值與驗證切分尚未凍結，不執行正式搜尋。"
+    }
+  ],
+  "safetyBoundary": {
+    "providerAccessAuthorized": false,
+    "r2AccessAuthorized": false,
+    "holdoutAccessAuthorized": false,
+    "backtestAdmissionAuthorized": false,
+    "automaticModelPromotionAuthorized": false,
+    "tradePlanAuthorized": false,
+    "realMoneyOrderAuthorized": false,
+    "liveTradingAuthorized": false
+  }
 }

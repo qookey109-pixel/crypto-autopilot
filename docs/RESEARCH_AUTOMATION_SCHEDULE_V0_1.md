@@ -5,24 +5,24 @@ configs, receipts and workflows remain authoritative. It does not change the
 frozen V0.10 production-critical path, open the replacement holdout, promote a
 model or authorize trading.
 
-## Current active schedule
+## Current scheduled execution after 2026-08-29 convergence
 
 | Cadence | Current job | Evidence boundary |
 | --- | --- | --- |
-| Pull request / push | Repository CI and synthetic fault tests | No provider, production R2, holdout or trading access |
-| Sunday 02:37 UTC | Binance Spot R2 training governance V0.5 | First run completed; pipeline `PASS`, model quality `REJECT`; no push trigger |
-| Day 1 03:37 UTC | Binance Spot monthly governance V0.5 | One-time manual baseline completed; repeat manual activation is forbidden |
-| Hourly at `:07` | Pionex public paper training V0.1 | Repository Paper Broker only; Pionex Demo stays manual |
+| Pull request / push | Repository CI and dashboard validation | No provider, production R2, holdout or trading access |
+| `:17` / `:47` inside the exact V0.10 window | Provider Equivalence V0.10 metadata capture | Current metadata-only path; no holdout candle access |
 | Daily 02:17 UTC | Research Signal Layer V0.2 | Public HTTPS source metadata and structured KOL challenger evidence to dedicated R2 namespace; no trading |
 | Daily 02:47 UTC | Research Signal Quality V0.1 | Exact latest/manifest/payload R2 reads with SHA/time/authority checks; no list or write |
 | Every three hours at `:47` | Research Automation Health V0.1 | GitHub Actions metadata-only stale/failure/missing-run monitor; no provider or R2 access |
-| Every 6 hours at `:23`, 2026-09-04 through 2026-09-30 | Binance USD-M Detailed History V0.1.1 | One serialized incomplete 10-market shard; 250-market / 48-month target; R2-only |
-| Sunday 04:37 UTC | Binance USD-M Detailed Training V0.1.1 | Skips until all detailed-history shards are complete; research evidence only |
+| Every 6 hours at `:23`, 2026-09-04 through 2026-09-30 | Binance USD-M Crypto Core 100 V0.1.2 | One serialized incomplete 10-market shard; 100-market / 48-month target; R2-only |
+| Sunday 04:37 UTC | Binance USD-M Crypto Core 100 Training V0.1.2 | Skips until all 10 detailed-history shards are complete; research evidence only |
 
-The Binance weekly and monthly jobs stop before provider or R2 access at
-`2026-08-27T00:00:00Z`; the Pionex paper job also stops provider requests at
-that boundary. A green post-stop skip is intentional. No automatic resume is
-authorized.
+The expired Binance V0.5 weekly/monthly and Pionex Paper cron triggers are no
+longer active. Their binding provider cutoff was
+`2026-08-27T00:00:00Z`; `config/post_cutoff_schedule_retirement_v0_1.json`
+removes only the cron triggers and leaves manual fail-closed regression
+entrypoints. No automatic resume is authorized, and the historical config and
+receipt schedule strings are not rewritten.
 
 Research Signal Layer V0.2 is independent of the frozen Binance/Pionex stop
 window. Its collector performs a fresh FREE-ONLY R2 headroom gate before any
@@ -38,13 +38,13 @@ year field. A frozen `2026-10-01T00:00:00Z` backfill stop makes every later
 occurrence exit before provider or R2 access. The separate completed-dataset
 weekly trainer is not subject to that backfill-only expiration.
 
-The initial V0.5 monthly baseline was created successfully by run `32589005957`
+The historical V0.5 monthly baseline was created successfully by run `32589005957`
 at `2026-08-23 01:51 Asia/Taipei`. The first weekly run `32615608243` completed
 at `2026-08-23 11:32 Asia/Taipei`; the evidence pipeline passed while the model
-quality gate rejected the candidate. Do not repeat the monthly manual activation
-or reinterpret the model rejection as an execution failure. Repository push is
-not a production workflow trigger. The current execution handoff is recorded in
-`docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`.
+quality gate rejected the candidate. Do not reinterpret the model rejection as
+an execution failure. Repository push is not a production workflow trigger.
+The concise current index is `docs/AUTOMATION_INDEX_V0_1.md`; the historical
+execution handoff remains in `docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`.
 
 ## Data retention split (partially active)
 
@@ -54,8 +54,9 @@ The requested retention policy is recorded in
 
 - Binance Spot `1d` training history remains `2020-01-01` through the latest
   complete UTC day under the existing V0.5 authority.
-- Detailed History V0.1.1 authorizes a fixed 2022-08 through 2026-07 Binance USD-M
-  `15m` / `1h` / `4h` dataset for 250 markets after the V0.10 window.
+- Crypto Core 100 V0.1.2 authorizes a fixed 2022-08 through 2026-07 Binance USD-M
+  `15m` / `1h` / `4h` dataset for 100 unique Crypto markets after the V0.10
+  window. Tokenized-equity candidates require a separate future dataset.
 - Future rolling updates and the broader derivative-state series still need a
   separately authorized materialization path.
 - Derived indicators are recomputed from canonical inputs rather than stored as

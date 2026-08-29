@@ -14,6 +14,7 @@ const STATUS_LABELS = {
   READY: "已就緒 · READY",
   AUTHORIZED: "已授權 · AUTHORIZED",
   PREPARED: "已準備 · PREPARED",
+  WAITING_AUTHORITY: "等待授權 · WAITING_AUTHORITY",
   PENDING: "等待中 · PENDING",
   IN_PROGRESS: "進行中 · IN_PROGRESS",
   NOT_READY: "尚未就緒 · NOT_READY",
@@ -26,7 +27,7 @@ const STATUS_LABELS = {
 
 function badgeClass(status) {
   if (["PASS", "READY", "AUTHORIZED"].includes(status)) return "pass";
-  if (["PREPARED", "PENDING", "IN_PROGRESS", "NOT_READY", "REVIEW_REQUIRED", "SCOPE_REDUCTION_REQUIRED"].includes(status)) return "pending";
+  if (["PREPARED", "WAITING_AUTHORITY", "PENDING", "IN_PROGRESS", "NOT_READY", "REVIEW_REQUIRED", "SCOPE_REDUCTION_REQUIRED"].includes(status)) return "pending";
   if (["BLOCKED", "NOT_AUTHORIZED", "FAIL"].includes(status)) return "danger";
   return "neutral";
 }
@@ -338,8 +339,14 @@ function renderResearchEvidence(evidence) {
   }
 }
 
-function renderStrategy(strategy) {
-  if (!strategy || typeof strategy !== "object") return;
+function renderStrategy(projection) {
+  if (!projection || projection.schema !== "qookey-dashboard-strategy-projection-v0.1") return;
+  if (projection.authority !== false) throw new Error("Strategy projection must remain non-authoritative");
+  const boundary = projection.safetyBoundary || {};
+  if (Object.values(boundary).some(value => value !== false)) {
+    throw new Error("Strategy projection safety boundary rejected");
+  }
+  const strategy = projection.baseline || {};
   const setText = (id, value) => {
     const element = document.querySelector(`#${id}`);
     if (element) element.textContent = value;
@@ -386,23 +393,29 @@ function renderStrategy(strategy) {
       </div>
     `).join("");
   }
-}
-
-function renderStrategyResearch(project) {
-  if (!project || typeof project !== "object") return;
-  const setText = (id, value) => {
-    const element = document.querySelector(`#${id}`);
-    if (element) element.textContent = value;
-  };
-  const status = String(project.strategyResearchLoopState || "NOT_READY");
+  const summary = projection.summary || {};
+  const researchLayer = (projection.analysisLayers || []).find(layer => layer.id === "research_loop") || {};
+  const status = String(researchLayer.status || "NOT_READY");
   setText(
     "strategy-research-status",
     status === "PREPARED_RESEARCH_ONLY" ? "PREPARED · SYNTHETIC ONLY" : displayStatus(status)
   );
-  setText("strategy-research-candidates", number(project.strategyResearchCandidateCount, 0));
-  setText("strategy-research-families", number(project.strategyResearchFamilyCount, 0));
-  setText("strategy-research-horizons", number(project.strategyResearchHorizonCount, 0));
-  setText("strategy-edge-methods", number(project.strategyEdgeMethodCount, 0));
+  setText("strategy-research-candidates", number(summary.candidateCount, 0));
+  setText("strategy-research-families", number(summary.familyCount, 0));
+  setText("strategy-research-horizons", number(summary.horizonCount, 0));
+  setText("strategy-edge-methods", number(summary.edgeMethodCount, 0));
+  const layers = document.querySelector("#strategy-analysis-layers");
+  if (layers) {
+    layers.innerHTML = (projection.analysisLayers || []).map(layer => `
+      <div class="analysis-layer">
+        <div>
+          <strong>${escapeHtml(layer.name)}</strong>
+          <small>${escapeHtml(layer.detail)}</small>
+        </div>
+        <span class="badge ${badgeClass(String(layer.status || "NOT_READY"))}">${escapeHtml(layer.status || "NOT_READY")}</span>
+      </div>
+    `).join("");
+  }
 }
 
 function upsertByName(items, additions) {
@@ -445,7 +458,6 @@ function render(data) {
   renderCriticalGates(data.gates || []);
   renderAllGates(data.gates || []);
   renderMarkets(data.markets || []);
-  renderStrategyResearch(data.project || {});
 }
 
 async function fetchJson(path) {

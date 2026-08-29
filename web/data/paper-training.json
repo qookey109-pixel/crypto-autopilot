@@ -1,12 +1,12 @@
 {
   "schema": "pionex-public-paper-training-run-v0.1",
-  "status": "PREPARED",
+  "status": "WAITING_AUTHORITY",
   "mode": "PAPER_TRAINING_ONLY",
-  "runId": "safe-static-fixture",
+  "runId": "post-window-v0-2-gate",
   "observedAtUtc": null,
   "authority": {
-    "publicMarketDataReadAuthorized": true,
-    "paperCandidateGenerationAuthorized": true,
+    "publicMarketDataReadAuthorized": false,
+    "paperCandidateGenerationAuthorized": false,
     "repositoryPaperBrokerAuthorized": true,
     "formalTradePlanAuthorized": false,
     "pionexDemoAutomationAuthorized": false,
@@ -36,5 +36,5 @@
     "total_funding_usd": 0.0,
     "total_slippage_cost_usd": 0.0
   },
-  "interpretation": "Safe static fixture only; no provider request or trade was performed."
+  "interpretation": "Post-window Paper V0.2 is prepared but inactive. Complete V0.11 and merge a separate holdout-access authority before provider reads or scheduling."
 }

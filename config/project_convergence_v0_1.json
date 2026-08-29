@@ -1,0 +1,155 @@
+{
+  "schema": "project-convergence-index-v0.1",
+  "status": "DOCUMENTATION_INDEX_ONLY",
+  "authority": false,
+  "source_of_truth": "Repository main plus PROJECT_STATUS.md and versioned authorities",
+  "website": {
+    "entry": "web/index.html",
+    "script": "web/assets/js/app.js",
+    "styles": [
+      "web/assets/css/variables.css",
+      "web/assets/css/styles.css"
+    ],
+    "active_large_assets": [
+      "web/assets/images/cloud-garden-v4.jpg"
+    ],
+    "projection_directory": "web/data",
+    "strategy_projection_builder": "scripts/build_strategy_projection.py"
+  },
+  "strategy": {
+    "paper_baseline": "config/strategy_v0_1.json",
+    "technical_features": "config/technical_analysis_v0_2.json",
+    "shadow_ablation": "config/binance_spot_shadow_v0_6.json",
+    "research_loop": "config/strategy_research_loop_v0_1.json",
+    "edge_validation": "config/strategy_edge_validation_v0_1.json",
+    "parameter_sweep": "config/strategy_parameter_sweep_v0_1.json",
+    "display_projection": "web/data/strategy.json"
+  },
+  "current_data_and_paper": {
+    "crypto_core_100": "config/binance_usdm_detailed_history_v0_1_2.json",
+    "crypto_core_100_authority": "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json",
+    "tokenized_equity_dataset": "SEPARATE_FUTURE_VERSION_NOT_AUTHORIZED",
+    "paper_successor": "config/post_window_paper_training_v0_2.json",
+    "paper_successor_state": "PREPARED_WAITING_FOR_HOLDOUT_AUTHORITY"
+  },
+  "scheduled_workflows": {
+    "current_window": [
+      {
+        "workflow": "provider-equivalence-v0-10-render-metadata-capture.yml",
+        "cron_utc": [
+          "17,47 * 27,28,29,30,31 8 *",
+          "17,47 * 1,2,3 9 *",
+          "17,47 0,1 4 9 *"
+        ],
+        "active_until_utc": "2026-09-04T02:00:00Z"
+      }
+    ],
+    "continuous_research": [
+      {
+        "workflow": "research-signal-layer-v0-2.yml",
+        "cron_utc": ["17 2 * * *"]
+      },
+      {
+        "workflow": "research-signal-quality-v0-1.yml",
+        "cron_utc": ["47 2 * * *"]
+      },
+      {
+        "workflow": "research-automation-health-v0-1.yml",
+        "cron_utc": ["47 */3 * * *"]
+      }
+    ],
+    "authorized_post_window": [
+      {
+        "workflow": "binance-usdm-detailed-history-v0-1.yml",
+        "cron_utc": ["23 */6 4-30 9 *"],
+        "active_from_utc": "2026-09-04T02:00:00Z",
+        "active_until_utc": "2026-10-01T00:00:00Z"
+      },
+      {
+        "workflow": "binance-usdm-detailed-training-v0-1.yml",
+        "cron_utc": ["37 4 * * 0"],
+        "dependency": "complete detailed-history dataset"
+      }
+    ]
+  },
+  "post_cutoff_manual_regressions": [
+    "pionex-public-paper-training-v0-1.yml",
+    "binance-spot-r2-training-governance-v0-5.yml",
+    "binance-spot-r2-monthly-governance-v0-5.yml"
+  ],
+  "workflow_groups": {
+    "current_execution_monitoring_or_release": [
+      "binance-usdm-detailed-history-v0-1.yml",
+      "binance-usdm-detailed-training-v0-1.yml",
+      "ci.yml",
+      "dashboard-authority-snapshot.yml",
+      "dashboard-github-pages.yml",
+      "dashboard-static-smoke.yml",
+      "observe-v0-10-scheduled-capture.yml",
+      "provider-equivalence-v0-10-render-metadata-capture.yml",
+      "research-automation-health-v0-1.yml",
+      "research-signal-layer-v0-2.yml",
+      "research-signal-quality-v0-1.yml",
+      "v0-10-critical-path-freeze-guard.yml",
+      "validate-v0-10-capture-window-operations.yml",
+      "validate-v0-11-metadata-stability-evaluator.yml"
+    ],
+    "post_cutoff_manual_fail_closed": [
+      "binance-spot-r2-monthly-governance-v0-5.yml",
+      "binance-spot-r2-training-governance-v0-5.yml",
+      "pionex-public-paper-training-v0-1.yml"
+    ],
+    "historical_planning_or_regression_only": [
+      "automate-v0-3-cloud-transport-follow-up.yml",
+      "binance-2025-coverage-scan.yml",
+      "binance-2025-r2-pilot.yml",
+      "binance-funding-coverage.yml",
+      "binance-funding-materialization-authority-plan.yml",
+      "binance-funding-materialization-plan-v0-2.yml",
+      "binance-funding-r2-budget.yml",
+      "binance-funding-r2-v0-2-materialize.yml",
+      "binance-funding-r2-v0-2-preflight.yml",
+      "binance-funding-source-proof.yml",
+      "binance-max-coverage-discovery.yml",
+      "binance-spot-r2-automated-training-v0-3.yml",
+      "binance-spot-r2-monthly-universe-review-v0-4.yml",
+      "binance-spot-r2-weekly-training-v0-4.yml",
+      "binance-staged-expansion-plan.yml",
+      "binance-vision-live-proof.yml",
+      "binance-vision-r2-proof.yml",
+      "diagnose-v0-2-self-hosted-mac-binance-transport.yml",
+      "diagnose-v0-3-cloudflare-container-binance-transport.yml",
+      "dispatch-v0-3-cloud-transport-from-authority-marker.yml",
+      "historical-backfill-pilot.yml",
+      "historical-universe-long-horizon-review.yml",
+      "m1a-acquisition.yml",
+      "m1b-m1a-dataset-upload.yml",
+      "m1b-r2-roundtrip.yml",
+      "pionex-binance-equivalence-proof.yml",
+      "pionex-binance-equivalence-v0-1-forensics.yml",
+      "pre-window-readiness-v0-1.yml",
+      "provider-equivalence-v0-2-metadata-capture.yml",
+      "provider-equivalence-v0-8-render-metadata-capture.yml",
+      "validate-v0-4-koyeb-free-transport.yml",
+      "validate-v0-5-render-free-transport-pass.yml",
+      "validate-v0-5-render-free-transport.yml",
+      "validate-v0-6-render-transport-authority-transition.yml",
+      "validate-v0-7-render-metadata-capture-protocol.yml",
+      "validate-v0-8-shared-secret-preflight.yml",
+      "validate-v0-9-render-relay-smoke.yml"
+    ]
+  },
+  "boundaries": {
+    "frozen_evidence_deleted": false,
+    "v0_10_production_critical_path_changed": false,
+    "sstate_core_changed": false,
+    "strategy_parameters_changed": false,
+    "provider_or_r2_authority_added": false,
+    "provider_or_r2_scope_replaced_before_execution": true,
+    "replacement_holdout_access_authorized": false,
+    "paper_successor_automatic_activation_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

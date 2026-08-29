@@ -10,7 +10,7 @@
   <meta name="description" content="Qookey Crypto Autopilot 紙上交易與研究證據控制台。" />
   <title>Qookey Crypto Autopilot｜Research Space</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23075744'/%3E%3Ccircle cx='32' cy='32' r='21' fill='none' stroke='%23f2b28f' stroke-width='4'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='27' font-weight='700' fill='white'%3EQ%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="./styles.css?v=evidence-v3" />
+  <link rel="stylesheet" href="./assets/css/styles.css?v=convergence-v3" />
 </head>
 <body>
   <header class="site-header">
@@ -38,10 +38,10 @@
 
     <section class="view overview-content active" id="view-overview">
       <div class="snapshot-line"><div><p class="eyebrow">QOOKEY / RESEARCH SNAPSHOT</p><h2>今天的研究狀態</h2><div class="trusted-times" aria-label="資料時間"><span id="dashboard-generated-at">投影建立：尚未提供</span><span id="paper-observed-at">Paper 觀測：尚未完成</span></div></div><div class="snapshot-pill"><i class="status-dot safe"></i><span id="snapshot-label">安全測試資料快照</span></div></div>
-      <section class="metric-strip" aria-label="核心狀態"><article class="metric-card"><p class="card-kicker">即時模擬市場</p><strong class="metric-value" id="market-count">15</strong><span> Pionex 候選標的</span></article><article class="metric-card"><p class="card-kicker">詳細歷史目標</p><strong class="metric-value">250</strong><span>Binance USD-M · R2 only</span></article><article class="metric-card"><p class="card-kicker">Funding 覆蓋</p><strong class="metric-value" id="funding-months">1,010</strong><span>已觀察標的月份數</span></article><article class="metric-card"><p class="card-kicker">真實交易</p><strong class="metric-value danger-text">關閉</strong><span>authority = false</span></article></section>
+      <section class="metric-strip" aria-label="核心狀態"><article class="metric-card"><p class="card-kicker">即時模擬市場</p><strong class="metric-value" id="market-count">15</strong><span>Pionex 候選標的</span></article><article class="metric-card"><p class="card-kicker">Crypto Core 歷史目標</p><strong class="metric-value">100</strong><span>Binance USD-M · 10 個 R2 分片</span></article><article class="metric-card"><p class="card-kicker">Funding 覆蓋</p><strong class="metric-value" id="funding-months">1,010</strong><span>已觀察標的月份數</span></article><article class="metric-card"><p class="card-kicker">真實交易</p><strong class="metric-value danger-text">關閉</strong><span>authority = false</span></article></section>
       <section class="section-heading"><p class="section-number">01</p><div><p class="card-kicker">EVIDENCE PIPELINE</p><h2>從資料，到訊號，<br /><span class="heading-accent">每一步都能回頭檢查。</span></h2><p>網站只是 Repository authority 的唯讀視窗；真正的資料、訓練與閘門紀錄仍維持原有邊界。</p></div></section>
       <section class="dashboard-grid two-one"><article class="panel"><div class="panel-header"><div><p class="card-kicker">CURRENT WORK</p><h3>目前真正有在做的事</h3></div><span class="badge neutral">唯讀摘要</span></div><div class="pipeline" id="pipeline-list"></div></article><article class="panel"><div class="panel-header"><div><p class="card-kicker">FAIL-CLOSED</p><h3>關鍵安全閘門</h3></div><button class="text-action view-link" data-view="gates">查看全部 →</button></div><div class="gate-stack" id="critical-gates"></div></article></section>
-      <section class="dashboard-grid two-one"><article class="panel paper-panel"><div class="panel-header"><div><p class="card-kicker">PAPER TRAINING</p><h3>最新模擬結果</h3></div><span class="badge pending" id="paper-training-status">等待首次執行</span></div><svg class="equity-chart no-data" id="paper-equity-chart" viewBox="0 0 800 260" role="img" aria-label="尚無可繪製的模擬資產曲線"><path class="grid-line" d="M0 50 H800 M0 130 H800 M0 210 H800" /><path class="area" id="paper-equity-area" d="M0 150 H800 V230 H0 Z" /><path class="line" id="paper-equity-line" d="M0 150 H800" /></svg><p class="equity-note" id="paper-equity-note">完成至少一筆模擬成交後，才顯示真實產生的資產曲線。</p><p class="empty-note" id="paper-training-summary">只顯示 Repository Paper Broker；不代表正式交易建議。</p></article><article class="panel provider-panel"><div class="panel-header"><div><p class="card-kicker">PROVENANCE</p><h3>Provider 永遠分離</h3></div></div><div class="provider-card"><span class="provider-tag pionex">PIONEX</span><div><strong>執行目標交易所</strong><p>Pionex-native 證據獨立保存，並維持自己的正式 authority。</p></div></div><div class="provider-card"><span class="provider-tag binance">BINANCE USD-M</span><div><strong>研究歷史資料來源</strong><p>Binance 歷史資料永遠不會被標示成 Pionex-native。</p></div></div></article></section>
+      <section class="dashboard-grid two-one"><article class="panel paper-panel"><div class="panel-header"><div><p class="card-kicker">PAPER TRAINING</p><h3>最新模擬結果</h3></div><span class="badge pending" id="paper-training-status">後續版已準備 · 等待資料授權</span></div><svg class="equity-chart no-data" id="paper-equity-chart" viewBox="0 0 800 260" role="img" aria-label="尚無可繪製的模擬資產曲線"><path class="grid-line" d="M0 50 H800 M0 130 H800 M0 210 H800" /><path class="area" id="paper-equity-area" d="M0 150 H800 V230 H0 Z" /><path class="line" id="paper-equity-line" d="M0 150 H800" /></svg><p class="equity-note" id="paper-equity-note">完成至少一筆模擬成交後，才顯示真實產生的資產曲線。</p><p class="empty-note" id="paper-training-summary">沿用 Repository Paper Broker；V0.11 與獨立 holdout 存取 authority 完成前不自動恢復。</p></article><article class="panel provider-panel"><div class="panel-header"><div><p class="card-kicker">PROVENANCE</p><h3>Provider 永遠分離</h3></div></div><div class="provider-card"><span class="provider-tag pionex">PIONEX</span><div><strong>執行目標交易所</strong><p>Pionex-native 證據獨立保存，並維持自己的正式 authority。</p></div></div><div class="provider-card"><span class="provider-tag binance">BINANCE USD-M</span><div><strong>研究歷史資料來源</strong><p>Crypto Core 100 只進 R2；股票代幣留待獨立資料池。</p></div></div></article></section>
       <section class="calendar-section"><div class="section-heading compact"><p class="section-number">02</p><div><p class="card-kicker">RESEARCH CALENDAR</p><h2>研究時程與授權狀態</h2><p>時間到了不代表證據通過；每一階段仍依 Repository 的版本化 authority 判定。</p><small class="projection-time" id="calendar-generated-at">行事曆投影：尚未提供</small></div></div><ol class="learning-timeline" id="research-calendar" aria-live="polite"><li class="calendar-loading"><strong>正在讀取研究時程</strong><small>Repository projection</small></li></ol></section>
     </section>
 
@@ -53,13 +53,14 @@
         <div class="strategy-meta"><span class="badge pass" id="strategy-mode">PAPER · LONG_ONLY</span><small id="strategy-version">V0.1.0 · Repository config</small></div>
       </article>
       <article class="research-loop-summary panel" aria-labelledby="research-loop-title">
-        <div class="panel-header"><div><p class="card-kicker">LATEST RESEARCH LAYER · PR #204</p><h3 id="research-loop-title">策略探索、Edge 驗證與 Paper 稽核已接成同一條閉環。</h3><p class="panel-intro">這是最新合併的研究層；目前只允許合成資料驗證，不會取代上方正式 Paper 基線。</p></div><span class="badge pending" id="strategy-research-status">PREPARED · SYNTHETIC ONLY</span></div>
+        <div class="panel-header"><div><p class="card-kicker">CURRENT RESEARCH LAYER</p><h3 id="research-loop-title">策略探索、Edge 驗證與 Paper 稽核共用一份版本化投影。</h3><p class="panel-intro">資料由 Repository 的六份策略設定重建；目前只允許合成資料驗證，不會取代上方 Paper 基線。</p></div><span class="badge pending" id="strategy-research-status">PREPARED · SYNTHETIC ONLY</span></div>
         <div class="sstate-meaning-grid">
           <div><span>預註冊候選</span><strong id="strategy-research-candidates">120</strong><small>完整 registry 與 SHA-256 lineage。</small></div>
           <div><span>策略家族</span><strong id="strategy-research-families">4</strong><small>趨勢、均值回歸、突破、量價。</small></div>
           <div><span>研究週期</span><strong id="strategy-research-horizons">3</strong><small>短線、中線、波段分開驗證。</small></div>
           <div><span>Edge 方法</span><strong id="strategy-edge-methods">6</strong><small>通過也只進入人工審查。</small></div>
         </div>
+        <div class="analysis-layer-list" id="strategy-analysis-layers" aria-label="策略分析層"></div>
       </article>
       <article class="sstate-explainer panel" aria-labelledby="sstate-explainer-title">
         <div class="sstate-explainer-heading"><p class="card-kicker">SSTATE IN PLAIN LANGUAGE</p><h3 id="sstate-explainer-title">先判斷市場環境，再決定要不要找進場。</h3><p>SState 是 4H 市場狀態與背景准入閘門，不是單獨的買賣訊號，也不是這筆交易的預測勝率。</p></div>
@@ -85,6 +86,6 @@
     <section class="view" id="view-gates"><article class="panel"><div class="panel-header"><div><p class="card-kicker">FAIL-CLOSED</p><h3>全部專案安全閘門</h3></div><span class="badge danger">無真實交易路徑</span></div><div class="gate-grid" id="all-gates"></div></article></section>
     <footer class="site-footer"><p>這個網站是 Repository authority 的唯讀投影，不是 authority 本身。</p><span>QOOKEY / PAPER-ONLY / 0 USD RUNTIME BUDGET</span></footer>
   </main>
-  <script src="./app.js?v=evidence-v3" defer></script>
+  <script src="./assets/js/app.js?v=convergence-v3" defer></script>
 </body>
 </html>

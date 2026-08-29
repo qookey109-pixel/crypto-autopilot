@@ -1,4 +1,4 @@
-name: Binance USD-M Detailed History V0.1.1
+name: Binance USD-M Crypto Core 100 History V0.1.2
 
 on:
   schedule:
@@ -52,8 +52,8 @@ jobs:
           REQUESTED_SHARD: ${{ inputs.shard_index }}
         run: |
           args=(
-            --config config/binance_usdm_detailed_history_v0_1_1.json
-            --authority research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-1-bounded-authority.json
+            --config config/binance_usdm_detailed_history_v0_1_2.json
+            --authority research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json
             --mode "$REQUESTED_MODE"
             --run-id "github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
             --output detailed-history-output/report.json

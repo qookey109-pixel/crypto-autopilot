@@ -1,0 +1,31 @@
+{
+  "schema": "pionex-post-window-paper-training-successor-preparation-v0.2",
+  "status": "PREPARED_NOT_ACTIVE",
+  "date": "2026-08-29",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "config": "config/post_window_paper_training_v0_2.json",
+  "config_sha256": "de57b2ab60db84569ca46b02aa3887bb701102a437cb7df9c84ba4d0d0cb8329",
+  "purpose": "Freeze the safe resumption dependencies before production metadata stability or replacement-holdout evidence is read.",
+  "execution": {
+    "workflow_created": false,
+    "schedule_activated": false,
+    "provider_requests_performed": 0,
+    "r2_access_performed": false,
+    "holdout_access_performed": false
+  },
+  "decision": {
+    "reason": "The current Pionex lookback can return candles inside the frozen 2026-08-28 through 2026-09-03 replacement holdout. A post-window clock alone cannot authorize that read.",
+    "next_step": "After the complete V0.10 window, run the separately authorized V0.11 production evaluation, then merge a distinct holdout/paper-read activation authority before adding a schedule."
+  },
+  "authority": {
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "pionex_demo_automation_authorized": false,
+    "private_api_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

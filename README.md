@@ -4,14 +4,24 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 
 > **Current mode: PAPER-ONLY.** No real-money order path is authorized. `trade_plan_authorized=false` and `live_trading_authorized=false` remain mandatory. For the detailed current authority index, always read [`PROJECT_STATUS.md`](PROJECT_STATUS.md) first.
 
-## Current authority snapshot — 2026-08-28
+## Start here
+
+- [`PROJECT_STATUS.md`](PROJECT_STATUS.md) — formal current authority.
+- [`docs/PROJECT_MAP_V0_1.md`](docs/PROJECT_MAP_V0_1.md) — concise repository map.
+- [`docs/AUTOMATION_INDEX_V0_1.md`](docs/AUTOMATION_INDEX_V0_1.md) — only the schedules that can still run.
+- [`docs/STRATEGY_INDEX_V0_1.md`](docs/STRATEGY_INDEX_V0_1.md) — one view of the Paper baseline and research layers.
+
+Historical configs, receipts and CLI paths remain for evidence, but these four
+files are the current operating surface.
+
+## Current authority snapshot — 2026-08-29
 
 The repository has moved beyond the original V0.1 implementation baseline while preserving its scientific history:
 
 - Pionex M1/M1A historical-data foundation: **PASS**.
 - Cloudflare R2 historical storage and Binance 2025 pilot: **PASS**.
 - Binance Funding V0.2 R2 materialization: **PASS** — 192/192 authorized object identities verified after write.
-- Binance USD-M Detailed History V0.1.1: **AUTHORIZED AFTER V0.10 WINDOW / NOT STARTED** — 250-market target, fixed 2022-08 through 2026-07 window, native 15m/1h/4h archives, R2-only persistence, bounded intraday research training and a fail-closed 2026 backfill stop. V0.1 was superseded before execution and remains immutable.
+- Binance USD-M Crypto Core 100 V0.1.2: **AUTHORIZED AFTER V0.10 WINDOW / NOT STARTED** — 100 unique Crypto markets, fixed 2022-08 through 2026-07 window, native 15m/1h/4h archives, 10 R2-only shards and bounded intraday research training. V0.1.1 was superseded before execution and remains immutable; tokenized-equity data requires a separate future dataset.
 - Pionex ↔ Binance Equivalence V0.1: **definitive FAIL** — 45 pairs = 18 PASS / 18 REVIEW / 9 FAIL. The frozen result must not be regraded by changing thresholds or scope.
 - `source_switch_authorized=false`; Binance evidence remains `provider=binance_usdm` and must never be relabeled as Pionex-native evidence.
 - V0.5 Render Free / Frankfurt Binance public-metadata transport: **PASS**.
@@ -28,18 +38,19 @@ The repository has moved beyond the original V0.1 implementation baseline while 
 
 The V0.10 cutover authorizes only the frozen public-provider metadata capture phase and metadata-only R2 writes inside the exact window. V0.11 currently authorizes only evaluator preparation and synthetic validation. Neither stage authorizes replacement holdout candles, source switching, Historical Universe membership, W1 materialization, backtest admission, strategy changes, trade plans, real-money orders, or live trading.
 
-The separate **Pionex Public Paper Training V0.1** path is authorized for bounded
+The separate **Pionex Public Paper Training V0.1** path was authorized for bounded
 public-market reads, fixed-rule candidate generation, deterministic Repository
 Paper Broker replay, secret-free training evidence and a read-only GitHub Pages
 projection. It stops all provider requests at `2026-08-27T00:00:00Z` to avoid the
 frozen V0.10/holdout window. Pionex Demo remains manual sampling only; no private
 API, automated demo order, formal trade plan, real-money order or live-trading
-authority is introduced.
+authority is introduced. Its hourly cron is retired after that cutoff; manual
+dispatch remains only to validate the fail-closed stop.
 
-The **Binance Spot R2 Training Governance V0.5** path discovers the active public
-Spot catalog, builds provider-separated daily history, trains deterministic
-research models and publishes the canonical dataset/model lineage to Cloudflare
-R2 each Sunday at `02:37 UTC` (`10:37 Asia/Taipei`). The same run performs
+The historical **Binance Spot R2 Training Governance V0.5** path discovered the active public
+Spot catalog, built provider-separated daily history, trained deterministic
+research models and published the canonical dataset/model lineage to Cloudflare
+R2 on its bounded Sunday `02:37 UTC` (`10:37 Asia/Taipei`) schedule. The same run performed
 expanding-window walk-forward diagnostics, fee/slippage sensitivity, diagnostic
 maximum drawdown and model-signal exposure checks. Pipeline completion is now
 reported separately from a baseline/cost/drawdown/concentration model-quality
@@ -59,6 +70,8 @@ generated-data store; raw training history is not projected to GitHub Pages.
 V0.3 daily and V0.4 weekly/monthly execution are retired. V0.5 uses separate
 authority and R2 namespaces. No source-switch, formal backtest admission,
 automatic model promotion, W1, holdout or trading authority is introduced.
+Its weekly/monthly cron triggers are now retired after the same binding cutoff;
+manual dispatch remains fail-closed and cannot automatically resume.
 
 Data retention is intentionally split: the V0.5 Binance Spot `1d` training
 history remains from `2020-01-01` to the latest complete UTC day, while future
@@ -66,16 +79,19 @@ detailed `15m`/`1h`/`4h` and derivative-state materializations are planned as a
 rolling four-year window. The prepared, inactive policy is documented in
 [`docs/DATA_RETENTION_POLICY_V0_1.md`](docs/DATA_RETENTION_POLICY_V0_1.md).
 
-The separate **Binance USD-M Detailed History V0.1.1** path expands detailed
-research coverage beyond the original 15-contract basket. It builds a
-deterministic 250-market provider-separated catalog from official Binance
-Vision archive coverage, then materializes 48 complete months of native
-15m/1h/4h candles in serialized R2 shards. Execution begins only after
+The separate **Binance USD-M Crypto Core 100 V0.1.2** path expands detailed
+research coverage beyond the original 15-contract basket. It discovers a broad
+provider-separated catalog but materializes only 100 unique Crypto markets from
+official Binance Vision archive coverage. Tokenized-stock/ETF and other-asset
+candidates remain classified metadata for a separate future dataset. The Core
+materializes 48 complete months of native 15m/1h/4h candles in 10 serialized
+R2 shards. Execution begins only after
 `2026-09-04T02:00:00Z`; its source ends at 2026-07 and cannot read the
 replacement holdout. After all shards complete, a weekly research trainer runs
 causal multi-timeframe walk-forward, cost, drawdown and exposure diagnostics.
-See the current [`docs/BINANCE_USDM_DETAILED_HISTORY_V0_1_1.md`](docs/BINANCE_USDM_DETAILED_HISTORY_V0_1_1.md)
-addendum and the preserved full design in
+See the current [`docs/BINANCE_USDM_CRYPTO_CORE_100_V0_1_2.md`](docs/BINANCE_USDM_CRYPTO_CORE_100_V0_1_2.md)
+and the preserved superseded addendum in
+[`docs/BINANCE_USDM_DETAILED_HISTORY_V0_1_1.md`](docs/BINANCE_USDM_DETAILED_HISTORY_V0_1_1.md), plus the historical full design in
 [`docs/BINANCE_USDM_DETAILED_HISTORY_V0_1.md`](docs/BINANCE_USDM_DETAILED_HISTORY_V0_1.md).
 
 The prepared V0.6 Shadow Model compares feature groups locally after the first

@@ -1,8 +1,6 @@
 name: Pionex Public Paper Training V0.1
 
 on:
-  schedule:
-    - cron: "7 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -74,6 +72,8 @@ jobs:
           cp -R web/. _site/
           python scripts/build_dashboard_authority_snapshot.py \
             --output _site/data/dashboard.json
+          python scripts/build_strategy_projection.py \
+            --output _site/data/strategy.json
           python scripts/apply_dashboard_latest_authority.py \
             --input _site/data/dashboard.json \
             --output _site/data/dashboard.json

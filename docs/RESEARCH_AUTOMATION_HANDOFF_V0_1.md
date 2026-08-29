@@ -4,7 +4,7 @@ Status date: `2026-08-24` (`Asia/Taipei`).
 
 This handoff is an operations guide, not execution authority. Repository
 `main`, versioned configs and receipts remain authoritative. Detailed History
-V0.1.1 has its own post-window R2 authority; this handoff does not independently
+V0.1.2 has its own post-window R2 authority; this handoff does not independently
 enable R2 access, holdout access, model promotion, trade plans, real-money
 orders or live trading.
 
@@ -51,9 +51,10 @@ and cost contracts.
 
 ## Current implementation handoff
 
-The prepared V0.6 Shadow implementation and Detailed History V0.1 were merged
-to Repository `main` by PR #177. Detailed History V0.1.1 supersedes V0.1 before
-the first provider request or R2 access and adds the bounded cron stop.
+The prepared V0.6 Shadow implementation and historical Detailed History V0.1
+were merged to Repository `main` by PR #177. Crypto Core 100 V0.1.2 now
+supersedes V0.1.1 before either predecessor's first provider request or R2
+access, preserves the bounded cron stop and narrows materialization to Crypto.
 
 It provides:
 
@@ -68,13 +69,13 @@ The runner may use only an already-authorized ephemeral Parquet input. The
 prepared V0.6 config does not authorize downloading the production R2 dataset
 or adding a GitHub Actions schedule.
 
-Detailed History V0.1.1 separately provides:
+Crypto Core 100 V0.1.2 separately provides:
 
-- an official Binance Vision archive-directory catalog with 817 currently
-  observed eligible markets and a deterministic 250-market selection;
-- at least 20 of 39 observed heuristic tokenized-stock/ETF candidates, all 19
-  observed historical-absence candidates and at least 175 window-end markets;
-- 25 serialized, resumable R2 shards covering 2022-08 through 2026-07 at
+- an official Binance Vision archive-directory catalog with 817 previously
+  observed eligible markets and a deterministic 100-Crypto-market selection;
+- tokenized-stock/ETF, other-asset and historical-absence candidates retained
+  as discovery evidence but excluded from Core materialization;
+- 10 serialized, resumable R2 shards covering 2022-08 through 2026-07 at
   15m/1h/4h;
 - a weekly causal intraday trainer with chronological baseline, cost, drawdown
   and exposure diagnostics after dataset completion;
@@ -97,8 +98,8 @@ Detailed History V0.1.1 separately provides:
 | Every three hours at `:47` | Research automation health | GitHub Actions metadata only; alerts on stale, failed or missing jobs |
 | 2026-08-27 08:00 | V0.5 Binance and Pionex provider-read stop | Automatic post-stop resume is forbidden |
 | 2026-08-27 08:00 through 2026-09-04 09:59:59.999 | V0.10 frozen metadata capture window | Existing `:17` / `:47` attempts only; no second path or manual backfill |
-| 2026-09-04 14:23 first eligible cron, then every six hours through Sep 30 | Detailed History V0.1.1 catalog then next incomplete shard | Serialized R2-only backfill; source ends 2026-07; expires Oct 1 08:00 |
-| Sunday 12:37 after detailed dataset completion | Detailed Training V0.1.1 | Walk-forward research; `REJECT` is retained and never promoted |
+| 2026-09-04 14:23 first eligible cron, then every six hours through Sep 30 | Crypto Core 100 V0.1.2 catalog then next incomplete shard | 10 serialized R2-only shards; source ends 2026-07; expires Oct 1 08:00 |
+| Sunday 12:37 after detailed dataset completion | Crypto Core 100 Training V0.1.2 | Walk-forward research; `REJECT` is retained and never promoted |
 | After 2026-09-04 09:59:59.999 | Prepare and merge separate V0.11 production-evaluation authority | Do not read production V0.10 R2 receipts before authority exists |
 | After V0.11 evaluation | Review exact 194-slot completeness and provider-vector stability | Any missing slot, disagreement or drift fails closed |
 | Only after a future V0.11 PASS | Consider a separate replacement-holdout access authority | Stability PASS alone does not open holdout candles |
@@ -133,7 +134,7 @@ run independent crons that can race:
 - [x] Preserve first weekly pipeline `PASS` and model `REJECT` separately.
 - [x] Prepare V0.6 Shadow code, tests, config and experiment registry locally.
 - [x] Merge PR #177 after all seven GitHub checks pass.
-- [x] Preserve V0.6 as research-only; Detailed History V0.1.1 may use R2 only under
+- [x] Preserve V0.6 as research-only; Crypto Core 100 V0.1.2 may use R2 only under
   its exact post-window authority.
 - [x] Add event-aware automation health and daily KOL evidence quality schedules
   without changing V0.10, holdout or trading authority.

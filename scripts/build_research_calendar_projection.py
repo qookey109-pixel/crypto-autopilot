@@ -8,8 +8,9 @@ import re
 
 
 V0_10_CUTOVER = Path("config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json")
-DETAILED_HISTORY = Path("config/binance_usdm_detailed_history_v0_1_1.json")
+DETAILED_HISTORY = Path("config/binance_usdm_detailed_history_v0_1_2.json")
 SUCCESSOR_SCHEDULE = Path("config/post_window_research_successor_schedule_v0_1.json")
+PAPER_SUCCESSOR = Path("config/post_window_paper_training_v0_2.json")
 PROJECT_STATUS = Path("PROJECT_STATUS.md")
 ROADMAP = Path("docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md")
 SSTATE_INGESTION = Path("docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md")
@@ -21,6 +22,7 @@ SOURCE_AUTHORITIES = (
     DETAILED_HISTORY,
     V0_10_CUTOVER,
     SUCCESSOR_SCHEDULE,
+    PAPER_SUCCESSOR,
     ROADMAP,
     SSTATE_INGESTION,
     STRATEGY_EDGE,
@@ -75,10 +77,13 @@ def first_eligible_run(cron: object, not_before: datetime) -> datetime:
     raise RuntimeError("no eligible detailed-history run exists inside the configured cron window")
 
 
-def build_projection(*, generated_at_utc: str | None = None) -> dict[str, object]:
+def build_projection(
+    *, generated_at_utc: str | None = None, checked_in_fixture: bool = False
+) -> dict[str, object]:
     v0_10 = load_json(V0_10_CUTOVER)
     detailed = load_json(DETAILED_HISTORY)
     successor = load_json(SUCCESSOR_SCHEDULE)
+    paper_successor = load_json(PAPER_SUCCESSOR)
     strategy_edge = load_json(STRATEGY_EDGE)
     strategy_research = load_json(STRATEGY_RESEARCH_LOOP)
     project_status = PROJECT_STATUS.read_text(encoding="utf-8")
@@ -115,7 +120,7 @@ def build_projection(*, generated_at_utc: str | None = None) -> dict[str, object
         raise RuntimeError("detailed-history unexpectedly authorizes holdout access")
     if detailed_authority.get("backtest_admission_authorized") is not False:
         raise RuntimeError("detailed-history unexpectedly authorizes backtest admission")
-    if int(detailed_scope.get("target_market_count") or 0) != 250:
+    if int(detailed_scope.get("target_market_count") or 0) != 100:
         raise RuntimeError("detailed-history target market count changed")
     if detailed_scope.get("intervals") != ["15m", "1h", "4h"]:
         raise RuntimeError("detailed-history intervals changed")
@@ -125,6 +130,19 @@ def build_projection(*, generated_at_utc: str | None = None) -> dict[str, object
     successor_authority = require_dict(successor.get("current_authority"), "successor authority")
     if not successor_authority or any(value is not False for value in successor_authority.values()):
         raise RuntimeError("prepared successor schedule gained runtime authority")
+
+    if paper_successor.get("status") != "PREPARED_WAITING_FOR_HOLDOUT_AUTHORITY":
+        raise RuntimeError("post-window Paper successor state changed")
+    paper_activation = require_dict(
+        paper_successor.get("activation_gates"), "Paper successor activation"
+    )
+    paper_authority = require_dict(
+        paper_successor.get("authority"), "Paper successor authority"
+    )
+    if paper_activation.get("activation_authorized") is not False:
+        raise RuntimeError("post-window Paper successor activated without authority")
+    if not paper_authority or any(value is not False for value in paper_authority.values()):
+        raise RuntimeError("post-window Paper successor gained runtime authority")
 
     if strategy_edge.get("status") != "PREPARED_RESEARCH_ONLY":
         raise RuntimeError("Strategy Edge state changed")
@@ -165,7 +183,7 @@ def build_projection(*, generated_at_utc: str | None = None) -> dict[str, object
         raise RuntimeError("historical SState evidence readiness changed")
 
     target_at = "2026-09-30T15:59:59.999Z"
-    generated = normalized_utc(generated_at_utc)
+    generated = None if checked_in_fixture else normalized_utc(generated_at_utc)
     return {
         "schema": "qookey-research-calendar-projection-v0.1",
         "authority": False,
@@ -186,7 +204,7 @@ def build_projection(*, generated_at_utc: str | None = None) -> dict[str, object
             },
             {
                 "id": "strategy-research-loop-v0-1",
-                "windowLabel": "PR #204 MERGED · SYNTHETIC ONLY",
+                "windowLabel": "CURRENT RESEARCH · SYNTHETIC ONLY",
                 "title": "策略研究閉環 V0.1",
                 "detail": "120 個預註冊候選、4 類策略與短線／中線／波段三週期已準備；目前沒有 production dataset 執行或模型晉升權限。",
                 "status": "PREPARED",
@@ -197,12 +215,22 @@ def build_projection(*, generated_at_utc: str | None = None) -> dict[str, object
             {
                 "id": "detailed-history-backfill",
                 "windowLabel": "首個符合排程 09/04 14:23",
-                "title": "250 市場歷史回補",
-                "detail": "已授權、尚未開始；25 個可續跑分片，Binance USD-M 15m／1h／4h 資料只進 R2。",
+                "title": "Crypto Core 100 歷史回補",
+                "detail": "已授權、尚未開始；10 個可續跑分片，100 個 Crypto USD-M 市場的 15m／1h／4h 資料只進 R2。",
                 "status": "AUTHORIZED",
                 "startsAtUtc": first_run.isoformat(timespec="seconds").replace("+00:00", "Z"),
                 "endsAtUtc": stop_exclusive.isoformat(timespec="seconds").replace("+00:00", "Z"),
                 "kind": "window",
+            },
+            {
+                "id": "paper-training-resumption-v0-2",
+                "windowLabel": "WAITING · HOLDOUT AUTHORITY",
+                "title": "模擬交易恢復 V0.2",
+                "detail": "既有 Paper Broker 與 Pionex 公開資料路徑已保留；最新 K 線 lookback 可能包含凍結 holdout，完成 V0.11 並合併獨立存取 authority 前不建立排程。",
+                "status": "WAITING_AUTHORITY",
+                "startsAtUtc": None,
+                "endsAtUtc": None,
+                "kind": "dependency",
             },
             {
                 "id": "sstate-evidence-calibration",
@@ -243,8 +271,12 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default="web/data/research-calendar.json")
     parser.add_argument("--generated-at-utc")
+    parser.add_argument("--checked-in-fixture", action="store_true")
     args = parser.parse_args()
-    projection = build_projection(generated_at_utc=args.generated_at_utc)
+    projection = build_projection(
+        generated_at_utc=args.generated_at_utc,
+        checked_in_fixture=args.checked_in_fixture,
+    )
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(

@@ -1,0 +1,59 @@
+{
+  "schema": "pionex-post-window-paper-training-successor-v0.2",
+  "version": "0.2.0",
+  "status": "PREPARED_WAITING_FOR_HOLDOUT_AUTHORITY",
+  "purpose": "Prepare deterministic current-market paper simulation resumption without reading the frozen replacement holdout or creating a second broker.",
+  "baseline": {
+    "config": "config/paper_training_v0_1.json",
+    "provider": "pionex_public_futures",
+    "broker": "repository_paper_broker",
+    "strategy_parameters_changed": false,
+    "maximum_leverage_changed": false,
+    "live_execution_added": false
+  },
+  "proposed_execution": {
+    "earliest_utc": "2026-09-04T02:00:00Z",
+    "cron_utc": "17 1,5,9,13,17,21 * * *",
+    "cadence": "every_4_hours",
+    "closed_candles_only": true,
+    "latest_market_data": true,
+    "automatic_activation": false,
+    "workflow_created": false
+  },
+  "blocked_replacement_holdout": {
+    "start_utc": "2026-08-28T00:00:00Z",
+    "end_exclusive_utc": "2026-09-04T00:00:00Z",
+    "candle_list_read_access_authorized": false,
+    "may_be_returned_inside_latest_lookback": true,
+    "provider_request_must_not_start_until_separate_access_authority": true
+  },
+  "activation_gates": {
+    "complete_v0_10_window": true,
+    "v0_11_production_evaluation_completed": false,
+    "separate_holdout_access_authority_merged": false,
+    "exact_successor_config_and_receipt_binding": false,
+    "paper_market_read_execution_authorized": false,
+    "activation_authorized": false
+  },
+  "resume_contract": {
+    "reuse_existing_paper_broker": true,
+    "reuse_existing_pionex_public_adapter": true,
+    "preserve_long_only_v0_1_baseline": true,
+    "long_short_challenger_remains_research_only": true,
+    "forced_trade_count": false,
+    "pionex_demo_manual_sampling_only": true,
+    "state_persistence": "secret_free_forward_state",
+    "website_projection": "read_only"
+  },
+  "authority": {
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "pionex_demo_automation_authorized": false,
+    "private_api_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

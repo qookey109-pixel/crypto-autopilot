@@ -1,0 +1,24 @@
+{
+  "schema": "post-cutoff-schedule-retirement-receipt-v0.1",
+  "status": "EFFECTIVE_ON_MAIN_MERGE",
+  "recorded_at_utc": "2026-08-29T00:00:00Z",
+  "config": {
+    "path": "config/post_cutoff_schedule_retirement_v0_1.json",
+    "sha256": "510a27fa5780ef699d180cd591160a5cb929927edad3795e7f6980bc8cef4385"
+  },
+  "retired_schedule_count": 3,
+  "retained_manual_regression_count": 3,
+  "reason": "All three bounded workflows already stop before provider or R2 access at 2026-08-27T00:00:00Z. Removing their cron triggers avoids indefinite no-op GitHub Actions runs without changing their frozen evidence or execution boundary.",
+  "authority": {
+    "provider_requests_performed": 0,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "holdout_candles_accessed": false,
+    "source_switch_authorized": false,
+    "strategy_change_authorized": false,
+    "model_promotion_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

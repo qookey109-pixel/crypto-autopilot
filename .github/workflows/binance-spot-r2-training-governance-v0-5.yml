@@ -1,8 +1,6 @@
 name: Binance Spot R2 Training Governance V0.5
 
 on:
-  schedule:
-    - cron: "37 2 * * 0"
   workflow_dispatch:
 
 permissions:

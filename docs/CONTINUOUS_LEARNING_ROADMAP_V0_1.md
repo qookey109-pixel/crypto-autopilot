@@ -31,7 +31,8 @@ loop. A `REJECT` result is retained as evidence and cannot replace a model.
 ### 1. Current bounded research — through 2026-08-27 08:00 Asia/Taipei
 
 - Pionex public paper training produces candidate and simulated-trade evidence.
-- Binance Spot V0.5 remains the current weekly historical research trainer.
+- Binance Spot V0.5 was the bounded weekly historical research trainer; its
+  cron is retired after the 2026-08-27 cutoff and it does not auto-resume.
 - Research Signal Layer V0.2 collects only allowlisted structured public-source
   evidence; signal quality and automation health checks remain read-only.
 - These paths are separate. They do not yet share an automatic rolling dataset,
@@ -46,12 +47,12 @@ loop. A `REJECT` result is retained as evidence and cannot replace a model.
 
 ### 3. Detailed-history start — first eligible run 2026-09-04 14:23 Asia/Taipei
 
-- Binance USD-M Detailed History V0.1.1 starts only after its
+- Binance USD-M Crypto Core 100 V0.1.2 starts only after its
   `2026-09-04T02:00:00Z` not-before gate.
 - The `00:23 UTC` scheduled occurrence fails closed before provider/R2 access;
   the first eligible scheduled occurrence is `06:23 UTC` / `14:23 Asia/Taipei`.
 - Twenty-five serialized resumable shards run at most once every six hours.
-- A complete 250-market, 48-month, native `15m` / `1h` / `4h` dataset is a
+- A complete 100-Crypto-market, 48-month, native `15m` / `1h` / `4h` dataset is a
   prerequisite for its weekly research trainer.
 
 ### 4. Post-window successor authority — earliest after 2026-09-04 10:00 Asia/Taipei

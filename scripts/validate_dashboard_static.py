@@ -6,14 +6,18 @@ from pathlib import Path
 
 
 ROOT = Path("web")
+APP_JS = ROOT / "assets" / "js" / "app.js"
+STYLES = ROOT / "assets" / "css" / "styles.css"
+ACTIVE_IMAGE = ROOT / "assets" / "images" / "cloud-garden-v4.jpg"
 OPERATIONAL_STATUS = ROOT / "data" / "operational-status.json"
 RESEARCH_CALENDAR = ROOT / "data" / "research-calendar.json"
 RESEARCH_EVIDENCE = ROOT / "data" / "research-evidence.json"
 RESEARCH_EVIDENCE_SCHEMA = ROOT / "data" / "research-evidence.schema.json"
 REQUIRED = (
     ROOT / "index.html",
-    ROOT / "styles.css",
-    ROOT / "app.js",
+    STYLES,
+    ROOT / "assets" / "css" / "variables.css",
+    APP_JS,
     ROOT / "data" / "dashboard.json",
     OPERATIONAL_STATUS,
     ROOT / "data" / "paper-training.json",
@@ -75,6 +79,15 @@ def main() -> int:
     missing = [str(path) for path in REQUIRED if not path.is_file()]
     if missing:
         raise RuntimeError(f"dashboard required files missing: {missing}")
+    if not ACTIVE_IMAGE.is_file():
+        raise RuntimeError("dashboard active background image is missing")
+    for retired in (
+        "market-orbit-v2.jpg",
+        "research-constellation-v1.jpg",
+        "research-orbit-v3.jpg",
+    ):
+        if any((ROOT / "assets").rglob(retired)):
+            raise RuntimeError(f"retired dashboard design asset returned: {retired}")
 
     combined = "\n".join(path.read_text(encoding="utf-8") for path in REQUIRED)
     for token in FORBIDDEN_TEXT:
@@ -85,7 +98,16 @@ def main() -> int:
             raise RuntimeError(f"dashboard contains forbidden live/concurrent execution phrase: {phrase}")
 
     data = json.loads((ROOT / "data" / "dashboard.json").read_text(encoding="utf-8"))
-    strategy = json.loads((ROOT / "data" / "strategy.json").read_text(encoding="utf-8"))
+    strategy_projection = json.loads((ROOT / "data" / "strategy.json").read_text(encoding="utf-8"))
+    if strategy_projection.get("schema") != "qookey-dashboard-strategy-projection-v0.1":
+        raise RuntimeError("dashboard strategy projection schema changed")
+    if strategy_projection.get("authority") is not False:
+        raise RuntimeError("dashboard strategy projection must remain non-authoritative")
+    if strategy_projection.get("generatedAtUtc") is not None:
+        raise RuntimeError("checked-in strategy fixture must not invent a generation time")
+    if any(value is not False for value in strategy_projection.get("safetyBoundary", {}).values()):
+        raise RuntimeError("dashboard strategy projection safety boundary changed")
+    strategy = strategy_projection.get("baseline") or {}
     if strategy.get("version") != "0.1.0":
         raise RuntimeError("dashboard strategy version changed without a strategy update")
     if strategy.get("mode") != "paper" or strategy.get("direction") != "LONG_ONLY":
@@ -115,12 +137,18 @@ def main() -> int:
         "v0-10-metadata-window",
         "strategy-research-loop-v0-1",
         "detailed-history-backfill",
+        "paper-training-resumption-v0-2",
         "sstate-evidence-calibration",
         "continuous-learning-target",
     }
     if {item.get("id") for item in calendar_items} != expected_calendar_ids:
         raise RuntimeError("dashboard research calendar stages changed without review")
-    allowed_calendar_statuses = {"AUTHORIZED", "NOT_READY", "PREPARED"}
+    allowed_calendar_statuses = {
+        "AUTHORIZED",
+        "WAITING_AUTHORITY",
+        "NOT_READY",
+        "PREPARED",
+    }
     for item in calendar_items:
         if item.get("status") not in allowed_calendar_statuses:
             raise RuntimeError(f"dashboard calendar status is not allowlisted: {item.get('status')}")
@@ -132,6 +160,8 @@ def main() -> int:
     calendar_sources = set(calendar.get("sourceAuthorities") or [])
     for required_source in (
         "PROJECT_STATUS.md",
+        "config/binance_usdm_detailed_history_v0_1_2.json",
+        "config/post_window_paper_training_v0_2.json",
         "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
         "config/strategy_edge_validation_v0_1.json",
         "config/strategy_research_loop_v0_1.json",
@@ -301,8 +331,8 @@ def main() -> int:
         if f'id="view-{view}"' not in html:
             raise RuntimeError(f"dashboard view missing: {view}")
 
-    app_js = (ROOT / "app.js").read_text(encoding="utf-8")
-    styles = (ROOT / "styles.css").read_text(encoding="utf-8")
+    app_js = APP_JS.read_text(encoding="utf-8")
+    styles = STYLES.read_text(encoding="utf-8")
     if "style=" in html or "style=" in app_js:
         raise RuntimeError("dashboard CSP forbids inline style attributes")
     for token in (
@@ -316,6 +346,7 @@ def main() -> int:
         "通過 · PASS",
         "已授權 · AUTHORIZED",
         "已準備 · PREPARED",
+        "等待授權 · WAITING_AUTHORITY",
         "未授權 · NOT_AUTHORIZED",
         "失敗 · FAIL",
     ):
@@ -334,6 +365,8 @@ def main() -> int:
         "formatTrustedTime",
         "researchEvidenceIsSafe",
         "renderResearchEvidence",
+        "qookey-dashboard-strategy-projection-v0.1",
+        "strategy-analysis-layers",
         "strategy-score-progress",
         'wrap.setAttribute("role", "region")',
         "operational.pipelineItems",
@@ -347,7 +380,13 @@ def main() -> int:
         raise RuntimeError("dashboard paper-training schema changed")
     if paper.get("mode") != "PAPER_TRAINING_ONLY":
         raise RuntimeError("dashboard paper-training fixture must remain paper-only")
+    if paper.get("status") != "WAITING_AUTHORITY":
+        raise RuntimeError("dashboard Paper successor must remain waiting for authority")
     paper_authority = paper.get("authority") or {}
+    if paper_authority.get("publicMarketDataReadAuthorized") is not False:
+        raise RuntimeError("waiting Paper fixture cannot authorize provider reads")
+    if paper_authority.get("paperCandidateGenerationAuthorized") is not False:
+        raise RuntimeError("waiting Paper fixture cannot authorize candidate generation")
     for key in (
         "formalTradePlanAuthorized",
         "pionexDemoAutomationAuthorized",
