@@ -10,6 +10,18 @@ any versioned authority.
 3. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
 4. The exact config and receipt named by the stage being changed.
 
+## Current bounded data and Paper stages
+
+| Stage | Current contract | State |
+| --- | --- | --- |
+| Binance USD-M Crypto Core | `config/binance_usdm_detailed_history_v0_1_2.json` | 100 Crypto markets, 10 resumable R2 shards; authorized only after the V0.10 window |
+| Tokenized equities | future separate versioned dataset | not part of Core 100 and not authorized yet |
+| Pionex Paper successor | `config/post_window_paper_training_v0_2.json` | prepared, but no workflow or provider access until V0.11 and a separate holdout-access authority |
+
+The Paper successor reuses the existing Repository Paper Broker and Pionex
+public adapter. It does not create a second broker, force a trade count or add a
+live-order path.
+
 ## Current directory roles
 
 | Path | Current role |

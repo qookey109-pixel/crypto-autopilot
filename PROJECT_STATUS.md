@@ -14,7 +14,14 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ## Current formal stage
 
+**CRYPTO CORE 100 V0.1.2 AUTHORIZED AFTER V0.10 WINDOW / NOT STARTED / TOKENIZED EQUITY DATASET DEFERRED / POST-WINDOW PAPER V0.2 PREPARED WAITING FOR HOLDOUT AUTHORITY / V0.10 METADATA CAPTURE EFFECTIVE / REPLACEMENT HOLDOUT FROZEN_UNOPENED / PAPER-ONLY**
+
+<details>
+<summary>Historical aggregate stage markers</summary>
+
 **PROJECT CONVERGENCE V0.1 PREPARED ON BRANCH / POST-CUTOFF NO-OP CRON RETIREMENT EFFECTIVE ON MAIN MERGE / PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 TRAINING GOVERNANCE V0.5 HISTORICAL AUTHORITY MANUAL FAIL-CLOSED ONLY AFTER CUTOFF / BINANCE USD-M DETAILED HISTORY V0.1.1 AUTHORIZED AFTER V0.10 WINDOW NOT_STARTED / DETAILED HISTORY V0.1 SUPERSEDED BEFORE EXECUTION / V0.4 WEEKLY AND MONTHLY EXECUTION RETIRED / V0.3 DAILY TRAINING RETIRED / RESEARCH SIGNAL LAYER V0.2 ACTIVE / RESEARCH SIGNAL QUALITY V0.1 AUTHORIZED READ_ONLY / RESEARCH AUTOMATION HEALTH V0.1 AUTHORIZED READ_ONLY / STRATEGY EDGE VALIDATION V0.1 PREPARED RESEARCH_ONLY / STRATEGY RESEARCH LOOP V0.1 PREPARED SYNTHETIC_ONLY / POST-WINDOW RESEARCH SUCCESSOR SCHEDULE V0.1 PREPARED_NOT_ACTIVE / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 MANUAL FAIL-CLOSED ONLY AFTER CUTOFF / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION EFFECTIVE / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
+
+</details>
 
 ### Project Convergence V0.1 — PREPARED / EFFECTIVE ON MAIN MERGE
 
@@ -82,10 +89,10 @@ Repository branch `main` is the live formal authority and is intentionally not s
   `docs/STRATEGY_EDGE_VALIDATION_V0_1.md`; preparation receipt:
   `research/receipts/2026-08-28-strategy-edge-validation-v0-1-prepared.json`.
 
-### Binance USD-M Detailed History V0.1.1 — AUTHORIZED AFTER WINDOW / NOT STARTED
+### Binance USD-M Crypto Core 100 V0.1.2 — AUTHORIZED AFTER WINDOW / NOT STARTED
 
 - A separate provider-separated research path expands detailed coverage from
-  the original 15-contract basket to a deterministic 250-market target.
+  the original 15-contract basket to 100 unique Crypto USDT markets.
 - The fixed source window is 2022-08 through 2026-07, with native 15m, 1h and
   4h Binance Vision trade-Kline archives. It ends before the replacement
   holdout and performs no holdout candle access.
@@ -94,11 +101,11 @@ Repository branch `main` is the live formal authority and is intentionally not s
   provider or R2 access. Backfill authority expires at
   `2026-10-01T00:00:00Z`; later annual cron occurrences also stop before any
   provider or R2 access, while completed-dataset weekly training remains active.
-- Selection preserves the original 15 continuity symbols, at least 20
-  heuristic tokenized-stock/ETF candidates, all 19 currently observed eligible historical-absence
-  candidates and at least 175 markets reaching the window end. These labels do
-  not authorize historical-universe membership or trading.
-- Twenty-five serialized, resumable R2 shards run at most once every six hours.
+- Selection preserves the original 15 continuity symbols, requires all 100
+  selected Crypto markets to reach the window end, and excludes heuristic
+  tokenized-stock/ETF and other-asset candidates from materialization. Those
+  candidates remain discovery metadata for a separate future dataset.
+- Ten serialized, resumable R2 shards run at most once every six hours.
   Every run applies a fresh whole-bucket 8 GB hard stop before provider access
   and again before writes; exact existing-object equality and post-write
   SHA-256 readback are mandatory.
@@ -108,15 +115,30 @@ Repository branch `main` is the live formal authority and is intentionally not s
   remains evidence and cannot promote a model.
 - Raw history remains R2-only and is not projected to Pages. GitHub contains
   the strategy/config/training source and versioned authority.
-- V0.1.1 supersedes V0.1 before the first provider request or R2 access. V0.1
-  config/receipt remain immutable, and V0.1.1 adds only the version change and
-  bounded backfill stop.
-- Authority/config: `config/binance_usdm_detailed_history_v0_1_1.json` and
-  `research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-1-bounded-authority.json`.
-- Current addendum: `docs/BINANCE_USDM_DETAILED_HISTORY_V0_1_1.md`; the full
-  data design remains in `docs/BINANCE_USDM_DETAILED_HISTORY_V0_1.md`.
+- V0.1.2 supersedes V0.1.1 before either predecessor's first provider request
+  or R2 access. V0.1/V0.1.1 configs and receipts remain immutable.
+- Authority/config: `config/binance_usdm_detailed_history_v0_1_2.json` and
+  `research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json`.
+- Current contract: `docs/BINANCE_USDM_CRYPTO_CORE_100_V0_1_2.md`; superseded
+  designs remain historical evidence.
 - This stage does not change V0.10, relabel Binance as Pionex, switch sources,
   open the holdout, admit a formal backtest, promote a model or trade.
+
+### Post-window Paper Training V0.2 — PREPARED / WAITING FOR HOLDOUT AUTHORITY
+
+- The existing Pionex public adapter and Repository Paper Broker are retained;
+  strategy, risk, leverage and Pionex Demo boundaries are unchanged.
+- A proposed every-four-hour current-market cadence is recorded but has no
+  workflow or active cron.
+- The provider's latest-lookback response may include frozen 2026-08-28 through
+  09-03 candles. A post-window clock therefore cannot by itself authorize
+  resumption.
+- Activation requires the complete V0.10 window, separately authorized V0.11
+  production evaluation and a new holdout/paper-read authority. Until then,
+  provider requests, R2 access, demo automation and all live trading remain
+  false.
+- Config: `config/post_window_paper_training_v0_2.json`; preparation receipt:
+  `research/receipts/2026-08-29-post-window-paper-training-v0-2-prepared.json`.
 
 ### Binance Spot R2 Training Governance V0.5 — HISTORICAL AUTHORITY / POST-CUTOFF MANUAL FAIL-CLOSED
 
@@ -177,8 +199,8 @@ Repository branch `main` is the live formal authority and is intentionally not s
 - Current owner/timeline handoff:
   `docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`.
 - Data retention is partially active: Binance Spot `1d` remains `2020-01-01`
-  through the latest complete UTC day. Detailed History V0.1.1 separately
-  authorizes a fixed 2022-08 through 2026-07, 250-market `15m`/`1h`/`4h`
+  through the latest complete UTC day. Crypto Core 100 V0.1.2 separately
+  authorizes a fixed 2022-08 through 2026-07, 100-market `15m`/`1h`/`4h`
   Binance USD-M backfill after the V0.10 window. Rolling updates and the broader
   derivative-state materializations still require another authority. See
   `docs/DATA_RETENTION_POLICY_V0_1.md`.

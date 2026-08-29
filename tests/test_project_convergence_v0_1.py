@@ -89,7 +89,27 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
         self.assertFalse(boundaries["sstate_core_changed"])
         self.assertFalse(boundaries["strategy_parameters_changed"])
         self.assertFalse(boundaries["provider_or_r2_authority_added"])
+        self.assertTrue(boundaries["provider_or_r2_scope_replaced_before_execution"])
+        self.assertFalse(boundaries["replacement_holdout_access_authorized"])
+        self.assertFalse(boundaries["paper_successor_automatic_activation_authorized"])
         self.assertFalse(boundaries["live_trading_authorized"])
+
+    def test_current_data_and_paper_index_is_bounded(self) -> None:
+        current = self.index["current_data_and_paper"]
+        self.assertEqual(
+            current["crypto_core_100"],
+            "config/binance_usdm_detailed_history_v0_1_2.json",
+        )
+        self.assertEqual(
+            current["tokenized_equity_dataset"],
+            "SEPARATE_FUTURE_VERSION_NOT_AUTHORIZED",
+        )
+        self.assertEqual(
+            current["paper_successor_state"],
+            "PREPARED_WAITING_FOR_HOLDOUT_AUTHORITY",
+        )
+        for key in ("crypto_core_100", "crypto_core_100_authority", "paper_successor"):
+            self.assertTrue((ROOT / current[key]).is_file(), current[key])
 
 
 if __name__ == "__main__":

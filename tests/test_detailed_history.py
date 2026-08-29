@@ -37,6 +37,11 @@ V0_1_AUTHORITY = (
     ROOT
     / "research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-authority.json"
 )
+CORE_CONFIG = ROOT / "config/binance_usdm_detailed_history_v0_1_2.json"
+CORE_AUTHORITY = (
+    ROOT
+    / "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json"
+)
 
 
 def listing_xml(*, prefix: str, common: list[str], keys: list[str]) -> bytes:
@@ -132,7 +137,12 @@ class DetailedHistoryTests(unittest.TestCase):
         self.assertTrue(set(required).issubset(selected))
         plan = build_shard_plan(catalog, shard_index=0)
         self.assertGreater(len(plan), 0)
-        self.assertTrue(all(item.r2_key.startswith("market-data/binance_usdm/detailed-v0.1/") for item in plan))
+        self.assertTrue(
+            all(
+                item.r2_key.startswith("market-data/binance_usdm/detailed-v0.1/")
+                for item in plan
+            )
+        )
 
     def test_required_symbols_count_toward_category_minimums(self) -> None:
         records = [
@@ -195,6 +205,47 @@ class DetailedHistoryTests(unittest.TestCase):
             config,
             observed_at=datetime(2027, 9, 4, 2, 0, 0, tzinfo=UTC),
             operation="training",
+        )
+
+    def test_crypto_core_100_excludes_tokenized_equity_and_other_assets(self) -> None:
+        config, receipt, config_bytes = load_authority_pair(CORE_CONFIG, CORE_AUTHORITY)
+        self.assertEqual(receipt["config_sha256"], hashlib.sha256(config_bytes).hexdigest())
+        self.assertEqual(config["version"], "0.1.2")
+        self.assertEqual(config["scope"]["target_market_count"], 100)
+        required = list(config["selection"]["required_continuity_symbols"])
+        records = [coverage(symbol) for symbol in required]
+        records.extend(
+            coverage(f"COIN{index:03d}USDT", months=48) for index in range(120)
+        )
+        records.extend(
+            coverage(
+                f"STOCK{index:03d}USDT",
+                asset_class="tokenized_stock_candidate",
+                months=48,
+            )
+            for index in range(39)
+        )
+        records.extend(
+            coverage(f"METAL{index:03d}USDT", asset_class="other", months=48)
+            for index in range(7)
+        )
+        catalog = build_catalog(
+            records,
+            config=config,
+            retrieved_at_utc="2026-09-04T06:23:00Z",
+        )
+        self.assertEqual(catalog["selected_market_count"], 100)
+        self.assertEqual(catalog["shard_count"], 10)
+        self.assertEqual(catalog["selection_evidence"]["allowed_asset_classes"], ["crypto"])
+        self.assertTrue(all(item["asset_class"] == "crypto" for item in catalog["markets"]))
+        self.assertTrue(set(required).issubset({item["symbol"] for item in catalog["markets"]}))
+        self.assertGreaterEqual(catalog["selection_evidence"]["excluded_market_count"], 46)
+        plan = build_shard_plan(catalog, shard_index=0)
+        self.assertTrue(
+            all(
+                item.r2_key.startswith("market-data/binance_usdm/crypto-core-v0.1/")
+                for item in plan
+            )
         )
 
     def test_v0_1_authority_is_immutable_and_v0_1_1_delta_is_bounded(self) -> None:

@@ -256,7 +256,12 @@ def build_market_coverage(
 
 def _coverage_rank(item: DetailedMarketCoverage) -> tuple[int, int, int, str]:
     last_year, last_month = parse_month(item.last_common_month)
-    return (-item.common_month_count, -(last_year * 100 + last_month), len(item.missing_common_months_inside_span), item.symbol)
+    return (
+        -item.common_month_count,
+        -(last_year * 100 + last_month),
+        len(item.missing_common_months_inside_span),
+        item.symbol,
+    )
 
 
 def select_training_universe(
@@ -285,6 +290,8 @@ def select_training_universe(
     selected_symbols: set[str] = set()
 
     def add(items: Iterable[DetailedMarketCoverage], limit: int | None = None) -> None:
+        if limit is not None and limit <= 0:
+            return
         added = 0
         for item in sorted(items, key=_coverage_rank):
             if item.symbol in selected_symbols or len(selected) >= target_size:
@@ -358,8 +365,14 @@ def build_catalog(
 ) -> dict[str, Any]:
     scope = config["scope"]
     selection = config["selection"]
+    allowed_asset_classes = tuple(selection.get("allowed_asset_classes") or ())
+    eligible_records = tuple(
+        item
+        for item in records
+        if not allowed_asset_classes or item.asset_class in allowed_asset_classes
+    )
     selected = select_training_universe(
-        records,
+        eligible_records,
         target_size=int(scope["target_market_count"]),
         required_symbols=tuple(selection["required_continuity_symbols"]),
         minimum_tokenized_stock_candidates=int(
@@ -388,7 +401,9 @@ def build_catalog(
         "source_month_end": scope["source_month_end"],
         "target_market_count": int(scope["target_market_count"]),
         "selected_market_count": len(markets),
-        "eligible_market_count": len(records),
+        "eligible_market_count": len(eligible_records),
+        "discovered_market_count": len(records),
+        "provider_namespace": config["storage"]["provider_namespace"],
         "shard_size": shard_size,
         "shard_count": shard_count,
         "markets": markets,
@@ -401,6 +416,8 @@ def build_catalog(
             ),
             "window_end_candidate_count": sum(item.reaches_window_end for item in selected),
             "classification_is_heuristic": True,
+            "allowed_asset_classes": list(allowed_asset_classes),
+            "excluded_market_count": len(records) - len(eligible_records),
             "current_catalog_is_membership_authority": False,
         },
         "authority": {
@@ -437,6 +454,14 @@ def validate_catalog(payload: Mapping[str, Any], *, config: Mapping[str, Any]) -
         raise DetailedHistoryAuthorityError("detailed-history catalog symbols are not unique")
     if any(not symbol.endswith("USDT") or "SETTLED" in symbol for symbol in symbols):
         raise DetailedHistoryAuthorityError("detailed-history catalog contains unsafe symbols")
+    allowed_asset_classes = tuple(config["selection"].get("allowed_asset_classes") or ())
+    if allowed_asset_classes and any(
+        not isinstance(item, dict) or item.get("asset_class") not in allowed_asset_classes
+        for item in markets
+    ):
+        raise DetailedHistoryAuthorityError(
+            "detailed-history catalog contains an excluded asset class"
+        )
     authority = payload.get("authority")
     if not isinstance(authority, dict) or any(
         authority.get(name) is not False
@@ -454,15 +479,26 @@ def validate_catalog(payload: Mapping[str, Any], *, config: Mapping[str, Any]) -
         raise DetailedHistoryAuthorityError("detailed-history catalog authority drift")
 
 
-def detailed_object_key(*, symbol: str, interval: str, period: str) -> str:
+def detailed_object_key(
+    *,
+    symbol: str,
+    interval: str,
+    period: str,
+    provider_namespace: str = "market-data/binance_usdm/detailed-v0.1",
+) -> str:
     if interval not in INTERVALS:
         raise ValueError("unsupported detailed-history interval")
     year, month = parse_month(period)
     if not symbol.isascii() or not symbol.isalnum() or not symbol.endswith("USDT"):
         raise ValueError("unsafe detailed-history symbol")
+    if (
+        not provider_namespace.startswith("market-data/binance_usdm/")
+        or ".." in provider_namespace
+    ):
+        raise ValueError("unsafe detailed-history provider namespace")
     return (
-        "market-data/binance_usdm/detailed-v0.1/perp/"
-        f"{symbol}/{interval}/year={year:04d}/month={month:02d}/candles.parquet"
+        f"{provider_namespace.rstrip('/')}/perp/{symbol}/{interval}/"
+        f"year={year:04d}/month={month:02d}/candles.parquet"
     )
 
 
@@ -476,6 +512,9 @@ def build_shard_plan(
     if shard_index < 0 or shard_index >= shard_count:
         raise ValueError("shard index is outside catalog range")
     output: list[DetailedPartition] = []
+    provider_namespace = str(
+        catalog.get("provider_namespace") or "market-data/binance_usdm/detailed-v0.1"
+    )
     for market in markets:
         if not isinstance(market, dict) or int(market.get("shard_index", -1)) != shard_index:
             continue
@@ -501,7 +540,10 @@ def build_shard_plan(
                         source_key=source_key,
                         checksum_key=f"{source_key}.CHECKSUM",
                         r2_key=detailed_object_key(
-                            symbol=symbol, interval=interval, period=period
+                            symbol=symbol,
+                            interval=interval,
+                            period=period,
+                            provider_namespace=provider_namespace,
                         ),
                     )
                 )
@@ -521,8 +563,10 @@ def _parse_utc(value: str) -> datetime:
 
 
 def validate_authority_config(config: Mapping[str, Any]) -> None:
+    version = str(config.get("version") or "")
+    target_by_version = {"0.1.1": 250, "0.1.2": 100}
     if (
-        config.get("version") != "0.1.1"
+        version not in target_by_version
         or config.get("status") != "EXECUTION_AUTHORIZED_AFTER_V0_10_WINDOW"
         or config.get("provider") != "binance_usdm"
         or config.get("delivery") != "binance_vision"
@@ -539,8 +583,26 @@ def validate_authority_config(config: Mapping[str, Any]) -> None:
     assert isinstance(storage, dict)
     assert isinstance(authority, dict)
     requested = month_range(str(scope["source_month_start"]), str(scope["source_month_end"]))
-    if len(requested) != 48 or int(scope.get("target_market_count", 0)) != 250:
-        raise DetailedHistoryAuthorityError("detailed-history scope must remain 250 markets x 48 months")
+    expected_target = target_by_version[version]
+    if len(requested) != 48 or int(scope.get("target_market_count", 0)) != expected_target:
+        raise DetailedHistoryAuthorityError(
+            f"detailed-history scope must remain {expected_target} markets x 48 months"
+        )
+    if version == "0.1.2":
+        selection = config.get("selection")
+        if not isinstance(selection, dict):
+            raise DetailedHistoryAuthorityError("Crypto Core selection contract is missing")
+        if tuple(selection.get("allowed_asset_classes") or ()) != ("crypto",):
+            raise DetailedHistoryAuthorityError("Crypto Core must contain only crypto markets")
+        if any(
+            int(selection.get(name, -1)) != expected
+            for name, expected in (
+                ("minimum_tokenized_stock_candidates", 0),
+                ("minimum_historical_absence_candidates", 0),
+                ("minimum_window_end_candidates", 100),
+            )
+        ):
+            raise DetailedHistoryAuthorityError("Crypto Core category contract mismatch")
     if tuple(scope.get("intervals") or ()) != INTERVALS:
         raise DetailedHistoryAuthorityError("detailed-history interval contract mismatch")
     holdout_start = _parse_utc(str(scope["replacement_holdout_start_utc"]))
@@ -609,21 +671,36 @@ def load_authority_pair(
     receipt = json.loads(Path(receipt_path).read_text(encoding="utf-8"))
     validate_authority_config(config)
     digest = sha256_bytes(config_bytes)
+    version = str(config["version"])
+    expected = {
+        "0.1.1": {
+            "schema": "binance-usdm-detailed-history-execution-authority-v0.1.1",
+            "stage": "BINANCE_USDM_DETAILED_HISTORY_V0_1_1_AUTHORIZED",
+            "config": "config/binance_usdm_detailed_history_v0_1_1.json",
+            "prior_request_key": "v0_1_provider_requests_performed",
+            "prior_r2_key": "v0_1_r2_access_performed",
+        },
+        "0.1.2": {
+            "schema": "binance-usdm-detailed-history-execution-authority-v0.1.2",
+            "stage": "BINANCE_USDM_CRYPTO_CORE_100_V0_1_2_AUTHORIZED",
+            "config": "config/binance_usdm_detailed_history_v0_1_2.json",
+            "prior_request_key": "v0_1_1_provider_requests_performed",
+            "prior_r2_key": "v0_1_1_r2_access_performed",
+        },
+    }[version]
     supersession = receipt.get("supersession")
     execution_boundary = receipt.get("execution_boundary")
     if (
-        receipt.get("schema")
-        != "binance-usdm-detailed-history-execution-authority-v0.1.1"
+        receipt.get("schema") != expected["schema"]
         or receipt.get("status") != "AUTHORIZED"
-        or receipt.get("stage") != "BINANCE_USDM_DETAILED_HISTORY_V0_1_1_AUTHORIZED"
-        or receipt.get("config")
-        != "config/binance_usdm_detailed_history_v0_1_1.json"
+        or receipt.get("stage") != expected["stage"]
+        or receipt.get("config") != expected["config"]
         or receipt.get("config_sha256") != digest
         or not _SHA256_RE.fullmatch(str(receipt.get("config_sha256") or ""))
         or not isinstance(supersession, dict)
         or supersession.get("superseded_authority_mutated") is not False
-        or supersession.get("v0_1_provider_requests_performed") != 0
-        or supersession.get("v0_1_r2_access_performed") is not False
+        or supersession.get(expected["prior_request_key"]) != 0
+        or supersession.get(expected["prior_r2_key"]) is not False
         or not isinstance(execution_boundary, dict)
         or execution_boundary.get("backfill_stop_exclusive_utc")
         != config["execution"]["backfill_stop_exclusive_utc"]

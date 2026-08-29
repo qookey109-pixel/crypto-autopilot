@@ -12,8 +12,8 @@ and should not be read as active production schedules.
 | Continuous | Research Signal Layer V0.2 | daily 02:17 | bounded public structured-signal ingestion |
 | Continuous | Research Signal Quality V0.1 | daily 02:47 | allowlisted R2 lineage read only |
 | Continuous | Research Automation Health V0.1 | every 3 hours at :47 | GitHub Actions metadata read only |
-| Post-window | Binance USD-M Detailed History V0.1.1 | every 6 hours at :23 during 2026-09-04 through 09-30 | starts only after V0.10; fixed pre-holdout source range; R2-only persistence |
-| Conditional post-window | Binance USD-M Detailed Training V0.1.1 | Sunday 04:37 | skips until the complete detailed-history dataset exists |
+| Post-window | Binance USD-M Crypto Core 100 V0.1.2 | every 6 hours at :23 during 2026-09-04 through 09-30 | starts only after V0.10; 10 R2-only shards; fixed pre-holdout source range |
+| Conditional post-window | Binance USD-M Crypto Core 100 Training V0.1.2 | Sunday 04:37 | skips until all 100-market detailed-history shards exist |
 
 ## Retired cron triggers
 
@@ -34,6 +34,14 @@ evidence. They do not automatically resume.
 - CI and dashboard build/static smoke.
 - V0.10 critical-path freeze guard and capture-window validation.
 - V0.10 scheduled-capture observer.
+
+## Prepared but not scheduled
+
+- Pionex Post-window Paper Training V0.2 preserves the existing public adapter
+  and Repository Paper Broker, but remains `WAITING_FOR_HOLDOUT_AUTHORITY`.
+  Latest-lookback requests may include the frozen 2026-08-28 through 09-03
+  candles, so no workflow or cron is created until V0.11 and a separate
+  holdout/paper-read authority are complete.
 - V0.11 synthetic evaluator validation; production R2 evaluation remains unauthorized.
 
 Everything else under `.github/workflows/` is historical, planning-only,

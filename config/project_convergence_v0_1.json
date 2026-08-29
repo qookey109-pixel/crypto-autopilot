@@ -25,6 +25,13 @@
     "parameter_sweep": "config/strategy_parameter_sweep_v0_1.json",
     "display_projection": "web/data/strategy.json"
   },
+  "current_data_and_paper": {
+    "crypto_core_100": "config/binance_usdm_detailed_history_v0_1_2.json",
+    "crypto_core_100_authority": "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json",
+    "tokenized_equity_dataset": "SEPARATE_FUTURE_VERSION_NOT_AUTHORIZED",
+    "paper_successor": "config/post_window_paper_training_v0_2.json",
+    "paper_successor_state": "PREPARED_WAITING_FOR_HOLDOUT_AUTHORITY"
+  },
   "scheduled_workflows": {
     "current_window": [
       {
@@ -138,6 +145,9 @@
     "sstate_core_changed": false,
     "strategy_parameters_changed": false,
     "provider_or_r2_authority_added": false,
+    "provider_or_r2_scope_replaced_before_execution": true,
+    "replacement_holdout_access_authorized": false,
+    "paper_successor_automatic_activation_authorized": false,
     "trade_plan_authorized": false,
     "real_money_order_authorized": false,
     "live_trading_authorized": false

@@ -137,12 +137,18 @@ def main() -> int:
         "v0-10-metadata-window",
         "strategy-research-loop-v0-1",
         "detailed-history-backfill",
+        "paper-training-resumption-v0-2",
         "sstate-evidence-calibration",
         "continuous-learning-target",
     }
     if {item.get("id") for item in calendar_items} != expected_calendar_ids:
         raise RuntimeError("dashboard research calendar stages changed without review")
-    allowed_calendar_statuses = {"AUTHORIZED", "NOT_READY", "PREPARED"}
+    allowed_calendar_statuses = {
+        "AUTHORIZED",
+        "WAITING_AUTHORITY",
+        "NOT_READY",
+        "PREPARED",
+    }
     for item in calendar_items:
         if item.get("status") not in allowed_calendar_statuses:
             raise RuntimeError(f"dashboard calendar status is not allowlisted: {item.get('status')}")
@@ -154,6 +160,8 @@ def main() -> int:
     calendar_sources = set(calendar.get("sourceAuthorities") or [])
     for required_source in (
         "PROJECT_STATUS.md",
+        "config/binance_usdm_detailed_history_v0_1_2.json",
+        "config/post_window_paper_training_v0_2.json",
         "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
         "config/strategy_edge_validation_v0_1.json",
         "config/strategy_research_loop_v0_1.json",
@@ -338,6 +346,7 @@ def main() -> int:
         "通過 · PASS",
         "已授權 · AUTHORIZED",
         "已準備 · PREPARED",
+        "等待授權 · WAITING_AUTHORITY",
         "未授權 · NOT_AUTHORIZED",
         "失敗 · FAIL",
     ):
@@ -371,7 +380,13 @@ def main() -> int:
         raise RuntimeError("dashboard paper-training schema changed")
     if paper.get("mode") != "PAPER_TRAINING_ONLY":
         raise RuntimeError("dashboard paper-training fixture must remain paper-only")
+    if paper.get("status") != "WAITING_AUTHORITY":
+        raise RuntimeError("dashboard Paper successor must remain waiting for authority")
     paper_authority = paper.get("authority") or {}
+    if paper_authority.get("publicMarketDataReadAuthorized") is not False:
+        raise RuntimeError("waiting Paper fixture cannot authorize provider reads")
+    if paper_authority.get("paperCandidateGenerationAuthorized") is not False:
+        raise RuntimeError("waiting Paper fixture cannot authorize candidate generation")
     for key in (
         "formalTradePlanAuthorized",
         "pionexDemoAutomationAuthorized",

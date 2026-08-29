@@ -41,7 +41,7 @@ CI also rebuilds the non-authoritative research calendar from the current
 versioned Repository sources before publishing:
 
 ```text
-V0.10 cutover + Detailed History V0.1.1 + prepared successor schedule
+V0.10 cutover + Crypto Core 100 V0.1.2 + prepared Paper successor
        + Strategy Research Loop / Edge configs
        + continuous-learning roadmap + SState evidence boundary
                  |

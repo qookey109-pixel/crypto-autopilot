@@ -40,10 +40,10 @@ from crypto_autopilot.storage.r2 import R2Store
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_CONFIG = ROOT / "config/binance_usdm_detailed_history_v0_1_1.json"
+DEFAULT_CONFIG = ROOT / "config/binance_usdm_detailed_history_v0_1_2.json"
 DEFAULT_AUTHORITY = (
     ROOT
-    / "research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-1-bounded-authority.json"
+    / "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json"
 )
 BUCKET_LIST_URL = "https://s3-ap-northeast-1.amazonaws.com/data.binance.vision"
 OBJECT_BASE_URL = "https://data.binance.vision/"

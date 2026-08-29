@@ -57,6 +57,14 @@ def test_checked_in_calendar_is_derived_from_versioned_sources() -> None:
     assert "120" in strategy_loop["detail"]
     assert detailed["startsAtUtc"] == "2026-09-04T06:23:00Z"
     assert detailed["endsAtUtc"] == "2026-10-01T00:00:00Z"
+    paper = next(
+        item
+        for item in checked_in["items"]
+        if item["id"] == "paper-training-resumption-v0-2"
+    )
+    assert paper["status"] == "WAITING_AUTHORITY"
+    assert paper["startsAtUtc"] is None
+    assert paper["endsAtUtc"] is None
 
 
 def test_calendar_fails_closed_if_prepared_successor_gains_authority(
