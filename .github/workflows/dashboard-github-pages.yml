@@ -99,7 +99,7 @@ jobs:
             --output _site/data/dashboard.json
           python scripts/build_research_calendar_projection.py \
             --output _site/data/research-calendar.json
-          python scripts/build_alternative_assets_projection.py \
+          PYTHONPATH=src python scripts/build_alternative_assets_projection.py \
             --output _site/data/alternative-assets.json
           python scripts/apply_dashboard_latest_authority.py \
             --input _site/data/dashboard.json \
