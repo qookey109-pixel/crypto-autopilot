@@ -124,7 +124,7 @@ Repository branch `main` is the live formal authority and is intentionally not s
 - This stage does not change V0.10, relabel Binance as Pionex, switch sources,
   open the holdout, admit a formal backtest, promote a model or trade.
 
-### Pionex Alternative Assets Catalog V0.1 — AUTHORIZED AFTER WINDOW / NOT STARTED
+### Pionex Alternative Assets Observability V0.2 — AUTHORIZED AFTER WINDOW / NOT STARTED
 
 - A separate Pionex-native metadata catalog covers a 125-candidate registry:
   90 equity/stock-linked tokens, 31 ETF/ETN/fund-linked tokens and 4 direct
@@ -138,17 +138,23 @@ Repository branch `main` is the live formal authority and is intentionally not s
   first scheduled catalog is `2026-09-04T02:53:00Z`, followed by bounded weekly
   reviews on September 6, 13, 20 and 27 at `03:53 UTC`. Authority expires before
   provider/R2 access at `2026-10-01T00:00:00Z`.
+- V0.2 supersedes the unexecuted V0.1 schedule before its first provider request
+  or R2 access. One workflow now validates the complete catalog structure,
+  compares each run with the prior SHA-bound V0.2 catalog and estimates the
+  four-year `15M / 60M / 4H` capacity without materializing history. Catalog
+  absence is reported as an observation, never automatic delisting proof.
 - Each run performs fresh whole-bucket 8 GB FREE-ONLY headroom checks before the
-  Pionex metadata read and before R2 writes. Catalog and manifest are immutable,
-  SHA-256 read back, and the small latest pointer is written last. Persistent
-  generated data remains R2-only.
+  prior-catalog/provider read and before R2 writes. Catalog, analysis, safe
+  projection and manifest are immutable, SHA-256 read back, and the small latest
+  pointer is written last. Persistent generated data remains R2-only.
 - This version does not call K-line, funding, trade or order-book endpoints and
   does not access the replacement holdout. Proposed Pionex-native
   `15M / 60M / 4H` history and training remain waiting for V0.11 plus a separate
   holdout/candle authority; activation is not automatic.
-- Config: `config/pionex_alternative_assets_v0_1.json`; authority receipt:
-  `research/receipts/2026-08-30-pionex-alternative-assets-v0-1-authority.json`;
-  operating contract: `docs/PIONEX_ALTERNATIVE_ASSETS_V0_1.md`.
+- Candidate registry: `config/pionex_alternative_assets_v0_1.json`; current
+  config: `config/pionex_alternative_assets_observability_v0_2.json`; authority
+  receipt: `research/receipts/2026-08-30-pionex-alternative-assets-observability-v0-2-authority.json`;
+  operating contract: `docs/PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY_V0_2.md`.
 - No ownership/equivalence claim, source switch, provider splice, model
   promotion, trade plan, private API, real-money order or live trading is
   authorized.

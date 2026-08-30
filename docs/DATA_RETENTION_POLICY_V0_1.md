@@ -1,6 +1,6 @@
 # Data Retention Policy V0.1
 
-Status: **PARTIALLY ACTIVE / CRYPTO CORE 100 V0.1.2 AND PIONEX ALTERNATIVE-ASSET METADATA CATALOG AUTHORIZED AFTER V0.10 WINDOW**.
+Status: **PARTIALLY ACTIVE / CRYPTO CORE 100 V0.1.2 AND PIONEX ALTERNATIVE-ASSET METADATA OBSERVABILITY V0.2 AUTHORIZED AFTER V0.10 WINDOW**.
 
 This policy records the requested storage split. The executable Binance Spot
 V0.5 authority remains the current authority for its daily dataset. The
@@ -15,7 +15,7 @@ compaction, model run or trading action.
 | --- | --- | --- |
 | Binance Spot training candles | `1d`, provider-separated Spot | `2020-01-01` through latest complete UTC day |
 | Detailed candles | `15m`, `1h`, `4h`, provider-separated Binance USD-M Crypto Core namespace | fixed 2022-08 through 2026-07 under Crypto Core 100 V0.1.2; future rolling compaction needs another authority |
-| Pionex alternative-asset catalog | Pionex public `PERP + TRADING` symbol metadata | bounded Sep 2026 catalogs in R2; no K-line/funding/trade/order-book retention in V0.1 |
+| Pionex alternative-asset observability | Pionex public `PERP + TRADING` symbol metadata | bounded Sep 2026 catalog, validation, diff and safe-summary evidence in R2; no K-line/funding/trade/order-book retention in V0.2 |
 | Derivative state | funding, mark-index basis, open interest | rolling four years |
 | Derived indicators | ADX, VWAP, Bollinger, Donchian, ATR and related features | recompute from canonical inputs; no permanent duplicate copy |
 
@@ -44,3 +44,9 @@ Using the existing eight-year sizing basis, four years of detailed native
 intervals are approximately 1.48 GB canonical, 2.96 GB including retained
 staging, and 4.43 GB at the three-times stress factor. These are planning
 figures, not proof of provider availability or an authorization to backfill.
+
+V0.2 also computes a conservative candidate-max estimate for the separate 125
+alternative-asset registry: 23,010,750 rows across four years of `15M / 60M /
+4H`; approximately 1.47 GB at the 64-byte/row reference assumption and 3.68 GB
+at the 128-byte/row plus 1.25x operational-stress assumption. This is planning
+evidence only and grants no historical-materialization authority.

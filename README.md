@@ -22,7 +22,7 @@ The repository has moved beyond the original V0.1 implementation baseline while 
 - Cloudflare R2 historical storage and Binance 2025 pilot: **PASS**.
 - Binance Funding V0.2 R2 materialization: **PASS** — 192/192 authorized object identities verified after write.
 - Binance USD-M Crypto Core 100 V0.1.2: **AUTHORIZED AFTER V0.10 WINDOW / NOT STARTED** — 100 unique Crypto markets, fixed 2022-08 through 2026-07 window, native 15m/1h/4h archives, 10 R2-only shards and bounded intraday research training. V0.1.1 was superseded before execution and remains immutable; tokenized-equity historical K-line data requires a separate future dataset authority.
-- Pionex Alternative Assets Catalog V0.1: **AUTHORIZED AFTER V0.10 WINDOW / NOT STARTED** — a separate 125-candidate registry (90 equity/stock-linked, 31 ETF/fund-linked and 4 metal references) is intersected with the live Pionex `PERP + TRADING` public catalog. The bounded September schedule stores metadata-only evidence in R2; K-lines, funding, history/training and trading remain unauthorized.
+- Pionex Alternative Assets Observability V0.2: **AUTHORIZED AFTER V0.10 WINDOW / NOT STARTED** — the unexecuted V0.1 schedule was superseded before provider/R2 access. A separate 125-candidate registry (90 equity/stock-linked, 31 ETF/fund-linked and 4 metal references) is validated against live Pionex `PERP + TRADING` metadata, compared weekly with its prior SHA-bound catalog and given a planning-only four-year capacity estimate. K-lines, funding, history/training and trading remain unauthorized.
 - Pionex ↔ Binance Equivalence V0.1: **definitive FAIL** — 45 pairs = 18 PASS / 18 REVIEW / 9 FAIL. The frozen result must not be regraded by changing thresholds or scope.
 - `source_switch_authorized=false`; Binance evidence remains `provider=binance_usdm` and must never be relabeled as Pionex-native evidence.
 - V0.5 Render Free / Frankfurt Binance public-metadata transport: **PASS**.
@@ -95,14 +95,16 @@ and the preserved superseded addendum in
 [`docs/BINANCE_USDM_DETAILED_HISTORY_V0_1_1.md`](docs/BINANCE_USDM_DETAILED_HISTORY_V0_1_1.md), plus the historical full design in
 [`docs/BINANCE_USDM_DETAILED_HISTORY_V0_1.md`](docs/BINANCE_USDM_DETAILED_HISTORY_V0_1.md).
 
-The separate **Pionex Alternative Assets Catalog V0.1** keeps tokenized stocks,
+The separate **Pionex Alternative Assets Observability V0.2** keeps tokenized stocks,
 ETF/fund-linked contracts and direct metal references outside Crypto Core 100.
 It contains 125 point-in-time candidates, but selects only exact symbols still
 returned by Pionex public perpetual metadata. Its first catalog run is
 `2026-09-04 02:53 UTC` (`10:53 Asia/Taipei`), followed by four bounded weekly
-reviews in September. This is metadata-only discovery; the proposed Pionex-native
+reviews in September. Each run adds structural validation, a prior-catalog diff
+and a planning-only capacity estimate; the website receives only aggregate safe
+summary fields. This is metadata-only discovery; the proposed Pionex-native
 `15M / 60M / 4H` history remains waiting for V0.11 and a separate holdout/candle
-authority. See [`docs/PIONEX_ALTERNATIVE_ASSETS_V0_1.md`](docs/PIONEX_ALTERNATIVE_ASSETS_V0_1.md).
+authority. See [`docs/PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY_V0_2.md`](docs/PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY_V0_2.md).
 
 The prepared V0.6 Shadow Model compares feature groups locally after the first
 V0.5 quality gate rejected the current model. It records calibration and

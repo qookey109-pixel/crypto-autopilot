@@ -72,6 +72,8 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
         for relative in (
             website["entry"],
             website["script"],
+            website["alternative_assets_projection_builder"],
+            website["alternative_assets_projection"],
             *website["styles"],
             *website["active_large_assets"],
         ):
@@ -102,7 +104,7 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
         )
         self.assertEqual(
             current["pionex_alternative_assets_state"],
-            "CATALOG_AUTHORIZED_AFTER_V0_10_WINDOW_HISTORY_WAITING_HOLDOUT_AUTHORITY",
+            "OBSERVABILITY_V0_2_AUTHORIZED_AFTER_V0_10_WINDOW_HISTORY_WAITING_SEPARATE_AUTHORITY",
         )
         self.assertEqual(
             current["paper_successor_state"],
@@ -111,6 +113,7 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
         for key in (
             "crypto_core_100",
             "crypto_core_100_authority",
+            "pionex_alternative_assets_registry",
             "pionex_alternative_assets_catalog",
             "pionex_alternative_assets_authority",
             "paper_successor",

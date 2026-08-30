@@ -28,7 +28,7 @@ AUTHORITY = (
     ROOT
     / "research/receipts/2026-08-30-pionex-alternative-assets-v0-1-authority.json"
 )
-WORKFLOW = ROOT / ".github/workflows/pionex-alternative-assets-catalog-v0-1.yml"
+RETIRED_WORKFLOW = ROOT / ".github/workflows/pionex-alternative-assets-catalog-v0-1.yml"
 
 
 class FakeStore:
@@ -172,17 +172,8 @@ class PionexAlternativeAssetsV01Tests(unittest.TestCase):
             ["VERIFY_EXISTING", "VERIFY_EXISTING", "UPLOAD"],
         )
 
-    def test_workflow_is_bounded_metadata_only_and_has_no_trading_secret(self) -> None:
-        text = WORKFLOW.read_text(encoding="utf-8")
-        self.assertIn('cron: "53 2 4 9 *"', text)
-        self.assertIn('cron: "53 3 6,13,20,27 9 *"', text)
-        self.assertIn("cancel-in-progress: false", text)
-        self.assertIn("persist-credentials: false", text)
-        self.assertIn("R2_SECRET_ACCESS_KEY", text)
-        self.assertIn("run_pionex_alternative_assets_catalog.py", text)
-        self.assertNotIn("PIONEX_API_KEY", text)
-        self.assertNotIn("place_order", text.lower())
-        self.assertNotIn("/api/v1/trade", text)
+    def test_v0_1_schedule_is_retired_before_first_execution(self) -> None:
+        self.assertFalse(RETIRED_WORKFLOW.exists())
 
     def test_pre_window_script_skips_before_r2_or_provider(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

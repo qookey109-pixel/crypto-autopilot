@@ -13,6 +13,8 @@ const STATUS_LABELS = {
   PASS: "通過 · PASS",
   READY: "已就緒 · READY",
   AUTHORIZED: "已授權 · AUTHORIZED",
+  WAITING_FIRST_RUN: "等待首次執行 · WAITING_FIRST_RUN",
+  BASELINE_CREATED: "基準已建立 · BASELINE_CREATED",
   PREPARED: "已準備 · PREPARED",
   WAITING_AUTHORITY: "等待授權 · WAITING_AUTHORITY",
   PENDING: "等待中 · PENDING",
@@ -26,8 +28,8 @@ const STATUS_LABELS = {
 };
 
 function badgeClass(status) {
-  if (["PASS", "READY", "AUTHORIZED"].includes(status)) return "pass";
-  if (["PREPARED", "WAITING_AUTHORITY", "PENDING", "IN_PROGRESS", "NOT_READY", "REVIEW_REQUIRED", "SCOPE_REDUCTION_REQUIRED"].includes(status)) return "pending";
+  if (["PASS", "READY", "AUTHORIZED", "BASELINE_CREATED"].includes(status)) return "pass";
+  if (["PREPARED", "WAITING_AUTHORITY", "WAITING_FIRST_RUN", "PENDING", "IN_PROGRESS", "NOT_READY", "REVIEW_REQUIRED", "SCOPE_REDUCTION_REQUIRED"].includes(status)) return "pending";
   if (["BLOCKED", "NOT_AUTHORIZED", "FAIL"].includes(status)) return "danger";
   return "neutral";
 }
@@ -101,6 +103,56 @@ function renderMarkets(items) {
       <td><span class="badge ${badgeClass(item.status)}" title="Authority 狀態碼：${escapeHtml(item.status)}">${escapeHtml(displayStatus(item.status))}</span></td>
     </tr>
   `).join("");
+}
+
+function alternativeAssetsProjectionIsSafe(projection) {
+  if (!projection || projection.schema !== "qookey-pionex-alternative-assets-projection-v0.2") return false;
+  if (projection.authority !== false || projection.mode !== "METADATA_ONLY_READ_ONLY") return false;
+  const boundary = projection.safety_boundary || {};
+  if (!Object.keys(boundary).length || Object.values(boundary).some(value => value !== false)) return false;
+  const actual = projection.actual_catalog;
+  return actual === null || (typeof actual === "object" && !Array.isArray(actual) && !("markets" in actual));
+}
+
+function renderAlternativeAssets(projection) {
+  const safe = alternativeAssetsProjectionIsSafe(projection);
+  const status = safe ? String(projection.status || "WAITING_FIRST_RUN") : "NOT_READY";
+  const registry = safe ? (projection.candidate_registry || {}) : {};
+  const counts = registry.counts_by_class || {};
+  const actual = safe ? projection.actual_catalog : null;
+  const reference = safe
+    ? projection.capacity_candidate_max?.scenarios?.reference?.canonical_gb
+    : null;
+  const setText = (id, value) => {
+    const element = document.querySelector(`#${id}`);
+    if (element) element.textContent = value;
+  };
+  const badge = document.querySelector("#alternative-assets-status");
+  if (badge) {
+    badge.textContent = displayStatus(status);
+    badge.className = `badge ${badgeClass(status)}`;
+  }
+  setText("alternative-assets-candidates", number(registry.total, 0));
+  setText("alternative-assets-matched", number(actual?.matched_market_count, 0));
+  setText("alternative-assets-equity", number(counts.us_equity_token, 0));
+  setText("alternative-assets-funds", number(counts.etf_or_fund_token, 0));
+  setText("alternative-assets-metals", number(counts.metal_or_other_asset, 0));
+  setText(
+    "alternative-assets-capacity",
+    Number.isFinite(Number(reference)) ? `${number(reference, 2)} GB` : "—"
+  );
+  setText(
+    "alternative-assets-observed-at",
+    `目錄觀測：${actual ? formatTrustedTime(actual.observed_at_utc) : "尚未執行"}`
+  );
+  const nextRun = safe ? formatTrustedTime(projection.next_scheduled_run_utc) : "尚未提供";
+  const actualNote = actual
+    ? `本次新增 ${number(actual.added_count, 0)}、缺席 ${number(actual.removed_count, 0)}；缺席不等於下架。`
+    : "實際交集會在首輪 Pionex metadata 驗證後產生。";
+  setText(
+    "alternative-assets-note",
+    `下一次排程：${nextRun}；${actualNote} 容量只是規劃估算，未授權下載 K 線。`
+  );
 }
 
 function escapeHtml(value) {
@@ -505,6 +557,13 @@ async function loadData() {
       console.warn("Research calendar projection unavailable", error);
       renderCalendar(null);
     }
+    try {
+      const alternativeAssets = await fetchJson("./data/alternative-assets.json");
+      renderAlternativeAssets(alternativeAssets);
+    } catch (error) {
+      console.warn("Alternative-assets projection unavailable", error);
+      renderAlternativeAssets(null);
+    }
     render(mergeOperationalStatus(data, operational));
     renderPaperTraining(paperTraining);
     renderResearchEvidence(researchEvidence);
@@ -514,6 +573,7 @@ async function loadData() {
     renderCalendar(null);
     renderPaperTraining(null);
     renderResearchEvidence(null);
+    renderAlternativeAssets(null);
     document.querySelector("#snapshot-label").textContent = "狀態快照暫時無法讀取";
   } finally {
     refreshButton?.removeAttribute("aria-busy");

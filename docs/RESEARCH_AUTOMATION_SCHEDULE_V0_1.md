@@ -16,7 +16,7 @@ model or authorize trading.
 | Every three hours at `:47` | Research Automation Health V0.1 | GitHub Actions metadata-only stale/failure/missing-run monitor; no provider or R2 access |
 | Every 6 hours at `:23`, 2026-09-04 through 2026-09-30 | Binance USD-M Crypto Core 100 V0.1.2 | One serialized incomplete 10-market shard; 100-market / 48-month target; R2-only |
 | Sunday 04:37 UTC | Binance USD-M Crypto Core 100 Training V0.1.2 | Skips until all 10 detailed-history shards are complete; research evidence only |
-| 2026-09-04 02:53 UTC, then Sep 6/13/20/27 at 03:53 UTC | Pionex Alternative Assets Catalog V0.1 | Intersects the 125-candidate equity/ETF/metal registry with live `PERP + TRADING` metadata; metadata-only R2 catalog |
+| 2026-09-04 02:53 UTC, then Sep 6/13/20/27 at 03:53 UTC | Pionex Alternative Assets Observability V0.2 | Validates the 125-candidate equity/ETF/metal catalog, compares prior SHA-bound evidence and estimates capacity; metadata-only R2 evidence |
 
 The expired Binance V0.5 weekly/monthly and Pionex Paper cron triggers are no
 longer active. Their binding provider cutoff was

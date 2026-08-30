@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -10,6 +11,9 @@ import re
 V0_10_CUTOVER = Path("config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json")
 DETAILED_HISTORY = Path("config/binance_usdm_detailed_history_v0_1_2.json")
 PIONEX_ALTERNATIVE_ASSETS = Path("config/pionex_alternative_assets_v0_1.json")
+PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY = Path(
+    "config/pionex_alternative_assets_observability_v0_2.json"
+)
 SUCCESSOR_SCHEDULE = Path("config/post_window_research_successor_schedule_v0_1.json")
 PAPER_SUCCESSOR = Path("config/post_window_paper_training_v0_2.json")
 PROJECT_STATUS = Path("PROJECT_STATUS.md")
@@ -22,6 +26,7 @@ SOURCE_AUTHORITIES = (
     PROJECT_STATUS,
     DETAILED_HISTORY,
     PIONEX_ALTERNATIVE_ASSETS,
+    PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY,
     V0_10_CUTOVER,
     SUCCESSOR_SCHEDULE,
     PAPER_SUCCESSOR,
@@ -85,6 +90,7 @@ def build_projection(
     v0_10 = load_json(V0_10_CUTOVER)
     detailed = load_json(DETAILED_HISTORY)
     alternative_assets = load_json(PIONEX_ALTERNATIVE_ASSETS)
+    alternative_observability = load_json(PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY)
     successor = load_json(SUCCESSOR_SCHEDULE)
     paper_successor = load_json(PAPER_SUCCESSOR)
     strategy_edge = load_json(STRATEGY_EDGE)
@@ -130,11 +136,34 @@ def build_projection(
 
     if alternative_assets.get("status") != "CATALOG_EXECUTION_AUTHORIZED_AFTER_V0_10_WINDOW":
         raise RuntimeError("Pionex alternative-assets catalog authority state changed")
+    if alternative_observability.get("status") != (
+        "CATALOG_OBSERVABILITY_AUTHORIZED_AFTER_V0_10_WINDOW"
+    ):
+        raise RuntimeError("Pionex alternative-assets observability authority state changed")
+    alternative_supersession = require_dict(
+        alternative_observability.get("supersession"),
+        "alternative-assets observability supersession",
+    )
+    alternative_source_bytes = PIONEX_ALTERNATIVE_ASSETS.read_bytes()
+    if alternative_supersession.get("supersedes_config") != str(
+        PIONEX_ALTERNATIVE_ASSETS
+    ):
+        raise RuntimeError("alternative-assets observability source path changed")
+    if alternative_supersession.get("supersedes_config_sha256") != hashlib.sha256(
+        alternative_source_bytes
+    ).hexdigest():
+        raise RuntimeError("alternative-assets observability source hash changed")
+    if alternative_supersession.get("superseded_before_first_provider_request") is not True:
+        raise RuntimeError("alternative-assets V0.1 was not superseded before provider access")
+    if alternative_supersession.get("superseded_before_first_r2_access") is not True:
+        raise RuntimeError("alternative-assets V0.1 was not superseded before R2 access")
+    if alternative_supersession.get("concurrent_v0_1_schedule_authorized") is not False:
+        raise RuntimeError("alternative-assets concurrent schedules are forbidden")
     alternative_execution = require_dict(
-        alternative_assets.get("execution"), "alternative-assets execution"
+        alternative_observability.get("execution"), "alternative-assets execution"
     )
     alternative_authority = require_dict(
-        alternative_assets.get("authority"), "alternative-assets authority"
+        alternative_observability.get("authority"), "alternative-assets authority"
     )
     alternative_registry = require_dict(
         alternative_assets.get("registry"), "alternative-assets registry"
@@ -152,6 +181,8 @@ def build_projection(
         raise RuntimeError("alternative-assets not-before no longer follows V0.10")
     if sum(len(value) for value in alternative_registry.values() if isinstance(value, list)) != 125:
         raise RuntimeError("alternative-assets candidate registry count changed")
+    if alternative_execution.get("first_scheduled_run_utc") != "2026-09-04T02:53:00Z":
+        raise RuntimeError("alternative-assets first scheduled run changed")
     for key in (
         "pionex_kline_reads_authorized",
         "pionex_funding_reads_authorized",
@@ -262,10 +293,10 @@ def build_projection(
                 "kind": "window",
             },
             {
-                "id": "pionex-alternative-assets-catalog-v0-1",
+                "id": "pionex-alternative-assets-observability-v0-2",
                 "windowLabel": "首輪 09/04 10:53 · 九月每週複核",
-                "title": "Pionex 美股／ETF／金屬目錄",
-                "detail": "125 個候選（90 股票連結、31 ETF／基金、4 金屬）只與 Pionex 當下 PERP + TRADING metadata 取交集；K 線與訓練尚未授權。",
+                "title": "Pionex 替代資產驗證／差異",
+                "detail": "125 個候選（90 股票連結、31 ETF／基金、4 金屬）只做 Pionex 當下 PERP + TRADING metadata 驗證、每週差異與四年容量估算；K 線、歷史回補與訓練尚未授權。",
                 "status": "AUTHORIZED_METADATA_ONLY",
                 "startsAtUtc": "2026-09-04T02:53:00Z",
                 "endsAtUtc": alternative_stop.isoformat(timespec="seconds").replace(

@@ -100,7 +100,7 @@ Crypto Core 100 V0.1.2 separately provides:
 | 2026-08-27 08:00 through 2026-09-04 09:59:59.999 | V0.10 frozen metadata capture window | Existing `:17` / `:47` attempts only; no second path or manual backfill |
 | 2026-09-04 14:23 first eligible cron, then every six hours through Sep 30 | Crypto Core 100 V0.1.2 catalog then next incomplete shard | 10 serialized R2-only shards; source ends 2026-07; expires Oct 1 08:00 |
 | Sunday 12:37 after detailed dataset completion | Crypto Core 100 Training V0.1.2 | Walk-forward research; `REJECT` is retained and never promoted |
-| 2026-09-04 10:53, then Sep 6/13/20/27 at 11:53 | Pionex Alternative Assets Catalog V0.1 | 125-candidate registry intersected with current Pionex perpetual metadata; no candle/funding/trade/order-book reads |
+| 2026-09-04 10:53, then Sep 6/13/20/27 at 11:53 | Pionex Alternative Assets Observability V0.2 | validates the 125-candidate Pionex metadata catalog, compares prior SHA-bound evidence and estimates four-year capacity; no candle/funding/trade/order-book reads |
 | After 2026-09-04 09:59:59.999 | Prepare and merge separate V0.11 production-evaluation authority | Do not read production V0.10 R2 receipts before authority exists |
 | After V0.11 evaluation | Review exact 194-slot completeness and provider-vector stability | Any missing slot, disagreement or drift fails closed |
 | Only after a future V0.11 PASS | Consider a separate replacement-holdout access authority | Stability PASS alone does not open holdout candles |

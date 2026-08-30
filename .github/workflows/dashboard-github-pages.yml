@@ -7,6 +7,7 @@ on:
       - "web/**"
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/build_research_calendar_projection.py"
+      - "scripts/build_alternative_assets_projection.py"
       - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
       - "scripts/validate_dashboard_static.py"
@@ -15,6 +16,8 @@ on:
       - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
       - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
       - "config/binance_usdm_detailed_history_v0_1_2.json"
+      - "config/pionex_alternative_assets_v0_1.json"
+      - "config/pionex_alternative_assets_observability_v0_2.json"
       - "config/post_window_research_successor_schedule_v0_1.json"
       - "config/post_window_paper_training_v0_2.json"
       - "config/strategy_edge_validation_v0_1.json"
@@ -34,6 +37,7 @@ on:
       - "web/**"
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/build_research_calendar_projection.py"
+      - "scripts/build_alternative_assets_projection.py"
       - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
       - "scripts/validate_dashboard_static.py"
@@ -42,6 +46,8 @@ on:
       - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
       - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
       - "config/binance_usdm_detailed_history_v0_1_2.json"
+      - "config/pionex_alternative_assets_v0_1.json"
+      - "config/pionex_alternative_assets_observability_v0_2.json"
       - "config/post_window_research_successor_schedule_v0_1.json"
       - "config/post_window_paper_training_v0_2.json"
       - "config/strategy_edge_validation_v0_1.json"
@@ -93,6 +99,8 @@ jobs:
             --output _site/data/dashboard.json
           python scripts/build_research_calendar_projection.py \
             --output _site/data/research-calendar.json
+          PYTHONPATH=src python scripts/build_alternative_assets_projection.py \
+            --output _site/data/alternative-assets.json
           python scripts/apply_dashboard_latest_authority.py \
             --input _site/data/dashboard.json \
             --output _site/data/dashboard.json
@@ -110,6 +118,7 @@ jobs:
           calendar = json.loads(Path('_site/data/research-calendar.json').read_text(encoding='utf-8'))
           evidence = json.loads(Path('_site/data/research-evidence.json').read_text(encoding='utf-8'))
           strategy = json.loads(Path('_site/data/strategy.json').read_text(encoding='utf-8'))
+          alternative = json.loads(Path('_site/data/alternative-assets.json').read_text(encoding='utf-8'))
           project = data['project']
           assert data['authority'] is False
           assert data['locale'] == 'zh-Hant-TW'
@@ -165,6 +174,15 @@ jobs:
           assert strategy['summary']['candidateCount'] == 120
           assert strategy['summary']['edgeMethodCount'] == 6
           assert all(value is False for value in strategy['safetyBoundary'].values())
+          assert alternative['schema'] == 'qookey-pionex-alternative-assets-projection-v0.2'
+          assert alternative['authority'] is False
+          assert alternative['mode'] == 'METADATA_ONLY_READ_ONLY'
+          assert alternative['status'] == 'WAITING_FIRST_RUN'
+          assert alternative['candidate_registry']['total'] == 125
+          assert alternative['actual_catalog'] is None
+          assert alternative['capacity_candidate_max']['total_rows'] == 23010750
+          assert alternative['capacity_candidate_max']['historical_materialization_authorized'] is False
+          assert all(value is False for value in alternative['safety_boundary'].values())
           schema = json.loads(Path('_site/data/research-evidence.schema.json').read_text(encoding='utf-8'))
           assert schema['properties']['authority']['const'] is False
           assert Path('_site/assets/css/styles.css').is_file()
