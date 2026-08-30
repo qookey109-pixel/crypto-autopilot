@@ -32,6 +32,16 @@
       "windowLabel": "首個符合排程 09/04 14:23"
     },
     {
+      "detail": "125 個候選（90 股票連結、31 ETF／基金、4 金屬）只與 Pionex 當下 PERP + TRADING metadata 取交集；K 線與訓練尚未授權。",
+      "endsAtUtc": "2026-10-01T00:00:00Z",
+      "id": "pionex-alternative-assets-catalog-v0-1",
+      "kind": "window",
+      "startsAtUtc": "2026-09-04T02:53:00Z",
+      "status": "AUTHORIZED_METADATA_ONLY",
+      "title": "Pionex 美股／ETF／金屬目錄",
+      "windowLabel": "首輪 09/04 10:53 · 九月每週複核"
+    },
+    {
       "detail": "既有 Paper Broker 與 Pionex 公開資料路徑已保留；最新 K 線 lookback 可能包含凍結 holdout，完成 V0.11 並合併獨立存取 authority 前不建立排程。",
       "endsAtUtc": null,
       "id": "paper-training-resumption-v0-2",
@@ -79,6 +89,7 @@
   "sourceAuthorities": [
     "PROJECT_STATUS.md",
     "config/binance_usdm_detailed_history_v0_1_2.json",
+    "config/pionex_alternative_assets_v0_1.json",
     "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
     "config/post_window_research_successor_schedule_v0_1.json",
     "config/post_window_paper_training_v0_2.json",

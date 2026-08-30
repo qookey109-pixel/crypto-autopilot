@@ -9,6 +9,7 @@ import re
 
 V0_10_CUTOVER = Path("config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json")
 DETAILED_HISTORY = Path("config/binance_usdm_detailed_history_v0_1_2.json")
+PIONEX_ALTERNATIVE_ASSETS = Path("config/pionex_alternative_assets_v0_1.json")
 SUCCESSOR_SCHEDULE = Path("config/post_window_research_successor_schedule_v0_1.json")
 PAPER_SUCCESSOR = Path("config/post_window_paper_training_v0_2.json")
 PROJECT_STATUS = Path("PROJECT_STATUS.md")
@@ -20,6 +21,7 @@ STRATEGY_RESEARCH_LOOP = Path("config/strategy_research_loop_v0_1.json")
 SOURCE_AUTHORITIES = (
     PROJECT_STATUS,
     DETAILED_HISTORY,
+    PIONEX_ALTERNATIVE_ASSETS,
     V0_10_CUTOVER,
     SUCCESSOR_SCHEDULE,
     PAPER_SUCCESSOR,
@@ -82,6 +84,7 @@ def build_projection(
 ) -> dict[str, object]:
     v0_10 = load_json(V0_10_CUTOVER)
     detailed = load_json(DETAILED_HISTORY)
+    alternative_assets = load_json(PIONEX_ALTERNATIVE_ASSETS)
     successor = load_json(SUCCESSOR_SCHEDULE)
     paper_successor = load_json(PAPER_SUCCESSOR)
     strategy_edge = load_json(STRATEGY_EDGE)
@@ -124,6 +127,42 @@ def build_projection(
         raise RuntimeError("detailed-history target market count changed")
     if detailed_scope.get("intervals") != ["15m", "1h", "4h"]:
         raise RuntimeError("detailed-history intervals changed")
+
+    if alternative_assets.get("status") != "CATALOG_EXECUTION_AUTHORIZED_AFTER_V0_10_WINDOW":
+        raise RuntimeError("Pionex alternative-assets catalog authority state changed")
+    alternative_execution = require_dict(
+        alternative_assets.get("execution"), "alternative-assets execution"
+    )
+    alternative_authority = require_dict(
+        alternative_assets.get("authority"), "alternative-assets authority"
+    )
+    alternative_registry = require_dict(
+        alternative_assets.get("registry"), "alternative-assets registry"
+    )
+    alternative_start = parse_utc(
+        alternative_execution.get("not_before_utc"), "alternative-assets not-before"
+    )
+    alternative_stop = parse_utc(
+        alternative_execution.get("catalog_stop_exclusive_utc"),
+        "alternative-assets stop",
+    )
+    # V0.10 ends at 01:59:59.999; the next permitted instant is exactly 02:00.
+    expected_alternative_start = datetime(2026, 9, 4, 2, 0, tzinfo=timezone.utc)
+    if alternative_start != expected_alternative_start or alternative_start <= v0_end:
+        raise RuntimeError("alternative-assets not-before no longer follows V0.10")
+    if sum(len(value) for value in alternative_registry.values() if isinstance(value, list)) != 125:
+        raise RuntimeError("alternative-assets candidate registry count changed")
+    for key in (
+        "pionex_kline_reads_authorized",
+        "pionex_funding_reads_authorized",
+        "pionex_trade_or_orderbook_reads_authorized",
+        "replacement_holdout_access_authorized",
+        "historical_materialization_authorized",
+        "training_authorized",
+        "live_trading_authorized",
+    ):
+        if alternative_authority.get(key) is not False:
+            raise RuntimeError(f"alternative-assets unexpectedly authorizes {key}")
 
     if successor.get("status") != "PREPARED_NOT_ACTIVE":
         raise RuntimeError("post-window successor schedule is no longer prepared-only")
@@ -220,6 +259,18 @@ def build_projection(
                 "status": "AUTHORIZED",
                 "startsAtUtc": first_run.isoformat(timespec="seconds").replace("+00:00", "Z"),
                 "endsAtUtc": stop_exclusive.isoformat(timespec="seconds").replace("+00:00", "Z"),
+                "kind": "window",
+            },
+            {
+                "id": "pionex-alternative-assets-catalog-v0-1",
+                "windowLabel": "首輪 09/04 10:53 · 九月每週複核",
+                "title": "Pionex 美股／ETF／金屬目錄",
+                "detail": "125 個候選（90 股票連結、31 ETF／基金、4 金屬）只與 Pionex 當下 PERP + TRADING metadata 取交集；K 線與訓練尚未授權。",
+                "status": "AUTHORIZED_METADATA_ONLY",
+                "startsAtUtc": "2026-09-04T02:53:00Z",
+                "endsAtUtc": alternative_stop.isoformat(timespec="seconds").replace(
+                    "+00:00", "Z"
+                ),
                 "kind": "window",
             },
             {

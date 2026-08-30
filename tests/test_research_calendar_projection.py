@@ -57,6 +57,15 @@ def test_checked_in_calendar_is_derived_from_versioned_sources() -> None:
     assert "120" in strategy_loop["detail"]
     assert detailed["startsAtUtc"] == "2026-09-04T06:23:00Z"
     assert detailed["endsAtUtc"] == "2026-10-01T00:00:00Z"
+    alternative = next(
+        item
+        for item in checked_in["items"]
+        if item["id"] == "pionex-alternative-assets-catalog-v0-1"
+    )
+    assert alternative["status"] == "AUTHORIZED_METADATA_ONLY"
+    assert alternative["startsAtUtc"] == "2026-09-04T02:53:00Z"
+    assert alternative["endsAtUtc"] == "2026-10-01T00:00:00Z"
+    assert "125" in alternative["detail"]
     paper = next(
         item
         for item in checked_in["items"]
