@@ -1,4 +1,4 @@
-name: Pionex Alternative Assets Catalog V0.1
+name: Pionex Alternative Assets Observability V0.2
 
 on:
   schedule:
@@ -10,11 +10,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: pionex-alternative-assets-catalog-v0-1
+  group: pionex-alternative-assets-observability-v0-2
   cancel-in-progress: false
 
 jobs:
-  catalog:
+  catalog-observability:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -29,44 +29,58 @@ jobs:
       - name: Install constrained runtime
         run: python -m pip install -c requirements/ci-constraints.txt .
 
-      - name: Build and publish metadata-only Pionex catalog
+      - name: Build validated metadata-only catalog evidence
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          python scripts/run_pionex_alternative_assets_catalog.py \
-            --config config/pionex_alternative_assets_v0_1.json \
-            --authority research/receipts/2026-08-30-pionex-alternative-assets-v0-1-authority.json \
+          python scripts/run_pionex_alternative_assets_observability_v0_2.py \
+            --catalog-config config/pionex_alternative_assets_v0_1.json \
+            --config config/pionex_alternative_assets_observability_v0_2.json \
+            --authority research/receipts/2026-08-30-pionex-alternative-assets-observability-v0-2-authority.json \
             --run-id "github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
-            --output alternative-assets-output/report.json
+            --output alternative-assets-output/report.json \
+            --projection-output alternative-assets-output/alternative-assets.json
 
-      - name: Assert catalog-only safety boundary
+      - name: Assert metadata-only observability boundary
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
 
           report = json.loads(Path("alternative-assets-output/report.json").read_text())
+          projection = json.loads(
+              Path("alternative-assets-output/alternative-assets.json").read_text()
+          )
           authority = report["authority"]
           assert authority["metadata_only"] is True
           for key, value in authority.items():
               if key != "metadata_only":
                   assert value is False, key
+          assert projection["authority"] is False
+          assert all(value is False for value in projection["safety_boundary"].values())
+          assert projection["actual_catalog"] is None or "markets" not in projection["actual_catalog"]
           if report["status"] == "SKIPPED":
               assert report["provider_requests_performed"] == 0
               assert report["r2_access_performed"] is False
               raise SystemExit(0)
           assert report["provider"] == "pionex_public_futures"
           assert report["r2"]["latest_pointer_written_last"] is True
+          assert report["catalog_validation_status"] in {"PASS", "REVIEW_REQUIRED"}
+          assert report["catalog_diff_status"] in {
+              "BASELINE_CREATED",
+              "PASS",
+              "REVIEW_REQUIRED",
+          }
           PY
 
-      - name: Upload secret-free catalog report
+      - name: Upload secret-free catalog observability report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: pionex-alternative-assets-${{ github.run_id }}-${{ github.run_attempt }}
-          path: alternative-assets-output/report.json
+          name: pionex-alternative-assets-observability-${{ github.run_id }}-${{ github.run_attempt }}
+          path: alternative-assets-output
           retention-days: 90
           if-no-files-found: error
 

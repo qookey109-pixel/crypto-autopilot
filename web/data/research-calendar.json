@@ -32,13 +32,13 @@
       "windowLabel": "首個符合排程 09/04 14:23"
     },
     {
-      "detail": "125 個候選（90 股票連結、31 ETF／基金、4 金屬）只與 Pionex 當下 PERP + TRADING metadata 取交集；K 線與訓練尚未授權。",
+      "detail": "125 個候選（90 股票連結、31 ETF／基金、4 金屬）只做 Pionex 當下 PERP + TRADING metadata 驗證、每週差異與四年容量估算；K 線、歷史回補與訓練尚未授權。",
       "endsAtUtc": "2026-10-01T00:00:00Z",
-      "id": "pionex-alternative-assets-catalog-v0-1",
+      "id": "pionex-alternative-assets-observability-v0-2",
       "kind": "window",
       "startsAtUtc": "2026-09-04T02:53:00Z",
       "status": "AUTHORIZED_METADATA_ONLY",
-      "title": "Pionex 美股／ETF／金屬目錄",
+      "title": "Pionex 替代資產驗證／差異",
       "windowLabel": "首輪 09/04 10:53 · 九月每週複核"
     },
     {
@@ -90,6 +90,7 @@
     "PROJECT_STATUS.md",
     "config/binance_usdm_detailed_history_v0_1_2.json",
     "config/pionex_alternative_assets_v0_1.json",
+    "config/pionex_alternative_assets_observability_v0_2.json",
     "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
     "config/post_window_research_successor_schedule_v0_1.json",
     "config/post_window_paper_training_v0_2.json",

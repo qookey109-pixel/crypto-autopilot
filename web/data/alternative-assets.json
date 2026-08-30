@@ -1,0 +1,68 @@
+{
+  "actual_catalog": null,
+  "authority": false,
+  "candidate_registry": {
+    "counts_by_class": {
+      "etf_or_fund_token": 31,
+      "metal_or_other_asset": 4,
+      "us_equity_token": 90
+    },
+    "is_current_listing_proof": false,
+    "total": 125
+  },
+  "capacity_candidate_max": {
+    "historical_materialization_authorized": false,
+    "history_days": 1461,
+    "interpretation": "Planning estimate only; actual Parquet compression must be measured before any history authority.",
+    "market_count": 125,
+    "r2_hard_stop_bytes": 8000000000,
+    "rows_by_interval": {
+      "15M": 17532000,
+      "4H": 1095750,
+      "60M": 4383000
+    },
+    "scenarios": {
+      "low": {
+        "canonical_bytes": 736344000,
+        "canonical_gb": 0.736344,
+        "compressed_bytes_per_row_assumption": 32,
+        "operational_stress_bytes": 920430000,
+        "operational_stress_gb": 0.92043
+      },
+      "reference": {
+        "canonical_bytes": 1472688000,
+        "canonical_gb": 1.472688,
+        "compressed_bytes_per_row_assumption": 64,
+        "operational_stress_bytes": 1840860000,
+        "operational_stress_gb": 1.84086
+      },
+      "stress": {
+        "canonical_bytes": 2945376000,
+        "canonical_gb": 2.945376,
+        "compressed_bytes_per_row_assumption": 128,
+        "operational_stress_bytes": 3681720000,
+        "operational_stress_gb": 3.68172
+      }
+    },
+    "schema": "pionex-alternative-assets-history-capacity-projection-v0.2",
+    "total_rows": 23010750
+  },
+  "mode": "METADATA_ONLY_READ_ONLY",
+  "next_scheduled_run_utc": "2026-09-04T02:53:00Z",
+  "projection_generated_at_utc": null,
+  "safety_boundary": {
+    "automatic_model_promotion_authorized": false,
+    "historical_materialization_authorized": false,
+    "holdout_accessed": false,
+    "live_trading_authorized": false,
+    "provider_reads_performed": false,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "raw_market_list_exposed": false,
+    "real_money_order_authorized": false,
+    "trade_plan_authorized": false,
+    "training_authorized": false
+  },
+  "schema": "qookey-pionex-alternative-assets-projection-v0.2",
+  "status": "WAITING_FIRST_RUN"
+}

@@ -13,6 +13,7 @@ OPERATIONAL_STATUS = ROOT / "data" / "operational-status.json"
 RESEARCH_CALENDAR = ROOT / "data" / "research-calendar.json"
 RESEARCH_EVIDENCE = ROOT / "data" / "research-evidence.json"
 RESEARCH_EVIDENCE_SCHEMA = ROOT / "data" / "research-evidence.schema.json"
+ALTERNATIVE_ASSETS = ROOT / "data" / "alternative-assets.json"
 REQUIRED = (
     ROOT / "index.html",
     STYLES,
@@ -25,6 +26,7 @@ REQUIRED = (
     RESEARCH_CALENDAR,
     RESEARCH_EVIDENCE,
     RESEARCH_EVIDENCE_SCHEMA,
+    ALTERNATIVE_ASSETS,
     ROOT / "_headers",
 )
 
@@ -72,6 +74,8 @@ REQUIRED_ZH_HANT_LABELS = (
     "Paper 觀測：尚未完成",
     "未提供資料時不推算持倉",
     "研究結果不等於正式准入",
+    "股票代幣、ETF 與金屬資料池",
+    "網站只顯示安全摘要",
 )
 
 
@@ -119,6 +123,46 @@ def main() -> int:
     if data.get("generatedAtUtc") is not None:
         raise RuntimeError("checked-in dashboard fixture must not invent a generation time")
 
+    alternative_assets = json.loads(ALTERNATIVE_ASSETS.read_text(encoding="utf-8"))
+    if alternative_assets.get("schema") != (
+        "qookey-pionex-alternative-assets-projection-v0.2"
+    ):
+        raise RuntimeError("alternative-assets projection schema changed")
+    if alternative_assets.get("authority") is not False:
+        raise RuntimeError("alternative-assets projection must remain non-authoritative")
+    if alternative_assets.get("mode") != "METADATA_ONLY_READ_ONLY":
+        raise RuntimeError("alternative-assets projection must remain metadata-only")
+    if alternative_assets.get("status") != "WAITING_FIRST_RUN":
+        raise RuntimeError("checked-in alternative-assets fixture must await its first run")
+    if alternative_assets.get("projection_generated_at_utc") is not None:
+        raise RuntimeError("checked-in alternative-assets fixture must not invent a run time")
+    candidate_registry = alternative_assets.get("candidate_registry") or {}
+    if candidate_registry.get("total") != 125:
+        raise RuntimeError("alternative-assets candidate count changed")
+    if candidate_registry.get("counts_by_class") != {
+        "us_equity_token": 90,
+        "etf_or_fund_token": 31,
+        "metal_or_other_asset": 4,
+    }:
+        raise RuntimeError("alternative-assets candidate class counts changed")
+    if candidate_registry.get("is_current_listing_proof") is not False:
+        raise RuntimeError("candidate registry must not be represented as listing proof")
+    if alternative_assets.get("actual_catalog") is not None:
+        raise RuntimeError("checked-in fixture must not invent a provider catalog")
+    capacity = alternative_assets.get("capacity_candidate_max") or {}
+    if capacity.get("total_rows") != 23_010_750:
+        raise RuntimeError("alternative-assets capacity row estimate changed")
+    reference_capacity = (capacity.get("scenarios") or {}).get("reference") or {}
+    if reference_capacity.get("canonical_gb") != 1.472688:
+        raise RuntimeError("alternative-assets reference capacity estimate changed")
+    if capacity.get("historical_materialization_authorized") is not False:
+        raise RuntimeError("capacity projection must not authorize history materialization")
+    alternative_security = alternative_assets.get("safety_boundary") or {}
+    if not alternative_security or any(
+        value is not False for value in alternative_security.values()
+    ):
+        raise RuntimeError("alternative-assets projection safety boundary changed")
+
     calendar = json.loads(RESEARCH_CALENDAR.read_text(encoding="utf-8"))
     if calendar.get("schema") != "qookey-research-calendar-projection-v0.1":
         raise RuntimeError("dashboard research calendar schema changed")
@@ -137,7 +181,7 @@ def main() -> int:
         "v0-10-metadata-window",
         "strategy-research-loop-v0-1",
         "detailed-history-backfill",
-        "pionex-alternative-assets-catalog-v0-1",
+        "pionex-alternative-assets-observability-v0-2",
         "paper-training-resumption-v0-2",
         "sstate-evidence-calibration",
         "continuous-learning-target",
@@ -164,6 +208,7 @@ def main() -> int:
         "PROJECT_STATUS.md",
         "config/binance_usdm_detailed_history_v0_1_2.json",
         "config/pionex_alternative_assets_v0_1.json",
+        "config/pionex_alternative_assets_observability_v0_2.json",
         "config/post_window_paper_training_v0_2.json",
         "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
         "config/strategy_edge_validation_v0_1.json",
@@ -360,6 +405,7 @@ def main() -> int:
         "./data/paper-training.json",
         "./data/research-calendar.json",
         "./data/research-evidence.json",
+        "./data/alternative-assets.json",
         "mergeOperationalStatus",
         "renderPaperTraining",
         "renderEquityChart",
@@ -368,6 +414,9 @@ def main() -> int:
         "formatTrustedTime",
         "researchEvidenceIsSafe",
         "renderResearchEvidence",
+        "alternativeAssetsProjectionIsSafe",
+        "renderAlternativeAssets",
+        "qookey-pionex-alternative-assets-projection-v0.2",
         "qookey-dashboard-strategy-projection-v0.1",
         "strategy-analysis-layers",
         "strategy-score-progress",

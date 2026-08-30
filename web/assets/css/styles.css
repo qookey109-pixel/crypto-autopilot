@@ -88,6 +88,14 @@ h1, h2, h3 { font-family: var(--font-ui); font-weight: 600; letter-spacing: -.02
 .panel-intro { max-width: 760px; margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
 .evidence-panel { background: rgba(255,255,255,.96); }
 .evidence-time { margin: -8px 0 14px; padding-left: 10px; border-left: 3px solid var(--mint); color: var(--muted); font-size: 12px; }
+.alternative-assets-panel { margin-bottom: 16px; background: rgba(255,255,255,.95); box-shadow: inset 4px 0 0 var(--accent-contrast), var(--shadow-sm); }
+.alternative-assets-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+.alternative-assets-grid > div { min-width: 0; padding: 15px; border: 1px solid var(--line-strong); border-radius: var(--radius-tag); background: rgba(255,255,255,.82); box-shadow: inset 3px 0 0 rgba(12,140,94,.58); }
+.alternative-assets-grid span, .alternative-assets-grid strong, .alternative-assets-grid small { display: block; }
+.alternative-assets-grid span { margin-bottom: 5px; color: var(--mint); font-size: 12px; font-weight: 600; letter-spacing: .03em; }
+.alternative-assets-grid strong { margin-bottom: 4px; color: var(--ink-soft); font-size: 24px; }
+.alternative-assets-grid small { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.alternative-assets-note { margin: 16px 0 0; padding-left: 10px; border-left: 3px solid var(--accent-contrast); color: var(--muted); font-size: 13px; }
 .strategy-summary { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; background: rgba(255,255,255,.95); }
 .strategy-summary h2 { margin: 0 0 10px; font-size: 36px; line-height: 1.12; }
 .strategy-summary p:last-child { max-width: 680px; margin: 0; color: var(--muted); font-size: 16px; }
@@ -230,7 +238,7 @@ td strong { color: var(--ink); }
   .section-heading { grid-template-columns: 1fr; gap: 6px; margin-top: 62px; }
   .section-number { font-size: 20px; }
   .section-heading h2 { font-size: 36px; }
-  .dashboard-grid.two-one, .gate-grid, .analysis-layer-list { grid-template-columns: 1fr; }
+  .dashboard-grid.two-one, .gate-grid, .analysis-layer-list, .alternative-assets-grid { grid-template-columns: 1fr; }
   .panel { padding: 20px; }
   .panel-header { flex-direction: column; align-items: flex-start; }
   .strategy-summary { flex-direction: column; }

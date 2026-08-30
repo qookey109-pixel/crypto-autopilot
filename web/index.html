@@ -45,7 +45,22 @@
       <section class="calendar-section"><div class="section-heading compact"><p class="section-number">02</p><div><p class="card-kicker">RESEARCH CALENDAR</p><h2>研究時程與授權狀態</h2><p>時間到了不代表證據通過；每一階段仍依 Repository 的版本化 authority 判定。</p><small class="projection-time" id="calendar-generated-at">行事曆投影：尚未提供</small></div></div><ol class="learning-timeline" id="research-calendar" aria-live="polite"><li class="calendar-loading"><strong>正在讀取研究時程</strong><small>Repository projection</small></li></ol></section>
     </section>
 
-    <section class="view" id="view-data-health"><article class="panel"><div class="panel-header"><div><p class="card-kicker">HISTORICAL DATA</p><h3>市場資料覆蓋</h3></div><span class="badge neutral">保留 PROVIDER 來源</span></div><div class="table-wrap"><table><thead><tr><th>交易標的</th><th>成交 K 線</th><th>Mark Price</th><th>Funding</th><th>資料來源</th><th>狀態</th></tr></thead><tbody id="market-table"></tbody></table></div></article></section>
+    <section class="view" id="view-data-health">
+      <article class="panel alternative-assets-panel" aria-labelledby="alternative-assets-title">
+        <div class="panel-header"><div><p class="card-kicker">PIONEX ALTERNATIVE ASSETS</p><h3 id="alternative-assets-title">股票代幣、ETF 與金屬資料池</h3><p class="panel-intro">候選清單與 Crypto Core 100 分離；網站只顯示安全摘要，不公開 R2 原始目錄或歷史資料。</p></div><span class="badge pending" id="alternative-assets-status">等待首次目錄</span></div>
+        <p class="evidence-time" id="alternative-assets-observed-at">目錄觀測：尚未執行</p>
+        <div class="alternative-assets-grid">
+          <div><span>候選總數</span><strong id="alternative-assets-candidates">125</strong><small>不是目前上市證明</small></div>
+          <div><span>實際 Pionex 交集</span><strong id="alternative-assets-matched">—</strong><small>首輪 metadata 後產生</small></div>
+          <div><span>股票／股票連結</span><strong id="alternative-assets-equity">90</strong><small>獨立分類</small></div>
+          <div><span>ETF／基金／商品</span><strong id="alternative-assets-funds">31</strong><small>獨立分類</small></div>
+          <div><span>直接金屬</span><strong id="alternative-assets-metals">4</strong><small>黃金、白銀、鉑金、鈀金</small></div>
+          <div><span>四年容量參考</span><strong id="alternative-assets-capacity">1.47 GB</strong><small>125 市場 · 15M／60M／4H</small></div>
+        </div>
+        <p class="alternative-assets-note" id="alternative-assets-note">下一次排程：2026/09/04 10:53（台北）；容量只是規劃估算，不代表已授權下載 K 線。</p>
+      </article>
+      <article class="panel"><div class="panel-header"><div><p class="card-kicker">HISTORICAL DATA</p><h3>市場資料覆蓋</h3></div><span class="badge neutral">保留 PROVIDER 來源</span></div><div class="table-wrap"><table><thead><tr><th>交易標的</th><th>成交 K 線</th><th>Mark Price</th><th>Funding</th><th>資料來源</th><th>狀態</th></tr></thead><tbody id="market-table"></tbody></table></div></article>
+    </section>
     <section class="view" id="view-signals"><article class="panel"><div class="panel-header"><div><p class="card-kicker">PAPER TRAINING</p><h3>最新候選訊號</h3></div><span class="badge neutral">唯讀 · 不自動下單</span></div><div class="table-wrap"><table><thead><tr><th>標的</th><th>分數</th><th>狀態</th><th>參考價</th><th>停損</th><th>目標</th></tr></thead><tbody id="paper-signal-table"><tr><td colspan="6">等待首次 Paper Training 執行</td></tr></tbody></table></div></article></section>
     <section class="view" id="view-strategy">
       <article class="strategy-summary panel">

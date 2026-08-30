@@ -1,5 +1,10 @@
 # Pionex Alternative Assets V0.1
 
+> Historical registry and authority. V0.1 did not execute or access the
+> provider/R2; its schedule was superseded by V0.2 before the first eligible
+> run. Current operations are defined by
+> `docs/PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY_V0_2.md`.
+
 ## Outcome
 
 This is a separate, Pionex-native perpetual-market catalog for non-Crypto Core
@@ -66,7 +71,8 @@ metal or commodity contracts.
 
 ## Schedule
 
-Workflow: `.github/workflows/pionex-alternative-assets-catalog-v0-1.yml`.
+Historical workflow (removed before first execution):
+`.github/workflows/pionex-alternative-assets-catalog-v0-1.yml`.
 
 | Run | UTC | Asia/Taipei | Purpose |
 | --- | --- | --- | --- |

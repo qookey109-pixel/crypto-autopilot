@@ -52,6 +52,26 @@ scripts/build_research_calendar_projection.py
 _site/data/research-calendar.json
 ```
 
+The Data Health view also rebuilds a safe aggregate alternative-assets
+projection from the V0.1 candidate registry plus the current V0.2 authority:
+
+```text
+125-candidate registry + V0.2 observability config/receipt
+                 |
+                 v
+scripts/build_alternative_assets_projection.py
+                 |
+                 v
+_site/data/alternative-assets.json
+```
+
+The checked-in and deployed projection begins as `WAITING_FIRST_RUN`. It shows
+candidate counts and a planning-only capacity estimate, never raw symbol rows.
+The scheduled catalog workflow stores its sanitized run projection in R2 and a
+short-lived Actions artifact but is not allowed to deploy Pages. A future site
+refresh from actual evidence needs a reviewed Repository change; no browser R2
+access or schedule-driven Pages mutation is implied.
+
 The Strategy view is rebuilt from the six current Repository strategy and
 analysis configs rather than from copied or hard-coded UI values:
 

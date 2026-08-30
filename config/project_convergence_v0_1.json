@@ -14,7 +14,9 @@
       "web/assets/images/cloud-garden-v4.jpg"
     ],
     "projection_directory": "web/data",
-    "strategy_projection_builder": "scripts/build_strategy_projection.py"
+    "strategy_projection_builder": "scripts/build_strategy_projection.py",
+    "alternative_assets_projection_builder": "scripts/build_alternative_assets_projection.py",
+    "alternative_assets_projection": "web/data/alternative-assets.json"
   },
   "strategy": {
     "paper_baseline": "config/strategy_v0_1.json",
@@ -28,9 +30,10 @@
   "current_data_and_paper": {
     "crypto_core_100": "config/binance_usdm_detailed_history_v0_1_2.json",
     "crypto_core_100_authority": "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json",
-    "pionex_alternative_assets_catalog": "config/pionex_alternative_assets_v0_1.json",
-    "pionex_alternative_assets_authority": "research/receipts/2026-08-30-pionex-alternative-assets-v0-1-authority.json",
-    "pionex_alternative_assets_state": "CATALOG_AUTHORIZED_AFTER_V0_10_WINDOW_HISTORY_WAITING_HOLDOUT_AUTHORITY",
+    "pionex_alternative_assets_registry": "config/pionex_alternative_assets_v0_1.json",
+    "pionex_alternative_assets_catalog": "config/pionex_alternative_assets_observability_v0_2.json",
+    "pionex_alternative_assets_authority": "research/receipts/2026-08-30-pionex-alternative-assets-observability-v0-2-authority.json",
+    "pionex_alternative_assets_state": "OBSERVABILITY_V0_2_AUTHORIZED_AFTER_V0_10_WINDOW_HISTORY_WAITING_SEPARATE_AUTHORITY",
     "paper_successor": "config/post_window_paper_training_v0_2.json",
     "paper_successor_state": "PREPARED_WAITING_FOR_HOLDOUT_AUTHORITY"
   },
@@ -73,11 +76,11 @@
         "dependency": "complete detailed-history dataset"
       },
       {
-        "workflow": "pionex-alternative-assets-catalog-v0-1.yml",
+        "workflow": "pionex-alternative-assets-observability-v0-2.yml",
         "cron_utc": ["53 2 4 9 *", "53 3 6,13,20,27 9 *"],
         "active_from_utc": "2026-09-04T02:00:00Z",
         "active_until_utc": "2026-10-01T00:00:00Z",
-        "scope": "Pionex PERP symbol metadata only; no candle/funding/trade/order-book reads"
+        "scope": "Pionex PERP symbol metadata validation, prior-catalog diff and capacity estimate only; no candle/funding/trade/order-book reads"
       }
     ]
   },
@@ -95,7 +98,7 @@
       "dashboard-github-pages.yml",
       "dashboard-static-smoke.yml",
       "observe-v0-10-scheduled-capture.yml",
-      "pionex-alternative-assets-catalog-v0-1.yml",
+      "pionex-alternative-assets-observability-v0-2.yml",
       "provider-equivalence-v0-10-render-metadata-capture.yml",
       "research-automation-health-v0-1.yml",
       "research-signal-layer-v0-2.yml",
