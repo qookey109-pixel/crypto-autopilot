@@ -26,10 +26,14 @@ on:
       - "pyproject.toml"
       - "config/v0_10_critical_path_freeze_v0_1.json"
       - "config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json"
+      - "config/v0_10_mid_window_emergency_pionex_perp_query_v0_1.json"
       - "research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-authority.json"
+      - "research/receipts/2026-08-30-v0-10-mid-window-emergency-pionex-perp-query-authority.json"
       - ".github/workflows/v0-10-critical-path-freeze-guard.yml"
       - "tests/test_v0_10_critical_path_freeze_guard.py"
       - "tests/test_v0_10_mid_window_emergency_schedule_reactivation_v0_1.py"
+      - "tests/test_v0_10_mid_window_emergency_pionex_perp_query_v0_1.py"
+      - "tests/test_v0_10_pionex_perp_query_emergency_v0_1.py"
   push:
     branches:
       - main
@@ -92,13 +96,31 @@ jobs:
           )
           changed = [line.strip() for line in result.stdout.splitlines() if line.strip()]
           if changed:
-              emergency_path = Path(
+              schedule_emergency_path = Path(
                   'config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json'
               )
-              expected_changed = [
+              pionex_emergency_path = Path(
+                  'config/v0_10_mid_window_emergency_pionex_perp_query_v0_1.json'
+              )
+              schedule_expected_changed = [
                   '.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml'
               ]
-              if not emergency_path.is_file() or changed != expected_changed:
+              pionex_expected_changed = [
+                  '.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml',
+                  'src/crypto_autopilot/provider_metadata_capture_v0_10.py',
+              ]
+              recognized_change = changed in (
+                  schedule_expected_changed,
+                  pionex_expected_changed,
+              )
+              required_authorities_present = (
+                  schedule_emergency_path.is_file()
+                  and (
+                      changed != pionex_expected_changed
+                      or pionex_emergency_path.is_file()
+                  )
+              )
+              if not recognized_change or not required_authorities_present:
                   print(json.dumps({
                       'status': 'FAIL',
                       'stage': 'V0_10_CRITICAL_PATH_DRIFT_DETECTED',
@@ -120,7 +142,7 @@ jobs:
                       'V0.10 critical path drift detected; reviewed versioned authority required'
                   )
 
-              emergency = json.loads(emergency_path.read_text())
+              emergency = json.loads(schedule_emergency_path.read_text())
               if emergency['status'] != (
                   'AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE'
               ):
@@ -138,7 +160,7 @@ jobs:
               )
 
               event_name = os.environ.get('GITHUB_EVENT_NAME', '')
-              if event_name == 'pull_request':
+              if event_name == 'pull_request' and changed == schedule_expected_changed:
                   event = json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
                   if event['number'] != lineage['protected_main_pr_number']:
                       raise SystemExit('V0.10 emergency authority is used by the wrong PR')
@@ -160,7 +182,7 @@ jobs:
               replacement = schedule['replacement_registration_crons']
               if original != frozen['atomic_repository_cutover']['successor_cron_utc']:
                   raise SystemExit('V0.10 frozen cron lineage changed')
-              new_lines = Path(expected_changed[0]).read_text().splitlines()
+              new_lines = Path(schedule_expected_changed[0]).read_text().splitlines()
               active = [
                   line.split('"', 2)[1]
                   for line in new_lines
@@ -210,6 +232,144 @@ jobs:
                   raise SystemExit('V0.10 emergency cron set is not semantically equivalent')
               if len({instant.replace(minute=0) for instant in replacement_attempts}) != 194:
                   raise SystemExit('V0.10 emergency hourly-slot count changed')
+
+              if changed == pionex_expected_changed:
+                  pionex_emergency = json.loads(pionex_emergency_path.read_text())
+                  if pionex_emergency['status'] != (
+                      'AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE'
+                  ):
+                      raise SystemExit('V0.10 Pionex emergency authority status is invalid')
+
+                  pionex_lineage = pionex_emergency['lineage']
+                  if pionex_lineage['protected_main_pr_number'] != 210:
+                      raise SystemExit('V0.10 Pionex emergency PR binding changed')
+                  if pionex_lineage['pre_change_main_sha'] != (
+                      '62c3fee76016f8f42d3e444df79f87e2d55a5fc8'
+                  ):
+                      raise SystemExit('V0.10 Pionex emergency pre-change main SHA changed')
+                  pionex_change_sha = str(
+                      pionex_lineage['minimum_operational_change_commit_sha']
+                  )
+                  if pionex_change_sha != (
+                      'a56fcff85e65a051b3848a0362edfa7a6e9019f6'
+                  ):
+                      raise SystemExit('V0.10 Pionex operational commit binding changed')
+                  subprocess.run(
+                      ['git', 'merge-base', '--is-ancestor', pionex_change_sha, 'HEAD'],
+                      check=True,
+                  )
+
+                  operational_result = subprocess.run(
+                      [
+                          'git',
+                          'diff',
+                          '--name-only',
+                          pionex_lineage['pre_change_main_sha'],
+                          pionex_change_sha,
+                          '--',
+                          *paths,
+                      ],
+                      check=True,
+                      capture_output=True,
+                      text=True,
+                  )
+                  operational_changed = [
+                      line.strip()
+                      for line in operational_result.stdout.splitlines()
+                      if line.strip()
+                  ]
+                  if operational_changed != [
+                      'src/crypto_autopilot/provider_metadata_capture_v0_10.py'
+                  ]:
+                      raise SystemExit(
+                          'V0.10 Pionex operational commit changes another critical path'
+                      )
+
+                  if event_name == 'pull_request':
+                      event = json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
+                      if event['number'] != pionex_lineage['protected_main_pr_number']:
+                          raise SystemExit('V0.10 Pionex authority is used by the wrong PR')
+                      if event['pull_request']['base']['sha'] != (
+                          pionex_lineage['pre_change_main_sha']
+                      ):
+                          raise SystemExit('V0.10 Pionex emergency PR base SHA changed')
+
+                  if pionex_emergency['exact_critical_paths_changed_from_frozen_baseline'] != (
+                      pionex_expected_changed
+                  ):
+                      raise SystemExit('V0.10 Pionex critical-path allowlist changed')
+                  if any(
+                      value is not False
+                      for value in pionex_emergency['authorization_boundary'].values()
+                  ):
+                      raise SystemExit('V0.10 Pionex emergency downstream boundary changed')
+                  if any(
+                      value is not False
+                      for value in pionex_emergency['render_boundary'].values()
+                  ):
+                      raise SystemExit('V0.10 Pionex emergency affects Render')
+
+                  request = pionex_emergency['request_contract']
+                  expected_request = {
+                      'provider': 'pionex',
+                      'method': 'GET',
+                      'endpoint': 'https://api.pionex.com/api/v1/common/symbols',
+                      'query_parameter': 'type',
+                      'query_value': 'PERP',
+                      'additional_query_parameters_added': [],
+                      'public_endpoint_no_api_key_required': True,
+                      'conflicting_existing_type_must_fail_closed': True,
+                      'binance_request_changed': False,
+                      'render_relay_changed': False,
+                  }
+                  if request != expected_request:
+                      raise SystemExit('V0.10 Pionex emergency request contract changed')
+
+                  provider_text = Path(
+                      'src/crypto_autopilot/provider_metadata_capture_v0_10.py'
+                  ).read_text()
+                  required_provider_fragments = (
+                      'V0_10_PIONEX_MARKET_TYPE = "PERP"',
+                      '_pionex_perp_endpoint(str(pionex_cfg["public_endpoint"]))',
+                      'Pionex metadata endpoint has conflicting market type',
+                  )
+                  if not all(
+                      fragment in provider_text for fragment in required_provider_fragments
+                  ):
+                      raise SystemExit('V0.10 Pionex PERP implementation contract changed')
+
+                  preserved = pionex_emergency['preserved_frozen_scope']
+                  if preserved['replacement_holdout_state'] != 'FROZEN_UNOPENED':
+                      raise SystemExit('V0.10 Pionex emergency opened the holdout')
+                  if any(
+                      value is not True
+                      for key, value in preserved.items()
+                      if key != 'replacement_holdout_state'
+                  ):
+                      raise SystemExit('V0.10 Pionex emergency changed frozen scope')
+
+                  print(json.dumps({
+                      'status': 'PASS',
+                      'stage': 'V0_10_AUTHORIZED_EMERGENCY_PIONEX_PERP_QUERY_REVIEW_PASS',
+                      'baseline_main_sha': baseline,
+                      'changed_critical_paths': changed,
+                      'protected_main_pr_number': pionex_lineage['protected_main_pr_number'],
+                      'minimum_operational_change_commit_sha': pionex_change_sha,
+                      'pionex_query': 'type=PERP',
+                      'prior_failed_or_missing_attempts_remain_failures': True,
+                      'automatic_repair_authorized': False,
+                      'manual_v0_10_capture_authorized': False,
+                      'provider_requests_performed': 0,
+                      'render_requests_performed': 0,
+                      'r2_client_constructed': False,
+                      'r2_reads_performed': False,
+                      'r2_writes_performed': False,
+                      'holdout_accessed': False,
+                      'v0_11_production_evaluation_performed': False,
+                      'source_switch_authorized': False,
+                      'live_trading_authorized': False,
+                  }, sort_keys=True))
+                  raise SystemExit(0)
 
               print(json.dumps({
                   'status': 'PASS',
