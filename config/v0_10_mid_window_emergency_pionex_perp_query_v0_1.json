@@ -1,0 +1,131 @@
+{
+  "schema_version": "v0_10_mid_window_emergency_pionex_perp_query_v0_1",
+  "status": "AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE",
+  "date": "2026-08-30",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "incident_id": "V0_10_PIONEX_DEFAULT_SPOT_QUERY_2026_08_30",
+  "purpose": "Authorize one future-only V0.10 repair: add the documented Pionex type=PERP query to the existing public symbols request so the frozen 15 perpetual symbols are requested explicitly.",
+  "lineage": {
+    "emergency_template": "config/v0_10_mid_window_emergency_change_template_v0_1.json",
+    "critical_path_freeze": "config/v0_10_critical_path_freeze_v0_1.json",
+    "v0_10_cutover_protocol": "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
+    "v0_10_cutover_authority": "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json",
+    "incident_receipt": "research/receipts/2026-08-30-v0-10-mid-window-emergency-pionex-perp-query-authority.json",
+    "pre_change_main_sha": "62c3fee76016f8f42d3e444df79f87e2d55a5fc8",
+    "minimum_operational_change_commit_sha": "a56fcff85e65a051b3848a0362edfa7a6e9019f6",
+    "protected_main_pr_number": 210,
+    "post_merge_main_sha": null,
+    "post_merge_main_sha_state": "REQUIRED_AFTER_PROTECTED_MAIN_MERGE"
+  },
+  "observed_incident": {
+    "incident_detected_at_utc": "2026-08-30T01:39:00Z",
+    "incident_classification": "PIONEX_SYMBOLS_REQUEST_DEFAULTED_TO_SPOT",
+    "direct_root_cause": "DOCUMENTED_DEFAULT_SPOT_QUERY_OMITS_FROZEN_PERP_SCOPE",
+    "failed_run_ids": [33271565004, 33279007980, 33286173327],
+    "latest_failed_run": {
+      "run_id": 33286173327,
+      "job_id": 99189676497,
+      "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/33286173327",
+      "head_sha": "75a5ac320d9ee33ba39c5fbe26110be5b19191b4",
+      "window_gate": "PASS",
+      "atomic_cutover_validation": "PASS",
+      "capture_step": "FAIL_CLOSED",
+      "sanitized_failure_class": "PIONEX_METADATA_MISSING_ALL_15_FROZEN_SYMBOLS",
+      "r2_writes_performed": false,
+      "holdout_candles_accessed": false
+    },
+    "pionex_documentation": "https://www.pionex.com/docs/api-docs/zh-hant/futures-api/common",
+    "documented_default_when_type_omitted": "SPOT",
+    "provider_payload_or_capture_artifact_read_for_this_repair": false,
+    "prior_failed_or_missing_slots_remain_failures": true
+  },
+  "necessity": {
+    "normal_scheduled_execution_was_considered_first": true,
+    "why_next_frozen_scheduled_attempt_is_insufficient": "Three consecutive scheduled attempts failed closed with all 15 frozen Pionex perpetual symbols missing. Repeating the documented default SPOT request cannot request the frozen PERP scope.",
+    "minimum_change_description": "Add only type=PERP to the existing Pionex public symbols endpoint at request construction time and reject an already-present conflicting type.",
+    "future_scheduled_attempts_only": true,
+    "second_execution_path_created": false,
+    "manual_dispatch_used_as_capture": false,
+    "retroactive_backfill_authorized": false
+  },
+  "request_contract": {
+    "provider": "pionex",
+    "method": "GET",
+    "endpoint": "https://api.pionex.com/api/v1/common/symbols",
+    "query_parameter": "type",
+    "query_value": "PERP",
+    "additional_query_parameters_added": [],
+    "public_endpoint_no_api_key_required": true,
+    "conflicting_existing_type_must_fail_closed": true,
+    "binance_request_changed": false,
+    "render_relay_changed": false
+  },
+  "exact_critical_paths_changed_from_frozen_baseline": [
+    ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+    "src/crypto_autopilot/provider_metadata_capture_v0_10.py"
+  ],
+  "exact_files_allowed_to_change": [
+    ".github/workflows/v0-10-critical-path-freeze-guard.yml",
+    "PROJECT_STATUS.md",
+    "config/v0_10_mid_window_emergency_pionex_perp_query_v0_1.json",
+    "research/receipts/2026-08-30-v0-10-mid-window-emergency-pionex-perp-query-authority.json",
+    "src/crypto_autopilot/provider_metadata_capture_v0_10.py",
+    "tests/test_v0_10_critical_path_freeze_guard.py",
+    "tests/test_v0_10_mid_window_emergency_pionex_perp_query_v0_1.py",
+    "tests/test_v0_10_pionex_perp_query_emergency_v0_1.py"
+  ],
+  "reviewed_test_plan": [
+    "Require the endpoint helper to add exactly type=PERP and preserve the endpoint path.",
+    "Require a conflicting existing Pionex type to fail closed.",
+    "Use deterministic provider fixtures to prove only the Pionex request gains type=PERP.",
+    "Require frozen 15-symbol, 45-pair, window, schedule, freshness and R2 boundaries to remain unchanged.",
+    "Require the freeze guard to bind PR 210, the exact pre-change main SHA and operational commit.",
+    "Run the complete Repository pytest and Ruff suites before review."
+  ],
+  "effectivity": {
+    "effective_before_merge": false,
+    "effective_on_draft_pr": false,
+    "effective_only_when_exact_change_set_is_merged_to_protected_main": true,
+    "observed_ci_state": "PENDING",
+    "requires_human_review_before_merge": true,
+    "automatic_merge_authorized": false,
+    "automatic_or_manual_capture_dispatch_authorized": false
+  },
+  "rollback_or_stop_condition": "Do not merge if the query differs from type=PERP, any frozen scope changes, or any required check fails. After merge, preserve any further failure as evidence and do not backfill or introduce another capture path.",
+  "render_boundary": {
+    "transport_affected": false,
+    "render_redeploy_authorized": false,
+    "render_secret_change_authorized": false,
+    "render_may_receive_r2_credentials": false
+  },
+  "preserved_frozen_scope": {
+    "provider_provenance_preserved": true,
+    "frozen_window_preserved": true,
+    "hourly_slot_count_194_preserved": true,
+    "scheduled_minutes_17_47_preserved": true,
+    "symbol_scope_15_preserved": true,
+    "pair_scope_45_preserved": true,
+    "r2_free_only_hard_stop_8gb_preserved": true,
+    "freshness_guard_30_minutes_preserved": true,
+    "replacement_holdout_state": "FROZEN_UNOPENED"
+  },
+  "authorization_boundary": {
+    "prior_failed_or_missing_slot_validation_authorized": false,
+    "manual_capture_authorized": false,
+    "retroactive_slot_backfill_authorized": false,
+    "provider_substitution_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "r2_read_outside_existing_scheduled_capture_authorized": false,
+    "v0_11_production_r2_evaluation_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "source_switch_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

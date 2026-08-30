@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from . import provider_metadata_capture_v0_2 as v02
 from . import provider_metadata_capture_v0_8_successor as successor
@@ -26,6 +27,7 @@ V0_10_RENDER_RELAY_URL = (
     "https://qookey-binance-transport-v0-5.onrender.com"
     "/metadata/v0-10/binance-exchange-info"
 )
+V0_10_PIONEX_MARKET_TYPE = "PERP"
 V0_10_RECEIPT_SCHEMA = "provider-equivalence-v0-10-render-metadata-capture-receipt-v0.1"
 V0_10_CAPTURE_PASS_STAGE = "PROVIDER_EQUIVALENCE_V0_10_RENDER_METADATA_CAPTURE_PASS"
 
@@ -51,6 +53,21 @@ def _load(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise RuntimeError(f"expected JSON object: {path}")
     return payload
+
+
+def _pionex_perp_endpoint(url: str) -> str:
+    """Make the already-authorized Pionex symbols request explicitly futures-only."""
+
+    parts = urlsplit(url)
+    query = parse_qsl(parts.query, keep_blank_values=True)
+    market_types = [value for key, value in query if key == "type"]
+    if market_types and market_types != [V0_10_PIONEX_MARKET_TYPE]:
+        raise RuntimeError("Pionex metadata endpoint has conflicting market type")
+    if not market_types:
+        query.append(("type", V0_10_PIONEX_MARKET_TYPE))
+    return urlunsplit(
+        (parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment)
+    )
 
 
 def validate_final_atomic_cutover_authority() -> tuple[
@@ -149,7 +166,7 @@ def fetch_v0_10_provider_payloads() -> tuple[
     binance_cfg = providers["binance_usdm"]
 
     pionex_raw, pionex_content_type = v02._fetch_json_bytes(  # noqa: SLF001
-        str(pionex_cfg["public_endpoint"]),
+        _pionex_perp_endpoint(str(pionex_cfg["public_endpoint"])),
         max_bytes=int(pionex_cfg["raw_uncompressed_response_max_bytes"]),
     )
     binance_raw, binance_content_type = successor._fetch_render_relay_raw(  # noqa: SLF001

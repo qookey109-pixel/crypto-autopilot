@@ -65,8 +65,15 @@ def test_v0_10_critical_path_guard_is_read_only_and_not_scheduled() -> None:
     assert "V0_10_CRITICAL_PATH_DRIFT_DETECTED" in text
     assert "V0_10_CRITICAL_PATH_FREEZE_GUARD_PASS" in text
     assert "V0_10_AUTHORIZED_EMERGENCY_SCHEDULE_REREGISTRATION_REVIEW_PASS" in text
+    assert "V0_10_AUTHORIZED_EMERGENCY_PIONEX_PERP_QUERY_REVIEW_PASS" in text
     assert "v0_10_mid_window_emergency_schedule_reactivation_v0_1.json" in text
+    assert "v0_10_mid_window_emergency_pionex_perp_query_v0_1.json" in text
     assert "protected_main_pr_number" in text
+    assert "a56fcff85e65a051b3848a0362edfa7a6e9019f6" in text
+    assert "operational_changed != [" in text
+    assert "'query_value': 'PERP'" in text
+    assert "changed not in (schedule_expected_changed, pionex_expected_changed)" not in text
+    assert "not recognized_change or not required_authorities_present" in text
     assert "replacement_attempts != original_attempts" in text
     assert "len(replacement_attempts) != 388" in text
     assert "prior_missing_attempts_remain_failures': True" in text
