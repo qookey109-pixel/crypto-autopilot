@@ -15,7 +15,7 @@ any versioned authority.
 | Stage | Current contract | State |
 | --- | --- | --- |
 | Binance USD-M Crypto Core | `config/binance_usdm_detailed_history_v0_1_2.json` | 100 Crypto markets, 10 resumable R2 shards; authorized only after the V0.10 window |
-| Tokenized equities | future separate versioned dataset | not part of Core 100 and not authorized yet |
+| Pionex alternative assets | `config/pionex_alternative_assets_v0_1.json` | 125-candidate equity/ETF/metal registry; live Pionex metadata catalog authorized after the V0.10 window; historical candles still waiting for separate authority |
 | Pionex Paper successor | `config/post_window_paper_training_v0_2.json` | prepared, but no workflow or provider access until V0.11 and a separate holdout-access authority |
 
 The Paper successor reuses the existing Repository Paper Broker and Pionex

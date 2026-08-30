@@ -137,6 +137,7 @@ def main() -> int:
         "v0-10-metadata-window",
         "strategy-research-loop-v0-1",
         "detailed-history-backfill",
+        "pionex-alternative-assets-catalog-v0-1",
         "paper-training-resumption-v0-2",
         "sstate-evidence-calibration",
         "continuous-learning-target",
@@ -145,6 +146,7 @@ def main() -> int:
         raise RuntimeError("dashboard research calendar stages changed without review")
     allowed_calendar_statuses = {
         "AUTHORIZED",
+        "AUTHORIZED_METADATA_ONLY",
         "WAITING_AUTHORITY",
         "NOT_READY",
         "PREPARED",
@@ -161,6 +163,7 @@ def main() -> int:
     for required_source in (
         "PROJECT_STATUS.md",
         "config/binance_usdm_detailed_history_v0_1_2.json",
+        "config/pionex_alternative_assets_v0_1.json",
         "config/post_window_paper_training_v0_2.json",
         "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
         "config/strategy_edge_validation_v0_1.json",

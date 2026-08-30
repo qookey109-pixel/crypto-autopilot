@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-08-29
+Updated: 2026-08-30
 
 ## Project
 
@@ -14,7 +14,7 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ## Current formal stage
 
-**CRYPTO CORE 100 V0.1.2 AUTHORIZED AFTER V0.10 WINDOW / NOT STARTED / TOKENIZED EQUITY DATASET DEFERRED / POST-WINDOW PAPER V0.2 PREPARED WAITING FOR HOLDOUT AUTHORITY / V0.10 METADATA CAPTURE EFFECTIVE / REPLACEMENT HOLDOUT FROZEN_UNOPENED / PAPER-ONLY**
+**CRYPTO CORE 100 V0.1.2 AUTHORIZED AFTER V0.10 WINDOW / PIONEX ALTERNATIVE ASSETS CATALOG V0.1 AUTHORIZED AFTER WINDOW / BOTH NOT STARTED / ALTERNATIVE-ASSET HISTORY DEFERRED / POST-WINDOW PAPER V0.2 PREPARED WAITING FOR HOLDOUT AUTHORITY / V0.10 METADATA CAPTURE EFFECTIVE / REPLACEMENT HOLDOUT FROZEN_UNOPENED / PAPER-ONLY**
 
 <details>
 <summary>Historical aggregate stage markers</summary>
@@ -123,6 +123,35 @@ Repository branch `main` is the live formal authority and is intentionally not s
   designs remain historical evidence.
 - This stage does not change V0.10, relabel Binance as Pionex, switch sources,
   open the holdout, admit a formal backtest, promote a model or trade.
+
+### Pionex Alternative Assets Catalog V0.1 — AUTHORIZED AFTER WINDOW / NOT STARTED
+
+- A separate Pionex-native metadata catalog covers a 125-candidate registry:
+  90 equity/stock-linked tokens, 31 ETF/ETN/fund-linked tokens and 4 direct
+  metal references (`XAU`, `XAG`, `XPT`, `XPD`). It is not part of Crypto Core
+  100 and never changes that fixed 100-market count.
+- Registry membership is only a point-in-time candidate. Selection requires an
+  exact intersection with Pionex public `PERP + TRADING` symbols at each run;
+  an `X` suffix alone is never accepted as asset-class proof. Unknown suffix
+  matches remain `REVIEW_REQUIRED_NOT_SELECTED`.
+- The metadata-only workflow cannot begin before `2026-09-04T02:00:00Z`. Its
+  first scheduled catalog is `2026-09-04T02:53:00Z`, followed by bounded weekly
+  reviews on September 6, 13, 20 and 27 at `03:53 UTC`. Authority expires before
+  provider/R2 access at `2026-10-01T00:00:00Z`.
+- Each run performs fresh whole-bucket 8 GB FREE-ONLY headroom checks before the
+  Pionex metadata read and before R2 writes. Catalog and manifest are immutable,
+  SHA-256 read back, and the small latest pointer is written last. Persistent
+  generated data remains R2-only.
+- This version does not call K-line, funding, trade or order-book endpoints and
+  does not access the replacement holdout. Proposed Pionex-native
+  `15M / 60M / 4H` history and training remain waiting for V0.11 plus a separate
+  holdout/candle authority; activation is not automatic.
+- Config: `config/pionex_alternative_assets_v0_1.json`; authority receipt:
+  `research/receipts/2026-08-30-pionex-alternative-assets-v0-1-authority.json`;
+  operating contract: `docs/PIONEX_ALTERNATIVE_ASSETS_V0_1.md`.
+- No ownership/equivalence claim, source switch, provider splice, model
+  promotion, trade plan, private API, real-money order or live trading is
+  authorized.
 
 ### Post-window Paper Training V0.2 — PREPARED / WAITING FOR HOLDOUT AUTHORITY
 

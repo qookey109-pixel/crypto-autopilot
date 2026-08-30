@@ -88,7 +88,7 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
         self.assertFalse(boundaries["v0_10_production_critical_path_changed"])
         self.assertFalse(boundaries["sstate_core_changed"])
         self.assertFalse(boundaries["strategy_parameters_changed"])
-        self.assertFalse(boundaries["provider_or_r2_authority_added"])
+        self.assertTrue(boundaries["provider_or_r2_authority_added"])
         self.assertTrue(boundaries["provider_or_r2_scope_replaced_before_execution"])
         self.assertFalse(boundaries["replacement_holdout_access_authorized"])
         self.assertFalse(boundaries["paper_successor_automatic_activation_authorized"])
@@ -101,14 +101,20 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
             "config/binance_usdm_detailed_history_v0_1_2.json",
         )
         self.assertEqual(
-            current["tokenized_equity_dataset"],
-            "SEPARATE_FUTURE_VERSION_NOT_AUTHORIZED",
+            current["pionex_alternative_assets_state"],
+            "CATALOG_AUTHORIZED_AFTER_V0_10_WINDOW_HISTORY_WAITING_HOLDOUT_AUTHORITY",
         )
         self.assertEqual(
             current["paper_successor_state"],
             "PREPARED_WAITING_FOR_HOLDOUT_AUTHORITY",
         )
-        for key in ("crypto_core_100", "crypto_core_100_authority", "paper_successor"):
+        for key in (
+            "crypto_core_100",
+            "crypto_core_100_authority",
+            "pionex_alternative_assets_catalog",
+            "pionex_alternative_assets_authority",
+            "paper_successor",
+        ):
             self.assertTrue((ROOT / current[key]).is_file(), current[key])
 
 

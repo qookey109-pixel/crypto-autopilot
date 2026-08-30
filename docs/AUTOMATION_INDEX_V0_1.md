@@ -14,6 +14,7 @@ and should not be read as active production schedules.
 | Continuous | Research Automation Health V0.1 | every 3 hours at :47 | GitHub Actions metadata read only |
 | Post-window | Binance USD-M Crypto Core 100 V0.1.2 | every 6 hours at :23 during 2026-09-04 through 09-30 | starts only after V0.10; 10 R2-only shards; fixed pre-holdout source range |
 | Conditional post-window | Binance USD-M Crypto Core 100 Training V0.1.2 | Sunday 04:37 | skips until all 100-market detailed-history shards exist |
+| Post-window | Pionex Alternative Assets Catalog V0.1 | 2026-09-04 02:53, then 09-06/13/20/27 at 03:53 | Pionex `PERP + TRADING` symbol metadata only; selects live matches from the 125-candidate equity/ETF/metal registry and writes the catalog to R2 |
 
 ## Retired cron triggers
 
@@ -42,6 +43,10 @@ evidence. They do not automatically resume.
   Latest-lookback requests may include the frozen 2026-08-28 through 09-03
   candles, so no workflow or cron is created until V0.11 and a separate
   holdout/paper-read authority are complete.
+- Pionex Alternative Assets historical candles (`15M / 60M / 4H`) remain
+  prepared but inactive. The active catalog schedule reads symbol metadata only;
+  K-lines, funding, trades and order books require V0.11 plus a separate
+  holdout/candle authority.
 - V0.11 synthetic evaluator validation; production R2 evaluation remains unauthorized.
 
 Everything else under `.github/workflows/` is historical, planning-only,

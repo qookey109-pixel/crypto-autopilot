@@ -1,6 +1,6 @@
 # Data Retention Policy V0.1
 
-Status: **PARTIALLY ACTIVE / CRYPTO CORE 100 V0.1.2 AUTHORIZED AFTER V0.10 WINDOW**.
+Status: **PARTIALLY ACTIVE / CRYPTO CORE 100 V0.1.2 AND PIONEX ALTERNATIVE-ASSET METADATA CATALOG AUTHORIZED AFTER V0.10 WINDOW**.
 
 This policy records the requested storage split. The executable Binance Spot
 V0.5 authority remains the current authority for its daily dataset. The
@@ -15,6 +15,7 @@ compaction, model run or trading action.
 | --- | --- | --- |
 | Binance Spot training candles | `1d`, provider-separated Spot | `2020-01-01` through latest complete UTC day |
 | Detailed candles | `15m`, `1h`, `4h`, provider-separated Binance USD-M Crypto Core namespace | fixed 2022-08 through 2026-07 under Crypto Core 100 V0.1.2; future rolling compaction needs another authority |
+| Pionex alternative-asset catalog | Pionex public `PERP + TRADING` symbol metadata | bounded Sep 2026 catalogs in R2; no K-line/funding/trade/order-book retention in V0.1 |
 | Derivative state | funding, mark-index basis, open interest | rolling four years |
 | Derived indicators | ADX, VWAP, Bollinger, Donchian, ATR and related features | recompute from canonical inputs; no permanent duplicate copy |
 
