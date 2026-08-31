@@ -1,0 +1,110 @@
+{
+  "schema_version": "v0_10_post_perp_query_schema_mismatch_observation_v0_1",
+  "status": "FAIL_CLOSED",
+  "stage": "V0_10_POST_PERP_QUERY_PIONEX_SCHEMA_MISMATCH_OBSERVED",
+  "date": "2026-08-31",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "evidence_type": "POST_MERGE_READ_ONLY_OPERATIONAL_OBSERVATION_NOT_AUTHORITY",
+  "lineage": {
+    "source_pr": 210,
+    "source_pr_merged": true,
+    "post_merge_main_sha": "a34cf471876971a97200de4974906743642ed61f",
+    "prior_emergency_config": "config/v0_10_mid_window_emergency_pionex_perp_query_v0_1.json",
+    "prior_emergency_receipt": "research/receipts/2026-08-30-v0-10-mid-window-emergency-pionex-perp-query-authority.json",
+    "frozen_v0_10_config": "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
+    "frozen_v0_10_authority": "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
+  },
+  "observed_scheduled_runs": [
+    {
+      "attempt_number": 36,
+      "run_id": 33313769727,
+      "capture_job_id": 99263374768,
+      "created_at_utc": "2026-08-30T13:17:19Z",
+      "conclusion": "failure"
+    },
+    {
+      "attempt_number": 37,
+      "run_id": 33326147273,
+      "capture_job_id": 99296535100,
+      "created_at_utc": "2026-08-30T17:45:33Z",
+      "conclusion": "failure"
+    },
+    {
+      "attempt_number": 38,
+      "run_id": 33332576134,
+      "capture_job_id": 99313768188,
+      "created_at_utc": "2026-08-30T20:03:38Z",
+      "conclusion": "failure"
+    },
+    {
+      "attempt_number": 39,
+      "run_id": 33339908907,
+      "capture_job_id": 99333582370,
+      "created_at_utc": "2026-08-30T22:43:31Z",
+      "conclusion": "failure"
+    },
+    {
+      "attempt_number": 40,
+      "run_id": 33345766954,
+      "capture_job_id": 99349503304,
+      "created_at_utc": "2026-08-31T00:50:38Z",
+      "conclusion": "failure"
+    }
+  ],
+  "latest_failure": {
+    "run_id": 33345766954,
+    "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/33345766954",
+    "window_gate": "PASS",
+    "atomic_cutover_validation": "PASS",
+    "capture_step": "FAIL",
+    "freshness_state": "FRESH_SCHEDULED_RUN",
+    "failure_class": "PIONEX_REQUIRED_STATUS_OR_CONTRACT_TYPE_MISSING",
+    "first_rejected_symbol": "AAVE_USDT_PERP",
+    "sanitized_error": "Pionex status/contractType missing: AAVE_USDT_PERP",
+    "capture_artifact_uploaded": false
+  },
+  "operational_interpretation": {
+    "type_perp_change_effective_on_main": true,
+    "frozen_perpetual_symbol_scope_reached": true,
+    "required_status_or_contract_type_missing": true,
+    "provider_metadata_request_stage_reached": true,
+    "exact_provider_request_count_recorded_by_failed_result": false,
+    "parser_failed_before_r2_store_factory": true,
+    "r2_client_constructed": false,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "holdout_candles_accessed": false,
+    "holdout_evaluated": false,
+    "trade_plan_created": false,
+    "orders_created": false
+  },
+  "scientific_impact": {
+    "prior_failed_or_missing_slots_remain_failures": true,
+    "all_194_valid_hourly_slots_required": true,
+    "retroactive_backfill_authorized": false,
+    "metadata_stability_evaluation_state": "NOT_YET_RUN",
+    "current_frozen_window_eligible_for_complete_194_slot_pass": false,
+    "replacement_holdout_state": "FROZEN_UNOPENED",
+    "replacement_holdout_access_authorized": false
+  },
+  "authority_boundary": {
+    "this_observation_authorizes_parser_change": false,
+    "this_observation_authorizes_schedule_change": false,
+    "manual_capture_authorized": false,
+    "retroactive_backfill_authorized": false,
+    "provider_or_scope_change_authorized": false,
+    "r2_list_read_write_authorized": false,
+    "v0_11_production_evaluation_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_or_model_change_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "required_next_decision": {
+    "new_versioned_authority_required_before_frozen_critical_path_change": true,
+    "recommended_scope": "choose fail-closed suspension of remaining futile V0.10 attempts and prepare a separately frozen successor metadata window with the observed Pionex response contract",
+    "automatic_action_authorized": false
+  }
+}

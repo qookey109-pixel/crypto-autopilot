@@ -14,7 +14,7 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 Historical configs, receipts and CLI paths remain for evidence, but these four
 files are the current operating surface.
 
-## Current authority snapshot — 2026-08-30
+## Current authority snapshot — 2026-08-31
 
 The repository has moved beyond the original V0.1 implementation baseline while preserving its scientific history:
 
@@ -31,11 +31,20 @@ The repository has moved beyond the original V0.1 implementation baseline while 
 - V0.8 shared relay secret handshake: **PASS**; V0.8 prepared cutover contract and hard-disabled scaffold remain historical preparation authorities.
 - V0.9 authenticated Render relay smoke: **PASS** — HTTP 200 / valid JSON / `symbol_count=872` / zero R2 writes / zero holdout access.
 - V0.10 final atomic metadata-capture cutover: **EFFECTIVE / AUTHORIZED** after merged PR #127 at `8fce944da479dbda0e2899f9b30b9de62351fa27`.
+- PR #210's exact Pionex `type=PERP` query is **EFFECTIVE** on `main` at
+  `a34cf471876971a97200de4974906743642ed61f`, but observed scheduled runs #36
+  through #40 now fail closed because the returned perpetual symbol record does
+  not preserve the frozen required `status` / `contractType` contract. The
+  failure occurs before R2 client construction; no R2 or holdout access occurs.
 - V0.2 self-hosted scheduled metadata capture is now **RETIRED AS EXECUTION PATH**; its receipts remain immutable historical evidence.
 - V0.10 GitHub-hosted Ubuntu scheduled metadata capture is the current authorized metadata-capture execution path.
 - V0.11 metadata-stability evaluator: **PREPARED / PRODUCTION R2 EVALUATION NOT AUTHORIZED**. Its deterministic 194-slot rules were frozen before production stability evidence is read.
 - Replacement holdout `2026-08-28` through `2026-09-03`: **FROZEN_UNOPENED**; candle access and evaluation remain unauthorized.
-- Metadata stability gate: **NOT_YET_RUN**. The next scientific stage is the frozen 194-slot metadata-stability capture window beginning `2026-08-27T00:00:00Z`.
+- Metadata stability evaluation: **NOT_YET_RUN**. Because failed or missing
+  slots cannot be backfilled, the currently observed window is already blocked
+  from producing a complete 194-slot PASS dataset. A new versioned decision is
+  required before suspending the remaining attempts or preparing a successor
+  window.
 
 The V0.10 cutover authorizes only the frozen public-provider metadata capture phase and metadata-only R2 writes inside the exact window. V0.11 currently authorizes only evaluator preparation and synthetic validation. Neither stage authorizes replacement holdout candles, source switching, Historical Universe membership, W1 materialization, backtest admission, strategy changes, trade plans, real-money orders, or live trading.
 

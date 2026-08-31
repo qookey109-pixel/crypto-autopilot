@@ -24,10 +24,10 @@
     },
     {
       "critical": true,
-      "detail": "194 個 UTC hourly slots 尚未完成；完整 stability review 前不得進入 replacement holdout candle access。",
+      "detail": "正式 V0.11 評估尚未執行；觀察到的必要 slot 缺漏已阻止目前 window 形成完整 194-slot PASS。",
       "name": "Metadata Stability",
-      "status": "PENDING",
-      "tone": "pending"
+      "status": "BLOCKED",
+      "tone": "danger"
     },
     {
       "critical": true,
@@ -84,6 +84,13 @@
       "name": "Funding R2 Materialization",
       "status": "PASS",
       "tone": "pass"
+    },
+    {
+      "critical": true,
+      "detail": "Runs #36–#40 在 Pionex 必要欄位契約失配處 fail closed；未建立 R2 client、未讀寫 R2、未開啟 holdout。",
+      "name": "V0.10 Scheduled Capture",
+      "status": "FAIL_CLOSED",
+      "tone": "danger"
     }
   ],
   "generatedAtUtc": null,
@@ -252,9 +259,9 @@
       "status": "AUTHORIZED"
     },
     {
-      "detail": "Frozen window 2026-08-27 至 2026-09-04；完整 194-slot stability evidence 尚未完成。",
+      "detail": "V0.11 正式評估仍為 NOT_YET_RUN；既有缺漏／失敗 slot 不得回補，因此目前 frozen window 已無法形成完整 194-slot PASS 證據。",
       "name": "Metadata Stability 194 Slots",
-      "status": "PENDING"
+      "status": "BLOCKED"
     },
     {
       "detail": "Long-horizon review 已 PASS，但 membership evidence 尚未完成。",
@@ -272,12 +279,12 @@
       "status": "PASS"
     },
     {
-      "detail": "PR #201 已合併至 protected main；等價的 :17/:47 schedule registration text 已生效。先前缺漏與失敗仍保留，Pionex failure root cause 仍未確認。",
+      "detail": "PR #201 已合併至 protected main；等價的 :17/:47 schedule registration text 已生效。排程註冊本身有效，但不代表 capture 成功。",
       "name": "V0.10 Schedule Re-registration",
       "status": "EFFECTIVE"
     },
     {
-      "detail": "PR #204 已合併：120 個預註冊候選、4 類策略、短線／中線／波段三種週期；目前只允許 synthetic fixtures。",
+      "detail": "目前策略研究閉環包含 120 個預註冊候選、4 類策略、短線／中線／波段三種週期；目前只允許 synthetic fixtures。",
       "name": "Strategy Research Loop V0.1",
       "status": "PREPARED"
     },
@@ -285,6 +292,11 @@
       "detail": "六項 anti-overfitting 與驗證方法已準備；最強結果也只進入人工審查，不會自動晉升模型。",
       "name": "Strategy Edge Validation V0.1",
       "status": "PREPARED"
+    },
+    {
+      "detail": "PR #210 的 type=PERP 已生效；其後觀察到的 runs #36–#40 均在 Pionex status/contractType 契約檢查 fail closed，且在 R2 client 建立前停止。",
+      "name": "V0.10 Scheduled Capture",
+      "status": "FAIL_CLOSED"
     }
   ],
   "project": {
@@ -315,6 +327,7 @@
       47
     ],
     "metadataCaptureStartUtc": "2026-08-27T00:00:00Z",
+    "metadataStabilityEligibilityState": "KNOWN_BLOCKED_BY_MISSING_VALID_SLOTS",
     "metadataStabilityState": "NOT_YET_RUN",
     "mode": "PAPER-ONLY",
     "name": "Qookey Crypto Autopilot",
@@ -348,8 +361,12 @@
     "successorMetadataScheduleEnabled": true,
     "tradeKlineW1MaterializationAuthorized": false,
     "tradePlanAuthorized": false,
+    "v0_10CaptureLatestObservedRunId": 33345766954,
+    "v0_10CaptureObservedFailedRunCount": 5,
+    "v0_10CaptureOperationalState": "FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH",
     "v0_10EmergencyScheduleRegistrationMergeSha": "cf83b6320bc0f0817d8e6ae15d88fe304b933330",
-    "v0_10EmergencyScheduleRegistrationState": "EFFECTIVE"
+    "v0_10EmergencyScheduleRegistrationState": "EFFECTIVE",
+    "v0_10PerpQueryMergeSha": "a34cf471876971a97200de4974906743642ed61f"
   },
   "schema": "qookey-dashboard-authority-snapshot-v0.10",
   "securityBoundary": {
@@ -362,7 +379,7 @@
     "containsPrivateExchangeResponses": false,
     "containsSecrets": false
   },
-  "snapshotLabel": "Repository 正式 Authority 狀態快照 · Equivalence V0.1 FAIL / Funding V0.2 R2 PASS / V0.10 Metadata Cutover EFFECTIVE / Schedule Re-registration EFFECTIVE / Strategy Research Loop PREPARED",
+  "snapshotLabel": "Repository 正式 Authority 狀態快照 · Equivalence V0.1 FAIL / Funding V0.2 R2 PASS / V0.10 Metadata Cutover EFFECTIVE / Scheduled Capture FAIL-CLOSED / Strategy Research Loop PREPARED",
   "sourceAuthorities": [
     "research/receipts/2026-08-19-provider-equivalence-v0-5-render-free-transport-pass.json",
     "research/receipts/2026-08-19-provider-equivalence-v0-6-render-transport-authority-transition.json",
@@ -380,6 +397,7 @@
     "config/strategy_research_loop_v0_1.json",
     "research/receipts/2026-08-28-strategy-research-loop-v0-1-prepared.json",
     ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml",
-    ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+    ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+    "research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json"
   ]
 }

@@ -88,6 +88,8 @@ def test_status_and_dashboard_project_effective_post_merge_lineage() -> None:
     status = STATUS.read_text(encoding="utf-8")
     assert "V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION EFFECTIVE" in status
     assert "PR #201 DRAFT / NOT EFFECTIVE" not in status
+    assert "V0.10 PIONEX PERP QUERY EFFECTIVE ON MAIN" in status
+    assert "PROPOSED IN PR #210 / NOT EFFECTIVE" not in status
 
     lineage = dashboard_authority.validate_render_lineage()
     receipt = lineage["v10_emergency_schedule_effective"]
@@ -95,6 +97,14 @@ def test_status_and_dashboard_project_effective_post_merge_lineage() -> None:
     interpretation = receipt["interpretation"]
     assert interpretation["receipt_means_github_will_deliver_future_schedule_events"] is False
     assert interpretation["receipt_means_pionex_provider_failure_is_resolved"] is False
+
+    observation = dashboard_authority.validate_v10_post_perp_schema_observation()
+    assert observation["status"] == "FAIL_CLOSED"
+    assert observation["lineage"]["source_pr"] == 210
+    assert observation["operational_interpretation"]["r2_client_constructed"] is False
+    assert observation["scientific_impact"][
+        "current_frozen_window_eligible_for_complete_194_slot_pass"
+    ] is False
 
 
 def test_dashboard_overlay_emits_effective_registration_state(
@@ -121,8 +131,36 @@ def test_dashboard_overlay_emits_effective_registration_state(
     assert project["v0_10EmergencyScheduleRegistrationMergeSha"] == (
         "cf83b6320bc0f0817d8e6ae15d88fe304b933330"
     )
+    assert project["v0_10PerpQueryMergeSha"] == (
+        "a34cf471876971a97200de4974906743642ed61f"
+    )
+    assert project["v0_10CaptureOperationalState"] == (
+        "FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH"
+    )
+    assert project["v0_10CaptureObservedFailedRunCount"] == 5
+    assert project["v0_10CaptureLatestObservedRunId"] == 33345766954
+    assert project["metadataStabilityState"] == "NOT_YET_RUN"
+    assert project["metadataStabilityEligibilityState"] == (
+        "KNOWN_BLOCKED_BY_MISSING_VALID_SLOTS"
+    )
     assert any(
         item["name"] == "V0.10 Schedule Re-registration"
         and item["status"] == "EFFECTIVE"
         for item in dashboard["pipeline"]
+    )
+    assert any(
+        item["name"] == "V0.10 Scheduled Capture"
+        and item["status"] == "FAIL_CLOSED"
+        for item in dashboard["pipeline"]
+    )
+    assert any(
+        item["name"] == "Metadata Stability 194 Slots"
+        and item["status"] == "BLOCKED"
+        for item in dashboard["pipeline"]
+    )
+    assert any(
+        item["name"] == "V0.10 Scheduled Capture"
+        and item["status"] == "FAIL_CLOSED"
+        and item["critical"] is True
+        for item in dashboard["gates"]
     )
