@@ -6,12 +6,18 @@ and should not be read as active production schedules.
 
 ## Scheduled workflows after convergence
 
+Current observation (`2026-08-31`): PR #210's Pionex `type=PERP` query is
+effective, but scheduled captures #36 through #40 all fail closed on the
+required `status` / `contractType` parser contract before R2 client creation.
+The health workflow is correctly reporting this upstream failure. This index
+does not authorize a parser fix, schedule suspension, replay or backfill.
+
 | State | Workflow | UTC cadence | Effective behavior |
 | --- | --- | --- | --- |
-| Current bounded window | Provider Equivalence V0.10 metadata capture | `:17` and `:47`, only 2026-08-27 through 2026-09-04 01:59:59.999 | metadata-only provider reads and authorized immutable R2 writes inside the exact window |
+| Current bounded window / fail closed | Provider Equivalence V0.10 metadata capture | `:17` and `:47`, only 2026-08-27 through 2026-09-04 01:59:59.999 | schedule remains registered, but the latest observed attempts fail on Pionex required-field schema validation before R2 access; missing slots remain failures |
 | Continuous | Research Signal Layer V0.2 | daily 02:17 | bounded public structured-signal ingestion |
 | Continuous | Research Signal Quality V0.1 | daily 02:47 | allowlisted R2 lineage read only |
-| Continuous | Research Automation Health V0.1 | every 3 hours at :47 | GitHub Actions metadata read only |
+| Continuous / alerting | Research Automation Health V0.1 | every 3 hours at :47 | GitHub Actions metadata read only; current failure is an intentional alert on V0.10, not a health-check implementation error |
 | Post-window | Binance USD-M Crypto Core 100 V0.1.2 | every 6 hours at :23 during 2026-09-04 through 09-30 | starts only after V0.10; 10 R2-only shards; fixed pre-holdout source range |
 | Conditional post-window | Binance USD-M Crypto Core 100 Training V0.1.2 | Sunday 04:37 | skips until all 100-market detailed-history shards exist |
 | Post-window | Pionex Alternative Assets Observability V0.2 | 2026-09-04 02:53, then 09-06/13/20/27 at 03:53 | Pionex `PERP + TRADING` metadata only; validates the 125-candidate catalog, compares it with the prior SHA-bound catalog, estimates four-year capacity and writes R2 evidence plus a safe aggregate artifact |
@@ -43,6 +49,8 @@ evidence. They do not automatically resume.
   Latest-lookback requests may include the frozen 2026-08-28 through 09-03
   candles, so no workflow or cron is created until V0.11 and a separate
   holdout/paper-read authority are complete.
+- No automatic Paper Broker simulation is currently running. The V0.1 cron is
+  retired after its cutoff, and V0.2 remains prepared without a workflow.
 - Pionex Alternative Assets historical candles (`15M / 60M / 4H`) remain
   unauthorized. The active observability schedule reads symbol metadata only;
   K-lines, funding, trades and order books require V0.11 plus a separate

@@ -88,6 +88,13 @@ def test_dashboard_safe_fixture_reflects_v10_but_never_becomes_authority() -> No
     )
     assert project["renderMetadataV0_9SmokeState"] == "PASS_FROZEN"
     assert project["renderMetadataV0_10CutoverState"] == "EFFECTIVE_AUTHORIZED"
+    assert project["v0_10CaptureOperationalState"] == (
+        "FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH"
+    )
+    assert project["v0_10CaptureObservedFailedRunCount"] == 5
+    assert project["metadataStabilityEligibilityState"] == (
+        "KNOWN_BLOCKED_BY_MISSING_VALID_SLOTS"
+    )
     assert project["currentMetadataCaptureExecutionPath"] == "github_hosted_ubuntu_v0_10"
     assert project["oldV0_2ScheduledExecutionAuthorized"] is False
     assert project["successorMetadataCaptureExecutionAuthorized"] is True

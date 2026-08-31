@@ -41,6 +41,9 @@ V10_EMERGENCY_SCHEDULE_AUTHORITY = Path(
 V10_EMERGENCY_SCHEDULE_EFFECTIVE = Path(
     "research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-effective.json"
 )
+V10_POST_PERP_SCHEMA_OBSERVATION = Path(
+    "research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json"
+)
 OLD_V02_WORKFLOW = Path(
     ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
 )
@@ -555,6 +558,79 @@ def validate_strategy_research_lineage() -> dict[str, object]:
     }
 
 
+def validate_v10_post_perp_schema_observation() -> dict[str, object]:
+    observation = load(V10_POST_PERP_SCHEMA_OBSERVATION)
+    if observation.get("status") != "FAIL_CLOSED" or observation.get("stage") != (
+        "V0_10_POST_PERP_QUERY_PIONEX_SCHEMA_MISMATCH_OBSERVED"
+    ):
+        raise RuntimeError("V0.10 post-PERP observation changed")
+
+    lineage = require_dict(observation.get("lineage") or {}, "V0.10 incident lineage")
+    if lineage.get("source_pr") != 210 or lineage.get("source_pr_merged") is not True:
+        raise RuntimeError("V0.10 post-PERP PR lineage changed")
+    if lineage.get("post_merge_main_sha") != (
+        "a34cf471876971a97200de4974906743642ed61f"
+    ):
+        raise RuntimeError("V0.10 post-PERP merge SHA changed")
+
+    observed_runs = observation.get("observed_scheduled_runs") or []
+    if not isinstance(observed_runs, list):
+        raise RuntimeError("V0.10 observed run list changed shape")
+    if [require_dict(run, "V0.10 observed run").get("run_id") for run in observed_runs] != [
+        33313769727,
+        33326147273,
+        33332576134,
+        33339908907,
+        33345766954,
+    ]:
+        raise RuntimeError("V0.10 observed run lineage changed")
+    if any(require_dict(run, "V0.10 observed run").get("conclusion") != "failure" for run in observed_runs):
+        raise RuntimeError("V0.10 observed failure state changed")
+
+    latest = require_dict(observation.get("latest_failure") or {}, "V0.10 latest failure")
+    if (
+        latest.get("run_id"),
+        latest.get("failure_class"),
+        latest.get("first_rejected_symbol"),
+    ) != (
+        33345766954,
+        "PIONEX_REQUIRED_STATUS_OR_CONTRACT_TYPE_MISSING",
+        "AAVE_USDT_PERP",
+    ):
+        raise RuntimeError("V0.10 latest failure evidence changed")
+
+    interpretation = require_dict(
+        observation.get("operational_interpretation") or {},
+        "V0.10 operational interpretation",
+    )
+    for key in (
+        "r2_client_constructed",
+        "r2_reads_performed",
+        "r2_writes_performed",
+        "holdout_candles_accessed",
+        "holdout_evaluated",
+        "trade_plan_created",
+        "orders_created",
+    ):
+        if interpretation.get(key) is not False:
+            raise RuntimeError(f"V0.10 incident boundary changed: {key}")
+
+    impact = require_dict(observation.get("scientific_impact") or {}, "V0.10 impact")
+    if impact.get("metadata_stability_evaluation_state") != "NOT_YET_RUN":
+        raise RuntimeError("V0.11 evaluation state changed")
+    if impact.get("current_frozen_window_eligible_for_complete_194_slot_pass") is not False:
+        raise RuntimeError("V0.10 incomplete window cannot be shown as eligible")
+    if impact.get("replacement_holdout_state") != "FROZEN_UNOPENED":
+        raise RuntimeError("Replacement holdout state changed")
+
+    boundary = require_dict(
+        observation.get("authority_boundary") or {}, "V0.10 observation boundary"
+    )
+    if any(value is not False for value in boundary.values()):
+        raise RuntimeError("V0.10 observation unexpectedly grants authority")
+    return observation
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=Path, required=True)
@@ -565,6 +641,7 @@ def main() -> int:
     materialization, usage, equivalence = validate_foundation()
     lineage = validate_render_lineage()
     strategy_research = validate_strategy_research_lineage()
+    incident = validate_v10_post_perp_schema_observation()
 
     require_dict(materialization.get("exact_scope") or {}, "funding exact scope")
     postwrite = require_dict(materialization.get("postwrite_results") or {}, "funding postwrite")
@@ -608,7 +685,20 @@ def main() -> int:
             "v0_10EmergencyScheduleRegistrationMergeSha": (
                 "cf83b6320bc0f0817d8e6ae15d88fe304b933330"
             ),
+            "v0_10PerpQueryMergeSha": "a34cf471876971a97200de4974906743642ed61f",
+            "v0_10CaptureOperationalState": "FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH",
+            "v0_10CaptureObservedFailedRunCount": len(
+                incident["observed_scheduled_runs"]
+            ),
+            "v0_10CaptureLatestObservedRunId": int(
+                require_dict(incident["latest_failure"], "V0.10 latest failure")[
+                    "run_id"
+                ]
+            ),
             "metadataStabilityState": "NOT_YET_RUN",
+            "metadataStabilityEligibilityState": (
+                "KNOWN_BLOCKED_BY_MISSING_VALID_SLOTS"
+            ),
             "replacementHoldoutState": "FROZEN_UNOPENED",
             "currentMetadataCaptureExecutionPath": "github_hosted_ubuntu_v0_10",
             "currentMetadataCaptureBinanceTransport": "render_free_frankfurt_v0_10_relay",
@@ -638,7 +728,7 @@ def main() -> int:
     dashboard["snapshotLabel"] = (
         "Repository 正式 Authority 狀態快照 · Equivalence V0.1 FAIL / "
         "Funding V0.2 R2 PASS / V0.10 Metadata Cutover EFFECTIVE / "
-        "Schedule Re-registration EFFECTIVE / Strategy Research Loop PREPARED"
+        "Scheduled Capture FAIL-CLOSED / Strategy Research Loop PREPARED"
     )
 
     source_authorities = dashboard.get("sourceAuthorities") or []
@@ -656,6 +746,7 @@ def main() -> int:
         V10_AUTHORITY,
         V10_EMERGENCY_SCHEDULE_AUTHORITY,
         V10_EMERGENCY_SCHEDULE_EFFECTIVE,
+        V10_POST_PERP_SCHEMA_OBSERVATION,
         STRATEGY_EDGE_CONFIG,
         STRATEGY_EDGE_RECEIPT,
         STRATEGY_RESEARCH_CONFIG,
@@ -723,14 +814,20 @@ def main() -> int:
     replace_pipeline_item(
         pipeline,
         "V0.10 Schedule Re-registration",
-        "PR #201 已合併至 protected main；等價的 :17/:47 schedule registration text 已生效。先前缺漏與失敗仍保留，Pionex failure root cause 仍未確認。",
+        "PR #201 已合併至 protected main；等價的 :17/:47 schedule registration text 已生效。排程註冊本身有效，但不代表 capture 成功。",
         "EFFECTIVE",
     )
     replace_pipeline_item(
         pipeline,
+        "V0.10 Scheduled Capture",
+        "PR #210 的 type=PERP 已生效；其後觀察到的 runs #36–#40 均在 Pionex status/contractType 契約檢查 fail closed，且在 R2 client 建立前停止。",
+        "FAIL_CLOSED",
+    )
+    replace_pipeline_item(
+        pipeline,
         "Metadata Stability 194 Slots",
-        "Frozen window 2026-08-27 至 2026-09-04；完整 194-slot stability evidence 尚未完成。",
-        "PENDING",
+        "V0.11 正式評估仍為 NOT_YET_RUN；既有缺漏／失敗 slot 不得回補，因此目前 frozen window 已無法形成完整 194-slot PASS 證據。",
+        "BLOCKED",
     )
     replace_pipeline_item(
         pipeline,
@@ -792,10 +889,18 @@ def main() -> int:
     )
     upsert_gate(
         gates,
+        "V0.10 Scheduled Capture",
+        "Runs #36–#40 在 Pionex 必要欄位契約失配處 fail closed；未建立 R2 client、未讀寫 R2、未開啟 holdout。",
+        "FAIL_CLOSED",
+        "danger",
+        True,
+    )
+    upsert_gate(
+        gates,
         "Metadata Stability",
-        "194 個 UTC hourly slots 尚未完成；完整 stability review 前不得進入 replacement holdout candle access。",
-        "PENDING",
-        "pending",
+        "正式 V0.11 評估尚未執行；觀察到的必要 slot 缺漏已阻止目前 window 形成完整 194-slot PASS。",
+        "BLOCKED",
+        "danger",
         True,
     )
     upsert_gate(
@@ -855,6 +960,9 @@ def main() -> int:
                 "render_v0_10": project["renderMetadataV0_10CutoverState"],
                 "v0_10_schedule_registration": project[
                     "v0_10EmergencyScheduleRegistrationState"
+                ],
+                "v0_10_capture_operational_state": project[
+                    "v0_10CaptureOperationalState"
                 ],
                 "current_capture_path": project["currentMetadataCaptureExecutionPath"],
                 "successor_capture_authorized": project[

@@ -14,13 +14,16 @@ any versioned authority.
 
 | Stage | Current contract | State |
 | --- | --- | --- |
+| V0.10 provider metadata capture | `config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json` plus the 2026-08-31 observation receipt | cutover and `type=PERP` are effective; runs #36–#40 fail closed on Pionex required-field schema mismatch before R2 access; no backfill |
 | Binance USD-M Crypto Core | `config/binance_usdm_detailed_history_v0_1_2.json` | 100 Crypto markets, 10 resumable R2 shards; authorized only after the V0.10 window |
 | Pionex alternative assets | `config/pionex_alternative_assets_observability_v0_2.json` | V0.1 supplies the 125-candidate registry; V0.2 authorizes one post-window metadata validation/diff/capacity path; historical candles still need separate authority |
 | Pionex Paper successor | `config/post_window_paper_training_v0_2.json` | prepared, but no workflow or provider access until V0.11 and a separate holdout-access authority |
 
 The Paper successor reuses the existing Repository Paper Broker and Pionex
 public adapter. It does not create a second broker, force a trade count or add a
-live-order path.
+live-order path. No automatic Paper Broker simulation is currently running:
+V0.1 is retired after its cutoff and V0.2 remains prepared pending separate
+holdout/paper-read authority.
 
 ## Current directory roles
 

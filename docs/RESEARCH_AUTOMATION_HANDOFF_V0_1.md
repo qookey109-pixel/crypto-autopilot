@@ -1,12 +1,37 @@
 # Research Automation Handoff V0.1
 
-Status date: `2026-08-24` (`Asia/Taipei`).
+Status date: `2026-08-31` (`Asia/Taipei`).
 
 This handoff is an operations guide, not execution authority. Repository
 `main`, versioned configs and receipts remain authoritative. Detailed History
 V0.1.2 has its own post-window R2 authority; this handoff does not independently
 enable R2 access, holdout access, model promotion, trade plans, real-money
 orders or live trading.
+
+Project: `Qookey Crypto Autopilot`
+
+Repository: `https://github.com/qookey109-pixel/crypto-autopilot`
+
+Public dashboard: `https://qookey109-pixel.github.io/crypto-autopilot/`
+
+## Current live incident
+
+- PR #210 is merged at
+  `a34cf471876971a97200de4974906743642ed61f`; the Pionex public symbols request
+  now explicitly uses `type=PERP`.
+- Scheduled V0.10 attempts #36 through #40 reached the frozen perpetual-symbol
+  scope, then failed closed on the required provider-field contract. The latest
+  error is `Pionex status/contractType missing: AAVE_USDT_PERP` in run
+  [`33345766954`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/33345766954).
+- The failure occurs before R2 store construction. No R2 read/write, holdout
+  access, V0.11 evaluation, trade plan or order occurred.
+- Research Signal Layer and Signal Quality remain healthy. Research Automation
+  Health is correctly failing because it detected the V0.10 upstream failure.
+- V0.11 remains `NOT_YET_RUN`; however, immutable missing/failed slots make the
+  current frozen window ineligible to produce complete 194-slot PASS evidence.
+- Exact observation:
+  `research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json`.
+  It is evidence only and grants no new execution authority.
 
 ## Executive decision
 
@@ -97,7 +122,7 @@ Crypto Core 100 V0.1.2 separately provides:
 | Daily 10:47 | KOL research quality check | Three exact R2 reads; lineage/time/authority verification; no list/write |
 | Every three hours at `:47` | Research automation health | GitHub Actions metadata only; alerts on stale, failed or missing jobs |
 | 2026-08-27 08:00 | V0.5 Binance and Pionex provider-read stop | Automatic post-stop resume is forbidden |
-| 2026-08-27 08:00 through 2026-09-04 09:59:59.999 | V0.10 frozen metadata capture window | Existing `:17` / `:47` attempts only; no second path or manual backfill |
+| 2026-08-27 08:00 through 2026-09-04 09:59:59.999 | V0.10 frozen metadata capture window | Schedule remains registered, but observed post-#210 attempts fail closed before R2; no second path, replay or manual backfill |
 | 2026-09-04 14:23 first eligible cron, then every six hours through Sep 30 | Crypto Core 100 V0.1.2 catalog then next incomplete shard | 10 serialized R2-only shards; source ends 2026-07; expires Oct 1 08:00 |
 | Sunday 12:37 after detailed dataset completion | Crypto Core 100 Training V0.1.2 | Walk-forward research; `REJECT` is retained and never promoted |
 | 2026-09-04 10:53, then Sep 6/13/20/27 at 11:53 | Pionex Alternative Assets Observability V0.2 | validates the 125-candidate Pionex metadata catalog, compares prior SHA-bound evidence and estimates four-year capacity; no candle/funding/trade/order-book reads |
@@ -139,10 +164,31 @@ run independent crons that can race:
   its exact post-window authority.
 - [x] Add event-aware automation health and daily KOL evidence quality schedules
   without changing V0.10, holdout or trading authority.
-- [ ] At `2026-08-27 08:00 Asia/Taipei`, verify V0.5/Pionex jobs fail closed
+- [x] At `2026-08-27 08:00 Asia/Taipei`, verify V0.5/Pionex jobs fail closed
   before provider access and leave V0.10 as the only metadata capture path.
+- [x] Confirm PR #210 merged and preserve post-merge runs #36–#40 as immutable
+  fail-closed evidence.
+- [x] Confirm the V0.10 parser failure precedes R2 store construction and did
+  not open the replacement holdout.
+- [ ] Obtain a new explicit versioned authority before stopping the remaining
+  V0.10 schedule or changing its frozen provider/parser contract.
 - [ ] After the full metadata window ends, create the separate V0.11 production
   evaluation authority before any production receipt read.
+
+## Next decision
+
+The safest next action is not another in-place parser repair: the current
+window already lacks immutable valid slots and cannot regain complete 194-slot
+eligibility. Prepare a new reviewed authority that explicitly chooses both:
+
+1. fail-closed suspension of the remaining scientifically futile V0.10
+   attempts; and
+2. a successor metadata window/version whose Pionex normalization contract is
+   frozen from an observed sanitized response shape before scheduling.
+
+Do not execute either action from this handoff alone. The authority should
+preserve provider separation, the 0 USD budget, no backfill, unopened holdout,
+zero model promotion and zero trading authority.
 
 ## Stop conditions
 
@@ -154,3 +200,19 @@ Stop and record evidence rather than retrying when any of these occurs:
 - an action would read the replacement holdout, switch providers, relabel
   Binance as Pionex-native, enable promotion or change trading authority;
 - a task requires paid cloud capacity or secret disclosure.
+
+## New-chat continuation
+
+Copy this into a new task:
+
+> Continue `qookey109-pixel/crypto-autopilot` from latest `main`. PR #210 is
+> merged at `a34cf471876971a97200de4974906743642ed61f`; V0.10 runs #36–#40 fail
+> closed with `Pionex status/contractType missing: AAVE_USDT_PERP` before R2
+> client construction. Read `PROJECT_STATUS.md`,
+> `docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md` and
+> `research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json`
+> first. Preserve frozen V0.10 evidence, V0.11 `NOT_YET_RUN`, replacement
+> holdout `FROZEN_UNOPENED`, provider separation, PAPER-ONLY and 0 USD. Do not
+> alter or suspend the critical path until a new explicit versioned authority
+> is granted. First verify the observation/status PR, then prepare the bounded
+> suspension plus successor-window authority if the user explicitly approves.
