@@ -64,7 +64,7 @@ full map and dependency rules are in
 The current deployed/repository architecture is:
 
 - **GitHub repository** — source code, versioned configs/receipts and formal authority.
-- **GitHub Actions** — CI, validation, offline research and the versioned V0.10 metadata-capture scheduler.
+- **GitHub Actions** — CI, validation, offline research and the versioned V0.12 successor metadata-capture scheduler; V0.10 is historical validation evidence.
 - **Render Free / Frankfurt** — authenticated transport for the Binance public metadata leg only.
 - **Cloudflare R2 Standard Free** — immutable historical/provider metadata storage under explicit write authorities.
 - **GitHub Pages** — read-only Traditional Chinese dashboard; it is a normalized view and never authority.
@@ -76,7 +76,7 @@ Cloudflare Containers and Koyeb are historical/superseded transport experiments 
 ## Current metadata authority path
 
 ```text
-GitHub Actions V0.10 scheduler
+GitHub Actions V0.12 successor scheduler
         |
         +--> Pionex public metadata HTTPS
         |
@@ -92,7 +92,7 @@ immutable run-scoped metadata objects
 (receipt written last + SHA-256 readback)
 ```
 
-The V0.10 path is authorized only inside the frozen metadata window. Historical V0.2 self-hosted scheduled execution is retired and is not an automatic fallback.
+The V0.12 path is authorized only inside its exact successor metadata window. Historical V0.10 and V0.2 scheduled execution are retired and are not automatic fallbacks.
 
 ## Pionex public paper-training path
 

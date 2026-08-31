@@ -9,6 +9,9 @@ import re
 
 
 V0_10_CUTOVER = Path("config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json")
+V0_12_SUCCESSOR = Path(
+    "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json"
+)
 DETAILED_HISTORY = Path("config/binance_usdm_detailed_history_v0_1_2.json")
 PIONEX_ALTERNATIVE_ASSETS = Path("config/pionex_alternative_assets_v0_1.json")
 PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY = Path(
@@ -28,6 +31,7 @@ SOURCE_AUTHORITIES = (
     PIONEX_ALTERNATIVE_ASSETS,
     PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY,
     V0_10_CUTOVER,
+    V0_12_SUCCESSOR,
     SUCCESSOR_SCHEDULE,
     PAPER_SUCCESSOR,
     ROADMAP,
@@ -88,6 +92,7 @@ def build_projection(
     *, generated_at_utc: str | None = None, checked_in_fixture: bool = False
 ) -> dict[str, object]:
     v0_10 = load_json(V0_10_CUTOVER)
+    v0_12 = load_json(V0_12_SUCCESSOR)
     detailed = load_json(DETAILED_HISTORY)
     alternative_assets = load_json(PIONEX_ALTERNATIVE_ASSETS)
     alternative_observability = load_json(PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY)
@@ -108,10 +113,25 @@ def build_projection(
     if v0_boundary.get("holdout_candle_access_authorized") is not False:
         raise RuntimeError("calendar cannot project holdout access")
 
-    v0_start = parse_utc(v0_scope.get("metadata_capture_start_utc"), "V0.10 start")
+    parse_utc(v0_scope.get("metadata_capture_start_utc"), "V0.10 start")
     v0_end = parse_utc(v0_scope.get("metadata_capture_end_utc"), "V0.10 end")
     if int(v0_scope.get("hourly_slot_count") or 0) != 194:
         raise RuntimeError("V0.10 hourly-slot count changed")
+
+    if v0_12.get("status") != (
+        "AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE"
+    ):
+        raise RuntimeError("V0.12 successor authority state changed")
+    v12_window = require_dict(v0_12.get("successor_window"), "V0.12 window")
+    v12_boundary = require_dict(v0_12.get("authorization_boundary"), "V0.12 boundary")
+    v12_start = parse_utc(v12_window.get("start_utc"), "V0.12 start")
+    v12_end = parse_utc(v12_window.get("end_utc"), "V0.12 end")
+    if int(v12_window.get("expected_hourly_slot_count") or 0) != 194:
+        raise RuntimeError("V0.12 hourly-slot count changed")
+    if v12_boundary.get("v0_10_scheduled_execution_authorized_after_main_merge") is not False:
+        raise RuntimeError("V0.10 schedule was not retired by V0.12")
+    if v12_boundary.get("holdout_candle_access_authorized") is not False:
+        raise RuntimeError("calendar cannot project V0.12 holdout access")
 
     if detailed.get("status") != "EXECUTION_AUTHORIZED_AFTER_V0_10_WINDOW":
         raise RuntimeError("detailed-history authority state changed")
@@ -241,6 +261,7 @@ def build_projection(
 
     required_status_markers = (
         "V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE",
+        "V0.12 SUCCESSOR METADATA WINDOW",
         "REPLACEMENT HOLDOUT FROZEN_UNOPENED",
         "HISTORICAL UNIVERSE MEMBERSHIP NOT_READY",
     )
@@ -263,13 +284,13 @@ def build_projection(
         "sourceAuthorities": [str(path) for path in SOURCE_AUTHORITIES],
         "items": [
             {
-                "id": "v0-10-metadata-window",
-                "windowLabel": "CURRENT · 08/27 08:00 → 09/04 09:59",
-                "title": "V0.10 Metadata Capture",
-                "detail": "目前正式階段；PR #201 的 :17／:47 排程重註冊已生效，但缺漏與失敗仍保留為證據。只收集 metadata，不開啟 holdout candle。",
+                "id": "v0-12-successor-metadata-window",
+                "windowLabel": "09/04 10:00 → 09/12 11:59 · 194 SLOTS",
+                "title": "V0.12 Successor Metadata Capture",
+                "detail": "V0.10 剩餘排程已停止且不得回補；V0.12 使用獨立 R2 namespace 收集 194 個 hourly slots 的 metadata-only 證據，不開啟 holdout candle。",
                 "status": "AUTHORIZED",
-                "startsAtUtc": v0_start.isoformat().replace("+00:00", "Z"),
-                "endsAtUtc": v0_end.isoformat(timespec="milliseconds").replace("+00:00", "Z"),
+                "startsAtUtc": v12_start.isoformat().replace("+00:00", "Z"),
+                "endsAtUtc": v12_end.isoformat(timespec="milliseconds").replace("+00:00", "Z"),
                 "kind": "window",
             },
             {

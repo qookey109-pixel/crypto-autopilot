@@ -73,19 +73,23 @@ class RetiredExecutionWorkflowHygieneTests(unittest.TestCase):
                 ):
                     self.assertIn(marker, text, marker)
 
-    def test_v0_10_current_metadata_schedule_remains_active_and_unique(self) -> None:
-        current = (
+    def test_v0_10_schedule_is_retired_and_v0_12_is_active_and_unique(self) -> None:
+        retired = (
             WORKFLOWS / "provider-equivalence-v0-10-render-metadata-capture.yml"
+        ).read_text(encoding="utf-8")
+        current = (
+            WORKFLOWS / "provider-equivalence-v0-12-successor-metadata-capture.yml"
         ).read_text(encoding="utf-8")
         old = (WORKFLOWS / "provider-equivalence-v0-2-metadata-capture.yml").read_text(
             encoding="utf-8"
         )
+        self.assertFalse(any(line == "  schedule:" for line in retired.splitlines()))
         self.assertTrue(any(line == "  schedule:" for line in current.splitlines()))
         self.assertFalse(any(line == "  schedule:" for line in old.splitlines()))
         for cron in (
-            '    - cron: "17,47 * 27,28,29,30,31 8 *"',
-            '    - cron: "17,47 * 1,2,3 9 *"',
-            '    - cron: "17,47 0,1 4 9 *"',
+            '    - cron: "17,47 2-23 4 9 *"',
+            '    - cron: "17,47 * 5,6,7,8,9,10,11 9 *"',
+            '    - cron: "17,47 0-3 12 9 *"',
         ):
             self.assertIn(cron, current)
 

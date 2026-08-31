@@ -2,14 +2,14 @@
   "authority": false,
   "items": [
     {
-      "detail": "目前正式階段；PR #201 的 :17／:47 排程重註冊已生效，但缺漏與失敗仍保留為證據。只收集 metadata，不開啟 holdout candle。",
-      "endsAtUtc": "2026-09-04T01:59:59.999Z",
-      "id": "v0-10-metadata-window",
+      "detail": "V0.10 剩餘排程已停止且不得回補；V0.12 使用獨立 R2 namespace 收集 194 個 hourly slots 的 metadata-only 證據，不開啟 holdout candle。",
+      "endsAtUtc": "2026-09-12T03:59:59.999Z",
+      "id": "v0-12-successor-metadata-window",
       "kind": "window",
-      "startsAtUtc": "2026-08-27T00:00:00Z",
+      "startsAtUtc": "2026-09-04T02:00:00Z",
       "status": "AUTHORIZED",
-      "title": "V0.10 Metadata Capture",
-      "windowLabel": "CURRENT · 08/27 08:00 → 09/04 09:59"
+      "title": "V0.12 Successor Metadata Capture",
+      "windowLabel": "09/04 10:00 → 09/12 11:59 · 194 SLOTS"
     },
     {
       "detail": "120 個預註冊候選、4 類策略與短線／中線／波段三週期已準備；目前沒有 production dataset 執行或模型晉升權限。",
@@ -92,6 +92,7 @@
     "config/pionex_alternative_assets_v0_1.json",
     "config/pionex_alternative_assets_observability_v0_2.json",
     "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
+    "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
     "config/post_window_research_successor_schedule_v0_1.json",
     "config/post_window_paper_training_v0_2.json",
     "docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md",

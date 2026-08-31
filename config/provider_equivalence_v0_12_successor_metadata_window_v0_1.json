@@ -1,0 +1,150 @@
+{
+  "schema_version": "provider_equivalence_v0_12_successor_metadata_window_v0_1",
+  "status": "AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE",
+  "date": "2026-08-31",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "purpose": "Atomically retire the already-incomplete V0.10 scheduled capture and authorize a provider-separated V0.12 metadata-only successor window with a frozen Pionex PERP normalization contract, without replaying V0.10 slots, opening the replacement holdout, switching sources, promoting a model, or trading.",
+  "lineage": {
+    "pre_change_main_sha": "a6c2f0748a2b352f1ccac1fc349bbd4e0b3b80d4",
+    "minimum_operational_change_commit_sha": null,
+    "protected_main_pr_number": 0,
+    "v0_10_cutover_protocol": "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
+    "v0_10_cutover_authority": "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json",
+    "v0_10_failure_observation": "research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json",
+    "v0_12_authority_receipt": "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json",
+    "historical_authorities_mutated": false
+  },
+  "atomic_schedule_transition": {
+    "retired_workflow": ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+    "retired_workflow_schedule_removed_in_same_change": true,
+    "retired_v0_10_manual_capture_authorized": false,
+    "retired_v0_10_replay_or_backfill_authorized": false,
+    "successor_workflow": ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml",
+    "successor_schedule_enabled_in_same_change": true,
+    "successor_runner": "ubuntu-latest",
+    "successor_cron_utc": [
+      "17,47 2-23 4 9 *",
+      "17,47 * 5,6,7,8,9,10,11 9 *",
+      "17,47 0-3 12 9 *"
+    ],
+    "scheduled_minutes_utc": [17, 47],
+    "scheduled_attempt_count": 388,
+    "hourly_slot_count": 194,
+    "concurrent_v0_10_and_v0_12_capture_paths_authorized": false,
+    "automatic_fallback_to_v0_10_or_v0_2": false
+  },
+  "successor_window": {
+    "start_utc": "2026-09-04T02:00:00Z",
+    "end_utc": "2026-09-12T03:59:59.999Z",
+    "expected_hourly_slot_count": 194,
+    "scheduled_minutes_utc": [17, 47],
+    "candidate_symbol_count": 15,
+    "mapped_pair_count": 45,
+    "providers": ["pionex", "binance_usdm"],
+    "replacement_holdout_state": "FROZEN_UNOPENED",
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false
+  },
+  "pionex_normalization_contract": {
+    "endpoint": "https://api.pionex.com/api/v1/common/symbols",
+    "query": {"type": "PERP"},
+    "public_endpoint_no_api_key_required": true,
+    "price_increment_field": "quoteStep",
+    "contract_type_precedence": ["contractType", "type"],
+    "accepted_contract_type_mappings": {
+      "contractType=PERPETUAL": "PERPETUAL",
+      "type=PERP": "PERPETUAL"
+    },
+    "status_precedence": ["status", "enable"],
+    "accepted_status_mappings": {
+      "status=TRADING": "TRADING",
+      "status=OFFLINE": "OFFLINE",
+      "enable=true": "TRADING",
+      "enable=false": "OFFLINE"
+    },
+    "both_representations_present_must_agree": true,
+    "missing_or_unknown_representation_policy": "FAIL_CLOSED_BEFORE_R2_CLIENT",
+    "payload_result_must_be_true": true,
+    "frozen_symbol_set_must_match_exactly": true,
+    "raw_payload_persisted_without_relabeling": true,
+    "official_contract_reference": "https://www.pionex.com/docs/api-docs/futures-api/common"
+  },
+  "render_transport": {
+    "service_url": "https://qookey-binance-transport-v0-5.onrender.com",
+    "region": "frankfurt",
+    "plan": "free",
+    "monthly_budget_usd": 0,
+    "reused_authenticated_raw_relay_path": "/metadata/v0-10/binance-exchange-info",
+    "render_code_or_deploy_changed": false,
+    "render_secret_changed": false,
+    "render_receives_r2_credentials": false
+  },
+  "storage": {
+    "backend": "cloudflare_r2",
+    "namespace": "metadata/provider-equivalence/v0_12/successor-window-20260904/",
+    "objects_per_complete_capture": 3,
+    "immutable_run_scoped_keys": true,
+    "receipt_written_last": true,
+    "postwrite_sha256_readback_required": true,
+    "fresh_bucket_inventory_before_each_write": true,
+    "free_only_operational_hard_stop_bytes": 8000000000,
+    "r2_credentials_location": "github_actions_secrets_only",
+    "metadata_only_r2_writes_authorized_inside_successor_window": true
+  },
+  "execution_guards": {
+    "exact_window_gate_required": true,
+    "scheduled_run_freshness_max_minutes": 30,
+    "outside_window_provider_requests": 0,
+    "outside_window_r2_client_construction": false,
+    "outside_window_r2_writes": false,
+    "provider_schema_failure": "FAIL_CLOSED_BEFORE_R2_CLIENT",
+    "transport_or_auth_failure": "FAIL_CLOSED_NO_R2_WRITE",
+    "r2_headroom_failure": "FAIL_CLOSED_BEFORE_WRITE",
+    "existing_object_conflict": "FAIL_CLOSED_NO_OVERWRITE",
+    "holdout_access_attempt": "FAIL_CLOSED",
+    "source_switch_attempt": "FAIL_CLOSED",
+    "live_trading_attempt": "FAIL_CLOSED"
+  },
+  "frozen_future_stability_contract": {
+    "required_coverage": "AT_LEAST_ONE_COMPLETE_VALID_V0_12_RECEIPT_PER_EACH_OF_194_UTC_HOURLY_SLOTS",
+    "missing_hour_policy": "FAIL_METADATA_STABILITY_NO_HOLDOUT_AUTHORITY",
+    "duplicate_capture_policy": "ALLOWED_ONLY_WHEN_NORMALIZED_VECTORS_MATCH_EXACTLY_PER_PROVIDER_WITHIN_SLOT",
+    "cross_window_stability_policy": "ALL_COMPLETE_VALID_CAPTURE_NORMALIZED_VECTORS_MUST_MATCH_EXACTLY_PER_PROVIDER_ACROSS_THE_FULL_WINDOW",
+    "partial_window_may_produce_pass": false,
+    "post_hoc_deadband_authorized": false,
+    "post_hoc_symbol_scope_change_authorized": false,
+    "post_hoc_provider_splicing_authorized": false,
+    "production_r2_evaluation_authorized_now": false,
+    "future_separate_versioned_evaluation_authority_required": true,
+    "future_pass_automatically_authorizes_holdout_access": false
+  },
+  "authorization_boundary": {
+    "v0_12_metadata_capture_execution_authorized_on_main_merge": true,
+    "v0_12_metadata_only_r2_writes_authorized_on_main_merge": true,
+    "v0_10_scheduled_execution_authorized_after_main_merge": false,
+    "v0_10_manual_capture_authorized": false,
+    "v0_10_or_v0_12_retroactive_backfill_authorized": false,
+    "production_stability_evaluation_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "holdout_evaluation_authorized": false,
+    "source_switch_authorized": false,
+    "provider_splicing_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "staged_trade_kline_w1_materialization_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "effectivity": {
+    "effective_before_merge": false,
+    "effective_only_when_exact_change_set_is_merged_to_protected_main": true,
+    "requires_human_review_before_merge": true,
+    "automatic_merge_authorized": false,
+    "pre_merge_provider_capture_authorized": false,
+    "pre_merge_r2_access_authorized": false
+  }
+}

@@ -14,24 +14,29 @@ Repository: `https://github.com/qookey109-pixel/crypto-autopilot`
 
 Public dashboard: `https://qookey109-pixel.github.io/crypto-autopilot/`
 
-## Current live incident
+## Current metadata transition
 
 - PR #210 is merged at
   `a34cf471876971a97200de4974906743642ed61f`; the Pionex public symbols request
   now explicitly uses `type=PERP`.
-- Scheduled V0.10 attempts #36 through #40 reached the frozen perpetual-symbol
+- Scheduled V0.10 attempts #36 through #41 reached the frozen perpetual-symbol
   scope, then failed closed on the required provider-field contract. The latest
-  error is `Pionex status/contractType missing: AAVE_USDT_PERP` in run
-  [`33345766954`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/33345766954).
+  observed error is `Pionex status/contractType missing: AAVE_USDT_PERP` in run
+  [`33366572161`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/33366572161).
 - The failure occurs before R2 store construction. No R2 read/write, holdout
   access, V0.11 evaluation, trade plan or order occurred.
-- Research Signal Layer and Signal Quality remain healthy. Research Automation
-  Health is correctly failing because it detected the V0.10 upstream failure.
+- Research Signal Layer and Signal Quality remain separate from this capture.
+  Research Automation Health V0.1 records the historical V0.10 upstream
+  failure; it is not evidence that V0.12 has executed.
 - V0.11 remains `NOT_YET_RUN`; however, immutable missing/failed slots make the
   current frozen window ineligible to produce complete 194-slot PASS evidence.
 - Exact observation:
   `research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json`.
   It is evidence only and grants no new execution authority.
+- The user separately authorized retiring the remaining V0.10 schedule and
+  creating V0.12. On the exact protected-main merge, V0.12 becomes the only
+  metadata schedule for `2026-09-04T02:00:00Z` through
+  `2026-09-12T03:59:59.999Z`; it does not replay or regrade V0.10.
 
 ## Executive decision
 
@@ -122,7 +127,8 @@ Crypto Core 100 V0.1.2 separately provides:
 | Daily 10:47 | KOL research quality check | Three exact R2 reads; lineage/time/authority verification; no list/write |
 | Every three hours at `:47` | Research automation health | GitHub Actions metadata only; alerts on stale, failed or missing jobs |
 | 2026-08-27 08:00 | V0.5 Binance and Pionex provider-read stop | Automatic post-stop resume is forbidden |
-| 2026-08-27 08:00 through 2026-09-04 09:59:59.999 | V0.10 frozen metadata capture window | Schedule remains registered, but observed post-#210 attempts fail closed before R2; no second path, replay or manual backfill |
+| 2026-08-27 08:00 through V0.12 main merge | V0.10 frozen metadata capture evidence | Runs #36–#41 remain fail-closed evidence; remaining schedule is retired atomically, with no replay or manual backfill |
+| 2026-09-04 10:00 through 2026-09-12 11:59:59.999 | V0.12 successor metadata window | Only current metadata schedule after exact main merge; 194 hourly slots / 388 attempts, separate R2 namespace, no holdout or production evaluation |
 | 2026-09-04 14:23 first eligible cron, then every six hours through Sep 30 | Crypto Core 100 V0.1.2 catalog then next incomplete shard | 10 serialized R2-only shards; source ends 2026-07; expires Oct 1 08:00 |
 | Sunday 12:37 after detailed dataset completion | Crypto Core 100 Training V0.1.2 | Walk-forward research; `REJECT` is retained and never promoted |
 | 2026-09-04 10:53, then Sep 6/13/20/27 at 11:53 | Pionex Alternative Assets Observability V0.2 | validates the 125-candidate Pionex metadata catalog, compares prior SHA-bound evidence and estimates four-year capacity; no candle/funding/trade/order-book reads |
@@ -166,29 +172,26 @@ run independent crons that can race:
   without changing V0.10, holdout or trading authority.
 - [x] At `2026-08-27 08:00 Asia/Taipei`, verify V0.5/Pionex jobs fail closed
   before provider access and leave V0.10 as the only metadata capture path.
-- [x] Confirm PR #210 merged and preserve post-merge runs #36–#40 as immutable
+- [x] Confirm PR #210 merged and preserve post-merge runs #36–#41 as immutable
   fail-closed evidence.
 - [x] Confirm the V0.10 parser failure precedes R2 store construction and did
   not open the replacement holdout.
-- [ ] Obtain a new explicit versioned authority before stopping the remaining
-  V0.10 schedule or changing its frozen provider/parser contract.
-- [ ] After the full metadata window ends, create the separate V0.11 production
-  evaluation authority before any production receipt read.
+- [x] Record explicit user authority to stop the remaining V0.10 schedule and
+  create the separately versioned V0.12 successor contract.
+- [ ] Merge the exact protected-main V0.12 change set only after CI and human
+  review; no pre-merge provider or R2 execution is authorized.
+- [ ] After the V0.12 metadata window ends, create a separate production
+  evaluation authority before any V0.12 receipt read.
 
 ## Next decision
 
-The safest next action is not another in-place parser repair: the current
-window already lacks immutable valid slots and cannot regain complete 194-slot
-eligibility. Prepare a new reviewed authority that explicitly chooses both:
-
-1. fail-closed suspension of the remaining scientifically futile V0.10
-   attempts; and
-2. a successor metadata window/version whose Pionex normalization contract is
-   frozen from an observed sanitized response shape before scheduling.
-
-Do not execute either action from this handoff alone. The authority should
-preserve provider separation, the 0 USD budget, no backfill, unopened holdout,
-zero model promotion and zero trading authority.
+Review and merge the exact V0.12 protected-main change set only after all CI
+checks pass. The merge atomically retires the V0.10 schedule and enables the
+bounded V0.12 schedule; this handoff alone does not execute provider requests
+or R2 access. After the window, freeze the observed lineage and create a
+separate production-evaluation authority. Keep provider separation, the 0 USD
+budget, no backfill, unopened holdout, zero model promotion and zero trading
+authority.
 
 ## Stop conditions
 
@@ -206,13 +209,14 @@ Stop and record evidence rather than retrying when any of these occurs:
 Copy this into a new task:
 
 > Continue `qookey109-pixel/crypto-autopilot` from latest `main`. PR #210 is
-> merged at `a34cf471876971a97200de4974906743642ed61f`; V0.10 runs #36–#40 fail
+> merged at `a34cf471876971a97200de4974906743642ed61f`; V0.10 runs #36–#41 fail
 > closed with `Pionex status/contractType missing: AAVE_USDT_PERP` before R2
-> client construction. Read `PROJECT_STATUS.md`,
+> client construction. The user authorized atomic V0.10 schedule retirement
+> plus a bounded V0.12 successor window. Read `PROJECT_STATUS.md`,
 > `docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md` and
-> `research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json`
-> first. Preserve frozen V0.10 evidence, V0.11 `NOT_YET_RUN`, replacement
+> `config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json`
+> first. Preserve frozen V0.10 evidence, production evaluation `NOT_YET_RUN`, replacement
 > holdout `FROZEN_UNOPENED`, provider separation, PAPER-ONLY and 0 USD. Do not
-> alter or suspend the critical path until a new explicit versioned authority
-> is granted. First verify the observation/status PR, then prepare the bounded
-> suspension plus successor-window authority if the user explicitly approves.
+> replay/backfill V0.10 or read V0.12 R2 receipts without a separate authority.
+> Verify the exact protected-main PR/commit binding and CI before asking for
+> merge approval.

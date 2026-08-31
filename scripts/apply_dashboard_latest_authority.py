@@ -50,6 +50,16 @@ OLD_V02_WORKFLOW = Path(
 V10_WORKFLOW = Path(
     ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
 )
+V12_CONFIG = Path(
+    "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json"
+)
+V12_AUTHORITY = Path(
+    "research/receipts/"
+    "2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json"
+)
+V12_WORKFLOW = Path(
+    ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
+)
 STRATEGY_EDGE_CONFIG = Path("config/strategy_edge_validation_v0_1.json")
 STRATEGY_EDGE_RECEIPT = Path(
     "research/receipts/2026-08-28-strategy-edge-validation-v0-1-prepared.json"
@@ -72,6 +82,11 @@ EXPECTED_EMERGENCY_REGISTRATION_CRONS = (
     '    - cron: "17,47 * 27,28,29,30,31 8 *"',
     '    - cron: "17,47 * 1,2,3 9 *"',
     '    - cron: "17,47 0,1 4 9 *"',
+)
+EXPECTED_V12_CRONS = (
+    '    - cron: "17,47 2-23 4 9 *"',
+    '    - cron: "17,47 * 5,6,7,8,9,10,11 9 *"',
+    '    - cron: "17,47 0-3 12 9 *"',
 )
 
 
@@ -222,6 +237,8 @@ def validate_render_lineage() -> dict[str, object]:
     v10_authority = load(V10_AUTHORITY)
     emergency = load(V10_EMERGENCY_SCHEDULE_AUTHORITY)
     emergency_effective = load(V10_EMERGENCY_SCHEDULE_EFFECTIVE)
+    v12 = load(V12_CONFIG)
+    v12_authority = load(V12_AUTHORITY)
 
     if v05.get("status") != "PASS" or v05.get("stage") != (
         "PROVIDER_EQUIVALENCE_V0_5_RENDER_FREE_BINANCE_TRANSPORT_PASS"
@@ -391,10 +408,13 @@ def validate_render_lineage() -> dict[str, object]:
 
     old_lines = OLD_V02_WORKFLOW.read_text(encoding="utf-8").splitlines()
     new_lines = V10_WORKFLOW.read_text(encoding="utf-8").splitlines()
+    v12_lines = V12_WORKFLOW.read_text(encoding="utf-8").splitlines()
     if any(line == "  schedule:" for line in old_lines):
         raise RuntimeError("V0.2 workflow still has a schedule trigger")
-    if not any(line == "  schedule:" for line in new_lines):
-        raise RuntimeError("V0.10 workflow has no schedule trigger")
+    if any(line == "  schedule:" for line in new_lines):
+        raise RuntimeError("V0.10 schedule was not retired")
+    if not any(line == "  schedule:" for line in v12_lines):
+        raise RuntimeError("V0.12 successor workflow has no schedule trigger")
     if emergency.get("status") != (
         "AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE"
     ):
@@ -424,8 +444,8 @@ def validate_render_lineage() -> dict[str, object]:
         cron.split('"', 2)[1] for cron in EXPECTED_EMERGENCY_REGISTRATION_CRONS
     ]:
         raise RuntimeError("V0.10 emergency cron registration scope changed")
-    if not set(EXPECTED_EMERGENCY_REGISTRATION_CRONS).issubset(set(new_lines)):
-        raise RuntimeError("V0.10 emergency schedule registration changed")
+    if set(EXPECTED_EMERGENCY_REGISTRATION_CRONS).intersection(set(new_lines)):
+        raise RuntimeError("retired V0.10 cron registration remains active")
     if any(value is not False for value in emergency_boundary.values()):
         raise RuntimeError("V0.10 emergency schedule expanded downstream authority")
     if emergency.get("render_boundary", {}).get("transport_affected") is not False:
@@ -461,6 +481,51 @@ def validate_render_lineage() -> dict[str, object]:
     if any(value is not False for value in effective_boundary.values()):
         raise RuntimeError("V0.10 post-merge receipt expanded downstream authority")
 
+    if v12.get("status") != (
+        "AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE"
+    ):
+        raise RuntimeError("V0.12 successor authority status changed")
+    if v12_authority.get("status") != "PASS" or v12_authority.get("stage") != (
+        "PROVIDER_EQUIVALENCE_V0_12_SUCCESSOR_METADATA_WINDOW_AUTHORIZED_ON_MAIN_MERGE"
+    ):
+        raise RuntimeError("V0.12 successor receipt is not PASS")
+    v12_observation = require_dict(
+        v12_authority.get("observed_v0_10_failure") or {},
+        "V0.12 observed V0.10 failure",
+    )
+    if v12_observation.get("latest_additional_run_id_at_design_time") != 33366572161:
+        raise RuntimeError("V0.12 latest observed V0.10 run changed")
+    if v12_observation.get("latest_additional_run_number") != 41:
+        raise RuntimeError("V0.12 latest observed V0.10 run number changed")
+    if v12_observation.get("failure_before_r2_store_factory") is not True:
+        raise RuntimeError("V0.12 V0.10 fail-closed ordering changed")
+    transition = require_dict(
+        v12.get("atomic_schedule_transition") or {}, "V0.12 schedule transition"
+    )
+    if transition.get("successor_cron_utc") != [
+        cron.split('"', 2)[1] for cron in EXPECTED_V12_CRONS
+    ]:
+        raise RuntimeError("V0.12 successor cron authority changed")
+    if not set(EXPECTED_V12_CRONS).issubset(set(v12_lines)):
+        raise RuntimeError("V0.12 successor cron registration changed")
+    if transition.get("scheduled_attempt_count") != 388:
+        raise RuntimeError("V0.12 successor attempt count changed")
+    if transition.get("hourly_slot_count") != 194:
+        raise RuntimeError("V0.12 successor slot count changed")
+    if transition.get(
+        "concurrent_v0_10_and_v0_12_capture_paths_authorized"
+    ) is not False:
+        raise RuntimeError("concurrent V0.10/V0.12 capture paths are forbidden")
+    v12_boundary = require_dict(
+        v12.get("authorization_boundary") or {}, "V0.12 authorization boundary"
+    )
+    for key, value in v12_boundary.items():
+        if key.startswith("v0_12_metadata"):
+            if value is not True:
+                raise RuntimeError(f"V0.12 metadata authority missing: {key}")
+        elif value is not False:
+            raise RuntimeError(f"V0.12 downstream boundary changed: {key}")
+
     return {
         "v05": v05,
         "v06": v06,
@@ -472,6 +537,8 @@ def validate_render_lineage() -> dict[str, object]:
         "v10_authority": v10_authority,
         "v10_emergency_schedule_authority": emergency,
         "v10_emergency_schedule_effective": emergency_effective,
+        "v12": v12,
+        "v12_authority": v12_authority,
     }
 
 
@@ -647,8 +714,13 @@ def main() -> int:
     postwrite = require_dict(materialization.get("postwrite_results") or {}, "funding postwrite")
     inventory = require_dict(usage.get("inventory") or {}, "R2 inventory")
     eq_aggregate = require_dict(equivalence.get("aggregate") or {}, "equivalence aggregate")
-    v10 = require_dict(lineage["v10"], "V0.10 config")
-    v10_scope = require_dict(v10.get("scientific_scope") or {}, "V0.10 scope")
+    require_dict(lineage["v10"], "V0.10 config")
+    v12 = require_dict(lineage["v12"], "V0.12 config")
+    v12_authority = require_dict(lineage["v12_authority"], "V0.12 authority")
+    v12_observation = require_dict(
+        v12_authority["observed_v0_10_failure"], "V0.12 observed V0.10 failure"
+    )
+    v12_window = require_dict(v12.get("successor_window") or {}, "V0.12 window")
 
     project = require_dict(dashboard.get("project") or {}, "dashboard project")
     if project.get("mode") != "PAPER-ONLY":
@@ -681,35 +753,39 @@ def main() -> int:
             "renderMetadataV0_8SharedSecretState": "PASS_FROZEN",
             "renderMetadataV0_9SmokeState": "PASS_FROZEN",
             "renderMetadataV0_10CutoverState": "EFFECTIVE_AUTHORIZED",
-            "v0_10EmergencyScheduleRegistrationState": "EFFECTIVE",
+            "v0_10EmergencyScheduleRegistrationState": "HISTORICAL_EFFECTIVE",
             "v0_10EmergencyScheduleRegistrationMergeSha": (
                 "cf83b6320bc0f0817d8e6ae15d88fe304b933330"
             ),
             "v0_10PerpQueryMergeSha": "a34cf471876971a97200de4974906743642ed61f",
-            "v0_10CaptureOperationalState": "FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH",
+            "v0_10CaptureOperationalState": (
+                "RETIRED_AFTER_FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH"
+            ),
             "v0_10CaptureObservedFailedRunCount": len(
                 incident["observed_scheduled_runs"]
-            ),
+            ) + 1,
             "v0_10CaptureLatestObservedRunId": int(
-                require_dict(incident["latest_failure"], "V0.10 latest failure")[
-                    "run_id"
-                ]
+                v12_observation["latest_additional_run_id_at_design_time"]
             ),
             "metadataStabilityState": "NOT_YET_RUN",
-            "metadataStabilityEligibilityState": (
-                "KNOWN_BLOCKED_BY_MISSING_VALID_SLOTS"
-            ),
+            "metadataStabilityEligibilityState": "V0_10_BLOCKED_V0_12_NOT_YET_RUN",
             "replacementHoldoutState": "FROZEN_UNOPENED",
-            "currentMetadataCaptureExecutionPath": "github_hosted_ubuntu_v0_10",
+            "currentMetadataCaptureExecutionPath": "github_hosted_ubuntu_v0_12",
             "currentMetadataCaptureBinanceTransport": "render_free_frankfurt_v0_10_relay",
             "oldV0_2ScheduledExecutionAuthorized": False,
+            "v0_10ScheduledExecutionAuthorized": False,
+            "v0_12SuccessorWindowState": "AUTHORIZED_ON_MAIN_MERGE",
             "successorMetadataCaptureExecutionAuthorized": True,
             "successorMetadataScheduleEnabled": True,
             "metadataCapturePathsConcurrentAuthorized": False,
-            "metadataCaptureStartUtc": str(v10_scope["metadata_capture_start_utc"]),
-            "metadataCaptureEndUtc": str(v10_scope["metadata_capture_end_utc"]),
-            "metadataCaptureHourlySlotCount": int(v10_scope["hourly_slot_count"]),
-            "metadataCaptureScheduledMinutesUtc": list(v10_scope["scheduled_minutes_utc"]),
+            "metadataCaptureStartUtc": str(v12_window["start_utc"]),
+            "metadataCaptureEndUtc": str(v12_window["end_utc"]),
+            "metadataCaptureHourlySlotCount": int(
+                v12_window["expected_hourly_slot_count"]
+            ),
+            "metadataCaptureScheduledMinutesUtc": list(
+                v12_window["scheduled_minutes_utc"]
+            ),
             "cloudRuntimeMonthlyBudgetUsd": 0,
             "strategyResearchLoopState": "PREPARED_RESEARCH_ONLY",
             "strategyResearchCandidateCount": strategy_research["candidate_count"],
@@ -724,11 +800,11 @@ def main() -> int:
         }
     )
     dashboard["project"] = project
-    dashboard["schema"] = "qookey-dashboard-authority-snapshot-v0.10"
+    dashboard["schema"] = "qookey-dashboard-authority-snapshot-v0.12"
     dashboard["snapshotLabel"] = (
         "Repository 正式 Authority 狀態快照 · Equivalence V0.1 FAIL / "
-        "Funding V0.2 R2 PASS / V0.10 Metadata Cutover EFFECTIVE / "
-        "Scheduled Capture FAIL-CLOSED / Strategy Research Loop PREPARED"
+        "Funding V0.2 R2 PASS / V0.10 Schedule RETIRED / "
+        "V0.12 Successor AUTHORIZED / Strategy Research Loop PREPARED"
     )
 
     source_authorities = dashboard.get("sourceAuthorities") or []
@@ -747,12 +823,15 @@ def main() -> int:
         V10_EMERGENCY_SCHEDULE_AUTHORITY,
         V10_EMERGENCY_SCHEDULE_EFFECTIVE,
         V10_POST_PERP_SCHEMA_OBSERVATION,
+        V12_CONFIG,
+        V12_AUTHORITY,
         STRATEGY_EDGE_CONFIG,
         STRATEGY_EDGE_RECEIPT,
         STRATEGY_RESEARCH_CONFIG,
         STRATEGY_RESEARCH_RECEIPT,
         OLD_V02_WORKFLOW,
         V10_WORKFLOW,
+        V12_WORKFLOW,
     ):
         text = str(path)
         if text not in source_authorities:
@@ -772,7 +851,7 @@ def main() -> int:
     replace_pipeline_item(
         pipeline,
         "R2 實際使用容量",
-        "最新 frozen read-only inventory：457 objects / 22.120404 MB；V0.10 每次 metadata write 前仍需 fresh whole-bucket headroom check。",
+        "最新 frozen read-only inventory：457 objects / 22.120404 MB；V0.12 每次 metadata write 前仍需 fresh whole-bucket headroom check。",
         "PASS",
     )
     replace_pipeline_item(
@@ -808,26 +887,32 @@ def main() -> int:
     replace_pipeline_item(
         pipeline,
         "V0.10 Metadata Atomic Cutover",
-        "PR #127 已合併；V0.2 self-hosted schedule 已退役，V0.10 GitHub-hosted schedule 已成為 current metadata execution path。",
-        "AUTHORIZED",
+        "PR #127 的 atomic cutover 及後續失敗證據完整保留；V0.10 排程已由 V0.12 successor authority 退役。",
+        "HISTORICAL",
     )
     replace_pipeline_item(
         pipeline,
         "V0.10 Schedule Re-registration",
-        "PR #201 已合併至 protected main；等價的 :17/:47 schedule registration text 已生效。排程註冊本身有效，但不代表 capture 成功。",
-        "EFFECTIVE",
+        "PR #201 的等價 schedule registration 保留為歷史證據；目前 V0.10 workflow 已無 schedule trigger。",
+        "HISTORICAL",
     )
     replace_pipeline_item(
         pipeline,
         "V0.10 Scheduled Capture",
-        "PR #210 的 type=PERP 已生效；其後觀察到的 runs #36–#40 均在 Pionex status/contractType 契約檢查 fail closed，且在 R2 client 建立前停止。",
-        "FAIL_CLOSED",
+        "PR #210 後的失敗紀錄保留；V0.10 已停止剩餘排程，沒有回補、重跑或重新評級。",
+        "RETIRED",
+    )
+    replace_pipeline_item(
+        pipeline,
+        "V0.12 Successor Metadata Window",
+        "2026-09-04 02:00Z 至 09-12 03:59:59.999Z 的獨立 194-slot metadata-only window；新 R2 namespace，仍需每次 fresh 8 GB headroom gate。",
+        "AUTHORIZED",
     )
     replace_pipeline_item(
         pipeline,
         "Metadata Stability 194 Slots",
-        "V0.11 正式評估仍為 NOT_YET_RUN；既有缺漏／失敗 slot 不得回補，因此目前 frozen window 已無法形成完整 194-slot PASS 證據。",
-        "BLOCKED",
+        "V0.10 因缺漏無法 PASS；V0.12 尚未開始。Production R2 stability evaluation 仍需未來獨立 authority。",
+        "NOT_YET_RUN",
     )
     replace_pipeline_item(
         pipeline,
@@ -850,7 +935,7 @@ def main() -> int:
     upsert_gate(
         gates,
         "R2 儲存預算",
-        "最新 frozen inventory 22.120404 MB / 457 objects；每次 V0.10 metadata write 前須 fresh whole-bucket inventory，8 GB hard stop fail closed。",
+        "最新 frozen inventory 22.120404 MB / 457 objects；每次 V0.12 metadata write 前須 fresh whole-bucket inventory，8 GB hard stop fail closed。",
         "PASS",
         "pass",
         False,
@@ -874,7 +959,7 @@ def main() -> int:
     upsert_gate(
         gates,
         "Render Metadata Cutover",
-        "V0.10 atomic cutover 已生效：V0.2 schedule retired、V0.10 schedule authorized；concurrent capture path 仍禁止。",
+        "V0.10 與 V0.2 均無 schedule；V0.12 是唯一 current metadata schedule，concurrent capture path 仍禁止。",
         "AUTHORIZED",
         "pass",
         False,
@@ -882,25 +967,33 @@ def main() -> int:
     upsert_gate(
         gates,
         "V0.10 Metadata Cutover",
-        "Atomic old/new cutover 已生效；V0.10 只授權 frozen-window metadata capture 與 metadata-only R2 writes。",
+        "V0.10 frozen authority 與失敗證據保留，但剩餘排程已停止且不得手動回補。",
+        "HISTORICAL",
+        "pending",
+        False,
+    )
+    upsert_gate(
+        gates,
+        "V0.10 Scheduled Capture",
+        "必要欄位契約失配的失敗紀錄保留；workflow schedule 已退役，沒有回補或重新評級。",
+        "RETIRED",
+        "pending",
+        False,
+    )
+    upsert_gate(
+        gates,
+        "V0.12 Metadata Capture",
+        "Successor window 已經 versioned authority 核准於 main merge 後執行；仍維持 metadata-only、FREE-ONLY 與 fail-closed。",
         "AUTHORIZED",
         "pass",
         False,
     )
     upsert_gate(
         gates,
-        "V0.10 Scheduled Capture",
-        "Runs #36–#40 在 Pionex 必要欄位契約失配處 fail closed；未建立 R2 client、未讀寫 R2、未開啟 holdout。",
-        "FAIL_CLOSED",
-        "danger",
-        True,
-    )
-    upsert_gate(
-        gates,
         "Metadata Stability",
-        "正式 V0.11 評估尚未執行；觀察到的必要 slot 缺漏已阻止目前 window 形成完整 194-slot PASS。",
-        "BLOCKED",
-        "danger",
+        "V0.10 已 blocked；V0.12 尚未形成 evidence，正式 production evaluation 仍未授權。",
+        "NOT_YET_RUN",
+        "pending",
         True,
     )
     upsert_gate(
@@ -953,11 +1046,12 @@ def main() -> int:
         json.dumps(
             {
                 "status": "PASS",
-                "stage": "DASHBOARD_LATEST_AUTHORITY_OVERLAY_V0_10_PASS",
+                "stage": "DASHBOARD_LATEST_AUTHORITY_OVERLAY_V0_12_PASS",
                 "funding_materialization_state": project["fundingMaterializationState"],
                 "equivalence_gate_state": project["providerEquivalenceGateState"],
                 "render_v0_9": project["renderMetadataV0_9SmokeState"],
                 "render_v0_10": project["renderMetadataV0_10CutoverState"],
+                "v0_12_successor": project["v0_12SuccessorWindowState"],
                 "v0_10_schedule_registration": project[
                     "v0_10EmergencyScheduleRegistrationState"
                 ],

@@ -12,6 +12,8 @@ on:
       - ".github/workflows/validate-v0-9-render-relay-smoke.yml"
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+      - ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
+      - "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json"
       - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
 
 permissions:
@@ -37,7 +39,7 @@ jobs:
             tests/test_render_relay_smoke_pass_v0_9.py \
             tests/test_render_shared_secret_preflight_v0_8.py \
             tests/test_render_metadata_capture_protocol_v0_7.py
-      - name: Assert V0.9 evidence stays frozen while schedule ownership may transition to V0.10
+      - name: Assert V0.9 evidence stays frozen while V0.12 owns current schedule
         shell: bash
         run: |
           set -euo pipefail
@@ -50,6 +52,7 @@ jobs:
           v08_workflow = Path('.github/workflows/provider-equivalence-v0-8-render-metadata-capture.yml').read_text().splitlines()
           old = Path('.github/workflows/provider-equivalence-v0-2-metadata-capture.yml').read_text().splitlines()
           new = Path('.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml').read_text().splitlines()
+          current = Path('.github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml').read_text().splitlines()
           smoke = json.loads(Path('research/receipts/2026-08-20-provider-equivalence-v0-9-render-relay-smoke-pass.json').read_text())
           cutover = json.loads(Path('config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json').read_text())
 
@@ -64,7 +67,8 @@ jobs:
           assert 'SUCCESSOR_RUNTIME_EXECUTION_AUTHORIZED = False' in successor
           assert not any(line == '  schedule:' for line in v08_workflow)
           assert not any(line == '  schedule:' for line in old)
-          assert any(line == '  schedule:' for line in new)
+          assert not any(line == '  schedule:' for line in new)
+          assert any(line == '  schedule:' for line in current)
           assert cutover['atomic_repository_cutover']['old_schedule_removed_in_same_change'] is True
           assert cutover['atomic_repository_cutover']['successor_schedule_enabled_in_same_change'] is True
           assert cutover['atomic_repository_cutover']['concurrent_old_and_new_capture_paths_authorized'] is False

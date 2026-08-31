@@ -38,12 +38,14 @@ loop. A `REJECT` result is retained as evidence and cannot replace a model.
 - These paths are separate. They do not yet share an automatic rolling dataset,
   experiment registry and recurrent Challenger decision loop.
 
-### 2. Frozen metadata window — 2026-08-27 08:00 through 2026-09-04 09:59:59.999 Asia/Taipei
+### 2. Metadata evidence transition — V0.10 retired; V0.12 successor window prepared
 
-- V0.10 metadata capture is the only current production metadata-capture path.
+- V0.10 is incomplete historical evidence and no longer has a schedule.
+- V0.12 is the only current production metadata-capture schedule after its exact protected-main merge, bounded to `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z`.
+- V0.10 failures are not replayed, backfilled or regraded into V0.12.
 - No new learning or holdout-candle authority is implied.
 - Replacement holdout candles remain `FROZEN_UNOPENED`.
-- V0.11 production evaluation still requires a separate post-window authority.
+- Production V0.12 receipt evaluation still requires a separate post-window authority.
 
 ### 3. Detailed-history start — first eligible run 2026-09-04 14:23 Asia/Taipei
 

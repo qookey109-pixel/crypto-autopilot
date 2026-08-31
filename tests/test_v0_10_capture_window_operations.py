@@ -8,6 +8,9 @@ ROOT = Path(__file__).resolve().parents[1]
 OPERATIONS = ROOT / "config/v0_10_capture_window_operations_v0_1.json"
 RUNBOOK = ROOT / "docs/V0_10_CAPTURE_WINDOW_OPERATIONS_RUNBOOK.md"
 CAPTURE_WORKFLOW = ROOT / ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+SUCCESSOR_WORKFLOW = (
+    ROOT / ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
+)
 OBSERVER_WORKFLOW = ROOT / ".github/workflows/observe-v0-10-scheduled-capture.yml"
 POST_WINDOW = ROOT / "config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json"
 OPERATIONAL_STATUS = ROOT / "web/data/operational-status.json"
@@ -19,7 +22,7 @@ def _load(path: Path) -> dict[str, object]:
     return payload
 
 
-def test_capture_window_operations_timing_matches_frozen_v0_10_schedule() -> None:
+def test_capture_window_operations_preserve_frozen_v0_10_history_after_retirement() -> None:
     cfg = _load(OPERATIONS)
     window = cfg["frozen_window"]
     assert isinstance(window, dict)
@@ -33,12 +36,15 @@ def test_capture_window_operations_timing_matches_frozen_v0_10_schedule() -> Non
     assert window["last_scheduled_attempt_utc"] == "2026-09-04T01:47:00Z"
 
     workflow = CAPTURE_WORKFLOW.read_text(encoding="utf-8")
+    assert not any(line == "  schedule:" for line in workflow.splitlines())
+    successor = SUCCESSOR_WORKFLOW.read_text(encoding="utf-8")
+    assert any(line == "  schedule:" for line in successor.splitlines())
     for cron in (
         'cron: "17,47 * 27,28,29,30,31 8 *"',
         'cron: "17,47 * 1,2,3 9 *"',
         'cron: "17,47 0,1 4 9 *"',
     ):
-        assert cron in workflow
+        assert cron not in workflow
 
 
 def test_operations_policy_forbids_manual_and_retroactive_backfill() -> None:

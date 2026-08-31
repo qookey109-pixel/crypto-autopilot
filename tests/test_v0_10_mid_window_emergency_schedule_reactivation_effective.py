@@ -19,6 +19,9 @@ EFFECTIVE_RECEIPT = (
     / "research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-effective.json"
 )
 WORKFLOW = ROOT / ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+SUCCESSOR_WORKFLOW = (
+    ROOT / ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
+)
 STATUS = ROOT / "PROJECT_STATUS.md"
 
 
@@ -65,14 +68,29 @@ def test_pre_merge_evidence_remains_immutable_and_non_effective_at_creation() ->
     assert receipt["effectivity"]["authority_effective_at_receipt_creation"] is False
 
 
-def test_effective_registration_matches_reviewed_crons_without_authority_expansion() -> None:
+def test_effective_registration_receipt_remains_historical_after_v012_retirement() -> None:
     receipt = _load(EFFECTIVE_RECEIPT)
     active_crons = re.findall(
         r'^\s+- cron: "([^"]+)"$',
         WORKFLOW.read_text(encoding="utf-8"),
         flags=re.MULTILINE,
     )
-    assert active_crons == receipt["validated_change"]["effective_registration_crons"]
+    assert active_crons == []
+    assert receipt["validated_change"]["effective_registration_crons"] == [
+        "17,47 * 27,28,29,30,31 8 *",
+        "17,47 * 1,2,3 9 *",
+        "17,47 0,1 4 9 *",
+    ]
+    successor_crons = re.findall(
+        r'^\s+- cron: "([^"]+)"$',
+        SUCCESSOR_WORKFLOW.read_text(encoding="utf-8"),
+        flags=re.MULTILINE,
+    )
+    assert successor_crons == [
+        "17,47 2-23 4 9 *",
+        "17,47 * 5,6,7,8,9,10,11 9 *",
+        "17,47 0-3 12 9 *",
+    ]
     assert receipt["validated_change"]["semantic_attempt_set_equal"] is True
     assert receipt["validated_change"]["frozen_attempt_count"] == 388
     assert receipt["validated_change"]["frozen_hourly_slot_count"] == 194
@@ -86,9 +104,9 @@ def test_effective_registration_matches_reviewed_crons_without_authority_expansi
 
 def test_status_and_dashboard_project_effective_post_merge_lineage() -> None:
     status = STATUS.read_text(encoding="utf-8")
-    assert "V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION EFFECTIVE" in status
+    assert "V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION HISTORICAL EFFECTIVE" in status
     assert "PR #201 DRAFT / NOT EFFECTIVE" not in status
-    assert "V0.10 PIONEX PERP QUERY EFFECTIVE ON MAIN" in status
+    assert "V0.10 PIONEX PERP QUERY EFFECTIVE" in status
     assert "PROPOSED IN PR #210 / NOT EFFECTIVE" not in status
 
     lineage = dashboard_authority.validate_render_lineage()
@@ -127,7 +145,7 @@ def test_dashboard_overlay_emits_effective_registration_state(
     assert dashboard_authority.main() == 0
     dashboard = _load(output)
     project = dashboard["project"]
-    assert project["v0_10EmergencyScheduleRegistrationState"] == "EFFECTIVE"
+    assert project["v0_10EmergencyScheduleRegistrationState"] == "HISTORICAL_EFFECTIVE"
     assert project["v0_10EmergencyScheduleRegistrationMergeSha"] == (
         "cf83b6320bc0f0817d8e6ae15d88fe304b933330"
     )
@@ -135,32 +153,32 @@ def test_dashboard_overlay_emits_effective_registration_state(
         "a34cf471876971a97200de4974906743642ed61f"
     )
     assert project["v0_10CaptureOperationalState"] == (
-        "FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH"
+        "RETIRED_AFTER_FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH"
     )
-    assert project["v0_10CaptureObservedFailedRunCount"] == 5
-    assert project["v0_10CaptureLatestObservedRunId"] == 33345766954
+    assert project["v0_10CaptureObservedFailedRunCount"] == 6
+    assert project["v0_10CaptureLatestObservedRunId"] == 33366572161
     assert project["metadataStabilityState"] == "NOT_YET_RUN"
     assert project["metadataStabilityEligibilityState"] == (
-        "KNOWN_BLOCKED_BY_MISSING_VALID_SLOTS"
+        "V0_10_BLOCKED_V0_12_NOT_YET_RUN"
     )
     assert any(
         item["name"] == "V0.10 Schedule Re-registration"
-        and item["status"] == "EFFECTIVE"
+        and item["status"] == "HISTORICAL"
         for item in dashboard["pipeline"]
     )
     assert any(
         item["name"] == "V0.10 Scheduled Capture"
-        and item["status"] == "FAIL_CLOSED"
+        and item["status"] == "RETIRED"
         for item in dashboard["pipeline"]
     )
     assert any(
-        item["name"] == "Metadata Stability 194 Slots"
-        and item["status"] == "BLOCKED"
+        item["name"] == "V0.12 Successor Metadata Window"
+        and item["status"] == "AUTHORIZED"
         for item in dashboard["pipeline"]
     )
     assert any(
-        item["name"] == "V0.10 Scheduled Capture"
-        and item["status"] == "FAIL_CLOSED"
-        and item["critical"] is True
+        item["name"] == "V0.12 Metadata Capture"
+        and item["status"] == "AUTHORIZED"
+        and item["critical"] is False
         for item in dashboard["gates"]
     )

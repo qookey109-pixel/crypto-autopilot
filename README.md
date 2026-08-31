@@ -31,13 +31,20 @@ The repository has moved beyond the original V0.1 implementation baseline while 
 - V0.8 shared relay secret handshake: **PASS**; V0.8 prepared cutover contract and hard-disabled scaffold remain historical preparation authorities.
 - V0.9 authenticated Render relay smoke: **PASS** — HTTP 200 / valid JSON / `symbol_count=872` / zero R2 writes / zero holdout access.
 - V0.10 final atomic metadata-capture cutover: **EFFECTIVE / AUTHORIZED** after merged PR #127 at `8fce944da479dbda0e2899f9b30b9de62351fa27`.
-- PR #210's exact Pionex `type=PERP` query is **EFFECTIVE** on `main` at
+- PR #210's exact Pionex `type=PERP` query remains **EFFECTIVE HISTORICAL
+  LINEAGE** on `main` at
   `a34cf471876971a97200de4974906743642ed61f`, but observed scheduled runs #36
   through #40 now fail closed because the returned perpetual symbol record does
   not preserve the frozen required `status` / `contractType` contract. The
   failure occurs before R2 client construction; no R2 or holdout access occurs.
 - V0.2 self-hosted scheduled metadata capture is now **RETIRED AS EXECUTION PATH**; its receipts remain immutable historical evidence.
-- V0.10 GitHub-hosted Ubuntu scheduled metadata capture is the current authorized metadata-capture execution path.
+- V0.10 GitHub-hosted schedule is **RETIRED ON THE EXACT V0.12 MAIN MERGE**;
+  its failures and missing slots remain immutable evidence and cannot be
+  replayed, backfilled or regraded.
+- V0.12 successor metadata window is **AUTHORIZED ON THE EXACT REVIEWED MAIN
+  MERGE**. It is the only scheduled metadata-capture path, covering
+  `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z` with 194 hourly
+  slots and an independent R2 namespace.
 - V0.11 metadata-stability evaluator: **PREPARED / PRODUCTION R2 EVALUATION NOT AUTHORIZED**. Its deterministic 194-slot rules were frozen before production stability evidence is read.
 - Replacement holdout `2026-08-28` through `2026-09-03`: **FROZEN_UNOPENED**; candle access and evaluation remain unauthorized.
 - Metadata stability evaluation: **NOT_YET_RUN**. Because failed or missing
@@ -46,7 +53,12 @@ The repository has moved beyond the original V0.1 implementation baseline while 
   required before suspending the remaining attempts or preparing a successor
   window.
 
-The V0.10 cutover authorizes only the frozen public-provider metadata capture phase and metadata-only R2 writes inside the exact window. V0.11 currently authorizes only evaluator preparation and synthetic validation. Neither stage authorizes replacement holdout candles, source switching, Historical Universe membership, W1 materialization, backtest admission, strategy changes, trade plans, real-money orders, or live trading.
+The retired V0.10 authority remains historical evidence. V0.12 authorizes only
+the successor public-provider metadata capture phase and metadata-only R2 writes
+inside its exact window. Production stability evaluation is not authorized.
+Neither stage authorizes replacement holdout candles, source switching,
+Historical Universe membership, W1 materialization, backtest admission,
+strategy changes, trade plans, real-money orders, or live trading.
 
 The separate **Pionex Public Paper Training V0.1** path was authorized for bounded
 public-market reads, fixed-rule candidate generation, deterministic Repository
@@ -273,7 +285,7 @@ dependency rules and the complete exception list.
 
 Current zero-cost infrastructure split:
 
-- GitHub: source, CI, versioned authority, V0.10 scheduled metadata orchestration, validation jobs and R2 credentials;
+- GitHub: source, CI, versioned authority, the V0.12 successor metadata schedule, validation jobs and R2 credentials; V0.10 is retained as historical fail-closed evidence only;
 - Render Free / Frankfurt: authenticated Binance public-metadata transport leg only;
 - Cloudflare R2 Standard Free: immutable historical/provider metadata storage under explicit metadata-only write authority;
 - GitHub Pages / static assets: read-only Traditional Chinese dashboard;
