@@ -48,7 +48,7 @@ def test_checked_in_calendar_is_derived_from_versioned_sources() -> None:
         item for item in checked_in["items"] if item["id"] == "detailed-history-backfill"
     )
     current = checked_in["items"][0]
-    assert current["id"] == "v0-10-metadata-window"
+    assert current["id"] == "v0-12-successor-metadata-window"
     assert current["status"] == "AUTHORIZED"
     strategy_loop = next(
         item for item in checked_in["items"] if item["id"] == "strategy-research-loop-v0-1"

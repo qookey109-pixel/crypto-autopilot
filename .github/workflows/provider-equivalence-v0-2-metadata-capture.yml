@@ -6,6 +6,8 @@ on:
     paths:
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+      - ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
+      - "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json"
       - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
       - "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
       - "config/provider_equivalence_v0_2_metadata_capture_v0_2.json"
@@ -34,17 +36,20 @@ jobs:
           from pathlib import Path
 
           old_workflow = Path('.github/workflows/provider-equivalence-v0-2-metadata-capture.yml').read_text().splitlines()
-          successor_workflow = Path('.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml').read_text().splitlines()
+          v010_workflow = Path('.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml').read_text().splitlines()
+          successor_workflow = Path('.github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml').read_text().splitlines()
           protocol = json.loads(Path('config/provider_equivalence_v0_2_metadata_capture_v0_2.json').read_text())
           old_authority = json.loads(Path('research/receipts/2026-08-19-provider-equivalence-v0-2-forward-metadata-capture-authority-v0-2.json').read_text())
           cutover = json.loads(Path('config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json').read_text())
           authority = json.loads(Path('research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json').read_text())
+          successor = json.loads(Path('config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json').read_text())
 
           assert not any(line == '  schedule:' for line in old_workflow)
           assert not any(
               line.strip().startswith('runs' + '-on:') and ('self' + '-hosted') in line
               for line in old_workflow
           )
+          assert not any(line == '  schedule:' for line in v010_workflow)
           assert any(line == '  schedule:' for line in successor_workflow)
           assert protocol['metadata_capture_window']['hourly_slot_count'] == 194
           assert old_authority['stage'] == 'PROVIDER_EQUIVALENCE_V0_2_FORWARD_METADATA_CAPTURE_AUTHORIZED_HOLDOUT_CANDLES_FORBIDDEN'
@@ -54,6 +59,8 @@ jobs:
           assert cutover['atomic_repository_cutover']['concurrent_old_and_new_capture_paths_authorized'] is False
           assert authority['post_merge_authorization']['old_v0_2_scheduled_execution_authorized'] is False
           assert authority['effectivity']['requires_human_review_before_merge'] is True
+          assert successor['authorization_boundary']['v0_10_scheduled_execution_authorized_after_main_merge'] is False
+          assert successor['authorization_boundary']['v0_12_metadata_capture_execution_authorized_on_main_merge'] is True
           PY
 
       - name: Record harmless retired-path state

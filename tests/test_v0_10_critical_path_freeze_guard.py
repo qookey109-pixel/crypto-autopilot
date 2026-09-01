@@ -56,7 +56,7 @@ def test_v0_10_critical_path_guard_is_read_only_and_not_scheduled() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     assert "name: V0.10 Critical Path Freeze Guard" in text
     assert "workflow_dispatch:" not in text
-    assert "schedule:" not in text
+    assert not any(line == "  schedule:" for line in text.splitlines())
     assert "permissions:\n  contents: read" in text
     assert "secrets." not in text
     assert "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803" in text
@@ -66,6 +66,8 @@ def test_v0_10_critical_path_guard_is_read_only_and_not_scheduled() -> None:
     assert "V0_10_CRITICAL_PATH_FREEZE_GUARD_PASS" in text
     assert "V0_10_AUTHORIZED_EMERGENCY_SCHEDULE_REREGISTRATION_REVIEW_PASS" in text
     assert "V0_10_AUTHORIZED_EMERGENCY_PIONEX_PERP_QUERY_REVIEW_PASS" in text
+    assert "V0_10_RETIRED_V0_12_SUCCESSOR_AUTHORITY_REVIEW_PASS" in text
+    assert "provider_equivalence_v0_12_successor_metadata_window_v0_1.json" in text
     assert "v0_10_mid_window_emergency_schedule_reactivation_v0_1.json" in text
     assert "v0_10_mid_window_emergency_pionex_perp_query_v0_1.json" in text
     assert "protected_main_pr_number" in text
@@ -83,3 +85,6 @@ def test_v0_10_critical_path_guard_is_read_only_and_not_scheduled() -> None:
     assert "holdout_accessed': False" in text
     assert "source_switch_authorized': False" in text
     assert "live_trading_authorized': False" in text
+    assert "V0.10 schedule was not retired" in text
+    assert "V0.2 schedule was reactivated" in text
+    assert "prior_v0_10_failures_regraded': False" in text

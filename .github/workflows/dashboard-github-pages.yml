@@ -15,6 +15,9 @@ on:
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
       - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
       - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
+      - "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json"
+      - "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json"
+      - "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json"
       - "config/binance_usdm_detailed_history_v0_1_2.json"
       - "config/pionex_alternative_assets_v0_1.json"
       - "config/pionex_alternative_assets_observability_v0_2.json"
@@ -29,6 +32,7 @@ on:
       - "docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md"
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+      - ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
       - "PROJECT_STATUS.md"
       - "config/strategy_v0_1.json"
       - ".github/workflows/dashboard-github-pages.yml"
@@ -45,6 +49,9 @@ on:
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
       - "config/provider_equivalence_v0_8_render_metadata_execution_cutover_v0_1.json"
       - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
+      - "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json"
+      - "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json"
+      - "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json"
       - "config/binance_usdm_detailed_history_v0_1_2.json"
       - "config/pionex_alternative_assets_v0_1.json"
       - "config/pionex_alternative_assets_observability_v0_2.json"
@@ -59,6 +66,7 @@ on:
       - "docs/HISTORICAL_SSTATE_EVIDENCE_INGESTION_V0_1.md"
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+      - ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
       - "PROJECT_STATUS.md"
       - "config/strategy_v0_1.json"
       - ".github/workflows/dashboard-github-pages.yml"
@@ -106,7 +114,7 @@ jobs:
             --output _site/data/dashboard.json
           touch _site/.nojekyll
 
-      - name: Assert latest V0.10 authority and PAPER-ONLY boundary
+      - name: Assert latest V0.12 authority and PAPER-ONLY boundary
         shell: bash
         run: |
           set -euo pipefail
@@ -122,7 +130,7 @@ jobs:
           project = data['project']
           assert data['authority'] is False
           assert data['locale'] == 'zh-Hant-TW'
-          assert data['schema'] == 'qookey-dashboard-authority-snapshot-v0.10'
+          assert data['schema'] == 'qookey-dashboard-authority-snapshot-v0.12'
           assert project['fundingMaterializationComplete'] is True
           assert project['fundingMaterializationState'] == 'PASS'
           assert project['fundingV0_2R2Identities'] == 192
@@ -141,17 +149,19 @@ jobs:
           assert project['renderMetadataV0_9SmokeState'] == 'PASS_FROZEN'
           assert project['renderMetadataV0_10CutoverState'] == 'EFFECTIVE_AUTHORIZED'
           assert project['v0_10PerpQueryMergeSha'] == 'a34cf471876971a97200de4974906743642ed61f'
-          assert project['v0_10CaptureOperationalState'] == 'FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH'
-          assert project['v0_10CaptureObservedFailedRunCount'] == 5
-          assert project['v0_10CaptureLatestObservedRunId'] == 33345766954
-          assert project['currentMetadataCaptureExecutionPath'] == 'github_hosted_ubuntu_v0_10'
+          assert project['v0_10CaptureOperationalState'] == 'RETIRED_AFTER_FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH'
+          assert project['v0_10CaptureObservedFailedRunCount'] == 6
+          assert project['v0_10CaptureLatestObservedRunId'] == 33366572161
+          assert project['currentMetadataCaptureExecutionPath'] == 'github_hosted_ubuntu_v0_12'
           assert project['oldV0_2ScheduledExecutionAuthorized'] is False
+          assert project['v0_10ScheduledExecutionAuthorized'] is False
+          assert project['v0_12SuccessorWindowState'] == 'AUTHORIZED_ON_MAIN_MERGE'
           assert project['successorMetadataCaptureExecutionAuthorized'] is True
           assert project['successorMetadataScheduleEnabled'] is True
           assert project['metadataCapturePathsConcurrentAuthorized'] is False
           assert project['replacementHoldoutState'] == 'FROZEN_UNOPENED'
           assert project['metadataStabilityState'] == 'NOT_YET_RUN'
-          assert project['metadataStabilityEligibilityState'] == 'KNOWN_BLOCKED_BY_MISSING_VALID_SLOTS'
+          assert project['metadataStabilityEligibilityState'] == 'V0_10_BLOCKED_V0_12_NOT_YET_RUN'
           assert project['cloudRuntimeMonthlyBudgetUsd'] == 0
           assert project['strategyResearchLoopState'] == 'PREPARED_RESEARCH_ONLY'
           assert project['strategyResearchCandidateCount'] == 120

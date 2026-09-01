@@ -1,0 +1,43 @@
+{
+  "schema": "provider-equivalence-v0-12-successor-metadata-window-binding-v0.1",
+  "status": "PASS",
+  "stage": "PROVIDER_EQUIVALENCE_V0_12_SUCCESSOR_METADATA_WINDOW_PR_AND_OPERATIONAL_SHA_BOUND",
+  "date": "2026-08-31",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "protocol": "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json",
+  "protocol_sha256": "89f52022ba5f62da9e6560d45ec885209d44d08af85de10067cad681bb25b24b",
+  "bound_authority": "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
+  "bound_authority_receipt": "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json",
+  "lineage": {
+    "pre_change_main_sha": "a6c2f0748a2b352f1ccac1fc349bbd4e0b3b80d4",
+    "minimum_operational_change_commit_sha": "80732edee9a8954b53b4b56115ecb0d506591f0a",
+    "protected_main_pr_number": 212,
+    "pull_request_url": "https://github.com/qookey109-pixel/crypto-autopilot/pull/212",
+    "binding_is_append_only": true,
+    "bound_authority_files_mutated_after_operational_commit": false
+  },
+  "observed_operational_frozen_path_delta": [
+    ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+    ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
+  ],
+  "scope_boundary": {
+    "authority_scope_expanded_by_binding": false,
+    "provider_requests_performed_by_this_receipt": 0,
+    "r2_client_constructed_by_this_receipt": false,
+    "r2_reads_performed_by_this_receipt": false,
+    "r2_writes_performed_by_this_receipt": false,
+    "holdout_candles_accessed_by_this_receipt": false,
+    "source_switch_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "effectivity": {
+    "effective_before_merge": false,
+    "effective_only_after_exact_pr_change_set_is_merged_to_protected_main": true,
+    "requires_human_review_before_merge": true,
+    "automatic_merge_authorized": false
+  }
+}

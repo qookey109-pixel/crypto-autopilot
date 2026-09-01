@@ -21,6 +21,9 @@ CONFIG = ROOT / "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.jso
 AUTHORITY = ROOT / "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
 OLD_WORKFLOW = ROOT / ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
 NEW_WORKFLOW = ROOT / ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+SUCCESSOR_WORKFLOW = (
+    ROOT / ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
+)
 
 
 def _server_module():
@@ -132,19 +135,21 @@ def test_final_authority_is_effective_only_on_merge_and_preserves_boundaries() -
     assert cfg["api_key_interpretation"]["binance_api_key_transport_bypass_authorized"] is False
 
 
-def test_atomic_workflow_cutover_has_no_old_schedule_and_window_scoped_new_schedule() -> None:
+def test_historical_atomic_cutover_is_preserved_and_v012_now_owns_the_schedule() -> None:
     old = OLD_WORKFLOW.read_text(encoding="utf-8").splitlines()
-    new = NEW_WORKFLOW.read_text(encoding="utf-8").splitlines()
+    retired_v010 = NEW_WORKFLOW.read_text(encoding="utf-8").splitlines()
+    successor = SUCCESSOR_WORKFLOW.read_text(encoding="utf-8").splitlines()
     assert not any(line == "  schedule:" for line in old)
     assert not any("runs-on: [self-hosted" in line for line in old)
-    assert any(line == "  schedule:" for line in new)
+    assert not any(line == "  schedule:" for line in retired_v010)
+    assert any(line == "  schedule:" for line in successor)
     for cron in (
-        '    - cron: "17,47 * 27,28,29,30,31 8 *"',
-        '    - cron: "17,47 * 1,2,3 9 *"',
-        '    - cron: "17,47 0,1 4 9 *"',
+        '    - cron: "17,47 2-23 4 9 *"',
+        '    - cron: "17,47 * 5,6,7,8,9,10,11 9 *"',
+        '    - cron: "17,47 0-3 12 9 *"',
     ):
-        assert cron in new
-    assert "runs-on: ubuntu-latest" in NEW_WORKFLOW.read_text(encoding="utf-8")
+        assert cron in successor
+    assert "runs-on: ubuntu-latest" in SUCCESSOR_WORKFLOW.read_text(encoding="utf-8")
 
 
 def test_v010_raw_relay_returns_exact_fixture_while_v07_raw_relay_stays_disabled() -> None:

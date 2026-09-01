@@ -28,6 +28,7 @@ APPROVED_CRITICAL_ACTIONS = {
 CURRENT = (
     "ci.yml",
     "provider-equivalence-v0-10-render-metadata-capture.yml",
+    "provider-equivalence-v0-12-successor-metadata-capture.yml",
     "validate-v0-11-metadata-stability-evaluator.yml",
     "provider-equivalence-v0-8-render-metadata-capture.yml",
     "validate-v0-7-render-metadata-capture-protocol.yml",
@@ -40,6 +41,7 @@ CURRENT = (
 PINNED_CRITICAL = (
     "ci.yml",
     "provider-equivalence-v0-10-render-metadata-capture.yml",
+    "provider-equivalence-v0-12-successor-metadata-capture.yml",
     "validate-v0-11-metadata-stability-evaluator.yml",
     "dashboard-authority-snapshot.yml",
     "dashboard-github-pages.yml",
@@ -127,15 +129,21 @@ class CurrentWorkflowActionsNode24Tests(unittest.TestCase):
                 self.assertNotIn("actions/checkout@v4", text)
                 self.assertNotIn("actions/setup-python@v5", text)
 
-    def test_v0_10_capture_schedule_and_authority_markers_are_preserved(self) -> None:
-        text = (WORKFLOWS / "provider-equivalence-v0-10-render-metadata-capture.yml").read_text(
+    def test_v0_10_is_retired_and_v0_12_schedule_and_authority_markers_are_current(self) -> None:
+        retired = (
+            WORKFLOWS / "provider-equivalence-v0-10-render-metadata-capture.yml"
+        ).read_text(encoding="utf-8")
+        text = (
+            WORKFLOWS / "provider-equivalence-v0-12-successor-metadata-capture.yml"
+        ).read_text(
             encoding="utf-8"
         )
+        self.assertFalse(any(line == "  schedule:" for line in retired.splitlines()))
         self.assertEqual(_action_refs(text, "actions/checkout").count(CHECKOUT_V6_SHA), 3)
         self.assertEqual(text.count("persist-credentials: false"), 3)
-        self.assertIn('    - cron: "17,47 * 27,28,29,30,31 8 *"', text)
-        self.assertIn('    - cron: "17,47 * 1,2,3 9 *"', text)
-        self.assertIn('    - cron: "17,47 0,1 4 9 *"', text)
+        self.assertIn('    - cron: "17,47 2-23 4 9 *"', text)
+        self.assertIn('    - cron: "17,47 * 5,6,7,8,9,10,11 9 *"', text)
+        self.assertIn('    - cron: "17,47 0-3 12 9 *"', text)
         self.assertIn("METADATA_RELAY_TOKEN: ${{ secrets.METADATA_RELAY_TOKEN }}", text)
         self.assertIn("--mode capture", text)
         self.assertIn("holdout_candles_accessed", text)

@@ -39,11 +39,13 @@ Repository `main` is the formal current authority. If chat history, an issue com
 - Apply the FREE-ONLY operational R2 hard stop/headroom gate before every authorized metadata write.
 - Historical workflows whose proof/materialization is already frozen must remain validation-only. Do not reintroduce schedule, push execution, provider requests, self-hosted execution, R2 secret bindings, or write commands without a new versioned authority.
 
-## V0.10 effective metadata-capture authority
+## V0.10 historical metadata-capture authority
 
 - PR #127 is merged on `main`; V0.10 final atomic metadata-capture cutover is **effective**.
 - Current cutover authority: `config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json` and `research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json`.
-- Current scheduled metadata-capture workflow: `.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml` on `ubuntu-latest`.
+- V0.10 is historical effective authority whose remaining schedule is retired by
+  the reviewed V0.12 successor transition. Its workflow has no schedule and
+  cannot be used for manual capture, replay or backfill.
 - Historical V0.2 `[self-hosted, macOS, ARM64]` scheduled metadata execution is retired. Preserve its receipts and transport PASS as immutable historical authority; do not silently reactivate it or use it as automatic fallback.
 - Historical V0.7 raw relay `/metadata/binance-exchange-info` remains disabled. Current V0.10 versioned relay path is `/metadata/v0-10/binance-exchange-info`.
 - V0.8 prepared cutover/scaffold remains frozen historical evidence. Do not mutate V0.8 receipts/configs to describe the V0.10 effective state.
@@ -51,8 +53,35 @@ Repository `main` is the formal current authority. If chat history, an issue com
 - `METADATA_RELAY_TOKEN` is already an out-of-band shared secret between Render and GitHub Actions. Never commit, expose, rotate, or request its value unless a separately authorized security operation requires rotation.
 - Exact metadata capture window remains `2026-08-27T00:00:00Z` through `2026-09-04T01:59:59.999Z`, 194 UTC hourly slots with `:17/:47` attempts.
 - V0.10 metadata capture is metadata-only. It authorizes provider metadata fetch plus metadata-only immutable R2 writes inside the frozen window, subject to the fresh 8 GB headroom gate.
-- Scheduled V0.10 runs must remain serialized and stale queued runs must fail closed before provider/R2 access.
-- Do not create a second concurrent capture path or re-enable V0.2 scheduling while V0.10 is current authority.
+- Preserve all V0.10 failures and missing slots without replay, backfill or
+  regrading. Do not re-enable V0.10 or V0.2 scheduling.
+
+## V0.12 successor metadata-capture authority
+
+- The successor authority is
+  `config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json` with
+  receipt
+  `research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json`.
+- Exact protected-main lineage is append-only in
+  `config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json`
+  and its matching binding receipt; do not rewrite the pre-binding authority
+  files after PR creation.
+- On the exact protected-main merge, V0.12 is the only scheduled metadata
+  capture workflow:
+  `.github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml`.
+- Its exact window is `2026-09-04T02:00:00Z` through
+  `2026-09-12T03:59:59.999Z`, 194 UTC hourly slots with `:17/:47` attempts.
+- It reuses the existing authenticated V0.10 Render raw relay without changing
+  Render code, deployment or secrets. Render still must never receive R2
+  credentials.
+- V0.12 may write metadata-only immutable objects only in its independent R2
+  namespace and only after the fresh 8 GB FREE-ONLY headroom gate.
+- Pionex `contractType/status` and legacy `type/enable` representations are
+  accepted only under the frozen agreement rules. Missing, unknown or
+  conflicting representations fail closed before R2 client construction.
+- V0.12 production R2 stability evaluation is not authorized. It requires a
+  separate post-window versioned authority, and even a future PASS does not
+  authorize holdout candle access.
 
 ## V0.11 metadata-stability evaluator preparation
 

@@ -3,7 +3,7 @@
   "gates": [
     {
       "critical": false,
-      "detail": "最新 frozen inventory 22.120404 MB / 457 objects；每次 V0.10 metadata write 前須 fresh whole-bucket inventory，8 GB hard stop fail closed。",
+      "detail": "最新 frozen inventory 22.120404 MB / 457 objects；每次 V0.12 metadata write 前須 fresh whole-bucket inventory，8 GB hard stop fail closed。",
       "name": "R2 儲存預算",
       "status": "PASS",
       "tone": "pass"
@@ -17,17 +17,17 @@
     },
     {
       "critical": false,
-      "detail": "Atomic old/new cutover 已生效；V0.10 只授權 frozen-window metadata capture 與 metadata-only R2 writes。",
+      "detail": "V0.10 frozen authority 與失敗證據保留，但剩餘排程已停止且不得手動回補。",
       "name": "V0.10 Metadata Cutover",
-      "status": "AUTHORIZED",
-      "tone": "pass"
+      "status": "HISTORICAL",
+      "tone": "pending"
     },
     {
       "critical": true,
-      "detail": "正式 V0.11 評估尚未執行；觀察到的必要 slot 缺漏已阻止目前 window 形成完整 194-slot PASS。",
+      "detail": "V0.10 已 blocked；V0.12 尚未形成 evidence，正式 production evaluation 仍未授權。",
       "name": "Metadata Stability",
-      "status": "BLOCKED",
-      "tone": "danger"
+      "status": "NOT_YET_RUN",
+      "tone": "pending"
     },
     {
       "critical": true,
@@ -59,7 +59,7 @@
     },
     {
       "critical": false,
-      "detail": "V0.10 atomic cutover 已生效：V0.2 schedule retired、V0.10 schedule authorized；concurrent capture path 仍禁止。",
+      "detail": "V0.10 與 V0.2 均無 schedule；V0.12 是唯一 current metadata schedule，concurrent capture path 仍禁止。",
       "name": "Render Metadata Cutover",
       "status": "AUTHORIZED",
       "tone": "pass"
@@ -86,11 +86,18 @@
       "tone": "pass"
     },
     {
-      "critical": true,
-      "detail": "Runs #36–#40 在 Pionex 必要欄位契約失配處 fail closed；未建立 R2 client、未讀寫 R2、未開啟 holdout。",
+      "critical": false,
+      "detail": "必要欄位契約失配的失敗紀錄保留；workflow schedule 已退役，沒有回補或重新評級。",
       "name": "V0.10 Scheduled Capture",
-      "status": "FAIL_CLOSED",
-      "tone": "danger"
+      "status": "RETIRED",
+      "tone": "pending"
+    },
+    {
+      "critical": false,
+      "detail": "Successor window 已經 versioned authority 核准於 main merge 後執行；仍維持 metadata-only、FREE-ONLY 與 fail-closed。",
+      "name": "V0.12 Metadata Capture",
+      "status": "AUTHORIZED",
+      "tone": "pass"
     }
   ],
   "generatedAtUtc": null,
@@ -234,7 +241,7 @@
       "status": "PASS"
     },
     {
-      "detail": "最新 frozen read-only inventory：457 objects / 22.120404 MB；V0.10 每次 metadata write 前仍需 fresh whole-bucket headroom check。",
+      "detail": "最新 frozen read-only inventory：457 objects / 22.120404 MB；V0.12 每次 metadata write 前仍需 fresh whole-bucket headroom check。",
       "name": "R2 實際使用容量",
       "status": "PASS"
     },
@@ -254,14 +261,14 @@
       "status": "PASS"
     },
     {
-      "detail": "PR #127 已合併；V0.2 self-hosted schedule 已退役，V0.10 GitHub-hosted schedule 已成為 current metadata execution path。",
+      "detail": "PR #127 的 atomic cutover 及後續失敗證據完整保留；V0.10 排程已由 V0.12 successor authority 退役。",
       "name": "V0.10 Metadata Atomic Cutover",
-      "status": "AUTHORIZED"
+      "status": "HISTORICAL"
     },
     {
-      "detail": "V0.11 正式評估仍為 NOT_YET_RUN；既有缺漏／失敗 slot 不得回補，因此目前 frozen window 已無法形成完整 194-slot PASS 證據。",
+      "detail": "V0.10 因缺漏無法 PASS；V0.12 尚未開始。Production R2 stability evaluation 仍需未來獨立 authority。",
       "name": "Metadata Stability 194 Slots",
-      "status": "BLOCKED"
+      "status": "NOT_YET_RUN"
     },
     {
       "detail": "Long-horizon review 已 PASS，但 membership evidence 尚未完成。",
@@ -279,9 +286,9 @@
       "status": "PASS"
     },
     {
-      "detail": "PR #201 已合併至 protected main；等價的 :17/:47 schedule registration text 已生效。排程註冊本身有效，但不代表 capture 成功。",
+      "detail": "PR #201 的等價 schedule registration 保留為歷史證據；目前 V0.10 workflow 已無 schedule trigger。",
       "name": "V0.10 Schedule Re-registration",
-      "status": "EFFECTIVE"
+      "status": "HISTORICAL"
     },
     {
       "detail": "目前策略研究閉環包含 120 個預註冊候選、4 類策略、短線／中線／波段三種週期；目前只允許 synthetic fixtures。",
@@ -294,15 +301,20 @@
       "status": "PREPARED"
     },
     {
-      "detail": "PR #210 的 type=PERP 已生效；其後觀察到的 runs #36–#40 均在 Pionex status/contractType 契約檢查 fail closed，且在 R2 client 建立前停止。",
+      "detail": "PR #210 後的失敗紀錄保留；V0.10 已停止剩餘排程，沒有回補、重跑或重新評級。",
       "name": "V0.10 Scheduled Capture",
-      "status": "FAIL_CLOSED"
+      "status": "RETIRED"
+    },
+    {
+      "detail": "2026-09-04 02:00Z 至 09-12 03:59:59.999Z 的獨立 194-slot metadata-only window；新 R2 namespace，仍需每次 fresh 8 GB headroom gate。",
+      "name": "V0.12 Successor Metadata Window",
+      "status": "AUTHORIZED"
     }
   ],
   "project": {
     "cloudRuntimeMonthlyBudgetUsd": 0,
     "currentMetadataCaptureBinanceTransport": "render_free_frankfurt_v0_10_relay",
-    "currentMetadataCaptureExecutionPath": "github_hosted_ubuntu_v0_10",
+    "currentMetadataCaptureExecutionPath": "github_hosted_ubuntu_v0_12",
     "fundingFullPreflightPass": true,
     "fundingMaterializationComplete": true,
     "fundingMaterializationState": "PASS",
@@ -319,15 +331,15 @@
     "fundingWriterState": "READY",
     "liveTradingAuthorized": false,
     "marketCount": 15,
-    "metadataCaptureEndUtc": "2026-09-04T01:59:59.999Z",
+    "metadataCaptureEndUtc": "2026-09-12T03:59:59.999Z",
     "metadataCaptureHourlySlotCount": 194,
     "metadataCapturePathsConcurrentAuthorized": false,
     "metadataCaptureScheduledMinutesUtc": [
       17,
       47
     ],
-    "metadataCaptureStartUtc": "2026-08-27T00:00:00Z",
-    "metadataStabilityEligibilityState": "KNOWN_BLOCKED_BY_MISSING_VALID_SLOTS",
+    "metadataCaptureStartUtc": "2026-09-04T02:00:00Z",
+    "metadataStabilityEligibilityState": "V0_10_BLOCKED_V0_12_NOT_YET_RUN",
     "metadataStabilityState": "NOT_YET_RUN",
     "mode": "PAPER-ONLY",
     "name": "Qookey Crypto Autopilot",
@@ -361,14 +373,16 @@
     "successorMetadataScheduleEnabled": true,
     "tradeKlineW1MaterializationAuthorized": false,
     "tradePlanAuthorized": false,
-    "v0_10CaptureLatestObservedRunId": 33345766954,
-    "v0_10CaptureObservedFailedRunCount": 5,
-    "v0_10CaptureOperationalState": "FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH",
+    "v0_10CaptureLatestObservedRunId": 33366572161,
+    "v0_10CaptureObservedFailedRunCount": 6,
+    "v0_10CaptureOperationalState": "RETIRED_AFTER_FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH",
     "v0_10EmergencyScheduleRegistrationMergeSha": "cf83b6320bc0f0817d8e6ae15d88fe304b933330",
-    "v0_10EmergencyScheduleRegistrationState": "EFFECTIVE",
-    "v0_10PerpQueryMergeSha": "a34cf471876971a97200de4974906743642ed61f"
+    "v0_10EmergencyScheduleRegistrationState": "HISTORICAL_EFFECTIVE",
+    "v0_10PerpQueryMergeSha": "a34cf471876971a97200de4974906743642ed61f",
+    "v0_10ScheduledExecutionAuthorized": false,
+    "v0_12SuccessorWindowState": "AUTHORIZED_ON_MAIN_MERGE"
   },
-  "schema": "qookey-dashboard-authority-snapshot-v0.10",
+  "schema": "qookey-dashboard-authority-snapshot-v0.12",
   "securityBoundary": {
     "authorizesHoldoutAccess": false,
     "authorizesLiveTrading": false,
@@ -379,7 +393,7 @@
     "containsPrivateExchangeResponses": false,
     "containsSecrets": false
   },
-  "snapshotLabel": "Repository 正式 Authority 狀態快照 · Equivalence V0.1 FAIL / Funding V0.2 R2 PASS / V0.10 Metadata Cutover EFFECTIVE / Scheduled Capture FAIL-CLOSED / Strategy Research Loop PREPARED",
+  "snapshotLabel": "Repository 正式 Authority 狀態快照 · Equivalence V0.1 FAIL / Funding V0.2 R2 PASS / V0.10 Schedule RETIRED / V0.12 Successor AUTHORIZED / Strategy Research Loop PREPARED",
   "sourceAuthorities": [
     "research/receipts/2026-08-19-provider-equivalence-v0-5-render-free-transport-pass.json",
     "research/receipts/2026-08-19-provider-equivalence-v0-6-render-transport-authority-transition.json",
@@ -398,6 +412,11 @@
     "research/receipts/2026-08-28-strategy-research-loop-v0-1-prepared.json",
     ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml",
     ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
-    "research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json"
+    "research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json",
+    "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
+    "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json",
+    ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml",
+    "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json",
+    "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json"
   ]
 }

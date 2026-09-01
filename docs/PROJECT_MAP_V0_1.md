@@ -14,7 +14,7 @@ any versioned authority.
 
 | Stage | Current contract | State |
 | --- | --- | --- |
-| V0.10 provider metadata capture | `config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json` plus the 2026-08-31 observation receipt | cutover and `type=PERP` are effective; runs #36–#40 fail closed on Pionex required-field schema mismatch before R2 access; no backfill |
+| V0.12 successor provider metadata capture | `config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json` plus its authority receipt | V0.10 runs #36–#41 remain incomplete fail-closed evidence; V0.10 schedule is retired and V0.12 is the only bounded metadata schedule after exact protected-main merge; no replay/backfill |
 | Binance USD-M Crypto Core | `config/binance_usdm_detailed_history_v0_1_2.json` | 100 Crypto markets, 10 resumable R2 shards; authorized only after the V0.10 window |
 | Pionex alternative assets | `config/pionex_alternative_assets_observability_v0_2.json` | V0.1 supplies the 125-candidate registry; V0.2 authorizes one post-window metadata validation/diff/capacity path; historical candles still need separate authority |
 | Pionex Paper successor | `config/post_window_paper_training_v0_2.json` | prepared, but no workflow or provider access until V0.11 and a separate holdout-access authority |

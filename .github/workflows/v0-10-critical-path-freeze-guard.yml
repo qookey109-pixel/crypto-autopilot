@@ -27,6 +27,14 @@ on:
       - "config/v0_10_critical_path_freeze_v0_1.json"
       - "config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json"
       - "config/v0_10_mid_window_emergency_pionex_perp_query_v0_1.json"
+      - "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json"
+      - "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json"
+      - "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json"
+      - "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json"
+      - ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
+      - "src/crypto_autopilot/provider_metadata_capture_v0_12.py"
+      - "scripts/capture_provider_equivalence_v0_12_metadata.py"
+      - "tests/test_provider_equivalence_v0_12_successor_metadata_window.py"
       - "research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-authority.json"
       - "research/receipts/2026-08-30-v0-10-mid-window-emergency-pionex-perp-query-authority.json"
       - ".github/workflows/v0-10-critical-path-freeze-guard.yml"
@@ -55,6 +63,7 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
+          import hashlib
           import json
           import os
           import subprocess
@@ -96,6 +105,185 @@ jobs:
           )
           changed = [line.strip() for line in result.stdout.splitlines() if line.strip()]
           if changed:
+              successor_path = Path(
+                  'config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json'
+              )
+              successor_receipt_path = Path(
+                  'research/receipts/'
+                  '2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json'
+              )
+              binding_path = Path(
+                  'config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json'
+              )
+              binding_receipt_path = Path(
+                  'research/receipts/'
+                  '2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json'
+              )
+              if all(path.is_file() for path in (
+                  successor_path,
+                  successor_receipt_path,
+                  binding_path,
+                  binding_receipt_path,
+              )):
+                  successor = json.loads(successor_path.read_text())
+                  successor_receipt = json.loads(successor_receipt_path.read_text())
+                  binding = json.loads(binding_path.read_text())
+                  binding_receipt = json.loads(binding_receipt_path.read_text())
+                  if successor['status'] != (
+                      'AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE'
+                  ):
+                      raise SystemExit('V0.12 successor authority status is invalid')
+                  if successor_receipt['status'] != 'PASS':
+                      raise SystemExit('V0.12 successor receipt is not PASS')
+                  if successor['lineage']['protected_main_pr_number'] != 0 or successor[
+                      'lineage'
+                  ]['minimum_operational_change_commit_sha'] is not None:
+                      raise SystemExit('V0.12 frozen pre-binding authority was rewritten')
+                  if successor_receipt['effectivity']['protected_main_pr_number'] != 0 or (
+                      successor_receipt['effectivity'][
+                          'minimum_operational_change_commit_sha'
+                      ] is not None
+                  ):
+                      raise SystemExit('V0.12 frozen pre-binding receipt was rewritten')
+                  if binding['bound_authority'] != str(successor_path):
+                      raise SystemExit('V0.12 append-only authority binding changed')
+                  if binding_receipt['protocol'] != str(binding_path):
+                      raise SystemExit('V0.12 binding receipt protocol changed')
+                  if binding_receipt['protocol_sha256'] != hashlib.sha256(
+                      binding_path.read_bytes()
+                  ).hexdigest():
+                      raise SystemExit('V0.12 binding receipt SHA-256 changed')
+
+                  expected_frozen_drift = {
+                      '.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml',
+                      '.github/workflows/provider-equivalence-v0-2-metadata-capture.yml',
+                      'src/crypto_autopilot/provider_metadata_capture_v0_10.py',
+                  }
+                  if set(changed) != expected_frozen_drift:
+                      raise SystemExit(
+                          'V0.12 successor changes an unauthorized frozen critical path'
+                      )
+
+                  lineage = binding['lineage']
+                  if lineage['pre_change_main_sha'] != (
+                      'a6c2f0748a2b352f1ccac1fc349bbd4e0b3b80d4'
+                  ):
+                      raise SystemExit('V0.12 pre-change main SHA changed')
+                  pr_number = lineage['protected_main_pr_number']
+                  change_sha = str(lineage['minimum_operational_change_commit_sha'])
+                  if not isinstance(pr_number, int) or pr_number <= 0:
+                      raise SystemExit('V0.12 protected-main PR binding is missing')
+                  if len(change_sha) != 40:
+                      raise SystemExit('V0.12 operational commit binding is missing')
+                  if binding_receipt['lineage']['protected_main_pr_number'] != pr_number:
+                      raise SystemExit('V0.12 binding receipt PR differs from config')
+                  if binding_receipt['lineage'][
+                      'minimum_operational_change_commit_sha'
+                  ] != change_sha:
+                      raise SystemExit('V0.12 binding receipt commit differs from config')
+                  subprocess.run(
+                      ['git', 'merge-base', '--is-ancestor', change_sha, 'HEAD'], check=True
+                  )
+
+                  operational_result = subprocess.run(
+                      [
+                          'git', 'diff', '--name-only',
+                          lineage['pre_change_main_sha'], change_sha,
+                          '--', *paths,
+                      ],
+                      check=True,
+                      capture_output=True,
+                      text=True,
+                  )
+                  operational_changed = {
+                      line.strip()
+                      for line in operational_result.stdout.splitlines()
+                      if line.strip()
+                  }
+                  if operational_changed != {
+                      '.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml',
+                      '.github/workflows/provider-equivalence-v0-2-metadata-capture.yml',
+                  }:
+                      raise SystemExit(
+                          'V0.12 operational commit changes another frozen critical path'
+                      )
+
+                  event_name = os.environ.get('GITHUB_EVENT_NAME', '')
+                  if event_name == 'pull_request':
+                      event = json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
+                      if event['number'] != pr_number:
+                          raise SystemExit('V0.12 authority is used by the wrong PR')
+                      if event['pull_request']['base']['sha'] != lineage['pre_change_main_sha']:
+                          raise SystemExit('V0.12 PR base SHA changed')
+
+                  v010_lines = Path(
+                      '.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml'
+                  ).read_text().splitlines()
+                  v02_lines = Path(
+                      '.github/workflows/provider-equivalence-v0-2-metadata-capture.yml'
+                  ).read_text().splitlines()
+                  v012_lines = Path(
+                      '.github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml'
+                  ).read_text().splitlines()
+                  if any(line == '  schedule:' for line in v010_lines):
+                      raise SystemExit('V0.10 schedule was not retired')
+                  if any(line == '  schedule:' for line in v02_lines):
+                      raise SystemExit('V0.2 schedule was reactivated')
+                  active_crons = [
+                      line.split('"', 2)[1]
+                      for line in v012_lines
+                      if line.strip().startswith('- cron: "')
+                  ]
+                  expected_crons = [
+                      '17,47 2-23 4 9 *',
+                      '17,47 * 5,6,7,8,9,10,11 9 *',
+                      '17,47 0-3 12 9 *',
+                  ]
+                  transition = successor['atomic_schedule_transition']
+                  if active_crons != expected_crons:
+                      raise SystemExit('V0.12 active cron text changed')
+                  if transition['successor_cron_utc'] != expected_crons:
+                      raise SystemExit('V0.12 cron authority changed')
+                  if transition['scheduled_attempt_count'] != 388:
+                      raise SystemExit('V0.12 scheduled attempt count changed')
+                  if transition['hourly_slot_count'] != 194:
+                      raise SystemExit('V0.12 hourly-slot count changed')
+                  if transition[
+                      'concurrent_v0_10_and_v0_12_capture_paths_authorized'
+                  ] is not False:
+                      raise SystemExit('V0.12 concurrent capture paths became authorized')
+
+                  boundary = successor['authorization_boundary']
+                  for key, value in boundary.items():
+                      if key.startswith('v0_12_metadata'):
+                          if value is not True:
+                              raise SystemExit(f'V0.12 metadata authority missing: {key}')
+                      elif value is not False:
+                          raise SystemExit(f'V0.12 downstream boundary changed: {key}')
+
+                  print(json.dumps({
+                      'status': 'PASS',
+                      'stage': 'V0_10_RETIRED_V0_12_SUCCESSOR_AUTHORITY_REVIEW_PASS',
+                      'baseline_main_sha': baseline,
+                      'changed_critical_paths': changed,
+                      'protected_main_pr_number': pr_number,
+                      'minimum_operational_change_commit_sha': change_sha,
+                      'scheduled_attempt_count': 388,
+                      'hourly_slot_count': 194,
+                      'prior_v0_10_failures_regraded': False,
+                      'manual_v0_10_capture_authorized': False,
+                      'provider_requests_performed': 0,
+                      'render_requests_performed': 0,
+                      'r2_client_constructed': False,
+                      'r2_reads_performed': False,
+                      'r2_writes_performed': False,
+                      'holdout_accessed': False,
+                      'v0_12_production_stability_evaluation_performed': False,
+                      'source_switch_authorized': False,
+                      'live_trading_authorized': False,
+                  }, sort_keys=True))
+                  raise SystemExit(0)
+
               schedule_emergency_path = Path(
                   'config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json'
               )

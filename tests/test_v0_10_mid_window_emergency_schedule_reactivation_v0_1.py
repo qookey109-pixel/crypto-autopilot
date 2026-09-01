@@ -16,6 +16,9 @@ RECEIPT = (
 )
 FROZEN_CUTOVER = ROOT / "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
 WORKFLOW = ROOT / ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
+SUCCESSOR_WORKFLOW = (
+    ROOT / ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
+)
 RETIRED_WORKFLOW = ROOT / ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
 
 
@@ -130,13 +133,28 @@ def test_original_and_replacement_crons_expand_to_identical_frozen_attempts() ->
     assert sum(instant <= reconfirmed for instant in original_attempts) == 15
 
 
-def test_workflow_uses_only_replacement_registration_text() -> None:
+def test_historical_registration_is_preserved_but_v010_schedule_is_retired() -> None:
     authority = _load(AUTHORITY)
     schedule = authority["schedule_equivalence"]
     assert isinstance(schedule, dict)
     workflow_text = WORKFLOW.read_text(encoding="utf-8")
     active_crons = re.findall(r'^\s+- cron: "([^"]+)"$', workflow_text, flags=re.MULTILINE)
-    assert active_crons == schedule["replacement_registration_crons"]
+    assert active_crons == []
+    successor_crons = re.findall(
+        r'^\s+- cron: "([^"]+)"$',
+        SUCCESSOR_WORKFLOW.read_text(encoding="utf-8"),
+        flags=re.MULTILINE,
+    )
+    assert successor_crons == [
+        "17,47 2-23 4 9 *",
+        "17,47 * 5,6,7,8,9,10,11 9 *",
+        "17,47 0-3 12 9 *",
+    ]
+    assert schedule["replacement_registration_crons"] == [
+        "17,47 * 27,28,29,30,31 8 *",
+        "17,47 * 1,2,3 9 *",
+        "17,47 0,1 4 9 *",
+    ]
     retired_lines = RETIRED_WORKFLOW.read_text(encoding="utf-8").splitlines()
     assert not any(line == "  schedule:" for line in retired_lines)
     assert not any("runs-on: [self-hosted" in line for line in retired_lines)

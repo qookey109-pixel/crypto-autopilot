@@ -14,21 +14,50 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ## Current formal stage
 
-**V0.10 PIONEX PERP QUERY EFFECTIVE ON MAIN / POST-MERGE SCHEDULED CAPTURE FAIL_CLOSED ON PIONEX REQUIRED-FIELD SCHEMA MISMATCH / CURRENT 194-SLOT WINDOW KNOWN BLOCKED BY MISSING VALID SLOTS / METADATA STABILITY FORMALLY NOT_YET_RUN / CRYPTO CORE 100 V0.1.2 AUTHORIZED AFTER V0.10 WINDOW / PIONEX ALTERNATIVE ASSETS V0.2 AUTHORIZED AFTER WINDOW / BOTH NOT STARTED / POST-WINDOW PAPER V0.2 PREPARED WAITING FOR HOLDOUT AUTHORITY / REPLACEMENT HOLDOUT FROZEN_UNOPENED / PAPER-ONLY**
+**V0.12 SUCCESSOR METADATA WINDOW AUTHORIZED ON EXACT PROTECTED-MAIN MERGE / V0.10 REMAINING SCHEDULE RETIRED IN THE SAME CHANGE / V0.10 INCOMPLETE WINDOW PRESERVED AS BLOCKED EVIDENCE / V0.12 PRODUCTION STABILITY EVALUATION NOT_AUTHORIZED / CRYPTO CORE 100 V0.1.2 AUTHORIZED AFTER V0.10 WINDOW / PIONEX ALTERNATIVE ASSETS V0.2 AUTHORIZED AFTER WINDOW / BOTH NOT STARTED / POST-WINDOW PAPER V0.2 PREPARED WAITING FOR HOLDOUT AUTHORITY / REPLACEMENT HOLDOUT FROZEN_UNOPENED / PAPER-ONLY**
 
 <details>
 <summary>Historical aggregate stage markers</summary>
 
-**PROJECT CONVERGENCE V0.1 PREPARED ON BRANCH / POST-CUTOFF NO-OP CRON RETIREMENT EFFECTIVE ON MAIN MERGE / PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 TRAINING GOVERNANCE V0.5 HISTORICAL AUTHORITY MANUAL FAIL-CLOSED ONLY AFTER CUTOFF / BINANCE USD-M DETAILED HISTORY V0.1.1 AUTHORIZED AFTER V0.10 WINDOW NOT_STARTED / DETAILED HISTORY V0.1 SUPERSEDED BEFORE EXECUTION / V0.4 WEEKLY AND MONTHLY EXECUTION RETIRED / V0.3 DAILY TRAINING RETIRED / RESEARCH SIGNAL LAYER V0.2 ACTIVE / RESEARCH SIGNAL QUALITY V0.1 AUTHORIZED READ_ONLY / RESEARCH AUTOMATION HEALTH V0.1 AUTHORIZED READ_ONLY AND CURRENTLY ALERTING ON V0.10 / STRATEGY EDGE VALIDATION V0.1 PREPARED RESEARCH_ONLY / STRATEGY RESEARCH LOOP V0.1 PREPARED SYNTHETIC_ONLY / POST-WINDOW RESEARCH SUCCESSOR SCHEDULE V0.1 PREPARED_NOT_ACTIVE / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 MANUAL FAIL-CLOSED ONLY AFTER CUTOFF / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE CURRENT / V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION EFFECTIVE / V0.10 PIONEX PERP QUERY EFFECTIVE / V0.10 POST-PERP CAPTURE FAIL_CLOSED / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / CURRENT 194-SLOT PASS ELIGIBILITY BLOCKED BY MISSING VALID SLOTS / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
+**PROJECT CONVERGENCE V0.1 CURRENT INDEX / POST-CUTOFF NO-OP CRON RETIREMENT EFFECTIVE / PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 TRAINING GOVERNANCE V0.5 HISTORICAL AUTHORITY MANUAL FAIL-CLOSED ONLY AFTER CUTOFF / BINANCE USD-M DETAILED HISTORY V0.1.2 AUTHORIZED AFTER V0.10 WINDOW NOT_STARTED / DETAILED HISTORY V0.1/V0.1.1 SUPERSEDED BEFORE EXECUTION / V0.4 WEEKLY AND MONTHLY EXECUTION RETIRED / V0.3 DAILY TRAINING RETIRED / RESEARCH SIGNAL LAYER V0.2 ACTIVE / RESEARCH SIGNAL QUALITY V0.1 AUTHORIZED READ_ONLY / RESEARCH AUTOMATION HEALTH V0.1 AUTHORIZED READ_ONLY / STRATEGY EDGE VALIDATION V0.1 PREPARED RESEARCH_ONLY / STRATEGY RESEARCH LOOP V0.1 PREPARED SYNTHETIC_ONLY / POST-WINDOW RESEARCH SUCCESSOR SCHEDULE V0.1 PREPARED_NOT_ACTIVE / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 MANUAL FAIL-CLOSED ONLY AFTER CUTOFF / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE HISTORICAL / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE RETIRED / V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION HISTORICAL EFFECTIVE / V0.10 PIONEX PERP QUERY EFFECTIVE / V0.10 POST-PERP CAPTURE FAIL_CLOSED / V0.12 SUCCESSOR METADATA WINDOW AUTHORIZED ON MAIN MERGE / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / V0.10 194-SLOT PASS ELIGIBILITY BLOCKED / V0.12 EVIDENCE NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
 
 </details>
 
-### V0.10 post-#210 scheduled capture — FAIL_CLOSED / NO R2 ACCESS
+### V0.12 successor metadata window — AUTHORIZED ON EXACT MAIN MERGE
+
+- The reviewed change atomically removes every V0.10 cron and adds one V0.12
+  GitHub-hosted schedule. V0.10 manual capture, replay and backfill remain
+  unauthorized.
+- The successor window is `2026-09-04T02:00:00Z` through
+  `2026-09-12T03:59:59.999Z`: 194 UTC hourly slots with `:17` and `:47`
+  attempts, for 388 bounded schedule attempts.
+- V0.12 uses the independent R2 namespace
+  `metadata/provider-equivalence/v0_12/successor-window-20260904/` and the
+  existing Render Free Frankfurt raw relay. Render code, deployment and secret
+  state are unchanged; Render still receives no R2 credentials.
+- Pionex normalization accepts the official modern
+  `contractType/status` representation or legacy `type/enable` representation.
+  When both exist they must agree; missing, unknown or conflicting values stop
+  before R2 client construction.
+- Future 194-slot stability rules are frozen now, but production R2 evaluation
+  remains unauthorized and requires a separate versioned authority. The
+  replacement holdout remains `FROZEN_UNOPENED`.
+- Authority/config:
+  `config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json`;
+  receipt:
+  `research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json`;
+  contract: `docs/PROVIDER_EQUIVALENCE_V0_12_SUCCESSOR_METADATA_WINDOW_V0_1.md`.
+- Protected-main PR #212 and minimum operational commit
+  `80732edee9a8954b53b4b56115ecb0d506591f0a` are bound append-only by
+  `config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json`
+  and its matching receipt; the pre-binding authority files remain unchanged.
+
+### V0.10 post-#210 scheduled capture — RETIRED / FAIL_CLOSED EVIDENCE PRESERVED
 
 - PR #210 is merged on protected `main` at
   `a34cf471876971a97200de4974906743642ed61f`; the exact `type=PERP` query is
   effective and the frozen perpetual symbol scope is now reached.
-- Post-merge scheduled runs #36 through #40 all passed the window gate and
+- Post-merge scheduled runs #36 through #41 all passed the window gate and
   atomic-cutover validation, then failed at the same parser boundary:
   `Pionex status/contractType missing: AAVE_USDT_PERP`. The latest observed run
   is [`33345766954`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/33345766954).
@@ -44,11 +73,9 @@ Repository branch `main` is the live formal authority and is intentionally not s
 - Observation receipt:
   `research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json`.
   The pre-merge #210 config and receipt remain immutable historical evidence.
-- This observation grants no parser, schedule, provider, R2, V0.11, holdout,
-  source-switch, model or trading authority. Any critical-path change requires
-  a new reviewed versioned authority; the recommended decision is to stop
-  futile remaining V0.10 attempts and prepare a separately frozen successor
-  metadata window rather than trying to repair the already-incomplete window.
+- V0.12 retires the remaining V0.10 schedule without changing or regrading
+  these failures. V0.10 has no current schedule, no manual capture authority and
+  no replay/backfill authority.
 
 ### Project Convergence V0.1 — PREPARED / EFFECTIVE ON MAIN MERGE
 
@@ -498,9 +525,10 @@ Key authorities and evidence:
 - `research/receipts/2026-08-21-provider-equivalence-v0-11-production-evaluation-authority-template-prepared.json`
 - `web/data/operational-status.json`
 
-Frozen operational rules:
+Historical V0.10 operational rules and current V0.12 transition:
 
-- the existing V0.10 scheduled workflow remains the only normal production metadata-capture execution path;
+- the remaining V0.10 schedule is retired atomically when the exact V0.12 change set reaches protected `main`; the V0.10 workflow remains validation-only historical evidence;
+- V0.12 is the only scheduled production metadata-capture path after that merge and may run only inside its exact `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z` window;
 - manual metadata-capture backfill is **NOT_AUTHORIZED**;
 - retroactive hourly-slot backfill is **NOT_AUTHORIZED**;
 - if the `:17` attempt fails, preserve the failure and allow the frozen `:47` scheduled attempt to run normally;
@@ -711,17 +739,17 @@ Repository branch protection/ruleset configuration is external GitHub state, not
 
 Before `2026-08-27T00:00:00Z`: readiness/maintenance validation only. Do not manually consume production metadata evidence.
 
-During the frozen window:
+For the V0.12 successor window:
 
-1. Let the existing V0.10 schedule run at `:17/:47`; do not create a second execution path.
-2. Preserve the exact 194-slot / 388-attempt / 15-symbol / 45-pair scope.
+1. Keep V0.10 unscheduled and allow only the V0.12 `:17/:47` schedule; do not create a second execution path.
+2. Preserve the exact V0.12 194-slot / 388-attempt / 15-symbol / 45-pair scope.
 3. Preserve every failed, blocked, skipped, stale, or missing attempt as evidence; do not manually or retroactively backfill it.
 4. If `:17` fails, let the existing frozen `:47` attempt run normally rather than manually retrying.
 5. Keep the replacement holdout unopened.
 6. Require the exact window/freshness gate and authenticated Render transport.
 7. Require fresh R2 headroom before each write; never overwrite, delete, or bypass evidence to force a capture through.
 8. Keep production-critical code/runtime/secrets frozen by default; any unavoidable intervention requires a separate versioned emergency authority and protected-main PR.
-9. After the full window has ended at `2026-09-04T01:59:59.999Z`, verify critical-path lineage without production R2 reads, then create a separate versioned V0.11 production evaluation authority from the prepared template **before any R2 receipt read for stability evaluation**.
+9. After the V0.12 window has ended at `2026-09-12T03:59:59.999Z`, verify critical-path lineage without production R2 reads, then create a separate versioned production evaluation authority **before any V0.12 R2 receipt read for stability evaluation**.
 
 ## Explicitly forbidden next actions
 

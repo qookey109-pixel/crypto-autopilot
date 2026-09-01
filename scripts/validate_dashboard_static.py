@@ -178,7 +178,7 @@ def main() -> int:
             raise RuntimeError("dashboard research calendar generation time is invalid") from exc
     calendar_items = calendar.get("items") or []
     expected_calendar_ids = {
-        "v0-10-metadata-window",
+        "v0-12-successor-metadata-window",
         "strategy-research-loop-v0-1",
         "detailed-history-backfill",
         "pionex-alternative-assets-observability-v0-2",
@@ -211,6 +211,9 @@ def main() -> int:
         "config/pionex_alternative_assets_observability_v0_2.json",
         "config/post_window_paper_training_v0_2.json",
         "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
+        "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
+        "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json",
+        "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json",
         "config/strategy_edge_validation_v0_1.json",
         "config/strategy_research_loop_v0_1.json",
         "docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md",
@@ -253,8 +256,7 @@ def main() -> int:
     if project.get("fundingMaterializationState") != "PASS":
         raise RuntimeError("dashboard fixture must reflect Funding V0.2 materialization PASS")
 
-    # Historical V0.8 preparation remains frozen evidence; current execution
-    # ownership must come from the merged V0.10 authority.
+    # Historical V0.8/V0.10 evidence remains frozen; V0.12 owns current schedule.
     if project.get("renderMetadataV0_8CutoverState") != (
         "HISTORICAL_PREPARED_EXECUTION_NOT_AUTHORIZED"
     ):
@@ -263,14 +265,18 @@ def main() -> int:
         raise RuntimeError("dashboard fixture must reflect frozen V0.9 smoke PASS")
     if project.get("renderMetadataV0_10CutoverState") != "EFFECTIVE_AUTHORIZED":
         raise RuntimeError("dashboard fixture must reflect effective V0.10 cutover")
-    if project.get("currentMetadataCaptureExecutionPath") != "github_hosted_ubuntu_v0_10":
-        raise RuntimeError("dashboard fixture must reflect V0.10 current capture path")
+    if project.get("currentMetadataCaptureExecutionPath") != "github_hosted_ubuntu_v0_12":
+        raise RuntimeError("dashboard fixture must reflect V0.12 current capture path")
     if project.get("oldV0_2ScheduledExecutionAuthorized") is not False:
         raise RuntimeError("dashboard fixture must keep V0.2 scheduled execution retired")
+    if project.get("v0_10ScheduledExecutionAuthorized") is not False:
+        raise RuntimeError("dashboard fixture must keep V0.10 scheduled execution retired")
+    if project.get("v0_12SuccessorWindowState") != "AUTHORIZED_ON_MAIN_MERGE":
+        raise RuntimeError("dashboard fixture must reflect V0.12 successor authority")
     if project.get("successorMetadataCaptureExecutionAuthorized") is not True:
-        raise RuntimeError("dashboard fixture must reflect V0.10 metadata capture authority")
+        raise RuntimeError("dashboard fixture must reflect V0.12 metadata capture authority")
     if project.get("successorMetadataScheduleEnabled") is not True:
-        raise RuntimeError("dashboard fixture must reflect V0.10 schedule enablement")
+        raise RuntimeError("dashboard fixture must reflect V0.12 schedule enablement")
     if project.get("metadataCapturePathsConcurrentAuthorized") is not False:
         raise RuntimeError("dashboard fixture must forbid concurrent capture paths")
     if project.get("metadataStabilityState") != "NOT_YET_RUN":
@@ -477,6 +483,7 @@ def main() -> int:
                 "paper_only": True,
                 "equivalence_v0_1": project["providerEquivalenceGateState"],
                 "render_v0_10": project["renderMetadataV0_10CutoverState"],
+                "successor_v0_12": project["v0_12SuccessorWindowState"],
                 "metadata_capture_authorized": True,
                 "capture_window_operations": op_project["v0_10CaptureWindowOperationsState"],
                 "mid_window_emergency_template": op_project["v0_10MidWindowEmergencyTemplateState"],

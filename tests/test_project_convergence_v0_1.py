@@ -87,7 +87,9 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
     def test_convergence_index_cannot_claim_runtime_or_trading_authority(self) -> None:
         self.assertIs(self.index["authority"], False)
         boundaries = self.index["boundaries"]
-        self.assertFalse(boundaries["v0_10_production_critical_path_changed"])
+        self.assertTrue(boundaries["v0_10_production_critical_path_changed"])
+        self.assertTrue(boundaries["v0_10_schedule_retired_by_reviewed_v0_12_authority"])
+        self.assertTrue(boundaries["v0_12_successor_metadata_authority_added"])
         self.assertFalse(boundaries["sstate_core_changed"])
         self.assertFalse(boundaries["strategy_parameters_changed"])
         self.assertTrue(boundaries["provider_or_r2_authority_added"])

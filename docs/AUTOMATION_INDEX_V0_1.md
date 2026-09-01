@@ -7,14 +7,15 @@ and should not be read as active production schedules.
 ## Scheduled workflows after convergence
 
 Current observation (`2026-08-31`): PR #210's Pionex `type=PERP` query is
-effective, but scheduled captures #36 through #40 all fail closed on the
+effective, but scheduled captures #36 through #41 all failed closed on the
 required `status` / `contractType` parser contract before R2 client creation.
-The health workflow is correctly reporting this upstream failure. This index
-does not authorize a parser fix, schedule suspension, replay or backfill.
+The V0.12 successor authority retires that schedule atomically and freezes an
+explicit preferred/legacy Pionex normalization contract. It never replays,
+backfills or regrades the incomplete V0.10 evidence.
 
 | State | Workflow | UTC cadence | Effective behavior |
 | --- | --- | --- | --- |
-| Current bounded window / fail closed | Provider Equivalence V0.10 metadata capture | `:17` and `:47`, only 2026-08-27 through 2026-09-04 01:59:59.999 | schedule remains registered, but the latest observed attempts fail on Pionex required-field schema validation before R2 access; missing slots remain failures |
+| Current bounded successor | Provider Equivalence V0.12 metadata capture | `:17` and `:47`, only 2026-09-04 02:00 through 2026-09-12 03:59:59.999 | only current metadata schedule after exact protected-main merge; normalized Pionex schema must validate before R2 construction |
 | Continuous | Research Signal Layer V0.2 | daily 02:17 | bounded public structured-signal ingestion |
 | Continuous | Research Signal Quality V0.1 | daily 02:47 | allowlisted R2 lineage read only |
 | Continuous / alerting | Research Automation Health V0.1 | every 3 hours at :47 | GitHub Actions metadata read only; current failure is an intentional alert on V0.10, not a health-check implementation error |
@@ -39,8 +40,8 @@ evidence. They do not automatically resume.
 ## Non-scheduled current checks
 
 - CI and dashboard build/static smoke.
-- V0.10 critical-path freeze guard and capture-window validation.
-- V0.10 scheduled-capture observer.
+- V0.10/V0.12 critical-path freeze guard and successor-window validation.
+- V0.10 scheduled-capture observer retained as historical run-metadata inspection only.
 
 ## Prepared but not scheduled
 

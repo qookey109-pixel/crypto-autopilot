@@ -28,6 +28,8 @@
     "display_projection": "web/data/strategy.json"
   },
   "current_data_and_paper": {
+    "current_metadata_successor": "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
+    "current_metadata_successor_state": "V0_12_AUTHORIZED_ON_MAIN_MERGE_V0_10_SCHEDULE_RETIRED",
     "crypto_core_100": "config/binance_usdm_detailed_history_v0_1_2.json",
     "crypto_core_100_authority": "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json",
     "pionex_alternative_assets_registry": "config/pionex_alternative_assets_v0_1.json",
@@ -40,13 +42,14 @@
   "scheduled_workflows": {
     "current_window": [
       {
-        "workflow": "provider-equivalence-v0-10-render-metadata-capture.yml",
+        "workflow": "provider-equivalence-v0-12-successor-metadata-capture.yml",
         "cron_utc": [
-          "17,47 * 27,28,29,30,31 8 *",
-          "17,47 * 1,2,3 9 *",
-          "17,47 0,1 4 9 *"
+          "17,47 2-23 4 9 *",
+          "17,47 * 5,6,7,8,9,10,11 9 *",
+          "17,47 0-3 12 9 *"
         ],
-        "active_until_utc": "2026-09-04T02:00:00Z"
+        "active_from_utc": "2026-09-04T02:00:00Z",
+        "active_until_utc": "2026-09-12T04:00:00Z"
       }
     ],
     "continuous_research": [
@@ -97,9 +100,8 @@
       "dashboard-authority-snapshot.yml",
       "dashboard-github-pages.yml",
       "dashboard-static-smoke.yml",
-      "observe-v0-10-scheduled-capture.yml",
       "pionex-alternative-assets-observability-v0-2.yml",
-      "provider-equivalence-v0-10-render-metadata-capture.yml",
+      "provider-equivalence-v0-12-successor-metadata-capture.yml",
       "research-automation-health-v0-1.yml",
       "research-signal-layer-v0-2.yml",
       "research-signal-quality-v0-1.yml",
@@ -141,7 +143,9 @@
       "pionex-binance-equivalence-proof.yml",
       "pionex-binance-equivalence-v0-1-forensics.yml",
       "pre-window-readiness-v0-1.yml",
+      "observe-v0-10-scheduled-capture.yml",
       "provider-equivalence-v0-2-metadata-capture.yml",
+      "provider-equivalence-v0-10-render-metadata-capture.yml",
       "provider-equivalence-v0-8-render-metadata-capture.yml",
       "validate-v0-4-koyeb-free-transport.yml",
       "validate-v0-5-render-free-transport-pass.yml",
@@ -154,7 +158,9 @@
   },
   "boundaries": {
     "frozen_evidence_deleted": false,
-    "v0_10_production_critical_path_changed": false,
+    "v0_10_production_critical_path_changed": true,
+    "v0_10_schedule_retired_by_reviewed_v0_12_authority": true,
+    "v0_12_successor_metadata_authority_added": true,
     "sstate_core_changed": false,
     "strategy_parameters_changed": false,
     "provider_or_r2_authority_added": true,

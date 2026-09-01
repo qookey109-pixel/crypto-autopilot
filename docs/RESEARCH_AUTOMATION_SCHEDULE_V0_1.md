@@ -10,7 +10,7 @@ model or authorize trading.
 | Cadence | Current job | Evidence boundary |
 | --- | --- | --- |
 | Pull request / push | Repository CI and dashboard validation | No provider, production R2, holdout or trading access |
-| `:17` / `:47` inside the exact V0.10 window | Provider Equivalence V0.10 metadata capture | Current metadata-only path; no holdout candle access |
+| `:17` / `:47` inside 2026-09-04 02:00 through 2026-09-12 03:59:59.999 UTC | Provider Equivalence V0.12 successor metadata capture | Only current metadata schedule; V0.10 is retired, no replay/backfill or holdout candle access |
 | Daily 02:17 UTC | Research Signal Layer V0.2 | Public HTTPS source metadata and structured KOL challenger evidence to dedicated R2 namespace; no trading |
 | Daily 02:47 UTC | Research Signal Quality V0.1 | Exact latest/manifest/payload R2 reads with SHA/time/authority checks; no list or write |
 | Every three hours at `:47` | Research Automation Health V0.1 | GitHub Actions metadata-only stale/failure/missing-run monitor; no provider or R2 access |

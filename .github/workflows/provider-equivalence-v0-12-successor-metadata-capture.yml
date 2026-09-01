@@ -1,44 +1,41 @@
-name: Provider Equivalence V0.10 Render Metadata Capture
+name: Provider Equivalence V0.12 Successor Metadata Capture
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
-      - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
-      - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
-      - "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json"
-      - "config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json"
-      - "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
-      - "research/receipts/2026-08-20-provider-equivalence-v0-9-render-relay-smoke-pass.json"
-      - "research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-authority.json"
-      - "src/crypto_autopilot/provider_metadata_capture_v0_10.py"
-      - "scripts/capture_provider_equivalence_v0_10_metadata.py"
-      - "infra/render/binance-transport-free/server.py"
-      - "tests/test_final_atomic_cutover_v0_10.py"
-      - "tests/test_v0_10_mid_window_emergency_schedule_reactivation_v0_1.py"
-      - "tests/test_ci_dependency_constraints.py"
-      - "requirements/ci-constraints.txt"
       - ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
+      - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json"
+      - "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json"
       - "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json"
+      - "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json"
+      - "src/crypto_autopilot/provider_metadata_capture_v0_12.py"
+      - "scripts/capture_provider_equivalence_v0_12_metadata.py"
       - "tests/test_provider_equivalence_v0_12_successor_metadata_window.py"
+      - "requirements/ci-constraints.txt"
+  schedule:
+    - cron: "17,47 2-23 4 9 *"
+    - cron: "17,47 * 5,6,7,8,9,10,11 9 *"
+    - cron: "17,47 0-3 12 9 *"
 
 permissions:
   actions: read
   contents: read
 
 concurrency:
-  group: provider-equivalence-v0-10-metadata-${{ github.event_name }}
+  group: provider-equivalence-v0-12-metadata-${{ github.event_name }}
   cancel-in-progress: false
 
 jobs:
-  validate-atomic-cutover:
+  validate-successor-authority:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
@@ -46,51 +43,11 @@ jobs:
         run: |
           python -m pip install -c requirements/ci-constraints.txt -e .
           python -m pip install -c requirements/ci-constraints.txt pytest
-      - name: Validate final cutover, relay and receipt boundaries
+      - name: Validate V0.12 authority, parser and capture boundaries
         run: |
           python -m pytest -q \
-            tests/test_final_atomic_cutover_v0_10.py \
-            tests/test_render_relay_smoke_pass_v0_9.py \
-            tests/test_provider_metadata_capture_v0_8_successor.py \
-            tests/test_render_metadata_capture_protocol_v0_7.py
-      - name: Assert historical V0.10 retirement and V0.12 successor exclusivity
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          old = Path('.github/workflows/provider-equivalence-v0-2-metadata-capture.yml').read_text().splitlines()
-          v010 = Path('.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml').read_text().splitlines()
-          v012 = Path('.github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml').read_text().splitlines()
-          frozen = json.loads(Path('config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json').read_text())
-          authority = json.loads(Path('config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json').read_text())
-          server = Path('infra/render/binance-transport-free/server.py').read_text()
-
-          assert not any(line == '  schedule:' for line in old)
-          assert not any('runs-on: [self-hosted' in line for line in old)
-          assert not any(line == '  schedule:' for line in v010)
-          assert any(line == '  schedule:' for line in v012)
-          expected_crons = {
-              '    - cron: "17,47 2-23 4 9 *"',
-              '    - cron: "17,47 * 5,6,7,8,9,10,11 9 *"',
-              '    - cron: "17,47 0-3 12 9 *"',
-          }
-          assert expected_crons.issubset(set(v012))
-          assert frozen['atomic_repository_cutover']['successor_schedule_enabled_in_same_change'] is True
-          assert authority['atomic_schedule_transition']['successor_cron_utc'] == [
-              '17,47 2-23 4 9 *',
-              '17,47 * 5,6,7,8,9,10,11 9 *',
-              '17,47 0-3 12 9 *',
-          ]
-          assert authority['atomic_schedule_transition']['concurrent_v0_10_and_v0_12_capture_paths_authorized'] is False
-          assert authority['effectivity']['requires_human_review_before_merge'] is True
-          assert 'METADATA_RELAY_EXECUTION_AUTHORIZED = False' in server
-          assert 'V0_10_METADATA_RELAY_EXECUTION_AUTHORIZED = True' in server
-          for secret_name in ('R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_ACCOUNT_ID', 'R2_BUCKET_NAME'):
-              assert secret_name not in server
-          PY
+            tests/test_provider_equivalence_v0_12_successor_metadata_window.py \
+            tests/test_final_atomic_cutover_v0_10.py
 
   window-gate:
     if: github.event_name == 'schedule'
@@ -103,7 +60,7 @@ jobs:
         with:
           persist-credentials: false
       - id: gate
-        name: Gate V0.10 capture to exact frozen metadata window
+        name: Gate V0.12 capture to exact successor metadata window
         shell: bash
         run: |
           set -euo pipefail
@@ -113,8 +70,10 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
 
-          protocol = json.loads(Path('config/provider_equivalence_v0_2_metadata_capture_v0_2.json').read_text())
-          window = protocol['metadata_capture_window']
+          cfg = json.loads(
+              Path('config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json').read_text()
+          )
+          window = cfg['successor_window']
           start = datetime.fromisoformat(window['start_utc'].replace('Z', '+00:00'))
           end = datetime.fromisoformat(window['end_utc'].replace('Z', '+00:00'))
           now = datetime.now(timezone.utc)
@@ -131,7 +90,7 @@ jobs:
           PY
 
   capture:
-    needs: [validate-atomic-cutover, window-gate]
+    needs: [validate-successor-authority, window-gate]
     if: github.event_name == 'schedule' && needs.window-gate.outputs.inside_window == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -157,7 +116,7 @@ jobs:
           from pathlib import Path
           from urllib.request import Request, urlopen
 
-          output = Path('artifacts/provider-metadata-capture-v0-10.json')
+          output = Path('artifacts/provider-metadata-capture-v0-12.json')
           eligible = False
           reason = 'UNKNOWN'
           created_at_text = None
@@ -172,7 +131,7 @@ jobs:
                       'Accept': 'application/vnd.github+json',
                       'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
                       'X-GitHub-Api-Version': '2022-11-28',
-                      'User-Agent': 'qookey-v0-10-metadata-schedule-freshness-guard/0.1',
+                      'User-Agent': 'qookey-v0-12-metadata-schedule-freshness-guard/0.1',
                   },
               )
               with urlopen(request, timeout=20) as response:
@@ -181,16 +140,18 @@ jobs:
               created_at = datetime.fromisoformat(created_at_text.replace('Z', '+00:00'))
               now = datetime.now(timezone.utc)
               age = now - created_at
-              protocol = json.loads(Path('config/provider_equivalence_v0_2_metadata_capture_v0_2.json').read_text())
-              window = protocol['metadata_capture_window']
+              cfg = json.loads(
+                  Path('config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json').read_text()
+              )
+              window = cfg['successor_window']
               start = datetime.fromisoformat(window['start_utc'].replace('Z', '+00:00'))
               end = datetime.fromisoformat(window['end_utc'].replace('Z', '+00:00'))
               if not (start <= created_at <= end):
-                  reason = 'RUN_CREATED_OUTSIDE_FROZEN_WINDOW'
+                  reason = 'RUN_CREATED_OUTSIDE_V0_12_SUCCESSOR_WINDOW'
               elif age < timedelta(0) or age > timedelta(minutes=30):
                   reason = 'STALE_QUEUED_RUN_OVER_30_MINUTES'
               elif not (start <= now <= end):
-                  reason = 'EXECUTION_TIME_OUTSIDE_FROZEN_WINDOW'
+                  reason = 'EXECUTION_TIME_OUTSIDE_V0_12_SUCCESSOR_WINDOW'
               else:
                   eligible = True
                   reason = 'FRESH_SCHEDULED_RUN'
@@ -214,7 +175,10 @@ jobs:
                   'holdout_candles_accessed': False,
                   'source_switch_authorized': False,
                   'live_trading_authorized': False,
-                  'capture_execution_version': 'v0_10',
+                  'activation_authority': (
+                      'provider_equivalence_v0_12_successor_metadata_window_v0_1'
+                  ),
+                  'capture_execution_version': 'v0_12',
               }
               output.write_text(json.dumps(payload, sort_keys=True, indent=2) + '\n')
               print(json.dumps(payload, sort_keys=True))
@@ -226,7 +190,7 @@ jobs:
         if: steps.freshness.outputs.eligible == 'true'
         run: python -m pip install -c requirements/ci-constraints.txt -e .
 
-      - name: Capture frozen provider metadata through V0.10 successor path
+      - name: Capture provider metadata through V0.12 successor path
         if: steps.freshness.outputs.eligible == 'true'
         env:
           METADATA_RELAY_TOKEN: ${{ secrets.METADATA_RELAY_TOKEN }}
@@ -235,11 +199,11 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          python scripts/capture_provider_equivalence_v0_10_metadata.py \
+          python scripts/capture_provider_equivalence_v0_12_metadata.py \
             --mode capture \
-            --output artifacts/provider-metadata-capture-v0-10.json
+            --output artifacts/provider-metadata-capture-v0-12.json
 
-      - name: Assert V0.10 capture boundary
+      - name: Assert V0.12 capture boundary
         shell: bash
         run: |
           set -euo pipefail
@@ -247,14 +211,21 @@ jobs:
           import json
           from pathlib import Path
 
-          payload = json.loads(Path('artifacts/provider-metadata-capture-v0-10.json').read_text())
+          payload = json.loads(Path('artifacts/provider-metadata-capture-v0-12.json').read_text())
           assert payload['holdout_candles_accessed'] is False
           assert payload['source_switch_authorized'] is False
           assert payload['live_trading_authorized'] is False
-          assert payload['capture_execution_version'] == 'v0_10'
+          assert payload['capture_execution_version'] == 'v0_12'
+          assert payload['activation_authority'] == (
+              'provider_equivalence_v0_12_successor_metadata_window_v0_1'
+          )
           if payload['status'] == 'PASS':
-              assert payload['stage'] == 'PROVIDER_EQUIVALENCE_V0_10_RENDER_METADATA_CAPTURE_PASS'
-              assert payload['receipt_schema'] == 'provider-equivalence-v0-10-render-metadata-capture-receipt-v0.1'
+              assert payload['stage'] == (
+                  'PROVIDER_EQUIVALENCE_V0_12_SUCCESSOR_METADATA_CAPTURE_PASS'
+              )
+              assert payload['receipt_schema'] == (
+                  'provider-equivalence-v0-12-successor-metadata-capture-receipt-v0.1'
+              )
               assert payload['object_count'] == 3
               assert payload['postwrite_sha256_verification'] is True
               assert payload['provider_requests_performed'] == 2
@@ -267,7 +238,7 @@ jobs:
           else:
               assert payload['status'] == 'SKIP'
               assert payload['stage'] in {
-                  'OUTSIDE_FROZEN_METADATA_CAPTURE_WINDOW',
+                  'OUTSIDE_V0_12_SUCCESSOR_METADATA_CAPTURE_WINDOW',
                   'SCHEDULE_FRESHNESS_GUARD_SKIP',
               }
               assert payload['provider_requests_performed'] == 0
@@ -277,7 +248,7 @@ jobs:
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: provider-metadata-capture-v0-10-${{ github.run_id }}
-          path: artifacts/provider-metadata-capture-v0-10.json
+          name: provider-metadata-capture-v0-12-${{ github.run_id }}
+          path: artifacts/provider-metadata-capture-v0-12.json
           retention-days: 30
           if-no-files-found: error
