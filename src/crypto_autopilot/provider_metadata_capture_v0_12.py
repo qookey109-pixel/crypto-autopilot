@@ -20,6 +20,13 @@ AUTHORITY = Path(
     "research/receipts/"
     "2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json"
 )
+BINDING = Path(
+    "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json"
+)
+BINDING_RECEIPT = Path(
+    "research/receipts/"
+    "2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json"
+)
 V0_10_OBSERVATION = Path(
     "research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json"
 )
@@ -82,6 +89,8 @@ def _positive_decimal_source_string(value: object, *, field: str) -> str:
 def validate_successor_authority() -> tuple[dict[str, Any], dict[str, Any]]:
     cfg = _load(CONFIG)
     authority = _load(AUTHORITY)
+    binding = _load(BINDING)
+    binding_receipt = _load(BINDING_RECEIPT)
     observation = _load(V0_10_OBSERVATION)
 
     if cfg.get("status") != (
@@ -94,6 +103,45 @@ def validate_successor_authority() -> tuple[dict[str, Any], dict[str, Any]]:
         raise RuntimeError("V0.12 successor authority receipt is not PASS")
     if authority.get("protocol") != str(CONFIG):
         raise RuntimeError("V0.12 authority protocol binding changed")
+    if (cfg.get("lineage") or {}).get("protected_main_pr_number") != 0 or (
+        cfg.get("lineage") or {}
+    ).get("minimum_operational_change_commit_sha") is not None:
+        raise RuntimeError("V0.12 frozen pre-binding authority was rewritten")
+    if (authority.get("effectivity") or {}).get("protected_main_pr_number") != 0 or (
+        authority.get("effectivity") or {}
+    ).get("minimum_operational_change_commit_sha") is not None:
+        raise RuntimeError("V0.12 frozen pre-binding receipt was rewritten")
+    if binding.get("status") != (
+        "AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE"
+    ):
+        raise RuntimeError("V0.12 append-only binding is not authorized-on-merge")
+    if binding.get("bound_authority") != str(CONFIG) or binding.get(
+        "bound_authority_receipt"
+    ) != str(AUTHORITY):
+        raise RuntimeError("V0.12 append-only authority binding changed")
+    if binding_receipt.get("status") != "PASS" or binding_receipt.get("stage") != (
+        "PROVIDER_EQUIVALENCE_V0_12_SUCCESSOR_METADATA_WINDOW_PR_AND_OPERATIONAL_SHA_BOUND"
+    ):
+        raise RuntimeError("V0.12 append-only binding receipt is not PASS")
+    if binding_receipt.get("protocol") != str(BINDING):
+        raise RuntimeError("V0.12 binding receipt protocol changed")
+    binding_sha256 = hashlib.sha256(BINDING.read_bytes()).hexdigest()
+    if binding_receipt.get("protocol_sha256") != binding_sha256:
+        raise RuntimeError("V0.12 binding receipt SHA-256 changed")
+    binding_lineage = binding.get("lineage") or {}
+    receipt_lineage = binding_receipt.get("lineage") or {}
+    if not isinstance(binding_lineage, dict) or not isinstance(receipt_lineage, dict):
+        raise RuntimeError("V0.12 binding lineage shape changed")
+    if binding_lineage.get("protected_main_pr_number") != 212:
+        raise RuntimeError("V0.12 protected-main PR binding changed")
+    operational_sha = binding_lineage.get("minimum_operational_change_commit_sha")
+    if operational_sha != "80732edee9a8954b53b4b56115ecb0d506591f0a":
+        raise RuntimeError("V0.12 minimum operational change binding changed")
+    if receipt_lineage != {
+        **binding_lineage,
+        "pull_request_url": "https://github.com/qookey109-pixel/crypto-autopilot/pull/212",
+    }:
+        raise RuntimeError("V0.12 append-only binding receipt lineage changed")
     if observation.get("status") != "FAIL_CLOSED":
         raise RuntimeError("V0.10 fail-closed observation is required")
     impact = observation.get("scientific_impact") or {}

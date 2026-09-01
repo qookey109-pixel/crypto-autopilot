@@ -62,6 +62,10 @@ Repository `main` is the formal current authority. If chat history, an issue com
   `config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json` with
   receipt
   `research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json`.
+- Exact protected-main lineage is append-only in
+  `config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json`
+  and its matching binding receipt; do not rewrite the pre-binding authority
+  files after PR creation.
 - On the exact protected-main merge, V0.12 is the only scheduled metadata
   capture workflow:
   `.github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml`.

@@ -212,6 +212,8 @@ def main() -> int:
         "config/post_window_paper_training_v0_2.json",
         "config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json",
         "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
+        "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json",
+        "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json",
         "config/strategy_edge_validation_v0_1.json",
         "config/strategy_research_loop_v0_1.json",
         "docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md",

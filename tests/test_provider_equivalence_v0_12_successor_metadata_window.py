@@ -18,6 +18,14 @@ AUTHORITY = (
     / "research/receipts/"
     "2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json"
 )
+BINDING = (
+    ROOT / "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json"
+)
+BINDING_RECEIPT = (
+    ROOT
+    / "research/receipts/"
+    "2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json"
+)
 V010_WORKFLOW = (
     ROOT / ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
 )
@@ -145,16 +153,22 @@ def _matches(cron: str, instant: datetime) -> bool:
 
 def test_authority_is_atomic_free_only_and_downstream_closed() -> None:
     cfg, authority = v12.validate_successor_authority()
+    binding = json.loads(BINDING.read_text(encoding="utf-8"))
+    binding_receipt = json.loads(BINDING_RECEIPT.read_text(encoding="utf-8"))
     assert cfg["lineage"]["pre_change_main_sha"] == (
         "a6c2f0748a2b352f1ccac1fc349bbd4e0b3b80d4"
     )
-    assert cfg["lineage"]["protected_main_pr_number"] > 0
-    assert len(cfg["lineage"]["minimum_operational_change_commit_sha"]) == 40
-    assert authority["effectivity"]["protected_main_pr_number"] == (
-        cfg["lineage"]["protected_main_pr_number"]
+    assert cfg["lineage"]["protected_main_pr_number"] == 0
+    assert cfg["lineage"]["minimum_operational_change_commit_sha"] is None
+    assert authority["effectivity"]["protected_main_pr_number"] == 0
+    assert authority["effectivity"]["minimum_operational_change_commit_sha"] is None
+    assert binding["lineage"]["protected_main_pr_number"] == 212
+    assert binding["lineage"]["minimum_operational_change_commit_sha"] == (
+        "80732edee9a8954b53b4b56115ecb0d506591f0a"
     )
-    assert authority["effectivity"]["minimum_operational_change_commit_sha"] == (
-        cfg["lineage"]["minimum_operational_change_commit_sha"]
+    assert binding_receipt["lineage"]["protected_main_pr_number"] == 212
+    assert binding_receipt["lineage"]["minimum_operational_change_commit_sha"] == (
+        binding["lineage"]["minimum_operational_change_commit_sha"]
     )
     assert cfg["atomic_schedule_transition"][
         "concurrent_v0_10_and_v0_12_capture_paths_authorized"

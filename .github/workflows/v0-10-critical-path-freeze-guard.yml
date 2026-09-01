@@ -28,7 +28,9 @@ on:
       - "config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json"
       - "config/v0_10_mid_window_emergency_pionex_perp_query_v0_1.json"
       - "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json"
+      - "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json"
       - "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json"
+      - "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json"
       - ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
       - "src/crypto_autopilot/provider_metadata_capture_v0_12.py"
       - "scripts/capture_provider_equivalence_v0_12_metadata.py"
@@ -61,6 +63,7 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
+          import hashlib
           import json
           import os
           import subprocess
@@ -109,15 +112,47 @@ jobs:
                   'research/receipts/'
                   '2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json'
               )
-              if successor_path.is_file() and successor_receipt_path.is_file():
+              binding_path = Path(
+                  'config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json'
+              )
+              binding_receipt_path = Path(
+                  'research/receipts/'
+                  '2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json'
+              )
+              if all(path.is_file() for path in (
+                  successor_path,
+                  successor_receipt_path,
+                  binding_path,
+                  binding_receipt_path,
+              )):
                   successor = json.loads(successor_path.read_text())
                   successor_receipt = json.loads(successor_receipt_path.read_text())
+                  binding = json.loads(binding_path.read_text())
+                  binding_receipt = json.loads(binding_receipt_path.read_text())
                   if successor['status'] != (
                       'AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE'
                   ):
                       raise SystemExit('V0.12 successor authority status is invalid')
                   if successor_receipt['status'] != 'PASS':
                       raise SystemExit('V0.12 successor receipt is not PASS')
+                  if successor['lineage']['protected_main_pr_number'] != 0 or successor[
+                      'lineage'
+                  ]['minimum_operational_change_commit_sha'] is not None:
+                      raise SystemExit('V0.12 frozen pre-binding authority was rewritten')
+                  if successor_receipt['effectivity']['protected_main_pr_number'] != 0 or (
+                      successor_receipt['effectivity'][
+                          'minimum_operational_change_commit_sha'
+                      ] is not None
+                  ):
+                      raise SystemExit('V0.12 frozen pre-binding receipt was rewritten')
+                  if binding['bound_authority'] != str(successor_path):
+                      raise SystemExit('V0.12 append-only authority binding changed')
+                  if binding_receipt['protocol'] != str(binding_path):
+                      raise SystemExit('V0.12 binding receipt protocol changed')
+                  if binding_receipt['protocol_sha256'] != hashlib.sha256(
+                      binding_path.read_bytes()
+                  ).hexdigest():
+                      raise SystemExit('V0.12 binding receipt SHA-256 changed')
 
                   expected_frozen_drift = {
                       '.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml',
@@ -129,7 +164,7 @@ jobs:
                           'V0.12 successor changes an unauthorized frozen critical path'
                       )
 
-                  lineage = successor['lineage']
+                  lineage = binding['lineage']
                   if lineage['pre_change_main_sha'] != (
                       'a6c2f0748a2b352f1ccac1fc349bbd4e0b3b80d4'
                   ):
@@ -140,12 +175,12 @@ jobs:
                       raise SystemExit('V0.12 protected-main PR binding is missing')
                   if len(change_sha) != 40:
                       raise SystemExit('V0.12 operational commit binding is missing')
-                  if successor_receipt['effectivity']['protected_main_pr_number'] != pr_number:
-                      raise SystemExit('V0.12 receipt PR binding differs from config')
-                  if successor_receipt['effectivity'][
+                  if binding_receipt['lineage']['protected_main_pr_number'] != pr_number:
+                      raise SystemExit('V0.12 binding receipt PR differs from config')
+                  if binding_receipt['lineage'][
                       'minimum_operational_change_commit_sha'
                   ] != change_sha:
-                      raise SystemExit('V0.12 receipt commit binding differs from config')
+                      raise SystemExit('V0.12 binding receipt commit differs from config')
                   subprocess.run(
                       ['git', 'merge-base', '--is-ancestor', change_sha, 'HEAD'], check=True
                   )

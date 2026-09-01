@@ -415,6 +415,8 @@
     "research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json",
     "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
     "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json",
-    ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
+    ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml",
+    "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json",
+    "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json"
   ]
 }

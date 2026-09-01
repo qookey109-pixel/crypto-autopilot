@@ -47,6 +47,10 @@ Repository branch `main` is the live formal authority and is intentionally not s
   receipt:
   `research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json`;
   contract: `docs/PROVIDER_EQUIVALENCE_V0_12_SUCCESSOR_METADATA_WINDOW_V0_1.md`.
+- Protected-main PR #212 and minimum operational commit
+  `80732edee9a8954b53b4b56115ecb0d506591f0a` are bound append-only by
+  `config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json`
+  and its matching receipt; the pre-binding authority files remain unchanged.
 
 ### V0.10 post-#210 scheduled capture — RETIRED / FAIL_CLOSED EVIDENCE PRESERVED
 

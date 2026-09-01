@@ -12,6 +12,13 @@ V0_10_CUTOVER = Path("config/provider_equivalence_v0_10_final_atomic_cutover_v0_
 V0_12_SUCCESSOR = Path(
     "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json"
 )
+V0_12_BINDING = Path(
+    "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json"
+)
+V0_12_BINDING_RECEIPT = Path(
+    "research/receipts/"
+    "2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json"
+)
 DETAILED_HISTORY = Path("config/binance_usdm_detailed_history_v0_1_2.json")
 PIONEX_ALTERNATIVE_ASSETS = Path("config/pionex_alternative_assets_v0_1.json")
 PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY = Path(
@@ -32,6 +39,8 @@ SOURCE_AUTHORITIES = (
     PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY,
     V0_10_CUTOVER,
     V0_12_SUCCESSOR,
+    V0_12_BINDING,
+    V0_12_BINDING_RECEIPT,
     SUCCESSOR_SCHEDULE,
     PAPER_SUCCESSOR,
     ROADMAP,
@@ -93,6 +102,8 @@ def build_projection(
 ) -> dict[str, object]:
     v0_10 = load_json(V0_10_CUTOVER)
     v0_12 = load_json(V0_12_SUCCESSOR)
+    v0_12_binding = load_json(V0_12_BINDING)
+    v0_12_binding_receipt = load_json(V0_12_BINDING_RECEIPT)
     detailed = load_json(DETAILED_HISTORY)
     alternative_assets = load_json(PIONEX_ALTERNATIVE_ASSETS)
     alternative_observability = load_json(PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY)
@@ -122,6 +133,12 @@ def build_projection(
         "AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE"
     ):
         raise RuntimeError("V0.12 successor authority state changed")
+    if (v0_12_binding.get("lineage") or {}).get("protected_main_pr_number") != 212:
+        raise RuntimeError("V0.12 successor PR binding changed")
+    if v0_12_binding_receipt.get("protocol_sha256") != hashlib.sha256(
+        V0_12_BINDING.read_bytes()
+    ).hexdigest():
+        raise RuntimeError("V0.12 successor binding receipt SHA-256 changed")
     v12_window = require_dict(v0_12.get("successor_window"), "V0.12 window")
     v12_boundary = require_dict(v0_12.get("authorization_boundary"), "V0.12 boundary")
     v12_start = parse_utc(v12_window.get("start_utc"), "V0.12 start")

@@ -45,13 +45,15 @@ The repository has moved beyond the original V0.1 implementation baseline while 
   MERGE**. It is the only scheduled metadata-capture path, covering
   `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z` with 194 hourly
   slots and an independent R2 namespace.
+- PR #212 and minimum operational commit
+  `80732edee9a8954b53b4b56115ecb0d506591f0a` are recorded in a separate
+  append-only binding amendment, preserving the pre-binding authority files.
 - V0.11 metadata-stability evaluator: **PREPARED / PRODUCTION R2 EVALUATION NOT AUTHORIZED**. Its deterministic 194-slot rules were frozen before production stability evidence is read.
 - Replacement holdout `2026-08-28` through `2026-09-03`: **FROZEN_UNOPENED**; candle access and evaluation remain unauthorized.
 - Metadata stability evaluation: **NOT_YET_RUN**. Because failed or missing
   slots cannot be backfilled, the currently observed window is already blocked
-  from producing a complete 194-slot PASS dataset. A new versioned decision is
-  required before suspending the remaining attempts or preparing a successor
-  window.
+  from producing a complete 194-slot PASS dataset. V0.12 is the separately
+  versioned successor decision; it does not repair or regrade V0.10.
 
 The retired V0.10 authority remains historical evidence. V0.12 authorizes only
 the successor public-provider metadata capture phase and metadata-only R2 writes

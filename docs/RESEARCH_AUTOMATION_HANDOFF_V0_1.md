@@ -37,6 +37,9 @@ Public dashboard: `https://qookey109-pixel.github.io/crypto-autopilot/`
   creating V0.12. On the exact protected-main merge, V0.12 becomes the only
   metadata schedule for `2026-09-04T02:00:00Z` through
   `2026-09-12T03:59:59.999Z`; it does not replay or regrade V0.10.
+- Delivery is PR #212. The append-only binding records minimum operational
+  commit `80732edee9a8954b53b4b56115ecb0d506591f0a` without rewriting the
+  pre-binding authority config or receipt.
 
 ## Executive decision
 

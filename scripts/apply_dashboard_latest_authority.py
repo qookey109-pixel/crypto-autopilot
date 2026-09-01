@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -56,6 +57,13 @@ V12_CONFIG = Path(
 V12_AUTHORITY = Path(
     "research/receipts/"
     "2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json"
+)
+V12_BINDING = Path(
+    "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json"
+)
+V12_BINDING_RECEIPT = Path(
+    "research/receipts/"
+    "2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json"
 )
 V12_WORKFLOW = Path(
     ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
@@ -239,6 +247,8 @@ def validate_render_lineage() -> dict[str, object]:
     emergency_effective = load(V10_EMERGENCY_SCHEDULE_EFFECTIVE)
     v12 = load(V12_CONFIG)
     v12_authority = load(V12_AUTHORITY)
+    v12_binding = load(V12_BINDING)
+    v12_binding_receipt = load(V12_BINDING_RECEIPT)
 
     if v05.get("status") != "PASS" or v05.get("stage") != (
         "PROVIDER_EQUIVALENCE_V0_5_RENDER_FREE_BINANCE_TRANSPORT_PASS"
@@ -489,6 +499,28 @@ def validate_render_lineage() -> dict[str, object]:
         "PROVIDER_EQUIVALENCE_V0_12_SUCCESSOR_METADATA_WINDOW_AUTHORIZED_ON_MAIN_MERGE"
     ):
         raise RuntimeError("V0.12 successor receipt is not PASS")
+    if (v12.get("lineage") or {}).get("protected_main_pr_number") != 0 or (
+        v12.get("lineage") or {}
+    ).get("minimum_operational_change_commit_sha") is not None:
+        raise RuntimeError("V0.12 frozen pre-binding authority was rewritten")
+    if v12_binding.get("bound_authority") != str(V12_CONFIG):
+        raise RuntimeError("V0.12 append-only binding target changed")
+    if (v12_binding.get("lineage") or {}).get("protected_main_pr_number") != 212:
+        raise RuntimeError("V0.12 protected-main PR binding changed")
+    if (v12_binding.get("lineage") or {}).get(
+        "minimum_operational_change_commit_sha"
+    ) != "80732edee9a8954b53b4b56115ecb0d506591f0a":
+        raise RuntimeError("V0.12 operational commit binding changed")
+    if v12_binding_receipt.get("protocol") != str(V12_BINDING):
+        raise RuntimeError("V0.12 binding receipt protocol changed")
+    if v12_binding_receipt.get("protocol_sha256") != hashlib.sha256(
+        V12_BINDING.read_bytes()
+    ).hexdigest():
+        raise RuntimeError("V0.12 binding receipt SHA-256 changed")
+    if (v12_binding_receipt.get("lineage") or {}).get(
+        "protected_main_pr_number"
+    ) != 212:
+        raise RuntimeError("V0.12 binding receipt PR changed")
     v12_observation = require_dict(
         v12_authority.get("observed_v0_10_failure") or {},
         "V0.12 observed V0.10 failure",
@@ -539,6 +571,8 @@ def validate_render_lineage() -> dict[str, object]:
         "v10_emergency_schedule_effective": emergency_effective,
         "v12": v12,
         "v12_authority": v12_authority,
+        "v12_binding": v12_binding,
+        "v12_binding_receipt": v12_binding_receipt,
     }
 
 
@@ -825,6 +859,8 @@ def main() -> int:
         V10_POST_PERP_SCHEMA_OBSERVATION,
         V12_CONFIG,
         V12_AUTHORITY,
+        V12_BINDING,
+        V12_BINDING_RECEIPT,
         STRATEGY_EDGE_CONFIG,
         STRATEGY_EDGE_RECEIPT,
         STRATEGY_RESEARCH_CONFIG,

@@ -1,0 +1,45 @@
+{
+  "schema_version": "provider_equivalence_v0_12_successor_metadata_window_binding_v0_1",
+  "status": "AUTHORIZED_FOR_PROTECTED_MAIN_REVIEW_NOT_EFFECTIVE_BEFORE_MERGE",
+  "date": "2026-08-31",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "purpose": "Append-only binding of the frozen V0.12 successor metadata-window authority to the exact protected-main pull request and its minimum operational change commit, without rewriting the previously committed authority config or receipt and without expanding execution scope.",
+  "bound_authority": "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
+  "bound_authority_receipt": "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json",
+  "lineage": {
+    "pre_change_main_sha": "a6c2f0748a2b352f1ccac1fc349bbd4e0b3b80d4",
+    "minimum_operational_change_commit_sha": "80732edee9a8954b53b4b56115ecb0d506591f0a",
+    "protected_main_pr_number": 212,
+    "binding_is_append_only": true,
+    "bound_authority_files_mutated_after_operational_commit": false
+  },
+  "binding_contract": {
+    "operational_commit_must_be_ancestor_of_binding_commit": true,
+    "operational_frozen_path_delta_must_equal": [
+      ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+      ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
+    ],
+    "pull_request_base_branch": "main",
+    "pull_request_head_branch": "codex/v0-12-successor-metadata-window-v0-1",
+    "exact_change_set_must_merge_to_protected_main": true,
+    "automatic_merge_authorized": false
+  },
+  "scope_boundary": {
+    "authority_scope_expanded_by_binding": false,
+    "provider_request_authorized_by_binding_commit": false,
+    "r2_access_authorized_by_binding_commit": false,
+    "production_stability_evaluation_authorized": false,
+    "holdout_candle_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "effectivity": {
+    "effective_before_merge": false,
+    "effective_only_after_exact_pr_change_set_is_merged_to_protected_main": true,
+    "requires_human_review_before_merge": true
+  }
+}

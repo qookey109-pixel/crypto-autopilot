@@ -20,6 +20,11 @@ backfilled, regraded or copied into V0.12.
 also requires `GITHUB_EVENT_NAME=schedule`, so manual events stop before any
 provider request or R2 client construction.
 
+The authority draft and its receipt remain byte-preserved after the delivery
+PR exists. PR #212 and minimum operational commit
+`80732edee9a8954b53b4b56115ecb0d506591f0a` are recorded separately in the
+append-only binding config and receipt.
+
 ## Pionex response adapter
 
 The official Pionex futures documentation currently describes the newer
