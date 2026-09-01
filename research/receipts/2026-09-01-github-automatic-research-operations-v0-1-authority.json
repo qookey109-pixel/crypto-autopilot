@@ -1,0 +1,54 @@
+{
+  "schema": "github-automatic-research-operations-authority-v0.1",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "stage": "GITHUB_AUTOMATIC_RESEARCH_OPERATIONS_V0_1_AUTHORIZED",
+  "date": "2026-09-01",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "request_basis": "The user requested that routine research operations require no manual execution and run online through GitHub where possible.",
+  "bound_files": [
+    {
+      "path": "config/github_automatic_research_operations_v0_1.json",
+      "sha256": "54126b517ba373dd82ddf378db1ae4c4d62026b23d573e4c2d2a4f4f8cb27c49"
+    },
+    {
+      "path": "config/research_automation_health_v0_2.json",
+      "sha256": "ccf6e45495d36b89c9d7abe4a0151728a236a44b4387464c2dc016a88e2bc0a6"
+    },
+    {
+      "path": ".github/workflows/research-automation-health-v0-2.yml",
+      "sha256": "2f83bfe215c6d3469f968ed718808aacbea207c44e3c4086f753d80073ce385a"
+    },
+    {
+      "path": ".github/workflows/research-automation-health-v0-1.yml",
+      "sha256": "2e98334beed3669c262bfb88c0f7facfefc785118a19c9d9ecb0538cc35a79b1"
+    },
+    {
+      "path": "docs/GITHUB_AUTOMATIC_RESEARCH_OPERATIONS_V0_1.md",
+      "sha256": "e41408eee3d5267697b41b17a9a262ca2ff60014e03c2552218aca318007a2a6"
+    },
+    {
+      "path": "docs/RESEARCH_AUTOMATION_HEALTH_V0_2.md",
+      "sha256": "0b9abd35befddf4921d0f9b7382a39395b280f7e2754096977b23b4bf3c30336"
+    }
+  ],
+  "authorized_scope": {
+    "scheduled_workflow_count": 7,
+    "normal_execution_event": "schedule",
+    "manual_dispatch_required": false,
+    "manual_dispatch_counts_as_health": false,
+    "health_cron_utc": "57 */2 * * *",
+    "health_artifact_retention_days": 90,
+    "github_actions_metadata_read_only": true,
+    "provider_or_r2_scope_added": false
+  },
+  "explicitly_not_authorized": {
+    "v0_12_production_stability_evaluation": false,
+    "replacement_holdout_access": false,
+    "post_window_paper_training_v0_2": false,
+    "alternative_asset_candles_or_training": false,
+    "automatic_model_promotion": false,
+    "trade_plan": false,
+    "real_money_order": false,
+    "live_trading": false
+  }
+}

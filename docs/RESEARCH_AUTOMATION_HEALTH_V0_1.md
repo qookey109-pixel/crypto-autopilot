@@ -1,5 +1,9 @@
 # Research Automation Health V0.1
 
+> Historical authority: its cron is retired by Research Automation Health
+> V0.2. The workflow remains manual regression-only and cannot count as current
+> automatic-health evidence.
+
 Research Automation Health V0.1 adds two research-only guardrails without
 changing the V0.10 metadata-capture path, replacement holdout state, model
 promotion or trading authority.
@@ -49,4 +53,3 @@ post-window execution authority is reviewed and merged.
 Neither active monitor opens the replacement holdout, reads V0.10 production
 receipts, changes a strategy, promotes a model, produces a trade plan, sends an
 order or enables live trading.
-

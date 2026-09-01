@@ -12,6 +12,12 @@ from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 
+SUPPORTED_REPORT_SCHEMAS = {
+    "research-automation-health-v0.1",
+    "research-automation-health-v0.2",
+}
+
+
 class ResearchAutomationHealthError(ValueError):
     """Raised when automation metadata or its monitoring authority is invalid."""
 
@@ -150,14 +156,17 @@ def evaluate_automation_health(
     runs_by_workflow: Mapping[str, Sequence[Mapping[str, Any]]],
     *,
     now: datetime,
+    schema: str = "research-automation-health-v0.1",
 ) -> dict[str, Any]:
+    if schema not in SUPPORTED_REPORT_SCHEMAS:
+        raise ResearchAutomationHealthError(f"unsupported report schema: {schema}")
     rows = [
         evaluate_workflow(item, runs_by_workflow.get(item.workflow, ()), now=now)
         for item in expectations
     ]
     alerts = [row for row in rows if row["alert"]]
     return {
-        "schema": "research-automation-health-v0.1",
+        "schema": schema,
         "status": "ALERT" if alerts else "PASS",
         "evaluated_at_utc": now.astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
         "workflow_count": len(rows),
@@ -173,6 +182,49 @@ def evaluate_automation_health(
             "real_money_order": False,
             "live_trading": False,
         },
+    }
+
+
+def scheduled_workflow_crons(workflow_dir: str | Path) -> dict[str, list[str]]:
+    """Return the exact Repository cron inventory without interpreting YAML."""
+
+    scheduled: dict[str, list[str]] = {}
+    for path in sorted(Path(workflow_dir).glob("*.y*ml")):
+        crons = re.findall(r'^\s+- cron: "([^"]+)"$', path.read_text(encoding="utf-8"), re.MULTILINE)
+        if crons:
+            scheduled[path.name] = crons
+    return scheduled
+
+
+def validate_schedule_coverage(
+    expectations: Sequence[WorkflowExpectation],
+    workflow_dir: str | Path,
+) -> dict[str, Any]:
+    """Require every active Repository cron to be monitored exactly once."""
+
+    scheduled = scheduled_workflow_crons(workflow_dir)
+    monitored = [item.workflow for item in expectations]
+    if len(monitored) != len(set(monitored)):
+        raise ResearchAutomationHealthError("duplicate monitored workflow")
+    missing = sorted(set(scheduled) - set(monitored))
+    unexpected = sorted(set(monitored) - set(scheduled))
+    if missing or unexpected:
+        raise ResearchAutomationHealthError(
+            f"scheduled workflow coverage mismatch: missing={missing}, unexpected={unexpected}"
+        )
+    manual_health = sorted(
+        item.workflow for item in expectations if item.allowed_events != ("schedule",)
+    )
+    if manual_health:
+        raise ResearchAutomationHealthError(
+            f"manual events cannot count as automatic health: {manual_health}"
+        )
+    return {
+        "scheduled_workflow_count": len(scheduled),
+        "monitored_workflow_count": len(monitored),
+        "complete": True,
+        "manual_events_count_as_health": False,
+        "workflows": scheduled,
     }
 
 
@@ -230,8 +282,9 @@ def audit_workflow_inventory(workflow_dir: str | Path) -> dict[str, int]:
 
 
 def markdown_summary(report: Mapping[str, Any]) -> str:
+    version = "V0.2" if report.get("schema") == "research-automation-health-v0.2" else "V0.1"
     lines = [
-        "# Research Automation Health V0.1",
+        f"# Research Automation Health {version}",
         "",
         f"Overall: **{report['status']}** · alerts: **{report['alert_count']}**",
         "",

@@ -26,8 +26,9 @@ Public dashboard: `https://qookey109-pixel.github.io/crypto-autopilot/`
 - The failure occurs before R2 store construction. No R2 read/write, holdout
   access, V0.11 evaluation, trade plan or order occurred.
 - Research Signal Layer and Signal Quality remain separate from this capture.
-  Research Automation Health V0.1 records the historical V0.10 upstream
-  failure; it is not evidence that V0.12 has executed.
+  Research Automation Health V0.2 is the single current cron control plane;
+  it records V0.12 as `WAITING_WINDOW` until the first scheduled run and does
+  not treat manual or PR runs as automatic-health evidence.
 - V0.11 remains `NOT_YET_RUN`; however, immutable missing/failed slots make the
   current frozen window ineligible to produce complete 194-slot PASS evidence.
 - Exact observation:
@@ -128,7 +129,7 @@ Crypto Core 100 V0.1.2 separately provides:
 | Hourly at `:07` until 2026-08-27 08:00 | Existing Pionex public paper training | Existing bounded paper authority only; Pionex Demo remains manual |
 | Daily 10:17 | Public KOL research collection | Dedicated R2 namespace; structured forecasts only, prose stays metadata |
 | Daily 10:47 | KOL research quality check | Three exact R2 reads; lineage/time/authority verification; no list/write |
-| Every three hours at `:47` | Research automation health | GitHub Actions metadata only; alerts on stale, failed or missing jobs |
+| Every two hours at `:57` | Research Automation Health V0.2 | GitHub Actions metadata only; covers all seven current crons and alerts on stale, failed or missing jobs |
 | 2026-08-27 08:00 | V0.5 Binance and Pionex provider-read stop | Automatic post-stop resume is forbidden |
 | 2026-08-27 08:00 through V0.12 main merge | V0.10 frozen metadata capture evidence | Runs #36–#41 remain fail-closed evidence; remaining schedule is retired atomically, with no replay or manual backfill |
 | 2026-09-04 10:00 through 2026-09-12 11:59:59.999 | V0.12 successor metadata window | Only current metadata schedule after exact main merge; 194 hourly slots / 388 attempts, separate R2 namespace, no holdout or production evaluation |
@@ -181,20 +182,21 @@ run independent crons that can race:
   not open the replacement holdout.
 - [x] Record explicit user authority to stop the remaining V0.10 schedule and
   create the separately versioned V0.12 successor contract.
-- [ ] Merge the exact protected-main V0.12 change set only after CI and human
-  review; no pre-merge provider or R2 execution is authorized.
+- [x] Merge PR #212 and verify protected `main`, CI, Freeze Guard, Pages and the
+  registered V0.12 schedule.
+- [ ] Merge GitHub Automatic Research Operations V0.1 after CI and human
+  review; its V0.2 health workflow must become the only health cron.
 - [ ] After the V0.12 metadata window ends, create a separate production
   evaluation authority before any V0.12 receipt read.
 
 ## Next decision
 
-Review and merge the exact V0.12 protected-main change set only after all CI
-checks pass. The merge atomically retires the V0.10 schedule and enables the
-bounded V0.12 schedule; this handoff alone does not execute provider requests
-or R2 access. After the window, freeze the observed lineage and create a
-separate production-evaluation authority. Keep provider separation, the 0 USD
-budget, no backfill, unopened holdout, zero model promotion and zero trading
-authority.
+Review and merge GitHub Automatic Research Operations V0.1 after all CI checks
+pass. Routine authorized work then stays schedule-driven in GitHub, while
+manual dispatch is regression-only and cannot count as automation health.
+After the V0.12 window, freeze the observed lineage and create a separate
+production-evaluation authority. Keep provider separation, the 0 USD budget,
+no backfill, unopened holdout, zero model promotion and zero trading authority.
 
 ## Stop conditions
 

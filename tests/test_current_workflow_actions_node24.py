@@ -35,6 +35,7 @@ CURRENT = (
     "dashboard-authority-snapshot.yml",
     "dashboard-github-pages.yml",
     "dashboard-static-smoke.yml",
+    "research-automation-health-v0-2.yml",
     "pionex-public-paper-training-v0-1.yml",
 )
 
@@ -46,6 +47,7 @@ PINNED_CRITICAL = (
     "dashboard-authority-snapshot.yml",
     "dashboard-github-pages.yml",
     "dashboard-static-smoke.yml",
+    "research-automation-health-v0-2.yml",
     "pionex-public-paper-training-v0-1.yml",
 )
 

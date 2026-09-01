@@ -12,6 +12,7 @@ from crypto_autopilot.research.automation_health import (
     expectation_from_config,
     fetch_workflow_runs,
     markdown_summary,
+    validate_schedule_coverage,
 )
 
 
@@ -25,7 +26,11 @@ def main() -> int:
     args = parser.parse_args()
 
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
-    if config.get("schema") != "research-automation-health-v0.1":
+    schema = str(config.get("schema", ""))
+    if schema not in {
+        "research-automation-health-v0.1",
+        "research-automation-health-v0.2",
+    }:
         raise RuntimeError("unexpected research automation health config")
     token = os.environ.get("GITHUB_TOKEN", "")
     expectations = [expectation_from_config(item) for item in config["workflows"]]
@@ -42,7 +47,12 @@ def main() -> int:
         if args.now_utc
         else datetime.now(timezone.utc)
     )
-    report = evaluate_automation_health(expectations, runs, now=now)
+    report = evaluate_automation_health(expectations, runs, now=now, schema=schema)
+    if schema == "research-automation-health-v0.2":
+        report["schedule_coverage"] = validate_schedule_coverage(
+            expectations,
+            ".github/workflows",
+        )
     report["workflow_inventory"] = audit_workflow_inventory(".github/workflows")
     thresholds = config["inventory_warn_thresholds"]
     report["workflow_inventory"]["retired_pr_warning"] = (

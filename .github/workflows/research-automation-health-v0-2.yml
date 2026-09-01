@@ -1,6 +1,8 @@
-name: Research Automation Health V0.1
+name: Research Automation Health V0.2
 
 on:
+  schedule:
+    - cron: "57 */2 * * *"
   workflow_dispatch:
 
 permissions:
@@ -8,7 +10,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: research-automation-health-v0-1
+  group: research-automation-health-v0-2
   cancel-in-progress: false
 
 jobs:
@@ -27,23 +29,29 @@ jobs:
       - name: Install constrained runtime
         run: python -m pip install -c requirements/ci-constraints.txt .
 
-      - name: Check versioned research automations
+      - name: Check every current scheduled research automation
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           python scripts/check_research_automation_health.py \
-            --config config/research_automation_health_v0_1.json \
+            --config config/research_automation_health_v0_2.json \
             --repository "${GITHUB_REPOSITORY}" \
             --output research-health-output/health.json \
             --fail-on-alert
 
-      - name: Assert monitor has no provider, storage or trading authority
+      - name: Assert complete schedule coverage and zero execution authority
         if: always()
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
+
           report = json.loads(Path("research-health-output/health.json").read_text())
+          coverage = report["schedule_coverage"]
+          assert coverage["complete"] is True
+          assert coverage["scheduled_workflow_count"] == 7
+          assert coverage["scheduled_workflow_count"] == coverage["monitored_workflow_count"]
+          assert coverage["manual_events_count_as_health"] is False
           authority = report["authority"]
           assert authority["provider_access"] is False
           assert authority["r2_access"] is False
@@ -54,11 +62,11 @@ jobs:
           assert authority["live_trading"] is False
           PY
 
-      - name: Upload secret-free health evidence
+      - name: Upload secret-free online health evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: research-automation-health-${{ github.run_id }}-${{ github.run_attempt }}
+          name: research-automation-health-v0-2-${{ github.run_id }}-${{ github.run_attempt }}
           path: research-health-output/health.json
           retention-days: 90
           if-no-files-found: error

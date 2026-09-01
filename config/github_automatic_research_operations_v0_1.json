@@ -1,0 +1,83 @@
+{
+  "schema": "github-automatic-research-operations-v0.1",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "purpose": "Make GitHub Actions schedule events the normal execution path for every currently authorized online research operation, while preserving fail-closed authority boundaries.",
+  "normal_operation": {
+    "execution_environment": "github_actions",
+    "persistent_generated_data": "cloudflare_r2_or_github_actions_artifact_as_already_authorized",
+    "dashboard": "github_pages",
+    "manual_dispatch_required": false,
+    "manual_dispatch_counts_as_automation_health": false,
+    "manual_dispatch_role": "REGRESSION_OR_EMERGENCY_ONLY_WHEN_SEPARATELY_AUTHORIZED",
+    "automatic_retry_may_bypass_failed_gate": false,
+    "automatic_provider_fallback": false,
+    "paid_runtime_fallback": false
+  },
+  "scheduled_workflows": [
+    {
+      "workflow": "provider-equivalence-v0-12-successor-metadata-capture.yml",
+      "cron_utc": [
+        "17,47 2-23 4 9 *",
+        "17,47 * 5,6,7,8,9,10,11 9 *",
+        "17,47 0-3 12 9 *"
+      ],
+      "scope": "BOUNDED_V0_12_METADATA_ONLY"
+    },
+    {
+      "workflow": "research-signal-layer-v0-2.yml",
+      "cron_utc": ["17 2 * * *"],
+      "scope": "STRUCTURED_PUBLIC_RESEARCH_SIGNAL_INGESTION"
+    },
+    {
+      "workflow": "research-signal-quality-v0-1.yml",
+      "cron_utc": ["47 2 * * *"],
+      "scope": "READ_ONLY_SIGNAL_LINEAGE_QUALITY"
+    },
+    {
+      "workflow": "research-automation-health-v0-2.yml",
+      "cron_utc": ["57 */2 * * *"],
+      "scope": "GITHUB_ACTIONS_METADATA_READ_ONLY"
+    },
+    {
+      "workflow": "binance-usdm-detailed-history-v0-1.yml",
+      "cron_utc": ["23 */6 4-30 9 *"],
+      "scope": "BOUNDED_CRYPTO_CORE_100_R2_SHARDS"
+    },
+    {
+      "workflow": "binance-usdm-detailed-training-v0-1.yml",
+      "cron_utc": ["37 4 * * 0"],
+      "scope": "CONDITIONAL_RESEARCH_TRAINING_AFTER_COMPLETE_DATASET"
+    },
+    {
+      "workflow": "pionex-alternative-assets-observability-v0-2.yml",
+      "cron_utc": ["53 2 4 9 *", "53 3 6,13,20,27 9 *"],
+      "scope": "BOUNDED_PIONEX_METADATA_OBSERVABILITY_ONLY"
+    }
+  ],
+  "waiting_not_automatically_unblocked": [
+    "V0_12_PRODUCTION_METADATA_STABILITY_EVALUATION",
+    "REPLACEMENT_HOLDOUT_ACCESS",
+    "POST_WINDOW_PAPER_TRAINING_V0_2",
+    "PIONEX_ALTERNATIVE_ASSET_CANDLES_AND_TRAINING",
+    "AUTOMATIC_MODEL_PROMOTION",
+    "TRADE_PLAN",
+    "REAL_MONEY_ORDER",
+    "LIVE_TRADING"
+  ],
+  "authority_transition": {
+    "protected_main_pr_still_required": true,
+    "human_merge_review_still_required": true,
+    "dates_or_schedule_events_grant_new_authority": false,
+    "workflow_may_self_authorize_new_scope": false
+  },
+  "authority": {
+    "github_actions_metadata_read_only": true,
+    "new_provider_access_added": false,
+    "new_r2_access_added": false,
+    "replacement_holdout_access": false,
+    "automatic_model_promotion": false,
+    "trade_plan": false,
+    "real_money_order": false,
+    "live_trading": false
+  }
+}

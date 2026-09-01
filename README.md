@@ -48,6 +48,11 @@ The repository has moved beyond the original V0.1 implementation baseline while 
 - PR #212 and minimum operational commit
   `80732edee9a8954b53b4b56115ecb0d506591f0a` are recorded in a separate
   append-only binding amendment, preserving the pre-binding authority files.
+- GitHub Automatic Research Operations V0.1 is **AUTHORIZED ON MAIN MERGE**:
+  all seven currently authorized online workflows use GitHub cron as their
+  normal path. Research Automation Health V0.2 checks the complete schedule
+  inventory every two hours, and manual/PR runs cannot count as cron health.
+  This adds no holdout, model-promotion or trading authority.
 - V0.11 metadata-stability evaluator: **PREPARED / PRODUCTION R2 EVALUATION NOT AUTHORIZED**. Its deterministic 194-slot rules were frozen before production stability evidence is read.
 - Replacement holdout `2026-08-28` through `2026-09-03`: **FROZEN_UNOPENED**; candle access and evaluation remain unauthorized.
 - Metadata stability evaluation: **NOT_YET_RUN**. Because failed or missing
