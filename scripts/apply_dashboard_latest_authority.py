@@ -76,6 +76,8 @@ STRATEGY_RESEARCH_CONFIG = Path("config/strategy_research_loop_v0_1.json")
 STRATEGY_RESEARCH_RECEIPT = Path(
     "research/receipts/2026-08-28-strategy-research-loop-v0-1-prepared.json"
 )
+AUTOMATIC_OPERATIONS = Path("config/github_automatic_research_operations_v0_1.json")
+AUTOMATION_HEALTH_V0_2 = Path("config/research_automation_health_v0_2.json")
 
 EXPECTED_SCOPE_SHA = "1e0ff54daeec8e5e47376fedb631c663687dd6fb6a4c297d269c33acdf99ad58"
 EXPECTED_CHECKSUM_SHA = "881c14d3b3c780b8a0d56ca2f7fd57d2abff310fcd7cb4b13dc01f506b9b64f3"
@@ -743,6 +745,30 @@ def main() -> int:
     lineage = validate_render_lineage()
     strategy_research = validate_strategy_research_lineage()
     incident = validate_v10_post_perp_schema_observation()
+    automatic_operations = load(AUTOMATIC_OPERATIONS)
+    automation_health = load(AUTOMATION_HEALTH_V0_2)
+
+    if automatic_operations.get("status") != "AUTHORIZED_ON_PROTECTED_MAIN_MERGE":
+        raise RuntimeError("automatic-operations authority state changed")
+    scheduled = automatic_operations.get("scheduled_workflows") or []
+    if not isinstance(scheduled, list) or len(scheduled) != 7:
+        raise RuntimeError("automatic-operations schedule inventory changed")
+    automatic_boundary = require_dict(
+        automatic_operations.get("authority") or {}, "automatic-operations boundary"
+    )
+    for key in (
+        "new_provider_access_added",
+        "new_r2_access_added",
+        "replacement_holdout_access",
+        "automatic_model_promotion",
+        "trade_plan",
+        "real_money_order",
+        "live_trading",
+    ):
+        if automatic_boundary.get(key) is not False:
+            raise RuntimeError(f"automatic operations changed safety boundary: {key}")
+    if automation_health.get("schema") != "research-automation-health-v0.2":
+        raise RuntimeError("automation-health V0.2 schema changed")
 
     require_dict(materialization.get("exact_scope") or {}, "funding exact scope")
     postwrite = require_dict(materialization.get("postwrite_results") or {}, "funding postwrite")
@@ -821,6 +847,10 @@ def main() -> int:
                 v12_window["scheduled_minutes_utc"]
             ),
             "cloudRuntimeMonthlyBudgetUsd": 0,
+            "githubAutomaticOperationsState": "AUTHORIZED_ON_MAIN_MERGE",
+            "githubAutomaticScheduledWorkflowCount": len(scheduled),
+            "githubManualDispatchRequiredForNormalOperations": False,
+            "githubManualRunsCountAsAutomationHealth": False,
             "strategyResearchLoopState": "PREPARED_RESEARCH_ONLY",
             "strategyResearchCandidateCount": strategy_research["candidate_count"],
             "strategyResearchFamilyCount": strategy_research["family_count"],
@@ -838,7 +868,8 @@ def main() -> int:
     dashboard["snapshotLabel"] = (
         "Repository 正式 Authority 狀態快照 · Equivalence V0.1 FAIL / "
         "Funding V0.2 R2 PASS / V0.10 Schedule RETIRED / "
-        "V0.12 Successor AUTHORIZED / Strategy Research Loop PREPARED"
+        "V0.12 Successor AUTHORIZED / GitHub Automatic Operations AUTHORIZED / "
+        "Strategy Research Loop PREPARED"
     )
 
     source_authorities = dashboard.get("sourceAuthorities") or []
@@ -865,6 +896,8 @@ def main() -> int:
         STRATEGY_EDGE_RECEIPT,
         STRATEGY_RESEARCH_CONFIG,
         STRATEGY_RESEARCH_RECEIPT,
+        AUTOMATIC_OPERATIONS,
+        AUTOMATION_HEALTH_V0_2,
         OLD_V02_WORKFLOW,
         V10_WORKFLOW,
         V12_WORKFLOW,
@@ -942,6 +975,12 @@ def main() -> int:
         pipeline,
         "V0.12 Successor Metadata Window",
         "2026-09-04 02:00Z 至 09-12 03:59:59.999Z 的獨立 194-slot metadata-only window；新 R2 namespace，仍需每次 fresh 8 GB headroom gate。",
+        "AUTHORIZED",
+    )
+    replace_pipeline_item(
+        pipeline,
+        "GitHub Automatic Research Operations V0.1",
+        "七條 current cron 皆由 GitHub schedule 自動執行；V0.2 每兩小時檢查完整排程，manual/PR run 不計入健康證據。",
         "AUTHORIZED",
     )
     replace_pipeline_item(

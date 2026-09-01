@@ -7,6 +7,8 @@ from crypto_autopilot.research.automation_health import (
     WorkflowExpectation,
     evaluate_automation_health,
     evaluate_workflow,
+    scheduled_workflow_crons,
+    validate_schedule_coverage,
 )
 
 
@@ -111,6 +113,66 @@ class ResearchAutomationHealthTests(unittest.TestCase):
         self.assertFalse(report["authority"]["provider_access"])
         self.assertFalse(report["authority"]["r2_access"])
         self.assertFalse(report["authority"]["live_trading"])
+
+    def test_v0_2_report_schema_is_explicit(self) -> None:
+        expectation = WorkflowExpectation(
+            workflow="daily.yml",
+            label="Daily",
+            mode="continuous",
+            max_age_seconds=7200,
+        )
+        report = evaluate_automation_health(
+            [expectation],
+            {"daily.yml": [_run()]},
+            now=NOW,
+            schema="research-automation-health-v0.2",
+        )
+        self.assertEqual(report["schema"], "research-automation-health-v0.2")
+
+    def test_schedule_coverage_rejects_manual_event_as_health(self) -> None:
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        with TemporaryDirectory() as directory:
+            workflow_dir = Path(directory)
+            (workflow_dir / "daily.yml").write_text(
+                'name: Daily\non:\n  schedule:\n    - cron: "17 2 * * *"\n',
+                encoding="utf-8",
+            )
+            expectation = WorkflowExpectation(
+                workflow="daily.yml",
+                label="Daily",
+                mode="continuous",
+                max_age_seconds=7200,
+                allowed_events=("schedule", "workflow_dispatch"),
+            )
+            with self.assertRaisesRegex(ValueError, "manual events"):
+                validate_schedule_coverage([expectation], workflow_dir)
+
+    def test_schedule_coverage_matches_exact_cron_inventory(self) -> None:
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        with TemporaryDirectory() as directory:
+            workflow_dir = Path(directory)
+            (workflow_dir / "daily.yml").write_text(
+                'name: Daily\non:\n  schedule:\n    - cron: "17 2 * * *"\n',
+                encoding="utf-8",
+            )
+            expectation = WorkflowExpectation(
+                workflow="daily.yml",
+                label="Daily",
+                mode="continuous",
+                max_age_seconds=7200,
+                allowed_events=("schedule",),
+            )
+            self.assertEqual(
+                scheduled_workflow_crons(workflow_dir),
+                {"daily.yml": ["17 2 * * *"]},
+            )
+            coverage = validate_schedule_coverage([expectation], workflow_dir)
+            self.assertTrue(coverage["complete"])
+            self.assertFalse(coverage["manual_events_count_as_health"])
 
 
 if __name__ == "__main__":

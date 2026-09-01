@@ -13,7 +13,7 @@ model or authorize trading.
 | `:17` / `:47` inside 2026-09-04 02:00 through 2026-09-12 03:59:59.999 UTC | Provider Equivalence V0.12 successor metadata capture | Only current metadata schedule; V0.10 is retired, no replay/backfill or holdout candle access |
 | Daily 02:17 UTC | Research Signal Layer V0.2 | Public HTTPS source metadata and structured KOL challenger evidence to dedicated R2 namespace; no trading |
 | Daily 02:47 UTC | Research Signal Quality V0.1 | Exact latest/manifest/payload R2 reads with SHA/time/authority checks; no list or write |
-| Every three hours at `:47` | Research Automation Health V0.1 | GitHub Actions metadata-only stale/failure/missing-run monitor; no provider or R2 access |
+| Every two hours at `:57` | Research Automation Health V0.2 | complete GitHub cron inventory monitor; manual/PR runs do not count; no provider or R2 access |
 | Every 6 hours at `:23`, 2026-09-04 through 2026-09-30 | Binance USD-M Crypto Core 100 V0.1.2 | One serialized incomplete 10-market shard; 100-market / 48-month target; R2-only |
 | Sunday 04:37 UTC | Binance USD-M Crypto Core 100 Training V0.1.2 | Skips until all 10 detailed-history shards are complete; research evidence only |
 | 2026-09-04 02:53 UTC, then Sep 6/13/20/27 at 03:53 UTC | Pionex Alternative Assets Observability V0.2 | Validates the 125-candidate equity/ETF/metal catalog, compares prior SHA-bound evidence and estimates capacity; metadata-only R2 evidence |

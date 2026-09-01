@@ -28,6 +28,8 @@
     "display_projection": "web/data/strategy.json"
   },
   "current_data_and_paper": {
+    "automatic_operations": "config/github_automatic_research_operations_v0_1.json",
+    "automatic_operations_state": "GITHUB_SCHEDULE_IS_NORMAL_PATH_MANUAL_DOES_NOT_COUNT_AS_HEALTH",
     "current_metadata_successor": "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
     "current_metadata_successor_state": "V0_12_AUTHORIZED_ON_MAIN_MERGE_V0_10_SCHEDULE_RETIRED",
     "crypto_core_100": "config/binance_usdm_detailed_history_v0_1_2.json",
@@ -62,8 +64,8 @@
         "cron_utc": ["47 2 * * *"]
       },
       {
-        "workflow": "research-automation-health-v0-1.yml",
-        "cron_utc": ["47 */3 * * *"]
+        "workflow": "research-automation-health-v0-2.yml",
+        "cron_utc": ["57 */2 * * *"]
       }
     ],
     "authorized_post_window": [
@@ -102,7 +104,7 @@
       "dashboard-static-smoke.yml",
       "pionex-alternative-assets-observability-v0-2.yml",
       "provider-equivalence-v0-12-successor-metadata-capture.yml",
-      "research-automation-health-v0-1.yml",
+      "research-automation-health-v0-2.yml",
       "research-signal-layer-v0-2.yml",
       "research-signal-quality-v0-1.yml",
       "v0-10-critical-path-freeze-guard.yml",
@@ -144,6 +146,7 @@
       "pionex-binance-equivalence-v0-1-forensics.yml",
       "pre-window-readiness-v0-1.yml",
       "observe-v0-10-scheduled-capture.yml",
+      "research-automation-health-v0-1.yml",
       "provider-equivalence-v0-2-metadata-capture.yml",
       "provider-equivalence-v0-10-render-metadata-capture.yml",
       "provider-equivalence-v0-8-render-metadata-capture.yml",
@@ -167,6 +170,8 @@
     "provider_or_r2_scope_replaced_before_execution": true,
     "replacement_holdout_access_authorized": false,
     "paper_successor_automatic_activation_authorized": false,
+    "manual_dispatch_required_for_normal_operations": false,
+    "manual_dispatch_counts_as_automation_health": false,
     "trade_plan_authorized": false,
     "real_money_order_authorized": false,
     "live_trading_authorized": false

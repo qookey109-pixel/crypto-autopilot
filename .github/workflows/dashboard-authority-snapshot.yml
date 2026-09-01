@@ -26,6 +26,8 @@ on:
       - "research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json"
       - "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json"
       - "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json"
+      - "config/github_automatic_research_operations_v0_1.json"
+      - "config/research_automation_health_v0_2.json"
       - "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-binding.json"
       - "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json"
       - "config/strategy_edge_validation_v0_1.json"
@@ -120,6 +122,10 @@ jobs:
           assert project['replacementHoldoutState'] == 'FROZEN_UNOPENED'
           assert project['metadataStabilityState'] == 'NOT_YET_RUN'
           assert project['metadataStabilityEligibilityState'] == 'V0_10_BLOCKED_V0_12_NOT_YET_RUN'
+          assert project['githubAutomaticOperationsState'] == 'AUTHORIZED_ON_MAIN_MERGE'
+          assert project['githubAutomaticScheduledWorkflowCount'] == 7
+          assert project['githubManualDispatchRequiredForNormalOperations'] is False
+          assert project['githubManualRunsCountAsAutomationHealth'] is False
           assert project['strategyResearchLoopState'] == 'PREPARED_RESEARCH_ONLY'
           assert project['strategyResearchCandidateCount'] == 120
           assert project['strategyResearchFamilyCount'] == 4

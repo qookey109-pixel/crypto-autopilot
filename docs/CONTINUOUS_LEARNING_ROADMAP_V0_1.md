@@ -1,6 +1,6 @@
 # Continuous Learning Roadmap V0.1
 
-Updated: 2026-08-24
+Updated: 2026-09-01
 
 Status: **PREPARED ROADMAP / NOT EXECUTION AUTHORITY**
 
@@ -46,6 +46,10 @@ loop. A `REJECT` result is retained as evidence and cannot replace a model.
 - No new learning or holdout-candle authority is implied.
 - Replacement holdout candles remain `FROZEN_UNOPENED`.
 - Production V0.12 receipt evaluation still requires a separate post-window authority.
+- GitHub Automatic Research Operations V0.1 makes all seven currently
+  authorized online workflows schedule-driven. Research Automation Health
+  V0.2 checks the exact cron inventory every two hours; manual and PR runs do
+  not count as automatic-health evidence.
 
 ### 3. Detailed-history start — first eligible run 2026-09-04 14:23 Asia/Taipei
 
@@ -88,6 +92,10 @@ true:
 7. automation health distinguishes expected waiting from stale or failed runs;
 8. the dashboard projects the latest safe status without becoming authority;
 9. model promotion, holdout access and trading remain separately gated.
+
+Routine execution is automatic, but authority transitions are intentionally
+not self-service. A workflow cannot merge its own new provider, R2, holdout,
+model or trading scope; those remain protected-main review decisions.
 
 The synthetic-only research-loop contract that prepares items 5 and 6 is
 documented in `docs/STRATEGY_RESEARCH_LOOP_V0_1.md`. It does not activate the

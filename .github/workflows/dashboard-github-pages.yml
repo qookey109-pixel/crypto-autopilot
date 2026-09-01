@@ -22,6 +22,8 @@ on:
       - "config/pionex_alternative_assets_v0_1.json"
       - "config/pionex_alternative_assets_observability_v0_2.json"
       - "config/post_window_research_successor_schedule_v0_1.json"
+      - "config/github_automatic_research_operations_v0_1.json"
+      - "config/research_automation_health_v0_2.json"
       - "config/post_window_paper_training_v0_2.json"
       - "config/strategy_edge_validation_v0_1.json"
       - "config/strategy_research_loop_v0_1.json"
@@ -56,6 +58,8 @@ on:
       - "config/pionex_alternative_assets_v0_1.json"
       - "config/pionex_alternative_assets_observability_v0_2.json"
       - "config/post_window_research_successor_schedule_v0_1.json"
+      - "config/github_automatic_research_operations_v0_1.json"
+      - "config/research_automation_health_v0_2.json"
       - "config/post_window_paper_training_v0_2.json"
       - "config/strategy_edge_validation_v0_1.json"
       - "config/strategy_research_loop_v0_1.json"
@@ -163,6 +167,10 @@ jobs:
           assert project['metadataStabilityState'] == 'NOT_YET_RUN'
           assert project['metadataStabilityEligibilityState'] == 'V0_10_BLOCKED_V0_12_NOT_YET_RUN'
           assert project['cloudRuntimeMonthlyBudgetUsd'] == 0
+          assert project['githubAutomaticOperationsState'] == 'AUTHORIZED_ON_MAIN_MERGE'
+          assert project['githubAutomaticScheduledWorkflowCount'] == 7
+          assert project['githubManualDispatchRequiredForNormalOperations'] is False
+          assert project['githubManualRunsCountAsAutomationHealth'] is False
           assert project['strategyResearchLoopState'] == 'PREPARED_RESEARCH_ONLY'
           assert project['strategyResearchCandidateCount'] == 120
           assert project['strategyResearchFamilyCount'] == 4
