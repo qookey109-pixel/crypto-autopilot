@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from crypto_autopilot.contextual_edge import evaluate_contextual_breakout_edge
+from crypto_autopilot.research.contextual_edge import evaluate_contextual_breakout_edge
 from crypto_autopilot.features.breakout import ACCEPTED, FAILED, PENDING, UP, BreakoutResearchEvent
 from crypto_autopilot.features.regime import MarketRegimeSnapshot
 
