@@ -1,0 +1,56 @@
+{
+  "version": "0.1.0",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "purpose": "Describe failed-breakout outcomes by causally available cross-market regime without changing the formal strategy.",
+  "inputs": {
+    "breakout_layer": "Failed Breakout Research V0.1",
+    "regime_layer": "Market Regime / Altcoin Breadth V0.1",
+    "join_rule": "latest regime with available_at_ms <= breakout_available_at_ms",
+    "future_resolution_masking_required": true
+  },
+  "metrics": {
+    "direction_baseline_required": true,
+    "slice_dimensions": [
+      "direction",
+      "regime_state"
+    ],
+    "reported": [
+      "total_events",
+      "resolved_events",
+      "decisive_events",
+      "accepted_events",
+      "failed_events",
+      "expired_events",
+      "pending_events",
+      "resolution_rate",
+      "decisive_acceptance_rate",
+      "expiry_rate_among_resolved",
+      "decisive_acceptance_uplift_vs_direction"
+    ],
+    "minimum_decisive_events_for_uplift": 30,
+    "insufficient_regime_comparison_eligible": false,
+    "interpretation": "DESCRIPTIVE_ONLY"
+  },
+  "statistical_boundary": {
+    "parameter_selection": false,
+    "significance_claim": false,
+    "multiple_testing_claim": false,
+    "promotion_gate": false,
+    "formal_statistical_validation_layer": "Strategy Edge Validation V0.1"
+  },
+  "authority": {
+    "provider_access_authorized": false,
+    "production_r2_read_authorized": false,
+    "production_r2_write_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "replacement_holdout_tuning_authorized": false,
+    "workflow_schedule_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "strategy_score_change_authorized": false,
+    "short_execution_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
