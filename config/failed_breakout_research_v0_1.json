@@ -1,0 +1,48 @@
+{
+  "version": "0.1.0",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "purpose": "Label closed-bar range breakouts as accepted, failed, expired, or pending without creating a trading signal.",
+  "supported_intervals": ["4H", "60M", "15M"],
+  "candidate": {
+    "source": "existing_market_structure_v0_2",
+    "trigger": "first closed-bar edge beyond rolling_previous_high_or_low",
+    "hardcoded_market_price_levels": false,
+    "kol_price_levels_as_strategy_parameters": false
+  },
+  "resolution": {
+    "followup_bars": 3,
+    "acceptance_closes": 2,
+    "acceptance_buffer_bps": 5.0,
+    "failure_reentry_buffer_bps": 5.0,
+    "statuses": ["PENDING", "ACCEPTED", "FAILED", "EXPIRED"]
+  },
+  "causality": {
+    "closed_bars_only": true,
+    "outcome_available_only_at_resolution_bar_close": true,
+    "historical_as_of_projection_masks_future_resolution": true,
+    "no_lookahead": true
+  },
+  "evaluation": {
+    "prepared_only": true,
+    "future_metrics": [
+      "acceptance_rate",
+      "failure_rate",
+      "resolution_latency_bars",
+      "forward_return_by_outcome",
+      "regime_conditional_failure_rate"
+    ],
+    "parameter_tuning_from_replacement_holdout": false
+  },
+  "authority": {
+    "strategy_gate_change_authorized": false,
+    "short_strategy_authorized": false,
+    "paper_order_authorized": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "model_promotion_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
