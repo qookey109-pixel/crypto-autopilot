@@ -1,0 +1,88 @@
+{
+  "version": "0.1.0",
+  "status": "PREPARED_RESEARCH_ONLY_SOURCE_DECISION",
+  "observation_date": "2026-09-03",
+  "purpose": "Preregister zero-cost source semantics for future cross-market context without authorizing provider access or historical backfill.",
+  "zero_cost_policy": {
+    "monthly_budget_usd": 0,
+    "paid_fallback_allowed": false,
+    "scraping_unofficial_chart_endpoints_allowed": false,
+    "redistribution_of_third_party_raw_data_authorized": false
+  },
+  "semantic_contract": {
+    "total_market_cap_usd": "provider-reported current aggregate cryptocurrency market capitalization in USD",
+    "btc_dominance_pct": "provider-reported BTC market capitalization as a percentage of provider-reported total cryptocurrency market capitalization",
+    "btc_market_cap_usd": "total_market_cap_usd * btc_dominance_pct / 100",
+    "eth_market_cap_usd": "same-provider ETH ticker market capitalization in USD",
+    "total3_value": "total_market_cap_usd - btc_market_cap_usd - eth_market_cap_usd",
+    "same_provider_components_required": true,
+    "negative_total3_fails_closed": true
+  },
+  "forward_candidate": {
+    "provider": "coinpaprika",
+    "base_url": "https://api.coinpaprika.com/v1/",
+    "plan": "Free",
+    "monthly_cost_usd": 0,
+    "authentication_required": false,
+    "documented_monthly_request_limit": 20000,
+    "endpoints": {
+      "global": "/global",
+      "eth_ticker": "/tickers/eth-ethereum"
+    },
+    "current_snapshot_semantics_supported": true,
+    "historical_global_semantics_supported": false,
+    "candidate_use": "FORWARD_COLLECTION_ONLY_AFTER_SEPARATE_EXECUTION_AUTHORITY"
+  },
+  "historical_decision": {
+    "status": "BLOCKED_NO_ZERO_COST_CANONICAL_GLOBAL_HISTORY",
+    "coinpaprika_free_per_coin_history": {
+      "status": "REJECTED_FOR_GLOBAL_RECONSTRUCTION_V0_1",
+      "reason": "Free daily per-coin history is bounded and does not provide a canonical point-in-time full-market membership series required to reconstruct historical total market cap or BTC dominance without survivorship/membership distortion."
+    },
+    "coingecko_global_market_cap_chart": {
+      "status": "REJECTED_PAID",
+      "reason": "Official global historical market-cap chart endpoint is documented as paid-plan only."
+    },
+    "coinmarketcap_global_metrics_historical": {
+      "status": "REJECTED_PAID",
+      "reason": "Official historical global metrics are documented for paid Hobbyist-and-above access."
+    },
+    "unofficial_tradingview_or_web_scrape": {
+      "status": "REJECTED",
+      "reason": "Unversioned or unofficial chart scraping is not acceptable research lineage."
+    }
+  },
+  "future_collection_boundary": {
+    "forward_only": true,
+    "historical_backfill_claim_allowed": false,
+    "provider_timestamp_must_be_recorded": true,
+    "capture_timestamp_must_be_recorded": true,
+    "raw_payload_sha256_required": true,
+    "same_provider_component_capture_required": true,
+    "schedule_not_authorized_by_this_config": true,
+    "r2_storage_not_authorized_by_this_config": true
+  },
+  "integration_boundary": {
+    "market_regime_breadth_v0_1_real_global_context_ready": false,
+    "contextual_edge_evaluation_v0_1_real_global_history_ready": false,
+    "crypto_core_100_breadth_may_remain_separate_exchange_derived_context": true,
+    "missing_global_history_must_not_be_imputed_from_current_snapshot": true
+  },
+  "authority": {
+    "research_only": true,
+    "provider_fetch_authorized": false,
+    "production_r2_read_authorized": false,
+    "production_r2_write_authorized": false,
+    "historical_backfill_authorized": false,
+    "workflow_schedule_authorized": false,
+    "holdout_access_authorized": false,
+    "replacement_holdout_tuning_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "strategy_score_change_authorized": false,
+    "short_execution_authorized": false,
+    "model_promotion_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
