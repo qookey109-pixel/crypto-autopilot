@@ -1,0 +1,95 @@
+{
+  "version": "0.1.0",
+  "status": "PREPARED_NOT_ACTIVE",
+  "purpose": "Prepare a deterministic CoinPaprika forward current-snapshot capture contract without granting provider, storage, schedule, holdout, strategy, or trading authority.",
+  "source_lineage": {
+    "path": "config/context_source_lineage_v0_1.json",
+    "sha256": "ae69033b3d236e49dbfa58fcfa8e39bcf2d82ecb97d20d3a338d17d707ecd403",
+    "required_version": "0.1.0",
+    "required_provider": "coinpaprika",
+    "required_candidate_use": "FORWARD_COLLECTION_ONLY_AFTER_SEPARATE_EXECUTION_AUTHORITY"
+  },
+  "zero_cost_policy": {
+    "cloud_policy_path": "config/cloud_free_tier_policy_v0_1.json",
+    "monthly_budget_usd": 0,
+    "paid_fallback_allowed": false,
+    "provider_plan": "Free",
+    "documented_provider_request_limit_per_month": 20000
+  },
+  "provider": {
+    "name": "coinpaprika",
+    "base_url": "https://api.coinpaprika.com/v1/",
+    "authentication_required": false,
+    "global_endpoint": "/global",
+    "eth_ticker_endpoint": "/tickers/eth-ethereum",
+    "global_last_updated_encoding": "unix_seconds",
+    "eth_last_updated_encoding": "iso8601_utc"
+  },
+  "capture_contract": {
+    "snapshot_schema": "context-forward-snapshot-v0.1",
+    "forward_only": true,
+    "historical_backfill_claim_allowed": false,
+    "max_requests_per_capture": 2,
+    "automatic_retries": 0,
+    "max_component_skew_seconds": 600,
+    "max_provider_age_seconds": 900,
+    "raw_payload_sha256_required": true,
+    "raw_payload_persistence_authorized": false,
+    "capture_timestamp_required": true,
+    "provider_timestamps_required": true,
+    "same_provider_components_required": true,
+    "missing_component_policy": "FAIL_CLOSED",
+    "nonfinite_numeric_policy": "FAIL_CLOSED",
+    "future_provider_timestamp_policy": "FAIL_CLOSED",
+    "negative_or_zero_total3_policy": "FAIL_CLOSED",
+    "interpolation_authorized": false,
+    "carry_backward_authorized": false,
+    "carry_forward_authorized": false
+  },
+  "transport_preparation": {
+    "injected_transport_contract_prepared": true,
+    "default_network_transport_implemented": false,
+    "provider_request_entrypoint_enabled": false,
+    "must_reject_before_first_request_when_unauthorized": true
+  },
+  "storage": {
+    "production_r2_namespace": null,
+    "local_raw_payload_persistence_authorized": false,
+    "production_r2_read_authorized": false,
+    "production_r2_write_authorized": false
+  },
+  "capacity_projection": {
+    "nominal_future_interval": "4H",
+    "captures_per_day": 6,
+    "requests_per_capture": 2,
+    "projected_requests_per_30_day_month": 360,
+    "within_documented_free_request_limit": true,
+    "projection_is_not_execution_authority": true
+  },
+  "integration_boundary": {
+    "market_regime_breadth_v0_1_forward_context_prepared": true,
+    "market_regime_breadth_v0_1_real_global_history_ready": false,
+    "contextual_edge_evaluation_v0_1_real_global_history_ready": false,
+    "replacement_holdout_remains_frozen_unopened": true,
+    "strategy_v0_1_unchanged": true
+  },
+  "authority": {
+    "research_only": true,
+    "provider_fetch_authorized": false,
+    "production_r2_read_authorized": false,
+    "production_r2_write_authorized": false,
+    "historical_backfill_authorized": false,
+    "workflow_schedule_authorized": false,
+    "holdout_access_authorized": false,
+    "replacement_holdout_tuning_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "strategy_score_change_authorized": false,
+    "risk_change_authorized": false,
+    "leverage_change_authorized": false,
+    "short_execution_authorized": false,
+    "model_promotion_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
