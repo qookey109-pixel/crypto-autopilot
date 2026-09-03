@@ -25,7 +25,7 @@ def _load_contract() -> tuple[dict[str, object], bytes]:
     return config, source_bytes
 
 
-def _global_payload(*, last_updated: int = 1_788_451_000) -> bytes:
+def _global_payload(*, last_updated: int = 1_788_487_800) -> bytes:
     return json.dumps(
         {
             "market_cap_usd": 3_000_000_000_000,
@@ -37,7 +37,11 @@ def _global_payload(*, last_updated: int = 1_788_451_000) -> bytes:
     ).encode("utf-8")
 
 
-def _eth_payload(*, last_updated: str = "2026-09-04T02:10:00Z", market_cap: float = 400_000_000_000) -> bytes:
+def _eth_payload(
+    *,
+    last_updated: str = "2026-09-04T02:10:00Z",
+    market_cap: float = 400_000_000_000,
+) -> bytes:
     return json.dumps(
         {
             "id": "eth-ethereum",
@@ -54,7 +58,7 @@ class ContextForwardCaptureV01Tests(unittest.TestCase):
     def setUp(self) -> None:
         self.config, self.source_bytes = _load_contract()
         # 2026-09-04T02:15:00Z
-        self.capture_ms = 1_788_451_300_000
+        self.capture_ms = 1_788_488_100_000
 
     def test_frozen_config_validates_against_exact_source_lineage(self) -> None:
         validate_context_forward_capture_config(
@@ -84,10 +88,12 @@ class ContextForwardCaptureV01Tests(unittest.TestCase):
         self.assertEqual(snapshot.eth_provider_age_ms, 300_000)
         self.assertEqual(snapshot.provider_component_skew_ms, 0)
         self.assertEqual(
-            snapshot.global_raw_payload_sha256, hashlib.sha256(global_payload).hexdigest()
+            snapshot.global_raw_payload_sha256,
+            hashlib.sha256(global_payload).hexdigest(),
         )
         self.assertEqual(
-            snapshot.eth_raw_payload_sha256, hashlib.sha256(eth_payload).hexdigest()
+            snapshot.eth_raw_payload_sha256,
+            hashlib.sha256(eth_payload).hexdigest(),
         )
         self.assertTrue(snapshot.forward_only)
         self.assertFalse(snapshot.historical_backfill_claim)
@@ -114,7 +120,7 @@ class ContextForwardCaptureV01Tests(unittest.TestCase):
             build_context_forward_snapshot(
                 config=self.config,
                 source_lineage_bytes=self.source_bytes,
-                global_payload=_global_payload(last_updated=1_788_451_301),
+                global_payload=_global_payload(last_updated=1_788_488_101),
                 eth_payload=_eth_payload(),
                 capture_timestamp_ms=self.capture_ms,
             )
@@ -124,7 +130,7 @@ class ContextForwardCaptureV01Tests(unittest.TestCase):
             build_context_forward_snapshot(
                 config=self.config,
                 source_lineage_bytes=self.source_bytes,
-                global_payload=_global_payload(last_updated=1_788_450_000),
+                global_payload=_global_payload(last_updated=1_788_487_000),
                 eth_payload=_eth_payload(),
                 capture_timestamp_ms=self.capture_ms,
             )
@@ -134,7 +140,7 @@ class ContextForwardCaptureV01Tests(unittest.TestCase):
             build_context_forward_snapshot(
                 config=self.config,
                 source_lineage_bytes=self.source_bytes,
-                global_payload=_global_payload(last_updated=1_788_450_650),
+                global_payload=_global_payload(last_updated=1_788_487_400),
                 eth_payload=_eth_payload(last_updated="2026-09-04T02:15:00Z"),
                 capture_timestamp_ms=self.capture_ms,
             )
@@ -153,7 +159,7 @@ class ContextForwardCaptureV01Tests(unittest.TestCase):
         duplicate = (
             b'{"market_cap_usd":3000000000000,'
             b'"bitcoin_dominance_percentage":50,'
-            b'"last_updated":1788451000,"last_updated":1788451000}'
+            b'"last_updated":1788487800,"last_updated":1788487800}'
         )
         with self.assertRaisesRegex(ContextForwardCaptureError, "duplicate key"):
             build_context_forward_snapshot(
