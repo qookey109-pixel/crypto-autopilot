@@ -14,7 +14,7 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 Historical configs, receipts and CLI paths remain for evidence, but these four
 files are the current operating surface.
 
-## Current authority snapshot — 2026-08-31
+## Current authority snapshot — 2026-09-03
 
 The repository has moved beyond the original V0.1 implementation baseline while preserving its scientific history:
 
@@ -30,13 +30,13 @@ The repository has moved beyond the original V0.1 implementation baseline while 
 - V0.7 successor Render metadata-capture protocol: historical **PREPARED / EXECUTION_NOT_AUTHORIZED** authority, preserved unchanged.
 - V0.8 shared relay secret handshake: **PASS**; V0.8 prepared cutover contract and hard-disabled scaffold remain historical preparation authorities.
 - V0.9 authenticated Render relay smoke: **PASS** — HTTP 200 / valid JSON / `symbol_count=872` / zero R2 writes / zero holdout access.
-- V0.10 final atomic metadata-capture cutover: **EFFECTIVE / AUTHORIZED** after merged PR #127 at `8fce944da479dbda0e2899f9b30b9de62351fa27`.
+- V0.10 final atomic metadata-capture cutover: historical **EFFECTIVE / AUTHORIZED** after merged PR #127 at `8fce944da479dbda0e2899f9b30b9de62351fa27`.
 - PR #210's exact Pionex `type=PERP` query remains **EFFECTIVE HISTORICAL
   LINEAGE** on `main` at
   `a34cf471876971a97200de4974906743642ed61f`, but observed scheduled runs #36
-  through #40 now fail closed because the returned perpetual symbol record does
+  through #41 failed closed because the returned perpetual symbol record did
   not preserve the frozen required `status` / `contractType` contract. The
-  failure occurs before R2 client construction; no R2 or holdout access occurs.
+  failure occurred before R2 client construction; no R2 or holdout access occurred.
 - V0.2 self-hosted scheduled metadata capture is now **RETIRED AS EXECUTION PATH**; its receipts remain immutable historical evidence.
 - V0.10 GitHub-hosted schedule is **RETIRED ON THE EXACT V0.12 MAIN MERGE**;
   its failures and missing slots remain immutable evidence and cannot be
@@ -44,19 +44,24 @@ The repository has moved beyond the original V0.1 implementation baseline while 
 - V0.12 successor metadata window is **AUTHORIZED ON THE EXACT REVIEWED MAIN
   MERGE**. It is the only scheduled metadata-capture path, covering
   `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z` with 194 hourly
-  slots and an independent R2 namespace.
+  slots and an independent R2 namespace. At the 2026-09-03 observation the
+  window has not started yet.
 - PR #212 and minimum operational commit
   `80732edee9a8954b53b4b56115ecb0d506591f0a` are recorded in a separate
   append-only binding amendment, preserving the pre-binding authority files.
-- GitHub Automatic Research Operations V0.1 is **AUTHORIZED ON MAIN MERGE**:
-  all seven currently authorized online workflows use GitHub cron as their
-  normal path. Research Automation Health V0.2 checks the complete schedule
-  inventory every two hours, and manual/PR runs cannot count as cron health.
-  This adds no holdout, model-promotion or trading authority.
+- GitHub Automatic Research Operations V0.1 is **AUTHORIZED ON MAIN MERGE**.
+  PR #213 is merged on `main` at
+  `0f1c7675f15301c248b64bbaa4a10bc956f3fdf6`; all seven currently authorized
+  online workflows use GitHub cron as their normal path. Research Automation
+  Health V0.2 checks the complete schedule inventory every two hours at `:57`
+  UTC, and manual/PR runs cannot count as cron health. Current scheduled Health
+  V0.2, Signal Layer V0.2 and Signal Quality V0.1 runs have been observed
+  completing successfully. This adds no holdout, model-promotion or trading
+  authority.
 - V0.11 metadata-stability evaluator: **PREPARED / PRODUCTION R2 EVALUATION NOT AUTHORIZED**. Its deterministic 194-slot rules were frozen before production stability evidence is read.
-- Replacement holdout `2026-08-28` through `2026-09-03`: **FROZEN_UNOPENED**; candle access and evaluation remain unauthorized.
+- Replacement holdout `2026-08-28` through `2026-09-03`: **FROZEN_UNOPENED**; candle access and evaluation remain unauthorized. Calendar passage does not grant access authority.
 - Metadata stability evaluation: **NOT_YET_RUN**. Because failed or missing
-  slots cannot be backfilled, the currently observed window is already blocked
+  V0.10 slots cannot be backfilled, the historical V0.10 window is blocked
   from producing a complete 194-slot PASS dataset. V0.12 is the separately
   versioned successor decision; it does not repair or regrade V0.10.
 
@@ -153,12 +158,15 @@ dedicated R2 namespace, with fresh FREE-ONLY headroom gates and no prose
 direction inference. It remains challenger evidence only; the existing
 Pionex hourly paper path and Binance weekly historical trainer remain separate.
 See [`docs/RESEARCH_SIGNAL_LAYER_V0_2.md`](docs/RESEARCH_SIGNAL_LAYER_V0_2.md).
-Two read-only guardrails now sit beside that collector: a daily `02:47 UTC`
-signal-lineage/quality check and a GitHub Actions health monitor every three
-hours at `:47`. They distinguish formal scheduled/manual runs from PR checks,
-verify the exact R2 latest-to-manifest-to-payload chain without listing or
-writing R2, and do not open the holdout or affect models/trades. See
-[`docs/RESEARCH_AUTOMATION_HEALTH_V0_1.md`](docs/RESEARCH_AUTOMATION_HEALTH_V0_1.md).
+Two current read-only guardrails sit beside that collector: Research Signal
+Quality V0.1 runs daily at `02:47 UTC`, and Research Automation Health V0.2 runs
+every two hours at `:57` UTC. Health V0.2 is the single complete cron control
+plane, covers all seven current schedules and ignores manual/PR runs when
+judging automatic health. The historical Health V0.1 workflow is retained for
+manual regression only. These guardrails do not open the holdout, promote
+models or affect trading. See
+[`docs/GITHUB_AUTOMATIC_RESEARCH_OPERATIONS_V0_1.md`](docs/GITHUB_AUTOMATIC_RESEARCH_OPERATIONS_V0_1.md)
+and [`docs/AUTOMATION_INDEX_V0_1.md`](docs/AUTOMATION_INDEX_V0_1.md).
 The proposed rolling four-hour data refresh, weekly Shadow ablation and monthly
 drift review remain prepared but inactive pending a separate post-window
 authority.
@@ -194,27 +202,46 @@ The current cloud policy is frozen in [`config/cloud_free_tier_policy_v0_1.json`
 - Cloudflare Containers are retired for this project because they require Workers Paid;
 - Koyeb V0.4 is superseded and is not a current transport candidate;
 - the current Mac-independent Binance public-metadata transport is **Render Free / Frankfurt**;
-- every V0.10 metadata R2 write must pass a fresh whole-bucket FREE-ONLY **8 GB hard-stop/headroom gate** before write;
+- every authorized metadata R2 write remains subject to a fresh whole-bucket FREE-ONLY **8 GB hard-stop/headroom gate**; V0.12 freezes the same `8,000,000,000` byte operational hard stop;
 - Render must never receive R2 credentials; R2 credentials remain in GitHub Actions secrets only;
 - historical proof/materialization workflows whose evidence is already frozen must be validation-only and must not silently regain schedules, push triggers, provider calls, self-hosted execution, or R2 credentials.
 
-## V0.10 metadata capture execution boundary
+## V0.10 metadata capture historical boundary
 
-Current authorized metadata-capture orchestration:
+Historical V0.10 orchestration is preserved as fail-closed evidence; its
+schedule was removed atomically when V0.12 became effective:
 
-- workflow: `.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml`;
+- historical workflow: `.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml`;
 - runner: `ubuntu-latest`;
 - Pionex metadata leg: direct public HTTPS from GitHub Actions;
 - Binance USD-M metadata leg: authenticated Render Free Frankfurt path `/metadata/v0-10/binance-exchange-info`;
-- exact metadata window: `2026-08-27T00:00:00Z` through `2026-09-04T01:59:59.999Z`;
-- 194 UTC hourly slots, scheduled attempts at minute `:17` and `:47`;
-- schedule is date-window scoped to avoid unnecessary free-tier runs;
-- scheduled runs are serialized; stale queued runs fail closed before provider/R2 access;
-- each complete capture uses 3 immutable run-scoped R2 objects, with receipt written last and post-write SHA-256 readback;
+- exact historical metadata window: `2026-08-27T00:00:00Z` through `2026-09-04T01:59:59.999Z`;
+- frozen design: 194 UTC hourly slots with scheduled attempts at minute `:17` and `:47`;
+- observed failed/missing slots are immutable; replay, manual capture and retroactive backfill are unauthorized;
 - V0.7 historical raw relay path remains disabled;
 - V0.2 self-hosted scheduled execution remains retired and is not an automatic fallback.
 
 The shared `METADATA_RELAY_TOKEN` is provisioned out of band in Render and GitHub Actions. Its value must never be committed, logged, posted in issues, artifacts, or chat.
+
+## V0.12 successor metadata boundary
+
+The current successor authority is frozen in
+`config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json` and its
+append-only binding. Current execution rules are:
+
+- workflow: `.github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml`;
+- runner: `ubuntu-latest`;
+- exact window: `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z`;
+- 194 UTC hourly slots / 388 bounded attempts at `:17` and `:47`;
+- independent R2 namespace: `metadata/provider-equivalence/v0_12/successor-window-20260904/`;
+- Pionex normalization accepts the frozen modern `contractType/status` or legacy `type/enable` representations and fails closed before R2 construction when they are missing, unknown or conflicting;
+- each complete capture remains immutable, writes its receipt last and requires post-write SHA-256 readback;
+- fresh whole-bucket 8 GB FREE-ONLY headroom is required before every authorized write;
+- no V0.10 fallback, replay or backfill is authorized;
+- production stability evaluation, holdout access, source switching, automatic promotion and trading remain unauthorized.
+
+At the 2026-09-03 status observation, this execution window is still waiting for
+its exact not-before time; no V0.12 evidence result is assumed in advance.
 
 ## V0.11 metadata-stability evaluator boundary
 
@@ -222,10 +249,9 @@ The evaluator is frozen in `config/provider_equivalence_v0_11_metadata_stability
 
 Current state:
 
-- exact 194 UTC hourly slots are required;
-- each slot needs at least one complete valid V0.10 receipt;
+- exact 194 UTC hourly slots are required for the evidence set being evaluated;
 - duplicate captures within a slot are acceptable only when each provider's normalized 15-symbol vector matches exactly;
-- Pionex and Binance USD-M vectors must each remain exactly stable across the full frozen window;
+- Pionex and Binance USD-M vectors must each remain exactly stable across the full frozen evaluation window;
 - missing slots, invalid receipts, SHA mismatch, intra-slot disagreement, or cross-window vector drift fail closed;
 - `V0_11_R2_EVALUATION_EXECUTION_AUTHORIZED = False`;
 - no production R2 client construction or receipt reads are authorized yet;
@@ -326,7 +352,7 @@ Bulk historical data is not stored in GitHub; canonical storage evidence is kept
 - `METADATA_RELAY_TOKEN` is an out-of-band shared secret between Render and GitHub Actions; never expose its value.
 - No martingale, loss-doubling, unlimited averaging down, cross-margin dependency, or liquidation-as-stop.
 - Provider provenance remains explicit; provider splicing, silent interpolation and Pionex-native relabeling are forbidden.
-- V0.10 metadata capture authorization is **not** trading authorization.
+- Historical V0.10 and current V0.12 metadata-capture authorization are **not** trading authorization.
 - V0.11 evaluator preparation is **not** metadata-stability PASS or production evaluation authority.
 - Replacement holdout candle access/evaluation remains forbidden until a separate post-stability authority exists.
 - No live order path is authorized.
@@ -381,9 +407,10 @@ The offline research governance extension is documented in
 [`docs/RESEARCH_GOVERNANCE_V0_1.md`](docs/RESEARCH_GOVERNANCE_V0_1.md) and
 configured by [`config/research_governance_v0_1.json`](config/research_governance_v0_1.json).
 
-Current cadence, evidence checks and non-activated post-window recommendations
-are indexed in
-[`docs/RESEARCH_AUTOMATION_SCHEDULE_V0_1.md`](docs/RESEARCH_AUTOMATION_SCHEDULE_V0_1.md).
+Current cadence and effective automation state are indexed in
+[`docs/AUTOMATION_INDEX_V0_1.md`](docs/AUTOMATION_INDEX_V0_1.md) and the
+machine-readable
+[`config/github_automatic_research_operations_v0_1.json`](config/github_automatic_research_operations_v0_1.json).
 
 Historical receipts remain immutable evidence even when a later version supersedes their execution role.
 
