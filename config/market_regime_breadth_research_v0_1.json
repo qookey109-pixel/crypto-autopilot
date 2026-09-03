@@ -1,0 +1,53 @@
+{
+  "version": "0.1.0",
+  "mode": "cross_market_regime_research_only",
+  "supported_intervals": ["4H", "1D"],
+  "semantic_inputs": {
+    "btc_close": "closed-bar BTC price from one explicitly recorded market-price provider",
+    "eth_close": "closed-bar ETH price from the same explicitly recorded market-price provider",
+    "total3_value": "aggregate crypto market capitalization excluding BTC and ETH; not bound to a named chart vendor",
+    "btc_dominance_pct": "BTC market capitalization divided by total crypto market capitalization, in percent",
+    "alt_breadth": "fixed-universe equal-weight closed-bar breadth derived from audited market candles"
+  },
+  "breadth": {
+    "ema_period": 20,
+    "momentum_lookback_bars": 5,
+    "minimum_assets": 20,
+    "majority_ratio": 0.5,
+    "excluded_symbols": ["BTCUSDT", "ETHUSDT"],
+    "membership_policy": "fixed_exact_aligned_universe",
+    "missing_bar_policy": "fail_closed_no_fill_no_interpolation",
+    "weighting": "equal_weight"
+  },
+  "regime": {
+    "lookback_bars": 20,
+    "minimum_votes": 4,
+    "states": [
+      "INSUFFICIENT",
+      "ALT_EXPANSION",
+      "BTC_CONCENTRATION",
+      "BROAD_RISK_OFF",
+      "MIXED"
+    ],
+    "absolute_price_levels_used": false,
+    "kol_price_levels_allowed_as_parameters": false,
+    "classification_policy": "sign_and_cross_sectional_majority_votes_only"
+  },
+  "authority": {
+    "research_only": true,
+    "provider_fetch_authorized": false,
+    "production_r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "replacement_holdout_tuning_authorized": false,
+    "strategy_gate_change_authorized": false,
+    "strategy_score_change_authorized": false,
+    "risk_change_authorized": false,
+    "leverage_change_authorized": false,
+    "short_execution_authorized": false,
+    "model_promotion_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "workflow_schedule_authorized": false
+  }
+}
