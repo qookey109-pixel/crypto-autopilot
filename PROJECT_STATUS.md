@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-09-01
+Updated: 2026-09-04
 
 ## Project
 
@@ -14,12 +14,12 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ## Current formal stage
 
-**GITHUB AUTOMATIC RESEARCH OPERATIONS V0.1 AUTHORIZED ON PROTECTED-MAIN MERGE / RESEARCH AUTOMATION HEALTH V0.2 IS THE SINGLE COMPLETE CRON CONTROL PLANE / V0.12 SUCCESSOR METADATA WINDOW AUTHORIZED / V0.10 REMAINING SCHEDULE RETIRED / V0.10 INCOMPLETE WINDOW PRESERVED AS BLOCKED EVIDENCE / V0.12 PRODUCTION STABILITY EVALUATION NOT_AUTHORIZED / CRYPTO CORE 100 V0.1.2 AUTHORIZED AFTER V0.10 WINDOW / PIONEX ALTERNATIVE ASSETS V0.2 AUTHORIZED AFTER WINDOW / BOTH NOT STARTED / POST-WINDOW PAPER V0.2 PREPARED WAITING FOR HOLDOUT AUTHORITY / REPLACEMENT HOLDOUT FROZEN_UNOPENED / PAPER-ONLY**
+**GITHUB AUTOMATIC RESEARCH OPERATIONS V0.1 AUTHORIZED ON PROTECTED-MAIN MERGE / RESEARCH AUTOMATION HEALTH V0.2 IS THE SINGLE COMPLETE CRON CONTROL PLANE / V0.12 SUCCESSOR METADATA WINDOW AUTHORIZED AND CURRENT / V0.10 REMAINING SCHEDULE RETIRED / V0.10 INCOMPLETE WINDOW PRESERVED AS BLOCKED EVIDENCE / V0.12 PRODUCTION STABILITY EVALUATION NOT_AUTHORIZED / CRYPTO CORE 100 V0.1.2 AUTHORIZED / PIONEX ALTERNATIVE ASSETS V0.2 AUTHORIZED / CURRENT EXECUTION OUTCOMES REQUIRE RUN EVIDENCE / CONTEXT FORWARD CAPTURE EXECUTION V0.1 AUTHORIZED MANUAL ONE-SHOT AFTER V0.12 WINDOW / CONTEXT FORWARD 4H SCHEDULE NOT_AUTHORIZED / POST-WINDOW PAPER V0.2 PREPARED WAITING FOR HOLDOUT AUTHORITY / REPLACEMENT HOLDOUT FROZEN_UNOPENED / PAPER-ONLY**
 
 <details>
 <summary>Historical aggregate stage markers</summary>
 
-**PROJECT CONVERGENCE V0.1 CURRENT INDEX / POST-CUTOFF NO-OP CRON RETIREMENT EFFECTIVE / PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 TRAINING GOVERNANCE V0.5 HISTORICAL AUTHORITY MANUAL FAIL-CLOSED ONLY AFTER CUTOFF / BINANCE USD-M DETAILED HISTORY V0.1.2 AUTHORIZED AFTER V0.10 WINDOW NOT_STARTED / DETAILED HISTORY V0.1/V0.1.1 SUPERSEDED BEFORE EXECUTION / V0.4 WEEKLY AND MONTHLY EXECUTION RETIRED / V0.3 DAILY TRAINING RETIRED / RESEARCH SIGNAL LAYER V0.2 ACTIVE / RESEARCH SIGNAL QUALITY V0.1 AUTHORIZED READ_ONLY / RESEARCH AUTOMATION HEALTH V0.1 HISTORICAL MANUAL REGRESSION_ONLY / RESEARCH AUTOMATION HEALTH V0.2 AUTHORIZED READ_ONLY / STRATEGY EDGE VALIDATION V0.1 PREPARED RESEARCH_ONLY / STRATEGY RESEARCH LOOP V0.1 PREPARED SYNTHETIC_ONLY / POST-WINDOW RESEARCH SUCCESSOR SCHEDULE V0.1 PREPARED_NOT_ACTIVE / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 MANUAL FAIL-CLOSED ONLY AFTER CUTOFF / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE HISTORICAL / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE RETIRED / V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION HISTORICAL EFFECTIVE / V0.10 PIONEX PERP QUERY EFFECTIVE / V0.10 POST-PERP CAPTURE FAIL_CLOSED / V0.12 SUCCESSOR METADATA WINDOW AUTHORIZED ON MAIN MERGE / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / V0.10 194-SLOT PASS ELIGIBILITY BLOCKED / V0.12 EVIDENCE NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
+**PROJECT CONVERGENCE V0.1 CURRENT INDEX / POST-CUTOFF NO-OP CRON RETIREMENT EFFECTIVE / PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 TRAINING GOVERNANCE V0.5 HISTORICAL AUTHORITY MANUAL FAIL-CLOSED ONLY AFTER CUTOFF / BINANCE USD-M DETAILED HISTORY V0.1.2 AUTHORIZED / DETAILED HISTORY V0.1/V0.1.1 SUPERSEDED BEFORE EXECUTION / V0.4 WEEKLY AND MONTHLY EXECUTION RETIRED / V0.3 DAILY TRAINING RETIRED / RESEARCH SIGNAL LAYER V0.2 ACTIVE / RESEARCH SIGNAL QUALITY V0.1 AUTHORIZED_READ_ONLY / RESEARCH AUTOMATION HEALTH V0.1 HISTORICAL MANUAL REGRESSION_ONLY / RESEARCH AUTOMATION HEALTH V0.2 AUTHORIZED_READ_ONLY / STRATEGY EDGE VALIDATION V0.1 PREPARED_RESEARCH_ONLY / STRATEGY RESEARCH LOOP V0.1 PREPARED_SYNTHETIC_ONLY / POST-WINDOW RESEARCH SUCCESSOR SCHEDULE V0.1 PREPARED_NOT_ACTIVE / CONTEXT FORWARD CAPTURE V0.1 PREPARED_NOT_ACTIVE / CONTEXT FORWARD CAPTURE EXECUTION V0.1 AUTHORIZED_MANUAL_ONE_SHOT_AFTER_2026-09-12T04:00:00Z / CONTEXT FORWARD 4H SCHEDULE NOT_AUTHORIZED / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE_FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 MANUAL FAIL-CLOSED ONLY AFTER CUTOFF / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE HISTORICAL / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE RETIRED / V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION HISTORICAL EFFECTIVE / V0.10 PIONEX PERP QUERY EFFECTIVE / V0.10 POST-PERP CAPTURE FAIL_CLOSED / V0.12 SUCCESSOR METADATA WINDOW AUTHORIZED ON MAIN MERGE / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION_NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION_NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION_NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / V0.10 194-SLOT PASS ELIGIBILITY BLOCKED / V0.12 SUCCESSOR WINDOW CURRENT / V0.12 PRODUCTION STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
 
 </details>
 
@@ -42,7 +42,44 @@ Repository branch `main` is the live formal authority and is intentionally not s
   config: `config/research_automation_health_v0_2.json`; operating guide:
   `docs/GITHUB_AUTOMATIC_RESEARCH_OPERATIONS_V0_1.md`.
 
-### V0.12 successor metadata window — AUTHORIZED ON EXACT MAIN MERGE
+### Context Forward Capture Execution V0.1 — AUTHORIZED MANUAL ONE-SHOT AFTER V0.12 WINDOW
+
+- PR #222 merged to protected `main` at merge commit
+  `f8ffa0473863f6999f2be1082f271cd4f03bf3ff` and adds a separately versioned
+  execution authority without changing the prepared non-executing
+  `config/context_forward_capture_v0_1.json` contract.
+- The prepared capture contract remains `PREPARED_NOT_ACTIVE` with provider and
+  production-R2 authority false. Execution authority exists only in
+  `config/context_forward_capture_execution_v0_1.json` and its exact SHA-bound
+  receipt
+  `research/receipts/2026-09-04-context-forward-capture-execution-v0-1-authority.json`.
+- The one-shot execution window is `2026-09-12T04:00:00Z` through
+  `2026-09-19T04:00:00Z`. Before the not-before boundary or at/after expiry the
+  runner must fail closed before R2 or CoinPaprika access.
+- `.github/workflows/context-forward-capture-execution-v0-1.yml` is
+  `workflow_dispatch` only and has no cron. It is classified separately from
+  normal automatic operations and does not change the seven-workflow schedule
+  inventory monitored by Research Automation Health V0.2.
+- One successful run may make at most two public CoinPaprika requests in frozen
+  order (`/global`, then `/tickers/eth-ethereum`), with zero automatic retries,
+  no authentication and no paid/provider fallback.
+- Production persistence is limited to the normalized snapshot and receipt in
+  the dedicated R2 namespace. Raw provider payload persistence remains false;
+  exact raw-payload SHA-256 fingerprints are retained instead.
+- Whole-bucket FREE-ONLY 8 GB inventory is required before provider access and
+  again before writes. Immutable exact-byte equality, post-write SHA-256
+  readback and receipt-last ordering are mandatory.
+- A valid existing PASS receipt makes the one-shot complete; a later manual run
+  returns `ALREADY_COMPLETE` without another provider request. Partial or
+  conflicting state fails closed for manual review.
+- A 4H schedule is explicitly not authorized. A future V0.2 schedule requires
+  a separate protected-main authority after a valid V0.1 one-shot PASS.
+- Historical backfill, holdout access/tuning, strategy/risk/leverage changes,
+  SHORT execution, model promotion, trade plans, real-money orders and live
+  trading remain unauthorized. Contract:
+  `docs/CONTEXT_FORWARD_CAPTURE_EXECUTION_V0_1.md`.
+
+### V0.12 successor metadata window — AUTHORIZED / CURRENT WINDOW
 
 - The reviewed change atomically removes every V0.10 cron and adds one V0.12
   GitHub-hosted schedule. V0.10 manual capture, replay and backfill remain
@@ -50,6 +87,9 @@ Repository branch `main` is the live formal authority and is intentionally not s
 - The successor window is `2026-09-04T02:00:00Z` through
   `2026-09-12T03:59:59.999Z`: 194 UTC hourly slots with `:17` and `:47`
   attempts, for 388 bounded schedule attempts.
+- This 2026-09-04 status sync is inside the authorized clock window. That is a
+  schedule-window statement only; it does not claim that any particular
+  capture, hourly slot or stability result has passed without run evidence.
 - V0.12 uses the independent R2 namespace
   `metadata/provider-equivalence/v0_12/successor-window-20260904/` and the
   existing Render Free Frankfurt raw relay. Render code, deployment and secret
@@ -162,7 +202,7 @@ Repository branch `main` is the live formal authority and is intentionally not s
   `docs/STRATEGY_EDGE_VALIDATION_V0_1.md`; preparation receipt:
   `research/receipts/2026-08-28-strategy-edge-validation-v0-1-prepared.json`.
 
-### Binance USD-M Crypto Core 100 V0.1.2 — AUTHORIZED AFTER WINDOW / NOT STARTED
+### Binance USD-M Crypto Core 100 V0.1.2 — AUTHORIZED / EXECUTION OUTCOME NOT ASSERTED HERE
 
 - A separate provider-separated research path expands detailed coverage from
   the original 15-contract basket to 100 unique Crypto USDT markets.
@@ -174,6 +214,9 @@ Repository branch `main` is the live formal authority and is intentionally not s
   provider or R2 access. Backfill authority expires at
   `2026-10-01T00:00:00Z`; later annual cron occurrences also stop before any
   provider or R2 access, while completed-dataset weekly training remains active.
+- This 2026-09-04 status sync does not infer successful execution from the clock;
+  current shard/run outcome must come from explicit GitHub Actions and R2
+  evidence.
 - Selection preserves the original 15 continuity symbols, requires all 100
   selected Crypto markets to reach the window end, and excludes heuristic
   tokenized-stock/ETF and other-asset candidates from materialization. Those
@@ -197,7 +240,7 @@ Repository branch `main` is the live formal authority and is intentionally not s
 - This stage does not change V0.10, relabel Binance as Pionex, switch sources,
   open the holdout, admit a formal backtest, promote a model or trade.
 
-### Pionex Alternative Assets Observability V0.2 — AUTHORIZED AFTER WINDOW / NOT STARTED
+### Pionex Alternative Assets Observability V0.2 — AUTHORIZED / EXECUTION OUTCOME NOT ASSERTED HERE
 
 - A separate Pionex-native metadata catalog covers a 125-candidate registry:
   90 equity/stock-linked tokens, 31 ETF/ETN/fund-linked tokens and 4 direct
@@ -211,6 +254,8 @@ Repository branch `main` is the live formal authority and is intentionally not s
   first scheduled catalog is `2026-09-04T02:53:00Z`, followed by bounded weekly
   reviews on September 6, 13, 20 and 27 at `03:53 UTC`. Authority expires before
   provider/R2 access at `2026-10-01T00:00:00Z`.
+- This 2026-09-04 status sync does not infer a catalog PASS from the scheduled
+  time; the current catalog/run outcome requires explicit execution evidence.
 - V0.2 supersedes the unexecuted V0.1 schedule before its first provider request
   or R2 access. One workflow now validates the complete catalog structure,
   compares each run with the prior SHA-bound V0.2 catalog and estimates the
@@ -412,17 +457,19 @@ No live-money authorization exists. `trade_plan_authorized=false`, `real_money_o
 
 ## Current execution / transport authority
 
-V0.10 activation merge commit from PR #127: `8fce944da479dbda0e2899f9b30b9de62351fa27`.
+Historical V0.10 activation merge commit from PR #127: `8fce944da479dbda0e2899f9b30b9de62351fa27`.
 
 Current metadata-capture path:
 
-- workflow: `.github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml`;
+- workflow: `.github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml`;
 - runner: `ubuntu-latest`;
-- Pionex metadata leg: GitHub-hosted direct public HTTPS;
-- Binance USD-M metadata leg: authenticated Render Free / Frankfurt path `/metadata/v0-10/binance-exchange-info`;
+- active window: `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z`;
+- Pionex metadata leg: GitHub-hosted direct public HTTPS with frozen preferred/legacy normalization;
+- Binance USD-M metadata leg: authenticated Render Free / Frankfurt raw relay;
+- V0.10 scheduled capture path: **RETIRED / HISTORICAL**;
 - old V0.2 `[self-hosted, macOS, ARM64]` scheduled path: **RETIRED**;
 - concurrent old/new metadata paths: forbidden;
-- automatic fallback to V0.2: forbidden;
+- automatic fallback to V0.10 or V0.2: forbidden;
 - Render receives R2 credentials: false.
 
 Render remains FREE / Frankfurt. Current runtime budget is `0 USD/month`.
@@ -493,7 +540,7 @@ Authority receipt: `research/receipts/2026-08-21-v0-10-render-final-pre-window-r
 
 This recheck was observation-only: it did not trigger a Render deploy, read/change Render environment values, hit providers, construct/read/write production R2, read capture artifacts, open holdout data, or run V0.11 production evaluation.
 
-## Frozen metadata scope
+## Historical V0.10 frozen metadata scope
 
 Inherited scientific scope is unchanged:
 
@@ -518,7 +565,7 @@ Inherited scientific scope is unchanged:
 
 Each complete V0.10 capture uses 3 immutable run-scoped R2 objects. Receipt is written last, post-write SHA-256 readback is required, and every authorized write must pass a fresh whole-bucket 8,000,000,000-byte FREE-ONLY headroom gate.
 
-No provider/R2 metadata capture is authorized outside the exact frozen window.
+No V0.10 provider/R2 metadata capture is authorized outside its exact frozen historical window.
 
 ## Pre-window readiness and capture-window operations — PREPARED PASS
 
@@ -551,7 +598,7 @@ Historical V0.10 operational rules and current V0.12 transition:
 - manual metadata-capture backfill is **NOT_AUTHORIZED**;
 - retroactive hourly-slot backfill is **NOT_AUTHORIZED**;
 - if the `:17` attempt fails, preserve the failure and allow the frozen `:47` scheduled attempt to run normally;
-- if both attempts in one UTC hour fail, preserve both failures and keep that hour as a potential missing slot for post-window V0.11 evaluation; do not manufacture replacement evidence;
+- if both attempts in one UTC hour fail, preserve both failures and keep that hour as a potential missing slot for post-window production stability evaluation; do not manufacture replacement evidence;
 - an R2 FREE-ONLY headroom `BLOCKED` result must stop before write and may not be bypassed by raising the 8 GB gate, deleting evidence, or performing partial writes;
 - a stale scheduled run over the frozen freshness limit remains a skip and may not bypass the freshness guard;
 - observer scope remains GitHub Actions run/job/step metadata only; it does not read capture artifacts, production R2, provider payloads, Render payloads, or holdout data;
@@ -562,7 +609,7 @@ Historical V0.10 operational rules and current V0.12 transition:
 
 The PR #153 synthetic rehearsal covered 12/12 scenarios and passed in CI. That PASS proves fail-closed behavior only; it is not production metadata-stability evidence and grants no downstream authority.
 
-## V0.11 metadata stability evaluator — PREPARED ONLY
+## V0.11 metadata stability evaluator — PREPARED ONLY / HISTORICAL V0.10-BOUND TEMPLATE
 
 PR #131 froze the evaluator rules and implementation before production stability evidence is read. PR #154 prepared the exact post-window execution sequence without granting execution authority. PR #161 additionally prepared and validated the exact future production-evaluation authority template while leaving the runtime hard-disabled.
 
@@ -585,7 +632,7 @@ Frozen evaluator semantics:
 - missing slot, invalid receipt, normalized-vector SHA mismatch, same-slot disagreement, or cross-window drift => FAIL CLOSED;
 - no post-hoc deadband, provider splicing, symbol-scope shrink, or retroactive slot backfill.
 
-Current execution boundary:
+Historical V0.11 execution boundary:
 
 - `V0_11_R2_EVALUATION_EXECUTION_AUTHORIZED=false`;
 - production R2 client construction/read is not authorized;
@@ -594,12 +641,12 @@ Current execution boundary:
 - raw provider objects and holdout objects may not be listed/read;
 - the prepared post-window package is not execution authority;
 - the prepared production-evaluation authority template is not execution authority;
-- no actual V0.11 production evaluation authority may be created or merged before the full metadata capture window ends at `2026-09-04T01:59:59.999Z`;
+- no actual V0.11 production evaluation authority may be created or merged before the historical V0.10 metadata capture window ended at `2026-09-04T01:59:59.999Z`;
 - metadata stability remains **NOT_YET_RUN**.
 
-The future authority template locks the only eligible execution delta after a separate post-window protected-main authority merge to a one-shot reviewed path: construct the R2 client, list/read allowlisted V0.10 `receipt.json` objects, and run the already-frozen evaluator. It must remain receipt-only/read-only: no R2 writes/deletes, no raw provider-object reads, no provider/Render requests, no `METADATA_RELAY_TOKEN`, no holdout listing/access, no scheduled/automatic evaluation, and no source-switch/W1/backtest/strategy/trading authority.
+The V0.11 future authority template remains historically bound to its reviewed V0.10 receipt-only path: after a separate protected-main authority merge, construct the R2 client, list/read allowlisted V0.10 `receipt.json` objects, and run the already-frozen V0.11 evaluator. It must remain receipt-only/read-only: no R2 writes/deletes, no raw provider-object reads, no provider/Render requests, no `METADATA_RELAY_TOKEN`, no holdout listing/access, no scheduled/automatic evaluation, and no source-switch/W1/backtest/strategy/trading authority.
 
-After the full window ends, the frozen sequence is: verify window completion and critical-path lineage without reading production R2; create a separate versioned V0.11 production-evaluation execution authority from the prepared template; merge it through protected `main` after required CI; only then list/read allowlisted V0.10 `receipt.json` objects and run the exact evaluator.
+The V0.12 successor does not inherit that execution template. Its own config freezes the future stability contract around at least one complete valid V0.12 receipt for each of all 194 UTC hourly slots, exact per-provider vector agreement, no partial-window PASS, and no post-hoc deadband/scope/provider splice. `production_r2_evaluation_authorized_now=false` and `future_separate_versioned_evaluation_authority_required=true` remain the current authority. After `2026-09-12T03:59:59.999Z`, any V0.12 production receipt read or stability evaluation therefore requires a new separately reviewed versioned authority that explicitly binds the V0.12 namespace.
 
 Even a future metadata-stability PASS will not itself authorize holdout access. A separate versioned holdout-access authority is required.
 
@@ -734,9 +781,11 @@ Repository branch protection/ruleset configuration is external GitHub state, not
 - Provider mapping never converts provenance.
 - No provider splicing, silent interpolation, Pionex-native relabeling, or post-hoc provenance rewrite.
 - V0.10 metadata authority is not strategy/backtest/trade/live authority.
+- V0.12 metadata authority is not strategy/backtest/trade/live authority.
 - V0.10 capture-window operations preparation is not new capture authority and does not authorize manual/retroactive backfill.
 - V0.10 emergency-change template is not authority and does not authorize a mid-window mutation or Render redeploy.
-- V0.11 prepared evaluator, post-window package, and production-evaluation authority template are not production stability authority.
+- V0.11 prepared evaluator, post-window package, and production-evaluation authority template are not V0.12 production stability authority.
+- Context Forward Capture Execution V0.1 authorizes one bounded manual forward snapshot only; it is not 4H schedule, backfill, holdout, strategy or trading authority.
 - No staged Trade-Kline W1 materialization yet.
 - Historical Universe membership remains NOT_READY.
 - SState frozen core must not be modified by this phase.
@@ -745,22 +794,23 @@ Repository branch protection/ruleset configuration is external GitHub state, not
 
 ## Current blockers
 
-1. Metadata stability: production 194-slot evidence has not run yet.
+1. Metadata stability: the V0.12 194-slot successor window is current, but production stability evaluation is not authorized and has not run; no PASS may be inferred from the clock or partial evidence.
 2. Holdout access: replacement holdout is `FROZEN_UNOPENED` and requires separate authority after stability PASS.
 3. Provider substitution: Equivalence V0.1 remains definitive FAIL.
 4. Trade-Kline W1 materialization: NOT_AUTHORIZED.
 5. Historical Universe membership: NOT_READY.
 6. Strategy replay/backtest admission: still blocked by authority.
 7. HYPE Funding 2026: deferred; no interpolation/provider splice.
-8. Live execution: forbidden; project remains PAPER-ONLY.
+8. Context Forward continuous history: the first real one-shot is authorized only for `2026-09-12T04:00:00Z` through `2026-09-19T04:00:00Z`; it has not been claimed as executed here and the future 4H schedule is NOT_AUTHORIZED.
+9. Live execution: forbidden; project remains PAPER-ONLY.
 
 ## Next formal milestone
 
-Before `2026-08-27T00:00:00Z`: readiness/maintenance validation only. Do not manually consume production metadata evidence.
+Current formal window: V0.12 successor metadata capture, `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z`.
 
-For the V0.12 successor window:
+For the V0.12 successor window and its immediate post-window boundary:
 
-1. Keep V0.10 unscheduled and allow only the V0.12 `:17/:47` schedule; do not create a second execution path.
+1. Keep V0.10 unscheduled and allow only the V0.12 `:17/:47` metadata schedule; do not create a second metadata execution path.
 2. Preserve the exact V0.12 194-slot / 388-attempt / 15-symbol / 45-pair scope.
 3. Preserve every failed, blocked, skipped, stale, or missing attempt as evidence; do not manually or retroactively backfill it.
 4. If `:17` fails, let the existing frozen `:47` attempt run normally rather than manually retrying.
@@ -769,17 +819,19 @@ For the V0.12 successor window:
 7. Require fresh R2 headroom before each write; never overwrite, delete, or bypass evidence to force a capture through.
 8. Keep production-critical code/runtime/secrets frozen by default; any unavoidable intervention requires a separate versioned emergency authority and protected-main PR.
 9. After the V0.12 window has ended at `2026-09-12T03:59:59.999Z`, verify critical-path lineage without production R2 reads, then create a separate versioned production evaluation authority **before any V0.12 R2 receipt read for stability evaluation**.
+10. After `2026-09-12T04:00:00Z`, the already-authorized Context Forward Capture Execution V0.1 may be manually dispatched once inside its bounded window. A valid one-shot PASS is only a prerequisite for later V0.2 4H-schedule review; it does not activate that schedule automatically.
 
 ## Explicitly forbidden next actions
 
-- Do not manually run V0.10 production metadata capture before the frozen window.
-- Do not manually or retroactively backfill failed/missing V0.10 attempts or hourly slots during or after the frozen window.
-- Do not bypass the 30-minute freshness guard or 8 GB FREE-ONLY R2 headroom gate.
-- Do not make an unreviewed production-critical mid-window code, runtime, secret, transport, or provider change.
+- Do not manually or retroactively backfill failed/missing V0.10 or V0.12 metadata attempts or hourly slots.
+- Do not bypass the frozen freshness guard or 8 GB FREE-ONLY R2 headroom gate.
+- Do not make an unreviewed production-critical V0.12 mid-window code, runtime, secret, transport, or provider change.
 - Do not treat the prepared emergency-change template as an intervention authority.
-- Do not create or merge the actual V0.11 production-evaluation authority before `2026-09-04T01:59:59.999Z`.
-- Do not manually run V0.11 production R2 stability evaluation under the prepared protocol/template.
-- Do not list/read production V0.10 R2 receipts for stability evaluation before a separate post-window authority is merged.
+- Do not create or merge V0.12 production-stability read/evaluation authority before `2026-09-12T03:59:59.999Z`.
+- Do not manually run production R2 stability evaluation under the prepared V0.11 protocol/template.
+- Do not list/read production V0.12 R2 receipts for stability evaluation before a separate post-window authority is merged.
+- Do not run Context Forward Capture Execution V0.1 before `2026-09-12T04:00:00Z` or at/after its `2026-09-19T04:00:00Z` expiry.
+- Do not treat the Context Forward V0.1 one-shot authority as authorization for a 4H cron, historical backfill, holdout access, strategy changes or trading.
 - Do not reactivate retired historical proof/materialization workflows without new authority.
 - Do not re-enable the V0.2 self-hosted schedule or create a second concurrent metadata path.
 - Do not access/evaluate replacement holdout candles.
