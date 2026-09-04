@@ -47,6 +47,11 @@ manual dispatch is never required and never counts as cron-health evidence.
 - CI and dashboard build/static smoke.
 - V0.10/V0.12 critical-path freeze guard and successor-window validation.
 - V0.10 scheduled-capture observer retained as historical run-metadata inspection only.
+- Context Forward Capture Execution V0.1 is a separately authorized manual one-shot
+  after `2026-09-12T04:00:00Z`. It has no cron, does not change the seven-workflow
+  health inventory, and may freeze at most one normalized CoinPaprika forward
+  snapshot plus receipt in its dedicated R2 namespace. A future 4H schedule
+  requires a separate V0.2 authority.
 
 ## Prepared but not scheduled
 

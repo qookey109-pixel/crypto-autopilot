@@ -38,6 +38,8 @@
     "pionex_alternative_assets_catalog": "config/pionex_alternative_assets_observability_v0_2.json",
     "pionex_alternative_assets_authority": "research/receipts/2026-08-30-pionex-alternative-assets-observability-v0-2-authority.json",
     "pionex_alternative_assets_state": "OBSERVABILITY_V0_2_AUTHORIZED_AFTER_V0_10_WINDOW_HISTORY_WAITING_SEPARATE_AUTHORITY",
+    "context_forward_capture_execution": "config/context_forward_capture_execution_v0_1.json",
+    "context_forward_capture_execution_state": "MANUAL_ONE_SHOT_AFTER_2026-09-12T04:00Z_NO_SCHEDULE",
     "paper_successor": "config/post_window_paper_training_v0_2.json",
     "paper_successor_state": "PREPARED_WAITING_FOR_HOLDOUT_AUTHORITY"
   },
@@ -99,6 +101,7 @@
       "binance-usdm-detailed-history-v0-1.yml",
       "binance-usdm-detailed-training-v0-1.yml",
       "ci.yml",
+      "context-forward-capture-execution-v0-1.yml",
       "dashboard-authority-snapshot.yml",
       "dashboard-github-pages.yml",
       "dashboard-static-smoke.yml",
@@ -172,6 +175,8 @@
     "paper_successor_automatic_activation_authorized": false,
     "manual_dispatch_required_for_normal_operations": false,
     "manual_dispatch_counts_as_automation_health": false,
+    "context_forward_capture_execution_authority_added": true,
+    "context_forward_capture_execution_schedule_added": false,
     "trade_plan_authorized": false,
     "real_money_order_authorized": false,
     "live_trading_authorized": false
