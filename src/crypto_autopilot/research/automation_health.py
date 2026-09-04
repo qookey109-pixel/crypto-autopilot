@@ -106,7 +106,12 @@ def evaluate_workflow(
     if active_until is not None and now >= active_until:
         return {**base, "status": "EXPECTED_STOP", "alert": False, "last_run": None}
 
-    eligible_runs = [run for run in runs if str(run.get("event") or "") in expectation.allowed_events]
+    eligible_runs = [
+        run
+        for run in runs
+        if str(run.get("event") or "") in expectation.allowed_events
+        and (active_from is None or _run_time(run) >= active_from)
+    ]
     ordered = sorted(eligible_runs, key=_run_time, reverse=True)
     if not ordered:
         if expectation.mode == "conditional":
