@@ -1,0 +1,87 @@
+{
+  "version": "0.1.0",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE_MANUAL_ONE_SHOT_AFTER_NOT_BEFORE",
+  "purpose": "Authorize one manually dispatched CoinPaprika forward context capture after the V0.12 metadata window, with immutable normalized R2 evidence and no schedule, holdout, strategy, or trading authority.",
+  "source_prepared_capture": {
+    "path": "config/context_forward_capture_v0_1.json",
+    "git_blob_sha": "95268e1dc945524824498390ebd07b9b302c3c5b",
+    "required_version": "0.1.0",
+    "required_status": "PREPARED_NOT_ACTIVE",
+    "required_provider": "coinpaprika"
+  },
+  "execution": {
+    "mode": "MANUAL_ONE_SHOT",
+    "workflow_dispatch_authorized": true,
+    "workflow_schedule_authorized": false,
+    "not_before_utc": "2026-09-12T04:00:00Z",
+    "expires_utc": "2026-09-19T04:00:00Z",
+    "max_successful_captures": 1,
+    "automatic_retries": 0,
+    "request_timeout_seconds": 20,
+    "max_response_bytes": 1048576,
+    "request_order": [
+      "https://api.coinpaprika.com/v1/global",
+      "https://api.coinpaprika.com/v1/tickers/eth-ethereum"
+    ],
+    "user_agent": "qookey-crypto-autopilot-context-forward/0.1"
+  },
+  "storage": {
+    "provider": "cloudflare_r2",
+    "namespace": "context/market-regime/v0_1/forward-execution-v0_1/",
+    "snapshot_key": "context/market-regime/v0_1/forward-execution-v0_1/first-success/snapshot.json",
+    "receipt_key": "context/market-regime/v0_1/forward-execution-v0_1/first-success/receipt.json",
+    "raw_payload_persistence_authorized": false,
+    "normalized_snapshot_persistence_authorized": true,
+    "receipt_persistence_authorized": true,
+    "receipt_written_last": true,
+    "immutable_exact_byte_required": true,
+    "postwrite_sha256_readback_required": true,
+    "whole_bucket_inventory_before_provider_required": true,
+    "whole_bucket_inventory_before_write_required": true,
+    "free_only_hard_stop_bytes": 8000000000
+  },
+  "failure_policy": {
+    "missing_secret": "FAIL_CLOSED_BEFORE_R2_OR_PROVIDER",
+    "outside_execution_window": "FAIL_CLOSED_BEFORE_R2_OR_PROVIDER",
+    "existing_success_receipt": "RETURN_ALREADY_COMPLETE_WITHOUT_PROVIDER",
+    "r2_headroom_exceeded": "FAIL_CLOSED_BEFORE_PROVIDER_OR_WRITE",
+    "provider_http_error": "FAIL_CLOSED_NO_RETRY",
+    "provider_timeout": "FAIL_CLOSED_NO_RETRY",
+    "response_too_large": "FAIL_CLOSED",
+    "parser_or_timestamp_failure": "FAIL_CLOSED_NO_WRITE",
+    "immutable_object_conflict": "FAIL_CLOSED",
+    "partial_snapshot_without_receipt": "FAIL_CLOSED_MANUAL_REVIEW",
+    "automatic_provider_fallback_authorized": false,
+    "paid_fallback_authorized": false
+  },
+  "output": {
+    "secret_free_github_artifact_authorized": true,
+    "artifact_retention_days": 90,
+    "artifact_contains_raw_provider_payloads": false,
+    "artifact_contains_secrets": false
+  },
+  "next_stage_boundary": {
+    "four_hour_schedule_authorized": false,
+    "four_hour_schedule_requires_separate_v0_2_authority": true,
+    "successful_v0_1_capture_is_prerequisite_for_v0_2_schedule_review": true
+  },
+  "authority": {
+    "research_only": true,
+    "provider_fetch_authorized_after_not_before": true,
+    "production_r2_read_authorized_after_not_before": true,
+    "production_r2_write_authorized_after_not_before": true,
+    "historical_backfill_authorized": false,
+    "workflow_schedule_authorized": false,
+    "holdout_access_authorized": false,
+    "replacement_holdout_tuning_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "strategy_score_change_authorized": false,
+    "risk_change_authorized": false,
+    "leverage_change_authorized": false,
+    "short_execution_authorized": false,
+    "model_promotion_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
