@@ -37,7 +37,7 @@ jobs:
         run: |
           python scripts/train_binance_detailed_history_models.py \
             --config config/binance_usdm_detailed_history_v0_1_2.json \
-            --authority research/receipts/2026-08-24-binance-usdm-detailed-history-v0-1-1-bounded-authority.json \
+            --authority research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json \
             --run-id "github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
             --output detailed-training-output/report.json
 
