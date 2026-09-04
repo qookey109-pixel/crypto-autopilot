@@ -14,6 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "config" / "context_forward_capture_v0_1.json"
 SOURCE_PATH = ROOT / "config" / "context_source_lineage_v0_1.json"
 CLOUD_POLICY_PATH = ROOT / "config" / "cloud_free_tier_policy_v0_1.json"
+EXECUTION_CONFIG_PATH = ROOT / "config" / "context_forward_capture_execution_v0_1.json"
+EXECUTION_WORKFLOW_NAME = "context-forward-capture-execution-v0-1.yml"
 
 
 class ContextForwardCaptureConfigTests(unittest.TestCase):
@@ -55,14 +57,31 @@ class ContextForwardCaptureConfigTests(unittest.TestCase):
         self.assertFalse(config["transport_preparation"]["provider_request_entrypoint_enabled"])
         self.assertFalse(config["transport_preparation"]["default_network_transport_implemented"])
 
-    def test_no_context_forward_capture_workflow_exists(self) -> None:
+    def test_prepared_capture_has_no_self_authorized_workflow(self) -> None:
+        """A workflow may exist only through the separate versioned execution authority."""
+
+        prepared = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+        self.assertFalse(prepared["authority"]["provider_fetch_authorized"])
+        self.assertFalse(prepared["authority"]["workflow_schedule_authorized"])
+        self.assertFalse(prepared["transport_preparation"]["provider_request_entrypoint_enabled"])
+
         workflow_root = ROOT / ".github" / "workflows"
-        violations: list[str] = []
+        matching: list[Path] = []
         for path in workflow_root.glob("*.yml"):
             text = path.read_text(encoding="utf-8").lower()
             if "context_forward_capture" in text or "context-forward-capture" in text:
-                violations.append(path.name)
-        self.assertEqual(violations, [])
+                matching.append(path)
+
+        self.assertEqual([path.name for path in matching], [EXECUTION_WORKFLOW_NAME])
+        execution = json.loads(EXECUTION_CONFIG_PATH.read_text(encoding="utf-8"))
+        workflow = matching[0].read_text(encoding="utf-8")
+        self.assertEqual(execution["execution"]["mode"], "MANUAL_ONE_SHOT")
+        self.assertTrue(execution["execution"]["workflow_dispatch_authorized"])
+        self.assertFalse(execution["execution"]["workflow_schedule_authorized"])
+        self.assertIn("workflow_dispatch:", workflow)
+        self.assertNotIn("schedule:", workflow)
+        self.assertNotIn("cron:", workflow)
+        self.assertIn("context_forward_capture_execution_v0_1.json", workflow)
 
 
 if __name__ == "__main__":
