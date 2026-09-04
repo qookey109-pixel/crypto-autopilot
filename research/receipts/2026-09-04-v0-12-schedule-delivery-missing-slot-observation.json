@@ -1,0 +1,75 @@
+{
+  "schema_version": "v0_12_schedule_delivery_missing_slot_observation_v0_1",
+  "status": "FAIL_CLOSED",
+  "stage": "V0_12_COMPLETE_194_SLOT_PASS_ELIGIBILITY_BLOCKED_BY_MISSING_SCHEDULE_SLOTS",
+  "date": "2026-09-04",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "evidence_type": "POST_MERGE_READ_ONLY_OPERATIONAL_OBSERVATION_NOT_AUTHORITY",
+  "lineage": {
+    "observed_main_sha": "fa090df53e14e1cc54d6ff93ddd26ae8090abb7b",
+    "source_issue": 224,
+    "source_issue_url": "https://github.com/qookey109-pixel/crypto-autopilot/issues/224",
+    "v0_12_config": "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
+    "v0_12_authority": "research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json",
+    "v0_12_binding": "config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json",
+    "v0_12_workflow": ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml",
+    "v0_12_workflow_id": 346848058
+  },
+  "observation": {
+    "observed_at_utc": "2026-09-04T04:53:11Z",
+    "window_start_utc": "2026-09-04T02:00:00Z",
+    "window_end_utc": "2026-09-12T03:59:59.999Z",
+    "repository_schedule_events_page_size": 100,
+    "latest_repository_schedule_run_id": 33837808364,
+    "latest_repository_schedule_run_workflow": "Binance USD-M Crypto Core 100 History V0.1.2",
+    "latest_repository_schedule_run_created_at_utc": "2026-09-04T04:42:39Z",
+    "current_window_v0_12_schedule_run_visible_in_latest_100_schedule_events": false,
+    "schedule_delivery_state": "PARTIAL_RECOVERY_ONLY"
+  },
+  "irreversibly_missing_hourly_slots": [
+    "2026-09-04T02:00:00Z",
+    "2026-09-04T03:00:00Z"
+  ],
+  "operational_interpretation": {
+    "github_schedule_delivery_partially_resumed_for_other_workflow": true,
+    "v0_12_current_window_schedule_run_visible": false,
+    "future_delayed_v0_12_execution_uses_actual_observed_hour": true,
+    "future_delayed_v0_12_execution_can_repair_02_or_03_utc_slot": false,
+    "provider_runtime_failure_observed_for_v0_12": false,
+    "v0_12_job_record_available_for_missing_slots": false
+  },
+  "scientific_impact": {
+    "required_hourly_slot_count": 194,
+    "all_194_valid_hourly_slots_required": true,
+    "missing_hour_policy": "FAIL_METADATA_STABILITY_NO_HOLDOUT_AUTHORITY",
+    "partial_window_may_produce_pass": false,
+    "retroactive_backfill_authorized": false,
+    "delayed_future_run_can_repair_prior_missing_slot": false,
+    "current_frozen_v0_12_window_eligible_for_complete_194_slot_pass": false,
+    "metadata_stability_evaluation_state": "NOT_AUTHORIZED_NOT_RUN",
+    "replacement_holdout_state": "FROZEN_UNOPENED",
+    "replacement_holdout_access_authorized": false
+  },
+  "authority_boundary": {
+    "this_observation_authorizes_schedule_change": false,
+    "this_observation_authorizes_parser_change": false,
+    "this_observation_authorizes_workflow_dispatch": false,
+    "manual_v0_12_capture_authorized": false,
+    "retroactive_backfill_authorized": false,
+    "provider_or_scope_change_authorized": false,
+    "r2_capture_or_evaluation_authorized_by_this_observation": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_or_model_change_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "required_next_decision": {
+    "continue_current_schedule_observation_without_replay": true,
+    "preserve_later_actual_run_creation_and_execution_timestamps": true,
+    "new_versioned_authority_required_before_frozen_critical_path_change": true,
+    "automatic_action_authorized": false
+  }
+}
