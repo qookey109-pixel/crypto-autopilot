@@ -71,7 +71,7 @@ def validate_execution_config(
         raise ContextForwardExecutionError("V0.1 schedule must remain disabled")
     if int(execution.get("max_successful_captures") or 0) != 1:
         raise ContextForwardExecutionError("V0.1 must authorize exactly one successful capture")
-    if int(execution.get("automatic_retries") or -1) != 0:
+    if execution.get("automatic_retries") != 0:
         raise ContextForwardExecutionError("automatic retries must remain zero")
     not_before = _parse_utc(str(execution.get("not_before_utc")), field="not_before_utc")
     expires = _parse_utc(str(execution.get("expires_utc")), field="expires_utc")
