@@ -1,0 +1,71 @@
+name: Context Forward Capture Execution V0.1
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: context-forward-capture-execution-v0-1
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Run one-shot forward context capture
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          python scripts/run_context_forward_capture_execution.py \
+            --config config/context_forward_capture_execution_v0_1.json \
+            --prepared-config config/context_forward_capture_v0_1.json \
+            --source-lineage config/context_source_lineage_v0_1.json \
+            --output context-forward-output/report.json
+
+      - name: Assert research-only output boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("context-forward-output/report.json").read_text())
+          assert report["status"] in {"PASS", "ALREADY_COMPLETE"}
+          assert report.get("raw_payloads_persisted", False) is False
+          assert report.get("historical_backfill_performed", False) is False
+          assert report.get("holdout_accessed", False) is False
+          assert report.get("strategy_changed", False) is False
+          assert report.get("short_execution_authorized", False) is False
+          assert report.get("model_promotion_authorized", False) is False
+          assert report.get("trade_plan_authorized", False) is False
+          assert report.get("real_money_order_authorized", False) is False
+          assert report.get("live_trading_authorized", False) is False
+          PY
+
+      - name: Upload secret-free execution report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: context-forward-capture-execution-${{ github.run_id }}-${{ github.run_attempt }}
+          path: context-forward-output/report.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf context-forward-output
