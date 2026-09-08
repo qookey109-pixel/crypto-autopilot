@@ -54,6 +54,8 @@ jobs:
           args=(
             --config config/binance_usdm_detailed_history_v0_1_2.json
             --authority research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json
+            --recovery-config config/binance_usdm_history_recovery_v0_1.json
+            --recovery-authority research/receipts/2026-09-08-binance-usdm-history-recovery-v0-1-authority.json
             --mode "$REQUESTED_MODE"
             --run-id "github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
             --output detailed-history-output/report.json
@@ -64,6 +66,7 @@ jobs:
           python scripts/run_binance_detailed_history.py "${args[@]}"
 
       - name: Assert research-only provider separation
+        if: ${{ !cancelled() && hashFiles('detailed-history-output/report.json') != '' }}
         run: |
           python - <<'PY'
           import json
@@ -80,6 +83,7 @@ jobs:
           PY
 
       - name: Upload secret-free run report
+        if: ${{ !cancelled() && hashFiles('detailed-history-output/report.json') != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: binance-usdm-detailed-history-${{ github.run_id }}-${{ github.run_attempt }}

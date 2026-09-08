@@ -16,7 +16,11 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from crypto_autopilot.binance.vision import BinanceVisionArchiveKey, ingest_kline_archive
+from crypto_autopilot.binance.vision import BinanceVisionArchiveKey, BinanceVisionEvidenceError, ingest_kline_archive
+from crypto_autopilot.history_recovery import (
+    Journal, RecoveryError, MAX_ATTEMPTS, choose_shard, load_contract,
+    quality_diagnostic, require_window,
+)
 from crypto_autopilot.history.detailed import (
     DetailedHistoryAuthorityError,
     DetailedMarketCoverage,
@@ -634,6 +638,8 @@ def main() -> int:
     parser.add_argument("--run-id", default=os.getenv("GITHUB_RUN_ID") or "local")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--now-utc")
+    parser.add_argument("--recovery-config", type=Path)
+    parser.add_argument("--recovery-authority", type=Path)
     args = parser.parse_args()
     output = require_ephemeral_output(args.output)
     if not SAFE_RUN_ID.fullmatch(args.run_id):
@@ -683,6 +689,16 @@ def main() -> int:
         print(json.dumps(report, sort_keys=True))
         return 0
 
+    recovery_sha = None
+    if bool(args.recovery_config) != bool(args.recovery_authority):
+        raise RecoveryError("both recovery authority files are required")
+    if args.recovery_config:
+        if (os.getenv("GITHUB_REF") != "refs/heads/main" or
+                os.getenv("GITHUB_REPOSITORY") != "qookey109-pixel/crypto-autopilot"):
+            raise RecoveryError("recovery execution requires repository main")
+        recovery_sha = load_contract(
+            args.recovery_config, args.recovery_authority, _config_bytes, datetime.now(UTC)
+        )
     store = create_store()
     published = load_published_catalog(store, config)
     mode = args.mode
@@ -730,21 +746,75 @@ def main() -> int:
                 for item in state["completed_shards"]
                 if isinstance(item, dict)
             }
-            shard_index = (
-                args.shard_index
-                if args.shard_index is not None
-                else next(index for index in range(int(state["shard_count"])) if index not in completed)
-            )
-            result = materialize_shard(
-                store,
-                config=config,
-                latest=latest,
-                catalog=catalog,
-                state=state,
-                shard_index=shard_index,
-                run_id=args.run_id,
-                generated_at_utc=generated_at,
-            )
+            journal = None
+            if recovery_sha:
+                require_window(datetime.now(UTC))
+                _ensure_reservation_headroom(store, config, planned=1_000_000)
+                if int(state["shard_count"]) != 10 or len(completed) != len(state["completed_shards"]):
+                    raise RecoveryError("recovery requires ten distinct governed shards")
+                # Verify original completion evidence; an attempt can never grant PASS.
+                for item in state["completed_shards"]:
+                    index = item["shard_index"]
+                    if type(index) is not int or not 0 <= index < 10:
+                        raise RecoveryError("invalid completed shard index")
+                    prefix = config["storage"]["shard_receipt_namespace"].rstrip("/") + f"/shard={index:03d}/run="
+                    key = item["receipt_key"]
+                    if not isinstance(key, str) or not key.startswith(prefix) or not key.endswith("/receipt.json"):
+                        raise RecoveryError("completed receipt escaped governed namespace")
+                    receipt = json.loads(store.get_bytes_verified(
+                        key, expected_sha256=item["receipt_sha256"]
+                    ))
+                    if (receipt.get("status") != "PASS" or receipt.get("shard_index") != index or
+                            receipt.get("provider") != "binance_usdm" or
+                            receipt.get("catalog_key") != latest["catalog_key"] or
+                            receipt.get("catalog_sha256") != latest["catalog_sha256"]):
+                        raise RecoveryError("completed receipt identity mismatch")
+                def recovery_gate():
+                    require_window(datetime.now(UTC))
+                    _ensure_reservation_headroom(store, config, planned=1_000_000)
+                journal = Journal(store, latest["catalog_sha256"], recovery_sha, recovery_gate)
+                attempts = journal.load()
+                if len(attempts) >= MAX_ATTEMPTS:
+                    raise RecoveryError("attempt budget exhausted before provider access")
+                if any(a["run_id"] == args.run_id for a in attempts):
+                    raise RecoveryError("duplicate recovery run before provider access")
+                selected = choose_shard(10, list(completed), attempts)
+                if args.shard_index is not None and args.shard_index != selected:
+                    raise RecoveryError("manual shard override conflicts with fair rotation")
+                shard_index = selected
+            else:
+                shard_index = (
+                    args.shard_index if args.shard_index is not None
+                    else next(index for index in range(int(state["shard_count"])) if index not in completed)
+                )
+            try:
+                result = materialize_shard(
+                    store, config=config, latest=latest, catalog=catalog, state=state,
+                    shard_index=shard_index, run_id=args.run_id, generated_at_utc=generated_at,
+                )
+            except BinanceVisionEvidenceError as exc:
+                if journal is None:
+                    raise
+                diagnostic = quality_diagnostic(str(exc))
+                # The diagnostic must identify a partition in this exact shard.
+                if not any(
+                    (p.symbol, p.interval, p.period) ==
+                    (diagnostic["symbol"], diagnostic["interval"], diagnostic["period"])
+                    for p in build_shard_plan(catalog, shard_index=shard_index)
+                ):
+                    raise RecoveryError("quality diagnostic escaped selected shard") from exc
+                journal.append(args.run_id, shard_index, "QUALITY_REJECT", diagnostic)
+                result = {
+                    "status": "FAIL", "stage": "DETAILED_HISTORY_SHARD_QUALITY_REJECT",
+                    "shard_index": shard_index, "shards_complete": len(completed),
+                    "shard_count": state["shard_count"], "dataset_status": "IN_PROGRESS",
+                    "dataset_complete": False, "diagnostic": diagnostic,
+                }
+            else:
+                if journal is not None:
+                    if result.get("status") != "PASS":
+                        raise RecoveryError("unexpected materialization outcome")
+                    journal.append(args.run_id, shard_index, "PASS")
 
     report = {
         **result,
@@ -764,7 +834,7 @@ def main() -> int:
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(canonical_json_bytes(report))
     print(json.dumps(report, sort_keys=True))
-    return 0
+    return 1 if report.get("status") == "FAIL" else 0
 
 
 if __name__ == "__main__":
