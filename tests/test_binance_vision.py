@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import io
+import json
 import unittest
 import zipfile
 from dataclasses import replace
@@ -139,6 +140,60 @@ class BinanceVisionTests(unittest.TestCase):
             BinanceVisionArchiveKey("klines", "monthly", "BTCUSDT", "15m", "2025-13")
         with self.assertRaises(ValueError):
             BinanceVisionArchiveKey("fundingRate", "monthly", "BTCUSDT", "15m", "2025-01")
+
+    def test_audit_failure_identifies_partition_without_exposing_candle_rows(self) -> None:
+        key = BinanceVisionArchiveKey("klines", "monthly", "BTCUSDT", "1h", "2025-01")
+        step = BINANCE_INTERVAL_MS["1h"]
+        cases = (
+            ("gap", [0, 2 * step], "1", 1, 1, 0, 0),
+            ("misalignment", [1, step + 1], "1", 0, 0, 2, 0),
+            ("invalid_volume", [0, step], "-1", 0, 0, 0, 2),
+        )
+        for name, times, volume, gaps, missing, misaligned, invalid in cases:
+            with self.subTest(name=name):
+                rows = [
+                    f"{stamp},123.4567,125,122,124,{volume},{stamp + step - 1}"
+                    for stamp in times
+                ]
+                payload = make_zip(key.csv_filename, rows)
+                with self.assertRaises(BinanceVisionEvidenceError) as caught:
+                    ingest_kline_archive(
+                        key,
+                        archive_bytes=payload,
+                        checksum_payload=checksum_for(key.filename, payload),
+                    )
+                message = str(caught.exception)
+                self.assertTrue(message.startswith("Binance Vision kline audit failed: "))
+                diagnostic = json.loads(message.split(": ", 1)[1])
+                self.assertEqual(diagnostic, {
+                    "provider": "binance_usdm",
+                    "dataset": "klines",
+                    "frequency": "monthly",
+                    "symbol": "BTCUSDT",
+                    "interval": "1h",
+                    "period": "2025-01",
+                    "archive_sha256": hashlib.sha256(payload).hexdigest(),
+                    "row_count": 2,
+                    "gap_count": gaps,
+                    "missing_bars": missing,
+                    "misaligned_count": misaligned,
+                    "invalid_candle_count": invalid,
+                })
+                self.assertNotIn("123.4567", message)
+                for row in rows:
+                    self.assertNotIn(row, message)
+
+    def test_bad_checksum_still_fails_before_audit_diagnostics(self) -> None:
+        key = BinanceVisionArchiveKey("klines", "monthly", "BTCUSDT", "1h", "2025-01")
+        payload = make_zip(key.csv_filename, ["0,1,2,0.5,1.5,-1,3599999"])
+        with self.assertRaises(BinanceVisionEvidenceError) as caught:
+            ingest_kline_archive(
+                key,
+                archive_bytes=payload,
+                checksum_payload=f"{'0' * 64}  {key.filename}",
+            )
+        self.assertIn("SHA-256 mismatch", str(caught.exception))
+        self.assertNotIn("gap_count", str(caught.exception))
 
 
 if __name__ == "__main__":
