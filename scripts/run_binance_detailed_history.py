@@ -17,7 +17,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from crypto_autopilot.binance.vision import BinanceVisionArchiveKey, BinanceVisionEvidenceError, ingest_kline_archive
-from crypto_autopilot.history_recovery import (
+from crypto_autopilot.history.recovery import (
     Journal, RecoveryError, MAX_ATTEMPTS, choose_shard, load_contract,
     quality_diagnostic, require_window,
 )

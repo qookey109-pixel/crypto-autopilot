@@ -2,7 +2,7 @@ import copy
 import json
 import unittest
 from datetime import datetime, timezone
-from crypto_autopilot.history_recovery import (
+from crypto_autopilot.history.recovery import (
     Journal, RecoveryError, choose_shard, digest, quality_diagnostic, require_window,
 )
 

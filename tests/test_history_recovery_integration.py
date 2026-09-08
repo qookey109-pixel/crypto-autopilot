@@ -13,7 +13,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
-from crypto_autopilot.history_recovery import (
+from crypto_autopilot.history.recovery import (
     Journal, RecoveryError, MAX_ATTEMPTS, choose_shard, load_contract,
     quality_diagnostic, require_window,
 )
