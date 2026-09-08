@@ -95,6 +95,11 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Validate dashboard JavaScript and paper empty states
+        run: |
+          node --check web/assets/js/app.js
+          node --test tests/dashboard_paper_readiness.test.cjs
+
       - name: Validate Traditional Chinese dashboard safety
         run: python scripts/validate_dashboard_static.py
 

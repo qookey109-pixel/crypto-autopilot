@@ -267,3 +267,19 @@ td strong { color: var(--ink); }
   .sstate-meaning-grid, .strategy-facts { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+
+/* Read-only cloud operations summary; preserve the existing research views. */
+.cloud-summary { margin-bottom: 28px; }
+.cloud-summary h2 { font-size: 28px; margin-bottom: 0; }
+.cloud-focus-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.cloud-focus-grid article { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-card); }
+.cloud-focus-grid h3 { font-size: 17px; }
+.cloud-focus-grid strong { display: block; font-size: 21px; margin-bottom: 12px; }
+.cloud-focus-grid p, .cloud-schedule p { font-size: 16px; }
+.cloud-summary a { color: var(--hero-teal); text-decoration: underline; text-underline-offset: 3px; }
+.cloud-schedule { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 16px; }
+.cloud-schedule summary { cursor: pointer; font-weight: 600; padding: 8px 0; }
+.cloud-schedule summary:focus-visible { outline: 3px solid var(--hero-teal); outline-offset: 3px; }
+.cloud-schedule td, .cloud-schedule th { white-space: normal; min-width: 170px; font-size: 14px; }
+.cloud-schedule td small { display: block; margin-top: 8px; font-size: 13px; }
+@media (max-width: 850px) { .cloud-focus-grid { grid-template-columns: 1fr; } }

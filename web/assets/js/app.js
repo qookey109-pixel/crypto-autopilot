@@ -270,14 +270,23 @@ function renderEquityChart(report) {
 
 function renderPaperTraining(report) {
   const observedAt = document.querySelector("#paper-observed-at");
-  if (!report || report.mode !== "PAPER_TRAINING_ONLY") {
+  const authority = report?.authority || {};
+  const unsafe = ["formalTradePlanAuthorized", "sourceSwitchAuthorized",
+    "realMoneyOrderAuthorized", "liveTradingAuthorized"].some(key => authority[key] !== false);
+  const observed = Date.parse(report?.observedAtUtc);
+  if (!report || report.mode !== "PAPER_TRAINING_ONLY" ||
+      report.status === "WAITING_AUTHORITY" || unsafe ||
+      !Number.isFinite(observed) || observed > Date.now()) {
     if (observedAt) observedAt.textContent = "Paper 觀測：尚未完成";
-    return;
-  }
-  const authority = report.authority || {};
-  if (authority.liveTradingAuthorized === true || authority.realMoneyOrderAuthorized === true) {
-    console.error("Unsafe paper-training projection rejected");
-    if (observedAt) observedAt.textContent = "Paper 觀測：資料契約未通過";
+    document.querySelector("#paper-training-status").textContent = "模擬未啟動 · 等待資料與執行授權";
+    document.querySelector("#paper-training-summary").textContent = "尚無通過檢查的模擬結果；開始日期未定。";
+    for (const id of ["paper-return", "paper-win-rate", "paper-profit-factor", "paper-drawdown"]) {
+      document.querySelector("#" + id).textContent = "—";
+    }
+    document.querySelector("#paper-performance-note").textContent = "尚無可用模擬績效；不以 0% 代替缺少資料。";
+    document.querySelector("#paper-signal-table").innerHTML = '<tr><td colspan="6">每日關注尚未啟動；沒有可用的當前候選。</td></tr>';
+    document.querySelector("#paper-trade-table").innerHTML = '<tr><td colspan="8">尚無通過檢查的模擬成交資料。</td></tr>';
+    renderEquityChart(null);
     return;
   }
   const metrics = report.metrics || {};
@@ -295,7 +304,7 @@ function renderPaperTraining(report) {
   document.querySelector("#paper-performance-note").textContent = report.interpretation || "Paper-only research evidence.";
   renderEquityChart(report);
 
-  const signals = report.latestCandidates || [];
+  const signals = Date.now() - observed <= 3600000 ? (report.latestCandidates || []) : [];
   document.querySelector("#paper-signal-table").innerHTML = signals.length ? signals.map(item => `
     <tr>
       <td><strong>${escapeHtml(item.symbol)}</strong></td>
@@ -304,7 +313,7 @@ function renderPaperTraining(report) {
       <td>${number(item.reference_price, 8)}</td>
       <td>${number(item.stop_price, 8)}</td>
       <td>${number(item.target_price, 8)}</td>
-    </tr>`).join("") : '<tr><td colspan="6">目前沒有已完成暖機的候選訊號</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="6">目前沒有新鮮且可用的候選訊號（觀測限一小時內）</td></tr>';
 
   const trades = report.paperTrades || [];
   document.querySelector("#paper-trade-table").innerHTML = trades.length ? trades.slice(-50).reverse().map(item => `
