@@ -7,7 +7,6 @@ import json
 import os
 import zipfile
 from datetime import datetime, timezone
-from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
@@ -86,11 +85,14 @@ class PublicReader:
         clock_gate()
         if url not in self.allowed or self.requests >= 12:
             raise DiagnosisError("REQUEST_SCOPE_OR_COUNT_LIMIT")
+        remaining = 20000000 - self.total_bytes
+        if remaining <= 0:
+            raise DiagnosisError("RESPONSE_BYTE_LIMIT")
         self.requests += 1
         limit = 1024 if url.endswith(".CHECKSUM") else LIMIT
         try:
             with self.opener.open(Request(url, headers={"User-Agent": "crypto-autopilot-bnx-diagnosis-v0.1"}), timeout=30) as response:
-                data = response.read(limit + 1)
+                data = response.read(min(limit + 1, remaining))
         except HTTPError as exc:
             if exc.code == 404:
                 raise DiagnosisError("OFFICIAL_ARCHIVE_NOT_FOUND") from exc
@@ -98,7 +100,7 @@ class PublicReader:
         except (URLError, TimeoutError) as exc:
             raise DiagnosisError("OFFICIAL_TRANSPORT_FAILED") from exc
         self.total_bytes += len(data)
-        if len(data) > limit or self.total_bytes > 20000000:
+        if len(data) > limit or self.total_bytes >= 20000000:
             raise DiagnosisError("RESPONSE_BYTE_LIMIT")
         return data
 

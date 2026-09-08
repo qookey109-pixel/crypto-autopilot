@@ -91,6 +91,20 @@ class DiagnosisTests(unittest.TestCase):
                 reader(d.KEY.url)
             network.assert_not_called()
 
+    def test_total_byte_budget_caps_read_and_stops_next_request(self):
+        reader = d.PublicReader()
+        reader.total_bytes = 19999990
+        with patch.object(d, "clock_gate"), patch.object(reader.opener, "open") as network:
+            response = network.return_value.__enter__.return_value
+            response.read.return_value = b"x" * 10
+            with self.assertRaises(d.DiagnosisError):
+                reader(d.KEY.url)
+            response.read.assert_called_once_with(10)
+            with self.assertRaises(d.DiagnosisError):
+                reader(d.KEY.url)
+            network.assert_called_once()
+        self.assertEqual(reader.total_bytes, 20000000)
+
     def test_denied_authority_creates_no_reader(self):
         with patch.object(d, "load_authority", side_effect=d.DiagnosisError("DENIED")), patch.object(d, "PublicReader") as reader:
             with self.assertRaises(d.DiagnosisError):
