@@ -1,0 +1,10 @@
+{
+  "schema": "bnx-archive-diagnosis-authority-v0.1",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "config": "config/bnx_archive_diagnosis_v0_1.json",
+  "config_sha256": "293187ce50a08a73efc233163b3b5d1aa8c5ed48ceaea942e12b39e644dcac63",
+  "public_archive_reads_authorized": true,
+  "aggregate_github_artifact_authorized": true,
+  "r2_access_authorized": false,
+  "production_repair_authorized": false
+}

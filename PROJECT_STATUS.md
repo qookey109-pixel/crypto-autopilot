@@ -23,6 +23,27 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 </details>
 
+### BNX Archive Diagnosis V0.1 — EFFECTIVE ONLY AFTER PROTECTED-MAIN MERGE
+
+- A bounded manual `diagnose-bnx` mode in the existing history workflow
+  compares the pinned BNXUSDT August 2022 15m monthly archive with same-provider
+  daily archives. At most 12 public requests, five daily archives, no retries
+  or redirects; fresh main dispatch required and rerun attempts are rejected.
+- Separate authority: `config/bnx_archive_diagnosis_v0_1.json` and
+  `research/receipts/2026-09-08-bnx-archive-diagnosis-v0-1-authority.json`.
+  Contract: `docs/BNX_ARCHIVE_DIAGNOSIS_V0_1.md`.
+- This diagnostic has no R2 access, secret bindings or raw-data artifacts.
+  Only aggregate evidence and candidate hashes are retained in GitHub.
+  It does not change the seven scheduled workflow inventory.
+- This is a separate public-read diagnostic scope. The original R2 headroom
+  gate remains required for all original backfill/provider and persistence work;
+  the diagnostic cannot publish data or enter training.
+- A candidate requires a separate versioned publication authority. Source gaps,
+  revisions or disagreements remain failures/review evidence. No completion
+  or repair outcome is asserted before an actual cloud run.
+- User execution preference: GitHub-hosted Actions for testing and runtime;
+  local source backup lives on `codex/cloud-handoff-20260908` and is not authority.
+
 ### History Recovery V0.1 — EFFECTIVE ONLY AFTER PROTECTED-MAIN MERGE
 
 - Adds a SHA-bound recovery appendix to Crypto Core 100 V0.1.2. The original
