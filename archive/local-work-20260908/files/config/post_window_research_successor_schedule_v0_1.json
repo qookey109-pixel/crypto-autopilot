@@ -1,0 +1,56 @@
+{
+  "schema": "post-window-research-successor-schedule-v0.1",
+  "status": "PREPARED_NOT_ACTIVE",
+  "purpose": "Bound a future rolling-data and shadow-model research cadence without activating provider, R2, holdout, promotion or trading access",
+  "activation": {
+    "earliest_utc": "2026-09-04T02:00:00Z",
+    "separate_versioned_execution_authority_required": true,
+    "v0_11_production_evaluation_authority_inherited": false,
+    "replacement_holdout_access_inherited": false,
+    "automatic_activation": false
+  },
+  "proposed_schedule": [
+    {
+      "job": "provider_separated_closed_candle_roll_forward",
+      "cron_utc": "17 1,5,9,13,17,21 * * *",
+      "cadence": "every_4_hours",
+      "dependency": "prior immutable pointer and exact closed-candle boundary",
+      "state": "PROPOSED_ONLY"
+    },
+    {
+      "job": "weekly_shadow_feature_ablation",
+      "cron_utc": "17 5 * * 0",
+      "cadence": "weekly_sunday",
+      "dependency": "validated rolling-data pointer and separate V0.6 online authority",
+      "state": "PROPOSED_ONLY"
+    },
+    {
+      "job": "monthly_drift_and_universe_review",
+      "cron_utc": "17 3 2 * *",
+      "cadence": "monthly_day_2",
+      "dependency": "four to eight comparable weekly experiment receipts",
+      "state": "PROPOSED_ONLY"
+    }
+  ],
+  "required_gates": {
+    "free_only_budget": true,
+    "fresh_r2_headroom": true,
+    "provider_separation": true,
+    "closed_candles_only": true,
+    "no_lookahead": true,
+    "immutable_lineage": true,
+    "bounded_retry_and_search": true,
+    "human_review_before_any_promotion": true
+  },
+  "current_authority": {
+    "provider_access": false,
+    "r2_read": false,
+    "r2_write": false,
+    "holdout_access": false,
+    "automatic_model_promotion": false,
+    "trade_plan": false,
+    "real_money_order": false,
+    "live_trading": false
+  }
+}
+

@@ -1,0 +1,41 @@
+{
+  "version": "0.1.0",
+  "mode": "paper",
+  "direction": "LONG_ONLY",
+  "universe_target": 15,
+  "max_new_trades_per_day": 3,
+  "timeframes": {
+    "market_context": "4H",
+    "setup": "60M",
+    "entry": "15M"
+  },
+  "sstate": {
+    "allowed_states": ["S3", "S0.5", "S2", "S1"],
+    "minimum_probability": 0.60,
+    "minimum_samples": 50,
+    "probability_horizon_use": "background_gate_only"
+  },
+  "score": {
+    "minimum_entry_score": 80,
+    "weights": {
+      "sstate_quality": 25,
+      "historical_probability": 20,
+      "trend_1h": 20,
+      "entry_15m": 20,
+      "reward_risk": 10,
+      "liquidity_funding": 5
+    }
+  },
+  "risk": {
+    "risk_fraction_per_trade": 0.01,
+    "max_leverage": 3.0,
+    "daily_loss_limit_r": 3.0,
+    "max_structural_stop_atr": 2.5
+  },
+  "exit": {
+    "partial_at_r": 1.0,
+    "partial_fraction": 0.30,
+    "runner_fraction": 0.70,
+    "max_holding_hours": 12
+  }
+}

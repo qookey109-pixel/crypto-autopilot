@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "version": "0.1.0",
+  "status": "ACTIVE_UNIFIED_PLANNING_OVERLAY",
+  "authority_effect": "NONE",
+  "issue_tracker": "github",
+  "formal_authority_branch": "main",
+  "source_of_truth": [
+    "PROJECT_STATUS.md",
+    "README.md",
+    "current_versioned_protocol_config_and_receipt",
+    "AGENTS.md"
+  ],
+  "upstream_inspiration": {
+    "repository": "mattpocock/skills",
+    "concepts": [
+      "triage",
+      "to-spec",
+      "to-tickets",
+      "wayfinder"
+    ],
+    "integration": "PROJECT_SPECIFIC_CONCEPTUAL_ADAPTATION",
+    "upstream_skill_installation_required": false,
+    "upstream_rules_are_authority": false
+  },
+  "interface": {
+    "type": "SINGLE_WORK_ITEM",
+    "template": ".github/ISSUE_TEMPLATE/work-item.yml",
+    "work_types": [
+      "BUG_TRIAGE",
+      "SPECIFICATION",
+      "IMPLEMENTATION_TICKET",
+      "DECISION_MAP"
+    ],
+    "separate_upstream_skill_routers": false
+  },
+  "triage_states": [
+    "needs-triage",
+    "needs-info",
+    "ready-for-agent",
+    "ready-for-human",
+    "wontfix"
+  ],
+  "project_labels": [
+    "planning-only",
+    "authority-required",
+    "evidence-ready",
+    "frozen-path",
+    "paper-only"
+  ],
+  "authority_classifications": {
+    "PLANNING_ONLY": {
+      "implementation_may_begin": true,
+      "external_execution_authorized": false
+    },
+    "WITHIN_EXISTING_AUTHORITY": {
+      "implementation_may_begin": true,
+      "exact_config_and_receipt_required": true,
+      "external_execution_authorized_by_ticket": false
+    },
+    "NEW_VERSIONED_AUTHORITY_REQUIRED": {
+      "authority_preparation_may_begin": true,
+      "gated_operation_may_execute": false
+    }
+  },
+  "ready_for_agent": {
+    "meaning": "IMPLEMENTATION_READY_ONLY",
+    "required_fields": [
+      "work_type",
+      "bounded_outcome",
+      "current_evidence",
+      "scope_and_slice",
+      "acceptance_and_verification",
+      "dependencies",
+      "decision_frontier",
+      "authority_classification",
+      "frozen_path_impact"
+    ],
+    "does_not_authorize": [
+      "provider_access",
+      "r2_list_read_write",
+      "holdout_access",
+      "source_switch",
+      "model_promotion",
+      "strategy_or_risk_change",
+      "trade_plan",
+      "demo_or_live_order"
+    ]
+  },
+  "ticket_decomposition": {
+    "style": "VERTICAL_TRACER_BULLET",
+    "one_context_window_target": true,
+    "blocking_edges_required": true,
+    "independent_verification_required": true,
+    "expand_contract_for_wide_refactors": true
+  },
+  "decision_maps": {
+    "planning_only": true,
+    "parent_map_and_child_decisions": true,
+    "frontier_must_list_unblocked_decisions": true,
+    "may_grant_authority": false
+  },
+  "branch_policy": {
+    "only_long_lived_branch": "main",
+    "branch_may_represent_authority_state": false,
+    "short_lived_delivery_branch": "ONLY_IF_REQUIRED_BY_MAIN_PROTECTION",
+    "remove_delivery_branch_after_merge": true,
+    "existing_branch_cleanup": "READ_ONLY_AUDIT_THEN_EXPLICIT_APPROVAL"
+  },
+  "frozen_boundaries": {
+    "issue_or_pr_may_override": false,
+    "frozen_receipts_and_configs_are_immutable": true,
+    "v0_10_critical_path_change_allowed": false
+  },
+  "secrets": {
+    "allowed_in_issue_pr_comment_artifact_fixture_or_chat": false
+  },
+  "automatic_external_actions": {
+    "create_or_close_issue": false,
+    "apply_remote_labels": false,
+    "merge_pr": false,
+    "deploy": false,
+    "provider_or_r2_access": false,
+    "trade": false
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "schema": "research-signal-layer-v0.1",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "purpose": "Time-safe rolling candle and KOL forecast evidence for challenger research",
+  "rolling_candles": {
+    "accepted_only_after_close": true,
+    "append_only": true,
+    "exact_duplicate_is_idempotent": true,
+    "conflicting_revision_requires_new_authority": true,
+    "provider_namespaces_must_remain_separate": true,
+    "production_r2_write_authorized": false
+  },
+  "kol_forecasts": {
+    "external_ingestion_authorized": false,
+    "https_source_required": true,
+    "publication_time_required": true,
+    "outcome_time_must_follow_publication": true,
+    "direct_trade_trigger_authorized": false,
+    "automatic_model_promotion_authorized": false
+  },
+  "quality_target": {
+    "data_integrity_target": "100_percent",
+    "lookahead_leakage_allowed": false,
+    "success_definition": "out_of_sample_lift_after_costs_and_stable_calibration",
+    "guaranteed_prediction_accuracy": false
+  }
+}
