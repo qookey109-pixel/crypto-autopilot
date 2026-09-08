@@ -23,6 +23,22 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 </details>
 
+### History Recovery V0.1 — EFFECTIVE ONLY AFTER PROTECTED-MAIN MERGE
+
+- Adds a SHA-bound recovery appendix to Crypto Core 100 V0.1.2. The original
+  100 markets, ten shards, archive quality checks and completion gate remain binding.
+- The existing six-hour workflow records bounded immutable attempt metadata
+  and rotates among incomplete shards. A quality-rejected shard stays incomplete
+  and its run stays failed; it no longer indefinitely blocks untouched shards.
+- Authority: `config/binance_usdm_history_recovery_v0_1.json` and
+  `research/receipts/2026-09-08-binance-usdm-history-recovery-v0-1-authority.json`.
+  Operating contract: `docs/HISTORY_RECOVERY_V0_1.md`.
+- The appendix authorizes only the dedicated attempt journal and shard selection
+  after protected-main merge. It does not repair BNXUSDT, exclude markets, change
+  cron, authorize training on partial data or change frozen provider/holdout/trading paths.
+- Journal conflicts or interrupted writes require review. The original expiry
+  remains 2026-10-01T00:00:00Z. Dataset completion and dates require run evidence.
+
 ### GitHub Automatic Research Operations V0.1 — AUTHORIZED ON MAIN MERGE
 
 - GitHub `schedule` is the normal execution path for all seven currently

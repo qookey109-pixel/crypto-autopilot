@@ -1,0 +1,12 @@
+{
+  "schema": "history-recovery-authority-v0.1",
+  "status": "AUTHORIZED_ON_MAIN_MERGE",
+  "config": "config/binance_usdm_history_recovery_v0_1.json",
+  "config_sha256": "6b89660fa7bda95932b93b808f3b54bb3e43421681cc946b801808bc0c7c009b",
+  "base_config_sha256": "fc4e42b855229ecb62e12e681778080c2aa749112036a6e8b3af9e9da98b716a",
+  "execution_gate": "protected-main merge before execution",
+  "attempt_metadata_r2_read_write_authorized": true,
+  "shard_rotation_authorized": true,
+  "data_repair_authorized": false,
+  "scope_change_authorized": false
+}
