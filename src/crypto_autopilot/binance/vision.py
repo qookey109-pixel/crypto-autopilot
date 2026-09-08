@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import io
+import json
 import re
 import zipfile
 from dataclasses import dataclass
@@ -263,7 +264,25 @@ def ingest_kline_archive(
         raise BinanceVisionEvidenceError("Binance Vision klines must be strictly increasing and unique")
     audit = audit_candles(candles, BINANCE_TO_PROJECT_INTERVAL[key.interval])
     if not audit.ok:
-        raise BinanceVisionEvidenceError("Binance Vision kline audit failed")
+        # Diagnostic metadata only: retain the same rejection and never emit rows.
+        diagnostic = {
+            "provider": "binance_usdm",
+            "dataset": key.dataset,
+            "frequency": key.frequency,
+            "symbol": key.symbol,
+            "interval": key.interval,
+            "period": key.period,
+            "archive_sha256": archive_sha256,
+            "row_count": audit.count,
+            "gap_count": len(audit.gaps),
+            "missing_bars": sum(gap.missing_bars for gap in audit.gaps),
+            "misaligned_count": len(audit.misaligned_timestamps),
+            "invalid_candle_count": len(audit.invalid_candle_timestamps),
+        }
+        raise BinanceVisionEvidenceError(
+            "Binance Vision kline audit failed: "
+            + json.dumps(diagnostic, sort_keys=True)
+        )
     return BinanceVisionKlineArchive(
         key=key,
         candles=candles,
