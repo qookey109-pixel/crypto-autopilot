@@ -539,8 +539,8 @@ function renderHomeSummary(data, strategy, paper, calendar) {
   setText("home-updated", snapshotTime);
   setText("home-paper-observed", `模擬觀測時間：${paperTime}`);
 
-  const history = calendar?.items?.find(item => item.id === "detailed-history-backfill" || item.title === "Crypto Core 100 歷史回補");
-  const historyAuthorized = history?.status === "AUTHORIZED";
+  const history = calendar?.items?.find(item => item.id === "detailed-history-backfill" || item.title === "Crypto Core 100 歷史回補" || item.detail?.includes("10 個可續跑分片"));
+  const historyAuthorized = Boolean(history && String(history.status || "").startsWith("AUTHORIZED"));
   setText("home-history-state", historyAuthorized ? "已授權 · 完成數待核對" : "狀態待核實");
   setText("home-history-detail", historyAuthorized
     ? "Crypto Core 100 依固定 10 分片由雲端補齊；首頁不宣稱未核對的完成數。"
