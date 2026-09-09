@@ -332,6 +332,15 @@ Bulk historical data is not stored in GitHub; canonical storage evidence is kept
 - Replacement holdout candle access/evaluation remains forbidden until a separate post-stability authority exists.
 - No live order path is authorized.
 
+## Current history cadence
+
+After reviewed main merge, the History Cadence V0.1 appendix replaces the
+six-hour trigger with every two hours, at minute 23 UTC, through September 30.
+This retains the single writer, one shard per run, original data/repair
+authorities and FREE-ONLY gates. Dataset completion still needs ten valid
+shards; scheduled opportunities do not establish completion.
+See [History Cadence V0.1](docs/HISTORY_CADENCE_V0_1.md).
+
 ## Quick start
 
 Python 3.11+ recommended.

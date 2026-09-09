@@ -1,0 +1,27 @@
+{
+  "schema": "history-cadence-authority-v0.1",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "config": "config/history_cadence_v0_1.json",
+  "config_sha256": "f7f7141cfd37b0b73b8546a0881a8baee5a80d4da165de39d7695f4b38033df1",
+  "bound_files": [
+    {
+      "path": "config/history_cadence_v0_1.json",
+      "sha256": "f7f7141cfd37b0b73b8546a0881a8baee5a80d4da165de39d7695f4b38033df1"
+    },
+    {
+      "path": ".github/workflows/binance-usdm-detailed-history-v0-1.yml",
+      "sha256": "36f1dd7ef4cd9b94bb508d5fcd303b0c72b87ffafd7e153e49f1caf1331f98c3"
+    },
+    {
+      "path": "config/github_automatic_research_operations_v0_2.json",
+      "sha256": "07cbbbe998677fe90577502cfe15ad3250f0f4688bf6fcef43689de11d30deb8"
+    },
+    {
+      "path": "scripts/check_history_cadence_authority.py",
+      "sha256": "8146ec5b09c93de821492ba38bc65905b1ee508fd8099b9ee4e0f4ef22f2fa6c"
+    }
+  ],
+  "request_basis": "2026-09-09 user requested more frequent online history backfill; human main merge review required",
+  "original_authorities_mutated": false,
+  "production_execution_performed": false
+}
