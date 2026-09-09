@@ -21,7 +21,7 @@ The repository has moved beyond the original V0.1 implementation baseline while 
 - Pionex M1/M1A historical-data foundation: **PASS**.
 - Cloudflare R2 historical storage and Binance 2025 pilot: **PASS**.
 - Binance Funding V0.2 R2 materialization: **PASS** — 192/192 authorized object identities verified after write.
-- Binance USD-M Crypto Core 100 V0.1.2: **AUTHORIZED AFTER V0.10 WINDOW / NOT STARTED** — 100 unique Crypto markets, fixed 2022-08 through 2026-07 window, native 15m/1h/4h archives, 10 R2-only shards and bounded intraday research training. V0.1.1 was superseded before execution and remains immutable; tokenized-equity historical K-line data requires a separate future dataset authority.
+- Binance USD-M Crypto Core 100 V0.1.2: **AUTHORIZED / COMPLETION REQUIRES RUN EVIDENCE** — 100 unique Crypto markets, fixed 2022-08 through 2026-07 window, native 15m/1h/4h archives, 10 R2-only shards and bounded intraday research training. V0.1.1 was superseded before execution and remains immutable; tokenized-equity historical K-line data requires a separate future dataset authority.
 - Pionex Alternative Assets Observability V0.2: **AUTHORIZED AFTER V0.10 WINDOW / NOT STARTED** — the unexecuted V0.1 schedule was superseded before provider/R2 access. A separate 125-candidate registry (90 equity/stock-linked, 31 ETF/fund-linked and 4 metal references) is validated against live Pionex `PERP + TRADING` metadata, compared weekly with its prior SHA-bound catalog and given a planning-only four-year capacity estimate. K-lines, funding, history/training and trading remain unauthorized.
 - Pionex ↔ Binance Equivalence V0.1: **definitive FAIL** — 45 pairs = 18 PASS / 18 REVIEW / 9 FAIL. The frozen result must not be regraded by changing thresholds or scope.
 - `source_switch_authorized=false`; Binance evidence remains `provider=binance_usdm` and must never be relabeled as Pionex-native evidence.
@@ -154,11 +154,12 @@ direction inference. It remains challenger evidence only; the existing
 Pionex hourly paper path and Binance weekly historical trainer remain separate.
 See [`docs/RESEARCH_SIGNAL_LAYER_V0_2.md`](docs/RESEARCH_SIGNAL_LAYER_V0_2.md).
 Two read-only guardrails now sit beside that collector: a daily `02:47 UTC`
-signal-lineage/quality check and a GitHub Actions health monitor every three
-hours at `:47`. They distinguish formal scheduled/manual runs from PR checks,
-verify the exact R2 latest-to-manifest-to-payload chain without listing or
-writing R2, and do not open the holdout or affect models/trades. See
-[`docs/RESEARCH_AUTOMATION_HEALTH_V0_1.md`](docs/RESEARCH_AUTOMATION_HEALTH_V0_1.md).
+signal-lineage/quality check and Research Automation Health V0.2 every two
+hours at `:57` UTC. Signal quality verifies the exact R2 latest-to-manifest-to-payload chain
+without listing or writing R2. Health V0.2 reads GitHub Actions metadata only.
+Neither opens the holdout or affects models/trades. See
+[`config/github_automatic_research_operations_v0_1.json`](config/github_automatic_research_operations_v0_1.json).
+Health V0.1 is historical manual regression-only; only scheduled runs count as current cron health.
 The proposed rolling four-hour data refresh, weekly Shadow ablation and monthly
 drift review remain prepared but inactive pending a separate post-window
 authority.

@@ -324,7 +324,7 @@ def build_projection(
                 "id": "detailed-history-backfill",
                 "windowLabel": "首個符合排程 09/04 14:23",
                 "title": "Crypto Core 100 歷史回補",
-                "detail": "已授權、尚未開始；10 個可續跑分片，100 個 Crypto USD-M 市場的 15m／1h／4h 資料只進 R2。",
+                "detail": "已授權由雲端排程補齊；10 個可續跑分片，100 個 Crypto USD-M 市場的 15m／1h／4h 資料只進 R2。完成數請看首頁最後核實報告。",
                 "status": "AUTHORIZED",
                 "startsAtUtc": first_run.isoformat(timespec="seconds").replace("+00:00", "Z"),
                 "endsAtUtc": stop_exclusive.isoformat(timespec="seconds").replace("+00:00", "Z"),
