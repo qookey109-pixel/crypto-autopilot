@@ -1,0 +1,22 @@
+{
+  "schema": "qookey-dashboard-history-progress-v0.1",
+  "authority": false,
+  "snapshotType": "SECRET_FREE_GITHUB_ACTIONS_RUN_REPORT",
+  "sourceRunId": 34312608074,
+  "sourceUrl": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34312608074",
+  "observedAtUtc": "2026-09-09T04:51:52.532240Z",
+  "status": "IN_PROGRESS",
+  "provider": "binance_usdm",
+  "mode": "backfill",
+  "shardCount": 10,
+  "shardsComplete": 5,
+  "lastShardIndex": 6,
+  "safetyBoundary": {
+    "holdoutAccessed": false,
+    "sourceSwitchAuthorized": false,
+    "automaticModelPromotionAuthorized": false,
+    "tradePlanAuthorized": false,
+    "realMoneyOrderAuthorized": false,
+    "liveTradingAuthorized": false
+  }
+}
