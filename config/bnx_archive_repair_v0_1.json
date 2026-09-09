@@ -1,0 +1,56 @@
+{
+  "schema": "bnx-archive-repair-v0.1",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "base_config": "config/binance_usdm_detailed_history_v0_1_2.json",
+  "base_config_sha256": "fc4e42b855229ecb62e12e681778080c2aa749112036a6e8b3af9e9da98b716a",
+  "diagnosis_run_id": 34241295251,
+  "diagnosis_commit": "468628c96c980980c4637823ff9e6eca207f0f60",
+  "provider": "binance_usdm",
+  "symbol": "BNXUSDT",
+  "interval": "15m",
+  "period": "2022-08",
+  "monthly_sha256": "a3351bdf83dad7f503fb5732c88c85253101954c47b0cdb6791a11d61b131543",
+  "daily_sha256": [
+    [
+      "2022-08-01",
+      "ef61c4444052bdb1a27aa6198a202a6b624c2fdc3805aef852053a77eaad9451"
+    ],
+    [
+      "2022-08-10",
+      "3b59e4839c51daae24cab18a1ceda26419a387e19ae63897f27a9d40cfb4641f"
+    ],
+    [
+      "2022-08-11",
+      "b1b421cabc5a927f9430600fe154e4dbdf7a6d82d342ebedf01670449b352299"
+    ],
+    [
+      "2022-08-12",
+      "b65e653214aa490880bf1fcac870368977e66c0b512ab673563923b9f071f493"
+    ]
+  ],
+  "candidate_sha256": "24d441889b173fa85205b189c8c63d316eac34461a29476f618a640b079f26ad",
+  "original_rows": 2688,
+  "inserted_rows": 288,
+  "overlapping_rows_verified": 96,
+  "candidate_rows": 2976,
+  "destination_key": "market-data/binance_usdm/crypto-core-v0.1/perp/BNXUSDT/15m/year=2022/month=08/candles.parquet",
+  "not_before_utc": "2026-09-08T14:54:34Z",
+  "expires_at_utc": "2026-10-01T00:00:00Z",
+  "execution": "existing_serialized_history_workflow_main_schedule_or_fresh_manual",
+  "maximum_requests_per_reconstruction": 10,
+  "maximum_total_response_bytes": 20000000,
+  "maximum_response_bytes": 8000000,
+  "download_retries": 0,
+  "daily_input_access_authorized": true,
+  "missing_partition_creation_authorized": true,
+  "existing_partition_overwrite_authorized": false,
+  "original_monthly_archive_regraded": false,
+  "lineage": "full_source_hashes_and_candidate_hash_in_original_shard_receipt",
+  "completion_gate": "all_original_partitions_and_all_ten_shards",
+  "r2_headroom": "existing_whole_bucket_metadata_inventory_and_8000000000_byte_hard_stop",
+  "new_schedule_authorized": false,
+  "holdout_access_authorized": false,
+  "source_switch_authorized": false,
+  "model_promotion_authorized": false,
+  "trading_authorized": false
+}

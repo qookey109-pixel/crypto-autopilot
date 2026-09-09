@@ -58,6 +58,8 @@ jobs:
             --authority research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json
             --recovery-config config/binance_usdm_history_recovery_v0_1.json
             --recovery-authority research/receipts/2026-09-08-binance-usdm-history-recovery-v0-1-authority.json
+            --repair-config config/bnx_archive_repair_v0_1.json
+            --repair-authority research/receipts/2026-09-09-bnx-archive-repair-v0-1-authority.json
             --mode "$REQUESTED_MODE"
             --run-id "github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
             --output detailed-history-output/report.json

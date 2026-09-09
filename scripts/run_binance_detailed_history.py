@@ -17,6 +17,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from crypto_autopilot.binance.vision import BinanceVisionArchiveKey, BinanceVisionEvidenceError, ingest_kline_archive
+from crypto_autopilot.history import bnx_repair
 from crypto_autopilot.history.recovery import (
     Journal, RecoveryError, MAX_ATTEMPTS, choose_shard, load_contract,
     quality_diagnostic, require_window,
@@ -389,7 +390,11 @@ def load_state(
     return state
 
 
-def fetch_partition(partition: Any, *, timeout_seconds: float, retries: int) -> dict[str, Any]:
+def fetch_partition(partition: Any, *, timeout_seconds: float, retries: int, repair=None) -> dict[str, Any]:
+    if repair is not None and bnx_repair.matches(partition):
+        archive, lineage = bnx_repair.reconstruct(partition, repair)
+        return {"partition": partition, "archive": archive,
+                "parquet": candles_to_parquet(archive.candles), "repair_lineage": lineage}
     key = BinanceVisionArchiveKey(
         "klines",
         "monthly",
@@ -424,7 +429,10 @@ def materialize_shard(
     shard_index: int,
     run_id: str,
     generated_at_utc: str,
+    repair=None,
 ) -> dict[str, Any]:
+    if repair is not None:
+        bnx_repair.require_clock()
     completed_indexes = {
         int(item["shard_index"])
         for item in state["completed_shards"]
@@ -450,6 +458,7 @@ def materialize_shard(
                 plan,
                 timeout_seconds=float(execution["timeout_seconds"]),
                 retries=int(execution["download_retries"]),
+                **({"repair": repair} if repair is not None else {}),
             ): plan
             for plan in plans
         }
@@ -504,6 +513,21 @@ def materialize_shard(
             }
         )
 
+    for item, record in zip(materialized, object_records):
+        if "repair_lineage" in item:
+            record["delivery"] = "binance_vision_monthly_daily_reconciliation"
+            record["source_archive_rows"] = 2688
+            record["source_archive_audit_ok"] = False
+            record["repair_lineage"] = item["repair_lineage"]
+
+    def repair_write_gate():
+        if repair is not None:
+            bnx_repair.require_clock()
+            _ensure_reservation_headroom(
+                store, config, planned=planned_missing_bytes + 5_000_000
+            )
+
+    repair_write_gate()
     current = current_bucket_bytes(store)
     if current + planned_missing_bytes + 5_000_000 > int(storage["free_only_hard_stop_bytes"]):
         raise DetailedHistoryAuthorityError("R2 exact shard headroom gate blocked before write")
@@ -516,14 +540,19 @@ def materialize_shard(
             if parquet_to_candles(restored) != list(item["archive"].candles):
                 raise DetailedHistoryAuthorityError("existing R2 candle equality verification failed")
             continue
+        if "repair_lineage" in record:
+            repair_write_gate()
         uploaded = store.put_bytes(
             record["r2_key"],
             item["parquet"].payload,
             content_type="application/vnd.apache.parquet",
             metadata={
                 "provider": "binance_usdm",
-                "delivery": "binance_vision",
+                "delivery": record["delivery"],
                 "version": "detailed-v0.1",
+                **({"repair-config-sha256": bnx_repair.CONFIG_SHA,
+                    "candidate-sha256": record["repair_lineage"]["candidate_sha256"]}
+                   if "repair_lineage" in record else {}),
                 "source-sha256": record["source_archive_sha256"],
             },
         )
@@ -569,6 +598,7 @@ def materialize_shard(
         f"{storage['shard_receipt_namespace'].rstrip('/')}/"
         f"shard={shard_index:03d}/run={run_id}/receipt.json"
     )
+    repair_write_gate()
     receipt_record = _put_immutable(
         store,
         key=receipt_key,
@@ -601,6 +631,7 @@ def materialize_shard(
         "COMPLETE" if len(completed) == int(state["shard_count"]) else "IN_PROGRESS"
     )
     state_payload = canonical_json_bytes(next_state)
+    repair_write_gate()
     state_receipt = store.put_bytes(
         storage["backfill_state_key"],
         state_payload,
@@ -638,6 +669,8 @@ def main() -> int:
     parser.add_argument("--run-id", default=os.getenv("GITHUB_RUN_ID") or "local")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--now-utc")
+    parser.add_argument("--repair-config", type=Path)
+    parser.add_argument("--repair-authority", type=Path)
     parser.add_argument("--recovery-config", type=Path)
     parser.add_argument("--recovery-authority", type=Path)
     args = parser.parse_args()
@@ -698,6 +731,15 @@ def main() -> int:
             raise RecoveryError("recovery execution requires repository main")
         recovery_sha = load_contract(
             args.recovery_config, args.recovery_authority, _config_bytes, datetime.now(UTC)
+        )
+    repair = None
+    if bool(args.repair_config) != bool(args.repair_authority):
+        raise ValueError("both BNX repair authority files are required")
+    if args.repair_config:
+        if not recovery_sha or args.now_utc:
+            raise ValueError("BNX repair requires recovery and the real clock")
+        repair = bnx_repair.load_contract(
+            args.repair_config, args.repair_authority, _config_bytes
         )
     store = create_store()
     published = load_published_catalog(store, config)
@@ -791,6 +833,7 @@ def main() -> int:
                 result = materialize_shard(
                     store, config=config, latest=latest, catalog=catalog, state=state,
                     shard_index=shard_index, run_id=args.run_id, generated_at_utc=generated_at,
+                    **({"repair": repair} if repair is not None else {}),
                 )
             except BinanceVisionEvidenceError as exc:
                 if journal is None:

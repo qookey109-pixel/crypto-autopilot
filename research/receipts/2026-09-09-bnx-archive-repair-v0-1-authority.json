@@ -1,0 +1,10 @@
+{
+  "schema": "bnx-archive-repair-authority-v0.1",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "config": "config/bnx_archive_repair_v0_1.json",
+  "config_sha256": "08721e700471fa2a66b686733d21e531ee9216d5607d4a5080d9c2846e985cdd",
+  "diagnosis_run_id": 34241295251,
+  "missing_partition_creation_authorized": true,
+  "existing_partition_overwrite_authorized": false,
+  "original_authorities_mutated": false
+}
