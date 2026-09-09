@@ -12,7 +12,8 @@ class DetailedHistoryWorkflowTests(unittest.TestCase):
         text = (
             ROOT / ".github/workflows/binance-usdm-detailed-history-v0-1.yml"
         ).read_text()
-        self.assertIn('cron: "23 */6 4-30 9 *"', text)
+        self.assertIn('cron: "23 */2 9-30 9 *"', text)
+        self.assertIn("python scripts/check_history_cadence_authority.py", text)
         self.assertIn("binance_usdm_detailed_history_v0_1_2.json", text)
         self.assertIn("crypto-core-100-v0-1-2-authority.json", text)
         self.assertIn("cancel-in-progress: false", text)

@@ -23,6 +23,21 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 </details>
 
+### History Cadence V0.1 — EFFECTIVE ONLY AFTER REVIEWED MAIN MERGE
+
+- User requested faster online backfill on 2026-09-09. The existing serialized
+  history trigger becomes every two hours at UTC minute 23, September 9–30.
+- Appendix: `config/history_cadence_v0_1.json`; authority receipt:
+  `research/receipts/2026-09-09-history-cadence-v0-1-authority.json`.
+- Original history/recovery/BNX configs and receipts remain unchanged. The
+  original six-hour cadence is superseded only by this reviewed appendix.
+- One shard per run, 330-minute timeout, fair recovery rotation, 128-attempt
+  budget, FREE-ONLY gates and October 1 exclusive expiry remain binding.
+- Current schedule inventory: `config/github_automatic_research_operations_v0_2.json`.
+  Health V0.2 remains unchanged, including its nine-hour long-run tolerance.
+- Contract: `docs/HISTORY_CADENCE_V0_1.md`. No run or data completion is
+  asserted by this change; BNX requires formal production evidence.
+
 ### BNX Archive Repair V0.1 — EFFECTIVE ONLY AFTER REVIEWED MAIN MERGE
 
 - Diagnosis run 34241295251 verified the August 2022 BNXUSDT 15m candidate:

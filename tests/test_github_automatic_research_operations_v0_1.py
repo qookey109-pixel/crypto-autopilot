@@ -11,7 +11,7 @@ from crypto_autopilot.research.automation_health import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-POLICY = ROOT / "config/github_automatic_research_operations_v0_1.json"
+POLICY = ROOT / "config/github_automatic_research_operations_v0_2.json"
 HEALTH = ROOT / "config/research_automation_health_v0_2.json"
 RECEIPT = (
     ROOT

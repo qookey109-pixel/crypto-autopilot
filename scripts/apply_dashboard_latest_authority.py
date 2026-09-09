@@ -76,7 +76,7 @@ STRATEGY_RESEARCH_CONFIG = Path("config/strategy_research_loop_v0_1.json")
 STRATEGY_RESEARCH_RECEIPT = Path(
     "research/receipts/2026-08-28-strategy-research-loop-v0-1-prepared.json"
 )
-AUTOMATIC_OPERATIONS = Path("config/github_automatic_research_operations_v0_1.json")
+AUTOMATIC_OPERATIONS = Path("config/github_automatic_research_operations_v0_2.json")
 AUTOMATION_HEALTH_V0_2 = Path("config/research_automation_health_v0_2.json")
 
 EXPECTED_SCOPE_SHA = "1e0ff54daeec8e5e47376fedb631c663687dd6fb6a4c297d269c33acdf99ad58"
