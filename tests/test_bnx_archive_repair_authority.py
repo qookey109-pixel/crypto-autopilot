@@ -141,7 +141,7 @@ class BNXRepairTests(unittest.TestCase):
                 runner.fetch_partition(self.partition, timeout_seconds=1, retries=1)
             repair.assert_not_called()
 
-    def materialize(self, store, *, headroom=None):
+    def materialize(self, store, *, headroom=None, run_id="synthetic"):
         archive, lineage = self.reconstruct()
         item = dict(partition=self.partition, archive=archive,
                     parquet=candles_to_parquet(archive.candles), repair_lineage=lineage)
@@ -155,7 +155,7 @@ class BNXRepairTests(unittest.TestCase):
             return runner.materialize_shard(
                 store, config=config, latest=dict(catalog_key="synthetic", catalog_sha256="b" * 64),
                 catalog={}, state=dict(completed_shards=[], shard_count=10),
-                shard_index=0, run_id="synthetic", generated_at_utc="2026-09-09T00:00:00Z",
+                shard_index=0, run_id=run_id, generated_at_utc="2026-09-09T00:00:00Z",
                 repair=copy.deepcopy(self.config),
             )
 
@@ -174,7 +174,7 @@ class BNXRepairTests(unittest.TestCase):
         self.assertIn("monthly_daily", record["delivery"])
         self.assertEqual(record["repair_lineage"]["candidate_sha256"], self.config["candidate_sha256"])
         store.writes.clear()
-        self.materialize(store)
+        self.materialize(store, run_id="synthetic-resume")
         self.assertNotIn(r.DESTINATION, store.writes)
 
     def test_existing_conflict_never_overwrites(self):
