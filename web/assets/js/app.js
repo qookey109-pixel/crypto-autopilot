@@ -585,7 +585,8 @@ async function loadData() {
     let operational = null;
     let paperTraining = null;
     let researchEvidence = null;
-    let strategy = null;\n    let researchCalendar = null;
+    let strategy = null;
+    let researchCalendar = null;
     try {
       operational = await fetchJson("./data/operational-status.json");
     } catch (error) {
