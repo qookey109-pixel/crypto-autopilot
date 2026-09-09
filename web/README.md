@@ -199,3 +199,20 @@ because several frozen V0.10/V0.11 contracts reference those exact paths.
 ## Safety
 
 The dashboard contains no real-money order action, no private exchange execution endpoint and no live-trading control. `PAPER-ONLY` is visible in the interface and provider provenance remains explicit.
+
+
+## Simplified overview
+
+The first screen answers four questions: history completion, strategy results,
+daily candidates, and snapshot update time. Full schedules, pipeline, gates,
+Paper chart and calendar remain in the keyboard-accessible research disclosure;
+all nine navigation views remain available.
+
+The current static projections do not supply live Core-100 shard completion
+counts. The overview explicitly says the count needs verification and links
+to the existing history workflow; it never turns unknown into zero or 100%.
+Prepared synthetic strategy work is not presented as realized performance.
+Daily investment recommendations remain unavailable. Snapshot time is taken
+only from the supplied generation timestamp, and is distinct from Paper
+observation time and workflow completion. Refresh reloads the existing
+same-origin projections; it does not query GitHub or R2.
