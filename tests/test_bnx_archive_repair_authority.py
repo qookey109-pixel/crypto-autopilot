@@ -141,7 +141,7 @@ class BNXRepairTests(unittest.TestCase):
                 runner.fetch_partition(self.partition, timeout_seconds=1, retries=1)
             repair.assert_not_called()
 
-    def materialize(self, store, *, headroom=None, run_id="synthetic"):
+    def materialize(self, store, *, headroom=None, run_id="synthetic", clock=None):
         archive, lineage = self.reconstruct()
         item = dict(partition=self.partition, archive=archive,
                     parquet=candles_to_parquet(archive.candles), repair_lineage=lineage)
@@ -151,7 +151,7 @@ class BNXRepairTests(unittest.TestCase):
              patch.object(runner, "fetch_partition", return_value=item), \
              patch.object(runner, "current_bucket_bytes", return_value=0), \
              patch.object(runner, "_ensure_reservation_headroom", side_effect=headroom), \
-             patch.object(r, "require_clock"):
+             patch.object(r, "require_clock", side_effect=clock):
             return runner.materialize_shard(
                 store, config=config, latest=dict(catalog_key="synthetic", catalog_sha256="b" * 64),
                 catalog={}, state=dict(completed_shards=[], shard_count=10),
@@ -198,3 +198,31 @@ class BNXRepairTests(unittest.TestCase):
         diagnostic = workflow.split("  diagnose-bnx:")[1]
         self.assertNotIn("--repair-config", diagnostic)
         self.assertNotIn("secrets.", diagnostic)
+
+    def test_expiry_after_download_prevents_all_writes(self):
+        store = MemoryStore()
+        with self.assertRaisesRegex(r.RepairAuthorityError, "expired"):
+            self.materialize(store, clock=[None, r.RepairAuthorityError("expired")])
+        self.assertEqual(store.writes, [])
+
+    def test_failed_readback_cannot_publish_receipt_or_complete_state(self):
+        store = MemoryStore()
+        with patch.object(store, "get_bytes_verified", side_effect=ValueError("bad readback")):
+            with self.assertRaisesRegex(ValueError, "bad readback"):
+                self.materialize(store)
+        self.assertEqual(store.writes, [r.DESTINATION])
+
+    def test_actual_cli_denies_push_before_r2_factory(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            args = ["runner", "--output", str(Path(tmp) / "report.json"),
+                    "--recovery-config", "unused", "--recovery-authority", "unused",
+                    "--repair-config", str(CONFIG), "--repair-authority", str(RECEIPT)]
+            with patch("sys.argv", args), patch.dict("os.environ", dict(ENV, GITHUB_EVENT_NAME="push")), \
+                 patch.object(runner, "require_ephemeral_output", side_effect=lambda p: p), \
+                 patch.object(runner, "require_execution_window"), \
+                 patch.object(runner, "load_contract", return_value="synthetic-recovery-sha"), \
+                 patch.object(runner, "create_store") as store, \
+                 patch.object(r, "require_clock"):
+                with self.assertRaises(r.RepairAuthorityError):
+                    runner.main()
+                store.assert_not_called()
