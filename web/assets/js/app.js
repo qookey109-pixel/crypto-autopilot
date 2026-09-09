@@ -539,7 +539,7 @@ function renderHomeSummary(data, strategy, paper, calendar) {
   setText("home-updated", snapshotTime);
   setText("home-paper-observed", `模擬觀測時間：${paperTime}`);
 
-  const history = calendar?.items?.find(item => item.id === "detailed-history-backfill");
+  const history = calendar?.items?.find(item => item.id === "detailed-history-backfill" || item.title === "Crypto Core 100 歷史回補");
   const historyAuthorized = history?.status === "AUTHORIZED";
   setText("home-history-state", historyAuthorized ? "已授權 · 完成數待核對" : "狀態待核實");
   setText("home-history-detail", historyAuthorized
