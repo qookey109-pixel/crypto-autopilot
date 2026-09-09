@@ -533,15 +533,19 @@ function renderHomeSummary(data, strategy, paper) {
     const element = document.getElementById(id);
     if (element) element.textContent = text;
   };
-  setText("home-updated", formatTrustedTime(data?.generatedAtUtc));
-  setText("home-paper-observed", `模擬觀測時間：${formatTrustedTime(paper?.observedAtUtc)}`);
+  const snapshotTime = data?.generatedAtUtc ? formatTrustedTime(data.generatedAtUtc) : "快照時間未提供";
+  const paperTime = paper?.observedAtUtc ? formatTrustedTime(paper.observedAtUtc) : "時間未提供";
+  setText("home-updated", snapshotTime);
+  setText("home-paper-observed", `模擬觀測時間：${paperTime}`);
   const safe = strategy?.schema === "qookey-dashboard-strategy-projection-v0.1"
     && strategy.authority === false
     && strategy.safetyBoundary
     && Object.keys(strategy.safetyBoundary).length > 0
     && Object.values(strategy.safetyBoundary).every(value => value === false);
+  const project = data?.project || {};
   const research = safe ? strategy.analysisLayers?.find(layer => layer.id === "research_loop") : null;
-  if (research?.status === "PREPARED_RESEARCH_ONLY") {
+  const researchStatus = research?.status || project.strategyResearchLoopState;
+  if (researchStatus === "PREPARED_RESEARCH_ONLY") {
     setText("home-research-state", "框架就緒，實績待驗證");
     setText("home-research-detail", "目前以合成資料驗證研究流程；尚無可據以推薦投資的實際策略成果。");
   } else {
