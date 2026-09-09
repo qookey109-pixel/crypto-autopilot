@@ -612,6 +612,7 @@ async function loadData() {
     try {
       const calendar = await fetchJson("./data/research-calendar.json");
       if (calendar.authority !== false) throw new Error("Calendar projection must remain non-authoritative");
+      researchCalendar = calendar;
       renderCalendar(calendar);
     } catch (error) {
       console.warn("Research calendar projection unavailable", error);
