@@ -23,6 +23,24 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 </details>
 
+### BNX Archive Repair V0.1 — EFFECTIVE ONLY AFTER REVIEWED MAIN MERGE
+
+- Diagnosis run 34241295251 verified the August 2022 BNXUSDT 15m candidate:
+  288 supplied bars, 96 identical overlaps, 2976 total rows. This is evidence,
+  not an assertion of completed production publication.
+- New config `config/bnx_archive_repair_v0_1.json` and receipt
+  `research/receipts/2026-09-09-bnx-archive-repair-v0-1-authority.json`
+  bind the exact five source hashes and candidate hash.
+- Existing history cron and recovery rotation consume this optional appendix
+  after merge. No second scheduler, secret binding or manual publication lane.
+- Only the named missing partition may be created; conflicting existing data
+  fails closed. Original monthly failure remains explicit in shard lineage.
+  All original partition checks and ten-shard completion requirements remain.
+- Real-clock gates, fresh FREE-ONLY headroom and post-write SHA checks apply.
+  No R2/provider execution occurs during PR preparation or synthetic cloud CI.
+- Operating contract: `docs/BNX_ARCHIVE_REPAIR_V0_1.md`.
+  Holdout/source-switch/trading and frozen metadata authorities are unchanged.
+
 ### BNX Archive Diagnosis V0.1 — EFFECTIVE ONLY AFTER PROTECTED-MAIN MERGE
 
 - A bounded manual `diagnose-bnx` mode in the existing history workflow
