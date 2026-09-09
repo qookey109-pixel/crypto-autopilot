@@ -528,7 +528,18 @@ async function fetchJson(path) {
 }
 
 
-function renderHomeSummary(data, strategy, paper, calendar) {
+function historyProgressIsSafe(progress) {
+  if (!progress || progress.schema !== "qookey-dashboard-history-progress-v0.1") return false;
+  if (progress.authority !== false || progress.snapshotType !== "SECRET_FREE_GITHUB_ACTIONS_RUN_REPORT") return false;
+  if (progress.status !== "IN_PROGRESS" || progress.provider !== "binance_usdm" || progress.mode !== "backfill") return false;
+  if (progress.shardCount !== 10 || !Number.isInteger(progress.shardsComplete) || progress.shardsComplete < 0 || progress.shardsComplete > progress.shardCount) return false;
+  if (!Number.isInteger(progress.lastShardIndex) || progress.lastShardIndex < 1 || progress.lastShardIndex > progress.shardCount) return false;
+  if (typeof progress.sourceUrl !== "string" || !progress.sourceUrl.startsWith("https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/")) return false;
+  const boundary = progress.safetyBoundary || {};
+  return Object.keys(boundary).length > 0 && Object.values(boundary).every(value => value === false);
+}
+
+function renderHomeSummary(data, strategy, paper, calendar, historyProgress) {
   const setText = (id, text) => {
     const element = document.getElementById(id);
     if (element) element.textContent = text;
@@ -541,10 +552,25 @@ function renderHomeSummary(data, strategy, paper, calendar) {
 
   const history = calendar?.items?.find(item => item.id === "detailed-history-backfill" || item.title === "Crypto Core 100 歷史回補" || item.detail?.includes("10 個可續跑分片"));
   const historyAuthorized = Boolean(history && String(history.status || "").startsWith("AUTHORIZED"));
-  setText("home-history-state", historyAuthorized ? "已授權 · 完成數待核對" : "狀態待核實");
-  setText("home-history-detail", historyAuthorized
-    ? "Crypto Core 100 依固定 10 分片由雲端補齊；首頁不宣稱未核對的完成數。"
-    : "無法由目前安全投影核實歷史補齊狀態，請查看雲端執行紀錄。");
+  const historySnapshotSafe = historyProgressIsSafe(historyProgress);
+  const historySource = document.querySelector("#home-history-source");
+  if (historySnapshotSafe) {
+    setText("home-history-state", `${historyProgress.shardsComplete}/${historyProgress.shardCount} 分片 · 進行中`);
+    setText("home-history-detail", `最後核實分片 #${historyProgress.lastShardIndex}；${formatTrustedTime(historyProgress.observedAtUtc)} 的 GitHub Actions 報告快照，不是即時 R2 查詢。`);
+    if (historySource) {
+      historySource.href = historyProgress.sourceUrl;
+      historySource.textContent = "查看最後核實報告 ↗";
+    }
+  } else {
+    setText("home-history-state", historyAuthorized ? "已授權 · 完成數待核對" : "狀態待核實");
+    setText("home-history-detail", historyAuthorized
+      ? "Crypto Core 100 依固定 10 分片由雲端補齊；首頁不宣稱未核對的完成數。"
+      : "無法由目前安全投影核實歷史補齊狀態，請查看雲端執行紀錄。");
+    if (historySource) {
+      historySource.href = "https://github.com/qookey109-pixel/crypto-autopilot/actions/workflows/binance-usdm-detailed-history-v0-1.yml";
+      historySource.textContent = "查看雲端補齊紀錄 ↗";
+    }
+  }
 
   const safe = strategy?.schema === "qookey-dashboard-strategy-projection-v0.1"
     && strategy.authority === false
@@ -587,6 +613,7 @@ async function loadData() {
     let researchEvidence = null;
     let strategy = null;
     let researchCalendar = null;
+    let historyProgress = null;
     try {
       operational = await fetchJson("./data/operational-status.json");
     } catch (error) {
@@ -619,6 +646,13 @@ async function loadData() {
       renderCalendar(null);
     }
     try {
+      const progress = await fetchJson("./data/history-progress.json");
+      if (!historyProgressIsSafe(progress)) throw new Error("History progress projection contract rejected");
+      historyProgress = progress;
+    } catch (error) {
+      console.warn("History progress projection unavailable", error);
+    }
+    try {
       const alternativeAssets = await fetchJson("./data/alternative-assets.json");
       renderAlternativeAssets(alternativeAssets);
     } catch (error) {
@@ -626,13 +660,13 @@ async function loadData() {
       renderAlternativeAssets(null);
     }
     render(mergeOperationalStatus(data, operational));
-    renderHomeSummary(data, strategy, paperTraining, researchCalendar);
+    renderHomeSummary(data, strategy, paperTraining, researchCalendar, historyProgress);
     renderPaperTraining(paperTraining);
     renderResearchEvidence(researchEvidence);
   } catch (error) {
     console.error("Dashboard snapshot load failed", error);
     render(FALLBACK);
-    renderHomeSummary(null, null, null, null);
+    renderHomeSummary(null, null, null, null, null);
     renderCalendar(null);
     renderPaperTraining(null);
     renderResearchEvidence(null);
