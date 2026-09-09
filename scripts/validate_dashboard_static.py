@@ -509,7 +509,7 @@ def main() -> int:
                 "required_files": len(REQUIRED),
                 "views": 9,
                 "calendar_items": len(calendar_items),
-                "history_progress": f"{complete}/{history_progress["shardCount"]}",
+                "history_progress": f"{complete}/{history_progress['shardCount']}",
                 "history_snapshot_run": history_progress["sourceRunId"],
                 "locale": "zh-Hant-TW",
                 "authority_fixture": False,
