@@ -528,32 +528,52 @@ async function fetchJson(path) {
 }
 
 
-function renderHomeSummary(data, strategy, paper) {
+function renderHomeSummary(data, strategy, paper, calendar) {
   const setText = (id, text) => {
     const element = document.getElementById(id);
     if (element) element.textContent = text;
   };
+  const project = data?.project || {};
   const snapshotTime = data?.generatedAtUtc ? formatTrustedTime(data.generatedAtUtc) : "快照時間未提供";
   const paperTime = paper?.observedAtUtc ? formatTrustedTime(paper.observedAtUtc) : "時間未提供";
   setText("home-updated", snapshotTime);
   setText("home-paper-observed", `模擬觀測時間：${paperTime}`);
+
+  const history = calendar?.items?.find(item => item.id === "detailed-history-backfill");
+  const historyAuthorized = history?.status === "AUTHORIZED";
+  setText("home-history-state", historyAuthorized ? "已授權 · 完成數待核對" : "狀態待核實");
+  setText("home-history-detail", historyAuthorized
+    ? "Crypto Core 100 依固定 10 分片由雲端補齊；首頁不宣稱未核對的完成數。"
+    : "無法由目前安全投影核實歷史補齊狀態，請查看雲端執行紀錄。");
+
   const safe = strategy?.schema === "qookey-dashboard-strategy-projection-v0.1"
     && strategy.authority === false
     && strategy.safetyBoundary
     && Object.keys(strategy.safetyBoundary).length > 0
     && Object.values(strategy.safetyBoundary).every(value => value === false);
-  const project = data?.project || {};
   const research = safe ? strategy.analysisLayers?.find(layer => layer.id === "research_loop") : null;
   const researchStatus = research?.status || project.strategyResearchLoopState;
   if (researchStatus === "PREPARED_RESEARCH_ONLY") {
+    const summary = strategy?.summary || {};
+    const counts = [summary.candidateCount, summary.familyCount, summary.horizonCount, summary.edgeMethodCount];
+    const hasCounts = counts.every(value => Number.isFinite(value));
     setText("home-research-state", "框架就緒，實績待驗證");
-    setText("home-research-detail", "目前以合成資料驗證研究流程；尚無可據以推薦投資的實際策略成果。");
+    setText("home-research-detail", hasCounts
+      ? `${summary.candidateCount} 個候選 · ${summary.familyCount} 類策略 · ${summary.horizonCount} 個週期 · ${summary.edgeMethodCount} 種驗證；僅 synthetic research。`
+      : "目前以合成資料驗證研究流程；尚無可據以推薦投資的實際策略成果。");
   } else {
     setText("home-research-state", safe ? "查看最新研究紀錄" : "研究資料暫不可用");
     setText("home-research-detail", safe
       ? "策略頁保留目前的研究狀態與驗證條件。"
       : "無法核實目前研究狀態，請稍後重新整理。");
   }
+
+  const candidates = Array.isArray(paper?.latestCandidates) ? paper.latestCandidates : [];
+  const paperReady = paper?.status === "READY" && paper?.authority?.paperCandidateGenerationAuthorized === true;
+  setText("home-candidate-state", paperReady && candidates.length > 0 ? `已產生 ${candidates.length} 筆模擬候選` : "尚無核實的每日推薦");
+  setText("home-candidate-detail", paperReady && candidates.length > 0
+    ? "候選僅供 Paper 研究觀測，不等同投資建議或交易計畫。"
+    : "目前模擬候選生成尚未取得授權；網站不會把研究候選冒充每日投資推薦。");
 }
 
 async function loadData() {
@@ -565,7 +585,7 @@ async function loadData() {
     let operational = null;
     let paperTraining = null;
     let researchEvidence = null;
-    let strategy = null;
+    let strategy = null;\n    let researchCalendar = null;
     try {
       operational = await fetchJson("./data/operational-status.json");
     } catch (error) {
@@ -604,13 +624,13 @@ async function loadData() {
       renderAlternativeAssets(null);
     }
     render(mergeOperationalStatus(data, operational));
-    renderHomeSummary(data, strategy, paperTraining);
+    renderHomeSummary(data, strategy, paperTraining, researchCalendar);
     renderPaperTraining(paperTraining);
     renderResearchEvidence(researchEvidence);
   } catch (error) {
     console.error("Dashboard snapshot load failed", error);
     render(FALLBACK);
-    renderHomeSummary(null, null, null);
+    renderHomeSummary(null, null, null, null);
     renderCalendar(null);
     renderPaperTraining(null);
     renderResearchEvidence(null);
