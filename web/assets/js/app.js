@@ -527,6 +527,31 @@ async function fetchJson(path) {
   return response.json();
 }
 
+
+function renderHomeSummary(data, strategy, paper) {
+  const setText = (id, text) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = text;
+  };
+  setText("home-updated", formatTrustedTime(data?.generatedAtUtc));
+  setText("home-paper-observed", `模擬觀測時間：${formatTrustedTime(paper?.observedAtUtc)}`);
+  const safe = strategy?.schema === "qookey-dashboard-strategy-projection-v0.1"
+    && strategy.authority === false
+    && strategy.safetyBoundary
+    && Object.keys(strategy.safetyBoundary).length > 0
+    && Object.values(strategy.safetyBoundary).every(value => value === false);
+  const research = safe ? strategy.analysisLayers?.find(layer => layer.id === "research_loop") : null;
+  if (research?.status === "PREPARED_RESEARCH_ONLY") {
+    setText("home-research-state", "框架就緒，實績待驗證");
+    setText("home-research-detail", "目前以合成資料驗證研究流程；尚無可據以推薦投資的實際策略成果。");
+  } else {
+    setText("home-research-state", safe ? "查看最新研究紀錄" : "研究資料暫不可用");
+    setText("home-research-detail", safe
+      ? "策略頁保留目前的研究狀態與驗證條件。"
+      : "無法核實目前研究狀態，請稍後重新整理。");
+  }
+}
+
 async function loadData() {
   const refreshButton = document.querySelector("#refresh-button");
   refreshButton?.setAttribute("aria-busy", "true");
@@ -536,6 +561,7 @@ async function loadData() {
     let operational = null;
     let paperTraining = null;
     let researchEvidence = null;
+    let strategy = null;
     try {
       operational = await fetchJson("./data/operational-status.json");
     } catch (error) {
@@ -553,7 +579,7 @@ async function loadData() {
       console.warn("Research evidence projection unavailable", error);
     }
     try {
-      const strategy = await fetchJson("./data/strategy.json");
+      strategy = await fetchJson("./data/strategy.json");
       renderStrategy(strategy);
     } catch (error) {
       console.warn("Strategy projection unavailable", error);
@@ -574,11 +600,13 @@ async function loadData() {
       renderAlternativeAssets(null);
     }
     render(mergeOperationalStatus(data, operational));
+    renderHomeSummary(data, strategy, paperTraining);
     renderPaperTraining(paperTraining);
     renderResearchEvidence(researchEvidence);
   } catch (error) {
     console.error("Dashboard snapshot load failed", error);
     render(FALLBACK);
+    renderHomeSummary(null, null, null);
     renderCalendar(null);
     renderPaperTraining(null);
     renderResearchEvidence(null);

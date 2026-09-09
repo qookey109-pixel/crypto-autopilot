@@ -283,3 +283,30 @@ td strong { color: var(--ink); }
 .cloud-schedule td, .cloud-schedule th { white-space: normal; min-width: 170px; font-size: 14px; }
 .cloud-schedule td small { display: block; margin-top: 8px; font-size: 13px; }
 @media (max-width: 850px) { .cloud-focus-grid { grid-template-columns: 1fr; } }
+
+/* Four-question overview; preserve the full research surface in disclosure. */
+.home-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; color: #fff; }
+.home-heading h2 { margin: 4px 0 0; font-size: clamp(28px, 4vw, 40px); line-height: 1.2; }
+.home-heading .eyebrow { color: inherit; }
+.home-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.home-card { display: flex; flex-direction: column; min-width: 0; margin: 0; }
+.home-card h3 { font-size: 18px; margin: 0 0 18px; }
+.home-card .card-kicker { font-size: 14px; }
+.home-value { display: block; font-size: clamp(21px, 2.5vw, 28px); line-height: 1.45; }
+.home-value span { display: inline-block; font-size: 16px; font-weight: 500; color: var(--muted); }
+.home-card p:not(.card-kicker) { color: var(--muted); font-size: 16px; line-height: 1.7; margin: 14px 0 22px; }
+.home-card .text-action { align-self: flex-start; margin-top: auto; font-size: 16px; min-height: 44px; display: inline-flex; align-items: center; }
+.home-card a { color: var(--hero-teal); text-decoration: underline; text-underline-offset: 4px; }
+.home-time { font-size: 22px; line-height: 1.5; overflow-wrap: anywhere; }
+.home-observed { font-size: 14px; color: var(--muted); margin-top: auto; }
+.home-details { margin-top: 24px; }
+.home-details > summary { cursor: pointer; padding: 18px 22px; background: #fff; color: var(--ink); border-radius: var(--radius-card); font-size: 16px; font-weight: 600; }
+.home-details > summary:focus-visible, .home-card .text-action:focus-visible { outline: 3px solid var(--accent-contrast); outline-offset: 4px; }
+.home-details-content { padding-top: 24px; }
+.home-details .cloud-schedule { border-top: 0; margin-top: 0; padding-top: 0; }
+.home-details .snapshot-line { margin-top: 28px; }
+@media (max-width: 760px) {
+  .home-grid { grid-template-columns: 1fr; gap: 16px; }
+  .home-heading { align-items: flex-start; }
+  .home-heading .badge { font-size: 14px; }
+}
