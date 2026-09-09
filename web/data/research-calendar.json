@@ -22,7 +22,7 @@
       "windowLabel": "CURRENT RESEARCH · SYNTHETIC ONLY"
     },
     {
-      "detail": "已授權、尚未開始；10 個可續跑分片，100 個 Crypto USD-M 市場的 15m／1h／4h 資料只進 R2。",
+      "detail": "已授權由雲端排程補齊；10 個可續跑分片，100 個 Crypto USD-M 市場的 15m／1h／4h 資料只進 R2。完成數請看首頁最後核實報告。",
       "endsAtUtc": "2026-10-01T00:00:00Z",
       "id": "detailed-history-backfill",
       "kind": "window",
