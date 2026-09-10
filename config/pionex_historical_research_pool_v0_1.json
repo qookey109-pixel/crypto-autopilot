@@ -1,0 +1,90 @@
+{
+  "schema_version": "pionex_historical_research_pool_v0_1",
+  "version": "0.1.0",
+  "status": "PREPARED_NOT_AUTHORIZED",
+  "purpose": "Define a provider-native Pionex historical research pool without changing the frozen 15-symbol M1/M1A/M1B evidence or authorizing execution.",
+  "provider": "pionex",
+  "product_scope": {
+    "market_type": "PERP",
+    "quote_asset": "USDT",
+    "symbol_suffix": "_USDT_PERP",
+    "minimum_target_market_count": 150,
+    "preferred_target_market_count": 150,
+    "expansion_policy": "ADD_QUALIFIED_MARKETS_BEYOND_150_ONLY_WITHIN_SEPARATE_EXECUTION_CAP_AND_FRESH_FREE_ONLY_HEADROOM_PROOF",
+    "selection_is_dynamic_snapshot": true,
+    "eligible_categories": [
+      "crypto",
+      "tokenized_equity",
+      "tokenized_metal",
+      "tokenized_etf",
+      "tokenized_fund",
+      "tokenized_commodity",
+      "other_pionex_perpetual"
+    ],
+    "category_quotas": "AS_AVAILABLE_REPORT_COUNTS_ONLY",
+    "spot_only_products_allowed": false,
+    "account_or_region_eligibility_inferred": false
+  },
+  "historical_scope": {
+    "intervals": ["15M", "60M", "4H"],
+    "start_policy": "MAXIMUM_AVAILABLE_PER_SYMBOL_WITH_POINT_IN_TIME_FIRST_TIMESTAMP",
+    "end_policy": "LATEST_COMPLETE_UTC_CANDLE_AT_AUTHORIZED_RUN_TIME",
+    "common_window_required_for_core_100": true,
+    "missing_history_policy": "EXCLUDE_FROM_COMPLETE_POOL_AND_REPORT",
+    "silent_interpolation_allowed": false,
+    "provider_splicing_allowed": false,
+    "historical_universe_from_current_catalog_allowed": false
+  },
+  "selection": {
+    "source": "PIONEX_PUBLIC_COMMON_SYMBOLS_AND_PUBLIC_MARKET_METADATA",
+    "required_status": "TRADING",
+    "ranking": "PUBLIC_24H_ACTIVITY_THEN_SPREAD_AND_DATA_INTEGRITY",
+    "category_classification": "EXPLICIT_METADATA_OR_REVIEW_REQUIRED",
+    "category_classification_is_authority": false,
+    "insufficient_qualified_markets_result": "INCOMPLETE_NOT_FORCED_TO_150"
+  },
+  "evidence_and_storage": {
+    "raw_history_persistent_store": "cloudflare_r2_only_AFTER_SEPARATE_EXECUTION_AUTHORITY",
+    "provider_namespace": "market-data/pionex/historical-research-pool-v0.1",
+    "receipt_required_per_symbol_interval": true,
+    "catalog_snapshot_required": true,
+    "exact_timestamp_order_and_gap_audit_required": true,
+    "sha256_readback_required_if_written": true,
+    "raw_history_projected_to_pages": false,
+    "local_persistent_artifacts_authorized": false
+  },
+  "execution_boundary": {
+    "provider_reads_authorized": false,
+    "r2_reads_authorized": false,
+    "r2_writes_authorized": false,
+    "schedule_authorized": false,
+    "workflow_creation_or_change_authorized": false,
+    "private_api_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "completion_gate": {
+    "pool_minimum_is_150": true,
+    "150_is_not_a_hard_upper_bound": true,
+    "complete_pool_requires_at_least_150_qualified_markets": true,
+    "additional_markets_require_new_execution_cap_or_authority": true,
+    "each_market_requires_all_requested_intervals": true,
+    "each_market_requires_audited_partition_receipts": true,
+    "incomplete_or_unavailable_market_must_not_be_marked_complete": true,
+    "core_100_is_a_downstream_complete_subset": true
+  },
+  "upstream_authorities": {
+    "project_status": "PROJECT_STATUS.md",
+    "frozen_pionex_foundation": "research/receipts/2026-08-17-m1a-pionex.json",
+    "frozen_r2_foundation": "research/receipts/2026-08-18-m1b-r2.json",
+    "free_only_policy": "config/cloud_free_tier_policy_v0_1.json",
+    "historical_universe_policy": "docs/HISTORICAL_UNIVERSE_V0_1.md"
+  },
+  "explicit_non_effect": "This prepared config does not authorize provider requests, R2 access, a new schedule, data materialization, Historical Universe membership, backtest admission, strategy changes, model promotion, trade plans, or trading. A separate protected-main execution authority is required after review."
+}

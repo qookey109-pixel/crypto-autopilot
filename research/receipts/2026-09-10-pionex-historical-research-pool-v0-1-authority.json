@@ -1,0 +1,62 @@
+{
+  "schema": "pionex-historical-research-pool-authority-v0.1",
+  "status": "PREPARED_NOT_AUTHORIZED",
+  "stage": "PIONEX_HISTORICAL_RESEARCH_POOL_V0_1_PREPARED",
+  "date": "2026-09-10",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "config": "config/pionex_historical_research_pool_v0_1.json",
+  "config_sha256": "f085060f81591efbc258ea3a4d72ef928dd71a58bded8d10579d27cbfcdb1d6b",
+  "request_basis": "User requested a first 150-market Pionex-native historical research pool including available crypto, tokenized equity, metal, ETF/fund and commodity perpetual products.",
+  "prepared_scope": {
+    "provider": "pionex",
+    "market_type": "PERP",
+    "quote_asset": "USDT",
+    "minimum_target_market_count": 150,
+    "preferred_target_market_count": 150,
+    "additional_qualified_markets_allowed": true,
+    "intervals": ["15M", "60M", "4H"],
+    "history_policy": "maximum available per symbol with point-in-time first timestamp",
+    "categories": [
+      "crypto",
+      "tokenized_equity",
+      "tokenized_metal",
+      "tokenized_etf",
+      "tokenized_fund",
+      "tokenized_commodity",
+      "other_pionex_perpetual"
+    ]
+  },
+  "current_evidence": {
+    "frozen_pionex_symbols": 15,
+    "frozen_pionex_intervals": ["15M", "60M", "4H"],
+    "frozen_pionex_candles": 13230,
+    "frozen_pionex_audit": "PASS",
+    "pionex_expansion_started": false,
+    "new_provider_requests_performed": false,
+    "new_r2_access_performed": false
+  },
+  "authority_effect": "NONE_UNTIL_PROTECTED_MAIN_MERGE_AND_SEPARATE_EXECUTION_AUTHORITY",
+  "guardrails": {
+    "pionex_native_only": true,
+    "binance_substitution": false,
+    "provider_splicing": false,
+    "silent_interpolation": false,
+    "private_api": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "historical_universe_membership": false,
+    "backtest_admission": false,
+    "model_promotion": false,
+    "trade_plan": false,
+    "real_money_order": false,
+    "live_trading": false
+  },
+  "required_before_execution": [
+    "protected-main review and merge of this versioned scope",
+    "separate execution authority bound to the merged config SHA",
+    "fresh FREE-ONLY storage/headroom proof",
+    "cloud workflow with serialized bounded shards and fail-closed stop",
+    "per-symbol and per-interval receipt contract",
+    "point-in-time Historical Universe membership review"
+  ]
+}
