@@ -60,6 +60,25 @@ def test_workflow_is_serialized_and_has_no_trading_or_schedule_path() -> None:
     assert "place_order" not in text.lower()
 
 
+def test_workflow_is_classified_without_adding_a_cron() -> None:
+    convergence = json.loads(
+        (ROOT / "config/project_convergence_v0_1.json").read_text(encoding="utf-8")
+    )
+    classified = {
+        name
+        for group in convergence["workflow_groups"].values()
+        for name in group
+    }
+    assert "pionex-historical-research-execution-v0-1.yml" in classified
+    scheduled = [
+        item
+        for group in convergence["scheduled_workflows"].values()
+        for item in group
+        if item.get("cron_utc")
+    ]
+    assert len(scheduled) == 7
+
+
 def test_runner_requires_headroom_before_pionex_history_and_writes_pointer_last() -> None:
     text = SCRIPT.read_text()
     assert text.index("before_provider = current_bucket_bytes(store)") < text.index("client = PionexPublicClient")
