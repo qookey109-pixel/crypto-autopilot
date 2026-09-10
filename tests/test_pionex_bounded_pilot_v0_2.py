@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import patch
 
 from crypto_autopilot.models import Candle
-from crypto_autopilot.pionex_bounded_pilot import PilotRejected, collect, stamp, require_window, digest
+from crypto_autopilot.history.pionex_bounded_pilot import PilotRejected, collect, stamp, require_window, digest
 from crypto_autopilot.historical import INTERVAL_MS
 
 ROOT = Path(__file__).resolve().parents[1]

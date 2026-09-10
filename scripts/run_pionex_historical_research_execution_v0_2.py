@@ -6,7 +6,7 @@ import os
 import re
 from pathlib import Path
 
-from crypto_autopilot.pionex_bounded_pilot import (
+from crypto_autopilot.history.pionex_bounded_pilot import (
     PilotRejected, collect, digest, encoded, now_ms, require_window,
 )
 

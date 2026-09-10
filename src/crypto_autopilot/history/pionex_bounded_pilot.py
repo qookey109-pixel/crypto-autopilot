@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import hashlib
 import json
 
-from .historical import INTERVAL_MS, audit_candles
+from ..historical import INTERVAL_MS, audit_candles
 
 
 class PilotRejected(RuntimeError):
