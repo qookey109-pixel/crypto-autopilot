@@ -1,0 +1,60 @@
+{
+  "version": "0.3.0",
+  "status": "AUTHORIZED_AFTER_PROTECTED_MAIN_MERGE_MANUAL_DISCOVERY_ONLY",
+  "provider": "pionex_public_futures",
+  "symbol": "BTC_USDT_PERP",
+  "intervals": [
+    "15M",
+    "60M",
+    "4H"
+  ],
+  "cutoff_exclusive_utc": "2026-08-28T00:00:00Z",
+  "not_before_utc": "2026-09-11T00:00:00Z",
+  "stop_exclusive_utc": "2026-09-16T00:00:00Z",
+  "page_limit": 500,
+  "documented_max_records_per_interval": 10000,
+  "max_pages_per_interval": 20,
+  "boundary_probe_limit": 1,
+  "maximum_requests": 63,
+  "requests_per_second": 3,
+  "request_timeout_seconds": 15,
+  "official_spec": {
+    "repository": "pionex-official/pionex-open-api",
+    "commit": "d31e146006da7b59c228c07e11949ec8fb7140de",
+    "file": "openapi.yaml",
+    "blob_sha": "6aee44bce634b695ead4caeb051bd8d036db896a",
+    "kline_endpoint": "/api/v1/market/klines",
+    "page_limit": 500,
+    "documented_max_records": 10000
+  },
+  "output": {
+    "persist_raw_provider_payloads": false,
+    "persist_candles": false,
+    "r2_read": false,
+    "r2_write": false,
+    "github_actions_secret_free_report": true,
+    "artifact_retention_days": 90
+  },
+  "authority": {
+    "public_pionex_reads": true,
+    "workflow_dispatch": true,
+    "automatic_schedule": false,
+    "api_key_required": false,
+    "private_account_reads": false,
+    "r2_read": false,
+    "r2_write": false,
+    "holdout_access": false,
+    "training": false,
+    "formal_backtest_admission": false,
+    "strategy_change": false,
+    "source_switch": false,
+    "binance_relabel_as_pionex": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  },
+  "classification": {
+    "provider_earliest_reached": "PROVIDER_EARLIEST_REACHED",
+    "documented_record_cap_reached": "DOCUMENTED_RECORD_CAP_REACHED"
+  }
+}
