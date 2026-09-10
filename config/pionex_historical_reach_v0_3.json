@@ -6,7 +6,9 @@
   "intervals": [
     "15M",
     "60M",
-    "4H"
+    "4H",
+    "1D",
+    "1W"
   ],
   "cutoff_exclusive_utc": "2026-08-28T00:00:00Z",
   "not_before_utc": "2026-09-11T00:00:00Z",
@@ -15,7 +17,7 @@
   "documented_max_records_per_interval": 10000,
   "max_pages_per_interval": 20,
   "boundary_probe_limit": 1,
-  "maximum_requests": 63,
+  "maximum_requests": 105,
   "requests_per_second": 3,
   "request_timeout_seconds": 15,
   "official_spec": {
@@ -26,6 +28,13 @@
     "kline_endpoint": "/api/v1/market/klines",
     "page_limit": 500,
     "documented_max_records": 10000
+  },
+  "derived_timeframes": {
+    "1Y": {
+      "provider_native": false,
+      "source_interval": "1D",
+      "derivation_authorized_by_this_stage": false
+    }
   },
   "output": {
     "persist_raw_provider_payloads": false,
