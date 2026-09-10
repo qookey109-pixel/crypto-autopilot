@@ -1,0 +1,49 @@
+{
+  "schema": "sstate-gate-calibration-protocol-v0.1",
+  "version": "0.1.0",
+  "status": "PREPARED_CALIBRATION_ONLY",
+  "purpose": "Re-evaluate the 0.60 probability and 50-sample admission gate without changing formal V0.1 or reading the frozen replacement holdout.",
+  "baseline_gate": {
+    "minimum_probability": 0.60,
+    "minimum_samples": 50,
+    "formal_strategy_change_authorized": false
+  },
+  "preregistered_grid": {
+    "minimum_probability": [0.55, 0.60, 0.65],
+    "minimum_effective_samples": [50, 100, 200],
+    "maximum_candidate_count": 9
+  },
+  "evaluation": {
+    "outer_walk_forward_folds_minimum": 4,
+    "inner_calibration_folds_minimum": 3,
+    "minimum_selected_effective_samples": 100,
+    "minimum_wilson_lower_bound_for_realized_success": 0.50,
+    "required_metrics": [
+      "brier_score",
+      "log_loss",
+      "ece",
+      "mce",
+      "reliability_by_probability_bucket",
+      "net_expectancy_r_after_costs"
+    ],
+    "selection_rule": "LOWEST_OUTER_FOLD_LOG_LOSS_SUBJECT_TO_POSITIVE_COST_ADJUSTED_EXPECTANCY_AND_WILSON_GATE",
+    "long_and_short_reported_separately": true,
+    "regime_results_required": ["TREND_UP", "TREND_DOWN", "RANGE"]
+  },
+  "multiple_comparison_family": {
+    "family_id": "SSTATE_GATE_GRID_V0_1",
+    "method": "HOLM_BONFERRONI",
+    "family_wise_alpha": 0.05
+  },
+  "authority": {
+    "provider_reads_authorized": false,
+    "r2_reads_authorized": false,
+    "r2_writes_authorized": false,
+    "holdout_access_authorized": false,
+    "formal_strategy_change_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

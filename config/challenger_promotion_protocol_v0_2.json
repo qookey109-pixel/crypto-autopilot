@@ -1,0 +1,112 @@
+{
+  "schema": "challenger-promotion-protocol-v0.2",
+  "version": "0.2.0",
+  "status": "PREPARED_EVIDENCE_GATE_ONLY",
+  "supersedes": "config/challenger_promotion_protocol_v0_1.json",
+  "purpose": "Add preregistration, time-series confidence, prospective-duration and family-wise multiple-comparison gates before integrated challenger results are read.",
+  "common_integrity_gates": {
+    "lineage_complete": true,
+    "no_lookahead": true,
+    "provider_separated": true,
+    "holdout_untouched": true,
+    "formal_baseline_unchanged": true,
+    "experiment_preregistered": true,
+    "family_registry_locked": true,
+    "primary_metric_frozen": true,
+    "minimum_walk_forward_folds": 4,
+    "minimum_positive_fold_fraction": 0.75,
+    "minimum_total_out_of_sample_trades": 300,
+    "minimum_out_of_sample_calendar_days": 180,
+    "minimum_prospective_paper_days": 28,
+    "minimum_median_net_expectancy_r": 0.05,
+    "minimum_cost_stress_net_expectancy_r": 0.0,
+    "maximum_drawdown_pct": 25.0,
+    "maximum_single_symbol_fraction": 0.10,
+    "maximum_leverage_rejection_fraction": 0.35,
+    "minimum_expectancy_lift_vs_baseline_r": 0.0
+  },
+  "statistical_evidence": {
+    "primary_metric": "net_expectancy_r_after_costs",
+    "bootstrap_method": "STATIONARY_BLOCK_BOOTSTRAP",
+    "minimum_bootstrap_replicates": 5000,
+    "confidence_level": 0.95,
+    "minimum_primary_metric_lower_confidence_bound_r": 0.0,
+    "lower_bound_comparison": "STRICTLY_GREATER_THAN",
+    "serial_dependence_must_be_preserved": true
+  },
+  "multiple_comparison_control": {
+    "method": "HOLM_BONFERRONI",
+    "family_wise_alpha": 0.05,
+    "maximum_registered_challengers_per_family": 8,
+    "maximum_evaluation_looks": 1,
+    "all_family_p_values_required": true,
+    "registry_sha256_required": true,
+    "approved_registry_path": "config/challenger_experiment_registry_v0_1.json",
+    "approved_registry_sha256": "61ad788976b6808c834521fd4bd6ad766eb0d480689d0e5bd949dada0d764f0a",
+    "approved_families": {
+      "CORE_INTRADAY_DIRECTIONAL_V0_1": [
+        "sstate-baseline-v0-1",
+        "paper-training-v0-1",
+        "paper-exploration-v0-2",
+        "long-short-v0-2",
+        "integrated-v0-3"
+      ],
+      "TOKENIZED_EQUITY_V0_1": [
+        "tokenized-equity-v0-1",
+        "integrated-tokenized-v0-3"
+      ]
+    },
+    "post_result_family_changes_authorized": false
+  },
+  "tracks": {
+    "CORE_LONG_SHORT": {
+      "experiment_family_id": "CORE_INTRADAY_DIRECTIONAL_V0_1",
+      "minimum_side_trades": {
+        "LONG": 100,
+        "SHORT": 100
+      },
+      "minimum_regime_trades": {
+        "TREND_UP": 50,
+        "TREND_DOWN": 50,
+        "RANGE": 50
+      },
+      "sstate_gate_calibration_required": true,
+      "minimum_sstate_selected_effective_samples": 100,
+      "minimum_sstate_outer_folds": 4,
+      "minimum_sstate_wilson_lower_bound": 0.50,
+      "short_score_independently_calibrated_required": true,
+      "minimum_short_calibration_trades": 100,
+      "short_funding_stress_pass_required": true,
+      "short_squeeze_regime_evaluated_required": true
+    },
+    "TOKENIZED_EQUITY": {
+      "experiment_family_id": "TOKENIZED_EQUITY_V0_1",
+      "minimum_total_out_of_sample_trades": 150,
+      "minimum_distinct_symbols": 3,
+      "minimum_session_policy_coverage": 1.0,
+      "minimum_corporate_action_policy_coverage": 1.0,
+      "spread_stress_must_pass": true,
+      "sstate_gate_calibration_required": true,
+      "minimum_sstate_selected_effective_samples": 100,
+      "minimum_sstate_outer_folds": 4,
+      "minimum_sstate_wilson_lower_bound": 0.50
+    }
+  },
+  "result_semantics": {
+    "passing_status": "EVIDENCE_READY_FOR_HUMAN_REVIEW",
+    "failing_status": "REJECT",
+    "automatic_promotion_authorized": false,
+    "formal_strategy_change_authorized": false,
+    "trading_authorized": false
+  },
+  "authority": {
+    "provider_reads_authorized": false,
+    "r2_reads_authorized": false,
+    "r2_writes_authorized": false,
+    "holdout_access_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
