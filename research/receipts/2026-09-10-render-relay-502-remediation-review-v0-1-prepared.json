@@ -1,0 +1,12 @@
+{
+  "schema": "render-relay-502-remediation-review-prepared-v0.1",
+  "status": "PREPARED_REVIEW_REQUIRED",
+  "config": "config/render_relay_502_remediation_review_v0_1.json",
+  "config_sha256": "e17916ac451778811131454ed303d414b42bf3effe6f93be86d02ef470a4f332",
+  "prepared_from_main_sha": "8b86cd95754a577581b74cec341b355293caeaa7",
+  "observed_failure_run_id": 34424167855,
+  "prior_observation": "research/receipts/2026-09-05-v0-12-render-relay-502-observation.json",
+  "execution_authorized": false,
+  "render_change_authorized": false,
+  "provider_or_r2_access_authorized": false
+}
