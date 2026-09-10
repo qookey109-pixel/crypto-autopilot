@@ -85,7 +85,7 @@ def validate_execution_config(
         raise UniverseExecutionRejected("request pace changed")
     if float(execution.get("request_timeout_seconds") or 0.0) != 15.0:
         raise UniverseExecutionRejected("request timeout changed")
-    if int(execution.get("automatic_retries") or -1) != 0:
+    if execution.get("automatic_retries") != 0:
         raise UniverseExecutionRejected("automatic retries must remain zero")
     for key in ("github_actions_main_only", "workflow_dispatch_only"):
         if execution.get(key) is not True:
