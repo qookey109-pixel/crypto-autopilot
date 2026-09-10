@@ -101,9 +101,9 @@ class LitDiagnosisTests(unittest.TestCase):
             diagnosis.load_authority(ROOT, ENV, datetime(2026, 10, 1, tzinfo=timezone.utc))
 
     def test_workflow_has_manual_diagnosis_without_secrets(self):
-        text = (ROOT / ".github/workflows/binance-usdm-detailed-history-v0-1.yml").read_text()
-        block = text.split("  diagnose-lit:")[1]
-        self.assertIn("inputs.mode == 'diagnose-lit'", block)
+        text = (ROOT / ".github/workflows/lit-archive-diagnosis-v0-1.yml").read_text()
+        self.assertIn("workflow_dispatch:", text)
+        block = text
         self.assertIn("python scripts/diagnose_lit_archive.py", block)
         self.assertIn("lit-archive-diagnosis-", block)
         self.assertNotIn("secrets.", block)

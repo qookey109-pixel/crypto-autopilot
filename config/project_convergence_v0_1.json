@@ -105,6 +105,7 @@
       "dashboard-authority-snapshot.yml",
       "dashboard-github-pages.yml",
       "dashboard-static-smoke.yml",
+      "lit-archive-diagnosis-v0-1.yml",
       "pionex-alternative-assets-observability-v0-2.yml",
       "provider-equivalence-v0-12-successor-metadata-capture.yml",
       "research-automation-health-v0-2.yml",
