@@ -42,6 +42,14 @@ Repository branch `main` is the live formal authority and is intentionally not s
   historical-universe admission, backtests, training, source switching,
   holdout access, private APIs, trade plans, real-money orders or live trading.
 
+- Run `34449227441` on `8dc56c2` also failed with `MARKET_INVALID_TIME`,
+  reporting no R2 writes. The earlier host-clock diagnosis is not established.
+  Public request diagnostics now identify interval, bootstrap/pagination,
+  request number, cursor and returned-row count without raw error bodies.
+  Pionex's legacy public K-line documentation describes a 10,000-record
+  retrieval limit; whether this run reached that limit remains unverified.
+  An error is not an empty terminal page or evidence of complete history.
+
 <details>
 <summary>Historical aggregate stage markers</summary>
 

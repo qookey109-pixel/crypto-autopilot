@@ -30,6 +30,14 @@ or a backtest dataset already exists.
 
 ## Boundary
 
+Provider failures retain sanitized public request context (interval, request
+number, phase, cursor, limit and returned rows including overlaps). These are
+diagnostics, not continuity or unique-row evidence. Errors still block writes.
+The [legacy Pionex K-line documentation](https://pionex-doc.gitbook.io/apidocs/restful/markets/get-klines)
+describes `MARKET_INVALID_TIME` for requests beyond 10,000 recent records.
+This is a hypothesis to check against actual request context, not permission
+to reinterpret an error as full-history completion or publish a partial range.
+
 The workflow is `workflow_dispatch` only: no schedule is added or changed.
 It has no private Pionex credential, no account/balance/order method, no
 Binance input, no holdout access, no raw-history R2 read path, no training,
