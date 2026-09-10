@@ -247,4 +247,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit("V0.1 execution retired: use the reviewed bounded V0.2 pilot")

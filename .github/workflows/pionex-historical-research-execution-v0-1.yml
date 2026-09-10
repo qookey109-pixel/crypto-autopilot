@@ -1,4 +1,4 @@
-name: Pionex Historical Research Pilot Execution V0.1
+name: Pionex Bounded Capacity Pilot V0.2
 
 on:
   workflow_dispatch:
@@ -33,11 +33,7 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          python scripts/run_pionex_historical_research_execution_v0_1.py \
-            --config config/pionex_historical_research_execution_v0_1.json \
-            --prepared-config config/pionex_historical_research_pool_v0_1.json \
-            --authority research/receipts/2026-09-10-pionex-historical-research-execution-v0-1-authority.json \
-            --run-id "github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+          python scripts/run_pionex_historical_research_execution_v0_2.py \
             --output pionex-history-pilot-output/report.json
 
       - name: Assert paper-only pilot boundary
@@ -49,10 +45,12 @@ jobs:
 
           report = json.loads(Path("pionex-history-pilot-output/report.json").read_text())
           assert report["status"] in {"PASS", "ALREADY_COMPLETE", "FAIL"}
-          assert report["holdout_accessed"] is False
+          assert report["holdout_accessed"] in (False, "UNVERIFIED_PROVIDER_RANGE_VIOLATION")
           assert report["live_trading_authorized"] is False
-          assert report["r2_writes_performed"] in {True, False}
+          assert report["r2_writes_performed"] in {True, False, "UNKNOWN_WRITE_ATTEMPTED"}
           if report["status"] == "PASS":
+              assert report["holdout_accessed"] is False
+              assert report["coverage_claim"] == "COMPLETE_FIXED_27_DAY_CAPACITY_SAMPLE_ONLY"
               assert report["r2_latest_pointer_written_last"] is True
               assert report["training_authorized"] is False
               assert report["source_switch_authorized"] is False
