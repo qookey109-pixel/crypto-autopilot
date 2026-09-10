@@ -1,0 +1,38 @@
+{
+  "schema": "pionex-research-universe-execution-v0.1-authority",
+  "status": "AUTHORIZED_AFTER_PROTECTED_MAIN_MERGE_AWAITING_WORKFLOW_WIRING",
+  "date": "2026-09-11",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "base_selection_branch_head": "b29c01f8985a060a6b392e0f631f7550ca4fc93d",
+  "config": "config/pionex_research_universe_execution_v0_1.json",
+  "config_sha256": "a7c898d24e4cc5a6685746559fc1aeb49a6841b471f1dd6a78d1d8ff84262d4a",
+  "selection_config": "config/pionex_research_universe_v0_1.json",
+  "selection_config_sha256": "3c70bab735b76f59766cfbea9f2c1e8cbb24305359f5f877eb2782a1445b6309",
+  "alternative_registry": "config/pionex_alternative_assets_v0_1.json",
+  "alternative_registry_sha256": "48aa707f51a50c3d1cf0db63eb1eb41989a8441b56230c06ac894a204b2d4e18",
+  "execution_performed_by_this_receipt": false,
+  "execution_contract": {
+    "provider_request_count_exact": 3,
+    "workflow_dispatch_only": true,
+    "github_actions_main_only": true,
+    "accepted_run_attempt": 1,
+    "automatic_retries": 0,
+    "workflow_wiring_included": false
+  },
+  "authority": {
+    "public_pionex_snapshot_reads_after_merge": true,
+    "private_api": false,
+    "api_key_required": false,
+    "r2_read": false,
+    "r2_write": false,
+    "historical_materialization": false,
+    "holdout_access": false,
+    "training": false,
+    "formal_backtest_admission": false,
+    "strategy_change": false,
+    "source_switch": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
