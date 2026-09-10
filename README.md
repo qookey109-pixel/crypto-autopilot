@@ -6,6 +6,11 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 
 ## Start here
 
+Pionex history pilot: the [V0.2 capacity sample](docs/PIONEX_BOUNDED_CAPACITY_PILOT_V0_2.md)
+replaces unrestricted backwards pagination after reviewed main merge. It
+covers 27 pre-holdout days only; complete history and 150+ market collection
+remain separate milestones. Prior pilot holdout non-access needs review.
+
 - [`PROJECT_STATUS.md`](PROJECT_STATUS.md) — formal current authority.
 - [`docs/PROJECT_MAP_V0_1.md`](docs/PROJECT_MAP_V0_1.md) — concise repository map.
 - [`docs/AUTOMATION_INDEX_V0_1.md`](docs/AUTOMATION_INDEX_V0_1.md) — only the schedules that can still run.

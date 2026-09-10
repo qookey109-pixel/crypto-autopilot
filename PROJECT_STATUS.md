@@ -14,6 +14,23 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ## Current formal stage
 
+### Pionex bounded capacity pilot V0.2 — EFFECTIVE AFTER REVIEWED MAIN MERGE
+
+- V0.2 supersedes V0.1 execution with a BTC-only 27-day sample (2026-08-01
+  through 2026-08-27 UTC), three intervals, at most ten public requests.
+  Completion means this fixed sample only; 150+ markets remain unauthorized.
+- Config: `config/pionex_historical_research_execution_v0_2.json`; receipt:
+  `research/receipts/2026-09-10-pionex-bounded-pilot-v0-2-authority.json`.
+  Contract and incident review: `docs/PIONEX_BOUNDED_CAPACITY_PILOT_V0_2.md`.
+- Run 34494612014 failed at request 22, 15M, with 10,500 returned rows
+  including overlaps. This supports a provider horizon limitation, not proof
+  of exact unique coverage. Its report records no R2 writes.
+- REVIEW_REQUIRED: V0.1 requested across protected dates and hard-coded
+  holdout_accessed=false; past non-access cannot be certified from that flag.
+  Do not read raw data to investigate. V0.2 excludes protected dates in each
+  request and replaces the original CLI in the same manual workflow.
+- No V0.2 execution or data completion is claimed by this engineering change.
+
 **GITHUB AUTOMATIC RESEARCH OPERATIONS V0.1 AUTHORIZED ON PROTECTED-MAIN MERGE / RESEARCH AUTOMATION HEALTH V0.2 IS THE SINGLE COMPLETE CRON CONTROL PLANE / V0.12 SUCCESSOR METADATA WINDOW AUTHORIZED AND CURRENT / V0.10 REMAINING SCHEDULE RETIRED / V0.10 INCOMPLETE WINDOW PRESERVED AS BLOCKED EVIDENCE / V0.12 PRODUCTION STABILITY EVALUATION NOT_AUTHORIZED / CRYPTO CORE 100 V0.1.2 AUTHORIZED / PIONEX ALTERNATIVE ASSETS V0.2 AUTHORIZED / CURRENT EXECUTION OUTCOMES REQUIRE RUN EVIDENCE / CONTEXT FORWARD CAPTURE EXECUTION V0.1 AUTHORIZED MANUAL ONE-SHOT AFTER V0.12 WINDOW / CONTEXT FORWARD 4H SCHEDULE NOT_AUTHORIZED / POST-WINDOW PAPER V0.2 PREPARED WAITING FOR HOLDOUT AUTHORITY / REPLACEMENT HOLDOUT FROZEN_UNOPENED / PAPER-ONLY**
 
 ### Pionex Historical Research Pilot Execution V0.1 — EFFECTIVE ONLY AFTER PROTECTED-MAIN MERGE

@@ -1,0 +1,15 @@
+{
+  "schema": "pionex-bounded-pilot-authority-v0.2",
+  "status": "AUTHORIZED_AFTER_PROTECTED_MAIN_MERGE",
+  "config": "config/pionex_historical_research_execution_v0_2.json",
+  "config_sha256": "a66fdf7def02023590163091fbdd1eceabe5d96a774ffa0207e7b7a7f506f932",
+  "prepared_pool_config_sha256": "f085060f81591efbc258ea3a4d72ef928dd71a58bded8d10579d27cbfcdb1d6b",
+  "supersedes_execution_only": "config/pionex_historical_research_execution_v0_1.json",
+  "evidence_run": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34494612014",
+  "user_decision": "Allow scoped rule changes for reliable operation; preserve separate production and scientific authority gates.",
+  "completion_claim": "fixed 27-day capacity sample only",
+  "execution_performed_by_this_receipt": false,
+  "prior_holdout_non_access": "REVIEW_REQUIRED_CONSTANT_FLAG_IS_NOT_PROOF",
+  "full_150_market_materialization_authorized": false,
+  "live_trading_authorized": false
+}
