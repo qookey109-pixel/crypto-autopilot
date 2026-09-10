@@ -1,0 +1,35 @@
+{
+  "schema_version": "pionex_historical_research_execution_authority_receipt_v0_1",
+  "status": "AUTHORIZED_AFTER_PROTECTED_MAIN_MERGE",
+  "config": "config/pionex_historical_research_execution_v0_1.json",
+  "config_sha256": "14f55f1be86161e7231f504d4468687aa7cac5acafcee49c64d1d4ae64fb8e07",
+  "prepared_pool_config": "config/pionex_historical_research_pool_v0_1.json",
+  "prepared_pool_config_sha256": "f085060f81591efbc258ea3a4d72ef928dd71a58bded8d10579d27cbfcdb1d6b",
+  "authorized_scope": {
+    "provider": "pionex_public_futures",
+    "pilot_symbol": "BTC_USDT_PERP",
+    "intervals": ["15M", "60M", "4H"],
+    "r2_pilot_writes": true,
+    "full_150_market_materialization": false,
+    "automatic_schedule": false
+  },
+  "boundary": {
+    "replacement_holdout_accessed": false,
+    "historical_universe_membership_authorized": false,
+    "backtest_admission_authorized": false,
+    "training_authorized": false,
+    "binance_relabel_as_pionex_authorized": false,
+    "private_api_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "evidence": {
+    "pionex_alternative_assets_observability_latest_success_run": "34021018731",
+    "observed_pionex_perp_count": 609,
+    "alternative_asset_registry_match_count": 80,
+    "catalog_validation_status": "REVIEW_REQUIRED",
+    "r2_bucket_bytes_before_observability_write": 253742289,
+    "source_is_execution_precondition_only_not_150_market_approval": true
+  },
+  "prepared_at_utc": "2026-09-10T06:00:00Z"
+}
