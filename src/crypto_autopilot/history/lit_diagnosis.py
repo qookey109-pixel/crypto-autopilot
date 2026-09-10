@@ -28,9 +28,33 @@ MAX_TOTAL_BYTES = 20_000_000
 MAX_REQUESTS = 12
 MAX_DAILY_ARCHIVES = 5
 
+# Exact locally authored messages only; never emit arbitrary exception text.
+RECONCILIATION_REASONS = {
+    "daily and monthly overlap conflict": "OVERLAP_CONFLICT",
+    "daily archive must cover its entire UTC day": "DAILY_INCOMPLETE",
+    "official daily archives did not fill every missing timestamp": "MISSING_BARS_REMAIN",
+    "daily archive identity mismatch": "DAILY_IDENTITY_MISMATCH",
+    "duplicate daily archive": "DUPLICATE_DAILY_ARCHIVE",
+    "conflicting replacement row": "REPLACEMENT_CONFLICT",
+    "overlap evidence required; include adjacent complete daily archive": "NO_OVERLAP_EVIDENCE",
+    "reconciled candidate failed original candle audit": "CANDIDATE_AUDIT_FAILED",
+    "only absent bars may be reconciled": "MONTHLY_INVALID",
+    "monthly rows outside exact UTC month": "MONTHLY_BOUNDARY_MISMATCH",
+    "monthly revision requires separate review": "MONTHLY_REVISION",
+}
+
 
 class DiagnosisError(ValueError):
     pass
+
+
+def rejection_reason(exc):
+    message = str(exc)
+    if message.startswith("Binance Vision kline audit failed: "):
+        return "DAILY_CANDLE_AUDIT_FAILED"
+    if message.startswith(("CHECKSUM filename mismatch:", "Binance Vision archive SHA-256 mismatch:")):
+        return "CHECKSUM_VALIDATION_FAILED"
+    return RECONCILIATION_REASONS.get(message, "ARCHIVE_VALIDATION_FAILED_UNCLASSIFIED")
 
 
 def clock_gate(now=None):
@@ -154,8 +178,9 @@ def diagnose(reader):
         daily.append((key, data, check))
     try:
         candidate = reconcile_monthly_from_daily(KEY, monthly, checksum, daily, expected_monthly_sha256=EXPECTED_SHA)
-    except BinanceVisionEvidenceError:
-        return dict(summary, status="DAILY_RECONCILIATION_REJECTED")
+    except BinanceVisionEvidenceError as exc:
+        return dict(summary, status="DAILY_RECONCILIATION_REJECTED",
+                    rejection_reason=rejection_reason(exc))
     normalized = json.dumps(
         [[c.time_ms, c.open, c.high, c.low, c.close, c.volume] for c in candidate.candles],
         separators=(",", ":"), allow_nan=False,
@@ -184,4 +209,3 @@ def run(root, output):
     output.write_text(json.dumps(report, sort_keys=True, indent=2) + "\n")
     print(json.dumps(report, sort_keys=True))
     return 0 if report["status"] == "REPAIR_CANDIDATE_REQUIRES_PUBLICATION_AUTHORITY" else 1
-

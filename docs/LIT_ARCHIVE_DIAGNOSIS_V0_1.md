@@ -2,6 +2,15 @@
 
 Status: AUTHORIZED ONLY AFTER REVIEWED MAIN MERGE.
 
+Run 34422327993 returned DAILY_RECONCILIATION_REJECTED after six public
+requests. That result alone does not prove a price overlap conflict: the
+same status covers daily candle audit failure, incomplete daily coverage,
+checksum failure and other reconstruction gates. The report now adds an
+allowlisted rejection_reason without exposing arbitrary exception text or
+raw rows. This reporting change adds no request or publication authority.
+One fresh explicitly approved main diagnosis is needed to obtain a reason;
+the historical report cannot be retrospectively assigned a cause.
+
 Run 34346196907 rejected LITUSDT, 2025-12, 15m because the official monthly
 archive had 2,906 rows and one 70-bar gap. This appendix authorizes one fresh
 manual GitHub Actions diagnosis against only that monthly archive and the

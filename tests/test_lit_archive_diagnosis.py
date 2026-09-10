@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
-from crypto_autopilot.binance.vision import BinanceVisionArchiveKey
+from crypto_autopilot.binance.vision import BinanceVisionArchiveKey, BinanceVisionEvidenceError
 from crypto_autopilot.history import lit_diagnosis as diagnosis
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -87,6 +87,27 @@ class LitDiagnosisTests(unittest.TestCase):
         with patch.object(diagnosis, "EXPECTED_SHA", hashlib.sha256(self.monthly).hexdigest()):
             unavailable = diagnosis.diagnose(self.reader())
         self.assertEqual(unavailable["status"], "DAILY_ARCHIVE_UNAVAILABLE")
+
+    def test_rejection_reasons_are_allowlisted_and_never_expose_exception_text(self):
+        cases = list(diagnosis.RECONCILIATION_REASONS.items()) + [
+            ("Binance Vision kline audit failed: untrusted detail", "DAILY_CANDLE_AUDIT_FAILED"),
+            ("CHECKSUM filename mismatch: untrusted detail", "CHECKSUM_VALIDATION_FAILED"),
+            ("Binance Vision archive SHA-256 mismatch: untrusted detail", "CHECKSUM_VALIDATION_FAILED"),
+            ("untrusted remote text with fake-secret-value", "ARCHIVE_VALIDATION_FAILED_UNCLASSIFIED"),
+        ]
+        for message, reason in cases:
+            with self.subTest(reason=reason), \
+                    patch.object(diagnosis, "EXPECTED_SHA", hashlib.sha256(self.monthly).hexdigest()), \
+                    patch.object(diagnosis, "reconcile_monthly_from_daily",
+                                 side_effect=BinanceVisionEvidenceError(message)):
+                reader = self.reader()
+                report = diagnosis.diagnose(reader)
+            self.assertEqual(report["status"], "DAILY_RECONCILIATION_REJECTED")
+            self.assertEqual(report["rejection_reason"], reason)
+            self.assertNotIn(message, json.dumps(report))
+            self.assertNotIn("candidate_sha256", report)
+            self.assertFalse(report["production_repair_performed"])
+            self.assertEqual(len(reader.calls), 6)
 
     def test_authority_rejects_other_event_ref_rerun_and_expiry(self):
         diagnosis.load_authority(ROOT, ENV, NOW)
