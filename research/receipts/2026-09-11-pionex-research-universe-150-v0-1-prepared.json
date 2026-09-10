@@ -1,0 +1,41 @@
+{
+  "schema": "pionex-research-universe-150-v0.1-prepared",
+  "status": "PREPARED_NOT_EXECUTION_AUTHORITY",
+  "date": "2026-09-11",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "base_main_sha": "9319455c2e392b9dc3b42ba3c570d8e6321e6623",
+  "config": "config/pionex_research_universe_v0_1.json",
+  "config_sha256": "3c70bab735b76f59766cfbea9f2c1e8cbb24305359f5f877eb2782a1445b6309",
+  "user_decision": "Continue toward the 2026-09-15 simulation target with a 150+ research-market universe covering crypto, explicit meme candidates and tokenized alternative assets, while using tiered timeframes rather than downloading every intraday interval for every market.",
+  "lineage": {
+    "binance_crypto_core_100": "config/binance_usdm_detailed_history_v0_1_2.json",
+    "pionex_alternative_assets_registry": "config/pionex_alternative_assets_v0_1.json",
+    "pionex_alternative_assets_registry_sha256": "48aa707f51a50c3d1cf0db63eb1eb41989a8441b56230c06ac894a204b2d4e18",
+    "pionex_historical_reach_pr": 258
+  },
+  "prepared_contract": {
+    "minimum_total_markets": 150,
+    "crypto_core_target": 100,
+    "meme_candidates_are_watchlist_metadata": true,
+    "all_live_quality_valid_alternative_registry_matches_retained": true,
+    "full_intraday_market_cap": 30,
+    "literal_market_cap_top_100_claimed": false,
+    "provider_requests_performed": 0
+  },
+  "authority": {
+    "synthetic_fixture_validation": true,
+    "public_pionex_requests": false,
+    "private_api": false,
+    "r2_read": false,
+    "r2_write": false,
+    "historical_materialization": false,
+    "holdout_access": false,
+    "training": false,
+    "formal_backtest_admission": false,
+    "strategy_change": false,
+    "source_switch": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
