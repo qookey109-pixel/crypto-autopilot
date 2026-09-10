@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import math
 from typing import Protocol, Sequence
 
-from ..historical import INTERVAL_MS, audit_candles
+from ..historical import INTERVAL_ALIGNMENT_OFFSET_MS, INTERVAL_MS, audit_candles
 from ..models import Candle
 
 
@@ -75,7 +75,7 @@ def _require_fixed_scope(config: dict[str, object]) -> None:
         raise ReachRejected("provider scope changed")
     if config.get("symbol") != "BTC_USDT_PERP":
         raise ReachRejected("symbol scope changed")
-    if config.get("intervals") != ["15M", "60M", "4H"]:
+    if config.get("intervals") != ["15M", "60M", "4H", "1D", "1W"]:
         raise ReachRejected("interval scope changed")
     if config.get("cutoff_exclusive_utc") != "2026-08-28T00:00:00Z":
         raise ReachRejected("cutoff changed or protected holdout could be crossed")
@@ -87,8 +87,16 @@ def _require_fixed_scope(config: dict[str, object]) -> None:
         raise ReachRejected("page budget changed")
     if config.get("boundary_probe_limit") != 1:
         raise ReachRejected("boundary probe changed")
-    if config.get("maximum_requests") != 63:
+    if config.get("maximum_requests") != 105:
         raise ReachRejected("request budget changed")
+    if config.get("derived_timeframes") != {
+        "1Y": {
+            "provider_native": False,
+            "source_interval": "1D",
+            "derivation_authorized_by_this_stage": False,
+        }
+    }:
+        raise ReachRejected("derived timeframe policy changed")
 
     authority = config.get("authority")
     if not isinstance(authority, dict):
@@ -123,6 +131,14 @@ def _require_fixed_scope(config: dict[str, object]) -> None:
         raise ReachRejected("candle persistence not allowed")
     if output.get("r2_read") is not False or output.get("r2_write") is not False:
         raise ReachRejected("R2 access not allowed")
+
+
+def _last_aligned_candle_before(cutoff: int, interval: str) -> int:
+    step = INTERVAL_MS[interval]
+    offset = INTERVAL_ALIGNMENT_OFFSET_MS.get(interval, 0)
+    if cutoff <= offset:
+        raise ReachRejected("cutoff precedes interval alignment origin")
+    return offset + ((cutoff - 1 - offset) // step) * step
 
 
 def _validate_page(
@@ -163,7 +179,7 @@ def discover_interval(
         raise ReachRejected("interval not authorized")
     step = INTERVAL_MS[interval]
     cutoff = stamp(str(config["cutoff_exclusive_utc"]))
-    cursor = cutoff - step
+    cursor = _last_aligned_candle_before(cutoff, interval)
     page_limit = int(config["page_limit"])
     max_records = int(config["documented_max_records_per_interval"])
     max_pages = int(config["max_pages_per_interval"])
@@ -280,6 +296,7 @@ def discover_all(
         "cutoff_exclusive_utc": config["cutoff_exclusive_utc"],
         "requests": progress["requests"],
         "intervals": [item.payload() for item in observations],
+        "derived_timeframes": config["derived_timeframes"],
         "raw_provider_payloads_persisted": False,
         "candles_persisted": False,
         "r2_accessed": False,
