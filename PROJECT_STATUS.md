@@ -31,6 +31,13 @@ Repository branch `main` is the live formal authority and is intentionally not s
 - Authority: `config/pionex_historical_research_execution_v0_1.json`; receipt:
   `research/receipts/2026-09-10-pionex-historical-research-execution-v0-1-authority.json`;
   contract: `docs/PIONEX_HISTORICAL_RESEARCH_EXECUTION_V0_1.md`.
+- The first authorized execution, GitHub Actions run `34446134119` on main
+  commit `9270e81`, failed closed before any R2 write because Pionex rejected
+  the host-derived `endTime` (`MARKET_INVALID_TIME`). Its secret-free 365-byte
+  report records `holdout_accessed=false`, `live_trading_authorized=false` and
+  `r2_writes_performed=false`. The bounded correction derives the cursor from
+  a no-`endTime` public K-line response and discards its newest candle; it does
+  not add a provider, retry loop, schedule or any new authority.
 - It does not authorize an automatic schedule, 150-market materialization,
   historical-universe admission, backtests, training, source switching,
   holdout access, private APIs, trade plans, real-money orders or live trading.

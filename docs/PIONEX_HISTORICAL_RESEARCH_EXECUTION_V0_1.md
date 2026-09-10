@@ -17,8 +17,11 @@ or a backtest dataset already exists.
    before any Pionex request.
 3. If the SHA-bound pilot latest pointer already exists, return
    `ALREADY_COMPLETE` without a provider request.
-4. Fetch only the configured public K-line endpoint, paginating backwards at
-   no more than three requests per second.
+4. Bootstrap each interval with the configured public K-line endpoint and no
+   optional `endTime`, discard its newest candle, then use the preceding
+   provider-native timestamp as the backwards-pagination cursor at no more
+   than three requests per second. This avoids relying on a host-clock value
+   while excluding the potentially in-progress candle.
 5. Reject duplicate, misaligned, invalid or gapped intervals before any write.
 6. Build zstd Parquet; reject a run larger than the declared reservation.
 7. Recheck whole-bucket headroom, publish immutable interval objects and
