@@ -16,6 +16,25 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 **GITHUB AUTOMATIC RESEARCH OPERATIONS V0.1 AUTHORIZED ON PROTECTED-MAIN MERGE / RESEARCH AUTOMATION HEALTH V0.2 IS THE SINGLE COMPLETE CRON CONTROL PLANE / V0.12 SUCCESSOR METADATA WINDOW AUTHORIZED AND CURRENT / V0.10 REMAINING SCHEDULE RETIRED / V0.10 INCOMPLETE WINDOW PRESERVED AS BLOCKED EVIDENCE / V0.12 PRODUCTION STABILITY EVALUATION NOT_AUTHORIZED / CRYPTO CORE 100 V0.1.2 AUTHORIZED / PIONEX ALTERNATIVE ASSETS V0.2 AUTHORIZED / CURRENT EXECUTION OUTCOMES REQUIRE RUN EVIDENCE / CONTEXT FORWARD CAPTURE EXECUTION V0.1 AUTHORIZED MANUAL ONE-SHOT AFTER V0.12 WINDOW / CONTEXT FORWARD 4H SCHEDULE NOT_AUTHORIZED / POST-WINDOW PAPER V0.2 PREPARED WAITING FOR HOLDOUT AUTHORITY / REPLACEMENT HOLDOUT FROZEN_UNOPENED / PAPER-ONLY**
 
+### Pionex Historical Research Pilot Execution V0.1 — EFFECTIVE ONLY AFTER PROTECTED-MAIN MERGE
+
+- The prepared 150+ Pionex-native research-pool definition remains a selection
+  contract, not a materialized historical universe.
+- This separate V0.1 authority permits one cloud-hosted `BTC_USDT_PERP` public
+  K-line pilot at `15M`, `60M`, and `4H`, from maximum available provider
+  history through the run's latest complete candle. It creates measured
+  Parquet-size and continuity evidence before any 150-market materialization.
+- The trigger is manual `workflow_dispatch` only; it neither adds nor changes
+  the automatic workflow inventory. R2 whole-bucket 8 GB FREE-ONLY headroom is
+  checked before Pionex access and again before writes; immutable SHA-256
+  readback and latest-pointer-last ordering are required.
+- Authority: `config/pionex_historical_research_execution_v0_1.json`; receipt:
+  `research/receipts/2026-09-10-pionex-historical-research-execution-v0-1-authority.json`;
+  contract: `docs/PIONEX_HISTORICAL_RESEARCH_EXECUTION_V0_1.md`.
+- It does not authorize an automatic schedule, 150-market materialization,
+  historical-universe admission, backtests, training, source switching,
+  holdout access, private APIs, trade plans, real-money orders or live trading.
+
 <details>
 <summary>Historical aggregate stage markers</summary>
 

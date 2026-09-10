@@ -109,6 +109,10 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
             "OBSERVABILITY_V0_2_AUTHORIZED_AFTER_V0_10_WINDOW_HISTORY_WAITING_SEPARATE_AUTHORITY",
         )
         self.assertEqual(
+            current["pionex_historical_research_execution_state"],
+            "MANUAL_BTC_USDT_PERP_CAPACITY_PILOT_ONLY_NO_SCHEDULE",
+        )
+        self.assertEqual(
             current["paper_successor_state"],
             "PREPARED_WAITING_FOR_HOLDOUT_AUTHORITY",
         )
@@ -118,6 +122,7 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
             "pionex_alternative_assets_registry",
             "pionex_alternative_assets_catalog",
             "pionex_alternative_assets_authority",
+            "pionex_historical_research_execution",
             "paper_successor",
         ):
             self.assertTrue((ROOT / current[key]).is_file(), current[key])
