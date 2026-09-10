@@ -1,0 +1,21 @@
+{
+  "schema": "simulation-readiness-v0.3-prepared",
+  "status": "PREPARED_NOT_EXECUTION_AUTHORITY",
+  "config": "config/simulation_readiness_v0_3.json",
+  "config_sha256": "75cbaf9c1a35d057bade9dd8e301dc14723a055d25ab453b15018928d0f12fd1",
+  "base_main_sha": "9319455c2e392b9dc3b42ba3c570d8e6321e6623",
+  "p0_execution_hardening_commit": "50f180b514f7caa586c527668ee37f7b1af0647e",
+  "prepared_scope": "synthetic/offline validation of Parquet->candle->strategy->risk->paper-backtest readiness adapter only",
+  "verified_v0_2_production_data_read_performed": false,
+  "provider_requests_performed": false,
+  "r2_reads_performed": false,
+  "r2_writes_performed": false,
+  "holdout_accessed": false,
+  "formal_backtest_admission_authorized": false,
+  "trade_plan_authorized": false,
+  "real_money_order_authorized": false,
+  "live_trading_authorized": false,
+  "source_switch_authorized": false,
+  "known_full_readiness_blocker": "historical_funding_evidence_missing",
+  "note": "A future separately reviewed authority is required before reading the production V0.2 R2 sample or claiming full perpetual-simulation readiness."
+}
