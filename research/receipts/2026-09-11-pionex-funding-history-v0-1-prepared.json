@@ -1,0 +1,30 @@
+{
+  "schema": "pionex-funding-history-v0.1-prepared",
+  "status": "PREPARED_NOT_EXECUTION_AUTHORITY",
+  "config": "config/pionex_funding_history_v0_1.json",
+  "config_sha256": "9117e707203b35ef9d7420b96033cd339b97c549f03e3cdae2ecece4637b6834",
+  "base_main_sha": "9319455c2e392b9dc3b42ba3c570d8e6321e6623",
+  "source_docs": "https://www.pionex.com/docs/api-docs/futures-api/market",
+  "source_endpoint": "https://api.pionex.com/api/v1/market/fundingRates",
+  "source_docs_observed_capabilities": {
+    "historical_funding_rates": true,
+    "public_authentication_required": false,
+    "end_time_supported": true,
+    "maximum_limit": 500
+  },
+  "target_window": {
+    "symbol": "BTC_USDT_PERP",
+    "start_utc": "2026-08-01T00:00:00Z",
+    "end_exclusive_utc": "2026-08-28T00:00:00Z"
+  },
+  "production_execution_performed": false,
+  "provider_request_performed": false,
+  "r2_read_performed": false,
+  "r2_write_performed": false,
+  "holdout_accessed": false,
+  "backtest_admission_authorized": false,
+  "source_switch_authorized": false,
+  "trade_plan_authorized": false,
+  "live_trading_authorized": false,
+  "note": "Prepared source protocol only. Separate reviewed execution authority is required before any Pionex request or integration with production V0.2 sample evidence."
+}
