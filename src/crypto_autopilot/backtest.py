@@ -15,12 +15,21 @@ class BacktestConfig:
     slippage_bps: float = 2.0
     risk: RiskConfig = RiskConfig()
     conservative_same_bar_exit: bool = True
+    max_holding_minutes: int | None = None
+    kill_switch_time_ms: int | None = None
 
     def __post_init__(self) -> None:
+        numeric = (self.initial_equity_usd, self.taker_fee_bps, self.slippage_bps)
+        if not all(math.isfinite(value) for value in numeric):
+            raise ValueError("backtest financial inputs must be finite")
         if self.initial_equity_usd <= 0:
             raise ValueError("initial_equity_usd must be positive")
         if self.taker_fee_bps < 0 or self.slippage_bps < 0:
             raise ValueError("fee/slippage bps cannot be negative")
+        if self.max_holding_minutes is not None and self.max_holding_minutes <= 0:
+            raise ValueError("max_holding_minutes must be positive when set")
+        if self.kill_switch_time_ms is not None and self.kill_switch_time_ms < 0:
+            raise ValueError("kill_switch_time_ms cannot be negative")
 
 
 @dataclass(frozen=True, slots=True)
@@ -42,6 +51,8 @@ class LongTradePlan:
             raise ValueError("plan_id and symbol are required")
         if self.signal_time_ms < 0:
             raise ValueError("signal_time_ms cannot be negative")
+        if not math.isfinite(self.stop_price) or not math.isfinite(self.target_price):
+            raise ValueError("stop_price and target_price must be finite")
         if self.stop_price <= 0 or self.target_price <= 0:
             raise ValueError("stop_price and target_price must be positive")
         if self.target_price <= self.stop_price:
@@ -158,8 +169,23 @@ def _exit_for_long(
     stop_price: float,
     target_price: float,
     conservative_same_bar_exit: bool,
+    max_holding_minutes: int | None,
+    kill_switch_time_ms: int | None,
 ) -> tuple[int, float, str]:
+    entry_time_ms = candles[entry_index].time_ms
+    max_holding_ms = (
+        None if max_holding_minutes is None else max_holding_minutes * 60_000
+    )
     for candle in candles[entry_index:]:
+        if kill_switch_time_ms is not None and candle.time_ms >= kill_switch_time_ms:
+            return candle.time_ms, candle.open, "kill_switch"
+
+        # A protective stop is a marketable exit once crossed. If the market
+        # opens through the stop, the stop price was not executable; model the
+        # first available bar price rather than understating loss.
+        if candle.open <= stop_price:
+            return candle.time_ms, candle.open, "stop_gap"
+
         stop_hit = candle.low <= stop_price
         target_hit = candle.high >= target_price
         if stop_hit and target_hit:
@@ -170,6 +196,10 @@ def _exit_for_long(
             return candle.time_ms, stop_price, "stop"
         if target_hit:
             return candle.time_ms, target_price, "target"
+
+        if max_holding_ms is not None and candle.time_ms - entry_time_ms >= max_holding_ms:
+            return candle.time_ms, candle.close, "max_holding_time"
+
     final = candles[-1]
     return final.time_ms, final.close, "end_of_data"
 
@@ -230,8 +260,7 @@ def run_long_backtest(
     """Run a deterministic, paper-only LONG backtest.
 
     V0.1 intentionally supports one portfolio position at a time. Signals are
-    treated as outputs of the existing strategy/SState boundary; this module
-    does not reimplement SState or indicator production.
+    strategy outputs; this engine owns causal fill, risk, costs and exit rules.
     """
 
     if len({plan.plan_id for plan in plans}) != len(plans):
@@ -244,10 +273,14 @@ def run_long_backtest(
         prepared[symbol] = candles
 
     funding_by_symbol: dict[str, list[FundingPoint]] = {}
-    for point in sorted(funding_points, key=lambda item: (item.time_ms, item.symbol, item.rate)):
+    for point in sorted(
+        funding_points, key=lambda item: (item.time_ms, item.symbol, item.rate)
+    ):
         funding_by_symbol.setdefault(point.symbol, []).append(point)
 
-    ordered_plans = sorted(plans, key=lambda item: (item.signal_time_ms, item.symbol, item.plan_id))
+    ordered_plans = sorted(
+        plans, key=lambda item: (item.signal_time_ms, item.symbol, item.plan_id)
+    )
     equity = config.initial_equity_usd
     equity_curve = [equity]
     trades: list[BacktestTrade] = []
@@ -262,35 +295,90 @@ def run_long_backtest(
         nonlocal sequence
         sequence += 1
         normalized = tuple(sorted((key, str(value)) for key, value in details.items()))
-        events.append(BacktestEvent(sequence, time_ms, kind, plan.symbol, plan.plan_id, normalized))
+        events.append(
+            BacktestEvent(
+                sequence,
+                time_ms,
+                kind,
+                plan.symbol,
+                plan.plan_id,
+                normalized,
+            )
+        )
 
     fee_rate = config.taker_fee_bps / 10_000.0
     slip_rate = config.slippage_bps / 10_000.0
 
     for plan in ordered_plans:
         emit(plan.signal_time_ms, "STRATEGY_SIGNAL", plan)
+        if (
+            config.kill_switch_time_ms is not None
+            and plan.signal_time_ms >= config.kill_switch_time_ms
+        ):
+            rejected.append((plan.plan_id, "kill_switch_active"))
+            emit(
+                plan.signal_time_ms,
+                "PLAN_REJECTED",
+                plan,
+                reason="kill_switch_active",
+            )
+            continue
+
         candles = prepared.get(plan.symbol)
         if not candles:
             rejected.append((plan.plan_id, "missing_market_data"))
-            emit(plan.signal_time_ms, "PLAN_REJECTED", plan, reason="missing_market_data")
+            emit(
+                plan.signal_time_ms,
+                "PLAN_REJECTED",
+                plan,
+                reason="missing_market_data",
+            )
             continue
         if plan.signal_time_ms < portfolio_available_after_ms:
             rejected.append((plan.plan_id, "position_overlap"))
-            emit(plan.signal_time_ms, "PLAN_REJECTED", plan, reason="position_overlap")
+            emit(
+                plan.signal_time_ms,
+                "PLAN_REJECTED",
+                plan,
+                reason="position_overlap",
+            )
             continue
 
         entry_index = _next_entry_index(candles, plan.signal_time_ms)
         if entry_index is None:
             rejected.append((plan.plan_id, "no_future_entry_bar"))
-            emit(plan.signal_time_ms, "PLAN_REJECTED", plan, reason="no_future_entry_bar")
+            emit(
+                plan.signal_time_ms,
+                "PLAN_REJECTED",
+                plan,
+                reason="no_future_entry_bar",
+            )
             continue
 
         entry_candle = candles[entry_index]
+        if (
+            config.kill_switch_time_ms is not None
+            and entry_candle.time_ms >= config.kill_switch_time_ms
+        ):
+            rejected.append((plan.plan_id, "kill_switch_active"))
+            emit(
+                entry_candle.time_ms,
+                "PLAN_REJECTED",
+                plan,
+                reason="kill_switch_active",
+            )
+            continue
+
         raw_entry = entry_candle.open
         entry_price = raw_entry * (1.0 + slip_rate)
         if plan.target_price <= entry_price:
             rejected.append((plan.plan_id, "target_not_above_entry"))
-            emit(entry_candle.time_ms, "PLAN_REJECTED", plan, reason="target_not_above_entry")
+            emit(
+                entry_candle.time_ms,
+                "PLAN_REJECTED",
+                plan,
+                reason="target_not_above_entry",
+            )
             continue
 
         entry_day = _day_key(entry_candle.time_ms)
@@ -315,10 +403,22 @@ def run_long_backtest(
             notional_usd=risk.notional_usd,
             required_leverage=risk.required_leverage,
         )
-        emit(entry_candle.time_ms, "ORDER_INTENT", plan, side="LONG", notional_usd=risk.notional_usd)
+        emit(
+            entry_candle.time_ms,
+            "ORDER_INTENT",
+            plan,
+            side="LONG",
+            notional_usd=risk.notional_usd,
+        )
 
         quantity = risk.notional_usd / entry_price
-        emit(entry_candle.time_ms, "FILL_ENTRY", plan, price=_r8(entry_price), quantity=_r8(quantity))
+        emit(
+            entry_candle.time_ms,
+            "FILL_ENTRY",
+            plan,
+            price=_r8(entry_price),
+            quantity=_r8(quantity),
+        )
         emit(entry_candle.time_ms, "POSITION_OPEN", plan)
         new_trades_by_day[entry_day] = new_trades_by_day.get(entry_day, 0) + 1
 
@@ -328,6 +428,8 @@ def run_long_backtest(
             stop_price=plan.stop_price,
             target_price=plan.target_price,
             conservative_same_bar_exit=config.conservative_same_bar_exit,
+            max_holding_minutes=config.max_holding_minutes,
+            kill_switch_time_ms=config.kill_switch_time_ms,
         )
         exit_price = raw_exit * (1.0 - slip_rate)
         gross_pnl = quantity * (exit_price - entry_price)
@@ -339,7 +441,9 @@ def run_long_backtest(
             for point in funding_by_symbol.get(plan.symbol, [])
             if entry_candle.time_ms <= point.time_ms <= exit_time
         )
-        slippage_cost = quantity * ((entry_price - raw_entry) + (raw_exit - exit_price))
+        slippage_cost = quantity * (
+            (entry_price - raw_entry) + (raw_exit - exit_price)
+        )
         net_pnl = gross_pnl - fees - funding
         r_multiple = net_pnl / risk.risk_usd if risk.risk_usd else 0.0
 
@@ -368,12 +472,28 @@ def run_long_backtest(
         equity = _r8(equity + trade.net_pnl_usd)
         equity_curve.append(equity)
         exit_day = _day_key(exit_time)
-        realized_daily_r[exit_day] = realized_daily_r.get(exit_day, 0.0) + trade.r_multiple
+        realized_daily_r[exit_day] = (
+            realized_daily_r.get(exit_day, 0.0) + trade.r_multiple
+        )
         portfolio_available_after_ms = exit_time
 
-        emit(exit_time, "FILL_EXIT", plan, price=trade.exit_price, reason=exit_reason)
+        emit(
+            exit_time,
+            "FILL_EXIT",
+            plan,
+            price=trade.exit_price,
+            reason=exit_reason,
+        )
         emit(exit_time, "POSITION_CLOSED", plan)
-        emit(exit_time, "PNL_REALIZED", plan, net_pnl_usd=trade.net_pnl_usd, r_multiple=trade.r_multiple)
+        emit(
+            exit_time,
+            "PNL_REALIZED",
+            plan,
+            net_pnl_usd=trade.net_pnl_usd,
+            r_multiple=trade.r_multiple,
+        )
+        if exit_reason == "kill_switch":
+            emit(exit_time, "KILL_SWITCH_TRIGGERED", plan)
 
     metrics = _metrics(
         initial_equity=config.initial_equity_usd,
