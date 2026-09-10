@@ -19,7 +19,7 @@ from crypto_autopilot.history.pionex_reach_v0_3 import (
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "config/pionex_historical_reach_v0_3.json"
 RECEIPT = ROOT / "research/receipts/2026-09-11-pionex-historical-reach-v0-3-authority.json"
-CONFIG_SHA256 = "02a95c0b20fa9f39d47a184ace1cb05d29c5aa593d9d6b64bffced5a69563b97"
+CONFIG_SHA256 = "ba7ffaaed06be43fd48348529282d078a7ffcb267957832075097cb5fa6648af"
 
 
 def digest(payload: bytes) -> str:
@@ -44,6 +44,8 @@ def load_authority() -> dict[str, object]:
         raise ReachRejected("V0.3 config/receipt status mismatch")
     if receipt.get("execution_performed_by_this_receipt") is not False:
         raise ReachRejected("authority receipt must not claim execution")
+    if receipt.get("yearly_derivation_authorized") is not False:
+        raise ReachRejected("V0.3 must not authorize yearly derivation")
     _require_fixed_scope(config)
     require_execution_window(config)
     return config
@@ -72,6 +74,7 @@ def main() -> int:
         "r2_accessed": False,
         "holdout_accessed": False,
         "materialization_authorized": False,
+        "yearly_derivation_authorized": False,
         "formal_backtest_admission_authorized": False,
         "real_money_orders_authorized": False,
         "live_trading_authorized": False,
