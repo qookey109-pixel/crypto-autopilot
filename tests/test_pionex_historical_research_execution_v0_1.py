@@ -85,3 +85,12 @@ def test_runner_requires_headroom_before_pionex_history_and_writes_pointer_last(
     assert "PIONEX_HISTORICAL_RESEARCH_PILOT_ALREADY_COMPLETE" in text
     assert text.index("receipt_key, manifest_key") < text.index("latest = {")
     assert "get_bytes_verified(storage[\"latest_pointer_key\"]" in text
+
+
+def test_runner_bootstraps_a_provider_native_closed_candle_cursor() -> None:
+    text = SCRIPT.read_text()
+    assert "def latest_complete_cursor(" in text
+    assert "end_time_ms=None" in text
+    assert "return ordered[-2].time_ms" in text
+    assert "end_ms = latest_complete_cursor(" in text
+    assert '"cursor_bootstrap_requests": 1' in text

@@ -116,6 +116,28 @@ def existing_complete(store: R2Store, config: dict[str, Any]) -> dict[str, Any] 
     return latest
 
 
+def latest_complete_cursor(
+    client: PionexPublicClient, *, symbol: str, interval: str, page_limit: int
+) -> int:
+    """Derive a conservative, provider-native end cursor without host-clock input.
+
+    Pionex documents ``endTime`` as optional.  Bootstrap with it omitted, then
+    discard the newest returned candle so the subsequent bounded backfill uses
+    an already-observed provider timestamp and cannot include an in-progress
+    bar.  This is one additional public K-line request, not a retry or a
+    second provider path.
+    """
+    page = client.get_klines(symbol, interval, limit=page_limit, end_time_ms=None)
+    if len(page) < 2:
+        raise PilotAuthorityError(
+            f"Pionex returned fewer than two K-lines for conservative cursor: {interval}"
+        )
+    ordered = sorted(page, key=lambda candle: candle.time_ms)
+    if ordered[-2].time_ms >= ordered[-1].time_ms:
+        raise PilotAuthorityError(f"Pionex cursor bootstrap is not strictly ordered: {interval}")
+    return ordered[-2].time_ms
+
+
 def run_pilot(config: dict[str, Any], store: R2Store, run_id: str, observed_at: datetime) -> dict[str, Any]:
     if not SAFE_RUN_ID.fullmatch(run_id):
         raise PilotAuthorityError("run-id must be a safe 1-96 character key component")
@@ -128,9 +150,14 @@ def run_pilot(config: dict[str, Any], store: R2Store, run_id: str, observed_at: 
         return {"status": "ALREADY_COMPLETE", "stage": "PIONEX_HISTORICAL_RESEARCH_PILOT_ALREADY_COMPLETE", "provider_requests_performed": 0, "r2_writes_performed": False, "existing_run_id": prior["run_id"], "holdout_accessed": False, "live_trading_authorized": False}
 
     client = PionexPublicClient(requests_per_second=float(config["provider"]["requests_per_second_maximum"]))
-    end_ms = int(observed_at.timestamp() * 1000)
     artifacts: list[tuple[str, bytes, dict[str, Any]]] = []
     for interval in pilot["intervals"]:
+        end_ms = latest_complete_cursor(
+            client,
+            symbol=pilot["symbol"],
+            interval=interval,
+            page_limit=int(pilot["page_limit"]),
+        )
         result = backfill_klines(client, pilot["symbol"], interval, start_time_ms=0, end_time_ms=end_ms, page_limit=int(pilot["page_limit"]), max_pages=int(pilot["maximum_pages_per_interval"]))
         if not result.candles or not result.audit.ok:
             raise PilotAuthorityError(f"Pionex interval rejected before write: {interval}")
@@ -138,7 +165,7 @@ def run_pilot(config: dict[str, Any], store: R2Store, run_id: str, observed_at: 
         if parquet_to_candles(parquet.payload) != list(result.candles):
             raise PilotAuthorityError(f"Parquet decode mismatch: {interval}")
         key = f"{storage['provider_namespace'].rstrip('/')}/run={run_id}/{pilot['symbol']}/{interval}.parquet"
-        artifacts.append((key, parquet.payload, {"interval": interval, "rows": parquet.rows, "first_time_ms": parquet.first_time_ms, "last_time_ms": parquet.last_time_ms, "parquet_sha256": parquet.sha256, "parquet_bytes": len(parquet.payload), "pages_fetched": result.pages_fetched, "audit": asdict(result.audit)}))
+        artifacts.append((key, parquet.payload, {"interval": interval, "rows": parquet.rows, "first_time_ms": parquet.first_time_ms, "last_time_ms": parquet.last_time_ms, "parquet_sha256": parquet.sha256, "parquet_bytes": len(parquet.payload), "pages_fetched": result.pages_fetched + 1, "cursor_bootstrap_requests": 1, "end_time_ms": end_ms, "audit": asdict(result.audit)}))
 
     receipt = {"schema": "pionex-historical-research-pilot-receipt-v0.1", "status": "PASS", "provider": "pionex_public_futures", "symbol": pilot["symbol"], "run_id": run_id, "observed_at_utc": utc_text(observed_at), "intervals": [details for _, _, details in artifacts], "provider_splicing_performed": False, "silent_interpolation_performed": False, "holdout_accessed": False, "historical_universe_membership_authorized": False, "backtest_admission_authorized": False, "training_authorized": False, "source_switch_authorized": False, "binance_relabel_as_pionex_authorized": False, "trade_plan_authorized": False, "live_trading_authorized": False}
     receipt_payload = canonical_json_bytes(receipt)
