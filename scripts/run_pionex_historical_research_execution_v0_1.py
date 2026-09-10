@@ -27,6 +27,34 @@ class PilotAuthorityError(RuntimeError):
     pass
 
 
+class PilotKlineDiagnostics:
+    """Record public request context without retaining candles or raw errors."""
+
+    def __init__(self, client: PionexPublicClient) -> None:
+        self.client = client
+        self.calls: dict[str, int] = {}
+        self.rows: dict[str, int] = {}
+
+    def get_klines(self, symbol, interval, *, limit=500, end_time_ms=None):
+        attempt = self.calls.get(interval, 0) + 1
+        self.calls[interval] = attempt
+        try:
+            page = self.client.get_klines(
+                symbol, interval, limit=limit, end_time_ms=end_time_ms
+            )
+        except Exception as exc:
+            code = "MARKET_INVALID_TIME" if "MARKET_INVALID_TIME" in str(exc) else "PROVIDER_REQUEST_FAILED"
+            raise PilotAuthorityError(
+                f"{code}: interval={interval}, request={attempt}, "
+                f"phase={'bootstrap' if end_time_ms is None else 'pagination'}, "
+                f"end_time_ms={end_time_ms}, limit={limit}, "
+                f"returned_rows_before_failure={self.rows.get(interval, 0)}; "
+                "provider boundary unverified; publication blocked"
+            ) from None
+        self.rows[interval] = self.rows.get(interval, 0) + len(page)
+        return page
+
+
 def canonical_json_bytes(value: dict[str, Any]) -> bytes:
     return (json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
 
@@ -150,6 +178,7 @@ def run_pilot(config: dict[str, Any], store: R2Store, run_id: str, observed_at: 
         return {"status": "ALREADY_COMPLETE", "stage": "PIONEX_HISTORICAL_RESEARCH_PILOT_ALREADY_COMPLETE", "provider_requests_performed": 0, "r2_writes_performed": False, "existing_run_id": prior["run_id"], "holdout_accessed": False, "live_trading_authorized": False}
 
     client = PionexPublicClient(requests_per_second=float(config["provider"]["requests_per_second_maximum"]))
+    client = PilotKlineDiagnostics(client)
     artifacts: list[tuple[str, bytes, dict[str, Any]]] = []
     for interval in pilot["intervals"]:
         end_ms = latest_complete_cursor(
