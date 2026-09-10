@@ -23,6 +23,19 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 </details>
 
+### LIT Archive Diagnosis V0.1 — EFFECTIVE ONLY AFTER REVIEWED MAIN MERGE
+
+- Run 34346196907 rejected LITUSDT, December 2025, 15m: one 70-bar gap and
+  2,906 monthly rows. This is a quality rejection, not a repair conclusion.
+- The bounded `diagnose-lit` manual mode reads only the named official monthly
+  archive and needed daily archives. Config:
+  `config/lit_archive_diagnosis_v0_1.json`; receipt:
+  `research/receipts/2026-09-09-lit-archive-diagnosis-v0-1-authority.json`.
+- It has no R2/secret binding, no raw artifact and no repair authority. A
+  candidate requires a separate publication authority; current history
+  scheduling and all other authority remains unchanged. Contract:
+  `docs/LIT_ARCHIVE_DIAGNOSIS_V0_1.md`.
+
 ### History Cadence V0.1 — EFFECTIVE ONLY AFTER REVIEWED MAIN MERGE
 
 - User requested faster online backfill on 2026-09-09. The existing serialized

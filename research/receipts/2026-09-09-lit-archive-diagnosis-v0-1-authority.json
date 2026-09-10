@@ -1,0 +1,10 @@
+{
+  "schema": "lit-archive-diagnosis-authority-v0.1",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "config": "config/lit_archive_diagnosis_v0_1.json",
+  "config_sha256": "8b4082c19711b513d18aa4ccc042ec80807a925eb0772d2ce1f28aa20a958004",
+  "public_archive_reads_authorized": true,
+  "aggregate_github_artifact_authorized": true,
+  "r2_access_authorized": false,
+  "production_repair_authorized": false
+}
