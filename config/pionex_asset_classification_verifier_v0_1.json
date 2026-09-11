@@ -1,0 +1,66 @@
+{
+  "schema": "pionex-asset-classification-verifier-v0.1",
+  "version": "0.1.0",
+  "status": "PREPARED_NOT_EXECUTION_AUTHORITY",
+  "purpose": "Verify selected Pionex research-universe asset classes without treating the universe selector's fallback crypto label as evidence.",
+  "inputs": {
+    "universe_report_schema": "pionex-research-universe-run-report-v0.1",
+    "universe_provider": "pionex_public_futures",
+    "alternative_registry": "config/pionex_alternative_assets_v0_1.json",
+    "alternative_registry_sha256": "48aa707f51a50c3d1cf0db63eb1eb41989a8441b56230c06ac894a204b2d4e18",
+    "crypto_registry_provider": "coinpaprika",
+    "crypto_registry_endpoint": "https://api.coinpaprika.com/v1/coins",
+    "crypto_registry_authentication_required": false,
+    "crypto_registry_expected_types": [
+      "coin",
+      "token"
+    ]
+  },
+  "classification_policy": {
+    "alternative_registry_match": "VERIFIED_ALTERNATIVE",
+    "unique_active_coinpaprika_symbol_match": "VERIFIED_CRYPTO",
+    "zero_active_coinpaprika_symbol_matches": "UNRESOLVED",
+    "multiple_active_coinpaprika_symbol_matches": "UNRESOLVED",
+    "inactive_coinpaprika_entries_are_evidence": false,
+    "universe_fallback_crypto_label_is_evidence": false,
+    "alternative_registry_precedence_over_crypto_registry": true,
+    "symbol_matching_case": "ASCII_UPPERCASE_EXACT",
+    "partial_classification_promotes_full_readiness": false
+  },
+  "prepared_execution_shape": {
+    "provider_request_count": 1,
+    "automatic_retries": 0,
+    "metadata_only": true,
+    "raw_provider_payload_persistence_authorized": false,
+    "r2_read_authorized": false,
+    "r2_write_authorized": false,
+    "github_actions_main_only_if_later_authorized": true,
+    "workflow_dispatch_only_if_later_authorized": true,
+    "workflow_included_by_this_stage": false
+  },
+  "output_contract": {
+    "authority": false,
+    "include_per_market_classification": true,
+    "include_unresolved_symbols": true,
+    "include_coinpaprika_payload_sha256": true,
+    "all_selected_markets_verified_required_to_clear_blocker": true
+  },
+  "authority": {
+    "fixture_validation": true,
+    "provider_fetch_authorized": false,
+    "workflow_dispatch_authorized": false,
+    "automatic_schedule_authorized": false,
+    "r2_read_authorized": false,
+    "r2_write_authorized": false,
+    "universe_membership_change_authorized": false,
+    "historical_materialization_authorized": false,
+    "holdout_access_authorized": false,
+    "training_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "strategy_change_authorized": false,
+    "source_switch_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
