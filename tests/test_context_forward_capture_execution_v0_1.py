@@ -10,6 +10,7 @@ from crypto_autopilot.providers.context_forward_capture_execution import (
     ContextForwardExecutionError,
     canonical_json_bytes,
     require_execution_window,
+    require_protected_main_ref,
     sha256_bytes,
     validate_execution_config,
     validate_existing_one_shot_state,
@@ -32,6 +33,13 @@ class ContextForwardCaptureExecutionV01Tests(unittest.TestCase):
 
     def test_execution_authority_validates(self) -> None:
         validate_execution_config(self.config, prepared_capture_bytes=self.prepared_bytes)
+
+    def test_execution_requires_protected_main_ref(self) -> None:
+        require_protected_main_ref("refs/heads/main")
+        for ref in (None, "", "refs/heads/feature/test", "refs/tags/v0.1"):
+            with self.subTest(ref=ref):
+                with self.assertRaisesRegex(ContextForwardExecutionError, "protected main"):
+                    require_protected_main_ref(ref)
 
     def test_execution_window_is_strictly_post_v012(self) -> None:
         with self.assertRaisesRegex(ContextForwardExecutionError, "before not_before"):
@@ -74,11 +82,12 @@ class ContextForwardCaptureExecutionV01Tests(unittest.TestCase):
         with self.assertRaisesRegex(ContextForwardExecutionError, "receipt exists without snapshot"):
             validate_existing_one_shot_state(snapshot_payload=None, receipt_payload=receipt)
 
-    def test_workflow_is_manual_only_and_has_no_cron(self) -> None:
+    def test_workflow_is_manual_only_and_main_gated(self) -> None:
         workflow = WORKFLOW.read_text(encoding="utf-8")
         self.assertIn("workflow_dispatch:", workflow)
         self.assertNotIn("schedule:", workflow)
         self.assertNotIn("cron:", workflow)
+        self.assertIn("github.ref == 'refs/heads/main'", workflow)
         self.assertIn("context_forward_capture_execution_v0_1.json", workflow)
 
     def test_no_4h_schedule_or_downstream_trading_authority(self) -> None:

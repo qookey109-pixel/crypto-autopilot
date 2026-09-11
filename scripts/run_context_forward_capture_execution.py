@@ -16,6 +16,7 @@ from crypto_autopilot.providers.context_forward_capture_execution import (
     ContextForwardExecutionError,
     canonical_json_bytes,
     require_execution_window,
+    require_protected_main_ref,
     sha256_bytes,
     validate_execution_config,
     validate_existing_one_shot_state,
@@ -102,6 +103,8 @@ def _write_report(path: Path, report: dict[str, Any]) -> None:
 
 
 def run(*, config_path: Path, prepared_path: Path, source_lineage_path: Path, output: Path) -> int:
+    require_protected_main_ref(os.environ.get("GITHUB_REF"))
+
     config_bytes = config_path.read_bytes()
     prepared_bytes = prepared_path.read_bytes()
     source_lineage_bytes = source_lineage_path.read_bytes()

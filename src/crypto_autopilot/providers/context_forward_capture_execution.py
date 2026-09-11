@@ -10,6 +10,13 @@ class ContextForwardExecutionError(ValueError):
     """Raised when Context Forward Capture Execution V0.1 violates authority."""
 
 
+def require_protected_main_ref(github_ref: str | None) -> None:
+    if github_ref != "refs/heads/main":
+        raise ContextForwardExecutionError(
+            "execution is authorized only from protected main (refs/heads/main)"
+        )
+
+
 def git_blob_sha(payload: bytes) -> str:
     header = f"blob {len(payload)}\0".encode("utf-8")
     return hashlib.sha1(header + payload).hexdigest()  # noqa: S324 - Git object identity
