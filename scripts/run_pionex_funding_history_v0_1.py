@@ -20,7 +20,7 @@ PROTOCOL = ROOT / "config/pionex_funding_history_v0_1.json"
 EXEC_CONFIG = ROOT / "config/pionex_funding_history_execution_v0_1.json"
 RECEIPT = ROOT / "research/receipts/2026-09-11-pionex-funding-history-execution-v0-1-authority.json"
 PROTOCOL_SHA256 = "9117e707203b35ef9d7420b96033cd339b97c549f03e3cdae2ecece4637b6834"
-EXEC_CONFIG_SHA256 = "914e3a8a49d378a0357598ff2e40e801da8496aeaa1b2a915584140ecf532b61"
+EXEC_CONFIG_SHA256 = "d2cdafc5900573eb7d9971b7e3d7b9e5e34f50d16a510b56dcd7e0512b5e3315"
 
 
 def digest(payload: bytes) -> str:
@@ -76,6 +76,8 @@ def load_authority(now: datetime | None = None) -> tuple[dict, dict]:
     stop = stamp(execution["execution"]["stop_exclusive_utc"])
     if not start <= current < stop:
         raise PionexFundingHistoryRejected("execution window closed")
+    if execution["execution"].get("automatic_retries") != 0:
+        raise PionexFundingHistoryRejected("automatic retries changed")
     return protocol, execution
 
 
@@ -112,8 +114,8 @@ def main() -> int:
         require_github_main_dispatch()
         protocol, execution = load_authority()
         client = PionexPublicClient(
-            timeout_seconds=15.0,
-            requests_per_second=3.0,
+            timeout_seconds=float(execution["execution"]["request_timeout_seconds"]),
+            requests_per_second=float(execution["execution"]["requests_per_second"]),
         )
         result = collect_bounded_funding_history(protocol, client)
         report = {
