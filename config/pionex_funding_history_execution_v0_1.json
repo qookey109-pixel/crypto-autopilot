@@ -1,0 +1,41 @@
+{
+  "version": "0.1.0",
+  "status": "AUTHORIZED_AFTER_PROTECTED_MAIN_MERGE_AWAITING_WORKFLOW_WIRING",
+  "purpose": "Authorize one bounded public Pionex funding-history capture for the exact BTC V0.2 capacity-sample window after the prepared funding protocol is merged, while keeping R2, holdout, training and trading disabled.",
+  "protocol": {
+    "config": "config/pionex_funding_history_v0_1.json",
+    "config_sha256": "9117e707203b35ef9d7420b96033cd339b97c549f03e3cdae2ecece4637b6834"
+  },
+  "execution": {
+    "not_before_utc": "2026-09-11T00:00:00Z",
+    "stop_exclusive_utc": "2026-09-16T00:00:00Z",
+    "github_actions_main_only": true,
+    "workflow_dispatch_only": true,
+    "accepted_run_attempt": 1,
+    "automatic_retries": 0,
+    "workflow_wiring_included_by_this_stage": false,
+    "secret_free_artifact_retention_days": 90
+  },
+  "output": {
+    "include_normalized_funding_observations": true,
+    "persist_raw_provider_payloads": false,
+    "r2_read": false,
+    "r2_write": false,
+    "api_key_required": false
+  },
+  "authority": {
+    "public_pionex_funding_reads_after_merge": true,
+    "private_api": false,
+    "r2_read": false,
+    "r2_write": false,
+    "holdout_access": false,
+    "training": false,
+    "formal_backtest_admission": false,
+    "simulation_data_admission": false,
+    "strategy_change": false,
+    "source_switch": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
