@@ -1,0 +1,54 @@
+{
+  "version": "0.1.0",
+  "status": "AUTHORIZED_AFTER_PROTECTED_MAIN_MERGE_AWAITING_WORKFLOW_WIRING",
+  "provider": "pionex_public_futures",
+  "purpose": "Authorize one bounded public Pionex market snapshot for the 150+ research-universe selector after the selector contract is merged, while keeping R2, holdout, training and trading disabled.",
+  "selection_contract": {
+    "config": "config/pionex_research_universe_v0_1.json",
+    "config_sha256": "3c70bab735b76f59766cfbea9f2c1e8cbb24305359f5f877eb2782a1445b6309",
+    "alternative_registry": "config/pionex_alternative_assets_v0_1.json",
+    "alternative_registry_sha256": "48aa707f51a50c3d1cf0db63eb1eb41989a8441b56230c06ac894a204b2d4e18"
+  },
+  "execution": {
+    "not_before_utc": "2026-09-10T19:00:00Z",
+    "stop_exclusive_utc": "2026-09-16T00:00:00Z",
+    "provider_request_count_exact": 3,
+    "endpoint_order": [
+      "/api/v1/common/symbols?type=PERP&status=TRADING",
+      "/api/v1/market/tickers?type=PERP",
+      "/api/v1/market/bookTickers?type=PERP"
+    ],
+    "requests_per_second": 3,
+    "request_timeout_seconds": 15,
+    "automatic_retries": 0,
+    "github_actions_main_only": true,
+    "workflow_dispatch_only": true,
+    "accepted_run_attempt": 1,
+    "workflow_wiring_included_by_this_stage": false
+  },
+  "output": {
+    "secret_free_json_report": true,
+    "include_selected_market_metrics": true,
+    "persist_raw_provider_payloads": false,
+    "persist_account_data": false,
+    "r2_read": false,
+    "r2_write": false,
+    "artifact_retention_days": 90
+  },
+  "authority": {
+    "public_pionex_snapshot_reads_after_merge": true,
+    "private_api": false,
+    "api_key_required": false,
+    "r2_read": false,
+    "r2_write": false,
+    "historical_materialization": false,
+    "holdout_access": false,
+    "training": false,
+    "formal_backtest_admission": false,
+    "strategy_change": false,
+    "source_switch": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}

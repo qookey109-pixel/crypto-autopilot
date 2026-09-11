@@ -1,0 +1,130 @@
+{
+  "version": "0.1.0",
+  "status": "PREPARED_NOT_EXECUTION_AUTHORITY",
+  "provider": "pionex_public_futures",
+  "purpose": "Prepare a deterministic 150+ Pionex research-market universe spanning liquid crypto, explicit meme candidates, and provider-native tokenized alternative assets without authorizing provider execution or historical materialization.",
+  "inputs": {
+    "live_perpetual_symbols_endpoint": "/api/v1/common/symbols?type=PERP&status=TRADING",
+    "perpetual_tickers_endpoint": "/api/v1/market/tickers?type=PERP",
+    "perpetual_book_tickers_endpoint": "/api/v1/market/bookTickers?type=PERP",
+    "alternative_assets_registry": "config/pionex_alternative_assets_v0_1.json",
+    "alternative_assets_registry_sha256": "48aa707f51a50c3d1cf0db63eb1eb41989a8441b56230c06ac894a204b2d4e18",
+    "meme_candidate_roots": [
+      "ACT",
+      "BABYDOGE",
+      "BOME",
+      "BONK",
+      "BRETT",
+      "DEGEN",
+      "DOGE",
+      "DOGS",
+      "FARTCOIN",
+      "FLOKI",
+      "GIGA",
+      "GOAT",
+      "HIPPO",
+      "MEME",
+      "MEW",
+      "MOG",
+      "MOODENG",
+      "MUBARAK",
+      "NEIRO",
+      "PEPE",
+      "PENGU",
+      "PNUT",
+      "PONKE",
+      "POPCAT",
+      "SHIB",
+      "SLERF",
+      "SPX",
+      "TOSHI",
+      "TURBO",
+      "WIF"
+    ],
+    "meme_registry_is_watchlist_metadata_not_investment_endorsement": true
+  },
+  "selection": {
+    "minimum_total_markets": 150,
+    "crypto_core_target": 100,
+    "include_all_live_meme_candidates": true,
+    "include_all_live_alternative_asset_registry_matches": true,
+    "fill_to_minimum_from_remaining_crypto": true,
+    "ranking": "QUOTE_AMOUNT_DESC_SPREAD_BPS_ASC_TRADE_COUNT_DESC_SYMBOL_ASC",
+    "crypto_core_semantics": "PIONEX_LIQUIDITY_RANKED_NOT_MARKET_CAP_TOP_100",
+    "literal_market_cap_top_100_claimed": false,
+    "literal_market_cap_top_100_requires_separate_rank_source": true,
+    "forced_exact_total_market_count": false
+  },
+  "market_quality": {
+    "require_live_symbol": true,
+    "require_ticker": true,
+    "require_book_ticker": true,
+    "require_finite_positive_close": true,
+    "require_finite_nonnegative_quote_amount": true,
+    "require_nonnegative_trade_count": true,
+    "require_finite_positive_bid_ask": true,
+    "require_ask_not_below_bid": true,
+    "hard_spread_rejection_bps": null,
+    "invalid_markets_are_reported_not_silently_repaired": true
+  },
+  "history_profiles": {
+    "FULL_INTRADAY": {
+      "maximum_markets": 30,
+      "intervals": [
+        "15M",
+        "60M",
+        "4H",
+        "1D",
+        "1W"
+      ]
+    },
+    "MULTISCALE_RESEARCH": {
+      "applies_to": [
+        "crypto_core",
+        "meme_candidate"
+      ],
+      "intervals": [
+        "60M",
+        "4H",
+        "1D",
+        "1W"
+      ]
+    },
+    "BREADTH_BACKGROUND": {
+      "default_for_selected_market": true,
+      "intervals": [
+        "1D",
+        "1W"
+      ]
+    }
+  },
+  "derived_timeframes": {
+    "1Y": {
+      "provider_native": false,
+      "source_interval": "1D",
+      "derivation_authorized_by_this_stage": false
+    }
+  },
+  "output": {
+    "deterministic_json_ready": true,
+    "raw_provider_payloads_persisted": false,
+    "r2_read": false,
+    "r2_write": false
+  },
+  "authority": {
+    "synthetic_fixture_validation": true,
+    "public_pionex_requests": false,
+    "private_api": false,
+    "r2_read": false,
+    "r2_write": false,
+    "historical_materialization": false,
+    "holdout_access": false,
+    "training": false,
+    "formal_backtest_admission": false,
+    "strategy_change": false,
+    "source_switch": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}

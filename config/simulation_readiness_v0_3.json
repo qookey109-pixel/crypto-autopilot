@@ -1,0 +1,92 @@
+{
+  "version": "0.3.0",
+  "status": "PREPARED_SIMULATION_ONLY_NOT_DATA_ADMISSION_AUTHORITY",
+  "purpose": "P0 proof that verified three-timeframe candle data can drive strategy plans through the canonical risk and paper backtest engine without hand-written trade plans.",
+  "input_contract": {
+    "source_authority": "config/pionex_historical_research_execution_v0_2.json",
+    "required_receipt_schema": "pionex-capacity-pilot-v0.2",
+    "required_config_sha256": "a66fdf7def02023590163091fbdd1eceabe5d96a774ffa0207e7b7a7f506f932",
+    "provider": "pionex_public_futures",
+    "symbol": "BTC_USDT_PERP",
+    "intervals": [
+      "15M",
+      "60M",
+      "4H"
+    ],
+    "start_utc": "2026-08-01T00:00:00Z",
+    "end_exclusive_utc": "2026-08-28T00:00:00Z",
+    "coverage_claim": "COMPLETE_FIXED_27_DAY_CAPACITY_SAMPLE_ONLY",
+    "exact_rows": {
+      "15M": 2592,
+      "60M": 648,
+      "4H": 162
+    },
+    "parquet_sha256_and_byte_size_must_match_receipt": true
+  },
+  "strategy_adapter": {
+    "name": "candle_driven_three_timeframe_readiness_v0_3",
+    "formal_strategy_v0_1_modified": false,
+    "sstate_probability_or_sample_fabrication": false,
+    "direction": "LONG_ONLY",
+    "context_4h": [
+      "ema20_above_ema50",
+      "ema20_slope_positive",
+      "close_above_ema20"
+    ],
+    "setup_60m": [
+      "ema20_above_ema50",
+      "ema20_slope_positive",
+      "close_above_ema20",
+      "extension_atr_lte_2_5"
+    ],
+    "entry_15m": [
+      "pullback_near_ema20",
+      "reclaim_ema20",
+      "close_breaks_previous_high",
+      "volume_ratio_gte_1_0"
+    ],
+    "maximum_extension_atr": 2.5,
+    "pullback_tolerance_atr": 0.25,
+    "minimum_volume_ratio": 1.0,
+    "stop_buffer_atr": 0.25,
+    "target_reward_risk": 2.0
+  },
+  "backtest": {
+    "initial_equity_usd": 100.0,
+    "taker_fee_bps_each_side": 5.0,
+    "adverse_slippage_bps_each_fill": 2.0,
+    "risk_fraction_per_trade": 0.01,
+    "max_leverage": 3.0,
+    "daily_loss_limit_r": 3.0,
+    "max_new_trades_per_day": 3,
+    "max_holding_minutes": 720,
+    "same_bar_stop_target_policy": "STOP_FIRST",
+    "gap_stop_policy": "FIRST_AVAILABLE_OPEN_IF_OPEN_THROUGH_STOP",
+    "kill_switch_required_in_engine": true
+  },
+  "readiness": {
+    "pipeline_pass_label": "PIPELINE_PASS_KLINE_ONLY",
+    "pipeline_pass_is_model_quality_pass": false,
+    "pipeline_pass_is_profitability_claim": false,
+    "full_simulation_ready": false,
+    "known_blockers": [
+      "historical_funding_evidence_missing"
+    ],
+    "funding_may_not_be_fabricated_or_assumed_zero_for_full_readiness": true
+  },
+  "authority": {
+    "synthetic_fixture_validation": true,
+    "production_pionex_v0_2_dataset_read": false,
+    "provider_requests": false,
+    "r2_reads": false,
+    "r2_writes": false,
+    "holdout_access": false,
+    "training": false,
+    "formal_backtest_admission": false,
+    "strategy_v0_1_change": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false,
+    "source_switch": false
+  }
+}

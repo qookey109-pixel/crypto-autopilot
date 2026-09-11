@@ -1,0 +1,76 @@
+name: Pionex Research Universe 150+ V0.1
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pionex-research-universe-v0-1
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Capture public Pionex universe snapshot
+        run: |
+          python scripts/run_pionex_research_universe_v0_1.py \
+            --output pionex-universe-output/report.json
+
+      - name: Assert snapshot-only boundary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("pionex-universe-output/report.json").read_text())
+          assert report["schema"] == "pionex-research-universe-run-report-v0.1"
+          assert report["status"] in {"PASS", "FAIL"}
+          assert report["api_key_used"] is False
+          assert report["private_account_data_accessed"] is False
+          assert report["raw_provider_payloads_persisted"] is False
+          assert report["r2_accessed"] is False
+          assert report["holdout_accessed"] is False
+          assert report["real_money_orders_authorized"] is False
+          assert report["live_trading_authorized"] is False
+          if report["status"] == "PASS":
+              assert report["provider"] == "pionex_public_futures"
+              assert report["provider_request_count"] == 3
+              assert report["selected_market_count"] >= 150
+              assert report["crypto_core_count"] == 100
+              assert report["market_cap_top_100_claimed"] is False
+              assert report["historical_materialization_authorized"] is False
+              assert report["formal_backtest_admission_authorized"] is False
+              assert report["derived_1y_authorized"] is False
+              allowed = {"FULL_INTRADAY", "MULTISCALE_RESEARCH", "BREADTH_BACKGROUND"}
+              assert report["markets"]
+              assert all(row["history_profile"] in allowed for row in report["markets"])
+          PY
+
+      - name: Upload secret-free universe report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: pionex-research-universe-v0-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: pionex-universe-output/report.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf pionex-universe-output

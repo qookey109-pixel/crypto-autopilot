@@ -1,0 +1,83 @@
+name: Pionex Funding History V0.1
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pionex-funding-history-v0-1
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Capture public Pionex funding history
+        run: |
+          python scripts/run_pionex_funding_history_v0_1.py \
+            --output pionex-funding-output/report.json
+
+      - name: Assert funding-only boundary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import math
+          from pathlib import Path
+
+          report = json.loads(Path("pionex-funding-output/report.json").read_text())
+          assert report["schema"] == "pionex-funding-history-run-report-v0.1"
+          assert report["status"] in {"PASS", "FAIL"}
+          assert report["api_key_used"] is False
+          assert report["private_api_used"] is False
+          assert report["raw_provider_payloads_persisted"] is False
+          assert report["r2_accessed"] is False
+          assert report["holdout_accessed"] is False
+          assert report["simulation_data_admission_authorized"] is False
+          assert report["formal_backtest_admission_authorized"] is False
+          assert report["real_money_orders_authorized"] is False
+          assert report["live_trading_authorized"] is False
+          if report["status"] == "PASS":
+              assert report["provider"] == "pionex_public_futures"
+              assert report["symbol"] == "BTC_USDT_PERP"
+              assert report["window_start_utc"] == "2026-08-01T00:00:00Z"
+              assert report["window_end_exclusive_utc"] == "2026-08-28T00:00:00Z"
+              assert 1 <= report["requests"] <= 3
+              assert report["left_boundary_reached"] is True
+              assert report["automatic_retries"] == 0
+              assert report["observation_count"] == len(report["observations"])
+              assert report["observation_count"] > 0
+              start_ms = 1785542400000
+              end_ms = 1787875200000
+              for row in report["observations"]:
+                  assert row["symbol"] == "BTC_USDT_PERP"
+                  assert start_ms <= row["funding_time_ms"] < end_ms
+                  assert math.isfinite(row["funding_rate"])
+          PY
+
+      - name: Upload secret-free funding report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: pionex-funding-history-v0-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: pionex-funding-output/report.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf pionex-funding-output

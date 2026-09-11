@@ -18,6 +18,13 @@ INTERVAL_MS = {
     "4H": 4 * 60 * 60 * 1000,
     "8H": 8 * 60 * 60 * 1000,
     "1D": 24 * 60 * 60 * 1000,
+    "1W": 7 * 24 * 60 * 60 * 1000,
+}
+
+# Pionex documents weekly candles as Monday UTC 00:00. Unix epoch is
+# Thursday 1970-01-01, so fixed-width weekly alignment needs a four-day offset.
+INTERVAL_ALIGNMENT_OFFSET_MS = {
+    "1W": 4 * 24 * 60 * 60 * 1000,
 }
 
 
@@ -168,6 +175,7 @@ def audit_candles(candles: list[Candle] | tuple[Candle, ...], interval: str) -> 
     if interval not in INTERVAL_MS:
         raise ValueError(f"Unsupported audit interval: {interval}")
     step = INTERVAL_MS[interval]
+    alignment_offset = INTERVAL_ALIGNMENT_OFFSET_MS.get(interval, 0)
     times = [candle.time_ms for candle in candles]
 
     counts: dict[int, int] = {}
@@ -180,7 +188,15 @@ def audit_candles(candles: list[Candle] | tuple[Candle, ...], interval: str) -> 
         for left, right in zip(times, times[1:])
         if right < left
     )
-    misaligned = tuple(sorted({timestamp for timestamp in times if timestamp % step != 0}))
+    misaligned = tuple(
+        sorted(
+            {
+                timestamp
+                for timestamp in times
+                if (timestamp - alignment_offset) % step != 0
+            }
+        )
+    )
     invalid = tuple(sorted({candle.time_ms for candle in candles if not _valid_candle(candle)}))
 
     unique_times = sorted(set(times))

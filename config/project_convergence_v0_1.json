@@ -40,6 +40,17 @@
     "pionex_alternative_assets_state": "OBSERVABILITY_V0_2_AUTHORIZED_AFTER_V0_10_WINDOW_HISTORY_WAITING_SEPARATE_AUTHORITY",
     "pionex_historical_research_execution": "config/pionex_historical_research_execution_v0_1.json",
     "pionex_historical_research_execution_state": "MANUAL_BTC_USDT_PERP_CAPACITY_PILOT_ONLY_NO_SCHEDULE",
+    "pionex_historical_reach": "config/pionex_historical_reach_v0_3.json",
+    "pionex_historical_reach_authority": "research/receipts/2026-09-11-pionex-historical-reach-v0-3-authority.json",
+    "pionex_historical_reach_state": "MANUAL_PUBLIC_READ_ONLY_DISCOVERY_AFTER_MERGE_NO_R2_NO_HOLDOUT_NO_SCHEDULE",
+    "pionex_research_universe": "config/pionex_research_universe_v0_1.json",
+    "pionex_research_universe_execution": "config/pionex_research_universe_execution_v0_1.json",
+    "pionex_research_universe_state": "MANUAL_PUBLIC_150_PLUS_SNAPSHOT_AFTER_MERGE_NO_R2_NO_HOLDOUT_NO_SCHEDULE",
+    "pionex_150_history_plan": "config/pionex_150_history_plan_v0_1.json",
+    "pionex_150_history_plan_state": "PREPARED_DETERMINISTIC_PLAN_ONLY_WAITING_REVIEWED_REACH_AND_UNIVERSE_REPORTS",
+    "pionex_funding_history": "config/pionex_funding_history_v0_1.json",
+    "pionex_funding_history_execution": "config/pionex_funding_history_execution_v0_1.json",
+    "pionex_funding_history_state": "MANUAL_PUBLIC_BOUNDED_CAPTURE_AFTER_MERGE_NO_R2_NO_HOLDOUT_NO_SCHEDULE",
     "context_forward_capture_execution": "config/context_forward_capture_execution_v0_1.json",
     "context_forward_capture_execution_state": "MANUAL_ONE_SHOT_AFTER_2026-09-12T04:00Z_NO_SCHEDULE",
     "paper_successor": "config/post_window_paper_training_v0_2.json",
@@ -61,32 +72,45 @@
     "continuous_research": [
       {
         "workflow": "research-signal-layer-v0-2.yml",
-        "cron_utc": ["17 2 * * *"]
+        "cron_utc": [
+          "17 2 * * *"
+        ]
       },
       {
         "workflow": "research-signal-quality-v0-1.yml",
-        "cron_utc": ["47 2 * * *"]
+        "cron_utc": [
+          "47 2 * * *"
+        ]
       },
       {
         "workflow": "research-automation-health-v0-2.yml",
-        "cron_utc": ["57 */2 * * *"]
+        "cron_utc": [
+          "57 */2 * * *"
+        ]
       }
     ],
     "authorized_post_window": [
       {
         "workflow": "binance-usdm-detailed-history-v0-1.yml",
-        "cron_utc": ["23 */2 9-30 9 *"],
+        "cron_utc": [
+          "23 */2 9-30 9 *"
+        ],
         "active_from_utc": "2026-09-04T02:00:00Z",
         "active_until_utc": "2026-10-01T00:00:00Z"
       },
       {
         "workflow": "binance-usdm-detailed-training-v0-1.yml",
-        "cron_utc": ["37 4 * * 0"],
+        "cron_utc": [
+          "37 4 * * 0"
+        ],
         "dependency": "complete detailed-history dataset"
       },
       {
         "workflow": "pionex-alternative-assets-observability-v0-2.yml",
-        "cron_utc": ["53 2 4 9 *", "53 3 6,13,20,27 9 *"],
+        "cron_utc": [
+          "53 2 4 9 *",
+          "53 3 6,13,20,27 9 *"
+        ],
         "active_from_utc": "2026-09-04T02:00:00Z",
         "active_until_utc": "2026-10-01T00:00:00Z",
         "scope": "Pionex PERP symbol metadata validation, prior-catalog diff and capacity estimate only; no candle/funding/trade/order-book reads"
@@ -109,7 +133,10 @@
       "dashboard-static-smoke.yml",
       "lit-archive-diagnosis-v0-1.yml",
       "pionex-alternative-assets-observability-v0-2.yml",
+      "pionex-funding-history-v0-1.yml",
+      "pionex-historical-reach-v0-3.yml",
       "pionex-historical-research-execution-v0-1.yml",
+      "pionex-research-universe-v0-1.yml",
       "provider-equivalence-v0-12-successor-metadata-capture.yml",
       "research-automation-health-v0-2.yml",
       "research-signal-layer-v0-2.yml",
