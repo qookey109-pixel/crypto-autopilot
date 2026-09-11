@@ -436,10 +436,13 @@ def run_long_backtest(
         entry_fee = quantity * entry_price * fee_rate
         exit_fee = quantity * exit_price * fee_rate
         fees = entry_fee + exit_fee
+        # Funding at the exact entry timestamp is treated as already settled
+        # before this bar-open fill. Funding at the exit timestamp still applies
+        # because the position existed immediately before that exit event.
         funding = sum(
             risk.notional_usd * point.rate
             for point in funding_by_symbol.get(plan.symbol, [])
-            if entry_candle.time_ms <= point.time_ms <= exit_time
+            if entry_candle.time_ms < point.time_ms <= exit_time
         )
         slippage_cost = quantity * (
             (entry_price - raw_entry) + (raw_exit - exit_price)
