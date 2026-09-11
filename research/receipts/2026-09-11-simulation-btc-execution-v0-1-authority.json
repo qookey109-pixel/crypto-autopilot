@@ -1,0 +1,26 @@
+{
+  "schema": "simulation-btc-execution-authority-v0.1",
+  "status": "AUTHORIZED_AFTER_REVIEWED_MAIN_MERGE",
+  "config": "config/simulation_btc_execution_v0_1.json",
+  "config_sha256": "c0eeace59bfb350985a8f72f00233c7ffa767bebe3b14076ab858337979a1dc2",
+  "base_main_sha": "6a7aad2aa4c9d8445209d77b32a4c1698d9984ef",
+  "user_decision": "Implement cloud automation and versioned simulation data admission toward September 15, excluding live trading.",
+  "execution_performed_by_this_receipt": false,
+  "supersedes_for_exact_sample_only": "PREPARED_SIMULATION_ONLY_NOT_DATA_ADMISSION_AUTHORITY",
+  "original_prepared_configs_and_historical_failures_unchanged": true,
+  "read_scope": "Three exact hash-bound Parquet files from BTC pilot run 34513815680; no listing, pointer reads, provider requests or writes.",
+  "funding_evidence": {
+    "run_id": 34563641025,
+    "artifact_id": 10185206308,
+    "zip_sha256": "90a52badad147e407e7dca4f88a607c647c2fec467e185eb31556f2714879095",
+    "observations_reported": 81,
+    "source_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34563641025"
+  },
+  "output": "GitHub Actions report artifact only; no candle persistence or Pages raw data",
+  "full_universe_admission": false,
+  "holdout_access": false,
+  "source_switch": false,
+  "model_promotion": false,
+  "real_money_orders": false,
+  "live_trading": false
+}

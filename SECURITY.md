@@ -32,7 +32,12 @@ Do not echo secret values for debugging. Presence checks must be boolean/length-
 
 Historical proof/materialization workflows whose evidence is already frozen must remain validation-only. They must not silently regain schedules, push-triggered production execution, self-hosted runners, provider calls, R2 secret bindings, or write commands.
 
-The only current scheduled metadata-capture execution path is the versioned V0.10 workflow. V0.11 production R2 stability evaluation remains unauthorized until a separate post-window authority exists.
+The current scheduled metadata-capture execution path is the versioned V0.12
+workflow within its bounded window. V0.10 is retired historical evidence.
+V0.11 production R2 stability evaluation remains unauthorized until a separate
+post-window authority exists. The separately versioned fixed BTC simulation
+may read only its three hash-bound sample objects after reviewed main merge;
+it cannot list R2, access holdout, or write storage.
 
 Production-critical GitHub Actions are supply-chain hardened:
 

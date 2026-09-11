@@ -141,6 +141,7 @@
       "research-automation-health-v0-2.yml",
       "research-signal-layer-v0-2.yml",
       "research-signal-quality-v0-1.yml",
+      "simulation-btc-v0-1.yml",
       "v0-10-critical-path-freeze-guard.yml",
       "validate-v0-10-capture-window-operations.yml",
       "validate-v0-11-metadata-stability-evaluator.yml"

@@ -38,6 +38,19 @@
 
     <section class="view overview-content active" id="view-overview">
       <div class="home-heading"><div><p class="eyebrow">QOOKEY</p><h2>今日總覽</h2></div><span class="badge neutral">研究與模擬</span></div>
+      <section class="panel readiness-summary" aria-labelledby="readiness-heading">
+        <h3 id="readiness-heading">9/15 模擬測試準備</h3>
+        <p><strong>尚未就緒</strong> · 程式已整合；下一步是確認資料並完成正式模擬。</p>
+        <p>已核實：Pionex BTC 27 天樣本、81 筆 Funding、197 個候選標的快照；Binance 歷史 7/10（9/11 快照）。候選池完整歷史尚未補齊；資產分類仍需複核。</p>
+        <p id="cloud-run-updated">雲端執行狀態尚未載入。</p>
+        <ul id="cloud-run-list" class="cloud-run-list" aria-live="polite"></ul>
+        <details><summary>查看資料證據與後續步驟</summary>
+          <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34563615657" target="_blank" rel="noopener noreferrer">197 個候選快照 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34563641025" target="_blank" rel="noopener noreferrer">Funding 報告 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34513815680" target="_blank" rel="noopener noreferrer">BTC 樣本 ↗</a></p>
+          <p>先修復歷史探測並確認各標的範圍，再經資料准入審查執行模擬。以上數字為 9/11 已核對的證據；下方雲端狀態只表示工作流程結果。</p>
+        </details>
+      </section>
+      <details class="home-details">
+        <summary>查看資料、策略與候選明細</summary>
       <section class="home-grid" aria-label="每日四項重點">
         <article class="panel home-card" aria-labelledby="home-history-title">
           <p class="card-kicker">01 · 資料</p><h3 id="home-history-title">歷史補齊進度</h3>
@@ -64,6 +77,7 @@
           <span class="home-observed" id="home-paper-observed">模擬觀測時間：時間未提供</span>
         </article>
       </section>
+      </details>
       <details class="home-details">
         <summary>展開研究明細與排程</summary>
         <div class="home-details-content">

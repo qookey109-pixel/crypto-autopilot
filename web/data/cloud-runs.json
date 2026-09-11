@@ -1,0 +1,7 @@
+{
+  "schema": "qookey-cloud-run-status-v0.1",
+  "authority": false,
+  "observedAtUtc": null,
+  "simulationReady": false,
+  "runs": {}
+}

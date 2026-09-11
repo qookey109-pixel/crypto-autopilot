@@ -42,11 +42,18 @@ discovery path.
 - latest admissible candle: strictly before `2026-08-28T00:00:00Z`
 - the discovery cursor is the last completed provider-aligned candle before the
   cutoff; for `1W`, Monday UTC 00:00 alignment is preserved
+- completion means the entire candle closes at or before the cutoff; the last
+  admissible weekly open is 2026-08-17, not 2026-08-24
 - page size: 500
 - maximum records per interval: 10,000
 - maximum data pages per interval: 20
 - one optional one-record boundary probe after a short page
 - total request ceiling: 105
+- each interval is inspected independently; one rejected interval does not
+  erase successful sibling diagnostics, but any rejection makes the overall
+  report FAIL (never partial PASS)
+- failure diagnostics contain interval, cursor, stage, request count and error
+  class/HTTP status only; never exception bodies, URLs, headers or secrets
 - no automatic schedule
 - manual `workflow_dispatch` only
 - no R2 read/write

@@ -18,6 +18,19 @@ FUNDING_EXECUTION_SHA256 = "d2cdafc5900573eb7d9971b7e3d7b9e5e34f50d16a510b56dcd7
 START_MS = 1_785_542_400_000
 END_MS = 1_787_875_200_000
 
+SIMULATION_BACKTEST_CONFIG = BacktestConfig(
+    initial_equity_usd=100.0,
+    taker_fee_bps=5.0,
+    slippage_bps=2.0,
+    risk=RiskConfig(
+        risk_fraction_per_trade=0.01,
+        max_leverage=3.0,
+        daily_loss_limit_r=3.0,
+        max_new_trades_per_day=3,
+    ),
+    max_holding_minutes=720,
+)
+
 
 class SimulationFundingError(RuntimeError):
     pass
@@ -135,18 +148,7 @@ def run_readiness_with_verified_funding(
         candles_by_symbol={SYMBOL: candles["15M"]},
         plans=plans,
         funding_points=funding_points,
-        config=BacktestConfig(
-            initial_equity_usd=100.0,
-            taker_fee_bps=5.0,
-            slippage_bps=2.0,
-            risk=RiskConfig(
-                risk_fraction_per_trade=0.01,
-                max_leverage=3.0,
-                daily_loss_limit_r=3.0,
-                max_new_trades_per_day=3,
-            ),
-            max_holding_minutes=720,
-        ),
+        config=SIMULATION_BACKTEST_CONFIG,
     )
     exercised = bool(result.trades)
     return {

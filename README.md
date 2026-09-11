@@ -6,6 +6,12 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 
 ## Start here
 
+September 11 delivery: [current audit, cloud schedule and handoff](docs/SIMULATION_CLOUD_HANDOFF_2026_09_11.md).
+Full-universe simulation is **NOT_READY**. Pionex has a verified 27-day BTC
+sample and 81 funding observations; the 197-market snapshot is not 197
+completed histories. The proposed bounded BTC execution starts only after
+reviewed main merge and successful main CI. No live trading is enabled.
+
 Pionex history pilot: the [V0.2 capacity sample](docs/PIONEX_BOUNDED_CAPACITY_PILOT_V0_2.md)
 replaces unrestricted backwards pagination after reviewed main merge. It
 covers 27 pre-holdout days only; complete history and 150+ market collection
@@ -19,7 +25,10 @@ remain separate milestones. Prior pilot holdout non-access needs review.
 Historical configs, receipts and CLI paths remain for evidence, but these four
 files are the current operating surface.
 
-## Current authority snapshot — 2026-08-31
+## Historical authority snapshot — 2026-08-31
+
+This dated snapshot is historical context, not the current schedule. Follow
+the September 11 index above and PROJECT_STATUS for subsequent transitions.
 
 The repository has moved beyond the original V0.1 implementation baseline while preserving its scientific history:
 

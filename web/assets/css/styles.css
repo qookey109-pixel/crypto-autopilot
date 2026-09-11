@@ -310,3 +310,7 @@ td strong { color: var(--ink); }
   .home-heading { align-items: flex-start; }
   .home-heading .badge { font-size: 14px; }
 }
+/* Compact readiness summary; detailed historical panels remain expandable. */
+.readiness-summary { margin-bottom: 1.25rem; }
+.readiness-summary p { max-width: 78ch; }
+.cloud-run-list { display: flex; flex-wrap: wrap; gap: .6rem 1.4rem; padding-left: 1.2rem; }

@@ -1,6 +1,12 @@
 # Simulation Readiness — 2026-09-15
 
-Status: **CONSOLIDATED INTEGRATION PREPARED — NOT YET ON `main` — NOT FULL_SIMULATION_READY**
+Status: **INTEGRATION MERGED — NOT FULL_SIMULATION_READY**
+
+September 11 update: PRs #263/#264/#265 are on main `6a7aad2`. Universe
+snapshot `34563615657` and Funding `34563641025` passed; Reach `34563589773`
+failed. The paragraphs below preserve the integration design. The current
+execution queue and remaining blockers are in
+[latest handoff](SIMULATION_CLOUD_HANDOFF_2026_09_11.md).
 
 This document is the short operational map for the 2026-09-15 paper/simulation target. Historical receipts remain immutable evidence; Draft PRs do not become Repository authority until reviewed merge.
 
@@ -57,7 +63,9 @@ It derives LONG simulation plans causally from:
 
 It does not fabricate SState probability/sample values and does not modify formal Strategy V0.1.
 
-`PIPELINE_PASS_KLINE_ONLY` remains weaker than `FULL_SIMULATION_READY` because provider-native historical funding evidence has not yet been captured/admitted.
+`PIPELINE_PASS_KLINE_ONLY` remains weaker than `FULL_SIMULATION_READY`.
+Funding capture now passed; its admission is proposed in the exact BTC
+execution authority, not automatically granted by capture success.
 
 ## Manual public control plane
 
@@ -130,22 +138,19 @@ A PASS capture remains evidence only. It does not automatically authorize produc
 
 ## Shortest remaining path to the 9/15 simulation test
 
-1. Review/merge the consolidated code path; no automatic merge is authorized here.
-2. Manually run Historical Reach Discovery and freeze its secret-free PASS/FAIL report.
-3. Manually run the 150+ Universe Snapshot and freeze its secret-free PASS/FAIL report.
-4. Feed reviewed reach + universe reports into the deterministic 150+ history planner.
-5. Manually run bounded Pionex Funding History and freeze its report.
-6. Create/review the exact historical-materialization and production-data-admission authority based on measured reach and capacity, not guessed years.
-7. Admit exact K-line + funding evidence to Simulation Readiness V0.3.
-8. Run historical/paper simulation and emit trade ledger, PnL, drawdown, fees, slippage, funding, kill-switch behavior and readiness report.
-9. Declare `READY` only if the final gate passes; otherwise declare `NOT_READY` with explicit blockers.
+1. Review the bounded BTC execution and reach-reliability repair; merge requires approval.
+2. Successful current-main CI triggers the exact BTC simulation under the new authority.
+3. Review its ledger, costs, funding, PnL, drawdown and failure report; this is not full-universe readiness.
+4. Obtain a new Reach report after the boundary/diagnostic repair; keep the old FAIL unchanged.
+5. Review asset classifications in the existing 197-market snapshot; do not rerun a successful snapshot merely to advance a checklist.
+6. Establish reviewed tiered materialization authority from measured reach/capacity, then validate each published market/interval.
+7. Admit reviewed multi-market evidence and evaluate full-universe readiness separately.
 
 ## Current blockers
 
-- New public workflows are not executable from Repository authority until reviewed onto `main`.
-- Historical reach evidence for the five native intervals has not yet been produced.
-- The real 150+ Pionex universe snapshot has not yet been produced.
-- Pionex-native historical funding evidence has not yet been produced.
+- Historical reach run `34563589773` failed; a complete five-interval result remains missing.
+- The 197-market snapshot exists, but fallback asset classification requires review.
+- Funding run `34563641025` passed; exact ZIP/report admission still requires reviewed authority and actual simulation execution.
 - Large 150+ historical materialization remains intentionally unauthorized until reach/capacity evidence exists.
 - Production V0.2 K-line + funding data admission into the simulator remains separately reviewable.
 

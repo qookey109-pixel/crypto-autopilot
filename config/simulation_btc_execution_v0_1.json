@@ -1,0 +1,30 @@
+{
+  "schema": "simulation-btc-execution-v0.1",
+  "status": "AUTHORIZED_AFTER_REVIEWED_MAIN_MERGE",
+  "scope": "BTC_FIXED_27_DAY_ENGINE_VALIDATION_ONLY",
+  "not_before_utc": "2026-09-11T00:00:00Z",
+  "stop_exclusive_utc": "2026-09-16T00:00:00Z",
+  "maximum_workflow_runs": 20,
+  "maximum_r2_gets_per_run": 3,
+  "maximum_r2_bytes_per_run": 105694,
+  "automatic_trigger": "SUCCESSFUL_MAIN_PUSH_CI_COMPLETION",
+  "kline_report": "research/receipts/2026-09-11-pionex-bounded-pilot-v0-2-run-34513815680-report.json",
+  "kline_report_sha256": "2f07df28137532d0e2767686bc72b1f527cebfc11b3f378294487ae054457f83",
+  "funding_artifact_id": 10185206308,
+  "funding_run_id": "34563641025",
+  "funding_zip_sha256": "90a52badad147e407e7dca4f88a607c647c2fec467e185eb31556f2714879095",
+  "funding_report_path": "report.json",
+  "authority": {
+    "exact_sample_r2_reads": true,
+    "fixed_sample_simulation": true,
+    "provider_requests": false,
+    "r2_list": false,
+    "r2_writes": false,
+    "holdout_access": false,
+    "full_universe_admission": false,
+    "model_promotion": false,
+    "source_switch": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}

@@ -147,6 +147,37 @@ class PionexHistoricalReachV03Tests(unittest.TestCase):
         with self.assertRaisesRegex(ReachRejected, "no data at discovery cutoff"):
             discover_interval(self.config, client, "4H", {"requests": 0})
 
+    def test_probe_error_preserves_safe_context_without_error_body(self) -> None:
+        from urllib.error import HTTPError
+        step = 4 * 60 * 60 * 1000
+        rows = series(step, 20, _last_aligned_candle_before(self.cutoff, "4H"))
+
+        class FailingProbe(FakeClient):
+            def get_klines(self, *args, **kwargs):
+                if kwargs["limit"] == 1:
+                    raise HTTPError("https://example.invalid/private", 400,
+                                    "SECRET_RESPONSE_BODY", {}, None)
+                return super().get_klines(*args, **kwargs)
+
+        with self.assertRaises(ReachRejected) as caught:
+            discover_interval(self.config, FailingProbe({"4H": rows}), "4H", {"requests": 0})
+        detail = caught.exception.diagnostics
+        self.assertEqual(detail["stage"], "boundary_probe")
+        self.assertEqual(detail["records_observed"], 20)
+        self.assertEqual(detail["request_number"], 2)
+        self.assertEqual(detail["http_status"], 400)
+        self.assertNotIn("SECRET", json.dumps(detail))
+        self.assertNotIn("example.invalid", json.dumps(detail))
+
+    def test_every_interval_request_ends_before_protected_window(self) -> None:
+        from crypto_autopilot.historical import INTERVAL_MS
+        for interval in self.config["intervals"]:
+            step = INTERVAL_MS[interval]
+            cursor = _last_aligned_candle_before(self.cutoff, interval)
+            client = FakeClient({interval: series(step, 20, cursor)})
+            discover_interval(self.config, client, interval, {"requests": 0})
+            self.assertTrue(all(call[3] + step <= self.cutoff for call in client.calls))
+
     def test_scope_change_that_could_cross_holdout_is_rejected(self) -> None:
         changed = json.loads(json.dumps(self.config))
         changed["cutoff_exclusive_utc"] = "2026-09-04T00:00:00Z"
@@ -155,7 +186,8 @@ class PionexHistoricalReachV03Tests(unittest.TestCase):
 
     def test_weekly_cursor_is_monday_utc_before_cutoff(self) -> None:
         weekly = _last_aligned_candle_before(self.cutoff, "1W")
-        self.assertEqual(weekly, stamp("2026-08-24T00:00:00Z"))
+        self.assertEqual(weekly, stamp("2026-08-17T00:00:00Z"))
+        self.assertLessEqual(weekly + 7 * 24 * 60 * 60 * 1000, self.cutoff)
         step = 7 * 24 * 60 * 60 * 1000
         rows = series(step, 120, weekly)
         result = discover_interval(
@@ -212,6 +244,20 @@ class PionexHistoricalReachV03Tests(unittest.TestCase):
         self.assertIn('"15M", "60M", "4H", "1D", "1W"', workflow)
         self.assertIn('report["yearly_derivation_authorized"] is False', workflow)
         self.assertIn('"source_interval": "1D"', workflow)
+
+    def test_failed_interval_does_not_erase_other_interval_evidence(self):
+        from crypto_autopilot.historical import INTERVAL_MS
+        data = {interval: series(INTERVAL_MS[interval], 10,
+                                 _last_aligned_candle_before(self.cutoff, interval))
+                for interval in self.config["intervals"]}
+        data["15M"] = []
+        client = FakeClient(data)
+        with self.assertRaises(ReachRejected) as caught:
+            discover_all(self.config, client)
+        diagnostics = caught.exception.diagnostics
+        self.assertEqual(len(diagnostics["completed_intervals"]), 4)
+        self.assertEqual(diagnostics["failed_intervals"][0]["interval"], "15M")
+        self.assertLessEqual(len(client.calls), 105)
 
 
 if __name__ == "__main__":
