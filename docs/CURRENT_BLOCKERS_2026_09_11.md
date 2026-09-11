@@ -62,7 +62,7 @@ Repository authority already defines the bounded next research path; a new V0.13
 
 `config/post_window_research_successor_schedule_v0_1.json` remains `PREPARED_NOT_ACTIVE`. The proposed four-hour/weekly/monthly successor cadence is not active authority. A four-hour schedule requires separate reviewed V0.2 authority after a successful bounded V0.1 one-shot.
 
-PR #269 is a restriction-only hardening proposal that makes the existing protected-main requirement explicit in workflow/runtime enforcement. Until merged, it is not Repository authority.
+The explicit workflow/runtime enforcement of the existing protected-main requirement is tracked by PR #269. Repository `main` is authoritative for whether that restriction has become active; this status note does not promote the PR itself into authority.
 
 ## 6. Next decisions
 
