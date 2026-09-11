@@ -1,0 +1,70 @@
+{
+  "schema": "pionex-asset-classification-execution-v0.1",
+  "version": "0.1.0",
+  "status": "AUTHORIZED_AFTER_PROTECTED_MAIN_MERGE_MANUAL_CLASSIFICATION_ONLY",
+  "purpose": "Authorize one bounded metadata-only CoinPaprika registry read to classify the exact formal Pionex Research Universe V0.1 report without changing universe membership.",
+  "verifier_contract": {
+    "path": "config/pionex_asset_classification_verifier_v0_1.json",
+    "sha256": "c87424af221dc360672e9332f375cf1c8864969520a03ce047600d1590693875"
+  },
+  "universe_source": {
+    "workflow": "Pionex Research Universe 150+ V0.1",
+    "run_id": 34563615657,
+    "run_attempt": 1,
+    "head_sha": "6a7aad2aa4c9d8445209d77b32a4c1698d9984ef",
+    "artifact_id": 10185197916,
+    "artifact_name": "pionex-research-universe-v0-1-34563615657-1",
+    "artifact_digest_sha256": "997c99f495e423673e8550da083b15dfc1a2f146833f64efc3d7da227bda8c47",
+    "report_path_after_download": "classification-input/report.json",
+    "report_sha256": "0f0694d660c52858f02e9dbd06bb5f8ae94f2885279656c0dafd91a00785ee68",
+    "expected_status": "PASS",
+    "expected_selected_market_count": 197,
+    "expected_crypto_core_count": 100
+  },
+  "provider": {
+    "name": "coinpaprika",
+    "endpoint": "https://api.coinpaprika.com/v1/coins",
+    "authentication_required": false,
+    "metadata_only": true
+  },
+  "execution": {
+    "not_before_utc": "2026-09-11T17:00:00Z",
+    "stop_exclusive_utc": "2026-09-16T00:00:00Z",
+    "provider_request_count_exact": 1,
+    "automatic_retries": 0,
+    "request_timeout_seconds": 30,
+    "max_response_bytes": 20000000,
+    "user_agent": "crypto-autopilot-pionex-asset-classification-v0.1",
+    "github_actions_main_only": true,
+    "workflow_dispatch_only": true,
+    "accepted_run_attempt": 1
+  },
+  "output": {
+    "secret_free_json_report": true,
+    "raw_provider_payload_persisted": false,
+    "include_coinpaprika_payload_sha256": true,
+    "include_per_market_classification": true,
+    "include_unresolved_symbols": true,
+    "github_artifact_retention_days": 90
+  },
+  "authority": {
+    "github_actions_artifact_read": true,
+    "public_coinpaprika_metadata_read": true,
+    "workflow_dispatch": true,
+    "automatic_schedule": false,
+    "api_key_required": false,
+    "private_account_reads": false,
+    "r2_read": false,
+    "r2_write": false,
+    "universe_membership_change": false,
+    "historical_materialization": false,
+    "holdout_access": false,
+    "training": false,
+    "automatic_model_promotion": false,
+    "strategy_change": false,
+    "source_switch": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
