@@ -31,9 +31,16 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
+      - name: Check frozen fixed-sample completion receipt
+        id: completion
+        run: >-
+          python scripts/check_simulation_btc_completion_v0_1.py
+          --github-output "$GITHUB_OUTPUT"
       - name: Install constrained runtime
+        if: steps.completion.outputs.complete != 'true'
         run: python -m pip install -c requirements/ci-constraints.txt .
       - name: Execute exact admitted BTC simulation
+        if: steps.completion.outputs.complete != 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -42,7 +49,10 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: python scripts/run_simulation_btc_v0_1.py --output simulation-btc-output/report.json
       - name: Preserve simulation result and failures
-        if: always()
+        if: >-
+          always() &&
+          steps.completion.outcome == 'success' &&
+          steps.completion.outputs.complete != 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: simulation-btc-${{ github.run_id }}-${{ github.run_attempt }}
