@@ -1,0 +1,42 @@
+{
+  "schema": "pionex-funding-history-execution-v0.1-authority",
+  "status": "AUTHORIZED_AFTER_PROTECTED_MAIN_MERGE_AWAITING_WORKFLOW_WIRING",
+  "date": "2026-09-11",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "base_protocol_head": "3ea64c861b23ed6a3a781749996b5ae4c22d49e5",
+  "protocol_config": "config/pionex_funding_history_v0_1.json",
+  "protocol_config_sha256": "9117e707203b35ef9d7420b96033cd339b97c549f03e3cdae2ecece4637b6834",
+  "execution_config": "config/pionex_funding_history_execution_v0_1.json",
+  "execution_config_sha256": "d2cdafc5900573eb7d9971b7e3d7b9e5e34f50d16a510b56dcd7e0512b5e3315",
+  "execution_performed_by_this_receipt": false,
+  "execution_contract": {
+    "symbol": "BTC_USDT_PERP",
+    "window_start_utc": "2026-08-01T00:00:00Z",
+    "window_end_exclusive_utc": "2026-08-28T00:00:00Z",
+    "maximum_provider_requests": 3,
+    "page_limit": 500,
+    "automatic_retries": 0,
+    "requests_per_second": 3,
+    "request_timeout_seconds": 15,
+    "workflow_dispatch_only": true,
+    "github_actions_main_only": true,
+    "accepted_run_attempt": 1,
+    "workflow_wiring_included": false
+  },
+  "authority": {
+    "public_pionex_funding_reads_after_merge": true,
+    "private_api": false,
+    "api_key_required": false,
+    "r2_read": false,
+    "r2_write": false,
+    "holdout_access": false,
+    "training": false,
+    "formal_backtest_admission": false,
+    "simulation_data_admission": false,
+    "strategy_change": false,
+    "source_switch": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
