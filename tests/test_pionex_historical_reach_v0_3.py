@@ -200,7 +200,7 @@ class PionexHistoricalReachV03Tests(unittest.TestCase):
         self.assertFalse(report["api_key_used"])
         self.assertNotIn("candles", json.dumps(report).lower().replace("candles_persisted", ""))
 
-    def test_workflow_is_manual_secret_free_and_has_no_schedule(self) -> None:
+    def test_workflow_is_manual_secret_free_and_matches_five_interval_scope(self) -> None:
         workflow = (
             ROOT / ".github/workflows/pionex-historical-reach-v0-3.yml"
         ).read_text(encoding="utf-8")
@@ -209,6 +209,9 @@ class PionexHistoricalReachV03Tests(unittest.TestCase):
         self.assertNotIn("secrets.", workflow)
         self.assertIn("persist-credentials: false", workflow)
         self.assertIn("requirements/ci-constraints.txt", workflow)
+        self.assertIn('"15M", "60M", "4H", "1D", "1W"', workflow)
+        self.assertIn('report["yearly_derivation_authorized"] is False', workflow)
+        self.assertIn('"source_interval": "1D"', workflow)
 
 
 if __name__ == "__main__":
