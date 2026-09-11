@@ -1,0 +1,74 @@
+{
+  "schema": "simulation-btc-fixed-sample-receipt-v0.1",
+  "status": "PASS",
+  "claim": "BTC_FIXED_SAMPLE_READY",
+  "scope": "BTC_FIXED_27_DAY_ENGINE_VALIDATION_ONLY",
+  "full_simulation_ready": false,
+  "full_universe_ready": false,
+  "execution_authority_granted_by_this_receipt": false,
+  "source_switch_authorized": false,
+  "holdout_accessed": false,
+  "live_trading_authorized": false,
+  "real_money_orders_authorized": false,
+  "r2_writes": false,
+  "main_sha": "25cdf4a9cf66749885fb7b5c33046330870d19d8",
+  "workflow_name": "BTC Fixed Sample Simulation V0.1",
+  "workflow_run_id": "34615465566",
+  "workflow_run_attempt": 1,
+  "artifact_id": "10269674365",
+  "artifact_name": "simulation-btc-34615465566-1",
+  "artifact_zip_sha256": "3966385491520c9818309c4ad76a06de17c8d3c1c333274f6f08b2ef25958d9c",
+  "report_path": "report.json",
+  "report_sha256": "8cde42d1d52fffcaf39251a29541ac1c13a91658a5349ef664e7601d061ee2a5",
+  "report_schema": "simulation-btc-run-v0.1",
+  "report_status": "READY",
+  "report_stage": "COMPLETE",
+  "r2_get_attempts": 3,
+  "data_ready": true,
+  "funding_data_ready": true,
+  "pipeline_exercised": true,
+  "funding_observation_count": 81,
+  "generated_plan_count": 28,
+  "executed_trade_count": 15,
+  "rejected_plan_count": 13,
+  "blockers": [],
+  "controls": {
+    "kill_switch": {
+      "configured": false,
+      "time_ms": null,
+      "triggered": false
+    },
+    "max_holding": {
+      "configured": true,
+      "minutes": 720,
+      "triggered": true,
+      "observed_exit_count": 3
+    }
+  },
+  "financial_summary": {
+    "gross_pnl_usd": 4.30655572,
+    "net_pnl_usd": 1.65797823,
+    "final_equity_usd": 101.65797823,
+    "return_pct": 1.65797823,
+    "max_drawdown_pct": 4.9329167,
+    "total_fees_usd": 2.56775057,
+    "total_funding_usd": 0.08082691,
+    "total_slippage_cost_usd": 1.02710042,
+    "win_count": 8,
+    "loss_count": 7,
+    "win_rate": 0.53333333,
+    "profit_factor": 1.1952065,
+    "trade_sharpe": 0.33899106
+  },
+  "exit_reason_counts": {
+    "target": 5,
+    "stop": 6,
+    "max_holding_time": 3,
+    "end_of_data": 1
+  },
+  "evidence_limits": [
+    "This receipt proves only the fixed 27-day BTC sample simulation path.",
+    "It does not prove 197-market history materialization, full-universe training/evaluation, walk-forward readiness, or generalization.",
+    "A successful workflow or this receipt must not be relabeled as FULL_SIMULATION_READY."
+  ]
+}
