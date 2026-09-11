@@ -47,12 +47,20 @@ jobs:
           assert report["r2_accessed"] is False
           assert report["holdout_accessed"] is False
           assert report["materialization_authorized"] is False
+          assert report["yearly_derivation_authorized"] is False
           assert report["formal_backtest_admission_authorized"] is False
           assert report["real_money_orders_authorized"] is False
           assert report["live_trading_authorized"] is False
           if report["status"] == "PASS":
               assert report["symbol"] == "BTC_USDT_PERP"
-              assert [row["interval"] for row in report["intervals"]] == ["15M", "60M", "4H"]
+              assert [row["interval"] for row in report["intervals"]] == [
+                  "15M", "60M", "4H", "1D", "1W"
+              ]
+              assert report["derived_timeframes"]["1Y"] == {
+                  "provider_native": False,
+                  "source_interval": "1D",
+                  "derivation_authorized_by_this_stage": False,
+              }
               assert all(row["classification"] in {
                   "PROVIDER_EARLIEST_REACHED",
                   "DOCUMENTED_RECORD_CAP_REACHED",
