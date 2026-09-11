@@ -602,6 +602,37 @@ function renderHomeSummary(data, strategy, paper, calendar, historyProgress) {
     : "目前模擬候選生成尚未取得授權；網站不會把研究候選冒充每日投資推薦。");
 }
 
+function renderCloudRuns(report) {
+  const list = document.getElementById("cloud-run-list");
+  const time = document.getElementById("cloud-run-updated");
+  if (!list || !time) return;
+  list.replaceChildren();
+  const observed = Date.parse(report?.observedAtUtc);
+  if (report?.schema !== "qookey-cloud-run-status-v0.1" || report.authority !== false
+      || report.simulationReady !== false || !Number.isFinite(observed)
+      || observed > Date.now() + 300000) {
+    time.textContent = "雲端狀態暫不可核實，請查看 GitHub 執行紀錄。";
+    return;
+  }
+  const stale = Date.now() - observed > 6 * 60 * 60 * 1000;
+  time.textContent = `${stale ? "較舊快照" : "最後核對"}：${formatTrustedTime(report.observedAtUtc)}。作業完成後由雲端更新。`;
+  const labels = { history: "Binance 歷史補齊", reach: "Pionex 歷史探測",
+    universe: "Pionex 候選池", funding: "Pionex Funding", health: "排程健康", simulation: "BTC 模擬測試" };
+  const states = { WORKFLOW_SUCCESS: "流程成功", WORKFLOW_FAILED: "需修復",
+    RUNNING: "執行或排隊中", CANCELLED: "已取消", TIMED_OUT: "逾時", UNVERIFIED: "待核實" };
+  for (const [key, label] of Object.entries(labels)) {
+    const row = report.runs?.[key] || {};
+    const item = document.createElement("li");
+    const link = document.createElement("a");
+    const safeUrl = typeof row.sourceUrl === "string"
+      && /^https:\/\/github\.com\/qookey109-pixel\/crypto-autopilot\/actions\/runs\/[0-9]+$/.test(row.sourceUrl);
+    link.textContent = `${label} · ${states[row.state] || "待核實"}`;
+    if (safeUrl) { link.href = row.sourceUrl; link.target = "_blank"; link.rel = "noopener noreferrer"; }
+    item.append(link);
+    list.append(item);
+  }
+}
+
 async function loadData() {
   const refreshButton = document.querySelector("#refresh-button");
   refreshButton?.setAttribute("aria-busy", "true");
@@ -663,10 +694,13 @@ async function loadData() {
     renderHomeSummary(data, strategy, paperTraining, researchCalendar, historyProgress);
     renderPaperTraining(paperTraining);
     renderResearchEvidence(researchEvidence);
+    try { renderCloudRuns(await fetchJson("./data/cloud-runs.json")); }
+    catch { renderCloudRuns(null); }
   } catch (error) {
     console.error("Dashboard snapshot load failed", error);
     render(FALLBACK);
     renderHomeSummary(null, null, null, null, null);
+    renderCloudRuns(null);
     renderCalendar(null);
     renderPaperTraining(null);
     renderResearchEvidence(null);

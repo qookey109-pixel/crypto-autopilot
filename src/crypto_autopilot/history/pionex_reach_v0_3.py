@@ -16,7 +16,9 @@ from ..models import Candle
 
 
 class ReachRejected(RuntimeError):
-    pass
+    def __init__(self, message: str, *, diagnostics: dict[str, object] | None = None):
+        super().__init__(message)
+        self.diagnostics = diagnostics or {}
 
 
 class KlineClient(Protocol):
@@ -138,7 +140,9 @@ def _last_aligned_candle_before(cutoff: int, interval: str) -> int:
     offset = INTERVAL_ALIGNMENT_OFFSET_MS.get(interval, 0)
     if cutoff <= offset:
         raise ReachRejected("cutoff precedes interval alignment origin")
-    return offset + ((cutoff - 1 - offset) // step) * step
+    # A candle belongs to the allowed window only when its CLOSE is inside it.
+    # In particular, the week opening Aug 24 closes Aug 31, inside the holdout.
+    return offset + ((cutoff - step - offset) // step) * step
 
 
 def _validate_page(
@@ -203,8 +207,11 @@ def discover_interval(
                 limit=limit,
                 end_time_ms=cursor,
             )
-        except Exception:
-            raise ReachRejected("provider request failed; discovery is incomplete") from None
+        except Exception as exc:
+            raise ReachRejected(
+                "provider request failed; discovery is incomplete",
+                diagnostics=_request_diagnostics(exc, interval, cursor, progress, len(seen), "page"),
+            ) from None
 
         if not page:
             if not seen:
@@ -229,8 +236,13 @@ def discover_interval(
                     limit=int(config["boundary_probe_limit"]),
                     end_time_ms=probe_cursor,
                 )
-            except Exception:
-                raise ReachRejected("provider boundary probe failed") from None
+            except Exception as exc:
+                raise ReachRejected(
+                    "provider boundary probe failed",
+                    diagnostics=_request_diagnostics(
+                        exc, interval, probe_cursor, progress, len(seen), "boundary_probe"
+                    ),
+                ) from None
             if probe:
                 _validate_page(
                     probe,
@@ -280,16 +292,39 @@ def discover_interval(
     )
 
 
+def _request_diagnostics(exc, interval, cursor, progress, rows, stage):
+    # Never serialize exception text, response bodies, headers, URLs or credentials.
+    from urllib.error import HTTPError
+    return {
+        "interval": interval,
+        "cursor_ms": cursor,
+        "request_number": progress["requests"],
+        "records_observed": rows,
+        "stage": stage,
+        "error_type": type(exc).__name__,
+        "http_status": exc.code if isinstance(exc, HTTPError) else None,
+    }
+
+
 def discover_all(
     config: dict[str, object],
     client: KlineClient,
 ) -> dict[str, object]:
     _require_fixed_scope(config)
     progress = {"requests": 0}
-    observations = [
-        discover_interval(config, client, interval, progress)
-        for interval in config["intervals"]
-    ]
+    observations = []
+    failures = []
+    for interval in config["intervals"]:
+        try:
+            observations.append(discover_interval(config, client, interval, progress))
+        except ReachRejected as exc:
+            failures.append({"interval": interval, "reason": str(exc), **exc.diagnostics})
+    if failures:
+        raise ReachRejected("one or more intervals incomplete", diagnostics={
+            "requests": progress["requests"],
+            "completed_intervals": [item.payload() for item in observations],
+            "failed_intervals": failures,
+        })
     return {
         "status": "PASS",
         "symbol": config["symbol"],

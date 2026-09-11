@@ -1,6 +1,15 @@
 name: Dashboard GitHub Pages
 
 on:
+  workflow_run:
+    workflows:
+      - "Pionex Historical Reach Discovery V0.3"
+      - "Pionex Research Universe 150+ V0.1"
+      - "Pionex Funding History V0.1"
+      - "Binance USD-M Crypto Core 100 History V0.1.2"
+      - "Research Automation Health V0.2"
+      - "BTC Fixed Sample Simulation V0.1"
+    types: [completed]
   push:
     branches: [main]
     paths:
@@ -10,6 +19,7 @@ on:
       - "scripts/build_alternative_assets_projection.py"
       - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
+      - "scripts/build_cloud_run_status.py"
       - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
@@ -46,6 +56,7 @@ on:
       - "scripts/build_alternative_assets_projection.py"
       - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
+      - "scripts/build_cloud_run_status.py"
       - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
@@ -80,11 +91,22 @@ permissions:
   contents: read
 
 concurrency:
-  group: github-pages-production
+  group: github-pages-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'production' }}
   cancel-in-progress: true
 
 jobs:
   build:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository &&
+       (github.event.workflow_run.event == 'schedule' ||
+        github.event.workflow_run.event == 'workflow_dispatch' ||
+        (github.event.workflow_run.event == 'workflow_run' &&
+         github.event.workflow_run.name == 'BTC Fixed Sample Simulation V0.1')))
+    permissions:
+      contents: read
+      actions: read
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -98,6 +120,7 @@ jobs:
       - name: Validate dashboard JavaScript and paper empty states
         run: |
           node --check web/assets/js/app.js
+          node scripts/test_dashboard_cloud_runs.cjs
           node --test tests/dashboard_paper_readiness.test.cjs
 
       - name: Validate Traditional Chinese dashboard safety
@@ -122,6 +145,12 @@ jobs:
             --input _site/data/dashboard.json \
             --output _site/data/dashboard.json
           touch _site/.nojekyll
+
+      - name: Refresh cloud execution status from GitHub metadata only
+        if: github.event_name != 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/build_cloud_run_status.py --output _site/data/cloud-runs.json
 
       - name: Assert latest V0.12 authority and PAPER-ONLY boundary
         shell: bash

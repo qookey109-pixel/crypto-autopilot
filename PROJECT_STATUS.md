@@ -1,6 +1,33 @@
 # Project Status
 
-Updated: 2026-09-04
+Updated: 2026-09-11
+
+## September 15 simulation delivery index
+
+PRs #263/#264/#265 landed on main `6a7aad2` with CI passing. This index
+supersedes older present-tense status summaries below for the simulation path;
+the historical/scientific authorities and their failures remain unchanged.
+
+- **Full-universe NOT_READY.** Pionex run `34563615657` selected 197 candidate
+  markets, not 197 materialized histories. Unknown asset classes need review.
+- BTC pilot `34513815680` verified the fixed 27-day sample. Funding run
+  `34563641025` reported PASS with 81 observations for that same window.
+- Reach `34563589773` failed at a boundary probe. The engineering correction
+  bounds candle CLOSE before the holdout, retains safe request diagnostics and
+  preserves independent interval evidence while the overall result stays FAIL.
+- Binance `34594667095`: 7/10 complete; shard 8 rejects LITUSDT 2025-12 15m,
+  70 missing bars. CTK 2025-04 15m and BNX 2022-08 1h are separate earlier
+  rejections. BNX 15m formal publication still needs its own evidence.
+- Proposed execution authority: `config/simulation_btc_execution_v0_1.json`
+  and `research/receipts/2026-09-11-simulation-btc-execution-v0-1-authority.json`.
+  Only after reviewed main merge, successful current-main push CI triggers
+  fixed BTC simulation: three exact R2 GETs, pinned funding artifact, no
+  provider requests/writes; max 20 workflow runs, expiry September 16 UTC.
+  A scoped READY is engine validation only, never full-universe READY.
+- Dashboard updates after monitored cloud jobs complete. Existing seven cron
+  scopes remain unchanged; the new simulation trigger is event-driven.
+- Delivery, readiness matrix and handoff:
+  `docs/SIMULATION_CLOUD_HANDOFF_2026_09_11.md`.
 
 ## Project
 

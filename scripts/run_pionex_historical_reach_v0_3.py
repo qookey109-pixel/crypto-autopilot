@@ -104,6 +104,8 @@ def main() -> int:
     except Exception as exc:
         reason = str(exc) if isinstance(exc, ReachRejected) else "runtime failure: " + type(exc).__name__
         report = {**base, "reason": reason}
+        if isinstance(exc, ReachRejected):
+            report["diagnostics"] = exc.diagnostics
 
     output = require_ephemeral_output(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
