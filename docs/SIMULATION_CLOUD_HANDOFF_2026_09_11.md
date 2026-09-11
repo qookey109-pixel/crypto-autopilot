@@ -9,6 +9,7 @@
 - 本次讀取的遠端 main：`6a7aad2aa4c9d8445209d77b32a4c1698d9984ef`。
 - PR #263、#264、#265 已整合；不可重做這次整合。
 - 交付分支：`codex/simulation-reliability-20260911`；須 PR 審核合併，禁止自動 merge。
+- 交付 [PR #266](https://github.com/qookey109-pixel/crypto-autopilot/pull/266) 已建立但未合併；功能 commit `99e5d4c53da7b4f7c816e1c5df9028a0057589f0`。後續文件 commit 不改這個功能基準，最終 head 以 PR 為準。
 - 原本 `codex/research-context-v0-1` dirty tree 保留；修改在隔離工作樹進行。
 - 本文件不自我宣稱已合併；精確交付 commit / PR / CI 以交付 PR 與最終訊息核對。
 - 目標：9/15 paper / simulation，不啟用 live trading、真實資金或帳戶 API。
@@ -66,9 +67,11 @@ BTC run number 包含 GitHub 建立的 skipped executions；20 是上限，不�
 超限或到期後需結束／取代這個版本，不得重跑來繞過 budget。新的 event workflow
 不會直接把 197 市場歷史蒐集自動啟動。
 
-既有 Codex 提醒 `crypto` 本輪讀到 ACTIVE、每小時一次、read-only。
-它仍引用已合併 #263/#264/#265，屬於追蹤提示詞待更新項；不是 GitHub 資料執行引擎。
-本交付未建立第二份提醒，亦未聲稱桌面提醒就是獨立雲端 runtime。
+既有 Codex 提醒 `crypto` 已更新，保留 ACTIVE、每小時一次、read-only。
+現在追蹤 #266、真實 BTC simulation、Reach、全池與缺口證據；只在重要變化通知。
+完成後通知一次並停止；9/16 08:00 仍未完成則通知 NOT_READY/blockers 並停止截止日追蹤。
+未建立第二份提醒。它不是 GitHub 資料執行引擎；桌面 project-scoped 排程需
+電腦／App 開啟，不能把它冒充獨立雲端服務（[官方排程說明](https://learn.chatgpt.com/docs/automations?surface=app)）。
 
 ## 架構與 Simulation Readiness
 
