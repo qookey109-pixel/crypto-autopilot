@@ -54,11 +54,22 @@ The following remain binding:
 - no live trading
 - FREE-ONLY cloud discipline remains in force
 
-## 5. Next decisions
+## 5. Authorized post-window research path
+
+Repository authority already defines the bounded next research path; a new V0.13 should not be invented merely to continue work.
+
+`config/context_forward_capture_execution_v0_1.json` authorizes one protected-main, manual one-shot CoinPaprika forward-context capture only after `2026-09-12T04:00:00Z` (`2026-09-12 12:00 Asia/Taipei`). The execution remains research-only, allows at most one successful capture, has zero automatic retries, persists only the normalized immutable snapshot plus receipt under the frozen R2 namespace, and preserves the 8 GB FREE-ONLY hard stop. It does not authorize holdout access, historical backfill, strategy/risk/leverage changes, model promotion, trade plans, orders, or live trading.
+
+`config/post_window_research_successor_schedule_v0_1.json` remains `PREPARED_NOT_ACTIVE`. The proposed four-hour/weekly/monthly successor cadence is not active authority. A four-hour schedule requires separate reviewed V0.2 authority after a successful bounded V0.1 one-shot.
+
+PR #269 is a restriction-only hardening proposal that makes the existing protected-main requirement explicit in workflow/runtime enforcement. Until merged, it is not Repository authority.
+
+## 6. Next decisions
 
 1. Preserve future V0.12 scheduled runs as observational evidence only; do not claim that a later successful capture repairs the two irreversibly missing hourly slots.
 2. Any new metadata-stability collection attempt that is intended to become complete PASS-eligible requires a new versioned authority rather than mutation or regrading of V0.12.
 3. Keep Binance detailed history fail-closed at the LIT quality gate unless official source evidence changes or a separately reviewed versioned repair/source protocol is approved.
-4. PR #249 remains an open proposal for bounded Render-502 review. It is not current execution authority and should not be treated as merged policy.
+4. Do not run the Context Forward Capture V0.1 before `2026-09-12T04:00:00Z`. After that time, only the frozen protected-main manual one-shot is within current authority; no recurring schedule follows automatically.
+5. PR #249 remains an open proposal for bounded Render-502 review. It is not current execution authority and should not be treated as merged policy.
 
 No automatic action is authorized by this note.
