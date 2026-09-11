@@ -15,7 +15,9 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 import zipfile
 
 from crypto_autopilot.paper.simulation_funding_v0_1 import (
-    load_verified_funding, run_readiness_with_verified_funding,
+    SIMULATION_BACKTEST_CONFIG,
+    load_verified_funding,
+    run_readiness_with_verified_funding,
 )
 from crypto_autopilot.paper.simulation_readiness_v0_3 import _validate_receipt
 
@@ -105,6 +107,83 @@ def funding_from_zip(payload, config):
     return report
 
 
+def controls_summary(backtest_result):
+    """Report configured controls separately from whether a run observed a trigger."""
+
+    observed = backtest_result is not None
+    trades = () if backtest_result is None else backtest_result.trades
+    rejected = () if backtest_result is None else backtest_result.rejected_plans
+    kill_switch_triggered = None if not observed else (
+        any(trade.exit_reason == "kill_switch" for trade in trades)
+        or any(reason == "kill_switch_active" for _, reason in rejected)
+    )
+    max_holding_triggered = None if not observed else any(
+        trade.exit_reason == "max_holding_time" for trade in trades
+    )
+    return {
+        "kill_switch": {
+            "configured": SIMULATION_BACKTEST_CONFIG.kill_switch_time_ms is not None,
+            "time_ms": SIMULATION_BACKTEST_CONFIG.kill_switch_time_ms,
+            "triggered": kill_switch_triggered,
+        },
+        "max_holding": {
+            "configured": SIMULATION_BACKTEST_CONFIG.max_holding_minutes is not None,
+            "minutes": SIMULATION_BACKTEST_CONFIG.max_holding_minutes,
+            "triggered": max_holding_triggered,
+        },
+    }
+
+
+def financial_summary(backtest_result):
+    """Return measured PnL/cost metrics, or explicit nulls when no result exists."""
+
+    if backtest_result is None:
+        return {
+            "available": False,
+            "gross_pnl_usd": None,
+            "net_pnl_usd": None,
+            "final_equity_usd": None,
+            "return_pct": None,
+            "max_drawdown_pct": None,
+            "total_fees_usd": None,
+            "total_funding_usd": None,
+            "total_slippage_cost_usd": None,
+        }
+    metrics = backtest_result.metrics
+    return {
+        "available": True,
+        "gross_pnl_usd": round(sum(trade.gross_pnl_usd for trade in backtest_result.trades), 8),
+        "net_pnl_usd": metrics.net_pnl_usd,
+        "final_equity_usd": backtest_result.final_equity_usd,
+        "return_pct": metrics.return_pct,
+        "max_drawdown_pct": metrics.max_drawdown_pct,
+        "total_fees_usd": metrics.total_fees_usd,
+        "total_funding_usd": metrics.total_funding_usd,
+        "total_slippage_cost_usd": metrics.total_slippage_cost_usd,
+    }
+
+
+def outcome_summary(state, *, bridge=None, reason=None):
+    """Keep no-signal, no-trade and execution-failure states schema-compatible."""
+
+    if bridge is None:
+        generated = executed = rejected = None
+        result_available = False
+    else:
+        generated = bridge.get("generated_plan_count")
+        executed = bridge.get("executed_trade_count")
+        rejected = bridge.get("rejected_plan_count", 0 if generated == 0 else None)
+        result_available = "result" in bridge
+    return {
+        "state": state,
+        "simulation_result_available": result_available,
+        "reason": reason,
+        "generated_plan_count": generated,
+        "executed_trade_count": executed,
+        "rejected_plan_count": rejected,
+    }
+
+
 def simulate(config, receipt, funding, read_object):
     payloads = {}
     for row in receipt["intervals"]:
@@ -121,9 +200,42 @@ def simulate(config, receipt, funding, read_object):
     result["scope"] = config["scope"]
     result["full_universe_ready"] = False
     result["production_sample_admitted"] = True
-    if "result" in result:
-        result["result"] = asdict(result["result"])
+
+    backtest_result = result.get("result")
+    if result["pipeline_exercised"]:
+        outcome_state = "TRADES_EXECUTED"
+        outcome_reason = None
+    elif result.get("generated_plan_count") == 0:
+        outcome_state = "NO_SIGNAL"
+        outcome_reason = "no_candle_derived_strategy_signal"
+    else:
+        outcome_state = "NO_TRADE"
+        outcome_reason = "no_executed_trade"
+    result["outcome"] = outcome_summary(outcome_state, bridge=result, reason=outcome_reason)
+    result["controls"] = controls_summary(backtest_result)
+    result["financial_summary"] = financial_summary(backtest_result)
+    if backtest_result is not None:
+        result["result"] = asdict(backtest_result)
     return result
+
+
+def base_report():
+    return {
+        "schema": "simulation-btc-run-v0.1",
+        "status": "NOT_READY",
+        "scope": "BTC_FIXED_27_DAY_ENGINE_VALIDATION_ONLY",
+        "full_universe_ready": False,
+        "r2_writes": False,
+        "holdout_accessed": False,
+        "live_trading_authorized": False,
+        "run_id": os.environ.get("GITHUB_RUN_ID"),
+        "r2_get_attempts": 0,
+        "stage": "AUTHORITY_AND_CONTEXT",
+        "blockers": [],
+        "outcome": outcome_summary("NOT_RUN"),
+        "controls": controls_summary(None),
+        "financial_summary": financial_summary(None),
+    }
 
 
 def main():
@@ -132,12 +244,7 @@ def main():
     args = parser.parse_args()
     from crypto_autopilot.storage.ephemeral import require_ephemeral_output
     output = require_ephemeral_output(args.output)
-    report = {"schema": "simulation-btc-run-v0.1", "status": "NOT_READY",
-              "scope": "BTC_FIXED_27_DAY_ENGINE_VALIDATION_ONLY",
-              "full_universe_ready": False, "r2_writes": False,
-              "holdout_accessed": False, "live_trading_authorized": False,
-              "run_id": os.environ.get("GITHUB_RUN_ID"), "r2_get_attempts": 0,
-              "stage": "AUTHORITY_AND_CONTEXT"}
+    report = base_report()
     try:
         config, receipt = load_authority()
         event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
@@ -180,7 +287,11 @@ def main():
         report.update(simulate(config, receipt, funding, read_object))
         report["stage"] = "COMPLETE"
     except Exception as exc:
-        report["blockers"] = ["execution_failed_" + type(exc).__name__]
+        failure = "execution_failed_" + type(exc).__name__
+        report["blockers"] = [failure]
+        report["outcome"] = outcome_summary("EXECUTION_FAILED", reason=failure)
+        report["controls"] = controls_summary(None)
+        report["financial_summary"] = financial_summary(None)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
     print(json.dumps({key: report[key] for key in ("status", "scope", "r2_get_attempts")}))
