@@ -1,0 +1,46 @@
+{
+  "schema": "pionex-150-history-plan-v0.1-prepared",
+  "status": "PREPARED_NOT_EXECUTION_AUTHORITY",
+  "date": "2026-09-11",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "stacked_on_head": "0975e7d7a3ffa11928dd9ea103b68e6fd3afe957",
+  "config": "config/pionex_150_history_plan_v0_1.json",
+  "config_sha256": "44ac6dc1d6947e485e6f2aa6bc14bfaf799c8c14b3f859ad813eaf665704e59b",
+  "user_decision": "Continue from the Pionex 150+ universe toward a tiered historical-data architecture for the 2026-09-15 simulation target, while avoiding unnecessary intraday history for every selected market.",
+  "dependencies": {
+    "pionex_historical_reach_pr": 258,
+    "pionex_universe_selection_pr": 259,
+    "pionex_universe_snapshot_execution_pr": 260
+  },
+  "prepared_contract": {
+    "minimum_selected_markets": 150,
+    "provider_native_intervals": [
+      "15M",
+      "60M",
+      "4H",
+      "1D",
+      "1W"
+    ],
+    "documented_record_cap_per_market_interval": 10000,
+    "request_upper_bound_per_market_interval": 21,
+    "btc_reach_is_per_market_listing_proof": false,
+    "each_market_earliest_boundary_must_be_proven": true,
+    "derived_1y_authorized": false
+  },
+  "authority": {
+    "synthetic_fixture_validation": true,
+    "public_pionex_requests": false,
+    "private_api": false,
+    "r2_read": false,
+    "r2_write": false,
+    "historical_materialization": false,
+    "holdout_access": false,
+    "training": false,
+    "formal_backtest_admission": false,
+    "strategy_change": false,
+    "source_switch": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
