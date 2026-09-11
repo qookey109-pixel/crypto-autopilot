@@ -12,6 +12,8 @@
     "github_actions_main_only": true,
     "workflow_dispatch_only": true,
     "accepted_run_attempt": 1,
+    "requests_per_second": 3,
+    "request_timeout_seconds": 15,
     "automatic_retries": 0,
     "workflow_wiring_included_by_this_stage": false,
     "secret_free_artifact_retention_days": 90
