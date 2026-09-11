@@ -1,0 +1,83 @@
+name: Pionex Historical Reach Discovery V0.3
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pionex-historical-reach-v0-3
+  cancel-in-progress: false
+
+jobs:
+  discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Discover Pionex-native historical reach
+        run: |
+          python scripts/run_pionex_historical_reach_v0_3.py \
+            --output pionex-reach-output/report.json
+
+      - name: Assert discovery-only boundary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("pionex-reach-output/report.json").read_text())
+          assert report["schema"] == "pionex-historical-reach-run-report-v0.3"
+          assert report["status"] in {"PASS", "FAIL"}
+          assert report["api_key_used"] is False
+          assert report["raw_provider_payloads_persisted"] is False
+          assert report["candles_persisted"] is False
+          assert report["r2_accessed"] is False
+          assert report["holdout_accessed"] is False
+          assert report["materialization_authorized"] is False
+          assert report["yearly_derivation_authorized"] is False
+          assert report["formal_backtest_admission_authorized"] is False
+          assert report["real_money_orders_authorized"] is False
+          assert report["live_trading_authorized"] is False
+          if report["status"] == "PASS":
+              assert report["symbol"] == "BTC_USDT_PERP"
+              assert [row["interval"] for row in report["intervals"]] == [
+                  "15M", "60M", "4H", "1D", "1W"
+              ]
+              assert report["derived_timeframes"]["1Y"] == {
+                  "provider_native": False,
+                  "source_interval": "1D",
+                  "derivation_authorized_by_this_stage": False,
+              }
+              assert all(row["classification"] in {
+                  "PROVIDER_EARLIEST_REACHED",
+                  "DOCUMENTED_RECORD_CAP_REACHED",
+              } for row in report["intervals"])
+              assert all(row["records_observed"] <= 10000 for row in report["intervals"])
+              assert all(row["continuity_verified"] is True for row in report["intervals"])
+          PY
+
+      - name: Upload secret-free reach report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: pionex-historical-reach-v0-3-${{ github.run_id }}-${{ github.run_attempt }}
+          path: pionex-reach-output/report.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf pionex-reach-output
