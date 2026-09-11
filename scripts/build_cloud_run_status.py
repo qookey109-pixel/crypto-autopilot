@@ -36,6 +36,11 @@ def project_run(runs: list[dict], workflow: str) -> dict:
         and run.get("head_repository", {}).get("full_name") == REPOSITORY
         and type(run.get("id")) is int
         and re.fullmatch(r"[0-9a-f]{40}", str(run.get("head_sha", "")))
+        and not (
+            workflow == "simulation-btc-v0-1.yml"
+            and run.get("status") == "completed"
+            and run.get("conclusion") == "skipped"
+        )
     )]
     if not candidates:
         return {"state": "UNVERIFIED", "datasetComplete": None}

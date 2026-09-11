@@ -1,51 +1,63 @@
-name: BTC Fixed Sample Simulation V0.1
+name: BTC Fixed Sample Simulation V0.1 — RETIRED
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
+  pull_request:
+    paths:
+      - ".github/workflows/simulation-btc-v0-1.yml"
+      - "research/receipts/2026-09-11-simulation-btc-fixed-sample-v0-1-pass.json"
+      - "scripts/build_cloud_run_status.py"
+      - "tests/test_cloud_run_status.py"
+      - "config/project_convergence_v0_1.json"
 
 permissions:
   contents: read
-  actions: read
-
-concurrency:
-  group: simulation-btc-v0-1
-  cancel-in-progress: false
 
 jobs:
-  simulation:
-    if: >-
-      github.event.workflow_run.head_branch == 'main' &&
-      github.event.workflow_run.head_repository.full_name == github.repository &&
-      github.event.workflow_run.event == 'push' &&
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_sha == github.sha
+  validate-retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-        with:
-          python-version: "3.13"
-      - name: Install constrained runtime
-        run: python -m pip install -c requirements/ci-constraints.txt .
-      - name: Execute exact admitted BTC simulation
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: python scripts/run_simulation_btc_v0_1.py --output simulation-btc-output/report.json
-      - name: Preserve simulation result and failures
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          name: simulation-btc-${{ github.run_id }}-${{ github.run_attempt }}
-          path: simulation-btc-output/report.json
-          retention-days: 90
-          if-no-files-found: error
+      - name: Assert fixed BTC V0.1 is frozen and cannot execute again
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(Path(
+              'research/receipts/2026-09-11-simulation-btc-fixed-sample-v0-1-pass.json'
+          ).read_text(encoding='utf-8'))
+          expected = {
+              'schema': 'simulation-btc-fixed-sample-receipt-v0.1',
+              'status': 'PASS',
+              'claim': 'BTC_FIXED_SAMPLE_READY',
+              'scope': 'BTC_FIXED_27_DAY_ENGINE_VALIDATION_ONLY',
+              'main_sha': '25cdf4a9cf66749885fb7b5c33046330870d19d8',
+              'workflow_run_id': '34615465566',
+              'workflow_run_attempt': 1,
+              'artifact_id': '10269674365',
+              'report_sha256': '8cde42d1d52fffcaf39251a29541ac1c13a91658a5349ef664e7601d061ee2a5',
+              'report_status': 'READY',
+              'full_simulation_ready': False,
+              'full_universe_ready': False,
+              'execution_authority_granted_by_this_receipt': False,
+              'source_switch_authorized': False,
+              'holdout_accessed': False,
+              'live_trading_authorized': False,
+              'real_money_orders_authorized': False,
+              'r2_writes': False,
+          }
+          for key, value in expected.items():
+              assert receipt.get(key) == value, key
+          print('RETIRED_FIXED_SAMPLE_COMPLETE')
+          print('automatic_execution_authorized=false')
+          print('provider_requests_performed=0')
+          print('r2_reads_performed=0')
+          print('r2_writes_performed=false')
+          print('holdout_accessed=false')
+          print('live_trading_authorized=false')
+          PY
