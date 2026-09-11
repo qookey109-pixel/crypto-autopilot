@@ -1,0 +1,73 @@
+{
+  "version": "0.1.0",
+  "status": "PREPARED_NOT_EXECUTION_AUTHORITY",
+  "purpose": "Prepare a deterministic capacity and acquisition plan for a future Pionex 150+ historical materialization using a reviewed universe report and reviewed Pionex historical-reach report, without performing provider or R2 execution.",
+  "inputs": {
+    "universe_report_schema": "pionex-research-universe-run-report-v0.1",
+    "reach_report_schema": "pionex-historical-reach-run-report-v0.3",
+    "required_provider": "pionex_public_futures",
+    "required_reach_symbol": "BTC_USDT_PERP",
+    "required_intervals": [
+      "15M",
+      "60M",
+      "4H",
+      "1D",
+      "1W"
+    ]
+  },
+  "planning": {
+    "page_limit": 500,
+    "documented_max_records_per_market_interval": 10000,
+    "max_data_pages_per_market_interval": 20,
+    "boundary_probe_allowance_per_market_interval": 1,
+    "history_profiles": {
+      "FULL_INTRADAY": [
+        "15M",
+        "60M",
+        "4H",
+        "1D",
+        "1W"
+      ],
+      "MULTISCALE_RESEARCH": [
+        "60M",
+        "4H",
+        "1D",
+        "1W"
+      ],
+      "BREADTH_BACKGROUND": [
+        "1D",
+        "1W"
+      ]
+    },
+    "btc_reach_is_provider_reference_not_per_market_listing_proof": true,
+    "each_market_earliest_boundary_must_be_proven_during_materialization": true,
+    "derived_1y_provider_native": false,
+    "derived_1y_source_interval": "1D",
+    "derived_1y_authorized": false
+  },
+  "output": {
+    "deterministic_plan_only": true,
+    "include_market_request_upper_bounds": true,
+    "include_total_request_upper_bound": true,
+    "include_interval_reference_reach": true,
+    "persist_raw_provider_payloads": false,
+    "r2_read": false,
+    "r2_write": false
+  },
+  "authority": {
+    "synthetic_fixture_validation": true,
+    "public_pionex_requests": false,
+    "private_api": false,
+    "r2_read": false,
+    "r2_write": false,
+    "historical_materialization": false,
+    "holdout_access": false,
+    "training": false,
+    "formal_backtest_admission": false,
+    "strategy_change": false,
+    "source_switch": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
