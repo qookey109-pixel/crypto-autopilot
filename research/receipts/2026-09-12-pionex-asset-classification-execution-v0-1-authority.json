@@ -1,0 +1,22 @@
+{
+  "schema": "pionex-asset-classification-execution-authority-v0.1",
+  "status": "AUTHORIZED_AFTER_PROTECTED_MAIN_MERGE_MANUAL_CLASSIFICATION_ONLY",
+  "config": "config/pionex_asset_classification_execution_v0_1.json",
+  "config_sha256": "1e9f812b569739af0d2535fe4263f625c6ff7cb574bd5cd5559363a5d722f658",
+  "execution_performed_by_this_receipt": false,
+  "github_actions_artifact_read_authorized": true,
+  "public_coinpaprika_metadata_read_authorized": true,
+  "workflow_dispatch_authorized": true,
+  "automatic_schedule_authorized": false,
+  "r2_access_authorized": false,
+  "holdout_access_authorized": false,
+  "universe_membership_change_authorized": false,
+  "historical_materialization_authorized": false,
+  "training_authorized": false,
+  "automatic_model_promotion_authorized": false,
+  "strategy_change_authorized": false,
+  "source_switch_authorized": false,
+  "trade_plan_authorized": false,
+  "real_money_orders_authorized": false,
+  "live_trading_authorized": false
+}
