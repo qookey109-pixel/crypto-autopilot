@@ -2,7 +2,7 @@
   "schema": "qookey-simulation-readiness-v0.1",
   "authority": false,
   "status_type": "READ_ONLY_OPERATIONAL_INDEX",
-  "as_of_repository_main_sha": "0b36ea70fabbf7bd41732a7b685b92ef833c05dc",
+  "as_of_repository_main_sha": "8ba78f961d267caa6d1adf79cc74aaddd4d1e2f7",
   "overall": "NOT_READY",
   "full_simulation_ready": false,
   "full_universe_ready": false,
@@ -49,13 +49,28 @@
   },
   "metadata_stability": {
     "state": "BLOCKED_V0_12_COMPLETE_PASS_INELIGIBLE",
+    "display_state": "BLOCKED",
+    "display_eligibility": "COMPLETE_194_SLOT_PASS_INELIGIBLE",
     "formal_observation": "research/receipts/2026-09-04-v0-12-schedule-delivery-missing-slot-observation.json",
+    "required_hourly_slot_count": 194,
+    "all_hourly_slots_required": true,
     "irreversibly_missing_hourly_slots_utc": [
       "2026-09-04T02:00:00Z",
       "2026-09-04T03:00:00Z"
     ],
+    "complete_window_pass_eligible": false,
+    "partial_window_may_pass": false,
     "retroactive_backfill_authorized": false,
-    "replacement_holdout_state": "FROZEN_UNOPENED"
+    "later_observation_can_restore_missing_slots": false,
+    "v0_12_capture_observation_may_continue": true,
+    "production_stability_evaluation_authorized": false,
+    "latest_observed_scheduled_run_id": 34614741624,
+    "latest_observed_scheduled_run_number": 55,
+    "latest_observed_run_outcome": "FAIL_PROVIDER_CAPTURE_RENDER_HTTP_502",
+    "render_recovery_occurred_after_latest_observed_failure": true,
+    "post_recovery_formal_schedule_evidence_state": "AWAITING_NEW_FORMAL_RUN_EVIDENCE",
+    "replacement_holdout_state": "FROZEN_UNOPENED",
+    "display_detail": "V0.12 later captures may remain observational evidence, but two irreversibly missing UTC hourly slots mean this frozen window cannot achieve the required complete 194-slot PASS."
   },
   "context_forward_v0_1": {
     "state": "AUTHORIZED_PENDING_ONE_SHOT",
