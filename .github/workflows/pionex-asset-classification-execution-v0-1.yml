@@ -1,0 +1,89 @@
+name: Pionex Asset Classification Execution V0.1
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: pionex-asset-classification-execution-v0-1
+  cancel-in-progress: false
+
+jobs:
+  classify:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Download exact formal Pionex universe evidence
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          artifact-ids: 10185197916
+          path: classification-input
+          github-token: ${{ github.token }}
+          repository: qookey109-pixel/crypto-autopilot
+          run-id: 34563615657
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Run bounded metadata-only classification
+        run: |
+          python scripts/run_pionex_asset_classification_execution_v0_1.py \
+            --universe-report classification-input/report.json \
+            --output classification-output/report.json
+
+      - name: Assert execution boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("classification-output/report.json").read_text())
+          result = report["classification_result"]
+          assert report["schema"] == "pionex-asset-classification-execution-report-v0.1"
+          assert report["status"] == "PASS"
+          assert report["classification_gate_status"] in {"PASS", "REVIEW_REQUIRED"}
+          assert report["source_universe_run_id"] == 34563615657
+          assert report["provider"] == "coinpaprika"
+          assert report["provider_requests_performed"] == 1
+          assert report["automatic_retries_performed"] == 0
+          assert report["raw_provider_payload_persisted"] is False
+          assert report["r2_accessed"] is False
+          assert report["holdout_accessed"] is False
+          assert report["universe_membership_changed"] is False
+          assert report["historical_materialization_performed"] is False
+          assert report["training_authorized"] is False
+          assert report["automatic_model_promotion_authorized"] is False
+          assert report["strategy_changed"] is False
+          assert report["source_switch_authorized"] is False
+          assert report["trade_plan_authorized"] is False
+          assert report["real_money_orders_authorized"] is False
+          assert report["live_trading_authorized"] is False
+          assert result["authority"] is False
+          assert result["selected_market_count"] == 197
+          assert result["full_simulation_readiness_cleared_by_this_result"] is False
+          assert result["universe_fallback_crypto_labels_used_as_evidence"] is False
+          PY
+
+      - name: Upload secret-free classification report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: pionex-asset-classification-v0-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: classification-output/report.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf classification-input classification-output
