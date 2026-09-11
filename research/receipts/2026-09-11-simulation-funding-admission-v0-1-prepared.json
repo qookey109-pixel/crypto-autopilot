@@ -1,0 +1,20 @@
+{
+  "schema": "simulation-funding-admission-v0.1-prepared",
+  "status": "PREPARED_NOT_PRODUCTION_ADMISSION_AUTHORITY",
+  "config": "config/simulation_funding_admission_v0_1.json",
+  "config_sha256": "b9871ca38bcb69d0850effc4ea56c9e43ff710e798a73966425b000f83521f6c",
+  "base_integration_head": "09ac44a1ebfb66dd8810055d61040ef6a08c5126",
+  "prepared_scope": "offline validation of exact Pionex funding PASS report -> canonical FundingPoint -> existing Simulation Readiness V0.3 backtest path",
+  "provider_requests_performed": false,
+  "production_kline_read_performed": false,
+  "production_funding_report_admitted": false,
+  "r2_read_performed": false,
+  "r2_write_performed": false,
+  "holdout_accessed": false,
+  "formal_backtest_admission_authorized": false,
+  "full_simulation_ready": false,
+  "real_money_order_authorized": false,
+  "live_trading_authorized": false,
+  "source_switch_authorized": false,
+  "note": "This stage removes the software bridge gap only. A later reviewed production simulation-data admission authority is still required after real funding evidence exists."
+}

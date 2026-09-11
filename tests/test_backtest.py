@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import unittest
 
 from crypto_autopilot.backtest import (
@@ -60,6 +61,80 @@ class BacktestEngineTest(unittest.TestCase):
         self.assertEqual(result.trades[0].exit_reason, "stop_same_bar_collision")
         self.assertEqual(result.trades[0].raw_exit_price, 95.0)
         self.assertLess(result.trades[0].net_pnl_usd, 0)
+
+    def test_gap_through_stop_uses_opening_price_not_unavailable_stop(self) -> None:
+        candles = [
+            candle(0, open_=100, high=101, low=99, close=100),
+            candle(1, open_=100, high=102, low=99, close=101),
+            candle(2, open_=90, high=92, low=88, close=91),
+        ]
+        result = run_long_backtest(
+            candles_by_symbol={"BTC_USDT_PERP": candles},
+            plans=[LongTradePlan("gap", "BTC_USDT_PERP", 0, 95.0, 120.0)],
+            config=BacktestConfig(taker_fee_bps=0, slippage_bps=0),
+        )
+        trade = result.trades[0]
+        self.assertEqual(trade.exit_reason, "stop_gap")
+        self.assertEqual(trade.raw_exit_price, 90.0)
+        self.assertLess(trade.r_multiple, -1.0)
+
+    def test_kill_switch_flattens_and_blocks_future_entries(self) -> None:
+        candles = [
+            candle(0, open_=100, high=101, low=99, close=100),
+            candle(1, open_=100, high=102, low=99, close=101),
+            candle(2, open_=103, high=104, low=102, close=103),
+            candle(3, open_=104, high=105, low=103, close=104),
+            candle(4, open_=105, high=106, low=104, close=105),
+        ]
+        plans = [
+            LongTradePlan("open", "BTC_USDT_PERP", 0, 95.0, 130.0),
+            LongTradePlan("blocked", "BTC_USDT_PERP", 3 * MINUTE, 95.0, 130.0),
+        ]
+        result = run_long_backtest(
+            candles_by_symbol={"BTC_USDT_PERP": candles},
+            plans=plans,
+            config=BacktestConfig(
+                taker_fee_bps=0,
+                slippage_bps=0,
+                kill_switch_time_ms=2 * MINUTE,
+            ),
+        )
+        self.assertEqual(len(result.trades), 1)
+        self.assertEqual(result.trades[0].exit_reason, "kill_switch")
+        self.assertEqual(result.trades[0].exit_time_ms, 2 * MINUTE)
+        self.assertEqual(result.trades[0].raw_exit_price, 103.0)
+        self.assertIn(("blocked", "kill_switch_active"), result.rejected_plans)
+        self.assertIn("KILL_SWITCH_TRIGGERED", [event.kind for event in result.events])
+
+    def test_max_holding_time_closes_at_observed_bar_close(self) -> None:
+        candles = [
+            candle(0, open_=100, high=101, low=99, close=100),
+            candle(1, open_=100, high=102, low=99, close=101),
+            candle(2, open_=101, high=103, low=100, close=102),
+            candle(3, open_=102, high=104, low=101, close=103),
+        ]
+        result = run_long_backtest(
+            candles_by_symbol={"BTC_USDT_PERP": candles},
+            plans=[LongTradePlan("hold", "BTC_USDT_PERP", 0, 95.0, 130.0)],
+            config=BacktestConfig(
+                taker_fee_bps=0,
+                slippage_bps=0,
+                max_holding_minutes=2,
+            ),
+        )
+        trade = result.trades[0]
+        self.assertEqual(trade.exit_reason, "max_holding_time")
+        self.assertEqual(trade.exit_time_ms, 3 * MINUTE)
+        self.assertEqual(trade.raw_exit_price, 103.0)
+
+    def test_non_finite_config_and_plan_values_are_rejected(self) -> None:
+        for value in (math.nan, math.inf, -math.inf):
+            with self.assertRaises(ValueError):
+                BacktestConfig(initial_equity_usd=value)
+            with self.assertRaises(ValueError):
+                BacktestConfig(taker_fee_bps=value)
+            with self.assertRaises(ValueError):
+                LongTradePlan("bad", "BTC_USDT_PERP", 0, value, 110.0)
 
     def test_last_bar_signal_is_rejected_instead_of_lookahead_fill(self) -> None:
         candles = [candle(0, open_=100, high=102, low=99, close=101)]

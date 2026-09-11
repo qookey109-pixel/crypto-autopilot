@@ -1,0 +1,48 @@
+{
+  "binance_relabel_as_pionex_authorized": false,
+  "config_sha256": "a66fdf7def02023590163091fbdd1eceabe5d96a774ffa0207e7b7a7f506f932",
+  "coverage_claim": "COMPLETE_FIXED_27_DAY_CAPACITY_SAMPLE_ONLY",
+  "end_exclusive_utc": "2026-08-28T00:00:00Z",
+  "holdout_accessed": false,
+  "intervals": [
+    {
+      "bytes": 77520,
+      "first_time_ms": 1785542400000,
+      "interval": "15M",
+      "key": "market-data/pionex/historical-research-pool-v0.2/pilot/run=github-34513815680-1/15M.parquet",
+      "last_time_ms": 1787874300000,
+      "rows": 2592,
+      "sha256": "054020f6eb3b8279b47bf4d71b4f772c5c8a278f8d2e1e463145d6063660ea72"
+    },
+    {
+      "bytes": 21139,
+      "first_time_ms": 1785542400000,
+      "interval": "60M",
+      "key": "market-data/pionex/historical-research-pool-v0.2/pilot/run=github-34513815680-1/60M.parquet",
+      "last_time_ms": 1787871600000,
+      "rows": 648,
+      "sha256": "cce5188d422bf8807b902b0ae8c5b4c265ab736e6b9ab668b65e6b476829a278"
+    },
+    {
+      "bytes": 7035,
+      "first_time_ms": 1785542400000,
+      "interval": "4H",
+      "key": "market-data/pionex/historical-research-pool-v0.2/pilot/run=github-34513815680-1/4H.parquet",
+      "last_time_ms": 1787860800000,
+      "rows": 162,
+      "sha256": "6a7ff016b32780f0389d240174214dc53d818c71b9d17524b50d5331b4895d43"
+    }
+  ],
+  "live_trading_authorized": false,
+  "provider": "pionex_public_futures",
+  "r2_latest_pointer_written_last": true,
+  "r2_writes_performed": true,
+  "requests": 9,
+  "run_id": "github-34513815680-1",
+  "schema": "pionex-bounded-pilot-run-report-v0.2",
+  "source_switch_authorized": false,
+  "start_utc": "2026-08-01T00:00:00Z",
+  "status": "PASS",
+  "symbol": "BTC_USDT_PERP",
+  "training_authorized": false
+}
