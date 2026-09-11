@@ -1,0 +1,47 @@
+{
+  "version": "0.1.0",
+  "status": "PREPARED_OFFLINE_VALIDATION_NOT_PRODUCTION_ADMISSION_AUTHORITY",
+  "purpose": "Bridge an exact validated Pionex funding-history PASS report into canonical FundingPoint values and the existing Simulation Readiness V0.3 backtest path without introducing a second broker or claiming production simulation admission.",
+  "bindings": {
+    "simulation_readiness_config": "config/simulation_readiness_v0_3.json",
+    "simulation_readiness_config_sha256": "75cbaf9c1a35d057bade9dd8e301dc14723a055d25ab453b15018928d0f12fd1",
+    "funding_protocol_config": "config/pionex_funding_history_v0_1.json",
+    "funding_protocol_config_sha256": "9117e707203b35ef9d7420b96033cd339b97c549f03e3cdae2ecece4637b6834",
+    "funding_execution_config": "config/pionex_funding_history_execution_v0_1.json",
+    "funding_execution_config_sha256": "d2cdafc5900573eb7d9971b7e3d7b9e5e34f50d16a510b56dcd7e0512b5e3315"
+  },
+  "input_contract": {
+    "funding_report_schema": "pionex-funding-history-run-report-v0.1",
+    "provider": "pionex_public_futures",
+    "symbol": "BTC_USDT_PERP",
+    "window_start_utc": "2026-08-01T00:00:00Z",
+    "window_end_exclusive_utc": "2026-08-28T00:00:00Z",
+    "maximum_provider_requests": 3,
+    "automatic_retries": 0,
+    "left_boundary_required": true,
+    "strict_unique_timestamps": true,
+    "fixed_cadence_assumption": false,
+    "zero_fill": false
+  },
+  "readiness": {
+    "validated_funding_removes_missing_funding_blocker": true,
+    "full_simulation_ready_after_this_stage": false,
+    "remaining_blocker": "production_simulation_data_admission_not_authorized"
+  },
+  "authority": {
+    "synthetic_fixture_validation": true,
+    "production_kline_read": false,
+    "production_funding_report_admission": false,
+    "provider_requests": false,
+    "r2_reads": false,
+    "r2_writes": false,
+    "holdout_access": false,
+    "training": false,
+    "formal_backtest_admission": false,
+    "strategy_change": false,
+    "source_switch": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
