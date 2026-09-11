@@ -1,0 +1,53 @@
+{
+  "version": "0.1.0",
+  "status": "PREPARED_NOT_EXECUTION_AUTHORITY",
+  "purpose": "Bounded Pionex-native historical funding source for the exact V0.2 BTC capacity-sample window.",
+  "source": {
+    "provider": "pionex_public_futures",
+    "endpoint": "https://api.pionex.com/api/v1/market/fundingRates",
+    "authentication": "NONE_PUBLIC",
+    "symbol": "BTC_USDT_PERP",
+    "start_utc": "2026-08-01T00:00:00Z",
+    "end_exclusive_utc": "2026-08-28T00:00:00Z",
+    "first_end_time_policy": "END_EXCLUSIVE_MINUS_1_MS",
+    "page_limit": 500,
+    "maximum_requests": 3,
+    "pagination": "DESCENDING_END_TIME_FROM_OLDEST_MINUS_1_MS",
+    "retry_count": 0
+  },
+  "completeness": {
+    "require_left_boundary_reached": true,
+    "left_boundary_rule": "OLDEST_OBSERVED_FUNDING_TIME_LTE_START_UTC",
+    "require_strict_unique_timestamps": true,
+    "require_finite_rates": true,
+    "require_exact_symbol": true,
+    "require_all_returned_timestamps_lte_request_cursor": true,
+    "filter_output_to_half_open_window": true,
+    "minimum_in_window_observations": 1,
+    "fixed_cadence_assumption": false,
+    "silent_gap_interpolation": false,
+    "zero_funding_fill": false
+  },
+  "integration": {
+    "target_blocker": "historical_funding_evidence_missing",
+    "compatible_simulation_stage": "simulation_readiness_v0_3",
+    "production_v0_2_r2_read_authorized": false,
+    "simulation_data_admission_authorized": false,
+    "backtest_admission_authorized": false
+  },
+  "authority": {
+    "synthetic_fixture_validation": true,
+    "public_pionex_funding_request": false,
+    "provider_execution": false,
+    "r2_reads": false,
+    "r2_writes": false,
+    "holdout_access": false,
+    "training": false,
+    "formal_backtest_admission": false,
+    "strategy_change": false,
+    "source_switch": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}

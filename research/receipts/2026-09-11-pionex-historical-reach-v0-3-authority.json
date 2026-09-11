@@ -1,0 +1,32 @@
+{
+  "schema": "pionex-historical-reach-authority-v0.3",
+  "status": "AUTHORIZED_AFTER_PROTECTED_MAIN_MERGE_MANUAL_DISCOVERY_ONLY",
+  "config": "config/pionex_historical_reach_v0_3.json",
+  "config_sha256": "ba7ffaaed06be43fd48348529282d078a7ffcb267957832075097cb5fa6648af",
+  "base_main_sha": "9319455c2e392b9dc3b42ba3c570d8e6321e6623",
+  "supersedes": null,
+  "extends_evidence_from": {
+    "stage": "Pionex Bounded Capacity Pilot V0.2",
+    "run_id": 34513815680,
+    "completion_claim": "COMPLETE_FIXED_27_DAY_CAPACITY_SAMPLE_ONLY"
+  },
+  "provider_spec": {
+    "repository": "pionex-official/pionex-open-api",
+    "commit": "d31e146006da7b59c228c07e11949ec8fb7140de",
+    "file": "openapi.yaml",
+    "blob_sha": "6aee44bce634b695ead4caeb051bd8d036db896a"
+  },
+  "user_decision": "Expand native reach discovery to 15M, 60M, 4H, 1D and 1W; treat 1Y as a later derived timeframe from validated 1D data because Pionex exposes no native 1Y interval.",
+  "execution_performed_by_this_receipt": false,
+  "public_pionex_reads_authorized_after_merge": true,
+  "api_key_required": false,
+  "r2_access_authorized": false,
+  "holdout_access_authorized": false,
+  "materialization_authorized": false,
+  "yearly_derivation_authorized": false,
+  "formal_backtest_admission_authorized": false,
+  "source_switch_authorized": false,
+  "binance_relabel_as_pionex_authorized": false,
+  "real_money_orders_authorized": false,
+  "live_trading_authorized": false
+}
