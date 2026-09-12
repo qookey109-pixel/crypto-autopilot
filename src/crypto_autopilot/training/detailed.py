@@ -57,6 +57,61 @@ class IntradayExample:
     forward_return: float
 
 
+def split_contiguous_candles(
+    candles: Sequence[Candle], interval_ms: int
+) -> list[tuple[Candle, ...]]:
+    """Split candles whenever timestamp continuity breaks.
+
+    This is a training-safety boundary, not a data-quality waiver. Missing,
+    duplicated or out-of-order candles start a new segment; callers must still
+    enforce their normal provider/data-quality gates.
+    """
+
+    if interval_ms <= 0:
+        raise ValueError("candle interval must be positive")
+    if not candles:
+        return []
+    output: list[tuple[Candle, ...]] = []
+    current = [candles[0]]
+    for previous, candle in zip(candles, candles[1:]):
+        if candle.time_ms - previous.time_ms != interval_ms:
+            output.append(tuple(current))
+            current = []
+        current.append(candle)
+    output.append(tuple(current))
+    return output
+
+
+def _build_segmented_feature_series(
+    candles: Sequence[Candle],
+    *,
+    project_interval: str,
+    interval_ms: int,
+) -> tuple[
+    tuple[TechnicalSnapshot, ...],
+    tuple[AdvancedTechnicalSnapshot, ...],
+    tuple[int, ...],
+]:
+    technical_output: list[TechnicalSnapshot] = []
+    advanced_output: list[AdvancedTechnicalSnapshot] = []
+    segment_ids: list[int] = []
+    for segment_id, segment in enumerate(split_contiguous_candles(candles, interval_ms)):
+        segment_technical = tuple(build_technical_series(segment, project_interval))
+        segment_advanced = tuple(
+            build_advanced_technical_series(
+                segment,
+                project_interval,
+                technical_series=segment_technical,
+            )
+        )
+        if len(segment_technical) != len(segment) or len(segment_advanced) != len(segment):
+            raise RuntimeError("technical feature series must align with candle segments")
+        technical_output.extend(segment_technical)
+        advanced_output.extend(segment_advanced)
+        segment_ids.extend([segment_id] * len(segment))
+    return tuple(technical_output), tuple(advanced_output), tuple(segment_ids)
+
+
 def _ratio(current: float, reference: float) -> float:
     if not math.isfinite(current) or not math.isfinite(reference) or reference <= 0:
         return 0.0
@@ -149,16 +204,17 @@ def build_intraday_examples(
         raise ValueError("intraday training requires 15m, 1h and 4h candles")
     project = {"15m": "15M", "1h": "60M", "4h": "4H"}
     candles = {interval: tuple(candles_by_interval[interval]) for interval in required}
-    technical = {
-        interval: build_technical_series(candles[interval], project[interval])
-        for interval in required
-    }
-    advanced = {
-        interval: build_advanced_technical_series(
-            candles[interval], project[interval], technical_series=technical[interval]
+    segmented = {
+        interval: _build_segmented_feature_series(
+            candles[interval],
+            project_interval=project[interval],
+            interval_ms=INTERVAL_MS[project[interval]],
         )
         for interval in required
     }
+    technical = {interval: segmented[interval][0] for interval in required}
+    advanced = {interval: segmented[interval][1] for interval in required}
+    segment_ids = {interval: segmented[interval][2] for interval in required}
     available = {
         interval: tuple(item.available_at_ms for item in technical[interval])
         for interval in required
@@ -170,6 +226,11 @@ def build_intraday_examples(
     start = 200
     for index in range(start, len(source) - forward_horizon_15m_bars, sample_stride_15m_bars):
         future_index = index + forward_horizon_15m_bars
+        source_segment = segment_ids["15m"][index]
+        if segment_ids["15m"][future_index] != source_segment:
+            continue
+        if index < 16 or segment_ids["15m"][index - 16] != source_segment:
+            continue
         if source[future_index].time_ms - source[index].time_ms != horizon_ms:
             continue
         current_technical = technical["15m"][index]
@@ -185,6 +246,12 @@ def build_intraday_examples(
                 available[interval], current_technical.available_at_ms
             ) - 1
             if context_index < 0:
+                values = {}
+                break
+            context_age_ms = (
+                current_technical.available_at_ms - available[interval][context_index]
+            )
+            if not 0 <= context_age_ms < INTERVAL_MS[project[interval]]:
                 values = {}
                 break
             values.update(
