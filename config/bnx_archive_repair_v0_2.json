@@ -1,0 +1,57 @@
+{
+  "schema": "bnx-archive-repair-v0.2",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "base_config": "config/binance_usdm_detailed_history_v0_1_2.json",
+  "base_config_sha256": "fc4e42b855229ecb62e12e681778080c2aa749112036a6e8b3af9e9da98b716a",
+  "diagnosis_run_id": 34666744148,
+  "diagnosis_head_sha": "007fa73ab992be7836eb7e09fe36b4b7b2d21da1",
+  "diagnosis_report": "research/receipts/2026-09-12-bnx-archive-diagnosis-v0-2-run-34666744148-report.json",
+  "diagnosis_report_sha256": "17cc10cc8c2c1bcbd1aa3a930cd6a4cf254cdf321b1b8bf53fce3e3905b36a2e",
+  "provider": "binance_usdm",
+  "symbol": "BNXUSDT",
+  "interval": "1h",
+  "period": "2022-08",
+  "shard_index": 3,
+  "monthly_sha256": "b64fa8a52889378b7174cdf196029be4bb49b6f5255c3253f3645baaf25cb239",
+  "daily_sha256": [
+    [
+      "2022-08-01",
+      "5c3f1b702ef582a002edea123d29e5d77c8aa9e53e98a3baf12c69f6e2dd6e7d"
+    ],
+    [
+      "2022-08-10",
+      "470b28f5e5a6a3da90b4370e57ff7d77aafabffb5d059aa94bc8150f5be3a72c"
+    ],
+    [
+      "2022-08-11",
+      "d4631f30d02b93289058acc60e3bf2a8a93988949acddcab440b7598320bab08"
+    ],
+    [
+      "2022-08-12",
+      "61197a3dd0ec840f6d2486037f8091e9309f748b83fbdcbded559c0a5d3c0c48"
+    ]
+  ],
+  "candidate_sha256": "acdaee9f7aca8516040c6c8219e9c1fc4538d7beda8d7c8bc6789c97b43f200b",
+  "original_rows": 672,
+  "inserted_rows": 72,
+  "overlapping_rows_verified": 24,
+  "candidate_rows": 744,
+  "destination_key": "market-data/binance_usdm/crypto-core-v0.1/perp/BNXUSDT/1h/year=2022/month=08/candles.parquet",
+  "not_before_utc": "2026-09-12T02:06:54Z",
+  "expires_at_utc": "2026-10-01T00:00:00Z",
+  "execution": "existing_serialized_history_workflow_fresh_manual_only",
+  "maximum_requests_per_reconstruction": 10,
+  "maximum_total_response_bytes": 20000000,
+  "maximum_response_bytes": 8000000,
+  "download_retries": 0,
+  "daily_input_access_authorized": true,
+  "missing_partition_creation_authorized": true,
+  "existing_partition_overwrite_authorized": false,
+  "original_monthly_archive_regraded": false,
+  "new_schedule_authorized": false,
+  "holdout_access_authorized": false,
+  "source_switch_authorized": false,
+  "pionex_native_relabel_authorized": false,
+  "model_promotion_authorized": false,
+  "trading_authorized": false
+}

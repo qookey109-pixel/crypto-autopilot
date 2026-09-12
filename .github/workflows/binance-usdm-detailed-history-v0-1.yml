@@ -14,6 +14,7 @@ on:
           - auto
           - discover
           - backfill
+          - repair-bnx-1h
           - diagnose-bnx
       shard_index:
         description: "Optional governed shard index for a manual backfill run"
@@ -29,7 +30,7 @@ concurrency:
 
 jobs:
   backfill:
-    if: ${{ inputs.mode != 'diagnose-bnx' }}
+    if: ${{ github.event_name == 'schedule' || (inputs.mode != 'diagnose-bnx' && inputs.mode != 'repair-bnx-1h') }}
     runs-on: ubuntu-latest
     timeout-minutes: 330
     steps:
@@ -94,6 +95,74 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: binance-usdm-detailed-history-${{ github.run_id }}-${{ github.run_attempt }}
+          path: detailed-history-output/report.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf detailed-history-output
+
+  repair-bnx-1h:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'repair-bnx-1h' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate reviewed history cadence before provider or R2 access
+        run: python scripts/check_history_cadence_authority.py
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Repair only the frozen BNX shard through the existing serialized writer
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          python scripts/run_bnx_1h_repair_v0_2.py \
+            --config config/binance_usdm_detailed_history_v0_1_2.json \
+            --authority research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json \
+            --recovery-config config/binance_usdm_history_recovery_v0_1.json \
+            --recovery-authority research/receipts/2026-09-08-binance-usdm-history-recovery-v0-1-authority.json \
+            --repair-config config/bnx_archive_repair_bundle_v0_2.json \
+            --repair-authority research/receipts/2026-09-12-bnx-archive-repair-bundle-v0-2-authority.json \
+            --mode backfill \
+            --shard-index 3 \
+            --run-id "github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --output detailed-history-output/report.json
+
+      - name: Assert bounded repair authority
+        if: ${{ !cancelled() && hashFiles('detailed-history-output/report.json') != '' }}
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("detailed-history-output/report.json").read_text())
+          authority = report.get("authority", {})
+          assert authority.get("holdout_accessed", False) is False
+          assert authority.get("pionex_native_relabel_authorized", False) is False
+          assert authority.get("source_switch_authorized", False) is False
+          assert authority.get("automatic_model_promotion_authorized", False) is False
+          assert authority.get("real_money_order_authorized", False) is False
+          assert authority.get("live_trading_authorized", False) is False
+          PY
+
+      - name: Upload secret-free repair report
+        if: ${{ !cancelled() && hashFiles('detailed-history-output/report.json') != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: bnx-1h-repair-v0-2-${{ github.run_id }}-${{ github.run_attempt }}
           path: detailed-history-output/report.json
           retention-days: 90
           if-no-files-found: error

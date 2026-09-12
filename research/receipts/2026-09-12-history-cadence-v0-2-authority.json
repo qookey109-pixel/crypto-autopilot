@@ -1,0 +1,30 @@
+{
+  "schema": "history-cadence-authority-v0.2",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "config": "config/history_cadence_v0_1.json",
+  "config_sha256": "f7f7141cfd37b0b73b8546a0881a8baee5a80d4da165de39d7695f4b38033df1",
+  "bound_files": [
+    {
+      "path": "config/history_cadence_v0_1.json",
+      "sha256": "f7f7141cfd37b0b73b8546a0881a8baee5a80d4da165de39d7695f4b38033df1"
+    },
+    {
+      "path": ".github/workflows/binance-usdm-detailed-history-v0-1.yml",
+      "sha256": "538f563290cbb91f5d14b3902943a8db3975bf5b759630f2f914ade4f95cce3f"
+    },
+    {
+      "path": "config/github_automatic_research_operations_v0_2.json",
+      "sha256": "07cbbbe998677fe90577502cfe15ad3250f0f4688bf6fcef43689de11d30deb8"
+    },
+    {
+      "path": "scripts/check_history_cadence_authority.py",
+      "sha256": "a1fb6b94943226535ab931f134db27c9b4456ee9bd9091f2f90b0898c3688d67"
+    }
+  ],
+  "request_basis": "2026-09-12 cadence remains unchanged while a protected-main fresh-manual BNX 1h repair job is added; no new schedule is authorized",
+  "cron_changed": false,
+  "new_schedule_authorized": false,
+  "manual_repair_job_authorized_by_separate_bounded_contract": true,
+  "original_authorities_mutated": false,
+  "production_execution_performed": false
+}
