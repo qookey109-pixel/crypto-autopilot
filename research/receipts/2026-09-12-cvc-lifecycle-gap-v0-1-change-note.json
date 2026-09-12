@@ -1,0 +1,18 @@
+{
+  "allowed_partition": {
+    "archive_sha256": "d9940880a57d29b57185712e3c12defd2ea5b0f9044d2da23510d9450570bd40",
+    "gap_count": 1,
+    "interval": "15m",
+    "missing_bars": 34,
+    "period": "2025-05",
+    "row_count": 2942,
+    "symbol": "CVCUSDT"
+  },
+  "causal_claim": "NOT_ASSERTED",
+  "generic_gap_bypass_authorized": false,
+  "holdout_access_authorized": false,
+  "interpolation_authorized": false,
+  "schema": "cvc-lifecycle-gap-change-note-v0.1",
+  "source_switch_authorized": false,
+  "synthetic_candles_authorized": false
+}
