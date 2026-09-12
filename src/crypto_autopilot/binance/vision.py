@@ -9,6 +9,7 @@ import zipfile
 from dataclasses import dataclass
 from datetime import date
 
+from crypto_autopilot.binance.lifecycle_gap_policy import match_lifecycle_gap
 from crypto_autopilot.binance_historical import BINANCE_INTERVAL_MS, BINANCE_TO_PROJECT_INTERVAL
 from crypto_autopilot.exchanges.binance_usdm_public import BinanceMarkPriceCandle
 from crypto_autopilot.historical import audit_candles
@@ -263,7 +264,9 @@ def ingest_kline_archive(
     if times != sorted(times) or len(times) != len(set(times)):
         raise BinanceVisionEvidenceError("Binance Vision klines must be strictly increasing and unique")
     audit = audit_candles(candles, BINANCE_TO_PROJECT_INTERVAL[key.interval])
-    if not audit.ok:
+    if not audit.ok and match_lifecycle_gap(
+        key, archive_sha256=archive_sha256, audit=audit
+    ) is None:
         # Diagnostic metadata only: retain the same rejection and never emit rows.
         diagnostic = {
             "provider": "binance_usdm",
@@ -292,7 +295,7 @@ def ingest_kline_archive(
             row_count=len(candles),
             first_time_ms=times[0],
             last_time_ms=times[-1],
-            audit_ok=True,
+            audit_ok=audit.ok,
         ),
     )
 

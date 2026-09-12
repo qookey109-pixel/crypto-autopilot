@@ -1,0 +1,73 @@
+{
+  "allowances": [
+    {
+      "evidence": "research/receipts/2026-09-12-ctk-official-lifecycle-evidence-v0-4.json",
+      "gap_count": 1,
+      "gap_next_time_ms": 1746008100000,
+      "gap_previous_time_ms": 1745970300000,
+      "interval": "15m",
+      "missing_bars": 41,
+      "monthly_sha256": "bd77c44d0061511b2e8f5c140a06ad2dd30007c640586fad5b035d71b0c3c61c",
+      "period": "2025-04",
+      "row_count": 2839,
+      "symbol": "CTKUSDT"
+    },
+    {
+      "evidence": "research/receipts/2026-09-12-ctk-official-lifecycle-evidence-v0-4.json",
+      "gap_count": 1,
+      "gap_next_time_ms": 1746007200000,
+      "gap_previous_time_ms": 1745967600000,
+      "interval": "1h",
+      "missing_bars": 10,
+      "monthly_sha256": "1fe1c295babc4481dd5c5e9145b68e2bacafe3c6e262528854f8de903ac14b25",
+      "period": "2025-04",
+      "row_count": 710,
+      "symbol": "CTKUSDT"
+    },
+    {
+      "evidence": "research/receipts/2026-09-12-ctk-official-lifecycle-evidence-v0-4.json",
+      "gap_count": 1,
+      "gap_next_time_ms": 1746000000000,
+      "gap_previous_time_ms": 1745956800000,
+      "interval": "4h",
+      "missing_bars": 2,
+      "monthly_sha256": "08ce76f52b01e9151d64e5df72dca9c5af36ebb41afa9b397edd43fec799862f",
+      "period": "2025-04",
+      "row_count": 178,
+      "symbol": "CTKUSDT"
+    },
+    {
+      "evidence": "config/lit_archive_diagnosis_v0_1.json",
+      "gap_count": 1,
+      "interval": "15m",
+      "missing_bars": 70,
+      "monthly_sha256": "246dca9c1bcc046af274cc4d5b61fdd1fb818f243a2ae3c82a20471bdecdd160",
+      "period": "2025-12",
+      "row_count": 2906,
+      "symbol": "LITUSDT"
+    }
+  ],
+  "causal_claim": "NOT_ASSERTED",
+  "delivery": "binance_vision",
+  "holdout_access_authorized": false,
+  "interpolation_authorized": false,
+  "match_requirements": {
+    "exact_archive_sha256": true,
+    "exact_gap_count": true,
+    "exact_missing_bars": true,
+    "exact_row_count": true,
+    "exact_symbol_interval_period": true,
+    "reject_duplicates": true,
+    "reject_invalid_candles": true,
+    "reject_misaligned": true,
+    "reject_out_of_order": true
+  },
+  "operational_classification": "USER_AUTHORIZED_LIFECYCLE_GAP",
+  "policy_id": "binance-usdm-lifecycle-gap-v0.1",
+  "provider": "binance_usdm",
+  "schema": "binance-usdm-lifecycle-gap-policy-v0.1",
+  "source_switch_authorized": false,
+  "status": "AUTHORIZED_ON_REVIEWED_MAIN_MERGE",
+  "synthetic_candles_authorized": false,
+  "training_segmentation_required": true
+}
