@@ -15,10 +15,44 @@ runner = importlib.util.module_from_spec(spec)
 assert spec.loader is not None
 spec.loader.exec_module(runner)
 
+
+class _RepairBundleAdapter:
+    """Bind the generic writer to the exact v0.3 repair contract for this process only."""
+
+    def __init__(self):
+        self.contract = None
+
+    def load_contract(self, *args, **kwargs):
+        contract = repair_bundle.load_contract(*args, **kwargs)
+        self.contract = contract
+        return contract
+
+    def __getattr__(self, name):
+        return getattr(repair_bundle, name)
+
+
+_repair_adapter = _RepairBundleAdapter()
+
 # Keep the existing writer authoritative for serialization, R2 headroom,
 # immutable writes, readback verification, shard receipts, and state ordering.
-runner.bnx_repair = repair_bundle
+runner.bnx_repair = _repair_adapter
+_original_choose_shard = runner.choose_shard
 _original_canonical_json_bytes = runner.canonical_json_bytes
+
+
+def choose_shard(shard_count, completed, attempts):
+    """Preserve fair rotation unless the exact loaded v0.3 bundle authorizes shard 3."""
+    selected = _original_choose_shard(shard_count, completed, attempts)
+    if selected == repair_bundle.SHARD_INDEX or _repair_adapter.contract is None:
+        return selected
+    return repair_bundle.authorize_recovery_shard_override(
+        _repair_adapter.contract,
+        requested_shard=repair_bundle.SHARD_INDEX,
+        completed=completed,
+    )
+
+
+runner.choose_shard = choose_shard
 
 
 def canonical_json_bytes(value):
