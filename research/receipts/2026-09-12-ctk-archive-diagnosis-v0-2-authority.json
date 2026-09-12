@@ -1,0 +1,21 @@
+{
+  "schema": "ctk-archive-diagnosis-authority-v0.2",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "config": "config/ctk_archive_diagnosis_v0_2.json",
+  "config_sha256": "dacd10a6efff73a3aa43f78ea6f40ac9373f05f6f5a9b70f34bf980310043099",
+  "source_failure_run_id": 34682130869,
+  "source_failure_report_sha256": "c972f754c8e03bba606f7392e2ac46c2822aade7d8287cf631315b073d6c63ad",
+  "execution_performed_by_this_receipt": false,
+  "public_archive_reads_authorized": true,
+  "aggregate_github_artifact_authorized": true,
+  "allowlisted_reconciliation_reason_authorized": true,
+  "automatic_schedule_authorized": false,
+  "r2_access_authorized": false,
+  "production_repair_authorized": false,
+  "source_switch_authorized": false,
+  "pionex_native_relabel_authorized": false,
+  "holdout_access_authorized": false,
+  "trading_authorized": false,
+  "automatic_model_promotion_authorized": false,
+  "supersedes_future_diagnosis_execution": "ctk-archive-diagnosis-v0.1"
+}
