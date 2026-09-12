@@ -30,11 +30,18 @@ class DetailedHistoryWorkflowTests(unittest.TestCase):
         ).read_text()
         self.assertIn('cron: "37 4 * * 0"', text)
         self.assertIn("binance_usdm_detailed_history_v0_1_2.json", text)
-        self.assertIn("train_binance_detailed_history_models.py", text)
+        self.assertIn("train_binance_detailed_history_models_v0_2.py", text)
         self.assertIn("automatic_model_promotion_authorized", text)
         self.assertIn("live_trading_authorized", text)
         self.assertNotIn("PIONEX_API_KEY", text)
         self.assertNotIn("place_order", text.lower())
+
+        wrapper = (
+            ROOT / "scripts/train_binance_detailed_history_models_v0_2.py"
+        ).read_text()
+        self.assertIn('RUNNER = ROOT / "scripts/train_binance_detailed_history_models.py"', wrapper)
+        self.assertIn("runner.build_examples_from_r2 = build_examples_from_r2", wrapper)
+        self.assertIn("return runner.main()", wrapper)
 
 
 if __name__ == "__main__":
