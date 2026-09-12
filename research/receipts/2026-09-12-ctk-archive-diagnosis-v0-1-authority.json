@@ -1,0 +1,17 @@
+{
+  "schema": "ctk-archive-diagnosis-authority-v0.1",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "config": "config/ctk_archive_diagnosis_v0_1.json",
+  "config_sha256": "110337d541627212a34dad28d691db887a63a4cb0d4ed4e6e27262fd7f42bb39",
+  "execution_performed_by_this_receipt": false,
+  "public_archive_reads_authorized": true,
+  "aggregate_github_artifact_authorized": true,
+  "automatic_schedule_authorized": false,
+  "r2_access_authorized": false,
+  "production_repair_authorized": false,
+  "source_switch_authorized": false,
+  "pionex_native_relabel_authorized": false,
+  "holdout_access_authorized": false,
+  "trading_authorized": false,
+  "automatic_model_promotion_authorized": false
+}
