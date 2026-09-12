@@ -1,0 +1,17 @@
+{
+  "causal_claim_required": false,
+  "config": "config/binance_usdm_lifecycle_gap_policy_v0_1.json",
+  "config_sha256": "3fdd17af60c692bae4e2d8c82856fb37d825ac29e3dbc82c18f55c9eaca72313",
+  "entries": 4,
+  "exact_allowlist_only": true,
+  "holdout_access_authorized": false,
+  "interpolation_authorized": false,
+  "policy_id": "binance-usdm-lifecycle-gap-v0.1",
+  "runtime_scope": "binance_vision_monthly_klines_exact_allowlist_only",
+  "schema": "binance-usdm-lifecycle-gap-policy-authority-v0.1",
+  "source_switch_authorized": false,
+  "status": "AUTHORIZED_ON_REVIEWED_MAIN_MERGE",
+  "synthetic_candles_authorized": false,
+  "training_segmentation_required": true,
+  "user_authorized_operational_treatment": true
+}
