@@ -1,0 +1,15 @@
+{
+  "schema": "bnx-archive-repair-authority-v0.3",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "config": "config/bnx_archive_repair_v0_3.json",
+  "config_sha256": "283f26de59acd5a978ad54c7781a6fae1db95cecfc8b3cca9c7552ba8ef67987",
+  "diagnosis_run_id": 34671635162,
+  "diagnosis_report": "research/receipts/2026-09-12-bnx-archive-diagnosis-v0-3-run-34671635162-report.json",
+  "diagnosis_report_sha256": "011be2ea56b4c5788418f12ad86fdaa55d0d6a7fe4258089f088bc469922fc4d",
+  "shard_index": 3,
+  "manual_only": true,
+  "missing_partition_creation_authorized": true,
+  "existing_partition_overwrite_authorized": false,
+  "new_schedule_authorized": false,
+  "original_authorities_mutated": false
+}

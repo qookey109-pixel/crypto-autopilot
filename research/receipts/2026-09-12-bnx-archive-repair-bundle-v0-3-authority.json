@@ -1,0 +1,14 @@
+{
+  "schema": "bnx-archive-repair-bundle-authority-v0.3",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "config": "config/bnx_archive_repair_bundle_v0_3.json",
+  "config_sha256": "26c15fa325741c61fb556901ce7b20672edfdac29359fd40654f820f2bd770de",
+  "shard_index": 3,
+  "fresh_manual_only": true,
+  "existing_v0_1_authority_reused": true,
+  "existing_v0_2_authority_reused": true,
+  "new_v0_3_authority_bound": true,
+  "existing_partition_overwrite_authorized": false,
+  "new_schedule_authorized": false,
+  "original_authorities_mutated": false
+}

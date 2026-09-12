@@ -10,7 +10,7 @@
     },
     {
       "path": ".github/workflows/binance-usdm-detailed-history-v0-1.yml",
-      "sha256": "538f563290cbb91f5d14b3902943a8db3975bf5b759630f2f914ade4f95cce3f"
+      "sha256": "b8fadbabac8c193f9e50a3ef42de15eae784589807e62e316574e83197e64861"
     },
     {
       "path": "config/github_automatic_research_operations_v0_2.json",
@@ -21,7 +21,7 @@
       "sha256": "a1fb6b94943226535ab931f134db27c9b4456ee9bd9091f2f90b0898c3688d67"
     }
   ],
-  "request_basis": "2026-09-12 cadence remains unchanged while a protected-main fresh-manual BNX 1h repair job is added; no new schedule is authorized",
+  "request_basis": "2026-09-12 cadence remains unchanged while a separately versioned protected-main fresh-manual BNX 15m/1h/4h repair bundle job is added; no new schedule is authorized",
   "cron_changed": false,
   "new_schedule_authorized": false,
   "manual_repair_job_authorized_by_separate_bounded_contract": true,
