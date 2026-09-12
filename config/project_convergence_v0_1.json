@@ -135,6 +135,7 @@
       "bnx-archive-diagnosis-v0-3.yml",
       "ctk-archive-diagnosis-v0-1.yml",
       "ctk-archive-diagnosis-v0-2.yml",
+      "ctk-lifecycle-diagnosis-v0-3.yml",
       "ci.yml",
       "context-forward-capture-execution-v0-1.yml",
       "dashboard-authority-snapshot.yml",
