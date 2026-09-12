@@ -1,0 +1,82 @@
+{
+  "schema": "bnx-archive-diagnosis-v0.3-github-evidence-freeze-v0.1",
+  "status": "PASS_DIAGNOSIS_EVIDENCE_FROZEN",
+  "run_id": 34671635162,
+  "run_number": 1,
+  "run_attempt": 1,
+  "event": "workflow_dispatch",
+  "head_branch": "main",
+  "head_sha": "bbfe7262f15daffeeeef77aa98c32a847d9a9c76",
+  "workflow": "BNX 4h Archive Diagnosis V0.3",
+  "job": "diagnose",
+  "job_id": 103493951266,
+  "workflow_conclusion": "success",
+  "artifact_id": 10291140705,
+  "artifact_name": "bnx-4h-archive-diagnosis-v0-3-34671635162-1",
+  "artifact_size_bytes": 980,
+  "artifact_zip_sha256": "73b17cffe2ad8d06b764217cc5d4322476ddbdf19bcbe68efbcfb0f5c0f0e277",
+  "report_path": "research/receipts/2026-09-12-bnx-archive-diagnosis-v0-3-run-34671635162-report.json",
+  "report_bytes": 1775,
+  "report_sha256": "011be2ea56b4c5788418f12ad86fdaa55d0d6a7fe4258089f088bc469922fc4d",
+  "diagnosis": {
+    "provider": "binance_usdm",
+    "delivery": "binance_vision",
+    "symbol": "BNXUSDT",
+    "interval": "4h",
+    "period": "2022-08",
+    "monthly_archive_sha256": "1da5c171a2d1ec9913fd4ace2ec35bc6ebe3aeff32a153df9164a876a8a71995",
+    "observed_rows": 168,
+    "expected_rows": 186,
+    "gap_count": 1,
+    "missing_bars": 18,
+    "missing_dates": [
+      "2022-08-10",
+      "2022-08-11",
+      "2022-08-12"
+    ],
+    "missing_start_utc": "2022-08-10T00:00:00Z",
+    "missing_end_open_utc": "2022-08-12T20:00:00Z",
+    "missing_end_exclusive_utc": "2022-08-13T00:00:00Z",
+    "overlap_day": "2022-08-01",
+    "overlapping_rows_verified": 6,
+    "candidate_rows": 186,
+    "inserted_rows": 18,
+    "candidate_sha256": "1580aca66432a28267b72ea32385650cde5b0898b399e4459aeef3c990eeb534",
+    "daily_sha256": [
+      [
+        "2022-08-01",
+        "0a65d43d78bbee104cb166fa2c332165c382ab2d81ab2a05233ce97429d5cf6a"
+      ],
+      [
+        "2022-08-10",
+        "df2982990d8dbcb50b9fe1cb645ca03687cb4a15f5f270a44f99d2b49a518c00"
+      ],
+      [
+        "2022-08-11",
+        "9afb0d3b6d967a0989bdc944e7ad3f86645fea2ced7027a8104ab8034e52905e"
+      ],
+      [
+        "2022-08-12",
+        "e3d81ce86ca17584c75ceaf651fef3de8f5b46a6f419a008939ac0d2162f7baa"
+      ]
+    ],
+    "public_requests": 10,
+    "response_bytes": 10220
+  },
+  "interpretation": {
+    "four_hour_missing_dates_proven": true,
+    "four_hour_daily_candidate_proven": true,
+    "candidate_matches_expected_monthly_rows": true,
+    "production_repair_performed": false,
+    "existing_partition_overwrite_performed": false,
+    "r2_accessed": false,
+    "holdout_accessed": false,
+    "source_switch_performed": false,
+    "pionex_native_relabel_performed": false,
+    "automatic_model_promotion_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "new_four_hour_repair_authority_granted": false,
+    "next_step_requires_separately_versioned_publication_authority": true
+  }
+}
