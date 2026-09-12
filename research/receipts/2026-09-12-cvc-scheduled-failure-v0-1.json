@@ -1,0 +1,29 @@
+{
+  "artifact": {
+    "digest": "sha256:5a3ec9f9be48731344158b50ab2985f79bb7a104ea3bba7e9c308e709f470a47",
+    "id": 10300484937,
+    "name": "binance-usdm-detailed-history-34702866751-1"
+  },
+  "diagnostic": {
+    "archive_sha256": "d9940880a57d29b57185712e3c12defd2ea5b0f9044d2da23510d9450570bd40",
+    "dataset": "klines",
+    "frequency": "monthly",
+    "gap_count": 1,
+    "interval": "15m",
+    "invalid_candle_count": 0,
+    "misaligned_count": 0,
+    "missing_bars": 34,
+    "period": "2025-05",
+    "provider": "binance_usdm",
+    "row_count": 2942,
+    "symbol": "CVCUSDT"
+  },
+  "head_sha": "b4adddad2c5c14aed2c01338b075a323d846653d",
+  "run_id": 34702866751,
+  "schema": "cvc-scheduled-failure-evidence-v0.1",
+  "shard_count": 10,
+  "shard_index": 4,
+  "shards_complete": 8,
+  "stage": "DETAILED_HISTORY_SHARD_QUALITY_REJECT",
+  "status": "FAIL"
+}

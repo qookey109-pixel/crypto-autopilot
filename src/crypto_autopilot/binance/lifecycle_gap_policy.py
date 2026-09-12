@@ -47,6 +47,16 @@ _ALLOWANCES: tuple[dict[str, Any], ...] = (
         "evidence": "research/receipts/2026-09-12-ctk-official-lifecycle-evidence-v0-4.json",
     },
     {
+        "symbol": "CVCUSDT",
+        "interval": "15m",
+        "period": "2025-05",
+        "monthly_sha256": "d9940880a57d29b57185712e3c12defd2ea5b0f9044d2da23510d9450570bd40",
+        "row_count": 2942,
+        "gap_count": 1,
+        "missing_bars": 34,
+        "evidence": "research/receipts/2026-09-12-cvc-official-lifecycle-evidence-v0-1.json",
+    },
+    {
         "symbol": "LITUSDT",
         "interval": "15m",
         "period": "2025-12",

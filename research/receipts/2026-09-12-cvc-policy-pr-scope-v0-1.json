@@ -1,0 +1,11 @@
+{
+  "automatic_model_promotion_authorized": false,
+  "generic_gap_bypass_authorized": false,
+  "holdout_access_authorized": false,
+  "live_trading_authorized": false,
+  "new_schedule_authorized": false,
+  "real_money_order_authorized": false,
+  "schema": "cvc-policy-pr-scope-v0.1",
+  "source_switch_authorized": false,
+  "synthetic_candles_authorized": false
+}

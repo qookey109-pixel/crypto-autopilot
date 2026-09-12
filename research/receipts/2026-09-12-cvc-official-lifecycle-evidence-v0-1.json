@@ -1,0 +1,35 @@
+{
+  "causal_claim": "NOT_ASSERTED",
+  "official_lifecycle": {
+    "previous_delist": {
+      "effective_at_utc": "2022-11-29T09:00:00Z",
+      "source": "https://www.binance.com/en/support/announcement/detail/3188e26f14a1464b91487abad452c04f",
+      "title": "Binance Futures Will Delist and Update the Leverage & Margin Tiers of CVCUSDT Perpetual Futures Contract"
+    },
+    "relaunch": {
+      "effective_at_utc": "2025-05-16T08:30:00Z",
+      "source": "https://www.binance.com/pt/support/announcement/detail/bbe829426ad844b9b9dac62f878d1e67",
+      "title": "Binance Futures Will Launch USDⓈ-Margined CVCUSDT Perpetual Contract"
+    }
+  },
+  "operational_classification": "USER_AUTHORIZED_LIFECYCLE_GAP",
+  "policy_scope": "exact_archive_only",
+  "scheduled_observation": {
+    "archive_sha256": "d9940880a57d29b57185712e3c12defd2ea5b0f9044d2da23510d9450570bd40",
+    "gap_count": 1,
+    "head_sha": "b4adddad2c5c14aed2c01338b075a323d846653d",
+    "interval": "15m",
+    "invalid_candle_count": 0,
+    "misaligned_count": 0,
+    "missing_bars": 34,
+    "period": "2025-05",
+    "row_count": 2942,
+    "run_id": 34702866751,
+    "shard_index": 4,
+    "stage": "DETAILED_HISTORY_SHARD_QUALITY_REJECT",
+    "symbol": "CVCUSDT"
+  },
+  "schema": "cvc-official-lifecycle-evidence-v0.1",
+  "statement": "The scheduled run observed one checksum-pinned CVCUSDT 15m discontinuity in the same month Binance officially relaunched the CVCUSDT perpetual contract after a prior delisting. This evidence supports the user's authorized operational lifecycle-gap treatment for this exact archive only; it does not assert that the lifecycle event is the proven historical cause of the missing timestamps.",
+  "synthetic_candles_authorized": false
+}
