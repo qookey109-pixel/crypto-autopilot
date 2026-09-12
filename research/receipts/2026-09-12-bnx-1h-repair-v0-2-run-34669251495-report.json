@@ -1,0 +1,35 @@
+{
+  "authority": {
+    "automatic_model_promotion_authorized": false,
+    "holdout_accessed": false,
+    "live_trading_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "real_money_order_authorized": false,
+    "source_switch_authorized": false
+  },
+  "dataset_complete": false,
+  "dataset_status": "IN_PROGRESS",
+  "delivery": "binance_vision",
+  "diagnostic": {
+    "archive_sha256": "1da5c171a2d1ec9913fd4ace2ec35bc6ebe3aeff32a153df9164a876a8a71995",
+    "dataset": "klines",
+    "frequency": "monthly",
+    "gap_count": 1,
+    "interval": "4h",
+    "invalid_candle_count": 0,
+    "misaligned_count": 0,
+    "missing_bars": 18,
+    "period": "2022-08",
+    "provider": "binance_usdm",
+    "row_count": 168,
+    "symbol": "BNXUSDT"
+  },
+  "mode": "backfill",
+  "observed_at_utc": "2026-09-12T03:01:53.911615Z",
+  "provider": "binance_usdm",
+  "shard_count": 10,
+  "shard_index": 3,
+  "shards_complete": 7,
+  "stage": "DETAILED_HISTORY_SHARD_QUALITY_REJECT",
+  "status": "FAIL"
+}
