@@ -1,8 +1,31 @@
 # Project Status
 
-Updated: 2026-09-11
+Updated: 2026-09-12
 
-## September 15 simulation delivery index
+## September 12 verified operations index
+
+This section supersedes stale present-tense summaries below. Full-universe
+simulation remains **NOT_READY**. See [current handoff](docs/OPERATIONS_HANDOFF_2026_09_12.md)
+and `research/status/simulation-readiness-v0-1.json`.
+
+- Fixed BTC simulation run `34615465566` is formally PASS: 15 trades and
+  13 rejected plans; its V0.1 workflow is retired after PASS, not waiting for CI execution.
+- Binance latest scheduled run `34680188351`: **8/10**, shard 4 rejected for
+  CTKUSDT April 2025 15m, 41 missing bars. LIT's 70-bar gap remains unresolved.
+- BNX bundle run `34677544161` formally published shard 3 with frozen receipt/hash evidence.
+- CTK V0.3 `34687012733` characterizes the three-interval internal gap only.
+  Downloaded artifact digest matches GitHub; old handoff hashes disagree.
+  Relaunch causality and lifecycle exception are not established or authorized.
+- V0.12 window ended September 12 at 04:00 UTC. Latest scheduled run
+  `34673261420` succeeded with capture skipped; missing slots remain immutable.
+- History cadence is every **two hours**. Health is failing because history
+  fails its quality gate; faster retries do not fix the source gap.
+- Pionex 197 candidates are not materialized histories. Reach/classification
+  still need formal evidence. BTC Funding 81 observations remain fixed-scope PASS.
+- This review changes derived website/docs and adds aggregate evidence only;
+  no runtime cron, provider/R2 execution or frozen quality threshold changes.
+
+## September 11 historical delivery index
 
 PRs #263/#264/#265 landed on main `6a7aad2` with CI passing. This index
 supersedes older present-tense status summaries below for the simulation path;

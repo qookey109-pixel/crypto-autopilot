@@ -38,17 +38,26 @@
 
     <section class="view overview-content active" id="view-overview">
       <div class="home-heading"><div><p class="eyebrow">QOOKEY</p><h2>今日總覽</h2></div><span class="badge neutral">研究與模擬</span></div>
+      <!-- DELIVERY_OVERVIEW_START -->
       <section class="panel readiness-summary" aria-labelledby="readiness-heading">
         <h3 id="readiness-heading">9/15 模擬測試準備</h3>
-        <p><strong>尚未就緒</strong> · 程式已整合；下一步是確認資料並完成正式模擬。</p>
-        <p>已核實：Pionex BTC 27 天樣本、81 筆 Funding、197 個候選標的快照；Binance 歷史 7/10（9/11 快照）。候選池完整歷史尚未補齊；資產分類仍需複核。</p>
+        <p><strong>完整模擬尚未就緒 · NOT_READY</strong>；BTC 固定樣本已通過。</p>
+        <div class="delivery-metrics" aria-label="目前已核實進度">
+          <article><p>BTC 27 天模擬</p><strong>已完成 · 15 筆成交</strong><p>僅驗證固定樣本；已停止自動重跑。</p></article>
+          <article><p>Binance Core 100</p><strong>8/10 分片</strong><p>BNX 修復已完成；CTK、LIT 仍有缺口。</p></article>
+          <article><p>Pionex 研究候選池</p><strong>197 個候選</strong><p>完整歷史與資產分類尚未完成。</p></article>
+          <article><p>BTC Funding</p><strong>81 筆已核實</strong><p>對應固定樣本期間。</p></article>
+        </div>
+        <p>優先處理：CTK 原因核對與精確資料規則、LIT 缺口、Pionex 歷史範圍與分類。</p>
+        <p>證據核對時間（UTC）：2026-09-12T10:40:47Z。下列 Actions 狀態只代表工作流程結果。</p>
         <p id="cloud-run-updated">雲端執行狀態尚未載入。</p>
         <ul id="cloud-run-list" class="cloud-run-list" aria-live="polite"></ul>
         <details><summary>查看資料證據與後續步驟</summary>
-          <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34563615657" target="_blank" rel="noopener noreferrer">197 個候選快照 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34563641025" target="_blank" rel="noopener noreferrer">Funding 報告 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34513815680" target="_blank" rel="noopener noreferrer">BTC 樣本 ↗</a></p>
-          <p>先修復歷史探測並確認各標的範圍，再經資料准入審查執行模擬。以上數字為 9/11 已核對的證據；下方雲端狀態只表示工作流程結果。</p>
+          <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34615465566" target="_blank" rel="noopener noreferrer">BTC 模擬報告 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34680188351" target="_blank" rel="noopener noreferrer">8/10 與 CTK 缺口 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34677544161" target="_blank" rel="noopener noreferrer">BNX 正式修復 ↗</a></p>
+          <p>CTK 三週期缺口已描述，尚未證實成因；不得補假 K 線。V0.12 視窗已結束，缺失時槽仍保留。固定樣本通過不代表全市場策略有效。</p>
         </details>
       </section>
+      <!-- DELIVERY_OVERVIEW_END -->
       <details class="home-details">
         <summary>查看資料、策略與候選明細</summary>
       <section class="home-grid" aria-label="每日四項重點">
@@ -81,26 +90,26 @@
       <details class="home-details">
         <summary>展開研究明細與排程</summary>
         <div class="home-details-content">
-          <section class="panel" aria-label="排程歷史快照">
-        <details class="cloud-schedule"><summary>後續排程與已核對結果（臺灣時間）</summary>
-          <p>2026/09/09 核對：歷史補齊最近報告為 5/10，BNX 正式修復仍待分片憑證確認。<a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34312608074" target="_blank" rel="noopener noreferrer">查看補齊報告 ↗</a>。下方表格保留 9/8 歷史結果；最新 metadata 擷取因 Render HTTP 502 失敗，<a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34312357845" target="_blank" rel="noopener noreferrer">查看失敗紀錄 ↗</a>。BNX 修復由既有補齊排程輪到該分片時處理；diagnose-bnx 跳過不代表修復失敗。</p>
-          <p>此表是 2026/09/08 08:08 臺灣時間核對的歷史快照，不會隨重新整理自動取得新執行結果。排程時間是預定時間，實際可能延遲；執行結果以連結中的 GitHub 紀錄為準。</p>
-          <div class="table-wrap"><table><thead><tr><th>作業</th><th>預定時間（Asia/Taipei）</th><th>已核對執行結果</th></tr></thead><tbody><tr><th scope="row">交易所資料擷取</th><td>9/4 10:00–9/12 11:59；每小時 :17、:47</td><td><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34171163631" target="_blank" rel="noopener noreferrer">擷取步驟失敗 ↗</a><small>執行建立時間：2026-09-07 23:46:45 UTC</small></td></tr>
-<tr><th scope="row">研究訊號收集</th><td>每日 10:17</td><td><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34095145067" target="_blank" rel="noopener noreferrer">工作流程成功 ↗</a><small>執行建立時間：2026-09-07 07:22:24 UTC</small></td></tr>
-<tr><th scope="row">訊號品質檢查</th><td>每日 10:47</td><td><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34096043182" target="_blank" rel="noopener noreferrer">工作流程成功 ↗</a><small>執行建立時間：2026-09-07 07:33:26 UTC</small></td></tr>
-<tr><th scope="row">雲端健康檢查</th><td>每日偶數小時 :57</td><td><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34164470122" target="_blank" rel="noopener noreferrer">檢查報錯；報告已保存 ↗</a><small>執行建立時間：2026-09-07 21:48:47 UTC</small></td></tr>
-<tr><th scope="row">歷史資料補建</th><td>9/4–9/30 UTC；臺灣時間每日 02:23、08:23、14:23、20:23</td><td><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34163690083" target="_blank" rel="noopener noreferrer">資料處理步驟失敗 ↗</a><small>執行建立時間：2026-09-07 21:35:29 UTC</small></td></tr>
-<tr><th scope="row">研究模型訓練</th><td>每週日 12:37；資料完整才訓練</td><td><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34022934430" target="_blank" rel="noopener noreferrer">工作流程成功；訓練成果未核實 ↗</a><small>執行建立時間：2026-09-06 08:49:33 UTC</small></td></tr>
-<tr><th scope="row">Pionex 商品觀測</th><td>9/6、9/13、9/20、9/27 11:53（9/4 初次排程已過）</td><td><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34021018731" target="_blank" rel="noopener noreferrer">工作流程成功；僅商品觀測 ↗</a><small>執行建立時間：2026-09-06 08:08:14 UTC</small></td></tr></tbody></table></div>
-          <p>9/12 中午起至 9/19 中午前，另有一次需人工觸發的背景資料採集授權；它不是自動排程，也不啟動模擬。9 月限定排程在到期後不代表自動續期。</p>
-          <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/blob/6d4b84a72bf3bb42ef3a4ca9da2e448e0f0f39e2/config/github_automatic_research_operations_v0_1.json" target="_blank" rel="noopener noreferrer">檢視本表依據的正式排程設定 ↗</a> · 本頁僅為衍生視圖，不授予資料或交易權限。</p>
-        </details>
-          </section>
-      <div class="snapshot-line"><div><p class="eyebrow">QOOKEY / RESEARCH SNAPSHOT</p><h2>今天的研究狀態</h2><div class="trusted-times" aria-label="資料時間"><span id="dashboard-generated-at">投影建立：尚未提供</span><span id="paper-observed-at">Paper 觀測：尚未完成</span></div></div><div class="snapshot-pill"><i class="status-dot safe"></i><span id="snapshot-label">安全測試資料快照</span></div></div>
+      <!-- DELIVERY_SCHEDULE_START -->
+      <section class="panel" aria-label="目前雲端排程">
+        <h3>後續排程（臺灣時間）</h3>
+        <p>由 GitHub Actions 雲端執行；時間為預定觸發時間，可能延遲。資料缺口不會因增加執行頻率而自動消失。</p>
+        <div class="table-wrap"><table><thead><tr><th>作業</th><th>預定時間</th><th>條件與狀態</th></tr></thead><tbody><tr><th scope="row">歷史補齊</th><td>每日偶數小時 :23；至 10/1 08:00 前</td><td>一次一分片；缺口仍須修復</td></tr>
+<tr><th scope="row">研究訓練</th><td>每週日 12:37</td><td>完整資料通過才訓練</td></tr>
+<tr><th scope="row">研究訊號</th><td>每日 10:17</td><td>結構化研究訊號收集</td></tr>
+<tr><th scope="row">訊號品質</th><td>每日 10:47</td><td>檢查來源與資料鏈</td></tr>
+<tr><th scope="row">排程健康</th><td>每日偶數小時 :57</td><td>目前因歷史補齊失敗而告警</td></tr>
+<tr><th scope="row">Pionex 商品觀測</th><td>9/13、9/20、9/27 11:53</td><td>只觀測商品 metadata，未抓完整歷史</td></tr>
+<tr><th scope="row">V0.12 metadata</th><td>視窗已於 9/12 12:00 結束</td><td>最後工作流程成功但 capture 跳過；未達完整 PASS</td></tr></tbody></table></div>
+        <p>BTC 固定模擬 V0.1 已完成並退役。Pionex Reach、分類、Universe、Funding 與 Context Forward 是人工限定流程；沒有新增自動排程。</p>
+        <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/blob/main/docs/OPERATIONS_HANDOFF_2026_09_12.md" target="_blank" rel="noopener noreferrer">最新交接與待辦 ↗</a></p>
+      </section>
+      <!-- DELIVERY_SCHEDULE_END -->
+      <div class="snapshot-line"><div><p class="eyebrow">QOOKEY / RESEARCH SNAPSHOT</p><h2>歷史研究與準備狀態</h2><div class="trusted-times" aria-label="資料時間"><span id="dashboard-generated-at">投影建立：尚未提供</span><span id="paper-observed-at">Paper 觀測：尚未完成</span></div></div><div class="snapshot-pill"><i class="status-dot safe"></i><span id="snapshot-label">安全測試資料快照</span></div></div>
       <section class="metric-strip" aria-label="核心狀態"><article class="metric-card"><p class="card-kicker">歷史研究範圍</p><strong class="metric-value" id="market-count">15</strong><span>非目前可交易清單</span></article><article class="metric-card"><p class="card-kicker">Crypto Core 歷史目標</p><strong class="metric-value">100</strong><span>Binance USD-M · 10 個 R2 分片</span></article><article class="metric-card"><p class="card-kicker">Funding 覆蓋</p><strong class="metric-value" id="funding-months">1,010</strong><span>已觀察標的月份數</span></article><article class="metric-card"><p class="card-kicker">真實交易</p><strong class="metric-value danger-text">關閉</strong><span>authority = false</span></article></section>
       <section class="section-heading"><p class="section-number">01</p><div><p class="card-kicker">EVIDENCE PIPELINE</p><h2>從資料，到訊號，<br /><span class="heading-accent">每一步都能回頭檢查。</span></h2><p>網站只是 Repository authority 的唯讀視窗；真正的資料、訓練與閘門紀錄仍維持原有邊界。</p></div></section>
-      <section class="dashboard-grid two-one"><article class="panel"><div class="panel-header"><div><p class="card-kicker">CURRENT WORK</p><h3>目前真正有在做的事</h3></div><span class="badge neutral">唯讀摘要</span></div><div class="pipeline" id="pipeline-list"></div></article><article class="panel"><div class="panel-header"><div><p class="card-kicker">FAIL-CLOSED</p><h3>關鍵安全閘門</h3></div><button class="text-action view-link" data-view="gates">查看全部 →</button></div><div class="gate-stack" id="critical-gates"></div></article></section>
-      <section class="dashboard-grid two-one"><article class="panel paper-panel"><div class="panel-header"><div><p class="card-kicker">PAPER TRAINING</p><h3>最新模擬結果</h3></div><span class="badge pending" id="paper-training-status">後續版已準備 · 等待資料授權</span></div><svg class="equity-chart no-data" id="paper-equity-chart" viewBox="0 0 800 260" role="img" aria-label="尚無可繪製的模擬資產曲線"><path class="grid-line" d="M0 50 H800 M0 130 H800 M0 210 H800" /><path class="area" id="paper-equity-area" d="M0 150 H800 V230 H0 Z" /><path class="line" id="paper-equity-line" d="M0 150 H800" /></svg><p class="equity-note" id="paper-equity-note">完成至少一筆模擬成交後，才顯示真實產生的資產曲線。</p><p class="empty-note" id="paper-training-summary">沿用 Repository Paper Broker；V0.11 與獨立 holdout 存取 authority 完成前不自動恢復。</p></article><article class="panel provider-panel"><div class="panel-header"><div><p class="card-kicker">PROVENANCE</p><h3>Provider 永遠分離</h3></div></div><div class="provider-card"><span class="provider-tag pionex">PIONEX</span><div><strong>執行目標交易所</strong><p>Pionex-native 證據獨立保存，並維持自己的正式 authority。</p></div></div><div class="provider-card"><span class="provider-tag binance">BINANCE USD-M</span><div><strong>研究歷史資料來源</strong><p>Crypto Core 100 只進 R2；股票代幣留待獨立資料池。</p></div></div></article></section>
+      <section class="dashboard-grid two-one"><article class="panel"><div class="panel-header"><div><p class="card-kicker">CURRENT WORK</p><h3>歷史成果與階段索引</h3></div><span class="badge neutral">唯讀摘要</span></div><div class="pipeline" id="pipeline-list"></div></article><article class="panel"><div class="panel-header"><div><p class="card-kicker">FAIL-CLOSED</p><h3>關鍵安全閘門</h3></div><button class="text-action view-link" data-view="gates">查看全部 →</button></div><div class="gate-stack" id="critical-gates"></div></article></section>
+      <section class="dashboard-grid two-one"><article class="panel paper-panel"><div class="panel-header"><div><p class="card-kicker">PAPER TRAINING</p><h3>持續模擬（待啟動）</h3></div><span class="badge pending" id="paper-training-status">後續版已準備 · 等待資料授權</span></div><svg class="equity-chart no-data" id="paper-equity-chart" viewBox="0 0 800 260" role="img" aria-label="尚無可繪製的模擬資產曲線"><path class="grid-line" d="M0 50 H800 M0 130 H800 M0 210 H800" /><path class="area" id="paper-equity-area" d="M0 150 H800 V230 H0 Z" /><path class="line" id="paper-equity-line" d="M0 150 H800" /></svg><p class="equity-note" id="paper-equity-note">完成至少一筆模擬成交後，才顯示真實產生的資產曲線。</p><p class="empty-note" id="paper-training-summary">沿用 Repository Paper Broker；V0.11 與獨立 holdout 存取 authority 完成前不自動恢復。</p></article><article class="panel provider-panel"><div class="panel-header"><div><p class="card-kicker">PROVENANCE</p><h3>Provider 永遠分離</h3></div></div><div class="provider-card"><span class="provider-tag pionex">PIONEX</span><div><strong>執行目標交易所</strong><p>Pionex-native 證據獨立保存，並維持自己的正式 authority。</p></div></div><div class="provider-card"><span class="provider-tag binance">BINANCE USD-M</span><div><strong>研究歷史資料來源</strong><p>Crypto Core 100 只進 R2；股票代幣留待獨立資料池。</p></div></div></article></section>
       <section class="calendar-section"><div class="section-heading compact"><p class="section-number">02</p><div><p class="card-kicker">RESEARCH CALENDAR</p><h2>研究時程與授權狀態</h2><p>時間到了不代表證據通過；每一階段仍依 Repository 的版本化 authority 判定。</p><small class="projection-time" id="calendar-generated-at">行事曆投影：尚未提供</small></div></div><ol class="learning-timeline" id="research-calendar" aria-live="polite"><li class="calendar-loading"><strong>正在讀取研究時程</strong><small>Repository projection</small></li></ol></section>
         </div>
       </details>
@@ -162,6 +171,6 @@
     <section class="view" id="view-gates"><article class="panel"><div class="panel-header"><div><p class="card-kicker">FAIL-CLOSED</p><h3>全部專案安全閘門</h3></div><span class="badge danger">無真實交易路徑</span></div><div class="gate-grid" id="all-gates"></div></article></section>
     <footer class="site-footer"><p>這個網站是 Repository authority 的唯讀投影，不是 authority 本身。</p><span>QOOKEY / PAPER-ONLY / 0 USD RUNTIME BUDGET</span></footer>
   </main>
-  <script src="./assets/js/app.js?v=home-summary-v5" defer></script>
+  <script src="./assets/js/app.js?v=delivery-review-20260912" defer></script>
 </body>
 </html>

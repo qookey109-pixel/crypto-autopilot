@@ -1,0 +1,30 @@
+{
+  "schema": "ctk-lifecycle-diagnosis-evidence-v0.3",
+  "status": "VERIFIED_ARTIFACT_SHAPE_ONLY",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "run_id": 34687012733,
+  "head_sha": "2ff32d55fbcddd54053c1338467e835b11a7c5a8",
+  "artifact_id": 10295164694,
+  "artifact_bytes": 992,
+  "artifact_zip_sha256": "f143781a10711cd02be2f082b9795d78baa89bd210a1853339a6d2240c1630dd",
+  "github_artifact_digest_matches": true,
+  "report_path": "research/receipts/2026-09-12-ctk-lifecycle-v0-3-run-34687012733-report.json",
+  "report_bytes": 2853,
+  "report_sha256": "ae2169273e7aadd9d5b645c3095a19c1ce66d24a12a48a704ca8caad5f2d5cdc",
+  "handoff_discrepancy": {
+    "status": "REVIEW_REQUIRED",
+    "claimed_zip_sha256": "d2c4547d54235e0c49a3261efb0a4258757ad178911398bf804ad4312f52da0b",
+    "claimed_report_sha256": "fa32c2640ad6ccf1c6c9fed4b82173dd78a25ced7862166341f28296987d06e2",
+    "interpretation": "Downloaded ZIP matches GitHub artifact digest. Handoff hash discrepancy preserved; original handoff is not edited."
+  },
+  "interpretation": "One internal gap on 2025-04-30 across three intervals. Contract relaunch is a hypothesis, not established by archive shape alone.",
+  "authority": {
+    "production_repair": false,
+    "lifecycle_exception": false,
+    "training_cutoff_change": false,
+    "r2_access": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "live_trading": false
+  }
+}

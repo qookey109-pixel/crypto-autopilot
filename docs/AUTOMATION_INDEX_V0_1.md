@@ -1,10 +1,15 @@
 # Automation Index V0.1
 
+Current review: 2026-09-12. [Verified operations and handoff](OPERATIONS_HANDOFF_2026_09_12.md).
+History is every two hours under `config/history_cadence_v0_1.json`.
+V0.12's window has ended; fixed BTC simulation V0.1 is PASS and retired.
+Seven workflow files retain cron declarations, but not all remain executable.
+
 This is the current schedule view. Workflow files that preserve historical or
 regression evidence are classified in `config/project_convergence_v0_1.json`
 and should not be read as active production schedules.
 
-## Scheduled workflows after convergence
+## Scheduled workflows after convergence (bounded dates still apply)
 
 Current observation (`2026-08-31`): PR #210's Pionex `type=PERP` query is
 effective, but scheduled captures #36 through #41 all failed closed on the
@@ -15,11 +20,11 @@ backfills or regrades the incomplete V0.10 evidence.
 
 | State | Workflow | UTC cadence | Effective behavior |
 | --- | --- | --- | --- |
-| Current bounded successor | Provider Equivalence V0.12 metadata capture | `:17` and `:47`, only 2026-09-04 02:00 through 2026-09-12 03:59:59.999 | only current metadata schedule after exact protected-main merge; normalized Pionex schema must validate before R2 construction |
+| Expired bounded successor | Provider Equivalence V0.12 metadata capture | `:17` and `:47`, only 2026-09-04 02:00 through 2026-09-12 03:59:59.999 | only current metadata schedule after exact protected-main merge; normalized Pionex schema must validate before R2 construction |
 | Continuous | Research Signal Layer V0.2 | daily 02:17 | bounded public structured-signal ingestion |
 | Continuous | Research Signal Quality V0.1 | daily 02:47 | allowlisted R2 lineage read only |
 | Continuous / alerting | Research Automation Health V0.2 | every 2 hours at :57 | GitHub Actions metadata read only; covers every current cron and ignores manual/PR runs when judging automatic health |
-| Post-window | Binance USD-M Crypto Core 100 V0.1.2 | every 6 hours at :23 during 2026-09-04 through 09-30 | starts only after V0.10; 10 R2-only shards; fixed pre-holdout source range |
+| Post-window | Binance USD-M Crypto Core 100 V0.1.2 | every 2 hours at :23 during 2026-09-09 through 09-30 | starts only after V0.10; 10 R2-only shards; fixed pre-holdout source range |
 | Conditional post-window | Binance USD-M Crypto Core 100 Training V0.1.2 | Sunday 04:37 | skips until all 100-market detailed-history shards exist |
 | Post-window | Pionex Alternative Assets Observability V0.2 | 2026-09-04 02:53, then 09-06/13/20/27 at 03:53 | Pionex `PERP + TRADING` metadata only; validates the 125-candidate catalog, compares it with the prior SHA-bound catalog, estimates four-year capacity and writes R2 evidence plus a safe aggregate artifact |
 
@@ -60,7 +65,7 @@ manual dispatch is never required and never counts as cron-health evidence.
   Latest-lookback requests may include the frozen 2026-08-28 through 09-03
   candles, so no workflow or cron is created until V0.11 and a separate
   holdout/paper-read authority are complete.
-- No automatic Paper Broker simulation is currently running. The V0.1 cron is
+- Fixed BTC simulation V0.1 passed run 34615465566 and is retired; no continuous Paper simulation is currently running. The older public-paper V0.1 cron is
   retired after its cutoff, and V0.2 remains prepared without a workflow.
 - Pionex Alternative Assets historical candles (`15M / 60M / 4H`) remain
   unauthorized. The active observability schedule reads symbol metadata only;
