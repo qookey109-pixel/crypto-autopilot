@@ -1,0 +1,57 @@
+{
+  "automatic_model_promotion_authorized": false,
+  "candidate_row_count": 744,
+  "candidate_sha256": "acdaee9f7aca8516040c6c8219e9c1fc4538d7beda8d7c8bc6789c97b43f200b",
+  "config_sha256": "c4e3e788afb6be9c4e84de69b0fa645802595e2b18ae10be032ed52ea08b7a9e",
+  "daily_sha256": [
+    [
+      "2022-08-01",
+      "5c3f1b702ef582a002edea123d29e5d77c8aa9e53e98a3baf12c69f6e2dd6e7d"
+    ],
+    [
+      "2022-08-10",
+      "470b28f5e5a6a3da90b4370e57ff7d77aafabffb5d059aa94bc8150f5be3a72c"
+    ],
+    [
+      "2022-08-11",
+      "d4631f30d02b93289058acc60e3bf2a8a93988949acddcab440b7598320bab08"
+    ],
+    [
+      "2022-08-12",
+      "61197a3dd0ec840f6d2486037f8091e9309f748b83fbdcbded559c0a5d3c0c48"
+    ]
+  ],
+  "delivery": "binance_vision",
+  "expected_monthly_rows": 744,
+  "gap_count": 1,
+  "holdout_accessed": false,
+  "inserted_rows": 72,
+  "interval": "1h",
+  "live_trading_authorized": false,
+  "missing_bars": 72,
+  "missing_dates": [
+    "2022-08-10",
+    "2022-08-11",
+    "2022-08-12"
+  ],
+  "missing_end_exclusive_utc": "2022-08-13T00:00:00Z",
+  "missing_end_open_utc": "2022-08-12T23:00:00Z",
+  "missing_start_utc": "2022-08-10T00:00:00Z",
+  "monthly_sha256": "b64fa8a52889378b7174cdf196029be4bb49b6f5255c3253f3645baaf25cb239",
+  "observed_monthly_rows": 672,
+  "overlap_day": "2022-08-01",
+  "overlapping_rows_verified": 24,
+  "period": "2022-08",
+  "pionex_native_relabel_authorized": false,
+  "production_repair_performed": false,
+  "provider": "binance_usdm",
+  "public_requests": 10,
+  "r2_accessed": false,
+  "raw_overlap_rows_verified": 24,
+  "raw_rows_emitted": false,
+  "real_money_order_authorized": false,
+  "response_bytes": 32637,
+  "source_switch_authorized": false,
+  "status": "REPAIR_CANDIDATE_REQUIRES_PUBLICATION_AUTHORITY",
+  "symbol": "BNXUSDT"
+}
