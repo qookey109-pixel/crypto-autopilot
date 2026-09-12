@@ -37,6 +37,16 @@
       "symbol": "CTKUSDT"
     },
     {
+      "evidence": "research/receipts/2026-09-12-cvc-official-lifecycle-evidence-v0-1.json",
+      "gap_count": 1,
+      "interval": "15m",
+      "missing_bars": 34,
+      "monthly_sha256": "d9940880a57d29b57185712e3c12defd2ea5b0f9044d2da23510d9450570bd40",
+      "period": "2025-05",
+      "row_count": 2942,
+      "symbol": "CVCUSDT"
+    },
+    {
       "evidence": "config/lit_archive_diagnosis_v0_1.json",
       "gap_count": 1,
       "interval": "15m",
