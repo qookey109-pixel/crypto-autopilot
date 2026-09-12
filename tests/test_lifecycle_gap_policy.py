@@ -44,6 +44,7 @@ class LifecycleGapPolicyTests(unittest.TestCase):
         authority = json.loads(AUTHORITY.read_bytes())
         self.assertEqual(config["policy_id"], POLICY_ID)
         self.assertEqual(config["allowances"], list(reviewed_allowances()))
+        self.assertEqual(len(config["allowances"]), authority["entries"])
         self.assertEqual(hashlib.sha256(raw).hexdigest(), authority["config_sha256"])
         self.assertTrue(authority["user_authorized_operational_treatment"])
         self.assertTrue(authority["exact_allowlist_only"])
@@ -81,6 +82,36 @@ class LifecycleGapPolicyTests(unittest.TestCase):
         )
         self.assertIsNone(
             match_lifecycle_gap(key, archive_sha256=digest, audit=wrong_gap)
+        )
+
+    def test_exact_cvc_relaunch_month_gap_is_archive_pinned(self) -> None:
+        key = BinanceVisionArchiveKey("klines", "monthly", "CVCUSDT", "15m", "2025-05")
+        audit = CandleAudit(
+            interval="15M",
+            count=2942,
+            duplicate_timestamps=(),
+            out_of_order_pairs=(),
+            gaps=(CandleGap(0, 35 * 900000, 34),),
+            misaligned_timestamps=(),
+            invalid_candle_timestamps=(),
+        )
+        digest = "d9940880a57d29b57185712e3c12defd2ea5b0f9044d2da23510d9450570bd40"
+        self.assertEqual(
+            match_lifecycle_gap(key, archive_sha256=digest, audit=audit), POLICY_ID
+        )
+        self.assertIsNone(match_lifecycle_gap(key, archive_sha256="0" * 64, audit=audit))
+
+        wrong_missing = CandleAudit(
+            interval=audit.interval,
+            count=audit.count,
+            duplicate_timestamps=(),
+            out_of_order_pairs=(),
+            gaps=(CandleGap(0, 36 * 900000, 35),),
+            misaligned_timestamps=(),
+            invalid_candle_timestamps=(),
+        )
+        self.assertIsNone(
+            match_lifecycle_gap(key, archive_sha256=digest, audit=wrong_missing)
         )
 
     def test_lit_allowance_is_archive_pinned_and_rejects_other_defects(self) -> None:
