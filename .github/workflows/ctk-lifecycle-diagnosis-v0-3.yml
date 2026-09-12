@@ -1,0 +1,66 @@
+name: CTK Lifecycle Archive Diagnosis V0.3
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ctk-lifecycle-archive-diagnosis-v0-3
+  cancel-in-progress: false
+
+jobs:
+  diagnose:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Characterize bounded CTKUSDT lifecycle shape
+        env:
+          PYTHONPATH: src
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python scripts/diagnose_ctk_lifecycle_v0_3.py
+
+      - name: Assert diagnosis authority boundary
+        if: ${{ !cancelled() && hashFiles('ctk-lifecycle-diagnosis-v0-3-output/report.json') != '' }}
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("ctk-lifecycle-diagnosis-v0-3-output/report.json").read_text())
+          assert report.get("status") == "LIFECYCLE_SHAPE_CHARACTERIZED"
+          assert set(report.get("intervals", {})) == {"15m", "1h", "4h"}
+          assert report.get("public_requests", 99) <= 6
+          assert report.get("r2_accessed", False) is False
+          assert report.get("production_repair_performed", False) is False
+          assert report.get("holdout_accessed", False) is False
+          assert report.get("raw_rows_emitted", False) is False
+          assert report.get("source_switch_authorized", False) is False
+          assert report.get("pionex_native_relabel_authorized", False) is False
+          assert report.get("automatic_model_promotion_authorized", False) is False
+          assert report.get("real_money_order_authorized", False) is False
+          assert report.get("live_trading_authorized", False) is False
+          PY
+
+      - name: Preserve aggregate diagnosis
+        if: ${{ !cancelled() && hashFiles('ctk-lifecycle-diagnosis-v0-3-output/report.json') != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ctk-lifecycle-archive-diagnosis-v0-3-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ctk-lifecycle-diagnosis-v0-3-output/report.json
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf ctk-lifecycle-diagnosis-v0-3-output
