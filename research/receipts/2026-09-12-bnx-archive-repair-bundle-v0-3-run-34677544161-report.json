@@ -1,0 +1,32 @@
+{
+  "authority": {
+    "automatic_model_promotion_authorized": false,
+    "holdout_accessed": false,
+    "live_trading_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "real_money_order_authorized": false,
+    "source_switch_authorized": false
+  },
+  "dataset_status": "IN_PROGRESS",
+  "delivery": "binance_vision",
+  "mode": "backfill",
+  "observed_at_utc": "2026-09-12T06:13:08.562365Z",
+  "parquet_bytes": 41887757,
+  "partition_object_count": 1440,
+  "provider": "binance_usdm",
+  "receipt": {
+    "action": "UPLOAD",
+    "bucket": "qookey-crypto-autopilot-data",
+    "bytes": 1138977,
+    "etag": "3757eac929b849ce0139b6228df91b97",
+    "key": "receipts/historical/binance_usdm/crypto-core-v0.1/shard=003/run=github-34677544161-1/receipt.json",
+    "sha256": "d1626f03eb309ba575156f6b470701bbf5196cf9966f1933741b33b1156c378e"
+  },
+  "row_count": 1838138,
+  "shard_count": 10,
+  "shard_index": 3,
+  "shards_complete": 8,
+  "stage": "BINANCE_USDM_DETAILED_HISTORY_SHARD_PUBLISHED_V0_1",
+  "state_pointer_written_last": true,
+  "status": "PASS"
+}

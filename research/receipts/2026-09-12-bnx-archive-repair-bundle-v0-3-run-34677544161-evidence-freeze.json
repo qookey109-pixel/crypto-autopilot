@@ -1,0 +1,74 @@
+{
+  "artifact": {
+    "artifact_id": 10294046051,
+    "contains_only": [
+      "report.json"
+    ],
+    "name": "bnx-repair-bundle-v0-3-34677544161-1",
+    "report_bytes": 1071,
+    "report_sha256": "79da917edf20ef53e4a40b5d8e67db5766ff4bbf01993b93ad765ebdeb27e720",
+    "size_bytes": 745,
+    "zip_sha256": "d519319d00aae759cd1049c1ff4769e014f6411264ae4c17fabe4d209b34cd15"
+  },
+  "authority_boundaries": {
+    "automatic_model_promotion_authorized": false,
+    "dataset_complete_claimed": false,
+    "holdout_accessed": false,
+    "live_trading_authorized": false,
+    "new_repair_authority_granted_by_this_evidence_freeze": false,
+    "new_schedule_authority_granted_by_this_evidence_freeze": false,
+    "pionex_native_relabel_authorized": false,
+    "real_money_order_authorized": false,
+    "source_switch_authorized": false
+  },
+  "frozen_at_utc": "2026-09-12T06:55:39Z",
+  "interpretation": {
+    "authority_bound_shard_3_published": true,
+    "bounded_bnx_repair_bundle_v0_3_succeeded": true,
+    "dataset_remains_in_progress": true,
+    "remaining_shards": 2,
+    "resulting_completed_shards": 8,
+    "total_shards": 10
+  },
+  "r2_receipt": {
+    "action": "UPLOAD",
+    "bytes": 1138977,
+    "etag": "3757eac929b849ce0139b6228df91b97",
+    "key": "receipts/historical/binance_usdm/crypto-core-v0.1/shard=003/run=github-34677544161-1/receipt.json",
+    "sha256": "d1626f03eb309ba575156f6b470701bbf5196cf9966f1933741b33b1156c378e"
+  },
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "result": {
+    "dataset_status": "IN_PROGRESS",
+    "delivery": "binance_vision",
+    "mode": "backfill",
+    "observed_at_utc": "2026-09-12T06:13:08.562365Z",
+    "parquet_bytes": 41887757,
+    "partition_object_count": 1440,
+    "provider": "binance_usdm",
+    "row_count": 1838138,
+    "shard_count": 10,
+    "shard_index": 3,
+    "shards_complete": 8,
+    "stage": "BINANCE_USDM_DETAILED_HISTORY_SHARD_PUBLISHED_V0_1",
+    "state_pointer_written_last": true,
+    "status": "PASS"
+  },
+  "run": {
+    "branch": "main",
+    "completed_at_utc": "2026-09-12T06:55:39Z",
+    "conclusion": "success",
+    "created_at_utc": "2026-09-12T06:12:51Z",
+    "event": "workflow_dispatch",
+    "head_sha": "5a7df3e63829e79a037bd8261c611bf32ac8ff89",
+    "job_id": 103509997554,
+    "job_name": "repair-bnx-bundle",
+    "run_attempt": 1,
+    "run_id": 34677544161,
+    "run_number": 39,
+    "workflow": "Binance USD-M Crypto Core 100 History V0.1.2",
+    "workflow_path": ".github/workflows/binance-usdm-detailed-history-v0-1.yml"
+  },
+  "schema": "bnx-archive-repair-bundle-v0.3-github-evidence-freeze-v0.1",
+  "status": "PASS_REPAIR_EVIDENCE_FROZEN"
+}
