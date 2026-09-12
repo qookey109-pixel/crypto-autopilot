@@ -15,6 +15,7 @@ CONFIG_SHA = "26c15fa325741c61fb556901ce7b20672edfdac29359fd40654f820f2bd770de"
 BASE_SHA = repair_v0_1.BASE_SHA
 SHARD_INDEX = 3
 TARGETS = (repair_v0_1.TARGET, repair_v0_2.TARGET, repair_v0_3.TARGET)
+RECOVERY_FAIR_ROTATION_OVERRIDE_AUTHORIZED = True
 
 
 class RepairAuthorityError(ValueError):
@@ -124,6 +125,19 @@ def load_contract(config_path, receipt_path, base_bytes, now=None, env=None):
         env=env,
     )
     return {"v0_1": v0_1, "v0_2": v0_2, "v0_3": v0_3}
+
+
+def authorize_recovery_shard_override(contract, *, requested_shard, completed):
+    """Allow only the exact loaded bundle to retry its bound shard after a quality reject."""
+    if RECOVERY_FAIR_ROTATION_OVERRIDE_AUTHORIZED is not True:
+        raise RepairAuthorityError("BNX_REPAIR_BUNDLE_V0_3_ROTATION_OVERRIDE_DISABLED")
+    if requested_shard != SHARD_INDEX:
+        raise RepairAuthorityError("BNX_REPAIR_BUNDLE_V0_3_ROTATION_OVERRIDE_SHARD_MISMATCH")
+    if SHARD_INDEX in completed:
+        raise RepairAuthorityError("BNX_REPAIR_BUNDLE_V0_3_SHARD_ALREADY_COMPLETE")
+    if not isinstance(contract, dict) or set(contract) != {"v0_1", "v0_2", "v0_3"}:
+        raise RepairAuthorityError("BNX_REPAIR_BUNDLE_V0_3_ROTATION_OVERRIDE_CONTRACT_MISMATCH")
+    return SHARD_INDEX
 
 
 def matches(partition):
