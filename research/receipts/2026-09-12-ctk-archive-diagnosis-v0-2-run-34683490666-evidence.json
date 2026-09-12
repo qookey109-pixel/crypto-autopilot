@@ -1,0 +1,44 @@
+{
+  "schema": "ctk-archive-diagnosis-run-evidence-v0.2",
+  "status": "FROZEN_SUCCESS_EVIDENCE",
+  "run": {
+    "workflow": "CTK 15m Archive Diagnosis V0.2",
+    "run_id": 34683490666,
+    "run_number": 1,
+    "event": "workflow_dispatch",
+    "branch": "main",
+    "head_sha": "245c43d4104287375690e95ecc6e2473adfa19b2",
+    "run_attempt": 1,
+    "conclusion": "success"
+  },
+  "artifact": {
+    "artifact_id": 10294243218,
+    "name": "ctk-15m-archive-diagnosis-v0-2-34683490666-1",
+    "size_in_bytes": 730,
+    "zip_sha256": "8df846b5e5291752e7468d8525021a10333464f01ecf625e50b4707d00b8b625",
+    "report_sha256": "dd86d17c7ff04b4ee765a1454d303c9cf163f396ef7654380ad2337d23b78332"
+  },
+  "diagnosis": {
+    "symbol": "CTKUSDT",
+    "interval": "15m",
+    "period": "2025-04",
+    "status": "RECONCILIATION_REJECTION_CHARACTERIZED",
+    "reason": "DAILY_NOT_FULL_UTC_DAY",
+    "missing_bars": 41,
+    "missing_start_utc": "2025-04-30T00:00:00Z",
+    "missing_end_exclusive_utc": "2025-04-30T10:15:00Z",
+    "public_requests": 6
+  },
+  "authority_boundaries": {
+    "r2_accessed": false,
+    "production_repair_performed": false,
+    "raw_rows_emitted": false,
+    "holdout_accessed": false,
+    "source_switch_authorized": false,
+    "pionex_native_relabel_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "new_publication_authority_granted_by_this_evidence_freeze": false
+  }
+}
