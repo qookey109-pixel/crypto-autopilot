@@ -1,0 +1,109 @@
+{
+  "schema": "bnx-archive-diagnosis-v0.2-github-evidence-freeze-v0.1",
+  "status": "PASS_EVIDENCE_OBSERVED_NOT_PUBLICATION_AUTHORITY",
+  "observed_on": "2026-09-12",
+  "workflow_run": {
+    "id": 34666744148,
+    "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34666744148",
+    "workflow": "BNX 1h Archive Diagnosis V0.2",
+    "event": "workflow_dispatch",
+    "head_branch": "main",
+    "head_sha": "007fa73ab992be7836eb7e09fe36b4b7b2d21da1",
+    "run_attempt": 1,
+    "created_at_utc": "2026-09-12T02:06:36Z",
+    "updated_at_utc": "2026-09-12T02:06:54Z",
+    "conclusion": "success",
+    "job_id": 103480049484,
+    "job_conclusion": "success"
+  },
+  "artifact": {
+    "id": 10289138030,
+    "name": "bnx-1h-archive-diagnosis-v0-2-34666744148-1",
+    "size_in_bytes": 984,
+    "zip_digest": "sha256:89ccb04f55a51e8408b478153f59e0f7b7821d339869f1ccb5341d27f12431f7",
+    "report_path_in_artifact": "report.json",
+    "report_sha256": "17cc10cc8c2c1bcbd1aa3a930cd6a4cf254cdf321b1b8bf53fce3e3905b36a2e",
+    "report_bytes": 1777,
+    "frozen_repository_copy": "research/receipts/2026-09-12-bnx-archive-diagnosis-v0-2-run-34666744148-report.json"
+  },
+  "observed_result": {
+    "report_status": "REPAIR_CANDIDATE_REQUIRES_PUBLICATION_AUTHORITY",
+    "provider": "binance_usdm",
+    "delivery": "binance_vision",
+    "symbol": "BNXUSDT",
+    "interval": "1h",
+    "period": "2022-08",
+    "monthly_sha256": "b64fa8a52889378b7174cdf196029be4bb49b6f5255c3253f3645baaf25cb239",
+    "observed_monthly_rows": 672,
+    "expected_monthly_rows": 744,
+    "missing_bars": 72,
+    "gap_count": 1,
+    "missing_start_utc": "2022-08-10T00:00:00Z",
+    "missing_end_open_utc": "2022-08-12T23:00:00Z",
+    "missing_end_exclusive_utc": "2022-08-13T00:00:00Z",
+    "missing_dates": [
+      "2022-08-10",
+      "2022-08-11",
+      "2022-08-12"
+    ],
+    "overlap_day": "2022-08-01",
+    "raw_overlap_rows_verified": 24,
+    "overlapping_rows_verified": 24,
+    "inserted_rows": 72,
+    "candidate_row_count": 744,
+    "candidate_sha256": "acdaee9f7aca8516040c6c8219e9c1fc4538d7beda8d7c8bc6789c97b43f200b",
+    "daily_sha256": [
+      [
+        "2022-08-01",
+        "5c3f1b702ef582a002edea123d29e5d77c8aa9e53e98a3baf12c69f6e2dd6e7d"
+      ],
+      [
+        "2022-08-10",
+        "470b28f5e5a6a3da90b4370e57ff7d77aafabffb5d059aa94bc8150f5be3a72c"
+      ],
+      [
+        "2022-08-11",
+        "d4631f30d02b93289058acc60e3bf2a8a93988949acddcab440b7598320bab08"
+      ],
+      [
+        "2022-08-12",
+        "61197a3dd0ec840f6d2486037f8091e9309f748b83fbdcbded559c0a5d3c0c48"
+      ]
+    ],
+    "public_requests": 10,
+    "response_bytes": 32637
+  },
+  "interpretation": {
+    "diagnosis_complete": true,
+    "repair_candidate_reconstructed_in_memory": true,
+    "candidate_published": false,
+    "production_repair_performed": false,
+    "r2_accessed": false,
+    "source_switch_performed": false,
+    "pionex_native_relabel_performed": false,
+    "holdout_accessed": false,
+    "trading_authority_changed": false,
+    "existing_15m_repair_authority_applies_to_1h": false,
+    "new_publication_authority_granted": false
+  },
+  "evidence_collection": {
+    "new_provider_request_performed_during_freeze": false,
+    "new_r2_read_performed_during_freeze": false,
+    "new_r2_write_performed_during_freeze": false,
+    "holdout_accessed_during_freeze": false,
+    "raw_candles_added_to_repository": false
+  },
+  "authority": {
+    "publication": false,
+    "production_repair": false,
+    "r2_reads": false,
+    "r2_writes": false,
+    "existing_partition_overwrite": false,
+    "source_switch": false,
+    "pionex_native_relabel": false,
+    "holdout_access": false,
+    "automatic_model_promotion": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
