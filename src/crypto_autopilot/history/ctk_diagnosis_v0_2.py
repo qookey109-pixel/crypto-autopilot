@@ -53,7 +53,7 @@ REASON_MAP = {
     "only absent bars may be reconciled": "MONTHLY_NON_ABSENCE_DEFECT",
 }
 REASON_ALLOWLIST = frozenset(
-    REASON_MAP.values()
+    set(REASON_MAP.values())
     | {
         "DAILY_ARCHIVE_VALIDATION_REJECTED",
         "RECONCILIATION_REJECTED_UNKNOWN",
