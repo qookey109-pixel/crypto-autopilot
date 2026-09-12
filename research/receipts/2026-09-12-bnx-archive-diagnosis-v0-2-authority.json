@@ -1,0 +1,17 @@
+{
+  "schema": "bnx-archive-diagnosis-authority-v0.2",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "config": "config/bnx_archive_diagnosis_v0_2.json",
+  "config_sha256": "c4e3e788afb6be9c4e84de69b0fa645802595e2b18ae10be032ed52ea08b7a9e",
+  "execution_performed_by_this_receipt": false,
+  "public_archive_reads_authorized": true,
+  "aggregate_github_artifact_authorized": true,
+  "automatic_schedule_authorized": false,
+  "r2_access_authorized": false,
+  "production_repair_authorized": false,
+  "source_switch_authorized": false,
+  "pionex_native_relabel_authorized": false,
+  "holdout_access_authorized": false,
+  "trading_authorized": false,
+  "automatic_model_promotion_authorized": false
+}

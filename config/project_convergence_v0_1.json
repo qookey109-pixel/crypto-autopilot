@@ -131,6 +131,7 @@
     "current_execution_monitoring_or_release": [
       "binance-usdm-detailed-history-v0-1.yml",
       "binance-usdm-detailed-training-v0-1.yml",
+      "bnx-archive-diagnosis-v0-2.yml",
       "ci.yml",
       "context-forward-capture-execution-v0-1.yml",
       "dashboard-authority-snapshot.yml",
