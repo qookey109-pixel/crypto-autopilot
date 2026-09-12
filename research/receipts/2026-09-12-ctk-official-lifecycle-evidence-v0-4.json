@@ -1,0 +1,106 @@
+{
+  "schema": "ctk-official-lifecycle-evidence-v0.4",
+  "status": "EVIDENCE_CONFLICT_CAUSE_UNCONFIRMED",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "base_main_sha": "a34ca9af5b1d4a54e2b0717bc1f42a0881373162",
+  "recorded_at_utc": "2026-09-12T12:36:54Z",
+  "symbol": "CTKUSDT",
+  "provider": "binance_usdm",
+  "delivery": "binance_vision",
+  "official_binance_lifecycle": {
+    "old_contract_delisting": {
+      "announcement_id": "ce74360a3fd444b2b35da7186f8dd0ad",
+      "url": "https://www.binance.com/en/support/announcement/detail/ce74360a3fd444b2b35da7186f8dd0ad",
+      "published_at_utc": "2024-03-25T04:40:00Z",
+      "automatic_settlement_at_utc": "2024-04-01T09:00:00Z",
+      "statement": "Binance Futures states CTKUSDT perpetual positions would be settled at 2024-04-01 09:00 UTC and the contract delisted after settlement."
+    },
+    "new_contract_launch": {
+      "announcement_id": "63155163bce541f5856d416efa71c6e8",
+      "url": "https://www.binance.com/en/support/announcement/63155163bce541f5856d416efa71c6e8",
+      "published_at_utc": "2025-04-30T08:30:00Z",
+      "launch_at_utc": "2025-04-30T10:15:00Z",
+      "statement": "Binance Futures states CTKUSDT perpetual would launch at 2025-04-30 10:15 UTC."
+    }
+  },
+  "verified_archive_evidence": {
+    "source_run_id": 34687012733,
+    "source_artifact_id": 10295164694,
+    "source_artifact_zip_sha256": "f143781a10711cd02be2f082b9795d78baa89bd210a1853339a6d2240c1630dd",
+    "source_report_path": "research/receipts/2026-09-12-ctk-lifecycle-v0-3-run-34687012733-report.json",
+    "source_report_sha256": "ae2169273e7aadd9d5b645c3095a19c1ce66d24a12a48a704ca8caad5f2d5cdc",
+    "archive_reader_path": "src/crypto_autopilot/history/ctk_lifecycle_diagnosis_v0_3.py",
+    "binance_vision_parser_path": "src/crypto_autopilot/binance/vision.py",
+    "derivation": {
+      "monthly_archive_downloaded_from_binance_vision": true,
+      "official_checksum_verified": true,
+      "zip_structure_validated": true,
+      "csv_rows_parsed_directly_to_candles": true,
+      "synthetic_rows_created": false,
+      "forward_fill_or_interpolation_used": false,
+      "raw_rows_emitted_by_diagnosis": false
+    },
+    "intervals": {
+      "15m": {
+        "monthly_sha256": "bd77c44d0061511b2e8f5c140a06ad2dd30007c640586fad5b035d71b0c3c61c",
+        "row_count": 2839,
+        "first_timestamp_utc": "2025-04-01T00:00:00Z",
+        "last_timestamp_utc": "2025-04-30T23:45:00Z",
+        "missing_bars": 41,
+        "missing_start_utc": "2025-04-30T00:00:00Z",
+        "missing_end_exclusive_utc": "2025-04-30T10:15:00Z"
+      },
+      "1h": {
+        "monthly_sha256": "1fe1c295babc4481dd5c5e9145b68e2bacafe3c6e262528854f8de903ac14b25",
+        "row_count": 710,
+        "first_timestamp_utc": "2025-04-01T00:00:00Z",
+        "last_timestamp_utc": "2025-04-30T23:00:00Z",
+        "missing_bars": 10,
+        "missing_start_utc": "2025-04-30T00:00:00Z",
+        "missing_end_exclusive_utc": "2025-04-30T10:00:00Z"
+      },
+      "4h": {
+        "monthly_sha256": "08ce76f52b01e9151d64e5df72dca9c5af36ebb41afa9b397edd43fec799862f",
+        "row_count": 178,
+        "first_timestamp_utc": "2025-04-01T00:00:00Z",
+        "last_timestamp_utc": "2025-04-30T20:00:00Z",
+        "missing_bars": 2,
+        "missing_start_utc": "2025-04-30T00:00:00Z",
+        "missing_end_exclusive_utc": "2025-04-30T08:00:00Z"
+      }
+    }
+  },
+  "evidence_assessment": {
+    "fifteen_minute_gap_end_matches_launch_exactly": true,
+    "coarser_interval_bucket_open_times_are_not_independent_launch_times": true,
+    "prelaunch_archive_rows_exist_from_2025_04_01": true,
+    "official_source_explains_prelaunch_archive_rows": false,
+    "simple_contract_absence_explanation_proven": false,
+    "lifecycle_related_gap_hypothesis_strengthened": true,
+    "cause_confirmed": false,
+    "interpretation": "The exact 15m gap boundary materially strengthens a lifecycle relationship, but the same checksum-verified Binance Vision futures archive contains CTKUSDT rows from 2025-04-01 onward, before the official 2025-04-30 launch. No reviewed official Binance source explains those pre-launch archive rows. Therefore archive shape plus announcements are insufficient to authorize a lifecycle exception."
+  },
+  "decision": {
+    "quality_gate_status": "FAIL_CLOSED",
+    "lifecycle_exception": false,
+    "exception": false,
+    "whitelist": false,
+    "production_materializer_use": false,
+    "training_quality_waiver": false,
+    "fake_or_interpolated_candles": false,
+    "next_evidence_required": "An authoritative explanation of the checksum-verified 2025-04 pre-launch CTKUSDT USD-M archive rows, or an independently verifiable provider lifecycle mapping that reconciles them with the official launch announcement."
+  },
+  "authority": {
+    "public_provider_requests": false,
+    "r2_access": false,
+    "holdout_access": false,
+    "production_repair": false,
+    "source_switch": false,
+    "pionex_native_relabel": false,
+    "training_cutoff_change": false,
+    "automatic_model_promotion": false,
+    "formal_trade_plan": false,
+    "real_money_order": false,
+    "live_trading": false
+  }
+}
