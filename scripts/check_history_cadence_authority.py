@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = "config/history_cadence_v0_1.json"
-RECEIPT = "research/receipts/2026-09-09-history-cadence-v0-1-authority.json"
+RECEIPT = "research/receipts/2026-09-12-history-cadence-v0-2-authority.json"
 CONFIG_SHA = "f7f7141cfd37b0b73b8546a0881a8baee5a80d4da165de39d7695f4b38033df1"
 BASE_BINDINGS = {
     "config/binance_usdm_detailed_history_v0_1_2.json": "fc4e42b855229ecb62e12e681778080c2aa749112036a6e8b3af9e9da98b716a",
@@ -35,7 +35,7 @@ def validate(root=ROOT, *, env=None, now=None):
     if not start <= now < end:
         raise ValueError("HISTORY_CADENCE_WINDOW_CLOSED")
     receipt = json.loads((root / RECEIPT).read_bytes())
-    if (receipt.get("schema") != "history-cadence-authority-v0.1"
+    if (receipt.get("schema") != "history-cadence-authority-v0.2"
             or receipt.get("status") != "AUTHORIZED_ON_PROTECTED_MAIN_MERGE"
             or receipt.get("config") != CONFIG
             or receipt.get("config_sha256") != CONFIG_SHA):
