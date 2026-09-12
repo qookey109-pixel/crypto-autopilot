@@ -20,6 +20,8 @@ on:
       - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
       - "scripts/build_cloud_run_status.py"
+      - "scripts/build_delivery_overview.py"
+      - "research/status/simulation-readiness-v0-1.json"
       - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
@@ -57,6 +59,8 @@ on:
       - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
       - "scripts/build_cloud_run_status.py"
+      - "scripts/build_delivery_overview.py"
+      - "research/status/simulation-readiness-v0-1.json"
       - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
@@ -133,6 +137,7 @@ jobs:
           rm -rf _site
           mkdir -p _site/data
           cp -R web/. _site/
+          python scripts/build_delivery_overview.py --site _site
           python scripts/build_strategy_projection.py \
             --output _site/data/strategy.json
           python scripts/build_dashboard_authority_snapshot.py \

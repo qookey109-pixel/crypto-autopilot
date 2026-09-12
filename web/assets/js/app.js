@@ -252,7 +252,7 @@ function renderEquityChart(report) {
     chart.setAttribute("aria-label", "尚無可繪製的模擬資產曲線");
     line.setAttribute("d", "M0 150 H800");
     area.setAttribute("d", "M0 150 H800 V230 H0 Z");
-    note.textContent = "完成至少一筆模擬成交後，才顯示真實產生的資產曲線。";
+    note.textContent = "此區等待持續模擬的成交曲線；固定 BTC 樣本結果請見首頁摘要。";
     return;
   }
   const minimum = Math.min(...values);
@@ -278,8 +278,8 @@ function renderPaperTraining(report) {
       report.status === "WAITING_AUTHORITY" || unsafe ||
       !Number.isFinite(observed) || observed > Date.now()) {
     if (observedAt) observedAt.textContent = "Paper 觀測：尚未完成";
-    document.querySelector("#paper-training-status").textContent = "模擬未啟動 · 等待資料與執行授權";
-    document.querySelector("#paper-training-summary").textContent = "尚無通過檢查的模擬結果；開始日期未定。";
+    document.querySelector("#paper-training-status").textContent = "持續模擬未啟動 · 等待資料與執行授權";
+    document.querySelector("#paper-training-summary").textContent = "此區顯示持續模擬；已完成的固定 BTC 樣本請見首頁摘要。";
     for (const id of ["paper-return", "paper-win-rate", "paper-profit-factor", "paper-drawdown"]) {
       document.querySelector("#" + id).textContent = "—";
     }

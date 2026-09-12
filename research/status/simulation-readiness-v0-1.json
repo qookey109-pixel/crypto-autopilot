@@ -2,7 +2,7 @@
   "schema": "qookey-simulation-readiness-v0.1",
   "authority": false,
   "status_type": "READ_ONLY_OPERATIONAL_INDEX",
-  "as_of_repository_main_sha": "8ba78f961d267caa6d1adf79cc74aaddd4d1e2f7",
+  "as_of_repository_main_sha": "2ff32d55fbcddd54053c1338467e835b11a7c5a8",
   "overall": "NOT_READY",
   "full_simulation_ready": false,
   "full_universe_ready": false,
@@ -11,7 +11,8 @@
     "scope": "BTC_FIXED_27_DAY_ENGINE_VALIDATION_ONLY",
     "formal_receipt": "research/receipts/2026-09-11-simulation-btc-fixed-sample-v0-1-pass.json",
     "workflow_run_id": 34615465566,
-    "does_not_imply_full_universe_ready": true
+    "does_not_imply_full_universe_ready": true,
+    "automatic_execution_state": "RETIRED_AFTER_PASS"
   },
   "pionex_research_universe": {
     "state": "PARTIAL",
@@ -35,16 +36,27 @@
   },
   "binance_core_100_history": {
     "state": "PARTIAL",
-    "latest_formal_run_id": 34594667095,
-    "completed_shards": 7,
+    "latest_formal_run_id": 34680188351,
+    "completed_shards": 8,
     "total_shards": 10,
+    "observed_at_utc": "2026-09-12T07:14:57.743217Z",
+    "last_shard_index": 4,
+    "latest_run_conclusion": "failure",
+    "progress_evidence": "research/receipts/2026-09-12-history-run-34680188351-log-observation.json",
+    "bnx_repair_evidence": "research/receipts/2026-09-12-bnx-archive-repair-bundle-v0-3-run-34677544161-evidence-freeze.json",
     "current_blocker": {
+      "symbol": "CTKUSDT",
+      "period": "2025-04",
+      "interval": "15m",
+      "missing_bars": 41,
+      "gap_count": 1
+    },
+    "other_unresolved_blocker": {
       "symbol": "LITUSDT",
       "period": "2025-12",
       "interval": "15m",
       "missing_bars": 70,
-      "gap_count": 1,
-      "daily_reconciliation_state": "DAILY_INCOMPLETE"
+      "evidence_run_id": 34594667095
     }
   },
   "metadata_stability": {
@@ -62,15 +74,15 @@
     "partial_window_may_pass": false,
     "retroactive_backfill_authorized": false,
     "later_observation_can_restore_missing_slots": false,
-    "v0_12_capture_observation_may_continue": true,
+    "v0_12_capture_observation_may_continue": false,
     "production_stability_evaluation_authorized": false,
-    "latest_observed_scheduled_run_id": 34614741624,
-    "latest_observed_scheduled_run_number": 55,
-    "latest_observed_run_outcome": "FAIL_PROVIDER_CAPTURE_RENDER_HTTP_502",
+    "latest_observed_scheduled_run_id": 34673261420,
+    "latest_observed_run_outcome": "WORKFLOW_SUCCESS_CAPTURE_SKIPPED_AFTER_WINDOW",
     "render_recovery_occurred_after_latest_observed_failure": true,
-    "post_recovery_formal_schedule_evidence_state": "AWAITING_NEW_FORMAL_RUN_EVIDENCE",
+    "post_recovery_formal_schedule_evidence_state": "NO_CAPTURE_PASS_ESTABLISHED",
     "replacement_holdout_state": "FROZEN_UNOPENED",
-    "display_detail": "V0.12 later captures may remain observational evidence, but two irreversibly missing UTC hourly slots mean this frozen window cannot achieve the required complete 194-slot PASS."
+    "display_detail": "V0.12 window ended 2026-09-12T04:00:00Z. Latest scheduled workflow succeeded with capture skipped. Two frozen missing slots remain; no complete 194-slot PASS.",
+    "window_state": "EXPIRED"
   },
   "context_forward_v0_1": {
     "state": "AUTHORIZED_PENDING_ONE_SHOT",
@@ -97,5 +109,19 @@
     "trade_plan_authorized": false,
     "real_money_order_authorized": false,
     "live_trading_authorized": false
+  },
+  "verified_at_utc": "2026-09-12T10:40:47Z",
+  "ctk_diagnosis": {
+    "state": "SHAPE_CHARACTERIZED_CAUSE_UNCONFIRMED",
+    "evidence": "research/receipts/2026-09-12-ctk-lifecycle-v0-3-run-34687012733-evidence.json",
+    "exception_authorized": false,
+    "handoff_hash_discrepancy": "REVIEW_REQUIRED"
+  },
+  "operations": {
+    "latest_health_run_id": 34674926711,
+    "health_state": "FAILED_HISTORY_QUALITY_REJECTION",
+    "github_schedule_count": 7,
+    "codex_monitor_state": "PAUSED",
+    "schedule_changes_applied": false
   }
 }

@@ -45,18 +45,18 @@ class SimulationReadinessIndexV01Tests(unittest.TestCase):
         self.assertFalse(metadata["partial_window_may_pass"])
         self.assertFalse(metadata["retroactive_backfill_authorized"])
         self.assertFalse(metadata["later_observation_can_restore_missing_slots"])
-        self.assertTrue(metadata["v0_12_capture_observation_may_continue"])
+        self.assertFalse(metadata["v0_12_capture_observation_may_continue"])
+        self.assertEqual(metadata["window_state"], "EXPIRED")
         self.assertFalse(metadata["production_stability_evaluation_authorized"])
-        self.assertEqual(metadata["latest_observed_scheduled_run_id"], 34614741624)
-        self.assertEqual(metadata["latest_observed_scheduled_run_number"], 55)
+        self.assertEqual(metadata["latest_observed_scheduled_run_id"], 34673261420)
         self.assertEqual(
             metadata["latest_observed_run_outcome"],
-            "FAIL_PROVIDER_CAPTURE_RENDER_HTTP_502",
+            "WORKFLOW_SUCCESS_CAPTURE_SKIPPED_AFTER_WINDOW",
         )
         self.assertTrue(metadata["render_recovery_occurred_after_latest_observed_failure"])
         self.assertEqual(
             metadata["post_recovery_formal_schedule_evidence_state"],
-            "AWAITING_NEW_FORMAL_RUN_EVIDENCE",
+            "NO_CAPTURE_PASS_ESTABLISHED",
         )
         self.assertEqual(metadata["replacement_holdout_state"], "FROZEN_UNOPENED")
 
