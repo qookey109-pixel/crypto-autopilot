@@ -1,0 +1,31 @@
+{
+  "causal_claim": "NOT_ASSERTED",
+  "evidence_basis": {
+    "official_lifecycle_receipt": "research/receipts/2026-09-12-cvc-official-lifecycle-evidence-v0-1.json",
+    "production_workflow_artifact": "binance-usdm-detailed-history-34722671256-1"
+  },
+  "operational_classification": "USER_AUTHORIZED_LIFECYCLE_GAP",
+  "scheduled_observation": {
+    "archive_sha256": "236cf0cecf8c927f3f5d07e7fc0c5171a09b60377641b1c7a8df3609674bd454",
+    "dataset": "klines",
+    "dataset_status": "IN_PROGRESS",
+    "frequency": "monthly",
+    "gap_count": 1,
+    "head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+    "interval": "1h",
+    "invalid_candle_count": 0,
+    "misaligned_count": 0,
+    "missing_bars": 8,
+    "period": "2025-05",
+    "row_count": 736,
+    "run_id": 34722671256,
+    "shard_count": 10,
+    "shard_index": 4,
+    "shards_complete": 8,
+    "stage": "DETAILED_HISTORY_SHARD_QUALITY_REJECT",
+    "symbol": "CVCUSDT"
+  },
+  "schema": "cvc-1h-scheduled-failure-v0.1",
+  "statement": "A protected-main scheduled production history run observed the checksum- and geometry-pinned CVCUSDT 1h May-2025 discontinuity. Existing official CVC lifecycle evidence documents a prior delisting and a May-2025 relaunch. The lifecycle event is not asserted as the proven cause of the missing timestamps; the operational treatment is limited to this exact archive.",
+  "synthetic_candles_authorized": false
+}
