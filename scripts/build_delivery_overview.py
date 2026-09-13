@@ -50,6 +50,20 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict]:
     if any(ctk["authority"].values()):
         raise ValueError("CTK observation grants no exception authority")
     stamp = html.escape(index["verified_at_utc"])
+    policy_index = index["lifecycle_policy"]
+    policy_path = policy_index["config"]
+    policy = read_json(policy_path, root)
+    if (hashlib.sha256((root / policy_path).read_bytes()).hexdigest() != policy_index["config_sha256"]
+            or len(policy["allowances"]) != policy_index["allowance_count"]
+            or policy["causal_claim"] != "NOT_ASSERTED"
+            or policy["provider"] != "binance_usdm"
+            or policy_index["production_completion_verified"] is not False):
+        raise ValueError("Lifecycle policy projection differs from reviewed evidence")
+    diagnostic = report["diagnostic"]
+    current_gap = html.escape(
+        f'{diagnostic["symbol"]} {diagnostic["period"]} {diagnostic["interval"]}，'
+        f'缺 {diagnostic["missing_bars"]} 根'
+    )
     run = history["latest_formal_run_id"]
     count = history["completed_shards"]
     sample_run = btc["workflow_run_id"]
@@ -58,24 +72,25 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict]:
         <p><strong>完整模擬尚未就緒 · NOT_READY</strong>；BTC 固定樣本已通過。</p>
         <div class="delivery-metrics" aria-label="目前已核實進度">
           <article><p>BTC 27 天模擬</p><strong>已完成 · {btc['executed_trade_count']} 筆成交</strong><p>僅驗證固定樣本；已停止自動重跑。</p></article>
-          <article><p>Binance Core 100</p><strong>{count}/10 分片</strong><p>BNX 修復已完成；CTK、LIT 仍有缺口。</p></article>
+          <article><p>Binance Core 100</p><strong>{count}/10 分片</strong><p>BNX 已正式發布；新缺口規則待執行證據。</p></article>
           <article><p>Pionex 研究候選池</p><strong>{index['pionex_research_universe']['selected_candidate_markets']} 個候選</strong><p>完整歷史與資產分類尚未完成。</p></article>
           <article><p>BTC Funding</p><strong>{index['pionex_funding']['observation_count']} 筆已核實</strong><p>對應固定樣本期間。</p></article>
         </div>
-        <p>優先處理：CTK 原因核對與精確資料規則、LIT 缺口、Pionex 歷史範圍與分類。</p>
+        <p>下一步：核對 PR #292 後的歷史補齊。最後一次拒絕：{current_gap}（合併前執行）。</p>
+        <p>訓練尚未完成：9/13 因資料未齊而跳過；下次例行 9/20，晚於 9/15 目標。</p>
         <p>證據核對時間（UTC）：{stamp}。下列 Actions 狀態只代表工作流程結果。</p>
         <p id="cloud-run-updated">雲端執行狀態尚未載入。</p>
         <ul id="cloud-run-list" class="cloud-run-list" aria-live="polite"></ul>
         <details><summary>查看資料證據與後續步驟</summary>
-          <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{sample_run}" target="_blank" rel="noopener noreferrer">BTC 模擬報告 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{run}" target="_blank" rel="noopener noreferrer">8/10 與 CTK 缺口 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34677544161" target="_blank" rel="noopener noreferrer">BNX 正式修復 ↗</a></p>
-          <p>CTK 三週期缺口已描述，尚未證實成因；不得補假 K 線。V0.12 視窗已結束，缺失時槽仍保留。固定樣本通過不代表全市場策略有效。</p>
+          <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{sample_run}" target="_blank" rel="noopener noreferrer">BTC 模擬報告 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{run}" target="_blank" rel="noopener noreferrer">{count}/10 與最後缺口 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34677544161" target="_blank" rel="noopener noreferrer">BNX 正式修復 ↗</a></p>
+          <p>CTK／CVC／LIT 共 {policy_index['allowance_count']} 項精確缺口規則已合併；缺口原樣保留，不宣稱已補齊或已證實成因。新規則不是資料完成證據。V0.12 已到期，缺失時槽仍保留；固定樣本通過不代表全市場策略有效。</p>
         </details>
       </section>'''
     cadence = read_json("config/history_cadence_v0_1.json", root)
     rows = []
     labels = {
         "binance-usdm-detailed-history-v0-1.yml": ("歷史補齊", "每日偶數小時 :23；至 10/1 08:00 前", "一次一分片；缺口仍須修復"),
-        "binance-usdm-detailed-training-v0-1.yml": ("研究訓練", "每週日 12:37", "完整資料通過才訓練"),
+        "binance-usdm-detailed-training-v0-1.yml": ("研究訓練", "每週日 12:37；下次 9/20", "9/13 實際跳過；完整資料通過才訓練"),
         "research-signal-layer-v0-2.yml": ("研究訊號", "每日 10:17", "結構化研究訊號收集"),
         "research-signal-quality-v0-1.yml": ("訊號品質", "每日 10:47", "檢查來源與資料鏈"),
         "research-automation-health-v0-2.yml": ("排程健康", "每日偶數小時 :57", "目前因歷史補齊失敗而告警"),
@@ -98,7 +113,7 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict]:
         <p>由 GitHub Actions 雲端執行；時間為預定觸發時間，可能延遲。資料缺口不會因增加執行頻率而自動消失。</p>
         <div class="table-wrap"><table><thead><tr><th>作業</th><th>預定時間</th><th>條件與狀態</th></tr></thead><tbody>''' + "\n".join(rows) + '''</tbody></table></div>
         <p>BTC 固定模擬 V0.1 已完成並退役。Pionex Reach、分類、Universe、Funding 與 Context Forward 是人工限定流程；沒有新增自動排程。</p>
-        <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/blob/main/docs/OPERATIONS_HANDOFF_2026_09_12.md" target="_blank" rel="noopener noreferrer">最新交接與待辦 ↗</a></p>
+        <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/blob/main/docs/OPERATIONS_HANDOFF_2026_09_13.md" target="_blank" rel="noopener noreferrer">最新交接與待辦 ↗</a></p>
       </section>'''
     progress = {
         "schema": "qookey-dashboard-history-progress-v0.1", "authority": False,

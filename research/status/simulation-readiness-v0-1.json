@@ -2,7 +2,7 @@
   "schema": "qookey-simulation-readiness-v0.1",
   "authority": false,
   "status_type": "READ_ONLY_OPERATIONAL_INDEX",
-  "as_of_repository_main_sha": "2ff32d55fbcddd54053c1338467e835b11a7c5a8",
+  "as_of_repository_main_sha": "d775fbd2ad01834635b8f82391933ac7141e7408",
   "overall": "NOT_READY",
   "full_simulation_ready": false,
   "full_universe_ready": false,
@@ -36,28 +36,30 @@
   },
   "binance_core_100_history": {
     "state": "PARTIAL",
-    "latest_formal_run_id": 34680188351,
+    "latest_formal_run_id": 34756244643,
     "completed_shards": 8,
     "total_shards": 10,
-    "observed_at_utc": "2026-09-12T07:14:57.743217Z",
+    "observed_at_utc": "2026-09-13T12:07:56.982966Z",
     "last_shard_index": 4,
     "latest_run_conclusion": "failure",
-    "progress_evidence": "research/receipts/2026-09-12-history-run-34680188351-log-observation.json",
+    "progress_evidence": "research/receipts/2026-09-13-history-run-34756244643-log-observation.json",
     "bnx_repair_evidence": "research/receipts/2026-09-12-bnx-archive-repair-bundle-v0-3-run-34677544161-evidence-freeze.json",
     "current_blocker": {
-      "symbol": "CTKUSDT",
-      "period": "2025-04",
-      "interval": "15m",
-      "missing_bars": 41,
+      "symbol": "CVCUSDT",
+      "period": "2025-05",
+      "interval": "1h",
+      "missing_bars": 8,
       "gap_count": 1
     },
     "other_unresolved_blocker": {
       "symbol": "LITUSDT",
       "period": "2025-12",
-      "interval": "15m",
-      "missing_bars": 70,
-      "evidence_run_id": 34594667095
-    }
+      "interval": "1h",
+      "missing_bars": 17,
+      "evidence_run_id": 34739234352
+    },
+    "latest_run_head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+    "post_policy_execution_state": "AWAITING_POST_PR292_SCHEDULED_EVIDENCE"
   },
   "metadata_stability": {
     "state": "BLOCKED_V0_12_COMPLETE_PASS_INELIGIBLE",
@@ -110,18 +112,32 @@
     "real_money_order_authorized": false,
     "live_trading_authorized": false
   },
-  "verified_at_utc": "2026-09-12T10:40:47Z",
+  "verified_at_utc": "2026-09-13T15:04:44Z",
   "ctk_diagnosis": {
     "state": "SHAPE_CHARACTERIZED_CAUSE_UNCONFIRMED",
     "evidence": "research/receipts/2026-09-12-ctk-lifecycle-v0-3-run-34687012733-evidence.json",
     "exception_authorized": false,
-    "handoff_hash_discrepancy": "REVIEW_REQUIRED"
+    "handoff_hash_discrepancy": "REVIEW_REQUIRED",
+    "scope": "Historical V0.3 observation only; later merged lifecycle policy is indexed separately"
   },
   "operations": {
-    "latest_health_run_id": 34674926711,
+    "latest_health_run_id": 34756817356,
     "health_state": "FAILED_HISTORY_QUALITY_REJECTION",
     "github_schedule_count": 7,
     "codex_monitor_state": "PAUSED",
-    "schedule_changes_applied": false
+    "schedule_changes_applied": false,
+    "latest_training_run_id": 34750015232,
+    "training_state": "SKIPPED_DATASET_NOT_READY",
+    "next_training_nominal_taipei": "2026-09-20T12:37:00+08:00",
+    "schedule_optimization": "DO_NOT_INCREASE_HISTORY_RETRIES; REVIEW_PRE_DEADLINE_TRAINING_AUTHORITY_AFTER_COMPLETE_DATA"
+  },
+  "lifecycle_policy": {
+    "config": "config/binance_usdm_lifecycle_gap_policy_v0_1.json",
+    "config_sha256": "863b3eda37c51f33343015cddbe05d0de3b6fd6d75ec8dcef13d190d2e026716",
+    "allowance_count": 7,
+    "merged_main_sha": "d775fbd2ad01834635b8f82391933ac7141e7408",
+    "state": "MERGED_NOT_DATA_COMPLETION",
+    "production_completion_verified": false,
+    "causal_claim": "NOT_ASSERTED"
   }
 }

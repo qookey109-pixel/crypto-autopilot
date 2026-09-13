@@ -1,6 +1,37 @@
 # Project Status
 
-Updated: 2026-09-12
+Updated: 2026-09-13
+
+## September 13 verified operations index
+
+This section supersedes earlier present-tense summaries, which remain dated
+historical observations. See [current handoff](docs/OPERATIONS_HANDOFF_2026_09_13.md)
+and `research/status/simulation-readiness-v0-1.json`.
+
+- Reviewed main: `d775fbd2ad01834635b8f82391933ac7141e7408` (PR #292).
+  CI `34762214321`, Pages `34762214329` and Freeze Guard `34762214349` succeeded.
+- Core 100 remains **8/10**, not 9/10 or COMPLETE. Latest scheduled History
+  `34756244643` ran on pre-merge `c7990a63` and rejected CVCUSDT 2025-05 1h:
+  736 rows, one gap, 8 missing bars. Latest LIT 1h rejection: `34739234352`.
+- Current lifecycle policy has seven exact archive allowances covering CTK,
+  CVC and LIT. PR #292 adds CVC/LIT 1h; production acceptance on the merged
+  version has not yet been observed. Raw gaps and historical FAIL remain.
+  No synthetic candles; causal claim NOT_ASSERTED; training uses segmentation
+  and exact lineage revalidation. Do not redo merged PRs #286–#292.
+- BNX formal repair publication and fixed BTC 27-day simulation PASS remain
+  preserved. Fixed BTC V0.1 execution stays retired; full-universe **NOT_READY**.
+- Training `34750015232` succeeded operationally but reported **SKIPPED**,
+  `DETAILED_HISTORY_DATASET_NOT_READY`. Next nominal weekly run is September 20,
+  after the September 15 target. No manual training is triggered by this review.
+- Health `34756817356` correctly alerts on history failure. Pionex alternative
+  assets `34747992983` succeeded as observability, not historical candle delivery.
+- History remains serialized every two hours; real run creation is irregular.
+  No second scheduler, faster retry, provider/R2 operation or authority change.
+- Pionex 197 candidates remain selection-only; Reach still has FAIL evidence,
+  classification and Context Forward have no new manual execution evidence in
+  the latest main dispatch listing. V0.12 expired with missing slots preserved.
+- Website is a dated evidence projection. Deploy success and policy merge do
+  not certify new production data. September 15 full completion is not guaranteed.
 
 ## September 12 verified operations index
 
