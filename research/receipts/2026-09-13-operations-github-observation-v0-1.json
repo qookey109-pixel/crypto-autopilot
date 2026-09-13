@@ -1,0 +1,140 @@
+{
+  "schema": "operations-github-observation-v0.1",
+  "authority": false,
+  "verified_at_utc": "2026-09-13T15:04:44Z",
+  "reviewed_main_sha": "d775fbd2ad01834635b8f82391933ac7141e7408",
+  "source_type": "GITHUB_RUN_METADATA_AND_DECODED_JOB_LOG_AGGREGATES",
+  "runs": [
+    {
+      "id": 34762214349,
+      "name": "V0.10 Critical Path Freeze Guard",
+      "head_sha": "d775fbd2ad01834635b8f82391933ac7141e7408",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-13T14:17:07Z",
+      "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34762214349"
+    },
+    {
+      "id": 34762214329,
+      "name": "Dashboard GitHub Pages",
+      "head_sha": "d775fbd2ad01834635b8f82391933ac7141e7408",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-13T14:17:07Z",
+      "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34762214329"
+    },
+    {
+      "id": 34762214321,
+      "name": "CI",
+      "head_sha": "d775fbd2ad01834635b8f82391933ac7141e7408",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-13T14:17:07Z",
+      "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34762214321"
+    },
+    {
+      "id": 34756830965,
+      "name": "Dashboard GitHub Pages",
+      "head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+      "event": "workflow_run",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-13T12:20:41Z",
+      "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34756830965"
+    },
+    {
+      "id": 34756817356,
+      "name": "Research Automation Health V0.2",
+      "head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-09-13T12:20:22Z",
+      "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34756817356"
+    },
+    {
+      "id": 34756421855,
+      "name": "Dashboard GitHub Pages",
+      "head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+      "event": "workflow_run",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-13T12:11:38Z",
+      "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34756421855"
+    },
+    {
+      "id": 34756244643,
+      "name": "Binance USD-M Crypto Core 100 History V0.1.2",
+      "head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-09-13T12:07:45Z",
+      "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34756244643"
+    },
+    {
+      "id": 34750015232,
+      "name": "Binance USD-M Crypto Core 100 Training V0.1.2",
+      "head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-13T09:41:24Z",
+      "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34750015232"
+    },
+    {
+      "id": 34747992983,
+      "name": "Pionex Alternative Assets Observability V0.2",
+      "head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-13T08:33:40Z",
+      "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34747992983"
+    },
+    {
+      "id": 34745789186,
+      "name": "Research Signal Quality V0.1",
+      "head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-13T07:39:54Z",
+      "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34745789186"
+    },
+    {
+      "id": 34745384761,
+      "name": "Research Signal Layer V0.2",
+      "head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-13T07:30:06Z",
+      "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34745384761"
+    }
+  ],
+  "training_report": {
+    "observed_at_utc": "2026-09-13T09:41:35.102115Z",
+    "provider_requests_performed": 0,
+    "r2_writes_performed": false,
+    "reason": "detailed-history dataset is not complete and bound",
+    "stage": "DETAILED_HISTORY_DATASET_NOT_READY",
+    "status": "SKIPPED"
+  },
+  "training_job_id": 103704745870,
+  "health_job_id": 103722495917,
+  "health_summary": {
+    "history": "FAILED",
+    "training": "HEALTHY_CONDITIONAL",
+    "v0_12": "EXPECTED_STOP"
+  },
+  "post_pr292_history_observed": false,
+  "limitations": [
+    "Run creation time is not a guaranteed cron delivery time.",
+    "Workflow success is not dataset completeness or training completion.",
+    "No R2 or provider operation performed by this audit."
+  ]
+}

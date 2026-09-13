@@ -1,0 +1,50 @@
+{
+  "schema": "history-github-log-observation-v0.1",
+  "authority": false,
+  "source_type": "DECODED_GITHUB_JOB_LOG_AGGREGATE_EXTRACT",
+  "run_id": 34756244643,
+  "head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+  "job_id": 103720977924,
+  "source_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34756244643",
+  "report": {
+    "authority": {
+      "automatic_model_promotion_authorized": false,
+      "holdout_accessed": false,
+      "live_trading_authorized": false,
+      "pionex_native_relabel_authorized": false,
+      "real_money_order_authorized": false,
+      "source_switch_authorized": false
+    },
+    "dataset_complete": false,
+    "dataset_status": "IN_PROGRESS",
+    "delivery": "binance_vision",
+    "diagnostic": {
+      "archive_sha256": "236cf0cecf8c927f3f5d07e7fc0c5171a09b60377641b1c7a8df3609674bd454",
+      "dataset": "klines",
+      "frequency": "monthly",
+      "gap_count": 1,
+      "interval": "1h",
+      "invalid_candle_count": 0,
+      "misaligned_count": 0,
+      "missing_bars": 8,
+      "period": "2025-05",
+      "provider": "binance_usdm",
+      "row_count": 736,
+      "symbol": "CVCUSDT"
+    },
+    "mode": "backfill",
+    "observed_at_utc": "2026-09-13T12:07:56.982966Z",
+    "provider": "binance_usdm",
+    "shard_count": 10,
+    "shard_index": 4,
+    "shards_complete": 8,
+    "stage": "DETAILED_HISTORY_SHARD_QUALITY_REJECT",
+    "status": "FAIL"
+  },
+  "limitations": [
+    "Aggregate extracted from GitHub job log; not an artifact byte/hash certification.",
+    "No R2 inspection performed by this audit.",
+    "This failure predates PR #292 merge; it does not evaluate the merged CVC/LIT 1h policy.",
+    "Failed run does not publish or complete the rejected shard."
+  ]
+}

@@ -1,9 +1,20 @@
 # Automation Index V0.1
 
-Current review: 2026-09-12. [Verified operations and handoff](OPERATIONS_HANDOFF_2026_09_12.md).
+Current review: 2026-09-13. [Verified operations and handoff](OPERATIONS_HANDOFF_2026_09_13.md).
 History is every two hours under `config/history_cadence_v0_1.json`.
 V0.12's window has ended; fixed BTC simulation V0.1 is PASS and retired.
 Seven workflow files retain cron declarations, but not all remain executable.
+
+Latest History `34756244643` is a pre-PR292 CVC 1h failure, still 8/10.
+Wait for scheduled evidence on the merged policy, not another CI result.
+Training `34750015232` is workflow success with data-gated SKIPPED; next nominal
+weekly run is September 20. A pre-deadline execution needs a separately reviewed
+decision; do not manually trigger training or add cron from this index.
+Health `34756817356` is correctly alerting on History failure.
+Pionex alternative assets `34747992983` succeeded as metadata observability only.
+The local Codex `crypto` monitor prompt was refreshed to resolve current main
+and its latest handoff at every run. It remains PAUSED; no monitor was resumed
+or duplicated. It is separate from the active GitHub runtime schedules.
 
 This is the current schedule view. Workflow files that preserve historical or
 regression evidence are classified in `config/project_convergence_v0_1.json`

@@ -6,10 +6,14 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 
 ## Start here
 
-September 12 delivery: [verified data, cloud schedules and handoff](docs/OPERATIONS_HANDOFF_2026_09_12.md).
+September 13 delivery: [verified data, cloud schedules and handoff](docs/OPERATIONS_HANDOFF_2026_09_13.md).
 Full-universe simulation remains **NOT_READY**. Fixed BTC 27-day simulation is
 formally PASS and its V0.1 execution is retired. Binance Core 100 is last verified
-**8/10**, BNX repair is published, and CTK/LIT gaps remain unresolved.
+**8/10**, BNX repair is published, and seven exact CTK/CVC/LIT lifecycle-gap
+allowances are merged. PR #292's CVC/LIT 1h additions still await production
+evidence; the last History rejection ran on pre-merge main.
+September 13 training was SKIPPED for incomplete data; the next weekly run
+is September 20, beyond the September 15 target. No manual run is activated here.
 Pionex's 197 selected candidates are not 197 completed histories.
 The homepage is generated from the current readiness index and frozen evidence.
 
@@ -29,7 +33,7 @@ files are the current operating surface.
 ## Historical authority snapshot — 2026-08-31
 
 This dated snapshot is historical context, not the current schedule. Follow
-the September 11 index above and PROJECT_STATUS for subsequent transitions.
+the current index above and PROJECT_STATUS for subsequent transitions.
 
 The repository has moved beyond the original V0.1 implementation baseline while preserving its scientific history:
 
