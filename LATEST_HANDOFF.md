@@ -85,7 +85,7 @@ Verified Core100 History status remains **8/10**.
 
 Do not claim 9/10 or 10/10 until a governed History report shows the corresponding `shards_complete`, receipt publication and R2 state advancement.
 
-After PR #291, protected-main scheduled History runs did execute on `c7990a63b7d8f21aae12ff13b51e9d0ee5189fab`. They proved that the 15m allowance was no longer the terminal blocker, but surfaced exact 1h discontinuities:
+After PR #291, protected-main scheduled History runs did execute on `c7990a63b7d8f21aae12ff13b51e9d0ee5189fab`. They proved that the 15m allowance was no longer the terminal blocker, but surfaced exact 1h discontinuities.
 
 ### Scheduled run #43
 
@@ -136,7 +136,23 @@ Run `34739234352` repeated the same LITUSDT 1h exact blocker as run #43:
 - shard index 8
 - `shards_complete`: 8 / 10
 
-This repetition is production evidence, not an inferred archive identity.
+### Scheduled run #46
+
+Run `34756244643` repeated the same CVCUSDT 1h exact blocker as run #44:
+
+- event: `schedule`
+- head: `c7990a63b7d8f21aae12ff13b51e9d0ee5189fab`
+- archive SHA `236cf0cecf8c927f3f5d07e7fc0c5171a09b60377641b1c7a8df3609674bd454`
+- 736 rows
+- 1 gap
+- 8 missing bars
+- invalid candles: 0
+- misaligned timestamps: 0
+- shard index 4
+- `shards_complete`: 8 / 10
+- dataset status: `IN_PROGRESS`
+
+The repeated CVC and LIT observations are production evidence, not inferred archive identities.
 
 ## LIT ticker lifecycle evidence
 
@@ -159,7 +175,7 @@ Branch:
 
 Exact reviewed head at this handoff:
 
-`6427a3318fdb370b5489661fb2835f180e8ac44a`
+`aa6fe2f268f6e625ce00b33777a6b70fddf4e175`
 
 Base:
 
@@ -173,17 +189,17 @@ Policy config SHA proposed by PR #292:
 
 Proposed exact allowlist size after merge: 7 entries.
 
-Verified exact-head checks:
+Verified exact-head checks for `aa6fe2f268f6e625ce00b33777a6b70fddf4e175`:
 
-- CI run `34761747284` — PASS on Python 3.12 and 3.13.
+- CI run `34761917291` — PASS on Python 3.12 and 3.13.
   - Ruff PASS.
   - Unit tests PASS.
   - R2 cost/budget gate PASS.
   - Observed Binance R2 budget gate PASS.
-- Dashboard GitHub Pages run `34761747286` — build PASS; PR deploy intentionally skipped.
+- Dashboard GitHub Pages run `34761917282` — PASS.
 - PR is mergeable.
 
-PR #292 must **not** be merged without explicit user approval of exact head `6427a3318fdb370b5489661fb2835f180e8ac44a` after a final main/head recheck.
+PR #292 must **not** be merged without explicit user approval of exact head `aa6fe2f268f6e625ce00b33777a6b70fddf4e175` after a final main/head recheck.
 
 ## Automation Health V0.2 interpretation
 
@@ -193,11 +209,11 @@ Do not weaken Health merely to remove the alert. Once a newer scheduled History 
 
 ## History cadence
 
-Existing reviewed cadence remains unchanged:
+Existing reviewed cadence remains unchanged on `main`:
 
 `23 */2 9-30 9 *`
 
-Operational interpretation in `Asia/Taipei`: every two hours on even local hours at `:23` within the existing September execution window. GitHub scheduled workflows may start late.
+Operational interpretation in `Asia/Taipei`: every two hours on even local hours at `:23` within the existing September execution window. GitHub scheduled workflows may be delayed substantially, so API `created_at` times need not equal the nominal cron slot.
 
 Binding constraints remain:
 
@@ -212,7 +228,7 @@ Binding constraints remain:
 Proceed autonomously in this order:
 
 1. Re-read latest `main` and PR #292 immediately before any merge decision.
-2. Verify PR #292 head is still exactly `6427a3318fdb370b5489661fb2835f180e8ac44a` and its exact-head checks remain PASS.
+2. Verify PR #292 head is still exactly `aa6fe2f268f6e625ce00b33777a6b70fddf4e175` and its exact-head checks remain PASS.
 3. Merge PR #292 only after explicit approval of that exact head.
 4. Verify the resulting `main`, merge parents, post-merge CI, Freeze Guard and Dashboard Pages.
 5. Do not manually trigger History/R2. Wait for the existing scheduled History cadence.
