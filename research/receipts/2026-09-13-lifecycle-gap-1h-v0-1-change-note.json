@@ -1,0 +1,42 @@
+{
+  "base_main": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+  "causal_claim": "NOT_ASSERTED",
+  "new_allowances": [
+    {
+      "archive_sha256": "236cf0cecf8c927f3f5d07e7fc0c5171a09b60377641b1c7a8df3609674bd454",
+      "gap_count": 1,
+      "interval": "1h",
+      "missing_bars": 8,
+      "period": "2025-05",
+      "row_count": 736,
+      "symbol": "CVCUSDT"
+    },
+    {
+      "archive_sha256": "8a92afa0f2ee875b880d37161055690394f14172eea48d6e243061db9426c6d3",
+      "gap_count": 1,
+      "interval": "1h",
+      "missing_bars": 17,
+      "period": "2025-12",
+      "row_count": 727,
+      "symbol": "LITUSDT"
+    }
+  ],
+  "not_authorized": [
+    "generic_gap_bypass",
+    "unobserved_intervals",
+    "source_switch",
+    "provider_relabel",
+    "synthetic_candles",
+    "interpolation",
+    "forward_fill",
+    "holdout_access",
+    "manual_history_or_r2_trigger",
+    "model_promotion",
+    "trade_plan",
+    "real_money_orders",
+    "live_trading"
+  ],
+  "policy_id": "binance-usdm-lifecycle-gap-v0.1",
+  "schema": "lifecycle-gap-1h-change-note-v0.1",
+  "status": "PROPOSED_FOR_REVIEWED_MAIN_MERGE"
+}
