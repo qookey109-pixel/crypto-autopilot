@@ -47,6 +47,16 @@
       "symbol": "CVCUSDT"
     },
     {
+      "evidence": "research/receipts/2026-09-13-cvc-1h-scheduled-failure-v0-1.json",
+      "gap_count": 1,
+      "interval": "1h",
+      "missing_bars": 8,
+      "monthly_sha256": "236cf0cecf8c927f3f5d07e7fc0c5171a09b60377641b1c7a8df3609674bd454",
+      "period": "2025-05",
+      "row_count": 736,
+      "symbol": "CVCUSDT"
+    },
+    {
       "evidence": "config/lit_archive_diagnosis_v0_1.json",
       "gap_count": 1,
       "interval": "15m",
@@ -54,6 +64,16 @@
       "monthly_sha256": "246dca9c1bcc046af274cc4d5b61fdd1fb818f243a2ae3c82a20471bdecdd160",
       "period": "2025-12",
       "row_count": 2906,
+      "symbol": "LITUSDT"
+    },
+    {
+      "evidence": "research/receipts/2026-09-13-lit-official-lifecycle-evidence-v0-1.json",
+      "gap_count": 1,
+      "interval": "1h",
+      "missing_bars": 17,
+      "monthly_sha256": "8a92afa0f2ee875b880d37161055690394f14172eea48d6e243061db9426c6d3",
+      "period": "2025-12",
+      "row_count": 727,
       "symbol": "LITUSDT"
     }
   ],

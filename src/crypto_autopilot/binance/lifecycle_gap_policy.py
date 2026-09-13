@@ -57,6 +57,16 @@ _ALLOWANCES: tuple[dict[str, Any], ...] = (
         "evidence": "research/receipts/2026-09-12-cvc-official-lifecycle-evidence-v0-1.json",
     },
     {
+        "symbol": "CVCUSDT",
+        "interval": "1h",
+        "period": "2025-05",
+        "monthly_sha256": "236cf0cecf8c927f3f5d07e7fc0c5171a09b60377641b1c7a8df3609674bd454",
+        "row_count": 736,
+        "gap_count": 1,
+        "missing_bars": 8,
+        "evidence": "research/receipts/2026-09-13-cvc-1h-scheduled-failure-v0-1.json",
+    },
+    {
         "symbol": "LITUSDT",
         "interval": "15m",
         "period": "2025-12",
@@ -65,6 +75,16 @@ _ALLOWANCES: tuple[dict[str, Any], ...] = (
         "gap_count": 1,
         "missing_bars": 70,
         "evidence": "config/lit_archive_diagnosis_v0_1.json",
+    },
+    {
+        "symbol": "LITUSDT",
+        "interval": "1h",
+        "period": "2025-12",
+        "monthly_sha256": "8a92afa0f2ee875b880d37161055690394f14172eea48d6e243061db9426c6d3",
+        "row_count": 727,
+        "gap_count": 1,
+        "missing_bars": 17,
+        "evidence": "research/receipts/2026-09-13-lit-official-lifecycle-evidence-v0-1.json",
     },
 )
 

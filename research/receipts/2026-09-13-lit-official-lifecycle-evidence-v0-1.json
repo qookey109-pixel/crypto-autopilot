@@ -1,0 +1,66 @@
+{
+  "causal_claim": "NOT_ASSERTED",
+  "official_lifecycle": {
+    "previous_contract": {
+      "effective_at_utc": "2025-01-31T09:00:00Z",
+      "identity": "Litentry (LIT)",
+      "source": "https://www.binance.com/en/support/announcement/detail/2a9feaa556f74dcdaa2192366f0e247c",
+      "title": "Binance Will Support the Litentry (LIT) Token Swap and Rebranding to Heima (HEI)"
+    },
+    "new_contract": {
+      "effective_at_utc": "2025-12-23T17:30:00Z",
+      "identity": "Lighter Protocol (LIT)",
+      "source": "https://www.binance.com/en-AE/support/announcement/detail/6a33be00231c4539b3a4a625538e4d1e",
+      "title": "Binance Futures Will Launch USDⓈ-Margined LITUSDT Perpetual Contract Pre-Market Trading (2025-12-23)"
+    }
+  },
+  "operational_classification": "USER_AUTHORIZED_LIFECYCLE_GAP",
+  "policy_scope": "exact_archive_only",
+  "scheduled_observations": [
+    {
+      "archive_sha256": "8a92afa0f2ee875b880d37161055690394f14172eea48d6e243061db9426c6d3",
+      "dataset": "klines",
+      "dataset_status": "IN_PROGRESS",
+      "frequency": "monthly",
+      "gap_count": 1,
+      "head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+      "interval": "1h",
+      "invalid_candle_count": 0,
+      "misaligned_count": 0,
+      "missing_bars": 17,
+      "observed_at_utc": "2026-09-12T18:31:05.312409Z",
+      "period": "2025-12",
+      "row_count": 727,
+      "run_id": 34711425773,
+      "shard_count": 10,
+      "shard_index": 8,
+      "shards_complete": 8,
+      "stage": "DETAILED_HISTORY_SHARD_QUALITY_REJECT",
+      "symbol": "LITUSDT"
+    },
+    {
+      "archive_sha256": "8a92afa0f2ee875b880d37161055690394f14172eea48d6e243061db9426c6d3",
+      "dataset": "klines",
+      "dataset_status": "IN_PROGRESS",
+      "frequency": "monthly",
+      "gap_count": 1,
+      "head_sha": "c7990a63b7d8f21aae12ff13b51e9d0ee5189fab",
+      "interval": "1h",
+      "invalid_candle_count": 0,
+      "misaligned_count": 0,
+      "missing_bars": 17,
+      "observed_at_utc": "2026-09-13T05:00:58.715335Z",
+      "period": "2025-12",
+      "row_count": 727,
+      "run_id": 34739234352,
+      "shard_count": 10,
+      "shard_index": 8,
+      "shards_complete": 8,
+      "stage": "DETAILED_HISTORY_SHARD_QUALITY_REJECT",
+      "symbol": "LITUSDT"
+    }
+  ],
+  "schema": "lit-official-lifecycle-evidence-v0.1",
+  "statement": "Binance official announcements show that the LITUSDT ticker was used for a Litentry perpetual contract removed in January 2025 and later for a distinct Lighter Protocol perpetual contract launched in December 2025. Protected-main scheduled history runs repeatedly observed the same checksum- and geometry-pinned LITUSDT 1h December-2025 discontinuity. This supports the user's operational lifecycle-gap treatment for this exact archive only and does not assert the lifecycle change as the proven cause of the missing timestamps.",
+  "synthetic_candles_authorized": false
+}
