@@ -57,6 +57,16 @@
       "symbol": "CVCUSDT"
     },
     {
+      "evidence": "research/receipts/2026-09-14-cvc-4h-scheduled-failure-v0-1.json",
+      "gap_count": 1,
+      "interval": "4h",
+      "missing_bars": 2,
+      "monthly_sha256": "fbcbdbb7efb85914de3ee359c07f67b635bad4d81c8fbbb642cdec4d8a5b6151",
+      "period": "2025-05",
+      "row_count": 184,
+      "symbol": "CVCUSDT"
+    },
+    {
       "evidence": "config/lit_archive_diagnosis_v0_1.json",
       "gap_count": 1,
       "interval": "15m",
