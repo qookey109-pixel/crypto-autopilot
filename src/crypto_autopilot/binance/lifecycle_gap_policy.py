@@ -86,6 +86,16 @@ _ALLOWANCES: tuple[dict[str, Any], ...] = (
         "missing_bars": 17,
         "evidence": "research/receipts/2026-09-13-lit-official-lifecycle-evidence-v0-1.json",
     },
+    {
+        "symbol": "LITUSDT",
+        "interval": "4h",
+        "period": "2025-12",
+        "monthly_sha256": "4d7e61e25eb2fab01e4d1206b36372009ee3bfc60dab72405076e9f6aa8852b2",
+        "row_count": 182,
+        "gap_count": 1,
+        "missing_bars": 4,
+        "evidence": "research/receipts/2026-09-14-lit-4h-scheduled-failure-v0-1.json",
+    },
 )
 
 
