@@ -1,8 +1,8 @@
 {
   "causal_claim_required": false,
   "config": "config/binance_usdm_lifecycle_gap_policy_v0_1.json",
-  "config_sha256": "48741ca60a7258198f978c09cdf5aff9731e376c4b1b368cfaf44ba52ac929a2",
-  "entries": 8,
+  "config_sha256": "97285ba6a66d5d57e2b26f98880bb4450ccd56a9ad5dc9453fded57f86e9bd9e",
+  "entries": 9,
   "exact_allowlist_only": true,
   "holdout_access_authorized": false,
   "interpolation_authorized": false,

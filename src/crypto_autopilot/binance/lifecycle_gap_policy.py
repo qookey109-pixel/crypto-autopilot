@@ -67,6 +67,16 @@ _ALLOWANCES: tuple[dict[str, Any], ...] = (
         "evidence": "research/receipts/2026-09-13-cvc-1h-scheduled-failure-v0-1.json",
     },
     {
+        "symbol": "CVCUSDT",
+        "interval": "4h",
+        "period": "2025-05",
+        "monthly_sha256": "fbcbdbb7efb85914de3ee359c07f67b635bad4d81c8fbbb642cdec4d8a5b6151",
+        "row_count": 184,
+        "gap_count": 1,
+        "missing_bars": 2,
+        "evidence": "research/receipts/2026-09-14-cvc-4h-scheduled-failure-v0-1.json",
+    },
+    {
         "symbol": "LITUSDT",
         "interval": "15m",
         "period": "2025-12",
@@ -85,6 +95,16 @@ _ALLOWANCES: tuple[dict[str, Any], ...] = (
         "gap_count": 1,
         "missing_bars": 17,
         "evidence": "research/receipts/2026-09-13-lit-official-lifecycle-evidence-v0-1.json",
+    },
+    {
+        "symbol": "LITUSDT",
+        "interval": "4h",
+        "period": "2025-12",
+        "monthly_sha256": "4d7e61e25eb2fab01e4d1206b36372009ee3bfc60dab72405076e9f6aa8852b2",
+        "row_count": 182,
+        "gap_count": 1,
+        "missing_bars": 4,
+        "evidence": "research/receipts/2026-09-14-lit-4h-scheduled-failure-v0-1.json",
     },
 )
 

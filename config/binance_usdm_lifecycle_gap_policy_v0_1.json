@@ -85,6 +85,16 @@
       "period": "2025-12",
       "row_count": 727,
       "symbol": "LITUSDT"
+    },
+    {
+      "evidence": "research/receipts/2026-09-14-lit-4h-scheduled-failure-v0-1.json",
+      "gap_count": 1,
+      "interval": "4h",
+      "missing_bars": 4,
+      "monthly_sha256": "4d7e61e25eb2fab01e4d1206b36372009ee3bfc60dab72405076e9f6aa8852b2",
+      "period": "2025-12",
+      "row_count": 182,
+      "symbol": "LITUSDT"
     }
   ],
   "causal_claim": "NOT_ASSERTED",
