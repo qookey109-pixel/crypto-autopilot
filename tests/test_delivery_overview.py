@@ -25,7 +25,7 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertEqual(progress["sourceRunId"], 34756244643)
         self.assertEqual(progress["shardsComplete"], 8)
         self.assertIn("CVCUSDT 2025-05 1h，缺 8 根", summary)
-        self.assertIn("8 項精確缺口規則已合併", summary)
+        self.assertIn("9 項精確缺口規則已合併", summary)
         self.assertIn("合併前執行", summary)
         self.assertIn("9/13 實際跳過", schedule)
         self.assertIn("下次 9/20", schedule)
@@ -58,7 +58,7 @@ class DeliveryOverviewTests(unittest.TestCase):
                 if path == "research/status/simulation-readiness-v0-1.json":
                     policy = value["lifecycle_policy"]
                     if change == "count":
-                        policy["allowance_count"] = 9
+                        policy["allowance_count"] = 10
                     elif change == "hash":
                         policy["config_sha256"] = "0" * 64
                     elif change == "completion":
