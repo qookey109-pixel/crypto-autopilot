@@ -133,8 +133,8 @@
   },
   "lifecycle_policy": {
     "config": "config/binance_usdm_lifecycle_gap_policy_v0_1.json",
-    "config_sha256": "865d24c3c178f102e22795c1c897077a2b5a8ed89ff2d19342b3f13acbee74ba",
-    "allowance_count": 8,
+    "config_sha256": "97285ba6a66d5d57e2b26f98880bb4450ccd56a9ad5dc9453fded57f86e9bd9e",
+    "allowance_count": 9,
     "merged_main_sha": "d775fbd2ad01834635b8f82391933ac7141e7408",
     "state": "MERGED_NOT_DATA_COMPLETION",
     "production_completion_verified": false,
