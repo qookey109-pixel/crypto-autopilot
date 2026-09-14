@@ -67,6 +67,16 @@ _ALLOWANCES: tuple[dict[str, Any], ...] = (
         "evidence": "research/receipts/2026-09-13-cvc-1h-scheduled-failure-v0-1.json",
     },
     {
+        "symbol": "CVCUSDT",
+        "interval": "4h",
+        "period": "2025-05",
+        "monthly_sha256": "fbcbdbb7efb85914de3ee359c07f67b635bad4d81c8fbbb642cdec4d8a5b6151",
+        "row_count": 184,
+        "gap_count": 1,
+        "missing_bars": 2,
+        "evidence": "research/receipts/2026-09-14-cvc-4h-scheduled-failure-v0-1.json",
+    },
+    {
         "symbol": "LITUSDT",
         "interval": "15m",
         "period": "2025-12",
