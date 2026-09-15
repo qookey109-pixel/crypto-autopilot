@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import time
 from pathlib import Path
 
 from crypto_autopilot.history.pionex_validation_materialization_v0_1 import (
@@ -345,7 +346,10 @@ def main() -> int:
     try:
         run_id = require_github_main_dispatch()
         config = load_authority()
-        now = lambda: int(__import__("time").time() * 1000)
+
+        def now() -> int:
+            return int(time.time() * 1000)
+
         require_execution_window(config, now_ms=now())
         store = R2Store(
             account_id=os.environ["CLOUDFLARE_ACCOUNT_ID"],
