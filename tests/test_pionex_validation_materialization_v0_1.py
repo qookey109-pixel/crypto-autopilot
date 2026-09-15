@@ -21,7 +21,7 @@ from crypto_autopilot.models import Candle
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "config/pionex_validation_dataset_v0_1.json"
-CONFIG_SHA256 = "6d59a93feca9a5743817e7d671cc370f934a57fa11b7a140c266d82504da4465"
+CONFIG_SHA256 = "83972be4bd6bd04d264a1f136283c5b95cb5e200c86cf22be4f02664d0035cbc"
 
 
 def load_config() -> dict:
