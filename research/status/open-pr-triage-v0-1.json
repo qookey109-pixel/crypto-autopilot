@@ -6,11 +6,12 @@
   "authority": "NAVIGATION_ONLY",
   "categories": {
     "ACTIVE": [302, 305, 306],
-    "DEFERRED_STACK": [255, 257, 258, 260, 261, 262],
     "REVIEW_REQUIRED_LEGACY_DRAFT": [166, 167, 168, 199, 249],
     "CLOSED_HISTORICAL_EVIDENCE": [256],
-    "CLOSED_SUPERSEDED_THIS_PASS": [220, 290, 301]
+    "CLOSED_ALREADY_PRESERVED_ON_MAIN": [255, 257, 260, 261, 262],
+    "CLOSED_SUPERSEDED_THIS_PASS": [220, 258, 290, 301]
   },
+  "open_pr_count_expected": 8,
   "rules": {
     "close_diverged_pr_without_file_level_review": false,
     "merge_authorized": false,
@@ -30,6 +31,25 @@
     "action_if_complete": "FREEZE_AND_ANALYZE_SECRET_FREE_REPLAY_EVIDENCE"
   },
   "evidence_checks": {
+    "pr_255": {
+      "classification": "ALREADY_ABSORBED_BY_MAIN",
+      "exact_blob_matches": [
+        "config/simulation_readiness_v0_3.json",
+        "docs/SIMULATION_READINESS_V0_3.md",
+        "research/receipts/2026-09-11-simulation-readiness-v0-3-prepared.json",
+        "src/crypto_autopilot/paper/simulation_readiness_v0_3.py",
+        "tests/test_simulation_readiness_v0_3.py",
+        "tests/test_backtest.py",
+        "tests/test_risk.py"
+      ],
+      "core_patch_present_on_main": [
+        "backtest finite validation",
+        "gap-through-stop",
+        "kill switch",
+        "maximum holding time",
+        "risk finite/config validation"
+      ]
+    },
     "pr_256": {
       "changed_files": 2,
       "main_matches_pr_head_byte_for_byte": true,
@@ -37,11 +57,39 @@
       "report_blob_sha": "3b3262e14790f0082ae346b5d9bd4b788cc19cd1",
       "classification": "HISTORICAL_EVIDENCE_ALREADY_PRESERVED_ON_MAIN"
     },
+    "pr_257": {
+      "changed_files": 5,
+      "main_matches_pr_head_byte_for_byte": true,
+      "classification": "ALREADY_PRESERVED_ON_MAIN"
+    },
+    "pr_258": {
+      "classification": "SUPERSEDED_BY_MAIN_AND_LATER_SAFETY_FIXES",
+      "exact_core_authority_assets_on_main": true,
+      "later_safety_fixes": [
+        "whole candle must close before protected cutoff",
+        "safe request diagnostics",
+        "aggregate interval failure with sibling diagnostics"
+      ]
+    },
+    "pr_260": {
+      "changed_files": 6,
+      "main_matches_pr_head_byte_for_byte": true,
+      "classification": "ALREADY_PRESERVED_ON_MAIN"
+    },
+    "pr_261": {
+      "changed_files": 5,
+      "main_matches_pr_head_byte_for_byte": true,
+      "classification": "ALREADY_PRESERVED_ON_MAIN"
+    },
+    "pr_262": {
+      "changed_files": 5,
+      "main_matches_pr_head_byte_for_byte": true,
+      "classification": "ALREADY_PRESERVED_ON_MAIN"
+    },
     "pr_220": {
       "changed_files": 6,
       "exact_blob_matches": 5,
       "evolved_files": ["tests/test_context_forward_capture_config.py"],
-      "evolution": "Current main preserves original config/zero-cost/authority assertions and replaces the old no-workflow expectation with validation of the later separately versioned manual-only execution authority.",
       "classification": "SUPERSEDED_BY_MAIN_AND_LATER_GOVERNANCE_EVOLUTION"
     },
     "pr_166": {
@@ -73,6 +121,7 @@
   "notes": {
     "305": "Current-status and documentation convergence; ready but unmerged.",
     "306": "Toolkit V0.2 REST/OpenAPI + Render + Cloudflare edge; CI passed; deployment/public exposure unauthorized.",
-    "legacy": "All five legacy PRs with confirmed unique content were converted to Draft so they cannot be mistaken for ready-to-merge work. Preserve until deliberate salvage/rebuild review."
+    "pionex_stack": "Old #255/#257/#258/#260/#261/#262 stack is fully closed after exact preservation/supersession review; do not reconstruct from old branches unless a future requirement needs a fresh current-main design.",
+    "legacy": "All five legacy PRs with confirmed unique content are Draft and preserved for deliberate salvage/rebuild review."
   }
 }
