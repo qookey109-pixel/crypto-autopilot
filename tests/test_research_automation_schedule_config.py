@@ -34,6 +34,31 @@ class ResearchAutomationScheduleConfigTests(unittest.TestCase):
         self.assertNotIn("  schedule:", retired)
         self.assertIn("  workflow_dispatch:", retired)
 
+    def test_health_inventory_count_is_derived_not_hard_coded(self) -> None:
+        health = _json("config/research_automation_health_v0_2.json")
+        coverage = health["coverage"]
+        self.assertEqual(
+            coverage["policy"],
+            "EXACT_REPOSITORY_SCHEDULE_INVENTORY",
+        )
+        self.assertTrue(coverage["require_every_repository_cron"])
+        self.assertTrue(coverage["derive_expected_count_from_workflows_inventory"])
+        self.assertNotIn("expected_scheduled_workflow_count", coverage)
+
+        workflow = (
+            ROOT / ".github/workflows/research-automation-health-v0-2.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn('inventory_count = len(config["workflows"])', workflow)
+        self.assertIn(
+            'coverage["scheduled_workflow_count"] == inventory_count',
+            workflow,
+        )
+        self.assertIn(
+            'coverage["monitored_workflow_count"] == inventory_count',
+            workflow,
+        )
+        self.assertNotIn('coverage["scheduled_workflow_count"] == 7', workflow)
+
     def test_authority_receipt_binds_exact_config_and_workflow_bytes(self) -> None:
         receipt = _json(
             "research/receipts/2026-08-24-research-automation-health-v0-1-authority.json"
