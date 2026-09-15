@@ -1,0 +1,66 @@
+{
+  "schema": "resource-hub-descriptive-context-policy-v0.1",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "source_evaluation_receipt": "research/receipts/2026-09-15-resource-hub-world-monitor-evaluation-v0-1.json",
+  "allowed_input_classes": [
+    "synthetic_fixture"
+  ],
+  "allowed_context_types": [
+    "geopolitical_event",
+    "supply_chain_disruption",
+    "sanctions_context",
+    "energy_context",
+    "cyber_context",
+    "disaster_context",
+    "market_stress_context"
+  ],
+  "allowed_severity_labels": [
+    "unknown",
+    "low",
+    "moderate",
+    "elevated",
+    "high",
+    "critical"
+  ],
+  "freshness": {
+    "max_cache_age_seconds": 3600,
+    "max_observation_age_seconds": 21600,
+    "max_clock_skew_seconds": 30
+  },
+  "provenance": {
+    "minimum_sources": 1,
+    "maximum_sources": 8,
+    "require_https_url": true
+  },
+  "content": {
+    "maximum_summary_characters": 800,
+    "reject_directional_or_trade_language": true
+  },
+  "interpretation": {
+    "directional_signal": false,
+    "strategy_input": false,
+    "formal_edge_gate": false,
+    "promotion_signal": false,
+    "formal_backtest_admission": false,
+    "trade_plan_generation": false,
+    "live_trading_signal": false,
+    "source_equivalence_claimed": false
+  },
+  "authority": {
+    "automatic_schedule_authorized": false,
+    "worldmonitor_network_call_authorized": false,
+    "worldmonitor_api_key_authorized": false,
+    "worldmonitor_oauth_authorized": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_strategy_mutation_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
