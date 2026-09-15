@@ -4,14 +4,17 @@
 
 Read these first, in order:
 
-1. `PROJECT_STATUS.md`
-2. `README.md`
-3. the current versioned protocol/config and receipt for the stage being changed
-4. `config/cloud_free_tier_policy_v0_1.json` for cloud/runtime work
-5. `docs/STRATEGY_V0_1.md`
-6. `config/strategy_v0_1.json`
+1. `CURRENT_STATUS.md`
+2. `PROJECT_STATUS.md`
+3. `README.md`
+4. the current versioned protocol/config and receipt for the stage being changed
+5. `config/cloud_free_tier_policy_v0_1.json` for cloud/runtime work
+6. `docs/STRATEGY_V0_1.md`
+7. `config/strategy_v0_1.json`
 
 Repository `main` is the formal current authority. If chat history, an issue comment, a dashboard fixture, or an older receipt conflicts with current merged authority, preserve the historical evidence but follow the latest valid versioned authority for new work.
+
+`CURRENT_STATUS.md` is the concise current-operations index. Dated present-tense summaries in `PROJECT_STATUS.md` and `README.md` may remain as historical evidence. When a later verified current-status entry explicitly supersedes an older dated summary, do not restart completed work or regress lifecycle state from the older prose. Versioned configs, receipts, immutable run evidence, and current merged code still control authority and scope.
 
 ## Non-negotiable boundaries
 
