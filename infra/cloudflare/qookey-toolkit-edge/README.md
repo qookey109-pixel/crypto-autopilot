@@ -6,7 +6,7 @@ This Cloudflare Worker is a thin edge gateway in front of the full-CPython Toolk
 
 ## Why edge-only
 
-The repository core has full-CPython dependencies and a larger research surface than an edge runtime should own. The Worker therefore handles only routing, client authentication, payload limits, request IDs, and response hardening. Toolkit calculations remain in the origin service.
+The repository core has full-CPython dependencies and a larger research surface than an edge runtime should own. The Worker therefore handles only routing, client authentication, payload limits, request IDs, CORS, and response hardening. Toolkit calculations remain in the origin service.
 
 ## Routes
 
@@ -38,6 +38,14 @@ npx wrangler secret put ORIGIN_API_TOKEN
 
 `TOOLKIT_ORIGIN` should be the HTTPS base URL of the full-CPython Toolkit API service, with no trailing slash.
 
+If a browser frontend needs cross-origin access, configure exactly one trusted origin:
+
+```bash
+npx wrangler secret put CORS_ORIGIN
+```
+
+Do not use a wildcard CORS origin for protected routes. Do not embed `EDGE_API_TOKEN` in public browser JavaScript. For a public frontend, use a server-side backend-for-frontend or put Cloudflare Access/authentication in front of the Worker instead.
+
 For local development, `.dev.vars` may be used but must remain untracked.
 
 ## Run and deploy
@@ -53,6 +61,7 @@ Do not deploy until the origin API is configured with the same `ORIGIN_API_TOKEN
 
 - Unknown routes fail closed.
 - Protected POST routes fail closed if edge or origin tokens are absent.
+- Browser preflight fails closed unless `CORS_ORIGIN` exactly matches the request origin.
 - Request bodies are capped at 2,000,000 bytes.
 - `set-cookie` is stripped from origin responses.
 - Responses are `no-store` and receive a request ID plus basic security headers.
