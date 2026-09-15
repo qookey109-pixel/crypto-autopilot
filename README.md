@@ -65,6 +65,10 @@ The current project still preserves the frozen lineage names required by fail-cl
 
 These historical labels preserve governance lineage; they do not reopen provider access, holdout access, model promotion, source switching, or trading authority.
 
+## Agent change walkthrough
+
+The repository keeps one read-only change-inspection skill at `.agents/skills/change-walkthrough/SKILL.md`. It should trace repository authority, base/head SHAs, local diff and test evidence around **one canonical Python domain action**. A walkthrough is evidence/navigation only and **does not justify a second runtime**, new execution path, merge approval, or execution authority.
+
 ## Useful entrypoints
 
 - [`docs/PROJECT_MAP_V0_1.md`](docs/PROJECT_MAP_V0_1.md) — repository map.
