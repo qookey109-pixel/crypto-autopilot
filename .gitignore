@@ -219,3 +219,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Cloudflare/Wrangler local state and secrets
+.wrangler/
+.dev.vars
+.dev.vars.*
+**/.wrangler/
+**/.dev.vars
+**/.dev.vars.*
