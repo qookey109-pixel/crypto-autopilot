@@ -1,0 +1,132 @@
+name: Core100 Effective Signal Audit V0.1
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "research/receipts/2026-09-15-core100-effective-signal-audit-v0-1-authority.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: core100-effective-signal-audit-v0-1
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Validate exact one-shot audit authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          receipt="research/receipts/2026-09-15-core100-effective-signal-audit-v0-1-authority.json"
+          if git cat-file -e "HEAD^1:${receipt}" 2>/dev/null; then
+            echo "one-shot audit authority existed before this protected-main push; refusing re-execution"
+            exit 1
+          fi
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          receipt = json.loads(
+              Path(
+                  "research/receipts/2026-09-15-core100-effective-signal-audit-v0-1-authority.json"
+              ).read_text()
+          )
+          policy = json.loads(Path("config/core100_effective_signal_audit_v0_1.json").read_text())
+          expected = "AUTHORIZED_ONE_SHOT_AFTER_REVIEWED_MAIN_MERGE"
+          assert receipt["schema"] == "core100-effective-signal-audit-authority-v0.1"
+          assert policy["schema"] == "core100-effective-signal-audit-policy-v0.1"
+          assert receipt["status"] == expected
+          assert policy["status"] == expected
+          assert receipt["user_authorization"]["effective_signal_audit_authorized"] is True
+          assert receipt["user_authorization"]["merge_authority_granted_by_this_receipt"] is False
+          assert receipt["execution"]["one_shot"] is True
+          assert receipt["execution"]["no_schedule"] is True
+          assert receipt["execution"]["no_manual_dispatch"] is True
+          assert all(value is False for value in receipt["safety_boundary"].values())
+          assert policy["authority"]["production_r2_training_reads_authorized"] is True
+          assert policy["authority"]["provider_requests_authorized"] is False
+          assert policy["authority"]["r2_writes_authorized"] is False
+          assert policy["authority"]["holdout_access_authorized"] is False
+          assert policy["authority"]["training_authorized"] is False
+          assert policy["authority"]["training_publication_authorized"] is False
+          prepared_from_main = receipt["prepared_from_main"]
+          assert prepared_from_main == policy["lineage"]["prepared_from_main"]
+          subprocess.run(
+              ["git", "merge-base", "--is-ancestor", prepared_from_main, "HEAD"],
+              check=True,
+          )
+          PY
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Run aggregate-only governed Core100 audit
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          python scripts/audit_core100_effective_signal_v0_1.py \
+            --output effective-signal-audit-output/report.json
+
+      - name: Assert diagnostic-only output
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("effective-signal-audit-output/report.json").read_text())
+          assert report["schema"] == "core100-effective-signal-audit-report-v0.1"
+          assert report["status"] == "PASS"
+          assert report["dataset_fingerprint"] == (
+              "91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876"
+          )
+          assert report["example_count"] == 249228
+          assert report["symbol_count"] == 100
+          assert report["lineage"]["partition_objects"] == 14274
+          assert report["lineage"]["source_rows"] == 18235427
+          authority = report["authority"]
+          assert authority["diagnostic_only"] is True
+          assert authority["aggregate_only"] is True
+          assert authority["holdout_accessed"] is False
+          assert authority["provider_requests_performed"] == 0
+          assert authority["r2_reads_performed"] is True
+          assert authority["r2_writes_performed"] is False
+          assert authority["training_performed"] is False
+          assert authority["training_published"] is False
+          assert authority["strategy_parameter_changed"] is False
+          assert authority["source_switch_authorized"] is False
+          assert authority["automatic_model_promotion"] is False
+          assert authority["formal_trade_plan"] is False
+          assert authority["real_money_orders"] is False
+          assert authority["live_trading"] is False
+          PY
+
+      - name: Upload secret-free aggregate audit evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: core100-effective-signal-audit-${{ github.run_id }}-${{ github.run_attempt }}
+          path: effective-signal-audit-output/report.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf effective-signal-audit-output
