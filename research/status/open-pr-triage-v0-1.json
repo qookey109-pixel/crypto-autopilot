@@ -7,7 +7,7 @@
   "categories": {
     "ACTIVE": [302, 305, 306],
     "DEFERRED_STACK": [255, 257, 258, 260, 261, 262],
-    "REVIEW_REQUIRED_LEGACY": [166, 167, 168, 199, 249],
+    "REVIEW_REQUIRED_LEGACY_DRAFT": [166, 167, 168, 199, 249],
     "CLOSED_HISTORICAL_EVIDENCE": [256],
     "CLOSED_SUPERSEDED_THIS_PASS": [220, 290, 301]
   },
@@ -44,17 +44,35 @@
       "evolution": "Current main preserves original config/zero-cost/authority assertions and replaces the old no-workflow expectation with validation of the later separately versioned manual-only execution authority.",
       "classification": "SUPERSEDED_BY_MAIN_AND_LATER_GOVERNANCE_EVOLUTION"
     },
+    "pr_166": {
+      "main_missing_changed_file": "src/crypto_autopilot/market_structure.py",
+      "draft": true,
+      "classification": "REVIEW_REQUIRED_UNIQUE_CONTENT_CONFIRMED"
+    },
+    "pr_167": {
+      "main_missing_changed_file": "src/crypto_autopilot/experiment_registry.py",
+      "draft": true,
+      "classification": "REVIEW_REQUIRED_UNIQUE_CONTENT_CONFIRMED"
+    },
+    "pr_168": {
+      "main_missing_changed_file": "src/crypto_autopilot/paper_simulation_demo.py",
+      "draft": true,
+      "classification": "REVIEW_REQUIRED_UNIQUE_CONTENT_CONFIRMED"
+    },
+    "pr_199": {
+      "main_missing_changed_file": "src/crypto_autopilot/integrated_paper_strategy_v0_3.py",
+      "draft": true,
+      "classification": "REVIEW_REQUIRED_UNIQUE_CONTENT_CONFIRMED"
+    },
     "pr_249": {
       "main_missing_changed_file": "config/render_relay_502_remediation_review_v0_1.json",
+      "draft": true,
       "classification": "REVIEW_REQUIRED_UNIQUE_CONTENT_CONFIRMED"
     }
   },
   "notes": {
     "305": "Current-status and documentation convergence; ready but unmerged.",
     "306": "Toolkit V0.2 REST/OpenAPI + Render + Cloudflare edge; CI passed; deployment/public exposure unauthorized.",
-    "256": "Closed as historical after both changed files matched current main by exact Git blob SHA.",
-    "220": "Closed as superseded after five of six files matched exact blobs and the sixth was a later governance evolution on main.",
-    "249": "Preserved because at least one changed file is absent from current main.",
-    "legacy": "Preserve unique research content until exact functional/file-level supersession is proven."
+    "legacy": "All five legacy PRs with confirmed unique content were converted to Draft so they cannot be mistaken for ready-to-merge work. Preserve until deliberate salvage/rebuild review."
   }
 }
