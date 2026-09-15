@@ -24,6 +24,7 @@ class DashboardCurrentOperationsOverlayTests(unittest.TestCase):
             "schema": "qookey-dashboard-authority-snapshot-v0.12",
             "project": {
                 "mode": "PAPER-ONLY",
+                "successorMetadataCaptureExecutionAuthorized": True,
                 "successorMetadataScheduleEnabled": True,
                 "currentMetadataCaptureExecutionPath": "github_hosted_ubuntu_v0_12",
                 "liveTradingAuthorized": False,
@@ -91,6 +92,8 @@ class DashboardCurrentOperationsOverlayTests(unittest.TestCase):
         self.assertEqual(project["v0_12SuccessorWindowState"], "HISTORICAL_WINDOW_ENDED")
         self.assertFalse(project["v0_12CurrentWindowActive"])
         self.assertTrue(project["v0_12ScheduleRegistrationPresent"])
+        self.assertFalse(project["successorMetadataCaptureExecutionAuthorized"])
+        self.assertFalse(project["successorMetadataScheduleEnabled"])
         self.assertEqual(pipeline["V0.12 Successor Metadata Window"]["status"], "HISTORICAL")
         self.assertEqual(gates["V0.12 Metadata Capture"]["status"], "HISTORICAL")
 
