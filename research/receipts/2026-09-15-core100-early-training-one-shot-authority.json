@@ -1,0 +1,43 @@
+{
+  "schema": "qookey-core100-early-training-one-shot-authority-v0.1",
+  "status": "AUTHORIZED_FOR_PROTECTED_MAIN_ONE_SHOT_AFTER_MERGE",
+  "authorized_at_utc": "2026-09-15T01:34:33Z",
+  "authorized_source_main_sha": "8896e3b427412e0dad243f6108df31b054e0e99f",
+  "purpose": "Run the already-authorized research-only Core100 training as soon as practical after verified History 10/10 completion, instead of waiting for the next weekly scheduled slot.",
+  "user_authorization": {
+    "early_execution_authorized": true,
+    "scope": "training_only_within_existing_repository_safety_boundaries",
+    "merge_authority_granted_by_this_receipt": false
+  },
+  "data_precondition": {
+    "history_workflow_id": 340899181,
+    "primary_complete_run_id": 34907888277,
+    "primary_complete_run_head_sha": "e529b0ee94fb1577c837552f3a87594d999675ce",
+    "primary_complete_run_conclusion": "success",
+    "primary_complete_stage": "DETAILED_HISTORY_DATASET_ALREADY_COMPLETE",
+    "primary_complete_shards": 10,
+    "primary_total_shards": 10,
+    "independent_repeat_run_id": 34887226438,
+    "production_completion_verified": true
+  },
+  "execution": {
+    "one_shot": true,
+    "trigger": "protected_main_push_that_first_introduces_this_receipt",
+    "existing_weekly_training_schedule_unchanged": true,
+    "manual_dispatch_not_required": true,
+    "concurrency_group_shared_with_existing_training": "binance-usdm-detailed-training-v0-1",
+    "training_script": "scripts/train_binance_detailed_history_models_v0_2.py",
+    "config": "config/binance_usdm_detailed_history_v0_1_2.json",
+    "authority": "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json"
+  },
+  "safety_boundary": {
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "synthetic_candles_authorized": false,
+    "interpolation_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

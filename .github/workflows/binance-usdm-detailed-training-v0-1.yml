@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "37 4 * * 0"
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "research/receipts/2026-09-15-core100-early-training-one-shot-authority.json"
 
 permissions:
   contents: read
@@ -20,6 +25,40 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+          fetch-depth: 0
+
+      - name: Validate one-shot early-training authority on push
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          receipt="research/receipts/2026-09-15-core100-early-training-one-shot-authority.json"
+          if git cat-file -e "HEAD^1:${receipt}" 2>/dev/null; then
+            echo "one-shot authority receipt existed before this protected-main push; refusing re-execution"
+            exit 1
+          fi
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          receipt = json.loads(
+              Path("research/receipts/2026-09-15-core100-early-training-one-shot-authority.json").read_text()
+          )
+          assert receipt["schema"] == "qookey-core100-early-training-one-shot-authority-v0.1"
+          assert receipt["status"] == "AUTHORIZED_FOR_PROTECTED_MAIN_ONE_SHOT_AFTER_MERGE"
+          assert receipt["user_authorization"]["early_execution_authorized"] is True
+          assert receipt["user_authorization"]["merge_authority_granted_by_this_receipt"] is False
+          assert receipt["data_precondition"]["production_completion_verified"] is True
+          assert receipt["data_precondition"]["primary_complete_shards"] == 10
+          assert receipt["data_precondition"]["primary_total_shards"] == 10
+          assert receipt["execution"]["one_shot"] is True
+          assert receipt["execution"]["existing_weekly_training_schedule_unchanged"] is True
+          boundary = receipt["safety_boundary"]
+          assert all(value is False for value in boundary.values())
+          source_main = receipt["authorized_source_main_sha"]
+          subprocess.run(["git", "merge-base", "--is-ancestor", source_main, "HEAD"], check=True)
+          PY
 
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
