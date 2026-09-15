@@ -5,7 +5,7 @@ import unittest
 from copy import deepcopy
 from pathlib import Path
 
-from crypto_autopilot.resource_hub_supply_chain import build_candidate_registry
+from crypto_autopilot.toolkit.resource_hub_supply_chain import build_candidate_registry
 
 
 POLICY_PATH = Path("config/resource_hub_supply_chain_v0_1.json")
