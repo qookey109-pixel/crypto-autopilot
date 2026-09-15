@@ -22,7 +22,8 @@
     "github_actions": "PRIMARY_CLOUD_INTERFACE",
     "python": "INTERNAL_REUSABLE_RUNNER",
     "cli": "INTERNAL_REUSABLE_RUNNER",
-    "rest_api": "DEFERRED",
+    "rest_api": "IMPLEMENTED_PREPARED_RESEARCH_ONLY",
+    "rest_api_config": "config/qookey_crypto_toolkit_api_v0_2.json",
     "telegram": "DEFERRED",
     "mcp": "DEFERRED"
   },
@@ -33,7 +34,9 @@
     "input_mode": "REPOSITORY_CONTROLLED_JSON",
     "artifact_output": true,
     "local_machine_required": false,
-    "r2_input_enabled": false
+    "r2_input_enabled": false,
+    "rest_api_deployment_authorized": false,
+    "rest_api_public_exposure_authorized": false
   },
   "research_guards": {
     "network_required": false,
