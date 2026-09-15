@@ -38,33 +38,84 @@ python scripts/qookey_crypto_toolkit_v0_1.py backtest --input backtest.json
 
 Use `--input -` to read JSON from stdin.
 
+## REST/OpenAPI adapter
+
+Toolkit V0.1 now has a dependency-free full-CPython HTTP adapter:
+
+```bash
+QOOKEY_TOOLKIT_API_TOKEN='replace-me' \
+QOOKEY_TOOLKIT_HOST=127.0.0.1 \
+python scripts/qookey_crypto_toolkit_http_v0_1.py
+```
+
+Available routes:
+
+```text
+GET  /healthz
+GET  /openapi.json
+GET  /v0/capabilities
+POST /v0/indicators
+POST /v0/strategy
+POST /v0/risk
+POST /v0/backtest
+```
+
+Protected POST routes use bearer authentication when `QOOKEY_TOOLKIT_API_TOKEN` is configured. The server refuses non-loopback exposure without that token. Request bodies are capped at 2 MB and CORS is disabled unless an explicit origin is configured.
+
+The HTTP adapter delegates to the exact same Toolkit functions used by Python and CLI. It does not reimplement strategy logic.
+
+## Cloud deployment layering
+
+The prepared deployment layout is:
+
+```text
+Website / Telegram / other client
+             ↓
+Cloudflare edge gateway
+  auth / request ID / size limits
+             ↓
+Full-CPython Toolkit API origin
+             ↓
+Qookey Crypto Toolkit
+             ↓
+Existing deterministic project core
+```
+
+Prepared infrastructure:
+
+- `infra/cloudflare/qookey-toolkit-edge/` — thin Worker proxy only.
+- `infra/render/qookey-toolkit-api/` — full-CPython origin container.
+- `config/qookey_crypto_toolkit_api_v0_1.json` — machine-readable API/deployment policy.
+
+The Cloudflare Worker intentionally has no provider credentials, R2 binding, holdout binding, or strategy logic. It separates a client-facing bearer token from the private origin bearer token.
+
+The origin container copies only the Python modules needed for Toolkit execution and does not install the repository's cloud/history dependencies. This reduces deployment surface and prevents accidental R2 coupling.
+
 ## Interface decision
 
-MCP is optional. The recommended layering is:
+The layering is now:
 
 ```text
 Existing crypto-autopilot core
         ↓
 Qookey Crypto Toolkit
         ↓
-Python / CLI / REST / Telegram / MCP
+Python / CLI / REST
+        ↓
+Cloudflare edge / website / Telegram / automation
 ```
 
-Choose the interface by caller:
+MCP is intentionally deferred. A future MCP adapter, if reintroduced, must call the existing Toolkit and must not duplicate indicators, strategy, risk, or backtesting.
 
-- Python: internal scripts, notebooks, GitHub Actions, tests.
-- CLI: local automation, shell pipelines, Codex terminal workflows.
-- REST/OpenAPI: websites, Telegram bots, Render/Cloudflare services, or clients that are not running inside Python.
-- MCP: AI clients that should discover tool schemas and invoke tools directly.
-- Telegram: human command/report interface; it should normally call the REST or Python toolkit rather than contain strategy logic itself.
+## Useful next integrations
 
-A future MCP adapter should call `crypto_autopilot.toolkit` and must not reimplement indicators, strategy, risk, or backtesting.
+After the HTTP path is stable, the most useful additions are:
 
-## Recommended next adapters
-
-The next generally useful adapter is a small read-only REST/OpenAPI service because it can serve a website, Telegram, and other automation at the same time. MCP can then be added as a thin adapter when direct AI tool discovery provides enough value.
-
-NotebookLM remains a separate research-source adapter. Browser profiles, cookies, Google sessions, CSRF tokens, and local NotebookLM credentials must never be committed to this repository.
+- Telegram as a human command/report client over REST.
+- Cloudflare Access or rate limiting before broad public exposure.
+- Queues only when asynchronous/long-running tool jobs are introduced.
+- Workflows only when durable multi-step jobs are introduced.
+- NotebookLM remains a separate research-source adapter; browser profiles, cookies, Google sessions, CSRF tokens, and local NotebookLM credentials must never be committed.
 
 ## Safety boundary
 
