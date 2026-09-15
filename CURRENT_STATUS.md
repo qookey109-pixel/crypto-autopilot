@@ -104,6 +104,18 @@ Merged on current `main`. It provides cloud-first, research-only commands for ca
 
 Merged as `PREPARED_RESEARCH_ONLY`. It is an offline, non-authoritative research-context adapter. No upstream LLM/provider call, R2 operation, holdout access, strategy/risk mutation, trade plan, or order is authorized.
 
+## Open PR navigation
+
+Open pull requests are operationally classified in `docs/OPEN_PR_TRIAGE_2026_09_15.md`.
+
+- `ACTIVE`: #302, #305, #306.
+- Pionex simulation/history stack #255/#257/#258/#260/#261/#262 is `DEFERRED_STACK`; do not treat it as the current Core100 next action.
+- #256 is a `HISTORICAL_EVIDENCE_CANDIDATE` pending proof that equivalent immutable evidence is already preserved on current `main`.
+- #166/#167/#168/#199/#220/#249 are `REVIEW_REQUIRED_LEGACY`; preserve until file-level comparison proves supersession or their unique content is migrated.
+- PR #290 and PR #301 have already been closed as superseded.
+
+This classification is navigation only. It does not authorize merge or execution.
+
 ## Safety and governance still binding
 
 - Current mode: **PAPER-ONLY**.
