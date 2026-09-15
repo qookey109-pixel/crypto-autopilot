@@ -73,7 +73,7 @@ class PionexPageAuditDiagnosticsTests(unittest.TestCase):
     def test_classifies_invalid_reasons_without_emitting_values(self) -> None:
         step = INTERVAL_MS["4H"]
         rows = [
-            candle(0, open_=0.0),
+            candle(0, open_=0.0, low=0.0),
             candle(step, volume=-1.0),
             candle(step * 2, high=100.0, close=102.0),
             candle(step * 3, low=102.0, high=103.0, open_=100.0, close=101.0),
