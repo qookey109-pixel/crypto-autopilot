@@ -12,6 +12,7 @@ from .research import (
     stress_paper_backtest,
     validate_candles,
 )
+from .statistical_edge import validate_statistical_edge
 
 __all__ = [
     "build_research_report",
@@ -24,4 +25,5 @@ __all__ = [
     "size_long_trade_tool",
     "stress_paper_backtest",
     "validate_candles",
+    "validate_statistical_edge",
 ]
