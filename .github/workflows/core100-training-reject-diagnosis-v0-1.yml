@@ -1,0 +1,98 @@
+name: Core100 Training REJECT Diagnosis V0.1
+
+on:
+  push:
+    branches:
+      - codex/core100-reject-diagnosis-20260915
+    paths:
+      - ".github/workflows/core100-training-reject-diagnosis-v0-1.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Read exact published metrics and diagnose REJECT
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p diagnostic-output
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          from crypto_autopilot.storage.r2 import R2Store
+
+          receipt = json.loads(
+              Path("research/receipts/2026-09-15-core100-reject-diagnosis-scope.json").read_text()
+          )
+          assert receipt["status"] == "AUTHORIZED_READ_ONLY_ONE_SHOT"
+          assert receipt["execution"]["one_shot"] is True
+          assert receipt["execution"]["read_only"] is True
+          assert receipt["execution"]["r2_writes_authorized"] is False
+          assert receipt["execution"]["holdout_access_authorized"] is False
+          assert receipt["execution"]["provider_requests_authorized"] is False
+
+          store = R2Store(
+              account_id=os.environ["CLOUDFLARE_ACCOUNT_ID"],
+              bucket=os.environ["R2_BUCKET_NAME"],
+              access_key_id=os.environ["R2_ACCESS_KEY_ID"],
+              secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"],
+          )
+          payload = store.get_bytes_verified(
+              receipt["source_metrics_key"],
+              expected_sha256=receipt["source_metrics_sha256"],
+          )
+          Path("diagnostic-output/metrics.json").write_bytes(payload)
+          PY
+          python scripts/diagnose_core100_training_reject_v0_1.py \
+            diagnostic-output/metrics.json \
+            --output diagnostic-output/diagnosis.json
+
+      - name: Assert diagnosis remains research-only
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          diagnosis = json.loads(Path("diagnostic-output/diagnosis.json").read_text())
+          gate = diagnosis["source_model_quality_gate"]
+          assert gate["status"] == "REJECT"
+          assert diagnosis["failing_fold_count"] > 0
+          assert diagnosis["failing_base_cost_scenario_count"] > 0
+          assert diagnosis["automatic_model_promotion_authorized"] is False
+          assert diagnosis["formal_trade_plan_authorized"] is False
+          assert diagnosis["real_money_order_authorized"] is False
+          assert diagnosis["live_trading_authorized"] is False
+          PY
+
+      - name: Upload secret-free diagnosis
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: core100-training-reject-diagnosis-${{ github.run_id }}-${{ github.run_attempt }}
+          path: diagnostic-output/diagnosis.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf diagnostic-output
