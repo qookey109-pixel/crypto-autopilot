@@ -1,6 +1,6 @@
 {
   "schema": "qookey-core100-reject-diagnosis-scope-v0.1",
-  "status": "AUTHORIZED_READ_ONLY_BOUNDED",
+  "status": "COMPLETE_READ_ONLY_BOUNDED",
   "source_training_run_id": 34918219864,
   "source_training_head_sha": "dc10ce590c8731fbef21115e0e3d3423cbcc7cf1",
   "source_metrics_key": "training/binance_usdm/crypto-core-v0.1/runs/run=github-34918219864-1/metrics.json",
@@ -8,12 +8,15 @@
   "observed_model_quality_gate": "REJECT",
   "execution": {
     "maximum_read_attempts": 2,
+    "completed_read_attempts": 2,
     "attempt_1_run_id": 34933866429,
-    "attempt_2_purpose": "Re-emit the same immutable metrics diagnosis with signal_count included after correcting the diagnostic projection schema.",
+    "attempt_2_run_id": 34934016894,
     "read_only": true,
     "r2_writes_authorized": false,
     "holdout_access_authorized": false,
-    "provider_requests_authorized": false
+    "provider_requests_authorized": false,
+    "further_read_attempts_authorized": false,
+    "diagnostic_workflow_retired_after_completion": true
   },
   "history_reacquisition_required": false,
   "retraining_authorized_by_this_receipt": false,
@@ -22,5 +25,5 @@
   "real_money_order_authorized": false,
   "live_trading_authorized": false,
   "source_switch_authorized": false,
-  "purpose": "Read only the exact already-published training metrics object, verify its immutable SHA-256, and rank fold-level, signal-count, and base-cost failure evidence before deciding whether any model or strategy change is justified."
+  "purpose": "Freeze the completed read-only diagnosis of the exact published Core100 training metrics. No further R2 diagnosis reads are authorized by this receipt."
 }
