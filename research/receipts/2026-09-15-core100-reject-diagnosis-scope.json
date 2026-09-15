@@ -1,9 +1,18 @@
 {
   "schema": "qookey-core100-reject-diagnosis-scope-v0.1",
-  "status": "DIAGNOSTIC_ONLY",
+  "status": "AUTHORIZED_READ_ONLY_ONE_SHOT",
   "source_training_run_id": 34918219864,
   "source_training_head_sha": "dc10ce590c8731fbef21115e0e3d3423cbcc7cf1",
+  "source_metrics_key": "training/binance_usdm/crypto-core-v0.1/runs/run=github-34918219864-1/metrics.json",
+  "source_metrics_sha256": "30dcbc5d85df722ce3a8aec7e7d11d1f2293b0010d793946d3233d9e9c63dd85",
   "observed_model_quality_gate": "REJECT",
+  "execution": {
+    "one_shot": true,
+    "read_only": true,
+    "r2_writes_authorized": false,
+    "holdout_access_authorized": false,
+    "provider_requests_authorized": false
+  },
   "history_reacquisition_required": false,
   "retraining_authorized_by_this_receipt": false,
   "automatic_model_promotion_authorized": false,
@@ -11,5 +20,5 @@
   "real_money_order_authorized": false,
   "live_trading_authorized": false,
   "source_switch_authorized": false,
-  "purpose": "Extract and rank fold-level and cost-scenario failure evidence before deciding whether any model or strategy change is justified."
+  "purpose": "Read the exact already-published training metrics object, verify its immutable SHA-256, and rank fold-level and base-cost failure evidence before deciding whether any model or strategy change is justified."
 }
