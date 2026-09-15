@@ -37,3 +37,16 @@ jobs:
         run: python scripts/check_r2_budget.py
       - name: Observed Binance R2 budget gate
         run: python scripts/check_binance_observed_r2_budget.py
+      - name: Build informational quality visibility report
+        if: ${{ always() && matrix.python-version == '3.13' }}
+        continue-on-error: true
+        run: python scripts/quality_visibility.py --output quality-visibility.json
+      - name: Upload informational quality visibility report
+        if: ${{ always() && matrix.python-version == '3.13' }}
+        continue-on-error: true
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4
+        with:
+          name: quality-visibility-${{ github.run_id }}-${{ github.run_attempt }}
+          path: quality-visibility.json
+          retention-days: 30
+          if-no-files-found: warn
