@@ -1,0 +1,155 @@
+{
+  "schema": "resource-hub-integration-evaluation-v0.1",
+  "status": "EVALUATED_RESEARCH_ONLY_NOT_APPROVED_FOR_INTEGRATION",
+  "evaluated_at": "2026-09-15",
+  "crypto_autopilot_base_main_sha": "90fa08446994e18e83e2778032dd89c513857dea",
+  "candidate_provenance": {
+    "resource_id": "world-monitor",
+    "resource_name": "World Monitor",
+    "resource_hub_repository": "qookey109-pixel/ai-resource-hub",
+    "resource_hub_commit": "7b19de82cd53d851fa5dd478bc1801d383f6c920",
+    "catalog_categories": [
+      "OSINT / Intelligence",
+      "Search / Research",
+      "Data / Analytics"
+    ],
+    "catalog_url": "https://github.com/koala73/worldmonitor",
+    "candidate_decision": "REVIEW_REQUIRED"
+  },
+  "upstream": {
+    "repository": "koala73/worldmonitor",
+    "commit": "c18ab87fae2859e07703bc73c1c1c5775a0d17c3",
+    "version": "2.10.0",
+    "license": "AGPL-3.0-only",
+    "homepage": "https://worldmonitor.app",
+    "primary_language": "TypeScript",
+    "archived": false,
+    "public_mcp_discovery": true,
+    "mcp_tool_calls_require_api_key_or_oauth": true,
+    "rest_api_available": true,
+    "official_sdk_surfaces": [
+      "TypeScript/CLI",
+      "Python",
+      "Ruby",
+      "Go"
+    ],
+    "observed_main_required_checks": [
+      "biome",
+      "typecheck",
+      "gate",
+      "unit"
+    ],
+    "upstream_test_execution_performed_by_this_evaluation": false
+  },
+  "evidence_reviewed": [
+    "README.md",
+    "package.json",
+    "docs/finance-data.mdx",
+    "docs/country-instability-index.mdx",
+    "docs/mcp-tools-reference.mdx",
+    "api/mcp/registry/cache-tools.ts",
+    "public/llms-full.txt",
+    "main branch protection and commit-status metadata"
+  ],
+  "component_evaluation": {
+    "geopolitical_and_supply_chain_context": {
+      "decision": "RESEARCH_CANDIDATE_DESCRIPTIVE_CONTEXT_ONLY",
+      "fit": "HIGH",
+      "notes": [
+        "Provides structured conflict, chokepoint, sanctions, energy, trade, cyber, disaster and other public-intelligence surfaces suitable for contextual research.",
+        "Cross-stream correlation can help label the environment around market moves, but it is not itself evidence of causal return prediction.",
+        "Any future use must preserve timestamps, source attribution, freshness state and an explicit non-directional context boundary."
+      ]
+    },
+    "freshness_and_provenance_contract": {
+      "decision": "RESEARCH_CANDIDATE",
+      "fit": "HIGH",
+      "notes": [
+        "MCP cache envelopes expose cached_at and stale state, with stale able to reflect fetch age, minimum-record coverage, and upstream content age.",
+        "News paths attach source provenance and credibility metadata, and some data paths explicitly suppress non-redistributable provider data.",
+        "These semantics are useful as a reference for a future fail-closed external-context envelope in Crypto Autopilot."
+      ]
+    },
+    "country_instability_index": {
+      "decision": "REFERENCE_ONLY_REQUIRES_INDEPENDENT_CALIBRATION",
+      "fit": "MEDIUM_HIGH",
+      "notes": [
+        "CII v8 blends a curated baseline with live event pressure, supplemental boosts and conflict/advisory floors for 31 curated Tier-1 countries.",
+        "The score is a situational-risk index, not a calibrated probability of crypto return, volatility, direction or liquidation risk.",
+        "dynamicScore is an approximate 24-hour movement delta and can be zero during cold start or when no valid comparison snapshot exists, so it must not be treated as a complete time-series signal."
+      ]
+    },
+    "market_and_crypto_data": {
+      "decision": "REJECT_AS_CANONICAL_CRYPTO_MARKET_DATA_AUTHORITY",
+      "fit": "LOW_FOR_NATIVE_MARKET_AUTHORITY_MEDIUM_FOR_CONTEXT",
+      "notes": [
+        "World Monitor market data is a mixed-asset aggregation layer and its MCP market tool is intentionally a fixed-universe cache read rather than a native exchange-history feed.",
+        "Crypto quote surfaces use upstream providers such as CoinGecko and CoinPaprika and therefore do not prove Binance USD-M or Pionex native provenance/equivalence.",
+        "It must not replace canonical OHLCV, funding, mark-price, open-interest, order-flow, provider-equivalence or backtest-admission evidence in Crypto Autopilot."
+      ]
+    },
+    "ai_synthesized_briefs": {
+      "decision": "REFERENCE_ONLY_WITH_GROUNDING_REQUIRED",
+      "fit": "MEDIUM",
+      "notes": [
+        "World and country briefs include AI-synthesized text grounded to source feeds and the project has explicit citation-grounding controls.",
+        "The upstream project has also documented prior unsupported-citation findings and subsequently tightened withholding rules.",
+        "Generated prose therefore remains a research summary surface and cannot directly authorize a directional signal, strategy change or trade plan."
+      ]
+    },
+    "mcp_rest_and_sdk_runtime": {
+      "decision": "DEFER_REMOTE_INTEGRATION_V0_1",
+      "fit": "POTENTIALLY_HIGH_AFTER_CONTRACT_REVIEW",
+      "notes": [
+        "The MCP server, REST API, CLI and SDKs make structured integration practical.",
+        "MCP tool calls require an API key or OAuth even though discovery can be public, which would add a new credentialed remote dependency and quota/plan surface.",
+        "No World Monitor API key, OAuth grant, network call, recurring job or production adapter is authorized by this evaluation."
+      ]
+    },
+    "license_and_data_redistribution": {
+      "decision": "REQUIRES_SEPARATE_LICENSE_AND_PROVIDER_REVIEW",
+      "fit": "GOVERNANCE_CONSTRAINT",
+      "notes": [
+        "Upstream source code is AGPL-3.0-only, so copying or deriving server/runtime code can create source-availability obligations that differ from Crypto Autopilot's existing code boundary.",
+        "World Monitor itself distinguishes providers whose terms permit redistribution and documents provider-specific restrictions for finance data.",
+        "A future integration must review API/product terms and per-source redistribution rights before persisting upstream-derived data into R2 or republishing it."
+      ]
+    },
+    "premium_stock_analysis_and_backtest": {
+      "decision": "OUT_OF_SCOPE_FOR_CRYPTO_CORE",
+      "fit": "LOW",
+      "notes": [
+        "Premium stock-analysis and stock-backtest surfaces are designed for equities and do not replace the existing crypto strategy-research, frozen-partition or perpetual-cost model."
+      ]
+    }
+  },
+  "overall_decision": {
+    "state": "EVALUATED_NOT_APPROVED_FOR_INTEGRATION",
+    "recommended_scope": "GEOPOLITICAL_MACRO_DESCRIPTIVE_CONTEXT_CONTRACT_REFERENCE_ONLY",
+    "do_not_import_as_runtime_dependency": true,
+    "do_not_use_market_data_as_native_crypto_authority": true,
+    "do_not_use_cii_or_ai_briefs_as_directional_signal": true,
+    "recommended_next_step": "Build an isolated descriptive-context envelope using synthetic fixtures only. Require explicit observed/cached time, stale=false, source/provenance metadata and context type; reject missing freshness/provenance and reject any payload or configuration that claims strategy, promotion, formal backtest, trade-plan or live-trading authority. Do not call World Monitor, Binance, Pionex, R2 or frozen holdout during this contract step.",
+    "license_note": "AGPL-3.0-only applies to World Monitor source code, while upstream data sources may have separate redistribution terms. Any future code reuse, remote API consumption, persistence or redistribution requires a separate license/terms review."
+  },
+  "authority": {
+    "automatic_schedule_authorized": false,
+    "code_import_authorized": false,
+    "runtime_dependency_authorized": false,
+    "worldmonitor_network_call_authorized": false,
+    "worldmonitor_api_key_authorized": false,
+    "worldmonitor_oauth_authorized": false,
+    "adapter_creation_authorized": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_strategy_mutation_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
