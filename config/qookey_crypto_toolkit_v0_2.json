@@ -1,10 +1,12 @@
 {
   "schema": "qookey-crypto-toolkit-v0.2",
   "status": "PREPARED_RESEARCH_ONLY",
+  "execution_model": "CLOUD_FIRST",
   "base": {
     "v0_1_compatibility_preserved": true,
     "python_package": "crypto_autopilot.toolkit",
-    "cli": "scripts/qookey_crypto_toolkit_v0_2.py"
+    "cli": "scripts/qookey_crypto_toolkit_v0_2.py",
+    "user_local_execution_required": false
   },
   "tools": [
     "get_indicators",
@@ -17,12 +19,21 @@
     "build_research_report"
   ],
   "interfaces": {
-    "python": "ENABLED",
-    "cli": "ENABLED",
-    "github_actions": "SUPPORTED_LOCAL_EXECUTION",
+    "github_actions": "PRIMARY_CLOUD_INTERFACE",
+    "python": "INTERNAL_REUSABLE_RUNNER",
+    "cli": "INTERNAL_REUSABLE_RUNNER",
     "rest_api": "DEFERRED",
     "telegram": "DEFERRED",
     "mcp": "DEFERRED"
+  },
+  "cloud_execution": {
+    "workflow": ".github/workflows/qookey-crypto-toolkit-v0-2-cloud.yml",
+    "trigger": "workflow_dispatch",
+    "runner": "github_hosted_ubuntu",
+    "input_mode": "REPOSITORY_CONTROLLED_JSON",
+    "artifact_output": true,
+    "local_machine_required": false,
+    "r2_input_enabled": false
   },
   "research_guards": {
     "network_required": false,
