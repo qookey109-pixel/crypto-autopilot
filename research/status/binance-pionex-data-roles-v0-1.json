@@ -1,0 +1,45 @@
+{
+  "schema": "qookey-binance-pionex-data-roles-v0.1",
+  "status": "FORMAL_ARCHITECTURE_POLICY",
+  "as_of_date": "2026-09-15",
+  "roles": {
+    "binance": "LARGE_SCALE_LEARNING_DATABASE",
+    "pionex": "FINAL_CALIBRATION_AND_REAL_TRADING_ENVIRONMENT"
+  },
+  "preferred_pipeline": [
+    "BINANCE_LARGE_SCALE_LEARNING",
+    "BINANCE_MODEL_QUALITY_FILTERING",
+    "PIONEX_NATIVE_CALIBRATION_AND_VALIDATION",
+    "PIONEX_EXECUTION"
+  ],
+  "pionex_verified_data": {
+    "provider": "pionex_public_futures",
+    "btc_fixed_27_day_pilot_complete": true,
+    "pilot_symbol": "BTC_USDT_PERP",
+    "pilot_intervals": ["15M", "60M", "4H"],
+    "pilot_start_utc": "2026-08-01T00:00:00Z",
+    "pilot_end_exclusive_utc": "2026-08-28T00:00:00Z",
+    "pilot_run_id": 34513815680
+  },
+  "current_gaps": {
+    "pionex_150_to_197_market_complete_multi_year_history": "NOT_MATERIALIZED",
+    "core100_direct_training_on_pionex_native_data": "NOT_IMPLEMENTED_NOT_PERFORMED",
+    "pionex_full_training_source": false
+  },
+  "invariants": {
+    "binance_must_not_be_relabelled_as_pionex_native": true,
+    "pionex_candidate_selection_does_not_equal_materialized_history": true,
+    "pionex_validation_required_before_future_live_execution": true
+  },
+  "authority": {
+    "provider_requests": false,
+    "r2_writes": false,
+    "retraining": false,
+    "source_switch": false,
+    "holdout_access": false,
+    "automatic_model_promotion": false,
+    "formal_trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}

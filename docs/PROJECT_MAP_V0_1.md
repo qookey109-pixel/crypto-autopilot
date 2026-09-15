@@ -6,17 +6,38 @@ any versioned authority.
 ## Read in this order
 
 1. `PROJECT_STATUS.md` — current formal stage and safety boundary.
-2. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
-3. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
-4. The exact config and receipt named by the stage being changed.
+2. `docs/BINANCE_PIONEX_DATA_ROLES_V0_1.md` — formal data-source roles: Binance for large-scale learning; Pionex for final calibration and the real trading environment.
+3. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
+4. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
+5. The exact config and receipt named by the stage being changed.
+
+## Core data-source architecture
+
+**Binance = large-scale learning database.**
+
+**Pionex = final calibration and real trading environment.**
+
+The intended path is:
+
+`Binance learning -> model candidate -> Pionex-native calibration/validation -> Pionex execution`
+
+Binance evidence must never be relabeled as Pionex-native evidence. Pionex-native validation is required before future live execution is considered.
+
+Current Pionex gaps remain explicit:
+
+- **Pionex 150-197 market complete multi-year historical dataset: NOT MATERIALIZED.**
+- **Core100 direct training on Pionex-native data: NOT IMPLEMENTED / NOT PERFORMED.**
+
+The completed Pionex BTC pilot is a fixed 27-day sample only and does not close either gap. Machine-readable status is in `research/status/binance-pionex-data-roles-v0-1.json`.
 
 ## Current bounded data and Paper stages
 
 | Stage | Current contract | State |
 | --- | --- | --- |
 | V0.12 successor provider metadata capture | `config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json` plus its authority receipt | V0.10 runs #36–#41 remain incomplete fail-closed evidence; V0.10 schedule is retired and V0.12 is the only bounded metadata schedule after exact protected-main merge; no replay/backfill |
-| Binance USD-M Crypto Core | `config/binance_usdm_detailed_history_v0_1_2.json` | 100 Crypto markets, 10 resumable R2 shards; authorized only after the V0.10 window |
-| Pionex alternative assets | `config/pionex_alternative_assets_observability_v0_2.json` | V0.1 supplies the 125-candidate registry; V0.2 authorizes one post-window metadata validation/diff/capacity path; historical candles still need separate authority |
+| Binance USD-M Crypto Core | `config/binance_usdm_detailed_history_v0_1_2.json` | 100 Crypto markets, 10 resumable R2 shards; authorized only after the V0.10 window; primary large-scale learning source |
+| Pionex alternative assets | `config/pionex_alternative_assets_observability_v0_2.json` | V0.1 supplies the 125-candidate registry; V0.2 authorizes one post-window metadata validation/diff/capacity path; historical candles still need separate authority; future role is venue calibration/validation |
+| Pionex BTC bounded history pilot | `config/pionex_historical_research_execution_v0_2.json` | completed fixed 27-day BTC sample at 15M/60M/4H; not multi-year and not Core100 training data |
 | Pionex Paper successor | `config/post_window_paper_training_v0_2.json` | prepared, but no workflow or provider access until V0.11 and a separate holdout-access authority |
 
 The Paper successor reuses the existing Repository Paper Broker and Pionex
@@ -33,6 +54,7 @@ holdout/paper-read authority.
 | `scripts/` | stable CLI entrypoints used by Actions and frozen receipts; intentionally flat so historical command paths do not move |
 | `config/` | versioned contracts and authorities; older versions remain immutable evidence |
 | `research/receipts/` | immutable results and transitions; never a cleanup target |
+| `research/status/` | current machine-readable status projections, including Binance/Pionex data-role state |
 | `.github/workflows/` | executable, manual or regression Action entrypoints; current classification is machine-checked by `config/project_convergence_v0_1.json` |
 | `web/` | static read-only Pages shell and non-authoritative projections |
 | `tests/` | fail-closed behavior, lineage and authority regression tests |
