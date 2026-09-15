@@ -19,9 +19,11 @@ on:
       - "scripts/build_alternative_assets_projection.py"
       - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
+      - "scripts/apply_dashboard_current_operations_v0_3.py"
       - "scripts/build_cloud_run_status.py"
       - "scripts/build_delivery_overview.py"
       - "research/status/simulation-readiness-v0-1.json"
+      - "research/status/current-operations-v0-3.json"
       - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
@@ -47,6 +49,7 @@ on:
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
+      - "CURRENT_STATUS.md"
       - "PROJECT_STATUS.md"
       - "config/strategy_v0_1.json"
       - ".github/workflows/dashboard-github-pages.yml"
@@ -58,9 +61,11 @@ on:
       - "scripts/build_alternative_assets_projection.py"
       - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
+      - "scripts/apply_dashboard_current_operations_v0_3.py"
       - "scripts/build_cloud_run_status.py"
       - "scripts/build_delivery_overview.py"
       - "research/status/simulation-readiness-v0-1.json"
+      - "research/status/current-operations-v0-3.json"
       - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
@@ -86,6 +91,7 @@ on:
       - ".github/workflows/provider-equivalence-v0-2-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml"
       - ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml"
+      - "CURRENT_STATUS.md"
       - "PROJECT_STATUS.md"
       - "config/strategy_v0_1.json"
       - ".github/workflows/dashboard-github-pages.yml"
@@ -124,13 +130,14 @@ jobs:
       - name: Validate dashboard JavaScript and paper empty states
         run: |
           node --check web/assets/js/app.js
+          node --check web/assets/js/current-operations.js
           node scripts/test_dashboard_cloud_runs.cjs
           node --test tests/dashboard_paper_readiness.test.cjs
 
       - name: Validate Traditional Chinese dashboard safety
         run: python scripts/validate_dashboard_static.py
 
-      - name: Build latest frozen authority dashboard
+      - name: Build historical authorities then current operations projection
         shell: bash
         run: |
           set -euo pipefail
@@ -149,6 +156,9 @@ jobs:
           python scripts/apply_dashboard_latest_authority.py \
             --input _site/data/dashboard.json \
             --output _site/data/dashboard.json
+          python scripts/apply_dashboard_current_operations_v0_3.py \
+            --input _site/data/dashboard.json \
+            --output _site/data/dashboard.json
           touch _site/.nojekyll
 
       - name: Refresh cloud execution status from GitHub metadata only
@@ -157,7 +167,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python scripts/build_cloud_run_status.py --output _site/data/cloud-runs.json
 
-      - name: Assert latest V0.12 authority and PAPER-ONLY boundary
+      - name: Assert current operations and historical authority boundaries
         shell: bash
         run: |
           set -euo pipefail
@@ -165,15 +175,21 @@ jobs:
           import json
           from datetime import datetime
           from pathlib import Path
+
           data = json.loads(Path('_site/data/dashboard.json').read_text(encoding='utf-8'))
           calendar = json.loads(Path('_site/data/research-calendar.json').read_text(encoding='utf-8'))
           evidence = json.loads(Path('_site/data/research-evidence.json').read_text(encoding='utf-8'))
           strategy = json.loads(Path('_site/data/strategy.json').read_text(encoding='utf-8'))
           alternative = json.loads(Path('_site/data/alternative-assets.json').read_text(encoding='utf-8'))
+          current_web = json.loads(Path('_site/data/current-operations.json').read_text(encoding='utf-8'))
+          automation_health = json.loads(Path('config/research_automation_health_v0_2.json').read_text(encoding='utf-8'))
           project = data['project']
+
           assert data['authority'] is False
           assert data['locale'] == 'zh-Hant-TW'
-          assert data['schema'] == 'qookey-dashboard-authority-snapshot-v0.12'
+          assert data['schema'] == 'qookey-dashboard-authority-snapshot-v0.13'
+
+          # Frozen historical authority lineage remains intact.
           assert project['fundingMaterializationComplete'] is True
           assert project['fundingMaterializationState'] == 'PASS'
           assert project['fundingV0_2R2Identities'] == 192
@@ -195,19 +211,44 @@ jobs:
           assert project['v0_10CaptureOperationalState'] == 'RETIRED_AFTER_FAIL_CLOSED_PIONEX_SCHEMA_MISMATCH'
           assert project['v0_10CaptureObservedFailedRunCount'] == 6
           assert project['v0_10CaptureLatestObservedRunId'] == 33366572161
-          assert project['currentMetadataCaptureExecutionPath'] == 'github_hosted_ubuntu_v0_12'
           assert project['oldV0_2ScheduledExecutionAuthorized'] is False
           assert project['v0_10ScheduledExecutionAuthorized'] is False
-          assert project['v0_12SuccessorWindowState'] == 'AUTHORIZED_ON_MAIN_MERGE'
-          assert project['successorMetadataCaptureExecutionAuthorized'] is True
-          assert project['successorMetadataScheduleEnabled'] is True
           assert project['metadataCapturePathsConcurrentAuthorized'] is False
-          assert project['replacementHoldoutState'] == 'FROZEN_UNOPENED'
           assert project['metadataStabilityState'] == 'NOT_YET_RUN'
           assert project['metadataStabilityEligibilityState'] == 'V0_10_BLOCKED_V0_12_NOT_YET_RUN'
           assert project['cloudRuntimeMonthlyBudgetUsd'] == 0
+
+          # Present-tense operational projection comes from Current Operations V0.3.
+          assert project['currentOperationsEvidenceBasisIsLatestMainClaim'] is False
+          assert project['currentOperationsEvidenceBasisSemantics'] == (
+              'REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION'
+          )
+          assert project['core100HistoryState'] == 'COMPLETE_10_OF_10'
+          assert project['core100TrainingState'] == 'COMPLETED_PASS'
+          assert project['core100TrainingRunId'] == 34918219864
+          assert project['core100ModelQualityState'] == 'REJECT'
+          assert project['core100ThresholdReplayState'] == (
+              'COMPLETED_NO_SUPPORTED_THRESHOLD_CHANGE'
+          )
+          assert project['core100ThresholdReplayRunId'] == 34936331199
+          assert project['core100ThresholdChangeSupported'] is False
+          assert project['pionexValidationMaterializationState'] == 'PENDING_MANUAL_DISPATCH'
+          assert project['pionexValidationPreviousRunId'] == 34991627998
+          assert project['pionexValidationBoundaryFixPr'] == 321
+          assert project['pionexValidationManualDispatchOnly'] is True
+          assert project['currentMetadataCaptureExecutionPath'] == 'NONE_V0_12_WINDOW_ENDED'
+          assert project['v0_12SuccessorWindowState'] == 'HISTORICAL_WINDOW_ENDED'
+          assert project['v0_12CurrentWindowActive'] is False
+          assert project['v0_12ScheduleRegistrationPresent'] is True
+          assert project['successorMetadataCaptureExecutionAuthorized'] is False
+          assert project['successorMetadataScheduleEnabled'] is False
+          assert project['replacementHoldoutState'] == 'FROZEN_UNOPENED'
+          assert project['sourceSwitchAuthorized'] is False
+          assert project['tradePlanAuthorized'] is False
+          assert project['liveTradingAuthorized'] is False
+
           assert project['githubAutomaticOperationsState'] == 'AUTHORIZED_ON_MAIN_MERGE'
-          assert project['githubAutomaticScheduledWorkflowCount'] == 7
+          assert project['githubAutomaticScheduledWorkflowCount'] == len(automation_health['workflows'])
           assert project['githubManualDispatchRequiredForNormalOperations'] is False
           assert project['githubManualRunsCountAsAutomationHealth'] is False
           assert project['strategyResearchLoopState'] == 'PREPARED_RESEARCH_ONLY'
@@ -219,9 +260,7 @@ jobs:
           assert project['strategyResearchExecutionAuthorized'] is False
           assert project['strategyModelPromotionAuthority'] == 0
           assert project['mode'] == 'PAPER-ONLY'
-          assert project['sourceSwitchAuthorized'] is False
-          assert project['tradePlanAuthorized'] is False
-          assert project['liveTradingAuthorized'] is False
+
           datetime.fromisoformat(data['generatedAtUtc'].replace('Z', '+00:00'))
           assert calendar['authority'] is False
           assert calendar['safetyBoundary']['backtestAdmissionAuthorized'] is False
@@ -245,17 +284,42 @@ jobs:
           assert alternative['capacity_candidate_max']['total_rows'] == 23010750
           assert alternative['capacity_candidate_max']['historical_materialization_authorized'] is False
           assert all(value is False for value in alternative['safety_boundary'].values())
+
           schema = json.loads(Path('_site/data/research-evidence.schema.json').read_text(encoding='utf-8'))
           assert schema['properties']['authority']['const'] is False
           assert Path('_site/assets/css/styles.css').is_file()
           assert Path('_site/assets/js/app.js').is_file()
+          assert Path('_site/assets/js/current-operations.js').is_file()
           assert Path('_site/assets/images/cloud-garden-v4.jpg').is_file()
+
           security = data['securityBoundary']
           assert security['containsSecrets'] is False
-          assert security['authorizesMetadataCapture'] is True
+          assert security['authorizesMetadataCapture'] is False
+          assert security['authorizesPionexValidationMaterialization'] is True
+          assert security['authorizesPionexPrivateApi'] is False
           assert security['authorizesHoldoutAccess'] is False
+          assert security['authorizesSourceSwitch'] is False
           assert security['authorizesTradePlans'] is False
           assert security['authorizesLiveTrading'] is False
+
+          assert current_web['schema'] == 'qookey-current-operations-web-v0.3'
+          assert current_web['authority'] is False
+          assert current_web['historyStatus'] == 'COMPLETE'
+          assert current_web['historyCompleteShards'] == 10
+          assert current_web['trainingStatus'] == 'COMPLETED_PASS'
+          assert current_web['modelQualityStatus'] == 'REJECT'
+          assert current_web['thresholdChangeSupported'] is False
+          assert current_web['pionexValidationStatus'] == 'PENDING_MANUAL_DISPATCH'
+          assert current_web['evidenceBasisIsLatestMainClaim'] is False
+
+          html = Path('_site/index.html').read_text(encoding='utf-8')
+          assert '9/16 目前作業狀態' in html
+          assert '10/10 · COMPLETE' in html
+          assert 'COMPLETED · PASS' in html
+          assert '8/10 分片' not in html
+          assert '訓練尚未完成' not in html
+          assert 'PR #292' not in html
+          assert 'current-operations.js?v=current-ops-v0-3' in html
           PY
 
       - name: Upload PR build evidence

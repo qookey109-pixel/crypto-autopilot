@@ -2,41 +2,31 @@
 
 Updated: 2026-09-16
 
-Repository `main` is the formal current authority. This file is the current project-stage, governance-compatibility, and retired-workflow index. Exact versioned configs, receipts, immutable run evidence, and merged code remain the detailed authority for each scope.
+Repository `main` is the formal current authority and must be resolved live at read time. This file is the project-stage, governance-compatibility, and retired-workflow index. Exact versioned configs, receipts, immutable run evidence, and merged code remain the detailed authority for each scope.
 
-## Reviewed repository authority
+## Current authority semantics
 
-- Repository: `qookey109-pixel/crypto-autopilot`
-- Reviewed `main`: `f5cf74292fca262ba72c4e0b36f8d757dfb82531`
-- Latest merged change: PR #321, exact reviewed head `880e3ed9203719cc992362918e3858a6dc63f5ec`
-- Current mode: **PAPER-ONLY**
-- FREE-ONLY cloud/runtime budget: **0 USD/month**
+- Repository: `qookey109-pixel/crypto-autopilot`.
+- Current Operations companion: `research/status/current-operations-v0-3.json`.
+- Current Operations V0.3 stores an **evidence-basis parent SHA**, not a self-referential latest-main claim.
+- Evidence-basis parent for V0.3: `a8f64ca1b2ecfbec6e6d9769fa3726dc007aa266`, the main commit after PR #322 merged and passed post-merge CI/Pages/Freeze Guard.
+- Current mode: **PAPER-ONLY**.
+- FREE-ONLY cloud/runtime budget: **0 USD/month**.
 
-For the concise current-operations view, read `CURRENT_STATUS.md` first. Machine-readable companion: `research/status/current-operations-v0-2.json`.
+For present-tense operations read `CURRENT_STATUS.md` first, then resolve the Repository's live `main`. Dated prose and dashboard fixtures are evidence/projections, not substitutes for live Repository authority.
 
 ## Current lifecycle
 
 `History COMPLETE -> Training COMPLETED -> Model Quality REJECT -> Threshold Replay COMPLETED / NO SUPPORTED THRESHOLD CHANGE -> Strategy Validation CLOSED -> Holdout CLOSED -> Promotion CLOSED -> Trading CLOSED`
 
-### Core100 History
+### Core100 History and training
 
 - Detailed Core100 History acquisition is complete: `10/10` governed shards.
 - Historical reacquisition is not required solely because the trained model was rejected by quality gates.
-- Do not restart completed History shards unless new evidence demonstrates actual dataset-integrity or lineage failure.
-
-### Core100 training
-
-Source run: `34918219864`
-
-- workflow conclusion: `success`
-- training report status: `PASS`
-- symbol count: `100`
-- dataset partition objects: `14,274`
-- dataset rows: `18,235,427`
-- example count: `249,228`
-- dataset fingerprint: `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`
-- all folds ready: `true`
-- run window: `2026-09-15T01:40:40Z` through `2026-09-15T04:38:22Z`
+- Training run `34918219864`: workflow `success`, report `PASS`.
+- 100 symbols; 14,274 dataset partition objects; 18,235,427 rows; 249,228 examples.
+- Dataset fingerprint: `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`.
+- All folds ready: `true`.
 
 Training/pipeline completion is separate from model-quality acceptance.
 
@@ -44,77 +34,68 @@ Training/pipeline completion is separate from model-quality acceptance.
 
 Current model-quality result: **REJECT**.
 
-Initial diagnosis:
+Exact read-only replay run `34936331199` completed successfully on the same dataset fingerprint:
 
-- fold-1 is the only identified fold that does not beat naive log-loss.
-- configured probability threshold `0.55` emitted zero signals in all four folds.
-- automatic promotion remains disabled.
+- thresholds evaluated: `0.50, 0.51, 0.52, 0.53, 0.54, 0.55`;
+- `supported_thresholds=[]`;
+- `threshold_change_supported=false`;
+- configured threshold remains unchanged;
+- automatic model promotion remains disabled.
 
-Exact read-only replay run: `34936331199` — `Core100 Threshold Sweep Replay V0.1`
-
-- workflow conclusion: `success`
-- execution head: `fbebb5cbe424e4a6d6c33cb6e09a12da4849ee07`
-- artifact: `10387278663`
-- digest: `sha256:f983f5364024a911be3f930fce641bd750922a8d95e710951b88d5738f5cfa29`
-- exact dataset fingerprint preserved
-- thresholds evaluated: `0.50, 0.51, 0.52, 0.53, 0.54, 0.55`
-- `0.50`: fold-1 negative, fold-2 positive, fold-3/4 zero signal
-- `0.51`: fold-1/2 negative, fold-3/4 zero signal
-- `0.52-0.55`: zero signals in all folds
-- `supported_thresholds=[]`
-- `threshold_change_supported=false`
-- configured threshold remains unchanged
-
-The replay was diagnostic-only: no provider requests, R2 writes, holdout access, training publication, automatic promotion, formal trade plan, real-money order, or live-trading authority was granted.
+The replay is diagnostic-only and grants no provider request, R2 write, holdout, promotion, trade-plan, order, or live-trading authority.
 
 ## Pionex validation state
 
 Pionex is the final calibration / execution-environment provenance target; Binance USD-M remains the large-scale learning database. The providers remain provenance-separated.
 
-PR #321 is merged and adds a narrow provider historical-boundary rule for bounds-only invalid OHLC candles. It does not repair, fabricate, interpolate, or splice candles.
+PR #321 merged the narrow bounds-only invalid-OHLC historical-boundary rule without repairing, fabricating, interpolating, or splicing candles.
 
 Current workflow: `.github/workflows/pionex-validation-materialization-v0-1.yml`
 
-- dispatch: manual only
-- public Pionex futures K-lines: authorized for this validation scope
-- R2 validation-dataset writes: authorized for this validation scope
-- previous run `34991627998`: fail-closed before PR #321 on three invalid `AAVE_USDT_PERP / 4H` candles
-- current-main materialization: **PENDING MANUAL DISPATCH**
-- private API/account data: unauthorized
-- replacement holdout access: unauthorized
-- training: unauthorized
-- source switch: unauthorized
-- promotion: unauthorized
-- formal trade plan / real-money / live trading: unauthorized
+- dispatch: manual only;
+- public Pionex futures K-lines: authorized for this validation scope;
+- R2 validation-dataset writes: authorized for this validation scope;
+- previous run `34991627998`: fail-closed before PR #321;
+- Repository materialization state: **PENDING MANUAL DISPATCH**;
+- private API/account data: unauthorized;
+- replacement holdout access: unauthorized;
+- training: unauthorized;
+- source switch: unauthorized;
+- promotion: unauthorized;
+- formal trade plan / real-money / live trading: unauthorized.
 
-Do not claim current-main Pionex validation completion until a new run from `main=f5cf7429...` is verified.
+The next materialization must be dispatched from the Repository's **live `main` at dispatch time**. Do not pin execution to the status file's evidence-basis SHA.
 
 ## Technical-debt cleanup
 
-The current highest-priority technical debt is control-plane/documentation drift, not a rewrite of the trading/data core.
+PR #322 merged the first control-plane convergence batch:
 
-Tracking: `docs/TECH_DEBT_REGISTER_2026_09_16.md`
+- current-operations entrypoint plus machine-readable companion;
+- README / PROJECT_STATUS / SECURITY / AGENTS convergence;
+- current-main PR triage;
+- Research Automation Health count derived from exact Repository schedule inventory rather than a magic `7`;
+- first fail-closed Dashboard current-operations overlay implementation.
 
-Priority sequence:
+The active follow-up removes two remaining projection defects:
 
-1. single current-truth entrypoint + machine-readable companion;
-2. README / PROJECT_STATUS / SECURITY / Dashboard projection sync;
-3. current-main open-PR triage;
-4. active-workflow registry instead of hard-coded scheduler counts;
-5. non-blocking quality/security/dependency visibility;
-6. only then consider responsibility-splitting large modules such as `training/quality.py`.
+1. Current Status must not self-claim a future/latest merge SHA; V0.3 uses evidence-basis semantics instead.
+2. Public Dashboard/Homepage must apply present-tense Current Operations after historical authority/readiness projections, so dated September 13 `8/10 / Training skipped / PR #292` text cannot return during deployment.
+
+After projection convergence, remaining P2 debt is non-blocking quality/type/complexity/dependency/security visibility. Large-module refactoring remains deferred until the control plane is stable.
+
+Tracking: `docs/TECH_DEBT_REGISTER_2026_09_16.md`.
 
 ## Open work that matters now
 
-- PR #302 — Core100 post-training REJECT diagnosis. Its replay is complete; the PR remains Draft and requires current-main review before any merge decision.
-- PR #305 — older-base current-state convergence proposal. Useful design has been reused by fresh current-main cleanup work; do not merge it unchanged.
-- PR #306 — Toolkit REST / Cloudflare edge V0.2 research interface; base is older than current main and public deployment remains unauthorized.
-- PR #307 — AI Resource Hub statistical-validation integration; base is older than current main and requires current-main review.
-- PR #315 — Binance/Pionex data-role documentation. Parts of its architecture are already represented on current main; compare before preserving or superseding.
-- PR #322 — current-main technical-debt/current-status convergence branch. Draft; merge is not self-authorized.
+- PR #322 is **MERGED**; its merge commit/evidence basis is `a8f64ca1b2ecfbec6e6d9769fa3726dc007aa266`.
+- PR #302 — preserve Core100 post-training REJECT diagnostic evidence; old branch code still requires current-main review before any merge decision.
+- PR #305 — older-base convergence proposal; superseded in purpose by merged #322 and current V0.3 follow-up, but unique content must be checked before closure.
+- PR #306 — Toolkit REST / Cloudflare edge V0.2; rebuild from current main if revived; public deployment remains unauthorized.
+- PR #307 — AI Resource Hub statistical-validation integration; rebuild from current main if revived.
+- PR #315 — Binance/Pionex data-role documentation; compare unique content against current merged architecture before preserving or closing.
 - PRs #166/#167/#168/#199/#249 — preserved legacy salvage drafts, not ready-to-merge work.
 
-Historical CI success on an old branch is not sufficient merge evidence after main has advanced.
+Historical CI success on an old branch is not sufficient merge evidence after main advances.
 
 ## Binding safety and governance
 
@@ -166,13 +147,13 @@ Exactly **17 historical workflows** remain retired evidence/validation paths and
 
 ## Frozen historical lineage and dashboard compatibility markers
 
-The research-calendar/dashboard and retired-workflow validators intentionally fail closed if these frozen stage markers disappear. They are retained as compatibility assertions; they do not grant new authority or override the current lifecycle above.
+The dashboard and retired-workflow validators intentionally preserve these historical stage names. They do not override current operations or grant new authority.
 
-- **V0.8 HISTORICAL** — frozen prepared cutover evidence only; successor execution remained unauthorized under V0.8.
+- **V0.8 HISTORICAL** — frozen prepared cutover evidence only.
 - **V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE** — historical effective authority.
 - **V0.2 SELF-HOSTED SCHEDULE RETIRED** — self-hosted metadata scheduling remains retired.
-- **V0.10 GITHUB-HOSTED SCHEDULE RETIRED** — V0.10 GitHub-hosted schedule remains retired after the reviewed successor transition.
-- **V0.12 SUCCESSOR METADATA WINDOW** — successor metadata-only capture lineage; its bounded window is historical and no holdout-candle authority is implied.
+- **V0.10 GITHUB-HOSTED SCHEDULE RETIRED** — V0.10 GitHub-hosted schedule remains retired.
+- **V0.12 SUCCESSOR METADATA WINDOW** — frozen successor metadata-only lineage. Its bounded window is historical; current projections must not call it an active execution path.
 - **REPLACEMENT HOLDOUT FROZEN_UNOPENED** — replacement holdout remains unopened.
 - **HISTORICAL UNIVERSE MEMBERSHIP NOT_READY** — full-universe historical membership remains not ready.
 - **TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED** — retired long-horizon pilot remains unable to materialize W1 trade-kline data.
@@ -180,17 +161,16 @@ The research-calendar/dashboard and retired-workflow validators intentionally fa
 ## Current navigation
 
 1. `CURRENT_STATUS.md`
-2. `PROJECT_STATUS.md`
-3. `README.md`
-4. `AGENTS.md`
-5. current versioned config/receipt/run evidence
-6. `docs/TECH_DEBT_REGISTER_2026_09_16.md`
-
-Machine-readable current operations state: `research/status/current-operations-v0-2.json`.
+2. `research/status/current-operations-v0-3.json`
+3. `PROJECT_STATUS.md`
+4. `README.md`
+5. `AGENTS.md`
+6. current versioned config/receipt/run evidence
+7. `docs/TECH_DEBT_REGISTER_2026_09_16.md`
 
 ## Preserved pre-convergence snapshot
 
-The previous long-form root documents remain exactly recoverable from reviewed main `f5cf74292fca262ba72c4e0b36f8d757dfb82531`:
+The pre-PR-#322 long-form root documents remain exactly recoverable from historical parent main `f5cf74292fca262ba72c4e0b36f8d757dfb82531`:
 
 - README blob: `0ce5c87ec4da228a6eb3d9a66ef2e8364661df58`
 - PROJECT_STATUS blob: `0815abd975c5c708fbb9578dff400733e1ff6275`

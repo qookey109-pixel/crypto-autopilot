@@ -1,0 +1,84 @@
+{
+  "schema": "qookey-open-pr-triage-v0.3",
+  "snapshot_date": "2026-09-16",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
+  "evidence_basis": {
+    "parent_main_sha": "a8f64ca1b2ecfbec6e6d9769fa3726dc007aa266",
+    "is_latest_main_claim": false,
+    "source_merged_pr": 322
+  },
+  "merge_authority_granted": false,
+  "execution_authority_granted": false,
+  "pull_requests": {
+    "323": {
+      "classification": "ACTIVE_CURRENT",
+      "head_role": "SELF_CURRENT_BRANCH_HEAD_NOT_FROZEN_IN_SELF_REFERENTIAL_STATUS",
+      "base_main_sha_at_snapshot": "a8f64ca1b2ecfbec6e6d9769fa3726dc007aa266",
+      "action": "KEEP_DRAFT_UNTIL_EXACT_HEAD_CI_AND_DASHBOARD_VALIDATION_GREEN"
+    },
+    "315": {
+      "classification": "REBUILD_FROM_CURRENT_MAIN",
+      "head_sha_at_snapshot": "893b0aadbd65e81b8d3ff302729810adc8e6aef1",
+      "action": "COMPARE_AND_SALVAGE_UNIQUE_DATA_ROLE_GOVERNANCE"
+    },
+    "307": {
+      "classification": "REBUILD_FROM_CURRENT_MAIN",
+      "head_sha_at_snapshot": "0cff93388b71ac5cf323b1889a0847ffeafb430f",
+      "action": "REBUILD_IF_STATISTICAL_EDGE_CAPABILITY_REMAINS_PRIORITY"
+    },
+    "306": {
+      "classification": "REBUILD_FROM_CURRENT_MAIN",
+      "head_sha_at_snapshot": "9e97b9493920c9b2e46303906d1d8942f2f4de3d",
+      "action": "REBUILD_IF_REST_EDGE_INTERFACE_REMAINS_PRIORITY"
+    },
+    "305": {
+      "classification": "SUPERSEDED_PENDING_PRESERVATION_PROOF",
+      "head_sha_at_snapshot": "f2a4310f51d5182ab2054b05c6b096405bf9388c",
+      "action": "COMPARE_UNIQUE_CONTENT_AGAINST_MERGED_322_AND_CURRENT_323_BEFORE_CLOSE"
+    },
+    "302": {
+      "classification": "PRESERVE_DIAGNOSTIC_EVIDENCE",
+      "head_sha_at_snapshot": "978dae1a1a39ee01905c82c2f8cfa4a12088719d",
+      "action": "PRESERVE_REPLAY_RESULT_THEN_REVIEW_CODE_AGAINST_CURRENT_MAIN"
+    },
+    "249": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "0563154e8b7fc68f4fd47476161ac0ec741f3b44",
+      "action": "KEEP_AS_INCIDENT_REVIEW_SALVAGE"
+    },
+    "199": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "a5cb4cfb797dc205167154f6a38925082106edad",
+      "action": "REBUILD_SELECTED_STRATEGY_GOVERNANCE_IF_REVIVED"
+    },
+    "168": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "38f7383a32ce64bb5a718da046af222156164fb4",
+      "action": "KEEP_AS_SIMULATION_REFERENCE"
+    },
+    "167": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "a2d4de6c955d32b5797161831d01adaa3d92d4f7",
+      "action": "REBUILD_SELECTED_RESEARCH_GOVERNANCE_IF_REVIVED"
+    },
+    "166": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "2b2ddc5deddb54ce77d44c61b4a4f9bef2eaf1dc",
+      "action": "REBUILD_SELECTED_TECHNICAL_ANALYSIS_FEATURES_IF_REVIVED"
+    }
+  },
+  "recently_merged": {
+    "322": {
+      "merge_commit_sha": "a8f64ca1b2ecfbec6e6d9769fa3726dc007aa266",
+      "outcome": "MERGED_POST_MERGE_CI_PAGES_FREEZE_GUARD_GREEN",
+      "role": "FIRST_CONTROL_PLANE_CONVERGENCE_BATCH"
+    }
+  },
+  "notes": [
+    "Resolve Repository main live before every merge decision; evidence_basis.parent_main_sha is not a latest-main claim.",
+    "Historical CI success on an old branch is not sufficient merge evidence after main advances.",
+    "Do not close PR #305 until its unique useful content is proven preserved or intentionally superseded.",
+    "This snapshot is navigation only and grants no merge, deployment, provider, holdout, promotion, order, or live-trading authority."
+  ]
+}
