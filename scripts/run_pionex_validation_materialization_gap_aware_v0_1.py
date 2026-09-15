@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from crypto_autopilot.exchanges import pionex_public
 from crypto_autopilot.history.pionex_gap_boundary_v0_1 import GapBoundaryKlineClient
+from crypto_autopilot.history.pionex_page_audit_diagnostics_v0_1 import (
+    install_page_audit_diagnostics,
+)
 
 
 _BasePionexPublicClient = pionex_public.PionexPublicClient
@@ -30,6 +33,7 @@ class _GapAwarePionexPublicClient:
 
 
 pionex_public.PionexPublicClient = _GapAwarePionexPublicClient
+install_page_audit_diagnostics()
 
 from run_pionex_validation_materialization_v0_1 import main  # noqa: E402
 
