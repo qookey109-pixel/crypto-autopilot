@@ -7,6 +7,10 @@ from crypto_autopilot.history.pionex_gap_boundary_v0_1 import GapBoundaryKlineCl
 from crypto_autopilot.history.pionex_page_audit_diagnostics_v0_1 import (
     install_page_audit_diagnostics,
 )
+from crypto_autopilot.history.pionex_provider_error_diagnostics_v0_1 import (
+    ProviderErrorDiagnosticKlineClient,
+    install_provider_error_diagnostics,
+)
 
 
 _BasePionexPublicClient = pionex_public.PionexPublicClient
@@ -14,7 +18,13 @@ _BasePionexPublicClient = pionex_public.PionexPublicClient
 
 class _GapAwarePionexPublicClient:
     def __init__(self, *args, **kwargs) -> None:
-        self._client = GapBoundaryKlineClient(_BasePionexPublicClient(*args, **kwargs))
+        self._client = ProviderErrorDiagnosticKlineClient(
+            GapBoundaryKlineClient(_BasePionexPublicClient(*args, **kwargs))
+        )
+
+    @property
+    def provider_error_diagnostics(self) -> dict[str, object]:
+        return self._client.provider_error_diagnostics
 
     def get_klines(
         self,
@@ -34,6 +44,7 @@ class _GapAwarePionexPublicClient:
 
 pionex_public.PionexPublicClient = _GapAwarePionexPublicClient
 install_page_audit_diagnostics()
+install_provider_error_diagnostics()
 
 from run_pionex_validation_materialization_v0_1 import main  # noqa: E402
 
