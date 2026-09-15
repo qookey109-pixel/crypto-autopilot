@@ -33,7 +33,7 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          python scripts/run_pionex_validation_materialization_v0_1.py \
+          python scripts/run_pionex_validation_materialization_gap_aware_v0_1.py \
             --output pionex-validation-output/report.json
 
       - name: Assert validation-only boundary
