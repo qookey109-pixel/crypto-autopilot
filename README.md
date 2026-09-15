@@ -9,11 +9,12 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 For current work, read in this order:
 
 1. [`CURRENT_STATUS.md`](CURRENT_STATUS.md) — concise current operations state.
-2. [`PROJECT_STATUS.md`](PROJECT_STATUS.md) — project-stage, governance, compatibility and retired-workflow index.
-3. [`AGENTS.md`](AGENTS.md) — execution and safety rules for coding agents.
-4. The exact versioned config, receipt, and immutable run evidence for the stage being changed.
+2. [`research/status/current-operations-v0-3.json`](research/status/current-operations-v0-3.json) — machine-readable current-operations companion.
+3. [`PROJECT_STATUS.md`](PROJECT_STATUS.md) — project-stage, governance, compatibility and retired-workflow index.
+4. [`AGENTS.md`](AGENTS.md) — execution and safety rules for coding agents.
+5. The exact versioned config, receipt, and immutable run evidence for the stage being changed.
 
-Repository `main` is the formal current authority. Dated documents, archived snapshots and dashboards are evidence/projections, not permission to regress current lifecycle state.
+Repository `main` is the formal current authority and must be resolved live at read time. Current Operations V0.3 intentionally does **not** claim that its stored evidence-basis SHA is the latest `main`; that SHA records the reviewed parent used to prepare the status version.
 
 ## Current Core100 state — 2026-09-16
 
@@ -33,9 +34,9 @@ Do **not** restart the completed History program solely because model quality re
 
 ## Current Pionex validation state
 
-PR #321 is merged on reviewed `main=f5cf74292fca262ba72c4e0b36f8d757dfb82531` and narrowly treats bounds-only invalid OHLC candles as a provider historical boundary without correcting or fabricating candles.
+PR #321 merged the narrow bounds-only invalid-OHLC provider-boundary behavior without correcting, fabricating, interpolating, or provider-splicing candles.
 
-The current validation workflow is `.github/workflows/pionex-validation-materialization-v0-1.yml` and remains manual-only. The previous authorized run `34991627998` failed closed before the PR #321 fix. A new run from current main is still required before current-main Pionex validation can be called complete.
+The current validation workflow is `.github/workflows/pionex-validation-materialization-v0-1.yml` and remains manual-only. The previous authorized run `34991627998` failed closed before the PR #321 fix. A new materialization must be dispatched from the Repository's **live `main` at dispatch time** before Repository-current Pionex validation can be called complete.
 
 Still closed:
 
@@ -50,13 +51,17 @@ Still closed:
 
 ## Technical-debt cleanup
 
-The current highest-priority technical debt is control-plane/documentation drift rather than a rewrite of the trading/data core.
+PR #322 merged the first control-plane convergence batch and established current-state entrypoints, root-doc/security convergence, current-main PR triage, and schedule-health inventory derivation.
 
-- Human current entrypoint: [`CURRENT_STATUS.md`](CURRENT_STATUS.md)
-- Machine-readable current state: [`research/status/current-operations-v0-2.json`](research/status/current-operations-v0-2.json)
-- Cleanup register: [`docs/TECH_DEBT_REGISTER_2026_09_16.md`](docs/TECH_DEBT_REGISTER_2026_09_16.md)
+The active cleanup is now the projection layer:
 
-Cleanup order is current-truth convergence -> README/PROJECT_STATUS/SECURITY/Dashboard projection sync -> PR/workflow registry cleanup -> non-blocking quality/security/dependency visibility -> only then large-module refactoring.
+- prevent Current Status from becoming stale through self-referential latest-main SHA claims;
+- build frozen/historical Dashboard authority first, then apply Current Operations V0.3 last;
+- stop the homepage generator from restoring September 13 `8/10 / Training skipped / PR #292` text;
+- keep V0.12 historical lineage while closing its expired present-tense execution flags;
+- add broader non-blocking quality/security/dependency visibility only after the control plane is stable.
+
+Cleanup register: [`docs/TECH_DEBT_REGISTER_2026_09_16.md`](docs/TECH_DEBT_REGISTER_2026_09_16.md).
 
 ## Current research components
 
@@ -104,9 +109,9 @@ The repository keeps one read-only change-inspection skill at `.agents/skills/ch
 
 ## Preserved pre-convergence snapshot
 
-The previous long-form root documents are historical evidence and remain exactly recoverable from reviewed main `f5cf74292fca262ba72c4e0b36f8d757dfb82531`:
+The pre-PR-#322 long-form root documents remain exactly recoverable from historical parent main `f5cf74292fca262ba72c4e0b36f8d757dfb82531`:
 
 - README blob: `0ce5c87ec4da228a6eb3d9a66ef2e8364661df58`
 - PROJECT_STATUS blob: `0815abd975c5c708fbb9578dff400733e1ff6275`
 
-Older statements that Core100 is `8/10` or Training is `SKIPPED` must not be used to classify current operations.
+Older statements that Core100 is `8/10` or Training is `SKIPPED` are historical evidence and must not be used to classify current operations.
