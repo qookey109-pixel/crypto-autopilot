@@ -1,5 +1,5 @@
 {
-  "schema": "qookey-resource-hub-supply-chain-policy-v0.1",
+  "schema": "qookey-resource-hub-supply-chain-policy-v0.1.1",
   "status": "PREPARED_READ_ONLY",
   "source": {
     "repository": "qookey109-pixel/ai-resource-hub",
@@ -19,6 +19,7 @@
     "backtest": 18,
     "risk": 15,
     "market": 14,
+    "market data": 18,
     "macro": 14,
     "forecast": 14,
     "time-series": 14,
@@ -27,10 +28,18 @@
     "geopolit": 10,
     "finance": 18,
     "portfolio": 14,
+    "portfolio management": 18,
+    "asset allocation": 18,
+    "price data": 16,
     "exchange": 12,
     "ohlcv": 14,
     "candles": 12
   },
+  "weak_domain_signals": [
+    "market",
+    "portfolio"
+  ],
+  "minimum_strong_signals_without_finance_category": 1,
   "minimum_score": 35,
   "max_candidates": 50,
   "safety": {
