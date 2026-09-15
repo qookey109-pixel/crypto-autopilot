@@ -1,0 +1,55 @@
+{
+  "architecture": {
+    "binance_role": "LARGE_SCALE_LEARNING_DATABASE",
+    "pionex_is_core100_training_input": false,
+    "pionex_role": "FINAL_CALIBRATION_AND_REAL_TRADING_ENVIRONMENT"
+  },
+  "authority": {
+    "account_data": false,
+    "binance_relabel_as_pionex": false,
+    "core100_pionex_training": false,
+    "formal_backtest_admission": false,
+    "live_trading": false,
+    "model_promotion": false,
+    "private_api": false,
+    "public_pionex_kline_reads": true,
+    "r2_headroom_reads": true,
+    "r2_validation_dataset_writes": true,
+    "real_money_orders": false,
+    "replacement_holdout_access": false,
+    "source_switch": false,
+    "trade_plan": false,
+    "training": false
+  },
+  "classification_counts": {
+    "company_reference_perpetual": 4,
+    "crypto": 96,
+    "energy_commodity_reference": 3,
+    "equity_linked_token": 67,
+    "etf_or_fund_linked_token": 20,
+    "industrial_metal_reference": 1,
+    "precious_metal_reference": 4,
+    "tokenized_precious_metal": 2
+  },
+  "config": "config/pionex_validation_dataset_v0_1.json",
+  "config_sha256": "6d59a93feca9a5743817e7d671cc370f934a57fa11b7a140c266d82504da4465",
+  "date": "2026-09-15",
+  "execution_performed_by_this_receipt": false,
+  "explicit_non_effect": "This receipt prepares a bounded manual post-merge Pionex validation-data materialization path. It does not itself perform provider requests or R2 writes and grants no training, source-switch, promotion, trade-plan, real-money-order, or live-trading authority.",
+  "history_profile_counts": {
+    "BREADTH_BACKGROUND": 68,
+    "FULL_INTRADAY": 30,
+    "MULTISCALE_RESEARCH": 99
+  },
+  "prepared_from_main_sha": "665250ff11a69b2fbd42db669c6e8d1c79968ad2",
+  "schema": "pionex-validation-dataset-authority-v0.1",
+  "source_universe": {
+    "artifact_digest": "sha256:997c99f495e423673e8550da083b15dfc1a2f146833f64efc3d7da227bda8c47",
+    "artifact_id": 10185197916,
+    "historical_snapshot_regraded": false,
+    "observed_at_utc": "2026-09-11T04:49:20.492233Z",
+    "selected_market_count": 197,
+    "workflow_run_id": 34563615657
+  },
+  "status": "AUTHORIZED_AFTER_REVIEWED_MAIN_MERGE_MANUAL_ONLY"
+}

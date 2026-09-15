@@ -1,0 +1,36 @@
+{
+  "as_of": "2026-09-15",
+  "authority": false,
+  "binance_role": "LARGE_SCALE_LEARNING_DATABASE",
+  "classification_counts": {
+    "company_reference_perpetual": 4,
+    "crypto": 96,
+    "energy_commodity_reference": 3,
+    "equity_linked_token": 67,
+    "etf_or_fund_linked_token": 20,
+    "industrial_metal_reference": 1,
+    "precious_metal_reference": 4,
+    "tokenized_precious_metal": 2
+  },
+  "core100_direct_pionex_training_performed": false,
+  "cutoff_exclusive_utc": "2026-08-28T00:00:00Z",
+  "execution_state": "NOT_RUN",
+  "full_197_market_multiyear_history_complete": false,
+  "history_profile_counts": {
+    "BREADTH_BACKGROUND": 68,
+    "FULL_INTRADAY": 30,
+    "MULTISCALE_RESEARCH": 99
+  },
+  "materialized_market_count": 0,
+  "materialized_symbol_interval_partitions": 0,
+  "notes": [
+    "Old run 34563615657 remains immutable selection evidence.",
+    "Historical materialization can occur only after reviewed merge and manual main workflow dispatch.",
+    "Partial provider-native contiguous partitions may be stored but never labeled complete history."
+  ],
+  "pionex_role": "FINAL_CALIBRATION_AND_REAL_TRADING_ENVIRONMENT",
+  "private_api_required": false,
+  "schema": "pionex-validation-dataset-status-v0.1",
+  "source_universe_markets": 197,
+  "status": "PREPARED_AWAITING_REVIEWED_MAIN_MERGE"
+}

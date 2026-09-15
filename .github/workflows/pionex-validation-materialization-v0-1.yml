@@ -1,0 +1,78 @@
+name: Pionex Validation Dataset Materialization V0.1
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pionex-validation-dataset-materialization-v0-1
+  cancel-in-progress: false
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Materialize bounded Pionex validation dataset
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          python scripts/run_pionex_validation_materialization_v0_1.py \
+            --output pionex-validation-output/report.json
+
+      - name: Assert validation-only boundary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("pionex-validation-output/report.json").read_text())
+          assert report["schema"] == "pionex-validation-materialization-run-report-v0.1"
+          assert report["status"] in {"PASS", "ALREADY_COMPLETE", "FAIL"}
+          assert report["provider"] == "pionex_public_futures"
+          assert report["api_key_used"] is False
+          assert report["private_api_used"] is False
+          assert report["account_data_accessed"] is False
+          assert report["raw_provider_payloads_persisted"] is False
+          assert report["replacement_holdout_accessed"] is False
+          assert report["training_authorized"] is False
+          assert report["source_switch_authorized"] is False
+          assert report["real_money_orders_authorized"] is False
+          assert report["live_trading_authorized"] is False
+          if report["status"] == "PASS":
+              assert report["selected_market_count"] == 197
+              assert report["partition_count"] == 682
+              assert report["r2_latest_pointer_written_last"] is True
+              assert report["complete_197_market_multiyear_history_claimed"] is False
+              assert report["core100_pionex_training_performed"] is False
+          PY
+
+      - name: Upload secret-free materialization report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: pionex-validation-materialization-${{ github.run_id }}-${{ github.run_attempt }}
+          path: pionex-validation-output/report.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf pionex-validation-output
