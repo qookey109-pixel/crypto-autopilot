@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import math
-import random
 import unittest
 from copy import deepcopy
 from pathlib import Path
@@ -21,12 +20,12 @@ def _positive_fixture() -> tuple[float, ...]:
 
 
 def _serial_fixture() -> tuple[float, ...]:
-    rng = random.Random(1)
     state = 0.0
     values = []
-    for _ in range(120):
-        state = 0.7 * state + rng.normalvariate(0.0, 0.003)
-        values.append(0.002 + state)
+    for index in range(120):
+        innovation = 0.003 * (math.sin(index * 0.31 + 0.2) + 0.35 * math.cos(index * 0.17))
+        state = 0.7 * state + innovation
+        values.append(0.001 + state)
     return tuple(values)
 
 
