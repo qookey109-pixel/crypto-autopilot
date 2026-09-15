@@ -59,7 +59,15 @@ Do not loosen the quality gate merely because the fold-1 delta is small.
 
 Observed GitHub Actions run: `34936331199` — `Core100 Threshold Sweep Replay V0.1`
 
-At the last 2026-09-15 verification, this run was still `in_progress` on branch `codex/core100-reject-diagnosis-20260915`, head `fbebb5cbe424e4a6d6c33cb6e09a12da4849ee07`.
+At the last 2026-09-15 verification, this run was still `in_progress` on branch `codex/core100-reject-diagnosis-20260915`.
+
+Important lineage distinction:
+
+- replay run head: `fbebb5cbe424e4a6d6c33cb6e09a12da4849ee07`
+- current diagnosis branch head: `3f2416d8b63b27e8dc29d7d94469792c87dd9e03`
+- the current branch head is the immediate child of the replay head and only retires the one-shot replay trigger after launch.
+
+Therefore, evaluate run `34936331199` against its own exact run head `fbebb5c...`, not against the later branch head.
 
 The currently running step is:
 
