@@ -66,9 +66,11 @@ class QookeyCryptoToolkitV02Tests(unittest.TestCase):
                 "validate_candles",
                 "stress_paper_backtest",
                 "compare_backtests",
+                "validate_statistical_edge",
                 "build_research_report",
             },
         )
+        self.assertEqual(len(v02_names), 9)
         self.assertEqual(v02["interfaces"]["rest_api"], "DEFERRED")
         self.assertEqual(v02["interfaces"]["telegram"], "DEFERRED")
         self.assertEqual(v02["interfaces"]["mcp"], "DEFERRED")
