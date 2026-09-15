@@ -1,0 +1,44 @@
+{
+  "schema": "resource-hub-statistical-crosscheck-policy-v0.1",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "lineage": {
+    "candidate_resource_id": "anti-gambling-trader-tw",
+    "upstream_repository": "mars-tw/anti-gambling-trader-tw",
+    "upstream_commit": "9d938b64c80ee29363aed496ba4e61d9110a7222",
+    "evaluation_receipt": "research/receipts/2026-09-15-resource-hub-anti-gambling-trader-evaluation-v0-1.json",
+    "prepared_from_main": "1b97428b55833e2a36ca70cb43bbe156e4fc1fac"
+  },
+  "allowed_input_classes": [
+    "synthetic_fixture",
+    "existing_non_holdout_fixture"
+  ],
+  "statistics": {
+    "alpha": 0.05,
+    "iid_bootstrap_samples": 999,
+    "stationary_bootstrap_samples": 999,
+    "stationary_mean_block_length": 10.0,
+    "deterministic_seed": 77,
+    "minimum_observations": 20
+  },
+  "interpretation": {
+    "purpose": "semantic cross-check only",
+    "formal_edge_gate": false,
+    "promotion_signal": false,
+    "upstream_code_equivalence_claimed": false
+  },
+  "authority": {
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "code_import_authorized": false,
+    "runtime_dependency_authorized": false,
+    "adapter_creation_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "formal_edge_admission_authorized": false,
+    "model_promotion_authorized": false,
+    "broker_connection_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
