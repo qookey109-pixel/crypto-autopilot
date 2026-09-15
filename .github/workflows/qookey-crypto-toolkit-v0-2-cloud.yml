@@ -1,0 +1,176 @@
+name: Qookey Crypto Toolkit V0.2 Cloud
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: Research tool to run
+        required: true
+        default: capabilities
+        type: choice
+        options:
+          - capabilities
+          - validate
+          - indicators
+          - strategy
+          - risk
+          - backtest
+          - stress
+          - compare
+          - report
+      input_path:
+        description: Repository-relative JSON input path; leave empty for capabilities
+        required: false
+        default: ""
+        type: string
+      interval:
+        description: Candle interval for validate/indicators
+        required: false
+        default: 4h
+        type: choice
+        options:
+          - 15m
+          - 1h
+          - 4h
+          - 8h
+          - 1d
+          - 1w
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qookey-crypto-toolkit-v0-2-cloud-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  run-toolkit:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Validate cloud dispatch inputs
+        env:
+          TOOLKIT_COMMAND: ${{ inputs.command }}
+          TOOLKIT_INPUT_PATH: ${{ inputs.input_path }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          command = os.environ["TOOLKIT_COMMAND"]
+          allowed = {
+              "capabilities",
+              "validate",
+              "indicators",
+              "strategy",
+              "risk",
+              "backtest",
+              "stress",
+              "compare",
+              "report",
+          }
+          if command not in allowed:
+              raise SystemExit(f"unsupported Toolkit command: {command}")
+
+          if command == "capabilities":
+              raise SystemExit(0)
+
+          raw = os.environ.get("TOOLKIT_INPUT_PATH", "").strip()
+          if not raw:
+              raise SystemExit("input_path is required for this command")
+
+          relative = Path(raw)
+          if relative.is_absolute() or ".." in relative.parts:
+              raise SystemExit("input_path must stay inside the repository")
+          if relative.suffix.lower() != ".json":
+              raise SystemExit("input_path must reference a JSON file")
+
+          root = Path.cwd().resolve()
+          target = (root / relative).resolve()
+          if target != root and root not in target.parents:
+              raise SystemExit("input_path escaped the repository")
+          if not target.is_file():
+              raise SystemExit(f"input file not found: {raw}")
+          PY
+
+      - name: Run cloud Toolkit command
+        env:
+          TOOLKIT_COMMAND: ${{ inputs.command }}
+          TOOLKIT_INPUT_PATH: ${{ inputs.input_path }}
+          TOOLKIT_INTERVAL: ${{ inputs.interval }}
+        run: |
+          set -euo pipefail
+          mkdir -p toolkit-cloud-output
+          case "$TOOLKIT_COMMAND" in
+            capabilities)
+              python scripts/qookey_crypto_toolkit_v0_2.py capabilities \
+                > toolkit-cloud-output/result.json
+              ;;
+            validate|indicators)
+              python scripts/qookey_crypto_toolkit_v0_2.py "$TOOLKIT_COMMAND" \
+                --input "$TOOLKIT_INPUT_PATH" \
+                --interval "$TOOLKIT_INTERVAL" \
+                > toolkit-cloud-output/result.json
+              ;;
+            strategy|risk|backtest|stress|compare|report)
+              python scripts/qookey_crypto_toolkit_v0_2.py "$TOOLKIT_COMMAND" \
+                --input "$TOOLKIT_INPUT_PATH" \
+                > toolkit-cloud-output/result.json
+              ;;
+            *)
+              echo "unsupported Toolkit command" >&2
+              exit 2
+              ;;
+          esac
+
+      - name: Assert research-only authority boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path("toolkit-cloud-output/result.json").read_text())
+          authority = payload.get("authority") or payload.get("safety_boundary")
+          if not isinstance(authority, dict):
+              raise SystemExit("Toolkit output is missing an authority boundary")
+          forbidden = (
+              "provider_access_authorized",
+              "r2_access_authorized",
+              "holdout_access_authorized",
+              "source_switch_authorized",
+              "synthetic_candles_authorized",
+              "interpolation_authorized",
+              "automatic_strategy_mutation_authorized",
+              "automatic_model_promotion_authorized",
+              "formal_trade_plan_authorized",
+              "real_money_order_authorized",
+              "live_trading_authorized",
+          )
+          enabled = [name for name in forbidden if authority.get(name) is not False]
+          if enabled:
+              raise SystemExit(f"research-only authority boundary failed: {enabled}")
+          PY
+
+      - name: Upload Toolkit result
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: qookey-crypto-toolkit-v0-2-${{ inputs.command }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: toolkit-cloud-output/result.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf toolkit-cloud-output
