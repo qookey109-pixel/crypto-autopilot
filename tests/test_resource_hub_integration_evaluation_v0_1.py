@@ -51,9 +51,13 @@ class ResourceHubIntegrationEvaluationV01Tests(unittest.TestCase):
             components["broker_adapter_and_live_scaffold"]["decision"],
             "REJECT_FOR_INTEGRATION_V0_1",
         )
-        self.assertIn(
-            components["statistical_metrics"]["decision"],
-            {"RESEARCH_CANDIDATE", "RESEARCH_CANDIDATE_WITH_LIMITATIONS"},
+        self.assertEqual(
+            components["performance_metrics"]["decision"],
+            "RESEARCH_CANDIDATE",
+        )
+        self.assertEqual(
+            components["significance_testing"]["decision"],
+            "RESEARCH_CANDIDATE_WITH_LIMITATIONS",
         )
         self.assertEqual(
             components["temporal_holdout"]["decision"],
