@@ -1,0 +1,43 @@
+{
+  "schema": "tradingagents-research-challenger-prepared-receipt-v0.1",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "prepared_at_utc": "2026-09-15T00:00:00Z",
+  "base_main_sha": "64692ce5702aa562dac79aee0480f48255e57082",
+  "upstream": {
+    "repository": "https://github.com/TauricResearch/TradingAgents",
+    "reviewed_release": "0.4.0",
+    "vendored": false,
+    "installed": false,
+    "executed": false
+  },
+  "config": {
+    "path": "config/tradingagents_research_challenger_v0_1.json",
+    "sha256": "fec867ef58f692076402bdc6d1ac9e07a3f367b884f76f70712b61aa7db23857"
+  },
+  "implementation": {
+    "module": "src/crypto_autopilot/research/tradingagents_challenger.py",
+    "tests": "tests/test_tradingagents_challenger.py",
+    "network_calls_added": 0,
+    "runtime_dependencies_added": 0,
+    "schedules_added": 0,
+    "raw_reports_persisted": false
+  },
+  "verification": {
+    "targeted_unittest": "8 PASS",
+    "ruff": "PASS",
+    "json_parse": "PASS",
+    "diff_check": "PASS",
+    "full_unittest_discovery": "809 PASS; 6 existing pytest-based modules could not collect because pytest is unavailable in the bundled runtime"
+  },
+  "authority": {
+    "source_switch_authorized": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "automatic_strategy_mutation_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

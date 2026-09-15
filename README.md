@@ -26,6 +26,7 @@ remain separate milestones. Prior pilot holdout non-access needs review.
 - [`docs/PROJECT_MAP_V0_1.md`](docs/PROJECT_MAP_V0_1.md) — concise repository map.
 - [`docs/AUTOMATION_INDEX_V0_1.md`](docs/AUTOMATION_INDEX_V0_1.md) — only the schedules that can still run.
 - [`docs/STRATEGY_INDEX_V0_1.md`](docs/STRATEGY_INDEX_V0_1.md) — one view of the Paper baseline and research layers.
+- [`docs/TRADINGAGENTS_RESEARCH_CHALLENGER_V0_1.md`](docs/TRADINGAGENTS_RESEARCH_CHALLENGER_V0_1.md) — optional multi-agent research output adapter; prepared, offline and non-authoritative.
 
 Historical configs, receipts and CLI paths remain for evidence, but these four
 files are the current operating surface.
