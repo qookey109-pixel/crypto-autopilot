@@ -149,14 +149,24 @@ def execute(config: dict, store, client, run_id: str, *, clock) -> dict:
             })
             continue
 
-        result = collect_partition(
-            config,
-            client,
-            symbol=symbol,
-            interval=interval,
-            progress=progress,
-            clock=clock,
-        )
+        try:
+            result = collect_partition(
+                config,
+                client,
+                symbol=symbol,
+                interval=interval,
+                progress=progress,
+                clock=clock,
+            )
+        except ValidationMaterializationRejected as exc:
+            diagnostics = {
+                **exc.diagnostics,
+                "symbol": symbol,
+                "interval": interval,
+                "history_profile": profile,
+                "provider_requests_before_failure": progress["requests"],
+            }
+            raise ValidationMaterializationRejected(str(exc), diagnostics=diagnostics) from None
         parquet = candles_to_parquet(result.candles)
         if parquet_to_candles(parquet.payload) != list(result.candles):
             raise ValidationMaterializationRejected("Parquet round-trip mismatch")
