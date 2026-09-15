@@ -8,7 +8,8 @@
   "pull_requests": {
     "322": {
       "classification": "ACTIVE_CURRENT",
-      "head_sha_at_snapshot": "17399dcb72cad073f4b0430db0ffea3a168286b5",
+      "head_role": "SELF_CURRENT_BRANCH_HEAD_NOT_FROZEN_IN_SELF_REFERENTIAL_STATUS",
+      "base_main_sha_at_snapshot": "f5cf74292fca262ba72c4e0b36f8d757dfb82531",
       "action": "KEEP_DRAFT_UNTIL_EXACT_HEAD_CI_GREEN_AND_SCOPE_STABLE"
     },
     "315": {
@@ -64,6 +65,7 @@
   },
   "notes": [
     "Historical CI success on an old branch is not sufficient merge evidence after main advances.",
+    "PR #322 intentionally does not freeze its own exact head SHA inside a file that changes that same head.",
     "Do not close PR #305 until PR #322 proves preservation or intentional supersession of its unique content.",
     "This snapshot is navigation only and grants no merge, deployment, provider, holdout, promotion, order, or live-trading authority."
   ]
