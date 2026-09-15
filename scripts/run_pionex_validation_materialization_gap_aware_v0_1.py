@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+"""Run Pionex Validation Dataset V0.1 with conservative gap-boundary handling."""
+from __future__ import annotations
+
+from crypto_autopilot.exchanges import pionex_public
+from crypto_autopilot.history.pionex_gap_boundary_v0_1 import GapBoundaryKlineClient
+
+
+_BasePionexPublicClient = pionex_public.PionexPublicClient
+
+
+class _GapAwarePionexPublicClient:
+    def __init__(self, *args, **kwargs) -> None:
+        self._client = GapBoundaryKlineClient(_BasePionexPublicClient(*args, **kwargs))
+
+    def get_klines(
+        self,
+        symbol: str,
+        interval: str,
+        *,
+        limit: int = 500,
+        end_time_ms: int | None = None,
+    ):
+        return self._client.get_klines(
+            symbol,
+            interval,
+            limit=limit,
+            end_time_ms=end_time_ms,
+        )
+
+
+pionex_public.PionexPublicClient = _GapAwarePionexPublicClient
+
+from run_pionex_validation_materialization_v0_1 import main  # noqa: E402
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
