@@ -1,0 +1,35 @@
+{
+  "schema": "core100-effective-signal-audit-authority-v0.1",
+  "status": "AUTHORIZED_ONE_SHOT_AFTER_REVIEWED_MAIN_MERGE",
+  "policy_path": "config/core100_effective_signal_audit_v0_1.json",
+  "prepared_from_main": "90fa08446994e18e83e2778032dd89c513857dea",
+  "user_authorization": {
+    "effective_signal_audit_authorized": true,
+    "authorization_date": "2026-09-15",
+    "merge_authority_granted_by_this_receipt": false
+  },
+  "execution": {
+    "one_shot": true,
+    "reviewed_main_merge_required": true,
+    "no_schedule": true,
+    "no_manual_dispatch": true,
+    "exact_dataset_fingerprint": "91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876",
+    "expected_examples": 249228,
+    "expected_symbols": 100,
+    "aggregate_artifact_only": true
+  },
+  "safety_boundary": {
+    "provider_requests_authorized": false,
+    "r2_writes_authorized": false,
+    "holdout_access_authorized": false,
+    "training_authorized": false,
+    "training_publication_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "interpretation": "This receipt authorizes a one-shot read-only aggregate diagnostic after reviewed protected-main merge. It does not authorize merging this branch or changing model/strategy/trading authority."
+}
