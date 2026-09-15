@@ -39,7 +39,9 @@
       "run_id": 34936331199,
       "workflow": "Core100 Threshold Sweep Replay V0.1",
       "branch": "codex/core100-reject-diagnosis-20260915",
-      "head_sha": "fbebb5cbe424e4a6d6c33cb6e09a12da4849ee07",
+      "run_head_sha": "fbebb5cbe424e4a6d6c33cb6e09a12da4849ee07",
+      "current_branch_head_sha": "3f2416d8b63b27e8dc29d7d94469792c87dd9e03",
+      "current_branch_head_role": "RETIRE_ONE_SHOT_TRIGGER_AFTER_LAUNCH",
       "last_observed_status": "in_progress",
       "candidate_thresholds": [0.5, 0.51, 0.52, 0.53, 0.54, 0.55],
       "diagnostic_only": true
@@ -61,6 +63,7 @@
   "next_decision": "WAIT_FOR_EXACT_REPLAY_THEN_DIAGNOSE_REPRODUCIBILITY_AND_THRESHOLD_CURVES",
   "notes": [
     "Older September 13 present-tense summaries that report Core100 8/10 and training SKIPPED are historical and superseded for current operations.",
+    "Evaluate threshold replay evidence against run_head_sha, not the later branch-head commit that retired the one-shot trigger.",
     "This status file does not grant new provider, R2 write, holdout, promotion, trading, or source-switch authority."
   ]
 }
