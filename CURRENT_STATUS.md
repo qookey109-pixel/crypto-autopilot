@@ -33,6 +33,7 @@ Source training run: `34918219864`
 - training examples: `249,228`
 - dataset fingerprint: `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`
 - all folds ready: `true`
+- source run wall-clock duration was approximately `2h 58m` (`01:40:40Z` to `04:38:22Z`)
 
 Operational pipeline success does **not** mean the model passed research quality gates.
 
@@ -72,6 +73,12 @@ Therefore, evaluate run `34936331199` against its own exact run head `fbebb5c...
 The currently running step is:
 
 `Replay exact governed dataset without publishing training`
+
+Runtime guidance:
+
+- replay workflow timeout: `330 minutes`
+- the source training run needed about `2h 58m`
+- because replay rebuilds examples from the governed R2 dataset and reruns the same training path with threshold diagnostics, a long-running replay is expected; do not cancel or rerun it merely because it remains active for tens of minutes or a few hours within its timeout.
 
 The one-shot diagnostic authority is bounded to candidate thresholds:
 
