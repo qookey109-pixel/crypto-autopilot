@@ -1,0 +1,142 @@
+name: Dashboard Current Operations V0.2
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "CURRENT_STATUS.md"
+      - "PROJECT_STATUS.md"
+      - "research/status/current-operations-v0-2.json"
+      - "scripts/build_dashboard_authority_snapshot.py"
+      - "scripts/apply_dashboard_latest_authority.py"
+      - "scripts/apply_dashboard_current_operations_v0_2.py"
+      - "tests/test_dashboard_current_operations_v0_2.py"
+      - ".github/workflows/dashboard-current-operations-v0-2.yml"
+      - "web/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-current-operations-v0-2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Build historical authority projection
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/dashboard-current-v0-2
+          python scripts/build_dashboard_authority_snapshot.py \
+            --output artifacts/dashboard-current-v0-2/dashboard.json
+          python scripts/apply_dashboard_latest_authority.py \
+            --input artifacts/dashboard-current-v0-2/dashboard.json \
+            --output artifacts/dashboard-current-v0-2/dashboard.json
+
+      - name: Overlay current operations
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/apply_dashboard_current_operations_v0_2.py \
+            --input artifacts/dashboard-current-v0-2/dashboard.json \
+            --output artifacts/dashboard-current-v0-2/dashboard.json
+
+      - name: Assert current projection and closed authority boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("artifacts/dashboard-current-v0-2/dashboard.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          project = data["project"]
+          security = data["securityBoundary"]
+
+          assert data["authority"] is False
+          assert data["locale"] == "zh-Hant-TW"
+          assert data["schema"] == "qookey-dashboard-authority-snapshot-v0.13"
+          assert project["currentOperationsReviewedMainSha"] == (
+              "f5cf74292fca262ba72c4e0b36f8d757dfb82531"
+          )
+          assert project["core100HistoryState"] == "COMPLETE_10_OF_10"
+          assert project["core100TrainingState"] == "COMPLETED_PASS"
+          assert project["core100TrainingRunId"] == 34918219864
+          assert project["core100ModelQualityState"] == "REJECT"
+          assert project["core100ThresholdReplayState"] == (
+              "COMPLETED_NO_SUPPORTED_THRESHOLD_CHANGE"
+          )
+          assert project["core100ThresholdReplayRunId"] == 34936331199
+          assert project["core100ThresholdChangeSupported"] is False
+          assert project["pionexValidationMaterializationState"] == (
+              "PENDING_MANUAL_DISPATCH"
+          )
+          assert project["pionexValidationPreviousRunId"] == 34991627998
+          assert project["pionexValidationBoundaryFixPr"] == 321
+          assert project["pionexValidationManualDispatchOnly"] is True
+          assert project["currentMetadataCaptureExecutionPath"] == (
+              "NONE_V0_12_WINDOW_ENDED"
+          )
+          assert project["v0_12SuccessorWindowState"] == "HISTORICAL_WINDOW_ENDED"
+          assert project["v0_12CurrentWindowActive"] is False
+          assert project["replacementHoldoutState"] == "FROZEN_UNOPENED"
+          assert project["sourceSwitchAuthorized"] is False
+          assert project["tradePlanAuthorized"] is False
+          assert project["liveTradingAuthorized"] is False
+
+          assert security["containsSecrets"] is False
+          assert security["containsPrivateExchangeResponses"] is False
+          assert security["authorizesMetadataCapture"] is False
+          assert security["authorizesPionexValidationMaterialization"] is True
+          assert security["authorizesPionexPrivateApi"] is False
+          assert security["authorizesHoldoutAccess"] is False
+          assert security["authorizesSourceSwitch"] is False
+          assert security["authorizesTradePlans"] is False
+          assert security["authorizesLiveTrading"] is False
+
+          pipeline = {row["name"]: row["status"] for row in data["pipeline"]}
+          gates = {row["name"]: row["status"] for row in data["gates"]}
+          assert pipeline["Core100 History"] == "COMPLETE"
+          assert pipeline["Core100 Training"] == "COMPLETED"
+          assert pipeline["Core100 Threshold Replay"] == "COMPLETED_NO_CHANGE"
+          assert pipeline["Pionex Validation Dataset V0.1"] == "PENDING_MANUAL_DISPATCH"
+          assert pipeline["V0.12 Successor Metadata Window"] == "HISTORICAL"
+          assert gates["Core100 Model Quality"] == "REJECT"
+          assert gates["V0.12 Metadata Capture"] == "HISTORICAL"
+          assert gates["Pionex Current-Main Validation"] == "PENDING_MANUAL_DISPATCH"
+          assert gates["Replacement Holdout"] == "NOT_AUTHORIZED"
+
+          text = path.read_text(encoding="utf-8")
+          for token in (
+              "R2_SECRET_ACCESS_KEY",
+              "R2_ACCESS_KEY_ID",
+              "PIONEX_API_SECRET",
+              "METADATA_RELAY_TOKEN=",
+              "BEGIN PRIVATE KEY",
+          ):
+              assert token not in text
+          PY
+
+      - name: Run current dashboard regression tests
+        run: python -m pytest -q tests/test_dashboard_current_operations_v0_2.py tests/test_current_operations_status.py
+
+      - name: Upload secret-free projection evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dashboard-current-operations-v0-2-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/dashboard-current-v0-2/dashboard.json
+          retention-days: 30
+          if-no-files-found: error
