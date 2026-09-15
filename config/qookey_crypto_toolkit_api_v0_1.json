@@ -1,0 +1,66 @@
+{
+  "schema": "qookey-crypto-toolkit-api-v0.1",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "origin": {
+    "runtime": "FULL_CPYTHON",
+    "entrypoint": "scripts/qookey_crypto_toolkit_http_v0_1.py",
+    "max_request_bytes": 2000000,
+    "non_loopback_requires_bearer_token": true,
+    "bearer_token_env": "QOOKEY_TOOLKIT_API_TOKEN",
+    "cors_default": "DISABLED",
+    "public_routes": [
+      "GET /healthz",
+      "GET /openapi.json",
+      "GET /v0/capabilities"
+    ],
+    "protected_routes": [
+      "POST /v0/indicators",
+      "POST /v0/strategy",
+      "POST /v0/risk",
+      "POST /v0/backtest"
+    ]
+  },
+  "cloudflare_edge": {
+    "status": "IMPLEMENTED_NOT_DEPLOYED",
+    "path": "infra/cloudflare/qookey-toolkit-edge",
+    "role": "AUTH_ROUTING_LIMITS_AND_ORIGIN_PROXY_ONLY",
+    "client_token_secret": "EDGE_API_TOKEN",
+    "origin_token_secret": "ORIGIN_API_TOKEN",
+    "origin_url_secret": "TOOLKIT_ORIGIN",
+    "provider_credentials_allowed": false,
+    "r2_binding_allowed": false,
+    "holdout_binding_allowed": false
+  },
+  "render_origin": {
+    "status": "IMPLEMENTED_NOT_DEPLOYED",
+    "path": "infra/render/qookey-toolkit-api",
+    "container_installs_repository_cloud_dependencies": false,
+    "expected_health_path": "/healthz"
+  },
+  "optional_next_tools": {
+    "cloudflare_access": "RECOMMENDED_BEFORE_BROAD_PUBLIC_ACCESS",
+    "cloudflare_rate_limiting": "RECOMMENDED_FOR_PUBLIC_TRAFFIC",
+    "cloudflare_queues": "DEFER_UNTIL_ASYNC_OR_LONG_RUNNING_TOOL_JOBS_EXIST",
+    "cloudflare_workflows": "DEFER_UNTIL_MULTI_STEP_DURABLE_JOBS_EXIST",
+    "telegram_adapter": "NEXT_USEFUL_HUMAN_INTERFACE_AFTER_HTTP_STABILIZES",
+    "mcp_adapter": "DEFERRED_BY_USER_DIRECTION"
+  },
+  "deployment": {
+    "automatic_deploy_authorized": false,
+    "public_exposure_authorized": false,
+    "secrets_must_not_be_committed": true
+  },
+  "safety_boundary": {
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "synthetic_candles_authorized": false,
+    "interpolation_authorized": false,
+    "automatic_strategy_mutation_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
