@@ -1,0 +1,53 @@
+{
+  "schema_version": "v0.1",
+  "policy_name": "Qookey Crypto Autopilot Provider Role Policy V0.1",
+  "status": "PREPARED_PENDING_REVIEWED_MAIN_MERGE",
+  "effective_on": "reviewed_main_merge",
+  "confirmed_rule": {
+    "binance": "LARGE_SCALE_LEARNING_DATABASE",
+    "pionex": "FINAL_CALIBRATION_AND_REAL_EXECUTION_ENVIRONMENT"
+  },
+  "provider_roles": {
+    "binance": {
+      "provider_scope": ["binance_usdm", "binance_vision"],
+      "role": "LARGE_SCALE_LEARNING_DATABASE",
+      "purpose": "Large-scale historical learning, feature engineering, model training, walk-forward evaluation and research validation.",
+      "allowed_role_functions": [
+        "large_scale_historical_materialization",
+        "feature_engineering",
+        "model_training",
+        "walk_forward_evaluation",
+        "research_validation"
+      ],
+      "final_execution_environment": false
+    },
+    "pionex": {
+      "provider_scope": ["pionex"],
+      "role": "FINAL_CALIBRATION_AND_REAL_EXECUTION_ENVIRONMENT",
+      "purpose": "Provider-native final calibration, paper execution validation and the eventual real execution venue after separate explicit authority.",
+      "future_role_functions_requiring_separate_authority": [
+        "provider_native_final_calibration",
+        "paper_execution_validation",
+        "real_money_execution"
+      ],
+      "live_trading_authorized_by_this_policy": false
+    }
+  },
+  "non_interchangeability": {
+    "providers_interchangeable": false,
+    "binance_evidence_may_be_relabeled_as_pionex_native": false,
+    "pionex_calibration_may_be_inferred_from_binance_only": false,
+    "historical_pionex_binance_equivalence_v0_1_result": "DEFINITIVE_FAIL",
+    "source_switch_authorized": false
+  },
+  "authority_boundaries": {
+    "paper_only_remains_binding": true,
+    "replacement_holdout_remains_frozen_unopened": true,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "provider_requests_added_by_this_policy": false,
+    "r2_writes_added_by_this_policy": false
+  }
+}
