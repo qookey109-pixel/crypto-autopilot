@@ -1,0 +1,155 @@
+{
+  "schema": "qookey-core100-threshold-sweep-evidence-v0.1",
+  "status": "COMPLETE_REJECT_NO_SUPPORTED_THRESHOLD",
+  "replay_run_id": 34936331199,
+  "replay_head_sha": "fbebb5cbe424e4a6d6c33cb6e09a12da4849ee07",
+  "artifact_id": 10387278663,
+  "artifact_name": "core100-threshold-sweep-replay-34936331199-1",
+  "artifact_digest": "sha256:f983f5364024a911be3f930fce641bd750922a8d95e710951b88d5738f5cfa29",
+  "source_training_run_id": 34918219864,
+  "source_dataset_fingerprint": "91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876",
+  "source_partition_objects": 14274,
+  "source_dataset_rows": 18235427,
+  "source_example_count": 249228,
+  "configured_threshold": 0.55,
+  "candidate_thresholds": [0.5, 0.51, 0.52, 0.53, 0.54, 0.55],
+  "model_quality_gate": {
+    "status": "REJECT",
+    "all_folds_ready": true,
+    "all_folds_beat_naive_log_loss": false,
+    "all_base_cost_scenarios_positive_average_return": false,
+    "automatic_promotion": false
+  },
+  "probability_tail": {
+    "fold-1": {
+      "samples": 32147,
+      "p99": 0.481397959576629,
+      "maximum": 0.5176492340015326
+    },
+    "fold-2": {
+      "samples": 28610,
+      "p99": 0.4697160117166153,
+      "maximum": 0.5118550168109922
+    },
+    "fold-3": {
+      "samples": 29155,
+      "p99": 0.4708596737802578,
+      "maximum": 0.4994264576946602
+    },
+    "fold-4": {
+      "samples": 27498,
+      "p99": 0.46597144702818905,
+      "maximum": 0.49669867881650903
+    }
+  },
+  "base_cost_threshold_summary": [
+    {
+      "threshold": 0.5,
+      "status": "REJECT_ZERO_SIGNAL_AND_NON_POSITIVE_RETURN",
+      "total_signal_count": 69,
+      "zero_signal_folds": ["fold-3", "fold-4"],
+      "non_positive_return_folds": ["fold-1"],
+      "positive_return_folds": ["fold-2"],
+      "fold_results": {
+        "fold-1": {
+          "signal_count": 60,
+          "selection_rate": 0.0018664261050797897,
+          "average_net_return": -0.01862377421286836,
+          "maximum_drawdown": 0.7067785587310669,
+          "maximum_symbol_concentration": 0.03333333333333333
+        },
+        "fold-2": {
+          "signal_count": 9,
+          "selection_rate": 0.00031457532331352676,
+          "average_net_return": 0.02845356709350301,
+          "maximum_drawdown": 0.26330238782608684,
+          "maximum_symbol_concentration": 0.2222222222222222
+        },
+        "fold-3": {
+          "signal_count": 0,
+          "selection_rate": 0.0,
+          "average_net_return": 0.0
+        },
+        "fold-4": {
+          "signal_count": 0,
+          "selection_rate": 0.0,
+          "average_net_return": 0.0
+        }
+      }
+    },
+    {
+      "threshold": 0.51,
+      "status": "REJECT_ZERO_SIGNAL_AND_NON_POSITIVE_RETURN",
+      "total_signal_count": 11,
+      "zero_signal_folds": ["fold-3", "fold-4"],
+      "non_positive_return_folds": ["fold-1", "fold-2"],
+      "positive_return_folds": [],
+      "fold_results": {
+        "fold-1": {
+          "signal_count": 9,
+          "selection_rate": 0.00027996391576196847,
+          "average_net_return": -0.014612682279546133,
+          "maximum_symbol_concentration": 0.1111111111111111
+        },
+        "fold-2": {
+          "signal_count": 2,
+          "selection_rate": 0.00006990562740300595,
+          "average_net_return": -0.134215734989648,
+          "maximum_symbol_concentration": 1.0
+        },
+        "fold-3": {
+          "signal_count": 0,
+          "selection_rate": 0.0,
+          "average_net_return": 0.0
+        },
+        "fold-4": {
+          "signal_count": 0,
+          "selection_rate": 0.0,
+          "average_net_return": 0.0
+        }
+      }
+    },
+    {
+      "threshold": 0.52,
+      "status": "REJECT_ZERO_SIGNAL",
+      "total_signal_count": 0,
+      "zero_signal_folds": ["fold-1", "fold-2", "fold-3", "fold-4"]
+    },
+    {
+      "threshold": 0.53,
+      "status": "REJECT_ZERO_SIGNAL",
+      "total_signal_count": 0,
+      "zero_signal_folds": ["fold-1", "fold-2", "fold-3", "fold-4"]
+    },
+    {
+      "threshold": 0.54,
+      "status": "REJECT_ZERO_SIGNAL",
+      "total_signal_count": 0,
+      "zero_signal_folds": ["fold-1", "fold-2", "fold-3", "fold-4"]
+    },
+    {
+      "threshold": 0.55,
+      "status": "REJECT_ZERO_SIGNAL",
+      "total_signal_count": 0,
+      "zero_signal_folds": ["fold-1", "fold-2", "fold-3", "fold-4"]
+    }
+  ],
+  "supported_thresholds": [],
+  "threshold_change_supported": false,
+  "conclusion": "No candidate threshold from 0.50 through 0.55 is supported across all four folds. Lowering the configured threshold from 0.55 to 0.50 is not justified by this replay.",
+  "next_action": "Keep the configured threshold and quality gate unchanged. Diagnose probability calibration, label prevalence, class separation, feature signal and fold/regime drift before proposing any retraining or threshold change.",
+  "execution": {
+    "diagnostic_only": true,
+    "threshold_changed": false,
+    "quality_gate_changed": false,
+    "r2_writes_performed": false,
+    "provider_requests_performed": 0,
+    "holdout_accessed": false,
+    "training_publication_performed": false
+  },
+  "automatic_model_promotion_authorized": false,
+  "formal_trade_plan_authorized": false,
+  "real_money_order_authorized": false,
+  "live_trading_authorized": false,
+  "source_switch_authorized": false
+}
