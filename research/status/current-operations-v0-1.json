@@ -10,6 +10,9 @@
     "training_run_id": 34918219864,
     "training_workflow_conclusion": "success",
     "training_report_status": "PASS",
+    "training_run_started_at_utc": "2026-09-15T01:40:40Z",
+    "training_run_completed_at_utc": "2026-09-15T04:38:22Z",
+    "training_run_duration_approx_minutes": 178,
     "symbol_count": 100,
     "dataset_partition_objects": 14274,
     "dataset_rows": 18235427,
@@ -42,6 +45,8 @@
       "run_head_sha": "fbebb5cbe424e4a6d6c33cb6e09a12da4849ee07",
       "current_branch_head_sha": "3f2416d8b63b27e8dc29d7d94469792c87dd9e03",
       "current_branch_head_role": "RETIRE_ONE_SHOT_TRIGGER_AFTER_LAUNCH",
+      "run_started_at_utc": "2026-09-15T06:18:10Z",
+      "workflow_timeout_minutes": 330,
       "last_observed_status": "in_progress",
       "candidate_thresholds": [0.5, 0.51, 0.52, 0.53, 0.54, 0.55],
       "diagnostic_only": true
@@ -64,6 +69,7 @@
   "notes": [
     "Older September 13 present-tense summaries that report Core100 8/10 and training SKIPPED are historical and superseded for current operations.",
     "Evaluate threshold replay evidence against run_head_sha, not the later branch-head commit that retired the one-shot trigger.",
+    "The source training run took about 178 minutes and the replay workflow timeout is 330 minutes, so a multi-hour replay can be normal.",
     "This status file does not grant new provider, R2 write, holdout, promotion, trading, or source-switch authority."
   ]
 }
