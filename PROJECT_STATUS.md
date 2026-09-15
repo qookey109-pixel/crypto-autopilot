@@ -105,6 +105,7 @@ Merged as `PREPARED_RESEARCH_ONLY`. It is offline and non-authoritative. No upst
 - Replacement holdout `2026-08-28` through `2026-09-03` remains `FROZEN_UNOPENED`.
 - `source_switch_authorized=false`.
 - Pionex-native and Binance USD-M evidence remain provider-separated and must never be relabeled.
+- **Equivalence V0.1** remains a definitive FAIL; thresholds and scope are frozen and must not be regraded.
 - No martingale, loss-doubling, or unlimited averaging down.
 - Render Free / Frankfurt remains the proven public-metadata transport leg where applicable.
 - Render must never receive R2 credentials.
@@ -113,12 +114,15 @@ Merged as `PREPARED_RESEARCH_ONLY`. It is offline and non-authoritative. No upst
 - Dashboards are derived evidence projections, not authority.
 - Backtests and research metrics are evidence, not proof of future profitability.
 
-## Frozen dashboard compatibility markers
+## Frozen historical lineage and dashboard compatibility markers
 
 The research-calendar/dashboard and retired-workflow validators intentionally fail closed if these frozen stage markers disappear. They are retained here as compatibility assertions; they do not grant new authority or override the current lifecycle above.
 
-- **V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE** — historical effective authority; remaining schedule retired by the reviewed successor transition.
-- **V0.12 SUCCESSOR METADATA WINDOW** — successor metadata-only capture authority remains historical/current lineage evidence; no holdout-candle authority is implied.
+- **V0.8 HISTORICAL** — frozen prepared cutover evidence only; successor execution remained unauthorized under V0.8.
+- **V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE** — historical effective authority.
+- **V0.2 SELF-HOSTED SCHEDULE RETIRED** — self-hosted metadata scheduling remains retired.
+- **V0.10 GITHUB-HOSTED SCHEDULE RETIRED** — V0.10 GitHub-hosted schedule remains retired after the reviewed successor transition.
+- **V0.12 SUCCESSOR METADATA WINDOW** — successor metadata-only capture lineage; no holdout-candle authority is implied.
 - **REPLACEMENT HOLDOUT FROZEN_UNOPENED** — replacement holdout remains unopened.
 - **HISTORICAL UNIVERSE MEMBERSHIP NOT_READY** — full-universe historical membership remains not ready.
 - **TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED** — retired long-horizon pilot remains unable to materialize W1 trade-kline data.
