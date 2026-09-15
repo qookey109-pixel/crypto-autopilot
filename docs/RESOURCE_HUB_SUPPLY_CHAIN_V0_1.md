@@ -123,7 +123,27 @@ The result is deliberately **not** an integration approval:
 - its PaperBroker is rejected for crypto-perpetual simulation authority because the short model omits funding, margin lock, maintenance margin, forced liquidation and related costs;
 - broker/live scaffold surfaces remain rejected for V0.1.
 
-The next allowed step is therefore an isolated statistical-equivalence/cross-check harness using synthetic and existing non-holdout fixtures. It does not authorize code import, runtime dependency, provider/R2/holdout access, strategy mutation, model promotion, broker connection or order execution.
+The allowed isolated statistical cross-check was subsequently implemented in `docs/RESOURCE_HUB_STATISTICAL_CROSSCHECK_V0_1.md`. It compares IID centered-bootstrap semantics against the existing stationary-bootstrap primitive using synthetic/non-holdout fixtures and still grants zero data, promotion, broker, or trading authority.
+
+## Second candidate evaluation
+
+The second reviewed candidate is `world-monitor` (World Monitor), bound to upstream commit `c18ab87fae2859e07703bc73c1c1c5775a0d17c3`.
+
+Evaluation receipt:
+
+`research/receipts/2026-09-15-resource-hub-world-monitor-evaluation-v0-1.json`
+
+The result is again **not** an integration approval:
+
+- conflict, chokepoint, sanctions, energy, trade, cyber, disaster and related structured intelligence are useful candidates for descriptive geopolitical/macro context;
+- World Monitor's `cached_at`, `stale`, source-provenance and redistribution-aware semantics are useful references for a future fail-closed external-context envelope;
+- CII is a situational-risk index with curated baseline/event weighting and must not be treated as a calibrated crypto return, volatility or directional predictor without independent time-safe calibration;
+- World Monitor market/crypto feeds are rejected as canonical Crypto Autopilot market-data authority because they are aggregated/cache-based and do not prove Binance USD-M or Pionex native provenance/equivalence;
+- AI-synthesized world/country briefs remain research summaries only, even with grounding controls;
+- MCP/REST/SDK runtime integration is deferred because it would add a credentialed remote dependency, quota/plan surface and provider/terms review;
+- upstream source code is AGPL-3.0-only and underlying data providers have separate redistribution terms, so code reuse and data persistence require separate license review.
+
+The next allowed step is an isolated descriptive-context envelope using synthetic fixtures only. It may validate timestamp, freshness, provenance and context-type semantics, but it must not call World Monitor, Binance, Pionex, R2 or frozen holdout and must not generate strategy, promotion, backtest-admission, trade-plan or live-trading authority.
 
 ## What comes next
 
@@ -133,4 +153,4 @@ A future reviewed version may add an `integration-registry.json` lifecycle such 
 discovered → candidate → evaluated → approved → active → deprecated
 ```
 
-The evaluation receipt above only records a reviewed decision; it does not create an approved/active registry entry. Any adapter execution, automatic PR, recurring schedule, tool installation, provider call, strategy mutation, or trading authority requires a separate reviewed version and explicit authority.
+The evaluation receipts above only record reviewed decisions; they do not create approved/active registry entries. Any adapter execution, automatic PR, recurring schedule, tool installation, provider call, strategy mutation, or trading authority requires a separate reviewed version and explicit authority.
