@@ -12,6 +12,7 @@ They are not interchangeable and are not added together into an invented score.
 | Research loop | `config/strategy_research_loop_v0_1.json` | PREPARED_RESEARCH_ONLY | 120 preregistered candidates over four families and three horizons |
 | Edge validation | `config/strategy_edge_validation_v0_1.json` | PREPARED_RESEARCH_ONLY | six anti-overfitting and disjoint-validation methods |
 | Parameter sweep | `config/strategy_parameter_sweep_v0_1.json` | FRAMEWORK_ONLY | protocol only; candidate values and split are still undefined |
+| TradingAgents challenger | `config/tradingagents_research_challenger_v0_1.json` | PREPARED_RESEARCH_ONLY | normalize point-in-time multi-agent research as descriptive context; no upstream execution or trading authority |
 
 ## Analysis flow
 
@@ -36,3 +37,7 @@ Pages rebuilds it during deployment.
 No strategy parameter, SHORT score, model-promotion rule or live authority is
 changed by this index. The Paper successor is an execution-readiness contract,
 not a seventh score or a strategy promotion.
+
+The TradingAgents challenger is also not a new strategy score. Its upstream
+rating and report hashes may be evaluated only as comparable research evidence;
+they cannot replace the canonical strategy, Risk Engine or Paper Broker.

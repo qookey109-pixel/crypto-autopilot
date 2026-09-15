@@ -95,6 +95,21 @@ Repository branch `main` is the live formal authority and is intentionally not s
 
 ## Current formal stage
 
+### TradingAgents Research Challenger V0.1 — PREPARED_RESEARCH_ONLY
+
+- A new offline adapter can validate a point-in-time, secret-free export from
+  `TauricResearch/TradingAgents` v0.4.0 and project its five-tier rating plus
+  report coverage into the existing descriptive Research Context.
+- The upstream framework is not vendored or installed. No LLM/provider call,
+  schedule, R2 operation, holdout access, strategy/risk mutation, trade plan or
+  order is authorized.
+- Normalized evidence retains report SHA-256 digests rather than upstream prose
+  and remains `authority=false`. See
+  `config/tradingagents_research_challenger_v0_1.json` and
+  `docs/TRADINGAGENTS_RESEARCH_CHALLENGER_V0_1.md`; the prepared config binding
+  is recorded in
+  `research/receipts/2026-09-15-tradingagents-research-challenger-v0-1-prepared.json`.
+
 ### Pionex bounded capacity pilot V0.2 — EFFECTIVE AFTER REVIEWED MAIN MERGE
 
 - V0.2 supersedes V0.1 execution with a BTC-only 27-day sample (2026-08-01

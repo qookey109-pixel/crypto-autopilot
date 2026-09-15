@@ -1,0 +1,59 @@
+{
+  "schema": "tradingagents-research-challenger-config-v0.1",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "purpose": "Normalize point-in-time TradingAgents output as a non-authoritative research challenger without adding a second strategy, risk, broker, or execution engine.",
+  "upstream": {
+    "repository": "https://github.com/TauricResearch/TradingAgents",
+    "reviewed_release": "0.4.0",
+    "license": "Apache-2.0",
+    "vendored": false,
+    "runtime_dependency_added": false
+  },
+  "adapter": {
+    "module": "crypto_autopilot.research.tradingagents_challenger",
+    "input_schema": "tradingagents-research-candidate-v0.1",
+    "input_transport": "secret-free JSON supplied out of band",
+    "required_reports": [
+      "market_report",
+      "bull_case",
+      "bear_case",
+      "investment_plan",
+      "risk_report",
+      "final_trade_decision"
+    ],
+    "accepted_ratings": ["BUY", "OVERWEIGHT", "HOLD", "UNDERWEIGHT", "SELL"],
+    "maximum_report_characters_each": 50000,
+    "point_in_time_verification_required": true,
+    "provider_match_required": true,
+    "allowed_universe_match_required": true,
+    "raw_report_persistence": false,
+    "report_sha256_only": true
+  },
+  "integration": {
+    "target": "research_context_v0_1",
+    "role": "descriptive_challenger_evidence",
+    "composite_score": null,
+    "may_replace_pionex_or_binance_data": false,
+    "may_replace_canonical_strategy": false,
+    "may_replace_canonical_risk_engine": false,
+    "may_replace_paper_broker": false
+  },
+  "execution": {
+    "upstream_installation_authorized": false,
+    "llm_api_calls_authorized": false,
+    "provider_requests_authorized": false,
+    "r2_reads_authorized": false,
+    "r2_writes_authorized": false,
+    "github_schedule_authorized": false,
+    "automatic_daily_scan_authorized": false
+  },
+  "authority": {
+    "source_switch_authorized": false,
+    "holdout_access_authorized": false,
+    "automatic_strategy_mutation_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
