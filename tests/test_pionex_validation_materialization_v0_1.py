@@ -26,8 +26,11 @@ CONFIG_SHA256 = "6d59a93feca9a5743817e7d671cc370f934a57fa11b7a140c266d82504da446
 
 def load_config() -> dict:
     payload = CONFIG_PATH.read_bytes()
-    if hashlib.sha256(payload).hexdigest() != CONFIG_SHA256:
-        raise AssertionError("validation config SHA-256 changed")
+    actual = hashlib.sha256(payload).hexdigest()
+    if actual != CONFIG_SHA256:
+        raise AssertionError(
+            f"validation config SHA-256 changed: actual={actual} expected={CONFIG_SHA256}"
+        )
     return json.loads(payload)
 
 
