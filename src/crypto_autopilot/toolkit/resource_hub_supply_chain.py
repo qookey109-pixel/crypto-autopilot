@@ -106,16 +106,30 @@ def build_candidate_registry(
 
     category_weights = policy.get("target_category_weights")
     signal_weights = policy.get("domain_signal_weights")
+    weak_signals_raw = policy.get("weak_domain_signals", [])
     safety = policy.get("safety")
     source = policy.get("source")
     if not isinstance(category_weights, Mapping) or not category_weights:
         raise ValueError("policy target_category_weights must be a non-empty object")
     if not isinstance(signal_weights, Mapping) or not signal_weights:
         raise ValueError("policy domain_signal_weights must be a non-empty object")
+    if not isinstance(weak_signals_raw, list) or not all(
+        isinstance(item, str) and item for item in weak_signals_raw
+    ):
+        raise ValueError("policy weak_domain_signals must be a list of non-empty strings")
     if not isinstance(safety, Mapping):
         raise ValueError("policy safety must be an object")
     if not isinstance(source, Mapping):
         raise ValueError("policy source must be an object")
+
+    weak_signals = {item.lower() for item in weak_signals_raw}
+    unknown_weak_signals = weak_signals.difference(signal.lower() for signal in signal_weights)
+    if unknown_weak_signals:
+        raise ValueError(f"weak_domain_signals are missing weights: {sorted(unknown_weak_signals)}")
+
+    minimum_strong_signals = int(policy.get("minimum_strong_signals_without_finance_category", 1))
+    if minimum_strong_signals < 1:
+        raise ValueError("minimum_strong_signals_without_finance_category must be >= 1")
 
     required_false = (
         "schedule_authorized",
@@ -153,10 +167,13 @@ def build_candidate_registry(
 
         text = _resource_text(resource)
         matched_signals = _matched_signals(text, signal_weights)
+        strong_matched_signals = [
+            item for item in matched_signals if item["signal"].lower() not in weak_signals
+        ]
         has_finance_category = any(
             item["category"] == "Finance / Crypto" for item in matched_categories
         )
-        if not has_finance_category and not matched_signals:
+        if not has_finance_category and len(strong_matched_signals) < minimum_strong_signals:
             continue
 
         eligible_count += 1
@@ -182,6 +199,7 @@ def build_candidate_registry(
                 "relevance_score": score,
                 "matched_categories": [item["category"] for item in matched_categories],
                 "matched_signals": [item["signal"] for item in matched_signals],
+                "strong_matched_signals": [item["signal"] for item in strong_matched_signals],
                 "integration_type": _integration_type(text),
                 "integration_risk": _integration_risk(text),
                 "license": resource.get("license"),
@@ -213,6 +231,8 @@ def build_candidate_registry(
         "policy": {
             "schema": policy.get("schema"),
             "minimum_score": minimum_score,
+            "minimum_strong_signals_without_finance_category": minimum_strong_signals,
+            "weak_domain_signals": sorted(weak_signals),
             "max_candidates": max_candidates,
         },
         "scanned_resource_count": len(resources),
