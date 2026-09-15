@@ -114,6 +114,40 @@ Merged as `PREPARED_RESEARCH_ONLY`. It is offline and non-authoritative. No upst
 - Dashboards are derived evidence projections, not authority.
 - Backtests and research metrics are evidence, not proof of future profitability.
 
+## Reproducibility and CI hardening lineage
+
+These markers preserve the reviewed engineering-hardening lineage required by repository authority tests; they do not add runtime authority.
+
+- Dependency reproducibility uses `requirements/ci-constraints.txt` and validates the supported **Python 3.12 and Python 3.13** matrix, including jobs `test (3.12)` and `test (3.13)`.
+- Production-critical GitHub Actions are pinned to **immutable 40-character commit SHAs**; the Python 3.13 runtime path remains explicitly validated.
+- PR #136 and PR #137 established the constrained dependency/reproducibility hardening baseline; PR #140 continued the reviewed workflow hardening lineage.
+- `D1_DATABASE_ID` is intentionally not a secret placeholder in `.env.example`; PR #141 records the related environment/authority cleanup lineage.
+- Ruff is constrained as `ruff==0.16.0` and CI enforces core correctness classes `E4`, `E7`, and `E9`.
+- PR #142 and PR #143 preserve the reviewed CI `pull_request` validation and supported Python matrix lineage.
+- Issue #139 remains historical engineering context for this reproducibility-hardening sequence.
+
+## Retired historical workflow inventory
+
+Exactly **17 historical workflows** remain retired evidence/validation paths and must not be silently reactivated:
+
+- `historical-backfill-pilot.yml`
+- `diagnose-v0-2-self-hosted-mac-binance-transport.yml`
+- `binance-2025-r2-pilot.yml`
+- `binance-vision-live-proof.yml`
+- `binance-vision-r2-proof.yml`
+- `binance-funding-r2-v0-2-preflight.yml`
+- `binance-funding-r2-v0-2-materialize.yml`
+- `m1b-m1a-dataset-upload.yml`
+- `m1b-r2-roundtrip.yml`
+- `binance-2025-coverage-scan.yml`
+- `binance-funding-source-proof.yml`
+- `binance-funding-coverage.yml`
+- `binance-max-coverage-discovery.yml`
+- `m1a-acquisition.yml`
+- `pionex-binance-equivalence-proof.yml`
+- `pionex-binance-equivalence-v0-1-forensics.yml`
+- `historical-universe-long-horizon-review.yml`
+
 ## Frozen historical lineage and dashboard compatibility markers
 
 The research-calendar/dashboard and retired-workflow validators intentionally fail closed if these frozen stage markers disappear. They are retained here as compatibility assertions; they do not grant new authority or override the current lifecycle above.
