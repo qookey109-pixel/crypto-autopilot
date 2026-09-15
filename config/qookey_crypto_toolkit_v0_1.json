@@ -21,16 +21,27 @@
       "secrets_required": false
     },
     "rest_api": {
-      "status": "NOT_IMPLEMENTED",
-      "recommended_when": "website, Telegram, or cloud services need stable HTTP access"
+      "status": "IMPLEMENTED_PREPARED_RESEARCH_ONLY",
+      "entrypoint": "scripts/qookey_crypto_toolkit_http_v0_1.py",
+      "openapi_path": "/openapi.json",
+      "config": "config/qookey_crypto_toolkit_api_v0_1.json"
+    },
+    "cloudflare_edge": {
+      "status": "IMPLEMENTED_NOT_DEPLOYED",
+      "path": "infra/cloudflare/qookey-toolkit-edge",
+      "role": "thin authenticated edge proxy"
+    },
+    "render_origin": {
+      "status": "IMPLEMENTED_NOT_DEPLOYED",
+      "path": "infra/render/qookey-toolkit-api"
     },
     "telegram": {
       "status": "NOT_IMPLEMENTED",
       "recommended_when": "human command and report delivery is needed"
     },
     "mcp": {
-      "status": "OPTIONAL_NOT_IMPLEMENTED",
-      "recommended_when": "Codex, Claude, Gemini, or another MCP client should discover and call tools directly"
+      "status": "DEFERRED_OPTIONAL_NOT_IMPLEMENTED",
+      "recommended_when": "direct AI tool discovery becomes useful again"
     }
   },
   "design": {
