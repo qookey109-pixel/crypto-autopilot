@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import unittest
 
 from crypto_autopilot.historical import INTERVAL_MS
@@ -47,6 +48,11 @@ class PionexPageAuditDiagnosticsTests(unittest.TestCase):
             diagnostics["first_invalid_candle_timestamp_ms"],
             step * 2,
         )
+        self.assertEqual(diagnostics["invalid_high_below_ohlc_count"], 1)
+        self.assertEqual(
+            diagnostics["first_invalid_high_below_ohlc_timestamp_ms"],
+            step * 2,
+        )
         self.assertEqual(diagnostics["duplicate_timestamp_count"], 0)
         self.assertEqual(diagnostics["misaligned_timestamp_count"], 0)
 
@@ -63,6 +69,29 @@ class PionexPageAuditDiagnosticsTests(unittest.TestCase):
         self.assertEqual(diagnostics["invalid_candle_count"], 0)
         self.assertNotIn("candles", diagnostics)
         self.assertNotIn("raw_provider_payload", diagnostics)
+
+    def test_classifies_invalid_reasons_without_emitting_values(self) -> None:
+        step = INTERVAL_MS["4H"]
+        rows = [
+            candle(0, open_=0.0),
+            candle(step, volume=-1.0),
+            candle(step * 2, high=100.0, close=102.0),
+            candle(step * 3, low=102.0, high=103.0, open_=100.0, close=101.0),
+            candle(step * 4, high=math.inf),
+        ]
+        diagnostics = page_audit_diagnostics(rows, interval="4H", cursor=step * 4)
+
+        self.assertEqual(diagnostics["invalid_candle_count"], 5)
+        self.assertEqual(diagnostics["invalid_nonpositive_price_count"], 1)
+        self.assertEqual(diagnostics["invalid_negative_volume_count"], 1)
+        self.assertEqual(diagnostics["invalid_high_below_ohlc_count"], 1)
+        self.assertEqual(diagnostics["invalid_low_above_ohlc_count"], 1)
+        self.assertEqual(diagnostics["invalid_nonfinite_count"], 1)
+        self.assertNotIn("open", diagnostics)
+        self.assertNotIn("high", diagnostics)
+        self.assertNotIn("low", diagnostics)
+        self.assertNotIn("close", diagnostics)
+        self.assertNotIn("volume", diagnostics)
 
 
 if __name__ == "__main__":
