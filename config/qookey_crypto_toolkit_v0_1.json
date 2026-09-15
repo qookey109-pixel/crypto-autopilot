@@ -1,0 +1,55 @@
+{
+  "schema": "qookey-crypto-toolkit-v0.1",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "core": {
+    "python_package": "crypto_autopilot.toolkit",
+    "cli": "scripts/qookey_crypto_toolkit_v0_1.py",
+    "tools": [
+      "get_indicators",
+      "evaluate_strategy",
+      "size_long_trade",
+      "run_paper_backtest"
+    ]
+  },
+  "interfaces": {
+    "python": {
+      "status": "ENABLED"
+    },
+    "cli": {
+      "status": "ENABLED",
+      "network_required": false,
+      "secrets_required": false
+    },
+    "rest_api": {
+      "status": "NOT_IMPLEMENTED",
+      "recommended_when": "website, Telegram, or cloud services need stable HTTP access"
+    },
+    "telegram": {
+      "status": "NOT_IMPLEMENTED",
+      "recommended_when": "human command and report delivery is needed"
+    },
+    "mcp": {
+      "status": "OPTIONAL_NOT_IMPLEMENTED",
+      "recommended_when": "Codex, Claude, Gemini, or another MCP client should discover and call tools directly"
+    }
+  },
+  "design": {
+    "core_must_not_depend_on_mcp": true,
+    "json_compatible_tool_contracts": true,
+    "adapter_first": true,
+    "fail_closed": true
+  },
+  "safety_boundary": {
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "synthetic_candles_authorized": false,
+    "interpolation_authorized": false,
+    "automatic_strategy_mutation_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
