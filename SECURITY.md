@@ -32,19 +32,18 @@ Do not echo secret values for debugging. Presence checks must be boolean/length-
 
 Historical proof/materialization workflows whose evidence is already frozen must remain validation-only. They must not silently regain schedules, push-triggered production execution, self-hosted runners, provider calls, R2 secret bindings, or write commands.
 
-The current scheduled metadata-capture execution path is the versioned V0.12
-workflow within its bounded window. V0.10 is retired historical evidence.
-V0.11 production R2 stability evaluation remains unauthorized until a separate
-post-window authority exists. The separately versioned fixed BTC simulation
-may read only its three hash-bound sample objects after reviewed main merge;
-it cannot list R2, access holdout, or write storage.
+V0.12 was the versioned successor metadata-capture path during its bounded `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z` window. That window is historical and must not be described as the current active scheduled path. V0.10 remains retired historical evidence.
+
+The current Pionex Validation Dataset Materialization V0.1 workflow is manual-only. Within that exact validation scope it may read public Pionex futures K-lines and write the dedicated R2 validation dataset, subject to its fail-closed guards. It may not use private API/account data, access the replacement holdout, authorize training, switch providers, promote a model, create a formal trade plan, place real-money orders, or enable live trading.
+
+V0.11 production R2 stability evaluation remains unauthorized until a separate post-window authority exists. The separately versioned fixed BTC simulation may read only its three hash-bound sample objects after reviewed main merge; it cannot list R2, access holdout, or write storage.
 
 Production-critical GitHub Actions are supply-chain hardened:
 
 - `actions/checkout`, `actions/setup-python`, artifact, and Pages actions on critical workflows execute from reviewed immutable 40-character commit SHAs rather than mutable major tags;
 - checkout keeps `persist-credentials: false`;
 - CI/test dependency resolution uses `requirements/ci-constraints.txt`, while `pyproject.toml` keeps public compatibility ranges;
-- the V0.10 scheduled capture job explicitly sets Python 3.13 before freshness checks, constrained dependency installation, provider access, or R2 access;
+- the historical V0.10 scheduled capture job explicitly set Python 3.13 before freshness checks, constrained dependency installation, provider access, or R2 access;
 - changes that weaken these boundaries are covered by Repository regression tests.
 
 Repository branch protection/ruleset state is an external GitHub setting, not a file-based authority. Do not assume `main` is protected unless GitHub settings are verified directly.
@@ -53,4 +52,4 @@ Repository branch protection/ruleset state is an external GitHub setting, not a 
 
 Current mode is **PAPER-ONLY**. No real-money or live order path is authorized.
 
-Replacement holdout candles remain `FROZEN_UNOPENED`; metadata capture/evaluator preparation does not authorize holdout access or evaluation. Provider substitution, provenance rewriting, and source switching remain unauthorized.
+Replacement holdout candles remain `FROZEN_UNOPENED`; metadata capture/evaluator preparation and Pionex validation materialization do not authorize holdout access or evaluation. Provider substitution, provenance rewriting, and source switching remain unauthorized.
