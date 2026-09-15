@@ -1,0 +1,61 @@
+{
+  "schema": "video-strategy-research-v0.1",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "purpose": "Convert grounded NotebookLM video research into an unverified strategy candidate without changing production strategy or trading authority.",
+  "notebooklm_mcp": {
+    "transport": "stdio",
+    "server_command": "notebooklm-mcp",
+    "preferred_reference_implementation": "euisuk-chung/notebooklm-mcp",
+    "required_capabilities": [
+      "notebook_create",
+      "source_add",
+      "notebook_query"
+    ],
+    "prompt_path": "research/prompts/notebooklm_video_strategy_analysis_v0_1.md",
+    "authentication_scope": "LOCAL_USER_SESSION_ONLY",
+    "repository_cookie_or_token_storage_authorized": false
+  },
+  "accepted_sources": [
+    "youtube_url",
+    "local_video_file"
+  ],
+  "candidate_contract": {
+    "status": "UNVERIFIED_RESEARCH_CANDIDATE",
+    "required_fields": [
+      "strategy_name",
+      "summary",
+      "timeframes",
+      "markets",
+      "indicators",
+      "entry_rules",
+      "exit_rules",
+      "risk_rules",
+      "claimed_metrics",
+      "uncertainties",
+      "evidence"
+    ],
+    "evidence_requires_source_locator": true,
+    "claimed_metrics_are_unverified": true
+  },
+  "next_gate": {
+    "target": "strategy_research_loop_v0_1",
+    "production_backtest_admission_authorized": false,
+    "requires_separate_reviewed_authority": true
+  },
+  "execution": {
+    "mcp_local_research_authorized": true,
+    "candidate_materialization_authorized": true,
+    "production_dataset_execution_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "automatic_strategy_mutation_authorized": false,
+    "automatic_model_promotion_authorized": false
+  },
+  "authority": {
+    "source_switch_authorized": false,
+    "synthetic_or_interpolated_candles_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
