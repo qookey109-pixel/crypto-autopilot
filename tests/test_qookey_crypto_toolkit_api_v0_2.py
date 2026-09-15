@@ -86,7 +86,9 @@ class QookeyCryptoToolkitApiV02ConfigTests(unittest.TestCase):
         self.assertNotIn("BINANCE_", dockerfile)
         self.assertIn("QOOKEY_TOOLKIT_API_TOKEN", server)
         self.assertIn("refusing non-loopback bind", server)
-        self.assertNotIn("Authorization headers", server.split("log_message", 1)[-1])
+        log_tail = server.split("def log_message", 1)[-1]
+        self.assertNotIn('self.headers.get("Authorization")', log_tail)
+        self.assertNotIn("self.rfile.read", log_tail)
 
 
 if __name__ == "__main__":
