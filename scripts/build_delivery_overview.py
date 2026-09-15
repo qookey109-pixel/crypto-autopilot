@@ -1,146 +1,271 @@
-"""Build the dated homepage from repository evidence; no network or authority changes."""
+"""Build the homepage from repository evidence without granting runtime authority."""
 from __future__ import annotations
 
 import argparse
-import hashlib
 import html
 import json
 from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
+CURRENT_OPERATIONS = "research/status/current-operations-v0-3.json"
 
 
 def read_json(path: str, root: Path = ROOT) -> dict:
     return json.loads((root / path).read_text(encoding="utf-8"))
 
 
-def overview(root: Path = ROOT) -> tuple[str, str, dict]:
+def _validate_current(current: dict) -> tuple[dict, dict, dict]:
+    if current.get("schema") != "qookey-current-operations-v0.3":
+        raise ValueError("Unexpected current-operations schema")
+    if current.get("repository_authority") != "RESOLVE_MAIN_LIVE_AT_READ_TIME":
+        raise ValueError("Repository authority semantics changed")
+    if current.get("mode") != "PAPER_ONLY":
+        raise ValueError("Homepage projection must remain PAPER_ONLY")
+
+    basis = current.get("evidence_basis") or {}
+    if basis.get("semantics") != "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION":
+        raise ValueError("Evidence-basis semantics changed")
+    if basis.get("is_latest_main_claim") is not False:
+        raise ValueError("Homepage cannot project a self-referential latest-main claim")
+
+    core = current.get("core100") or {}
+    quality = core.get("model_quality_gate") or {}
+    replay = core.get("threshold_replay") or {}
+    if core.get("history_status") != "COMPLETE":
+        raise ValueError("Core100 history is not complete")
+    if (core.get("history_complete_shards"), core.get("history_total_shards")) != (10, 10):
+        raise ValueError("Core100 shard state changed")
+    if core.get("training_workflow_conclusion") != "success" or core.get("training_report_status") != "PASS":
+        raise ValueError("Core100 training state changed")
+    if quality.get("status") != "REJECT" or quality.get("automatic_promotion") is not False:
+        raise ValueError("Core100 model-quality boundary changed")
+    if replay.get("workflow_conclusion") != "success":
+        raise ValueError("Threshold replay is not complete")
+    if replay.get("supported_thresholds") != [] or replay.get("threshold_change_supported") is not False:
+        raise ValueError("Threshold replay unexpectedly supports a change")
+    if replay.get("configured_threshold_changed") is not False:
+        raise ValueError("Configured threshold changed")
+
+    pionex = current.get("pionex_validation") or {}
+    if pionex.get("repository_materialization_status") != "PENDING_MANUAL_DISPATCH":
+        raise ValueError("Pionex validation state changed")
+    authority = pionex.get("authority") or {}
+    if authority.get("public_pionex_kline_reads") is not True:
+        raise ValueError("Pionex public validation read authority changed")
+    if authority.get("r2_validation_dataset_writes") is not True:
+        raise ValueError("Pionex validation R2 authority changed")
+    for key in (
+        "private_api",
+        "account_data",
+        "replacement_holdout_access",
+        "training",
+        "source_switch",
+        "automatic_model_promotion",
+        "formal_trade_plan",
+        "real_money_orders",
+        "live_trading",
+    ):
+        if authority.get(key) is not False:
+            raise ValueError(f"Unsafe Pionex homepage projection boundary: {key}")
+
+    gates = current.get("gates") or {}
+    if gates.get("holdout") != "FROZEN_UNOPENED":
+        raise ValueError("Holdout boundary changed")
+    if gates.get("source_switch_authorized") is not False or gates.get("live_trading") != "CLOSED":
+        raise ValueError("Trading/source-switch boundary changed")
+    return core, replay, pionex
+
+
+def _validate_historical_sample(root: Path) -> tuple[dict, dict]:
+    """Keep the dated readiness file as historical BTC sample evidence only."""
     index = read_json("research/status/simulation-readiness-v0-1.json", root)
+    if index.get("authority") is not False:
+        raise ValueError("Historical readiness projection cannot be authority")
+    if index.get("full_simulation_ready") is not False or index.get("full_universe_ready") is not False:
+        raise ValueError("Historical readiness unexpectedly claims full readiness")
+    if not index.get("safety_boundary") or any(index["safety_boundary"].values()):
+        raise ValueError("Historical readiness safety boundary changed")
+
     btc = read_json(index["btc_fixed_sample"]["formal_receipt"], root)
-    history = index["binance_core_100_history"]
-    evidence = read_json(history["progress_evidence"], root)
-    report = evidence["report"]
-    bnx = read_json(history["bnx_repair_evidence"], root)
-    ctk = read_json(index["ctk_diagnosis"]["evidence"], root)
-    if (index.get("authority") is not False or index["overall"] != "NOT_READY"
-            or index["full_simulation_ready"] is not False
-            or index["full_universe_ready"] is not False
-            or not index["safety_boundary"]
-            or any(index["safety_boundary"].values())):
-        raise ValueError("Unexpected readiness or authority; review required")
-    if (btc["status"] != "PASS" or btc["scope"] != "BTC_FIXED_27_DAY_ENGINE_VALIDATION_ONLY"
-            or btc["full_universe_ready"] is not False
-            or btc["full_simulation_ready"] is not False):
-        raise ValueError("Fixed BTC receipt cannot promote full readiness")
-    if (report["provider"] != "binance_usdm" or report["dataset_complete"] is not False
-            or report["dataset_status"] != "IN_PROGRESS"
-            or evidence["run_id"] != history["latest_formal_run_id"]
-            or report["shards_complete"] != history["completed_shards"]
-            or report["shard_count"] != history["total_shards"]
-            or not 0 <= report["shards_complete"] < report["shard_count"]
-            or report["diagnostic"] != {**report["diagnostic"], **history["current_blocker"]}
-            or not report["authority"] or any(report["authority"].values())):
-        raise ValueError("History index disagrees with aggregate evidence")
-    if (bnx["status"] != "PASS_REPAIR_EVIDENCE_FROZEN"
-            or not bnx["interpretation"]["authority_bound_shard_3_published"]):
-        raise ValueError("BNX publication evidence missing")
-    if hashlib.sha256((root / ctk["report_path"]).read_bytes()).hexdigest() != ctk["report_sha256"]:
-        raise ValueError("CTK report hash mismatch")
-    if any(ctk["authority"].values()):
-        raise ValueError("CTK observation grants no exception authority")
-    stamp = html.escape(index["verified_at_utc"])
-    policy_index = index["lifecycle_policy"]
-    policy_path = policy_index["config"]
-    policy = read_json(policy_path, root)
-    if (hashlib.sha256((root / policy_path).read_bytes()).hexdigest() != policy_index["config_sha256"]
-            or len(policy["allowances"]) != policy_index["allowance_count"]
-            or policy["causal_claim"] != "NOT_ASSERTED"
-            or policy["provider"] != "binance_usdm"
-            or policy_index["production_completion_verified"] is not False):
-        raise ValueError("Lifecycle policy projection differs from reviewed evidence")
-    diagnostic = report["diagnostic"]
-    current_gap = html.escape(
-        f'{diagnostic["symbol"]} {diagnostic["period"]} {diagnostic["interval"]}，'
-        f'缺 {diagnostic["missing_bars"]} 根'
-    )
-    run = history["latest_formal_run_id"]
-    count = history["completed_shards"]
-    sample_run = btc["workflow_run_id"]
+    if btc.get("status") != "PASS" or btc.get("scope") != "BTC_FIXED_27_DAY_ENGINE_VALIDATION_ONLY":
+        raise ValueError("BTC fixed-sample evidence changed")
+    if btc.get("full_universe_ready") is not False or btc.get("full_simulation_ready") is not False:
+        raise ValueError("BTC fixed sample cannot promote full readiness")
+    return index, btc
+
+
+def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
+    current = read_json(CURRENT_OPERATIONS, root)
+    core, replay, pionex = _validate_current(current)
+    historical, btc = _validate_historical_sample(root)
+
+    training_run = int(core["training_run_id"])
+    replay_run = int(replay["run_id"])
+    pionex_run = int(pionex["previous_run_id"])
+    sample_run = int(btc["workflow_run_id"])
+    current_date = html.escape(str(current["updated_date"]))
+
     summary = f'''      <section class="panel readiness-summary" aria-labelledby="readiness-heading">
-        <h3 id="readiness-heading">9/15 模擬測試準備</h3>
-        <p><strong>完整模擬尚未就緒 · NOT_READY</strong>；BTC 固定樣本已通過。</p>
+        <h3 id="readiness-heading">9/16 目前作業狀態</h3>
+        <p><strong>Core100 資料與訓練已完成；Model Quality REJECT</strong>。完整策略驗證、holdout、promotion 與 trading 仍關閉。</p>
         <div class="delivery-metrics" aria-label="目前已核實進度">
-          <article><p>BTC 27 天模擬</p><strong>已完成 · {btc['executed_trade_count']} 筆成交</strong><p>僅驗證固定樣本；已停止自動重跑。</p></article>
-          <article><p>Binance Core 100</p><strong>{count}/10 分片</strong><p>BNX 已正式發布；新缺口規則待執行證據。</p></article>
-          <article><p>Pionex 研究候選池</p><strong>{index['pionex_research_universe']['selected_candidate_markets']} 個候選</strong><p>完整歷史與資產分類尚未完成。</p></article>
-          <article><p>BTC Funding</p><strong>{index['pionex_funding']['observation_count']} 筆已核實</strong><p>對應固定樣本期間。</p></article>
+          <article><p>BTC 27 天固定樣本</p><strong>已完成 · {btc['executed_trade_count']} 筆成交</strong><p>歷史 engine validation only；不代表全市場策略有效。</p></article>
+          <article><p>Binance Core 100</p><strong>10/10 · COMPLETE</strong><p>不得因 model-quality REJECT 自動重啟歷史取得。</p></article>
+          <article><p>Core100 Training</p><strong>COMPLETED · PASS</strong><p>Run {training_run}；pipeline PASS 與 model-quality acceptance 分離。</p></article>
+          <article><p>Pionex Validation</p><strong>PENDING MANUAL DISPATCH</strong><p>PR #321 boundary fix 已進 Repository；仍需新的 Repository-current run。</p></article>
         </div>
-        <p>下一步：核對 PR #292 後的歷史補齊。最後一次拒絕：{current_gap}（合併前執行）。</p>
-        <p>訓練尚未完成：9/13 因資料未齊而跳過；下次例行 9/20，晚於 9/15 目標。</p>
-        <p>證據核對時間（UTC）：{stamp}。下列 Actions 狀態只代表工作流程結果。</p>
+        <p>模型品質閘門：<strong>REJECT</strong>。Threshold replay run {replay_run} 已完成；0.50–0.55 沒有 supported threshold change，configured threshold 保持不變。</p>
+        <p>Pionex 前次 run {pionex_run} fail-closed；新的 materialization 必須從 dispatch 當下的 Repository live <code>main</code> 執行，不能把 status evidence-basis SHA 當成 latest-main claim。</p>
+        <p>Current Operations 更新日期：{current_date}。下列 Actions 狀態只代表工作流程結果。</p>
         <p id="cloud-run-updated">雲端執行狀態尚未載入。</p>
         <ul id="cloud-run-list" class="cloud-run-list" aria-live="polite"></ul>
         <details><summary>查看資料證據與後續步驟</summary>
-          <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{sample_run}" target="_blank" rel="noopener noreferrer">BTC 模擬報告 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{run}" target="_blank" rel="noopener noreferrer">{count}/10 與最後缺口 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/34677544161" target="_blank" rel="noopener noreferrer">BNX 正式修復 ↗</a></p>
-          <p>CTK／CVC／LIT 共 {policy_index['allowance_count']} 項精確缺口規則已合併；缺口原樣保留，不宣稱已補齊或已證實成因。新規則不是資料完成證據。V0.12 已到期，缺失時槽仍保留；固定樣本通過不代表全市場策略有效。</p>
+          <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{sample_run}" target="_blank" rel="noopener noreferrer">BTC 固定樣本 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{training_run}" target="_blank" rel="noopener noreferrer">Core100 Training ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{replay_run}" target="_blank" rel="noopener noreferrer">Threshold Replay ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{pionex_run}" target="_blank" rel="noopener noreferrer">Pionex 前次 fail-closed run ↗</a></p>
+          <p>September 13 的 8/10、Training skipped、PR #292 blocker 等敘述保留為歷史證據，不再作為 present-tense homepage state。V0.12 bounded metadata window 已結束。</p>
         </details>
       </section>'''
+
     cadence = read_json("config/history_cadence_v0_1.json", root)
-    rows = []
     labels = {
-        "binance-usdm-detailed-history-v0-1.yml": ("歷史補齊", "每日偶數小時 :23；至 10/1 08:00 前", "一次一分片；缺口仍須修復"),
-        "binance-usdm-detailed-training-v0-1.yml": ("研究訓練", "每週日 12:37；下次 9/20", "9/13 實際跳過；完整資料通過才訓練"),
+        "binance-usdm-detailed-history-v0-1.yml": (
+            "Core100 歷史補齊",
+            "每日偶數小時 :23；bounded schedule 至 10/1 08:00 前",
+            "目前 10/10 COMPLETE；排程不得把 model-quality REJECT 解讀成重新取得歷史資料的理由",
+        ),
+        "binance-usdm-detailed-training-v0-1.yml": (
+            "Core100 研究訓練",
+            "每週日 12:37",
+            "目前 training 已完成；model-quality = REJECT；例行觸發不授權 promotion",
+        ),
         "research-signal-layer-v0-2.yml": ("研究訊號", "每日 10:17", "結構化研究訊號收集"),
         "research-signal-quality-v0-1.yml": ("訊號品質", "每日 10:47", "檢查來源與資料鏈"),
-        "research-automation-health-v0-2.yml": ("排程健康", "每日偶數小時 :57", "目前因歷史補齊失敗而告警"),
-        "pionex-alternative-assets-observability-v0-2.yml": ("Pionex 商品觀測", "9/13、9/20、9/27 11:53", "只觀測商品 metadata，未抓完整歷史"),
-        "provider-equivalence-v0-12-successor-metadata-capture.yml": ("V0.12 metadata", "視窗已於 9/12 12:00 結束", "最後工作流程成功但 capture 跳過；未達完整 PASS"),
+        "research-automation-health-v0-2.yml": (
+            "排程健康",
+            "每日偶數小時 :57",
+            "依 Repository exact schedule inventory 監控；manual run 不算 automation health",
+        ),
+        "pionex-alternative-assets-observability-v0-2.yml": (
+            "Pionex 商品觀測",
+            "9/20、9/27 11:53（9/13 已過）",
+            "只觀測商品 metadata；與 Pionex Validation Dataset materialization 分離",
+        ),
+        "provider-equivalence-v0-12-successor-metadata-capture.yml": (
+            "V0.12 metadata",
+            "視窗已於 9/12 12:00 結束",
+            "HISTORICAL；保留 schedule registration lineage，不是目前 active execution path",
+        ),
     }
     declared = read_json("config/project_convergence_v0_1.json", root)["scheduled_workflows"]
     inventory = {item["workflow"]: item["cron_utc"] for group in declared.values() for item in group}
     if set(inventory) != set(labels):
         raise ValueError("Schedule inventory changed; review display labels")
+
+    rows: list[str] = []
     for name, (label, timing, detail) in labels.items():
-        actual = re.findall(r'^\s+- cron: "([^"]+)"', (root / ".github/workflows" / name).read_text(), re.M)
+        actual = re.findall(
+            r'^\s+- cron: "([^"]+)"',
+            (root / ".github/workflows" / name).read_text(encoding="utf-8"),
+            re.M,
+        )
         if actual != inventory[name]:
             raise ValueError(f"Schedule index disagrees with workflow: {name}")
         if name.startswith("binance-usdm-detailed-history") and actual != [cadence["cron"]]:
             raise ValueError("History cadence authority mismatch")
         rows.append(f'<tr><th scope="row">{label}</th><td>{timing}</td><td>{detail}</td></tr>')
+
     schedule = '''      <section class="panel" aria-label="目前雲端排程">
         <h3>後續排程（臺灣時間）</h3>
-        <p>由 GitHub Actions 雲端執行；時間為預定觸發時間，可能延遲。資料缺口不會因增加執行頻率而自動消失。</p>
+        <p>由 GitHub Actions 雲端執行；時間為預定觸發時間，可能延遲。排程存在不代表目前 lifecycle stage 尚未完成。</p>
         <div class="table-wrap"><table><thead><tr><th>作業</th><th>預定時間</th><th>條件與狀態</th></tr></thead><tbody>''' + "\n".join(rows) + '''</tbody></table></div>
-        <p>BTC 固定模擬 V0.1 已完成並退役。Pionex Reach、分類、Universe、Funding 與 Context Forward 是人工限定流程；沒有新增自動排程。</p>
-        <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/blob/main/docs/OPERATIONS_HANDOFF_2026_09_13.md" target="_blank" rel="noopener noreferrer">最新交接與待辦 ↗</a></p>
+        <p>Pionex Validation Dataset V0.1 是 manual-only workflow，目前仍等待新的 Repository-current materialization；沒有新增自動排程，也沒有 holdout/training/source-switch/trading authority。</p>
+        <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/blob/main/CURRENT_STATUS.md" target="_blank" rel="noopener noreferrer">Current Operations ↗</a></p>
       </section>'''
+
     progress = {
-        "schema": "qookey-dashboard-history-progress-v0.1", "authority": False,
-        "snapshotType": "SECRET_FREE_GITHUB_ACTIONS_RUN_REPORT",
-        "sourceRunId": run, "sourceUrl": evidence["source_url"],
-        "observedAtUtc": report["observed_at_utc"], "status": report["dataset_status"],
-        "provider": report["provider"], "mode": report["mode"],
-        "shardCount": report["shard_count"], "shardsComplete": count,
-        "lastShardIndex": report["shard_index"],
-        "safetyBoundary": {key: False for key in (
-            "holdoutAccessed", "sourceSwitchAuthorized", "automaticModelPromotionAuthorized",
-            "tradePlanAuthorized", "realMoneyOrderAuthorized", "liveTradingAuthorized")},
+        "schema": "qookey-dashboard-history-progress-v0.2",
+        "authority": False,
+        "snapshotType": "CURRENT_OPERATIONS_PROJECTION",
+        "source": CURRENT_OPERATIONS,
+        "status": "COMPLETE",
+        "provider": "binance_usdm",
+        "mode": "current_operations",
+        "shardCount": 10,
+        "shardsComplete": 10,
+        "historyReacquisitionRequired": False,
+        "trainingRunId": training_run,
+        "modelQualityStatus": "REJECT",
+        "safetyBoundary": {
+            "holdoutAccessed": False,
+            "sourceSwitchAuthorized": False,
+            "automaticModelPromotionAuthorized": False,
+            "tradePlanAuthorized": False,
+            "realMoneyOrderAuthorized": False,
+            "liveTradingAuthorized": False,
+        },
     }
-    return summary, schedule, progress
+
+    web_current = {
+        "schema": "qookey-current-operations-web-v0.3",
+        "authority": False,
+        "mode": "PAPER_ONLY",
+        "repositoryAuthority": current["repository_authority"],
+        "evidenceBasisParentMainSha": current["evidence_basis"]["parent_main_sha"],
+        "evidenceBasisIsLatestMainClaim": False,
+        "updatedDate": current["updated_date"],
+        "historyStatus": core["history_status"],
+        "historyCompleteShards": core["history_complete_shards"],
+        "historyTotalShards": core["history_total_shards"],
+        "trainingStatus": "COMPLETED_PASS",
+        "trainingRunId": training_run,
+        "modelQualityStatus": core["model_quality_gate"]["status"],
+        "thresholdReplayRunId": replay_run,
+        "thresholdChangeSupported": replay["threshold_change_supported"],
+        "pionexValidationStatus": pionex["repository_materialization_status"],
+        "holdoutState": current["gates"]["holdout"],
+        "sourceSwitchAuthorized": current["gates"]["source_switch_authorized"],
+        "liveTradingAuthorized": False,
+    }
+    return summary, schedule, progress, web_current
 
 
 def build(site: Path, root: Path = ROOT) -> None:
-    summary, schedule, progress = overview(root)
+    summary, schedule, progress, web_current = overview(root)
     path = site / "index.html"
     content = path.read_text(encoding="utf-8")
     for label, replacement in (("OVERVIEW", summary), ("SCHEDULE", schedule)):
         pattern = rf'<!-- DELIVERY_{label}_START -->.*?<!-- DELIVERY_{label}_END -->'
-        content, count = re.subn(pattern, lambda _: f'<!-- DELIVERY_{label}_START -->\n{replacement}\n      <!-- DELIVERY_{label}_END -->', content, flags=re.S)
+        content, count = re.subn(
+            pattern,
+            lambda _: f'<!-- DELIVERY_{label}_START -->\n{replacement}\n      <!-- DELIVERY_{label}_END -->',
+            content,
+            flags=re.S,
+        )
         if count != 1:
             raise ValueError(f"Expected exactly one {label} block")
+
+    if "./assets/js/current-operations.js" not in content:
+        script_pattern = r'(\s*<script src="\./assets/js/app\.js[^"]*" defer></script>)'
+        content, count = re.subn(
+            script_pattern,
+            r'\1\n  <script src="./assets/js/current-operations.js?v=current-ops-v0-3" defer></script>',
+            content,
+            count=1,
+        )
+        if count != 1:
+            raise ValueError("Expected exactly one app.js script tag")
+
     path.write_text(content, encoding="utf-8")
-    (site / "data/history-progress.json").write_text(json.dumps(progress, indent=2) + "\n", encoding="utf-8")
+    data_dir = site / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    (data_dir / "history-progress.json").write_text(
+        json.dumps(progress, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    (data_dir / "current-operations.json").write_text(
+        json.dumps(web_current, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
 
 if __name__ == "__main__":
