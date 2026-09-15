@@ -92,6 +92,9 @@ jobs:
           )
           assert project["v0_12SuccessorWindowState"] == "HISTORICAL_WINDOW_ENDED"
           assert project["v0_12CurrentWindowActive"] is False
+          assert project["v0_12ScheduleRegistrationPresent"] is True
+          assert project["successorMetadataCaptureExecutionAuthorized"] is False
+          assert project["successorMetadataScheduleEnabled"] is False
           assert project["replacementHoldoutState"] == "FROZEN_UNOPENED"
           assert project["sourceSwitchAuthorized"] is False
           assert project["tradePlanAuthorized"] is False
