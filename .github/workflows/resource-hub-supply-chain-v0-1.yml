@@ -1,0 +1,144 @@
+name: Resource Hub Supply Chain V0.1
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: resource-hub-supply-chain-v0-1-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  scan-candidates:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Assert read-only policy boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          policy = json.loads(Path("config/resource_hub_supply_chain_v0_1.json").read_text())
+          safety = policy["safety"]
+          if safety.get("workflow_dispatch_only") is not True:
+              raise SystemExit("V0.1 must remain workflow_dispatch_only")
+          forbidden = [key for key, value in safety.items() if key != "workflow_dispatch_only" and value is not False]
+          if forbidden:
+              raise SystemExit(f"read-only policy boundary failed: {forbidden}")
+          PY
+
+      - name: Resolve exact Resource Hub authority
+        id: hub
+        run: |
+          set -euo pipefail
+          mkdir -p resource-hub-supply-chain-input resource-hub-supply-chain-output
+          curl --fail --silent --show-error --location \
+            --header 'Accept: application/vnd.github+json' \
+            https://api.github.com/repos/qookey109-pixel/ai-resource-hub/commits/main \
+            > resource-hub-supply-chain-input/commit.json
+          HUB_SHA="$(python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          payload = json.loads(Path("resource-hub-supply-chain-input/commit.json").read_text())
+          sha = str(payload.get("sha", ""))
+          if not re.fullmatch(r"[0-9a-f]{40}", sha):
+              raise SystemExit("failed to resolve exact AI Resource Hub commit SHA")
+          print(sha)
+          PY
+          )"
+          echo "hub_sha=$HUB_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch catalog at exact Resource Hub commit
+        env:
+          HUB_SHA: ${{ steps.hub.outputs.hub_sha }}
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            "https://raw.githubusercontent.com/qookey109-pixel/ai-resource-hub/${HUB_SHA}/data/resources.json" \
+            > resource-hub-supply-chain-input/resources.json
+
+      - name: Build integration candidate registry
+        env:
+          HUB_SHA: ${{ steps.hub.outputs.hub_sha }}
+        run: |
+          python scripts/resource_hub_candidates_v0_1.py \
+            --input resource-hub-supply-chain-input/resources.json \
+            --source-commit "$HUB_SHA" \
+            --output resource-hub-supply-chain-output/candidates.json
+
+      - name: Validate candidate artifact and authority
+        env:
+          HUB_SHA: ${{ steps.hub.outputs.hub_sha }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          payload = json.loads(Path("resource-hub-supply-chain-output/candidates.json").read_text())
+          if payload.get("status") != "RESEARCH_ONLY":
+              raise SystemExit("candidate registry is not research-only")
+          if payload.get("source", {}).get("commit_sha") != os.environ["HUB_SHA"]:
+              raise SystemExit("candidate registry lost exact Resource Hub lineage")
+
+          authority = payload.get("authority", {})
+          if authority.get("workflow_dispatch_only") is not True:
+              raise SystemExit("workflow_dispatch_only boundary missing")
+          forbidden = [
+              key
+              for key, value in authority.items()
+              if key != "workflow_dispatch_only" and value is not False
+          ]
+          if forbidden:
+              raise SystemExit(f"candidate artifact enabled forbidden authority: {forbidden}")
+
+          for candidate in payload.get("candidates", []):
+              if candidate.get("decision") != "REVIEW_REQUIRED":
+                  raise SystemExit("candidate bypassed review gate")
+              for key in (
+                  "automatic_install_authorized",
+                  "automatic_execution_authorized",
+                  "adapter_creation_authorized",
+                  "live_trading_authorized",
+              ):
+                  if candidate.get(key) is not False:
+                      raise SystemExit(f"candidate enabled forbidden action: {candidate.get('resource_id')}:{key}")
+
+          print(
+              "Resource Hub candidate scan PASS:",
+              payload.get("candidate_count", 0),
+              "candidates from",
+              payload.get("scanned_resource_count", 0),
+              "resources @",
+              os.environ["HUB_SHA"],
+          )
+          PY
+
+      - name: Upload candidate registry
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: resource-hub-supply-chain-v0-1-${{ steps.hub.outputs.hub_sha }}-${{ github.run_id }}
+          path: resource-hub-supply-chain-output/candidates.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner files
+        if: always()
+        run: rm -rf resource-hub-supply-chain-input resource-hub-supply-chain-output
