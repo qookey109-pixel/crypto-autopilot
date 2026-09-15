@@ -45,8 +45,8 @@ jobs:
           receipt = json.loads(
               Path("research/receipts/2026-09-15-core100-reject-diagnosis-scope.json").read_text()
           )
-          assert receipt["status"] == "AUTHORIZED_READ_ONLY_ONE_SHOT"
-          assert receipt["execution"]["one_shot"] is True
+          assert receipt["status"] == "AUTHORIZED_READ_ONLY_BOUNDED"
+          assert receipt["execution"]["maximum_read_attempts"] == 2
           assert receipt["execution"]["read_only"] is True
           assert receipt["execution"]["r2_writes_authorized"] is False
           assert receipt["execution"]["holdout_access_authorized"] is False
@@ -79,6 +79,7 @@ jobs:
           assert gate["status"] == "REJECT"
           assert diagnosis["failing_fold_count"] > 0
           assert diagnosis["failing_base_cost_scenario_count"] > 0
+          assert diagnosis["zero_signal_base_cost_scenario_count"] > 0
           assert diagnosis["automatic_model_promotion_authorized"] is False
           assert diagnosis["formal_trade_plan_authorized"] is False
           assert diagnosis["real_money_order_authorized"] is False
