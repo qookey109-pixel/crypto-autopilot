@@ -17,6 +17,7 @@ on:
           - backtest
           - stress
           - compare
+          - edge
           - report
       input_path:
         description: Repository-relative JSON input path; leave empty for capabilities
@@ -79,6 +80,7 @@ jobs:
               "backtest",
               "stress",
               "compare",
+              "edge",
               "report",
           }
           if command not in allowed:
@@ -124,7 +126,7 @@ jobs:
                 --interval "$TOOLKIT_INTERVAL" \
                 > toolkit-cloud-output/result.json
               ;;
-            strategy|risk|backtest|stress|compare|report)
+            strategy|risk|backtest|stress|compare|edge|report)
               python scripts/qookey_crypto_toolkit_v0_2.py "$TOOLKIT_COMMAND" \
                 --input "$TOOLKIT_INPUT_PATH" \
                 > toolkit-cloud-output/result.json

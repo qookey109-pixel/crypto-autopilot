@@ -17,6 +17,7 @@ from crypto_autopilot.toolkit import (
     size_long_trade_tool,
     stress_paper_backtest,
     validate_candles,
+    validate_statistical_edge,
 )
 
 
@@ -51,6 +52,7 @@ def main() -> int:
         ("backtest", "Run the deterministic paper-only backtest"),
         ("stress", "Stress a paper backtest across bounded execution-cost scenarios"),
         ("compare", "Compare paper-backtest evidence"),
+        ("edge", "Analyze supplied research returns for statistical edge evidence"),
         ("report", "Build a deterministic research report"),
     ):
         command_parser = subparsers.add_parser(command, help=help_text)
@@ -82,6 +84,8 @@ def main() -> int:
         _emit(stress_paper_backtest(payload))
     elif args.command == "compare":
         _emit(compare_backtests(payload))
+    elif args.command == "edge":
+        _emit(validate_statistical_edge(payload))
     elif args.command == "report":
         _emit(build_research_report(payload))
     else:

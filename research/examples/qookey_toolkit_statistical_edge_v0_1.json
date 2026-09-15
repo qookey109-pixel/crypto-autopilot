@@ -1,0 +1,39 @@
+{
+  "returns": [
+    0.012,
+    -0.004,
+    0.009,
+    0.006,
+    -0.003,
+    0.011,
+    0.004,
+    0.007,
+    -0.002,
+    0.01
+  ],
+  "train_returns": [
+    0.012,
+    -0.004,
+    0.009,
+    0.006,
+    -0.003,
+    0.011
+  ],
+  "test_returns": [
+    0.004,
+    0.007,
+    -0.002,
+    0.01
+  ],
+  "bootstrap_iterations": 1000,
+  "seed": 42,
+  "alpha": 0.05,
+  "concentration_top_n": 3,
+  "ruin": {
+    "initial_equity": 100.0,
+    "ruin_fraction": 0.5,
+    "horizon_trades": 100,
+    "simulations": 1000,
+    "max_ruin_probability": 0.05
+  }
+}

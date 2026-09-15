@@ -16,8 +16,21 @@
     "validate_candles",
     "stress_paper_backtest",
     "compare_backtests",
+    "validate_statistical_edge",
     "build_research_report"
   ],
+  "resource_hub_integrations": {
+    "registry": "config/resource_hub_integrations_v0_1.json",
+    "active_native_capabilities": [
+      "validate_statistical_edge"
+    ],
+    "prepared_disabled_integrations": [
+      "boundaryml-baml",
+      "trailhq-graft",
+      "world-monitor",
+      "agent-reach"
+    ]
+  },
   "interfaces": {
     "github_actions": "PRIMARY_CLOUD_INTERFACE",
     "python": "INTERNAL_REUSABLE_RUNNER",
@@ -47,6 +60,8 @@
       "slippage_bps",
       "conservative_same_bar_exit"
     ],
+    "statistical_edge_automatic_gate_change": false,
+    "resource_hub_external_network_integrations_enabled": false,
     "automatic_strategy_mutation": false,
     "automatic_selection_or_promotion": false
   },

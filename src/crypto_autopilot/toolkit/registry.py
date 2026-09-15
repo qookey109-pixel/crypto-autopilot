@@ -83,6 +83,21 @@ _V0_2_RESEARCH_TOOL_SPECS = (
     ),
 )
 
+_RESOURCE_HUB_RESEARCH_TOOL_SPECS = (
+    ToolSpec(
+        name="validate_statistical_edge",
+        category="statistical_validation",
+        description=(
+            "Analyze supplied fractional research returns with descriptive statistics, a centered "
+            "bootstrap, optional out-of-sample comparison, concentration, edge-decay and bounded "
+            "ruin simulation without changing any quality gate or trading authority."
+        ),
+        side_effects="none",
+        requires_network=False,
+        requires_secrets=False,
+    ),
+)
+
 
 SAFETY_BOUNDARY = {
     "provider_access_authorized": False,
@@ -114,7 +129,12 @@ def list_capabilities_v0_2() -> dict[str, object]:
         "schema": "qookey-crypto-toolkit-capabilities-v0.2",
         "status": "RESEARCH_ONLY",
         "tools": [
-            asdict(spec) for spec in (*_V0_1_TOOL_SPECS, *_V0_2_RESEARCH_TOOL_SPECS)
+            asdict(spec)
+            for spec in (
+                *_V0_1_TOOL_SPECS,
+                *_V0_2_RESEARCH_TOOL_SPECS,
+                *_RESOURCE_HUB_RESEARCH_TOOL_SPECS,
+            )
         ],
         "interfaces": {
             "python": "ENABLED",
