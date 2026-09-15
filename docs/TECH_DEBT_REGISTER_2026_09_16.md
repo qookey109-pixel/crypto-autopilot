@@ -6,23 +6,24 @@ Repository `main` is authority. This register tracks cleanup work; it does not g
 
 ### TD-001 — Multiple present-tense status authorities
 
-Status: **IN PROGRESS**
+Status: **IN PROGRESS — CORE CONVERGENCE IMPLEMENTED ON PR #322**
 
 Problem:
 
 - `README.md`, `PROJECT_STATUS.md`, status JSON, Dashboard projections, and security/governance prose can describe different lifecycle states.
 - Older September 13 text still reports Core100 `8/10` and Training `SKIPPED` even though History is complete and Training run `34918219864` completed successfully.
 
-Target:
+Implemented on PR #322:
 
 - `CURRENT_STATUS.md` is the concise human entrypoint.
 - `research/status/current-operations-v0-2.json` is the machine-readable current-state companion.
-- Other documents are projections or historical evidence, never independent current truth.
+- `AGENTS.md` reads current operations before dated status files.
+- root `README.md` and `PROJECT_STATUS.md` now project current lifecycle state while preserving required historical compatibility markers.
+- regression tests prevent `8/10 / Training SKIPPED` from returning as current state.
 
-Exit criteria:
+Remaining exit criterion:
 
-- CI verifies the current entrypoint and machine-readable companion agree on reviewed main, lifecycle, run IDs, and closed authority boundaries.
-- README / PROJECT_STATUS / Dashboard clearly reference the current entrypoint rather than restating stale present-tense status.
+- finish wiring the same machine-readable state into the production Dashboard projection and obtain exact-head green CI.
 
 ### TD-002 — Pionex current-main evidence gap
 
@@ -47,64 +48,69 @@ Exit criteria:
 
 ### TD-003 — Dashboard projection drift
 
-Status: **OPEN**
+Status: **IN PROGRESS — CURRENT OPERATIONS OVERLAY IMPLEMENTED**
 
 Problem:
 
-- Dashboard workflows and fixtures still contain older V0.12 / historical state assumptions.
-- Training completion and current Pionex validation state are not consistently projected.
+- Historical Dashboard overlay logic still contains V0.12-era current-state assumptions.
+- Training completion and current Pionex validation state were not consistently projected.
 
-Target:
+Implemented on PR #322:
 
-- Generate Dashboard current state from the machine-readable current-operations snapshot plus immutable evidence.
-- Keep Dashboard a projection, never authority.
+- added `scripts/apply_dashboard_current_operations_v0_2.py` as a final fail-closed current-state overlay after historical lineage projection;
+- added tests for Core100 History/Training, model-quality REJECT, threshold replay no-change, Pionex pending current-main validation, V0.12 historical status, and closed holdout/source-switch/trading boundaries;
+- added a non-deploying validation workflow to prove the new overlay against the full historical Dashboard build chain.
+
+Remaining exit criterion:
+
+- after exact-head validation passes, wire the current overlay into the real Dashboard authority snapshot / Pages build without deleting historical lineage checks.
 
 ### TD-004 — Security/current-runtime prose drift
 
-Status: **OPEN**
+Status: **IMPLEMENTED ON PR #322 / AWAITING EXACT-HEAD CI**
 
-Problem:
+Implemented:
 
-- `SECURITY.md` security boundaries are sound, but some present-tense workflow wording still describes V0.12 as the current scheduled path after its bounded window.
-
-Target:
-
-- Preserve secret/runtime/holdout rules.
-- Rewrite only stale present-tense operational wording as historical/superseded state.
+- preserved secret/runtime/holdout rules;
+- changed V0.12 from false present-tense current scheduling language to its exact historical bounded window;
+- documented the current Pionex validation workflow as manual-only and validation-scoped.
 
 ### TD-005 — Open PR backlog crosses architecture generations
 
-Status: **OPEN**
+Status: **TRIAGED / PRESERVATION REVIEW STILL OPEN**
 
-Current known lanes include active/recent work (#302, #305, #306, #307, #315) and legacy salvage drafts (#166, #167, #168, #199, #249).
+Current classification is recorded in:
 
-Target:
+- `docs/OPEN_PR_TRIAGE_2026_09_16.md`
+- `research/status/open-pr-triage-v0-2.json`
 
-For each open PR classify against current main as one of:
+Current lanes:
 
-- ACTIVE_CURRENT;
-- REBUILD_FROM_CURRENT_MAIN;
-- PRESERVE_SALVAGE_DRAFT;
-- SUPERSEDED_BY_MAIN;
-- CLOSE_AFTER_PRESERVATION_PROOF.
+- `ACTIVE_CURRENT`: #322
+- `REBUILD_FROM_CURRENT_MAIN`: #315, #307, #306
+- `SUPERSEDED_PENDING_PRESERVATION_PROOF`: #305
+- `PRESERVE_DIAGNOSTIC_EVIDENCE`: #302
+- `SALVAGE_DRAFT`: #249, #199, #168, #167, #166
 
-Do not merge an old branch merely because its historical CI was green.
+Do not merge an old branch merely because its historical CI was green. Do not close #305 until unique useful content is proven preserved or intentionally superseded.
 
 ## P2 — workflow and quality maintenance
 
 ### TD-006 — Hard-coded scheduled-workflow count
 
-Status: **OPEN**
+Status: **IMPLEMENTED ON PR #322 / AWAITING EXACT-HEAD CI**
 
-Problem:
+Previous problem:
 
-- Research Automation Health V0.2 asserts an exact scheduled workflow count of `7`.
-- Adding or retiring a scheduler requires synchronized code/config changes and can create avoidable drift.
+- Research Automation Health V0.2 repeated an exact scheduled workflow count of `7` even though the core coverage engine already scans Repository schedules and detects missing/duplicate monitoring.
 
-Target:
+Implemented:
 
-- Introduce an explicit active-workflow registry.
-- Health checks derive expected scheduled workflows from that registry and still fail closed on omissions.
+- config policy is now `EXACT_REPOSITORY_SCHEDULE_INVENTORY`;
+- expected count is derived from `config["workflows"]` rather than a magic number;
+- the workflow requires Repository scheduled count = monitored count = inventory count;
+- unmonitored schedules, duplicate monitored entries, and manual-event masking remain fail-closed;
+- a regression test prevents the literal `scheduled_workflow_count == 7` assertion from returning.
 
 ### TD-007 — Quality visibility is narrower than project size
 
@@ -114,8 +120,8 @@ Current blocking CI intentionally limits Ruff to core correctness classes and do
 
 Target:
 
-- Add non-blocking reports first for broader lint/type/complexity/dead-code visibility.
-- Do not immediately expand required gates and destabilize protected main.
+- add non-blocking reports first for broader lint/type/complexity/dead-code visibility;
+- do not immediately expand required gates and destabilize protected main.
 
 ### TD-008 — Dependency/security maintenance visibility
 
@@ -123,8 +129,8 @@ Status: **OPEN**
 
 Target:
 
-- Add review-only dependency-update visibility; no auto-merge.
-- Evaluate CodeQL or equivalent non-blocking static security analysis before making it required.
+- add review-only dependency-update visibility; no auto-merge;
+- evaluate CodeQL or equivalent non-blocking static security analysis before making it required.
 
 ## P3 — code structure
 
@@ -138,9 +144,9 @@ Observation:
 
 Target:
 
-- First add characterization tests around current behavior.
-- Split responsibilities only after control-plane and Pionex validation work are stable.
-- No behavior-changing rewrite solely for file size.
+- first add characterization tests around current behavior;
+- split responsibilities only after control-plane and Pionex validation work are stable;
+- no behavior-changing rewrite solely for file size.
 
 ## Explicit non-goals
 
