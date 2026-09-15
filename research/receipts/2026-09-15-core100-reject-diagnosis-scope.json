@@ -1,0 +1,15 @@
+{
+  "schema": "qookey-core100-reject-diagnosis-scope-v0.1",
+  "status": "DIAGNOSTIC_ONLY",
+  "source_training_run_id": 34918219864,
+  "source_training_head_sha": "dc10ce590c8731fbef21115e0e3d3423cbcc7cf1",
+  "observed_model_quality_gate": "REJECT",
+  "history_reacquisition_required": false,
+  "retraining_authorized_by_this_receipt": false,
+  "automatic_model_promotion_authorized": false,
+  "formal_trade_plan_authorized": false,
+  "real_money_order_authorized": false,
+  "live_trading_authorized": false,
+  "source_switch_authorized": false,
+  "purpose": "Extract and rank fold-level and cost-scenario failure evidence before deciding whether any model or strategy change is justified."
+}
