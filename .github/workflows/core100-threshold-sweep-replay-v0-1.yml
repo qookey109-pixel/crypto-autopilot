@@ -22,6 +22,35 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+          fetch-depth: 2
+
+      - name: Validate exact one-shot authority commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          from datetime import UTC, datetime
+          from pathlib import Path
+
+          receipt_path = Path("research/receipts/2026-09-15-core100-threshold-sweep-one-shot-authority.json")
+          receipt = json.loads(receipt_path.read_text())
+          assert receipt["schema"] == "qookey-core100-threshold-sweep-one-shot-authority-v0.1"
+          assert receipt["status"] == "AUTHORIZED_READ_ONLY_ONE_SHOT"
+          assert os.environ["GITHUB_EVENT_NAME"] == "push"
+          assert os.environ["GITHUB_REF"] == "refs/heads/codex/core100-reject-diagnosis-20260915"
+          parent = subprocess.check_output(["git", "rev-parse", "HEAD^"], text=True).strip()
+          assert parent == receipt["authorized_code_parent_sha"]
+          changed = subprocess.check_output(
+              ["git", "diff", "--name-only", "HEAD^", "HEAD"], text=True
+          ).splitlines()
+          assert changed == [str(receipt_path)]
+          expires = datetime.fromisoformat(receipt["expires_at_utc"].replace("Z", "+00:00"))
+          assert datetime.now(UTC) < expires
+          assert receipt["execution"]["maximum_runs"] == 1
+          PY
 
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
