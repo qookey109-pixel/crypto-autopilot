@@ -1,0 +1,70 @@
+{
+  "schema": "qookey-open-pr-triage-v0.2",
+  "snapshot_date": "2026-09-16",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "reviewed_main_sha": "f5cf74292fca262ba72c4e0b36f8d757dfb82531",
+  "merge_authority_granted": false,
+  "execution_authority_granted": false,
+  "pull_requests": {
+    "322": {
+      "classification": "ACTIVE_CURRENT",
+      "head_sha_at_snapshot": "17399dcb72cad073f4b0430db0ffea3a168286b5",
+      "action": "KEEP_DRAFT_UNTIL_EXACT_HEAD_CI_GREEN_AND_SCOPE_STABLE"
+    },
+    "315": {
+      "classification": "REBUILD_FROM_CURRENT_MAIN",
+      "head_sha_at_snapshot": "893b0aadbd65e81b8d3ff302729810adc8e6aef1",
+      "action": "COMPARE_AND_SALVAGE_UNIQUE_DATA_ROLE_GOVERNANCE"
+    },
+    "307": {
+      "classification": "REBUILD_FROM_CURRENT_MAIN",
+      "head_sha_at_snapshot": "0cff93388b71ac5cf323b1889a0847ffeafb430f",
+      "action": "REBUILD_IF_STATISTICAL_EDGE_CAPABILITY_REMAINS_PRIORITY"
+    },
+    "306": {
+      "classification": "REBUILD_FROM_CURRENT_MAIN",
+      "head_sha_at_snapshot": "9e97b9493920c9b2e46303906d1d8942f2f4de3d",
+      "action": "REBUILD_IF_REST_EDGE_INTERFACE_REMAINS_PRIORITY"
+    },
+    "305": {
+      "classification": "SUPERSEDED_PENDING_PRESERVATION_PROOF",
+      "head_sha_at_snapshot": "f2a4310f51d5182ab2054b05c6b096405bf9388c",
+      "action": "KEEP_OPEN_UNTIL_322_PRESERVATION_PROOF"
+    },
+    "302": {
+      "classification": "PRESERVE_DIAGNOSTIC_EVIDENCE",
+      "head_sha_at_snapshot": "978dae1a1a39ee01905c82c2f8cfa4a12088719d",
+      "action": "PRESERVE_REPLAY_RESULT_THEN_REVIEW_CODE_AGAINST_CURRENT_MAIN"
+    },
+    "249": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "0563154e8b7fc68f4fd47476161ac0ec741f3b44",
+      "action": "KEEP_AS_INCIDENT_REVIEW_SALVAGE"
+    },
+    "199": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "a5cb4cfb797dc205167154f6a38925082106edad",
+      "action": "REBUILD_SELECTED_STRATEGY_GOVERNANCE_IF_REVIVED"
+    },
+    "168": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "38f7383a32ce64bb5a718da046af222156164fb4",
+      "action": "KEEP_AS_SIMULATION_REFERENCE"
+    },
+    "167": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "a2d4de6c955d32b5797161831d01adaa3d92d4f7",
+      "action": "REBUILD_SELECTED_RESEARCH_GOVERNANCE_IF_REVIVED"
+    },
+    "166": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "2b2ddc5deddb54ce77d44c61b4a4f9bef2eaf1dc",
+      "action": "REBUILD_SELECTED_TECHNICAL_ANALYSIS_FEATURES_IF_REVIVED"
+    }
+  },
+  "notes": [
+    "Historical CI success on an old branch is not sufficient merge evidence after main advances.",
+    "Do not close PR #305 until PR #322 proves preservation or intentional supersession of its unique content.",
+    "This snapshot is navigation only and grants no merge, deployment, provider, holdout, promotion, order, or live-trading authority."
+  ]
+}
