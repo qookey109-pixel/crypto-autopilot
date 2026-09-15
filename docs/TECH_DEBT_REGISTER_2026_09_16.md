@@ -58,8 +58,8 @@ Problem:
 Implemented on PR #322:
 
 - added `scripts/apply_dashboard_current_operations_v0_2.py` as a final fail-closed current-state overlay after historical lineage projection;
-- added tests for Core100 History/Training, model-quality REJECT, threshold replay no-change, Pionex pending current-main validation, V0.12 historical status, and closed holdout/source-switch/trading boundaries;
-- added a non-deploying validation workflow to prove the new overlay against the full historical Dashboard build chain.
+- added tests for Core100 History/Training, model-quality REJECT, threshold replay no-change, Pionex pending current-main validation, V0.12 historical status, expired V0.12 execution flags, and closed holdout/source-switch/trading boundaries;
+- ran a temporary non-deploying pull-request validation workflow against the full historical Dashboard build chain and obtained SUCCESS; the temporary workflow was then removed so one-time validation did not become permanent control-plane inventory.
 
 Remaining exit criterion:
 
