@@ -1,0 +1,55 @@
+{
+  "schema": "qookey-crypto-toolkit-v0.2",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "base": {
+    "v0_1_compatibility_preserved": true,
+    "python_package": "crypto_autopilot.toolkit",
+    "cli": "scripts/qookey_crypto_toolkit_v0_2.py"
+  },
+  "tools": [
+    "get_indicators",
+    "evaluate_strategy",
+    "size_long_trade",
+    "run_paper_backtest",
+    "validate_candles",
+    "stress_paper_backtest",
+    "compare_backtests",
+    "build_research_report"
+  ],
+  "interfaces": {
+    "python": "ENABLED",
+    "cli": "ENABLED",
+    "github_actions": "SUPPORTED_LOCAL_EXECUTION",
+    "rest_api": "DEFERRED",
+    "telegram": "DEFERRED",
+    "mcp": "DEFERRED"
+  },
+  "research_guards": {
+    "network_required": false,
+    "secrets_required": false,
+    "candle_repair_performed": false,
+    "interpolation_performed": false,
+    "synthetic_candles_emitted": false,
+    "stress_scenario_limit": 64,
+    "stress_allowed_overrides": [
+      "taker_fee_bps",
+      "slippage_bps",
+      "conservative_same_bar_exit"
+    ],
+    "automatic_strategy_mutation": false,
+    "automatic_selection_or_promotion": false
+  },
+  "safety_boundary": {
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "synthetic_candles_authorized": false,
+    "interpolation_authorized": false,
+    "automatic_strategy_mutation_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

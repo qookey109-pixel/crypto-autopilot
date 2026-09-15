@@ -13,7 +13,7 @@ class ToolSpec:
     requires_secrets: bool
 
 
-_TOOL_SPECS = (
+_V0_1_TOOL_SPECS = (
     ToolSpec(
         name="get_indicators",
         category="technical",
@@ -48,6 +48,41 @@ _TOOL_SPECS = (
     ),
 )
 
+_V0_2_RESEARCH_TOOL_SPECS = (
+    ToolSpec(
+        name="validate_candles",
+        category="data_quality",
+        description="Audit supplied candles for duplicates, ordering, gaps, alignment and invalid OHLCV without repair.",
+        side_effects="none",
+        requires_network=False,
+        requires_secrets=False,
+    ),
+    ToolSpec(
+        name="stress_paper_backtest",
+        category="robustness",
+        description="Re-run a supplied paper backtest across bounded fee, slippage and same-bar execution scenarios.",
+        side_effects="none",
+        requires_network=False,
+        requires_secrets=False,
+    ),
+    ToolSpec(
+        name="compare_backtests",
+        category="evaluation",
+        description="Compare local paper-backtest evidence descriptively without selecting or promoting a strategy.",
+        side_effects="none",
+        requires_network=False,
+        requires_secrets=False,
+    ),
+    ToolSpec(
+        name="build_research_report",
+        category="reporting",
+        description="Build a deterministic research-only Markdown summary from Toolkit evidence.",
+        side_effects="none",
+        requires_network=False,
+        requires_secrets=False,
+    ),
+)
+
 
 SAFETY_BOUNDARY = {
     "provider_access_authorized": False,
@@ -65,9 +100,29 @@ SAFETY_BOUNDARY = {
 
 
 def list_capabilities() -> dict[str, object]:
+    """Preserve the V0.1 capability contract for existing callers."""
     return {
         "schema": "qookey-crypto-toolkit-capabilities-v0.1",
         "status": "RESEARCH_ONLY",
-        "tools": [asdict(spec) for spec in _TOOL_SPECS],
+        "tools": [asdict(spec) for spec in _V0_1_TOOL_SPECS],
+        "safety_boundary": dict(SAFETY_BOUNDARY),
+    }
+
+
+def list_capabilities_v0_2() -> dict[str, object]:
+    return {
+        "schema": "qookey-crypto-toolkit-capabilities-v0.2",
+        "status": "RESEARCH_ONLY",
+        "tools": [
+            asdict(spec) for spec in (*_V0_1_TOOL_SPECS, *_V0_2_RESEARCH_TOOL_SPECS)
+        ],
+        "interfaces": {
+            "python": "ENABLED",
+            "cli": "ENABLED",
+            "github_actions": "SUPPORTED_LOCAL_EXECUTION",
+            "rest_api": "DEFERRED",
+            "telegram": "DEFERRED",
+            "mcp": "DEFERRED",
+        },
         "safety_boundary": dict(SAFETY_BOUNDARY),
     }
