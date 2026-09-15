@@ -1,96 +1,103 @@
 # Technical Debt Register — 2026-09-16
 
-Repository `main` is authority. This register tracks cleanup work; it does not grant execution, trading, provider, holdout, promotion, or deployment authority.
+Repository `main` is authority and must be resolved live at read time. This register tracks cleanup work; it does not grant execution, trading, provider, holdout, promotion, or deployment authority.
 
 ## P0 — current-truth convergence
 
 ### TD-001 — Multiple present-tense status authorities
 
-Status: **IN PROGRESS — CORE CONVERGENCE IMPLEMENTED ON PR #322**
+Status: **CORE CONVERGENCE MERGED / SELF-REFERENCE FIX IN PR #323**
 
-Problem:
+Merged by PR #322:
 
-- `README.md`, `PROJECT_STATUS.md`, status JSON, Dashboard projections, and security/governance prose can describe different lifecycle states.
-- Older September 13 text still reports Core100 `8/10` and Training `SKIPPED` even though History is complete and Training run `34918219864` completed successfully.
+- `CURRENT_STATUS.md` as the concise human entrypoint;
+- machine-readable Current Operations state;
+- `AGENTS.md` current-first read order;
+- root README / PROJECT_STATUS / SECURITY convergence;
+- regression guards preventing old `8/10 / Training SKIPPED` text from becoming current state.
 
-Implemented on PR #322:
+Follow-up defect discovered after merge:
 
-- `CURRENT_STATUS.md` is the concise human entrypoint.
-- `research/status/current-operations-v0-2.json` is the machine-readable current-state companion.
-- `AGENTS.md` reads current operations before dated status files.
-- root `README.md` and `PROJECT_STATUS.md` now project current lifecycle state while preserving required historical compatibility markers.
-- regression tests prevent `8/10 / Training SKIPPED` from returning as current state.
+- a status file cannot safely claim that its stored SHA is the latest future `main`, because the merge commit is created only after the file is merged.
 
-Remaining exit criterion:
+Implemented on PR #323:
 
-- finish wiring the same machine-readable state into the production Dashboard projection and obtain exact-head green CI.
+- Current Operations V0.3 uses `evidence_basis.parent_main_sha` with `is_latest_main_claim=false`;
+- Repository `main` must be resolved live at read time;
+- tests reject self-referential latest-main semantics.
 
-### TD-002 — Pionex current-main evidence gap
+Exit criterion:
+
+- PR #323 exact-head CI and Dashboard validation green, then separate merge authorization.
+
+### TD-002 — Pionex Repository-current evidence gap
 
 Status: **OPEN / OPERATIONAL**
 
 Problem:
 
-- PR #321 is merged on current main and fixes narrow bounds-only invalid-candle boundary handling.
+- PR #321 merged the narrow bounds-only invalid-candle boundary fix.
 - Previous materialization run `34991627998` failed closed before that fix.
-- No new materialization result from `main=f5cf7429...` has yet been frozen as current-main execution evidence.
+- No new materialization result from the Repository's current live `main` has yet been frozen as post-fix validation evidence.
 
 Target:
 
-- Manually dispatch `.github/workflows/pionex-validation-materialization-v0-1.yml` from current main.
-- Verify the secret-free report and preserve only the allowed validation evidence.
+- manually dispatch `.github/workflows/pionex-validation-materialization-v0-1.yml` from live `main` after current control-plane work is stable;
+- verify the secret-free report and preserve only the allowed validation evidence.
 
 Exit criteria:
 
-- Current-main run ID, outcome, artifact digest, partition/coverage status, and authority assertions are recorded without opening holdout/training/source-switch/trading authority.
+- Repository-current run ID, outcome, artifact digest, partition/coverage status, and authority assertions are recorded without opening holdout/training/source-switch/trading authority.
 
 ## P1 — control-plane projections
 
-### TD-003 — Dashboard projection drift
+### TD-003 — Dashboard / homepage projection drift
 
-Status: **IN PROGRESS — CURRENT OPERATIONS OVERLAY IMPLEMENTED**
+Status: **IMPLEMENTED ON PR #323 / EXACT-HEAD VALIDATION IN PROGRESS**
 
-Problem:
+Previous problem:
 
-- Historical Dashboard overlay logic still contains V0.12-era current-state assumptions.
-- Training completion and current Pionex validation state were not consistently projected.
+- historical Dashboard overlay still projected the expired V0.12 bounded window as present-tense active;
+- production Pages did not apply the current-operations overlay;
+- `build_delivery_overview.py` restored September 13 `8/10 / Training skipped / PR #292` text on every deployment;
+- legacy `app.js` could overwrite the home history card with the dated progress snapshot.
 
-Implemented on PR #322:
+Implemented on PR #323:
 
-- added `scripts/apply_dashboard_current_operations_v0_2.py` as a final fail-closed current-state overlay after historical lineage projection;
-- added tests for Core100 History/Training, model-quality REJECT, threshold replay no-change, Pionex pending current-main validation, V0.12 historical status, expired V0.12 execution flags, and closed holdout/source-switch/trading boundaries;
-- ran a temporary non-deploying pull-request validation workflow against the full historical Dashboard build chain and obtained SUCCESS; the temporary workflow was then removed so one-time validation did not become permanent control-plane inventory.
-
-Remaining exit criterion:
-
-- after exact-head validation passes, wire the current overlay into the real Dashboard authority snapshot / Pages build without deleting historical lineage checks.
+- Current Operations V0.3 final Dashboard overlay;
+- production Pages and Zh-Hant authority workflows use `historical authority -> latest historical overlay -> Current Operations V0.3`;
+- Core100 10/10, Training completed, Model Quality REJECT, threshold replay no-change and Pionex pending are asserted in production builds;
+- V0.12 historical lineage remains preserved while expired present-tense execution/schedule flags are closed;
+- homepage generator now treats dated simulation readiness as historical BTC sample evidence only;
+- generated homepage current state comes from Current Operations V0.3;
+- secret-free `data/current-operations.json` plus final `current-operations.js` prevents legacy app state from reintroducing dated present-tense values;
+- build tests reject stale `8/10 分片`, `訓練尚未完成`, `PR #292`, and stale automation-health failure wording.
 
 ### TD-004 — Security/current-runtime prose drift
 
-Status: **IMPLEMENTED ON PR #322 / AWAITING EXACT-HEAD CI**
-
-Implemented:
+Status: **COMPLETE VIA PR #322**
 
 - preserved secret/runtime/holdout rules;
-- changed V0.12 from false present-tense current scheduling language to its exact historical bounded window;
-- documented the current Pionex validation workflow as manual-only and validation-scoped.
+- V0.12 wording now describes its exact historical bounded window rather than a current active schedule;
+- current Pionex validation remains manual-only and validation-scoped.
 
 ### TD-005 — Open PR backlog crosses architecture generations
 
-Status: **TRIAGED / PRESERVATION REVIEW STILL OPEN**
+Status: **TRIAGED / REFRESHED FOR PR #323**
 
 Current classification is recorded in:
 
-- `docs/OPEN_PR_TRIAGE_2026_09_16.md`
-- `research/status/open-pr-triage-v0-2.json`
+- `docs/OPEN_PR_TRIAGE_2026_09_16.md`;
+- `research/status/open-pr-triage-v0-3.json`.
 
 Current lanes:
 
-- `ACTIVE_CURRENT`: #322
-- `REBUILD_FROM_CURRENT_MAIN`: #315, #307, #306
-- `SUPERSEDED_PENDING_PRESERVATION_PROOF`: #305
-- `PRESERVE_DIAGNOSTIC_EVIDENCE`: #302
-- `SALVAGE_DRAFT`: #249, #199, #168, #167, #166
+- `ACTIVE_CURRENT`: #323;
+- recently merged control-plane batch: #322;
+- `REBUILD_FROM_CURRENT_MAIN`: #315, #307, #306;
+- `SUPERSEDED_PENDING_PRESERVATION_PROOF`: #305;
+- `PRESERVE_DIAGNOSTIC_EVIDENCE`: #302;
+- `SALVAGE_DRAFT`: #249, #199, #168, #167, #166.
 
 Do not merge an old branch merely because its historical CI was green. Do not close #305 until unique useful content is proven preserved or intentionally superseded.
 
@@ -98,19 +105,15 @@ Do not merge an old branch merely because its historical CI was green. Do not cl
 
 ### TD-006 — Hard-coded scheduled-workflow count
 
-Status: **IMPLEMENTED ON PR #322 / AWAITING EXACT-HEAD CI**
-
-Previous problem:
-
-- Research Automation Health V0.2 repeated an exact scheduled workflow count of `7` even though the core coverage engine already scans Repository schedules and detects missing/duplicate monitoring.
+Status: **COMPLETE VIA PR #322; DASHBOARD ASSERTIONS ALSO FIXED IN #323**
 
 Implemented:
 
-- config policy is now `EXACT_REPOSITORY_SCHEDULE_INVENTORY`;
-- expected count is derived from `config["workflows"]` rather than a magic number;
-- the workflow requires Repository scheduled count = monitored count = inventory count;
-- unmonitored schedules, duplicate monitored entries, and manual-event masking remain fail-closed;
-- a regression test prevents the literal `scheduled_workflow_count == 7` assertion from returning.
+- Research Automation Health policy is `EXACT_REPOSITORY_SCHEDULE_INVENTORY`;
+- expected count derives from `config["workflows"]` rather than magic number `7`;
+- Repository scheduled count = monitored count = inventory count remains fail-closed;
+- unmonitored schedules, duplicate monitoring, and manual-event masking remain fail-closed;
+- production Dashboard assertions now also compare against inventory length instead of literal `7`.
 
 ### TD-007 — Quality visibility is narrower than project size
 
