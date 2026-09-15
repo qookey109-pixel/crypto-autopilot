@@ -13,95 +13,117 @@ from pathlib import Path
 from typing import Any
 
 
-def _iter_dicts(value: Any):
-    if isinstance(value, dict):
-        yield value
-        for child in value.values():
-            yield from _iter_dicts(child)
-    elif isinstance(value, list):
-        for child in value:
-            yield from _iter_dicts(child)
+EXPECTED_SCHEMA = "binance-usdm-intraday-research-metrics-v0.1"
 
 
-def _number(obj: dict[str, Any], *keys: str) -> float | None:
-    for key in keys:
-        value = obj.get(key)
-        if isinstance(value, (int, float)) and not isinstance(value, bool):
-            return float(value)
-    return None
+def _number(value: Any, *, field: str) -> float:
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        raise ValueError(f"{field} must be numeric")
+    return float(value)
 
 
 def diagnose(metrics: dict[str, Any]) -> dict[str, Any]:
+    if metrics.get("schema") != EXPECTED_SCHEMA or metrics.get("status") != "PASS":
+        raise ValueError("unsupported Core100 training metrics payload")
+
+    folds = metrics.get("walk_forward_folds")
+    if not isinstance(folds, list):
+        raise ValueError("walk_forward_folds must be a list")
+
     fold_rows: list[dict[str, Any]] = []
     cost_rows: list[dict[str, Any]] = []
 
-    seen_folds: set[tuple[Any, ...]] = set()
-    seen_costs: set[tuple[Any, ...]] = set()
-
-    for obj in _iter_dicts(metrics):
-        fold = obj.get("fold", obj.get("fold_id", obj.get("name")))
-        model_log_loss = _number(obj, "model_log_loss", "log_loss")
-        naive_log_loss = _number(obj, "naive_log_loss", "baseline_log_loss")
-        if model_log_loss is not None and naive_log_loss is not None:
-            delta = model_log_loss - naive_log_loss
-            key = (fold, model_log_loss, naive_log_loss)
-            if key not in seen_folds:
-                seen_folds.add(key)
-                fold_rows.append(
-                    {
-                        "fold": fold,
-                        "model_log_loss": model_log_loss,
-                        "naive_log_loss": naive_log_loss,
-                        "delta_vs_naive": delta,
-                        "beats_naive": delta < 0,
-                    }
-                )
-
-        average_return = _number(
-            obj,
-            "average_return",
-            "avg_return",
-            "mean_return",
-            "net_average_return",
-        )
-        if average_return is not None:
-            cost = _number(
-                obj,
-                "cost_bps",
-                "transaction_cost_bps",
-                "fee_bps",
-                "base_cost_bps",
+    for fold in folds:
+        if not isinstance(fold, dict):
+            raise ValueError("walk_forward_folds entries must be objects")
+        name = str(fold.get("name") or "")
+        status = str(fold.get("status") or "")
+        if status != "PASS":
+            fold_rows.append(
+                {
+                    "fold": name,
+                    "status": status or "UNKNOWN",
+                    "train_samples": fold.get("train_samples"),
+                    "test_samples": fold.get("test_samples"),
+                    "beats_naive": False,
+                    "delta_vs_naive": None,
+                }
             )
-            scenario = obj.get("scenario", obj.get("cost_scenario", obj.get("name")))
-            if cost is not None or scenario is not None:
-                key = (scenario, cost, average_return)
-                if key not in seen_costs:
-                    seen_costs.add(key)
-                    cost_rows.append(
-                        {
-                            "scenario": scenario,
-                            "cost_bps": cost,
-                            "average_return": average_return,
-                            "positive": average_return > 0,
-                        }
-                    )
+            continue
 
-    fold_rows.sort(key=lambda row: row["delta_vs_naive"], reverse=True)
-    cost_rows.sort(key=lambda row: row["average_return"])
+        model_metrics = fold.get("metrics")
+        baseline_metrics = fold.get("naive_train_prevalence_baseline")
+        if not isinstance(model_metrics, dict) or not isinstance(baseline_metrics, dict):
+            raise ValueError(f"fold {name!r} is missing probability metrics")
+        model_log_loss = _number(model_metrics.get("log_loss"), field="metrics.log_loss")
+        naive_log_loss = _number(
+            baseline_metrics.get("log_loss"), field="naive_train_prevalence_baseline.log_loss"
+        )
+        delta = model_log_loss - naive_log_loss
+        beats_naive = bool(fold.get("beats_naive_log_loss"))
+        fold_rows.append(
+            {
+                "fold": name,
+                "status": status,
+                "train_samples": fold.get("train_samples"),
+                "test_samples": fold.get("test_samples"),
+                "model_log_loss": model_log_loss,
+                "naive_log_loss": naive_log_loss,
+                "delta_vs_naive": delta,
+                "beats_naive": beats_naive,
+            }
+        )
+
+        scenarios = fold.get("cost_scenarios")
+        if not isinstance(scenarios, dict):
+            raise ValueError(f"fold {name!r} is missing cost_scenarios")
+        for scenario_name, scenario in scenarios.items():
+            if not isinstance(scenario, dict):
+                raise ValueError(f"fold {name!r} cost scenario {scenario_name!r} must be an object")
+            average_net_return = _number(
+                scenario.get("average_net_return"),
+                field=f"cost_scenarios.{scenario_name}.average_net_return",
+            )
+            cost_rows.append(
+                {
+                    "fold": name,
+                    "scenario": str(scenario_name),
+                    "average_net_return": average_net_return,
+                    "positive": average_net_return > 0.0,
+                    "selected_trades": scenario.get("selected_trades"),
+                    "win_rate": scenario.get("win_rate"),
+                    "maximum_drawdown": scenario.get("maximum_drawdown"),
+                }
+            )
+
+    def fold_sort_key(row: dict[str, Any]) -> float:
+        delta = row.get("delta_vs_naive")
+        return float("inf") if delta is None else float(delta)
+
+    fold_rows.sort(key=fold_sort_key, reverse=True)
+    cost_rows.sort(key=lambda row: float(row["average_net_return"]))
 
     failing_folds = [row for row in fold_rows if not row["beats_naive"]]
-    failing_costs = [row for row in cost_rows if not row["positive"]]
+    base_cost_rows = [row for row in cost_rows if row["scenario"] == "base"]
+    failing_base_costs = [row for row in base_cost_rows if not row["positive"]]
+
+    gate = metrics.get("model_quality_gate")
+    if not isinstance(gate, dict):
+        raise ValueError("model_quality_gate must be an object")
 
     return {
         "schema": "qookey-core100-training-reject-diagnosis-v0.1",
+        "source_metrics_schema": metrics["schema"],
+        "source_dataset_fingerprint": metrics.get("dataset_fingerprint"),
+        "source_model_quality_gate": gate,
         "fold_metrics_found": len(fold_rows),
         "failing_fold_count": len(failing_folds),
-        "cost_scenarios_found": len(cost_rows),
-        "failing_cost_scenario_count": len(failing_costs),
+        "base_cost_scenarios_found": len(base_cost_rows),
+        "failing_base_cost_scenario_count": len(failing_base_costs),
         "worst_folds": fold_rows[:10],
-        "worst_cost_scenarios": cost_rows[:10],
+        "worst_base_cost_scenarios": base_cost_rows[:10],
         "failing_folds": failing_folds,
-        "failing_cost_scenarios": failing_costs,
+        "failing_base_cost_scenarios": failing_base_costs,
         "diagnostic_only": True,
         "automatic_model_promotion_authorized": False,
         "formal_trade_plan_authorized": False,
