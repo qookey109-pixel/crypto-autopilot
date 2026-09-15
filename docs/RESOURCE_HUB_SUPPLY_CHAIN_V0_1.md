@@ -107,6 +107,24 @@ No Mac-local execution, Telegram, MCP, external model, exchange API, R2 credenti
 
 The first manual production run on 2026-09-15 scanned AI Resource Hub commit `7b19de82cd53d851fa5dd478bc1801d383f6c920` and demonstrated that the end-to-end lineage/artifact path worked. It also exposed two false positives caused by weak terms (`market` and `portfolio`), which motivated policy `v0.1.1` and its permanent regressions.
 
+## First candidate evaluation
+
+The first reviewed candidate is `anti-gambling-trader-tw` (反詐投資王), bound to upstream commit `9d938b64c80ee29363aed496ba4e61d9110a7222`.
+
+Evaluation receipt:
+
+`research/receipts/2026-09-15-resource-hub-anti-gambling-trader-evaluation-v0-1.json`
+
+The result is deliberately **not** an integration approval:
+
+- performance-metric and significance-testing semantics are useful research/cross-check candidates;
+- its significance layer is limited by an IID-trade assumption and no block bootstrap;
+- its temporal validation is a single chronological holdout, not a replacement for Crypto Autopilot frozen-holdout governance or multi-stage validation;
+- its PaperBroker is rejected for crypto-perpetual simulation authority because the short model omits funding, margin lock, maintenance margin, forced liquidation and related costs;
+- broker/live scaffold surfaces remain rejected for V0.1.
+
+The next allowed step is therefore an isolated statistical-equivalence/cross-check harness using synthetic and existing non-holdout fixtures. It does not authorize code import, runtime dependency, provider/R2/holdout access, strategy mutation, model promotion, broker connection or order execution.
+
 ## What comes next
 
 A future reviewed version may add an `integration-registry.json` lifecycle such as:
@@ -115,4 +133,4 @@ A future reviewed version may add an `integration-registry.json` lifecycle such 
 discovered → candidate → evaluated → approved → active → deprecated
 ```
 
-That is deliberately out of scope for V0.1. Any adapter execution, automatic PR, recurring schedule, tool installation, provider call, strategy mutation, or trading authority requires a separate reviewed version and explicit authority.
+The evaluation receipt above only records a reviewed decision; it does not create an approved/active registry entry. Any adapter execution, automatic PR, recurring schedule, tool installation, provider call, strategy mutation, or trading authority requires a separate reviewed version and explicit authority.
