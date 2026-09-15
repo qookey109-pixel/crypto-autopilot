@@ -1,0 +1,78 @@
+{
+  "schema": "resource-hub-integrations-v0.1",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "catalog_source": {
+    "repository": "qookey109-pixel/ai-resource-hub",
+    "authority_file": "data/resources.json",
+    "reviewed_date": "2026-09-15"
+  },
+  "integrations": [
+    {
+      "id": "anti-gambling-trader-tw",
+      "upstream": "mars-tw/anti-gambling-trader-tw",
+      "license": "MIT",
+      "integration_status": "IMPLEMENTED_NATIVE_METHODS_ONLY",
+      "runtime_dependency": false,
+      "network_required": false,
+      "purpose": "Statistical edge validation patterns for expectancy robustness, centered bootstrap, out-of-sample checks, concentration, decay and risk-path analysis.",
+      "local_capability": "validate_statistical_edge",
+      "code_reuse": "INDEPENDENT_REIMPLEMENTATION_NO_UPSTREAM_CODE_COPY"
+    },
+    {
+      "id": "boundaryml-baml",
+      "upstream": "BoundaryML/baml",
+      "license": "Apache-2.0",
+      "integration_status": "PREPARED_DISABLED",
+      "runtime_dependency": false,
+      "network_required": false,
+      "purpose": "Future typed schema and eval boundary for LLM research outputs.",
+      "activation_requires": "SEPARATE_VERSIONED_REVIEW"
+    },
+    {
+      "id": "trailhq-graft",
+      "upstream": "trailhq/Graft",
+      "license": "MIT",
+      "integration_status": "PREPARED_DEVELOPER_TOOL_ONLY",
+      "runtime_dependency": false,
+      "network_required": false,
+      "purpose": "Optional local codebase context graph for coding agents; never part of trading runtime.",
+      "activation_requires": "LOCAL_DEVELOPER_OPT_IN"
+    },
+    {
+      "id": "world-monitor",
+      "upstream": "koala73/worldmonitor",
+      "license": "AGPL-3.0-only",
+      "integration_status": "PREPARED_EXTERNAL_CONTEXT_DISABLED",
+      "runtime_dependency": false,
+      "network_required": true,
+      "purpose": "Future timestamped macro/geopolitical/commodity/news research context via public API or SDK.",
+      "activation_requires": "SEPARATE_NETWORK_AND_LICENSE_REVIEW",
+      "data_leakage_rule": "published_at_or_observed_at_must_be_lte_decision_cutoff"
+    },
+    {
+      "id": "agent-reach",
+      "upstream": "Panniantong/Agent-Reach",
+      "license": "MIT",
+      "integration_status": "PREPARED_RESEARCH_INGESTION_DISABLED",
+      "runtime_dependency": false,
+      "network_required": true,
+      "purpose": "Future public research ingestion for RSS, web, GitHub, Reddit, X and YouTube transcripts.",
+      "activation_requires": "SEPARATE_NETWORK_SOURCE_AND_PLATFORM_TOS_REVIEW",
+      "credentials_or_cookies_in_repository": false,
+      "data_leakage_rule": "published_at_or_observed_at_must_be_lte_decision_cutoff"
+    }
+  ],
+  "global_authority": {
+    "provider_access_authorized": false,
+    "external_context_network_access_authorized": false,
+    "authenticated_social_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_strategy_mutation_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
