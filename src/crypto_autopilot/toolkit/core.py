@@ -23,6 +23,24 @@ from crypto_autopilot.technical import build_technical_series
 from .registry import SAFETY_BOUNDARY, list_capabilities
 
 
+_INTERVAL_ALIASES = {
+    "15m": "15M",
+    "15M": "15M",
+    "1h": "60M",
+    "1H": "60M",
+    "60m": "60M",
+    "60M": "60M",
+    "4h": "4H",
+    "4H": "4H",
+    "8h": "8H",
+    "8H": "8H",
+    "1d": "1D",
+    "1D": "1D",
+    "1w": "1W",
+    "1W": "1W",
+}
+
+
 def _candle_from_mapping(item: dict[str, Any]) -> Candle:
     return Candle(
         time_ms=int(item["time_ms"]),
@@ -32,6 +50,15 @@ def _candle_from_mapping(item: dict[str, Any]) -> Candle:
         close=float(item["close"]),
         volume=float(item["volume"]),
     )
+
+
+def _canonical_interval(interval: str) -> str:
+    requested = interval.strip()
+    try:
+        return _INTERVAL_ALIASES[requested]
+    except KeyError as exc:
+        supported = ", ".join(sorted(_INTERVAL_ALIASES))
+        raise ValueError(f"unsupported toolkit interval {interval!r}; expected one of: {supported}") from exc
 
 
 def _risk_config(values: dict[str, Any] | None = None) -> RiskConfig:
@@ -57,12 +84,14 @@ def get_indicators(
     include_series: bool = False,
 ) -> dict[str, Any]:
     prepared = tuple(_candle_from_mapping(item) for item in candles)
-    series = build_technical_series(prepared, interval)
+    canonical_interval = _canonical_interval(interval)
+    series = build_technical_series(prepared, canonical_interval)
     latest = None if not series else asdict(series[-1])
     response: dict[str, Any] = {
         "schema": "qookey-crypto-toolkit-indicators-v0.1",
         "status": "PASS",
-        "interval": interval,
+        "requested_interval": interval,
+        "canonical_interval": canonical_interval,
         "candle_count": len(prepared),
         "snapshot_count": len(series),
         "latest": latest,
