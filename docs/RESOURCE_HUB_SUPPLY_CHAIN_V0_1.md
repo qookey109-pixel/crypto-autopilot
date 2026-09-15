@@ -143,7 +143,9 @@ The result is again **not** an integration approval:
 - MCP/REST/SDK runtime integration is deferred because it would add a credentialed remote dependency, quota/plan surface and provider/terms review;
 - upstream source code is AGPL-3.0-only and underlying data providers have separate redistribution terms, so code reuse and data persistence require separate license review.
 
-The next allowed step is an isolated descriptive-context envelope using synthetic fixtures only. It may validate timestamp, freshness, provenance and context-type semantics, but it must not call World Monitor, Binance, Pionex, R2 or frozen holdout and must not generate strategy, promotion, backtest-admission, trade-plan or live-trading authority.
+The allowed synthetic-only descriptive-context contract is implemented in `docs/RESOURCE_HUB_DESCRIPTIVE_CONTEXT_V0_1.md`, with policy `config/resource_hub_descriptive_context_v0_1.json`. It validates exact payload shape, timezone-aware timestamps, cache/observation freshness, `stale=false`, HTTPS provenance and a directional-language firewall. Successful output is always `RESEARCH_ONLY / DESCRIPTIVE_CONTEXT_ONLY`, with no directional signal and no strategy, formal-backtest, trade-plan, promotion or trading authority.
+
+This implementation still does **not** call World Monitor, Binance, Pionex, R2 or frozen holdout. It is a synthetic contract proof only, not a live-source integration.
 
 ## What comes next
 
@@ -153,4 +155,4 @@ A future reviewed version may add an `integration-registry.json` lifecycle such 
 discovered → candidate → evaluated → approved → active → deprecated
 ```
 
-The evaluation receipts above only record reviewed decisions; they do not create approved/active registry entries. Any adapter execution, automatic PR, recurring schedule, tool installation, provider call, strategy mutation, or trading authority requires a separate reviewed version and explicit authority.
+The evaluation receipts and synthetic research contracts above only record reviewed decisions and bounded contract proofs; they do not create approved/active registry entries. Any adapter execution, automatic PR, recurring schedule, tool installation, provider call, strategy mutation, or trading authority requires a separate reviewed version and explicit authority.
