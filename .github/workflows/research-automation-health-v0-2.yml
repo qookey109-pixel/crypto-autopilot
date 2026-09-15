@@ -46,11 +46,21 @@ jobs:
           import json
           from pathlib import Path
 
+          config = json.loads(
+              Path("config/research_automation_health_v0_2.json").read_text()
+          )
           report = json.loads(Path("research-health-output/health.json").read_text())
           coverage = report["schedule_coverage"]
+          inventory_count = len(config["workflows"])
+
+          assert config["coverage"]["policy"] == "EXACT_REPOSITORY_SCHEDULE_INVENTORY"
+          assert config["coverage"]["derive_expected_count_from_workflows_inventory"] is True
           assert coverage["complete"] is True
-          assert coverage["scheduled_workflow_count"] == 7
+          assert coverage["scheduled_workflow_count"] == inventory_count
+          assert coverage["monitored_workflow_count"] == inventory_count
           assert coverage["scheduled_workflow_count"] == coverage["monitored_workflow_count"]
+          assert coverage["unmonitored_scheduled_workflows"] == []
+          assert coverage["duplicate_monitored_workflows"] == []
           assert coverage["manual_events_count_as_health"] is False
           authority = report["authority"]
           assert authority["provider_access"] is False
