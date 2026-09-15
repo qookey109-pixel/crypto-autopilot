@@ -22,16 +22,18 @@ def test_diagnose_core100_training_reject_reports_failing_fold_and_base_cost(
                 "beats_naive_log_loss": False,
                 "cost_scenarios": {
                     "base": {
-                        "average_net_return": -0.001,
-                        "selected_trades": 12,
-                        "win_rate": 0.4,
-                        "maximum_drawdown": 0.02,
+                        "signal_count": 0,
+                        "average_net_return": 0.0,
+                        "diagnostic_growth": 0.0,
+                        "maximum_drawdown": 0.0,
+                        "maximum_symbol_concentration": 0.0,
                     },
                     "stress": {
-                        "average_net_return": -0.003,
-                        "selected_trades": 12,
-                        "win_rate": 0.4,
-                        "maximum_drawdown": 0.03,
+                        "signal_count": 0,
+                        "average_net_return": 0.0,
+                        "diagnostic_growth": 0.0,
+                        "maximum_drawdown": 0.0,
+                        "maximum_symbol_concentration": 0.0,
                     },
                 },
             },
@@ -45,10 +47,11 @@ def test_diagnose_core100_training_reject_reports_failing_fold_and_base_cost(
                 "beats_naive_log_loss": True,
                 "cost_scenarios": {
                     "base": {
+                        "signal_count": 15,
                         "average_net_return": 0.002,
-                        "selected_trades": 15,
-                        "win_rate": 0.6,
+                        "diagnostic_growth": 0.03,
                         "maximum_drawdown": 0.01,
+                        "maximum_symbol_concentration": 0.2,
                     }
                 },
             },
@@ -85,6 +88,8 @@ def test_diagnose_core100_training_reject_reports_failing_fold_and_base_cost(
     assert diagnosis["base_cost_scenarios_found"] == 2
     assert diagnosis["failing_base_cost_scenario_count"] == 1
     assert diagnosis["failing_base_cost_scenarios"][0]["fold"] == "fold-1"
+    assert diagnosis["zero_signal_base_cost_scenario_count"] == 1
+    assert diagnosis["zero_signal_base_cost_scenarios"][0]["signal_count"] == 0
     assert diagnosis["diagnostic_only"] is True
     assert diagnosis["automatic_model_promotion_authorized"] is False
     assert diagnosis["formal_trade_plan_authorized"] is False
