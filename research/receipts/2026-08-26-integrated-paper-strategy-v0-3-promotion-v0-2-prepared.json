@@ -1,0 +1,61 @@
+{
+  "schema": "integrated-paper-strategy-v0-3-promotion-v0-2-prepared-v0.1",
+  "status": "PREPARED_LOCAL_REPLAY_ONLY",
+  "stage": "INTEGRATED_V0_3_AND_PROMOTION_V0_2_PREPARED_BEFORE_RESULT_EVIDENCE",
+  "date": "2026-08-26",
+  "prepared_at_utc": "2026-08-25T17:54:49Z",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "main_baseline_at_preparation_start": "49c6bedb1e79e20963519b7f344762129669feb9",
+  "integrated_v0_2_parent_commit": "8398d24472b18103ef0332fe6beb1139838c5afd",
+  "sha256": {
+    "config/integrated_paper_strategy_v0_3.json": "aa99803b3a23cc5a0c195a4142e4e836869a12f86d9635296780f7e8df30bf2f",
+    "config/challenger_promotion_protocol_v0_2.json": "ac8bace5e7c89f7ce373de35d18c584cc509ff5abc28120d5fdcfc55c43fc43e",
+    "config/challenger_experiment_registry_v0_1.json": "61ad788976b6808c834521fd4bd6ad766eb0d480689d0e5bd949dada0d764f0a",
+    "config/sstate_gate_calibration_v0_1.json": "be132b5478ab2e2593e03f93d0f95fba5e22ac1e70d75649dd12a88efb9e5a06",
+    "config/short_score_calibration_v0_1.json": "5860ee38d9a653b69bf1e3807b52a78e26816eb0881d65e02b6bc07de174fc80",
+    "src/crypto_autopilot/integrated_paper_strategy_v0_3.py": "c5773065facc5e15a66ecdfd41546f819fdd03f764d24e12002f5e5057da099a",
+    "src/crypto_autopilot/challenger_promotion_v0_2.py": "a5e60bc2b358c170f26878be123f5082e02f6d473495796e4a5c6aee6d29389a"
+  },
+  "prepared_evidence_contract": {
+    "portfolio_and_independent_signal_metrics_separated": true,
+    "independent_samples_may_be_reported_as_portfolio_pnl": false,
+    "stop_distance_atr_distribution_required": true,
+    "planned_reward_risk_distribution_required": true,
+    "leverage_rejected_candidate_quality_required": true,
+    "primary_metric": "net_expectancy_r_after_costs",
+    "minimum_out_of_sample_calendar_days": 180,
+    "minimum_prospective_paper_days": 28,
+    "bootstrap_method": "STATIONARY_BLOCK_BOOTSTRAP",
+    "minimum_bootstrap_replicates": 5000,
+    "confidence_level": 0.95,
+    "primary_metric_lower_bound_must_be_strictly_positive": true,
+    "multiple_comparison_method": "HOLM_BONFERRONI",
+    "family_wise_alpha": 0.05,
+    "maximum_family_size": 8,
+    "maximum_evaluation_looks": 1,
+    "sstate_gate_calibration_required": true,
+    "short_score_independent_calibration_required": true
+  },
+  "execution_boundary": {
+    "real_integrated_results_read_before_protocol_freeze": false,
+    "workflow_created": false,
+    "provider_requests_performed": 0,
+    "r2_client_constructed": false,
+    "r2_reads_performed": 0,
+    "r2_writes_performed": 0,
+    "replacement_holdout_accessed": false,
+    "v0_10_capture_path_mutated": false,
+    "formal_strategy_change_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "automatic_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "interpretation": {
+    "this_is_a_real_market_result": false,
+    "this_is_a_profitability_claim": false,
+    "this_authorizes_production_evaluation": false,
+    "this_authorizes_holdout_access": false,
+    "this_authorizes_trading": false
+  }
+}
