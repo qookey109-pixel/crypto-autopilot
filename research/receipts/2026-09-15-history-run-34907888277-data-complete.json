@@ -1,0 +1,67 @@
+{
+  "schema": "history-github-log-observation-v0.1",
+  "authority": false,
+  "status": "PASS",
+  "purpose": "Freeze secret-free GitHub Actions evidence that the governed Binance USD-M Core100 history backfill state is complete on the nine-entry policy main.",
+  "source": {
+    "type": "decoded_github_job_log_and_artifact_metadata",
+    "repository": "qookey109-pixel/crypto-autopilot",
+    "workflow_id": 340899181,
+    "workflow_name": "Binance USD-M Crypto Core 100 History V0.1.2",
+    "run_id": 34907888277,
+    "run_number": 53,
+    "event": "schedule",
+    "head_sha": "e529b0ee94fb1577c837552f3a87594d999675ce",
+    "conclusion": "success",
+    "created_at_utc": "2026-09-14T23:14:00Z",
+    "updated_at_utc": "2026-09-14T23:14:19Z",
+    "job_id": 104188652085
+  },
+  "report": {
+    "status": "SKIPPED",
+    "stage": "DETAILED_HISTORY_DATASET_ALREADY_COMPLETE",
+    "observed_at_utc": "2026-09-14T23:14:13.627764Z",
+    "provider": "binance_usdm",
+    "delivery": "binance_vision",
+    "mode": "backfill",
+    "shard_count": 10,
+    "shards_complete": 10,
+    "authority": {
+      "automatic_model_promotion_authorized": false,
+      "holdout_accessed": false,
+      "live_trading_authorized": false,
+      "pionex_native_relabel_authorized": false,
+      "real_money_order_authorized": false,
+      "source_switch_authorized": false
+    }
+  },
+  "artifact": {
+    "id": 10373227254,
+    "name": "binance-usdm-detailed-history-34907888277-1",
+    "size_in_bytes": 437,
+    "digest": "sha256:ea1bc273244355f1214ad7bc2490690f2c26f5773dcce5811a5c6891a80ddf57",
+    "created_at_utc": "2026-09-14T23:14:16Z",
+    "expires_at_utc": "2026-12-13T23:14:00Z"
+  },
+  "verification": {
+    "runner_contract": "scripts/run_binance_detailed_history.py only emits DETAILED_HISTORY_DATASET_ALREADY_COMPLETE after loading a contract-valid backfill state whose status is COMPLETE.",
+    "completion_rule": "The backfill state becomes COMPLETE only when the completed shard count equals the configured shard_count.",
+    "training_gate": "scripts/train_binance_detailed_history_models.py independently requires COMPLETE state, completed_shards length equal to shard_count, and PASS shard receipts bound to the catalog before training data may be used.",
+    "repeat_observation": {
+      "run_id": 34887226438,
+      "run_number": 52,
+      "event": "schedule",
+      "head_sha": "e529b0ee94fb1577c837552f3a87594d999675ce",
+      "conclusion": "success",
+      "stage": "DETAILED_HISTORY_DATASET_ALREADY_COMPLETE",
+      "shards_complete": 10,
+      "shard_count": 10
+    }
+  },
+  "limitations": [
+    "This receipt freezes GitHub Actions log and artifact metadata; it does not grant direct R2 or holdout access.",
+    "History data completion does not imply that the post-completion training workflow has run successfully.",
+    "History data completion does not authorize model promotion, trade plans, real-money orders, or live trading.",
+    "No source switch, synthetic candle creation, interpolation, holdout access, or manual History rerun is authorized by this receipt."
+  ]
+}
