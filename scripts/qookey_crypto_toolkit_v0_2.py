@@ -32,9 +32,9 @@ def _emit(payload: dict[str, Any]) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Qookey Crypto Toolkit V0.2")
+    parser = argparse.ArgumentParser(description="Qookey Crypto Toolkit V0.2 cloud/repository runner")
     subparsers = parser.add_subparsers(dest="command", required=True)
-    subparsers.add_parser("capabilities", help="List local research Toolkit capabilities")
+    subparsers.add_parser("capabilities", help="List research Toolkit capabilities")
 
     indicators = subparsers.add_parser("indicators", help="Calculate technical indicators")
     indicators.add_argument("--input", required=True)
