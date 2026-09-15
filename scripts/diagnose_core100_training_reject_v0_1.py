@@ -22,6 +22,12 @@ def _number(value: Any, *, field: str) -> float:
     return float(value)
 
 
+def _integer(value: Any, *, field: str) -> int:
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise ValueError(f"{field} must be an integer")
+    return value
+
+
 def diagnose(metrics: dict[str, Any]) -> dict[str, Any]:
     if metrics.get("schema") != EXPECTED_SCHEMA or metrics.get("status") != "PASS":
         raise ValueError("unsupported Core100 training metrics payload")
@@ -84,15 +90,22 @@ def diagnose(metrics: dict[str, Any]) -> dict[str, Any]:
                 scenario.get("average_net_return"),
                 field=f"cost_scenarios.{scenario_name}.average_net_return",
             )
+            signal_count = _integer(
+                scenario.get("signal_count"),
+                field=f"cost_scenarios.{scenario_name}.signal_count",
+            )
             cost_rows.append(
                 {
                     "fold": name,
                     "scenario": str(scenario_name),
+                    "signal_count": signal_count,
                     "average_net_return": average_net_return,
                     "positive": average_net_return > 0.0,
-                    "selected_trades": scenario.get("selected_trades"),
-                    "win_rate": scenario.get("win_rate"),
+                    "diagnostic_growth": scenario.get("diagnostic_growth"),
                     "maximum_drawdown": scenario.get("maximum_drawdown"),
+                    "maximum_symbol_concentration": scenario.get(
+                        "maximum_symbol_concentration"
+                    ),
                 }
             )
 
@@ -106,6 +119,7 @@ def diagnose(metrics: dict[str, Any]) -> dict[str, Any]:
     failing_folds = [row for row in fold_rows if not row["beats_naive"]]
     base_cost_rows = [row for row in cost_rows if row["scenario"] == "base"]
     failing_base_costs = [row for row in base_cost_rows if not row["positive"]]
+    zero_signal_base_costs = [row for row in base_cost_rows if row["signal_count"] == 0]
 
     gate = metrics.get("model_quality_gate")
     if not isinstance(gate, dict):
@@ -120,10 +134,12 @@ def diagnose(metrics: dict[str, Any]) -> dict[str, Any]:
         "failing_fold_count": len(failing_folds),
         "base_cost_scenarios_found": len(base_cost_rows),
         "failing_base_cost_scenario_count": len(failing_base_costs),
+        "zero_signal_base_cost_scenario_count": len(zero_signal_base_costs),
         "worst_folds": fold_rows[:10],
         "worst_base_cost_scenarios": base_cost_rows[:10],
         "failing_folds": failing_folds,
         "failing_base_cost_scenarios": failing_base_costs,
+        "zero_signal_base_cost_scenarios": zero_signal_base_costs,
         "diagnostic_only": True,
         "automatic_model_promotion_authorized": False,
         "formal_trade_plan_authorized": False,
