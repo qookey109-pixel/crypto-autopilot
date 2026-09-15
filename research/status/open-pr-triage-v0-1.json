@@ -1,0 +1,38 @@
+{
+  "schema": "open-pr-triage-v0.1",
+  "status_date": "2026-09-15",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "reviewed_main_sha": "7c5604efcd55d3d7f477e5417fe26bfe0b32b9ce",
+  "authority": "NAVIGATION_ONLY",
+  "categories": {
+    "ACTIVE": [302, 305, 306],
+    "DEFERRED_STACK": [255, 257, 258, 260, 261, 262],
+    "HISTORICAL_EVIDENCE_CANDIDATE": [256],
+    "REVIEW_REQUIRED_LEGACY": [166, 167, 168, 199, 220, 249],
+    "CLOSED_SUPERSEDED_THIS_PASS": [290, 301]
+  },
+  "rules": {
+    "close_diverged_pr_without_file_level_review": false,
+    "merge_authorized": false,
+    "provider_execution_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "current_p0": {
+    "pr": 302,
+    "workflow_run": 34936331199,
+    "stage": "CORE100_THRESHOLD_REPRODUCIBILITY_REPLAY",
+    "action_if_running": "LEAVE_UNTOUCHED",
+    "action_if_complete": "FREEZE_AND_ANALYZE_SECRET_FREE_REPLAY_EVIDENCE"
+  },
+  "notes": {
+    "305": "Current-status and documentation convergence; ready but unmerged.",
+    "306": "Toolkit V0.2 REST/OpenAPI + Render + Cloudflare edge; CI passed; deployment/public exposure unauthorized.",
+    "256": "Evidence-only PR; close only after proving equivalent immutable receipt/report already exists on current main.",
+    "legacy": "Preserve unique research content until exact functional/file-level supersession is proven."
+  }
+}
