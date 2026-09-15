@@ -47,12 +47,17 @@ V0.1 considers these catalog categories:
 - `Search / Research`
 - `OSINT / Intelligence`
 
-A `Finance / Crypto` resource is eligible from category membership alone. Other categories must also match at least one crypto/market-specific domain signal such as trading, investment, market, macro, forecasting, portfolio, OHLCV, candles, or backtesting. This prevents broad resources such as generic GIS or general-purpose research tools from becoming candidates simply because they are tagged Analytics or Research.
+A `Finance / Crypto` resource is eligible from category membership alone.
+
+Starting with policy `v0.1.1`, non-Finance resources must match at least one **strong** finance/market signal. Broad terms such as `market` and `portfolio` are retained as weak scoring signals, but they cannot make a non-Finance resource eligible on their own. Strong evidence includes terms such as trading, crypto, investment, backtest, risk, macro, forecasting, geopolitics, market data, portfolio management, asset allocation, price data, exchange, OHLCV, or candles.
+
+This hardening came from the first production proof: general AI/automation and design resources were incorrectly admitted when their catalog text happened to contain only `market` or `portfolio`. The permanent regression suite now requires those false positives to stay excluded while still allowing a genuine market-data/OHLCV resource through.
 
 Each accepted candidate receives:
 
 - deterministic `relevance_score`;
 - matched categories and domain signals;
+- explicit `strong_matched_signals` evidence;
 - an integration type such as `strategy_validation`, `market_intelligence`, `forecasting_research`, `trading_research`, or `data_analysis`;
 - a coarse integration-risk label;
 - upstream license/open-source/pricing/status metadata;
@@ -98,9 +103,13 @@ The workflow:
 
 No Mac-local execution, Telegram, MCP, external model, exchange API, R2 credential, or paid runtime is required.
 
+## First production proof
+
+The first manual production run on 2026-09-15 scanned AI Resource Hub commit `7b19de82cd53d851fa5dd478bc1801d383f6c920` and demonstrated that the end-to-end lineage/artifact path worked. It also exposed two false positives caused by weak terms (`market` and `portfolio`), which motivated policy `v0.1.1` and its permanent regressions.
+
 ## What comes next
 
-A future version may add a reviewed `integration-registry.json` lifecycle such as:
+A future reviewed version may add an `integration-registry.json` lifecycle such as:
 
 ```text
 discovered → candidate → evaluated → approved → active → deprecated
