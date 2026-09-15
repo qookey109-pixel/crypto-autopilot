@@ -1,0 +1,35 @@
+{
+  "schema": "qookey-binance-pionex-data-role-decision-v0.1",
+  "status": "RECORDED_ARCHITECTURE_DECISION",
+  "date": "2026-09-15",
+  "decision": {
+    "binance_role": "LARGE_SCALE_LEARNING_DATABASE",
+    "pionex_role": "FINAL_CALIBRATION_AND_REAL_TRADING_ENVIRONMENT",
+    "target_execution_venue": "PIONEX",
+    "preferred_pipeline": "BINANCE_LEARNING_TO_PIONEX_CALIBRATION_TO_PIONEX_EXECUTION"
+  },
+  "current_state": {
+    "pionex_native_data_exists": true,
+    "pionex_completed_btc_27_day_pilot": true,
+    "pionex_150_to_197_market_complete_multi_year_history": false,
+    "core100_directly_trained_on_pionex_native_data": false
+  },
+  "interpretation": [
+    "The absence of a full Pionex multi-year universe does not invalidate Binance as the primary learning source.",
+    "Binance-native evidence must not be relabeled as Pionex-native evidence.",
+    "Pionex-native calibration and execution-domain validation are required project milestones because Pionex is the intended trading venue.",
+    "Candidate selection or observability is not equivalent to materialized Pionex historical K-line coverage."
+  ],
+  "authority": {
+    "provider_requests": false,
+    "r2_writes": false,
+    "full_pionex_history_materialization": false,
+    "retraining": false,
+    "source_switch": false,
+    "holdout_access": false,
+    "automatic_model_promotion": false,
+    "formal_trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
