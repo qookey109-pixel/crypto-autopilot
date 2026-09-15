@@ -10,9 +10,10 @@
     "fail_on_alert": true
   },
   "coverage": {
-    "source": "config/project_convergence_v0_1.json",
+    "source": "REPOSITORY_WORKFLOW_SCHEDULE_SCAN_PLUS_THIS_WORKFLOWS_INVENTORY",
+    "policy": "EXACT_REPOSITORY_SCHEDULE_INVENTORY",
     "require_every_repository_cron": true,
-    "expected_scheduled_workflow_count": 7,
+    "derive_expected_count_from_workflows_inventory": true,
     "manual_events_count_as_health": false
   },
   "inventory_warn_thresholds": {

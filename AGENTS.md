@@ -4,14 +4,17 @@
 
 Read these first, in order:
 
-1. `PROJECT_STATUS.md`
-2. `README.md`
-3. the current versioned protocol/config and receipt for the stage being changed
-4. `config/cloud_free_tier_policy_v0_1.json` for cloud/runtime work
-5. `docs/STRATEGY_V0_1.md`
-6. `config/strategy_v0_1.json`
+1. `CURRENT_STATUS.md`
+2. `PROJECT_STATUS.md`
+3. `README.md`
+4. the current versioned protocol/config and receipt for the stage being changed
+5. `config/cloud_free_tier_policy_v0_1.json` for cloud/runtime work
+6. `docs/STRATEGY_V0_1.md`
+7. `config/strategy_v0_1.json`
 
 Repository `main` is the formal current authority. If chat history, an issue comment, a dashboard fixture, or an older receipt conflicts with current merged authority, preserve the historical evidence but follow the latest valid versioned authority for new work.
+
+`CURRENT_STATUS.md` is the concise current-operations index and `research/status/current-operations-v0-2.json` is its machine-readable companion. Dated present-tense summaries in `PROJECT_STATUS.md`, `README.md`, historical handoffs, or dashboard fixtures may remain as historical evidence. Do not regress lifecycle state or restart completed work from older prose when later merged evidence supersedes it. Versioned configs, receipts, immutable run evidence, and current merged code still control authority and scope.
 
 ## Non-negotiable boundaries
 
@@ -66,12 +69,11 @@ Repository `main` is the formal current authority. If chat history, an issue com
   `config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json`
   and its matching binding receipt; do not rewrite the pre-binding authority
   files after PR creation.
-- On the exact protected-main merge, V0.12 is the only scheduled metadata
-  capture workflow:
+- V0.12 was the only scheduled metadata-capture workflow during its exact bounded window:
   `.github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml`.
-- Its exact window is `2026-09-04T02:00:00Z` through
-  `2026-09-12T03:59:59.999Z`, 194 UTC hourly slots with `:17/:47` attempts.
-- It reuses the existing authenticated V0.10 Render raw relay without changing
+- Its exact window was `2026-09-04T02:00:00Z` through
+  `2026-09-12T03:59:59.999Z`, 194 UTC hourly slots with `:17/:47` attempts. That window is now historical; do not describe V0.12 as the current active scheduled path after the window.
+- It reused the existing authenticated V0.10 Render raw relay without changing
   Render code, deployment or secrets. Render still must never receive R2
   credentials.
 - V0.12 may write metadata-only immutable objects only in its independent R2
@@ -109,7 +111,7 @@ Repository `main` is the formal current authority. If chat history, an issue com
 - Preserve passing tests and add tests for behavior changes.
 - Frozen receipts/configs are historical evidence. Do not mutate them to make a later stage look successful; create a new versioned authority instead.
 - Record strategy parameter changes in configuration and status docs.
-- Record authority transitions in versioned configs/receipts and synchronize `PROJECT_STATUS.md`.
+- Record authority transitions in versioned configs/receipts and synchronize `CURRENT_STATUS.md` plus its machine-readable companion; update `PROJECT_STATUS.md` when it is serving as a current projection.
 - Treat dashboards as normalized views, never as authority; generated dashboard state must be derived from frozen Repository authorities.
 - Treat backtest results as evidence, not proof of future profitability.
 - Prefer deterministic fixtures and fail-closed behavior for tests and automation.

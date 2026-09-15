@@ -1,0 +1,93 @@
+{
+  "schema": "qookey-current-operations-v0.2",
+  "updated_date": "2026-09-16",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "reviewed_main_sha": "f5cf74292fca262ba72c4e0b36f8d757dfb82531",
+  "mode": "PAPER_ONLY",
+  "core100": {
+    "history_status": "COMPLETE",
+    "history_complete_shards": 10,
+    "history_total_shards": 10,
+    "history_reacquisition_required": false,
+    "training_run_id": 34918219864,
+    "training_workflow_conclusion": "success",
+    "training_report_status": "PASS",
+    "training_run_started_at_utc": "2026-09-15T01:40:40Z",
+    "training_run_completed_at_utc": "2026-09-15T04:38:22Z",
+    "symbol_count": 100,
+    "dataset_partition_objects": 14274,
+    "dataset_rows": 18235427,
+    "example_count": 249228,
+    "dataset_fingerprint": "91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876",
+    "all_folds_ready": true,
+    "model_quality_gate": {
+      "status": "REJECT",
+      "automatic_promotion": false
+    },
+    "threshold_replay": {
+      "run_id": 34936331199,
+      "workflow": "Core100 Threshold Sweep Replay V0.1",
+      "run_head_sha": "fbebb5cbe424e4a6d6c33cb6e09a12da4849ee07",
+      "workflow_conclusion": "success",
+      "artifact_id": 10387278663,
+      "artifact_digest": "sha256:f983f5364024a911be3f930fce641bd750922a8d95e710951b88d5738f5cfa29",
+      "candidate_thresholds": [0.5, 0.51, 0.52, 0.53, 0.54, 0.55],
+      "supported_thresholds": [],
+      "threshold_change_supported": false,
+      "configured_threshold": 0.55,
+      "configured_threshold_changed": false,
+      "diagnostic_only": true
+    }
+  },
+  "pionex_validation": {
+    "provider_role": "FINAL_CALIBRATION_AND_EXECUTION_ENVIRONMENT_PROVENANCE",
+    "binance_role": "LARGE_SCALE_LEARNING_DATABASE",
+    "workflow": ".github/workflows/pionex-validation-materialization-v0-1.yml",
+    "dispatch_mode": "MANUAL_ONLY",
+    "previous_run_id": 34991627998,
+    "previous_run_outcome": "FAIL_CLOSED_INVALID_OHLC_BOUNDARY",
+    "boundary_fix_merged_pr": 321,
+    "boundary_fix_main_sha": "f5cf74292fca262ba72c4e0b36f8d757dfb82531",
+    "current_main_materialization_status": "PENDING_MANUAL_DISPATCH",
+    "authority": {
+      "public_pionex_kline_reads": true,
+      "r2_validation_dataset_writes": true,
+      "private_api": false,
+      "account_data": false,
+      "replacement_holdout_access": false,
+      "training": false,
+      "source_switch": false,
+      "automatic_model_promotion": false,
+      "formal_trade_plan": false,
+      "real_money_orders": false,
+      "live_trading": false
+    }
+  },
+  "gates": {
+    "strategy_validation": "CLOSED",
+    "holdout": "FROZEN_UNOPENED",
+    "automatic_model_promotion": "CLOSED",
+    "formal_trade_plan": "CLOSED",
+    "real_money_orders": "CLOSED",
+    "live_trading": "CLOSED",
+    "source_switch_authorized": false
+  },
+  "technical_debt": {
+    "primary": "CONTROL_PLANE_AND_DOCUMENTATION_DRIFT",
+    "current_status_entrypoint": "PROPOSED_ON_CURRENT_MAIN_BRANCH",
+    "readme_projection": "STALE_NEEDS_SYNC",
+    "project_status_projection": "STALE_NEEDS_SYNC",
+    "security_present_tense_projection": "STALE_NEEDS_SYNC",
+    "dashboard_projection": "STALE_NEEDS_SYNC",
+    "open_pr_current_main_triage": "REQUIRED",
+    "workflow_registry": "RECOMMENDED",
+    "quality_visibility": "RECOMMENDED_NON_BLOCKING"
+  },
+  "next_decision": "RUN_CURRENT_MAIN_PIONEX_VALIDATION_THEN_SYNC_CONTROL_PLANE_PROJECTIONS",
+  "notes": [
+    "Older September 13 present-tense summaries reporting Core100 8/10 and Training SKIPPED are historical and superseded for current operations.",
+    "Threshold replay completed successfully and supports no threshold change in the evaluated 0.50-0.55 range.",
+    "PR #321 changes only the narrow Pionex bounds-only invalid-candle historical-boundary behavior and grants no broader execution authority.",
+    "This file grants no provider, holdout, promotion, trading, source-switch, or private-account authority beyond already merged versioned authority."
+  ]
+}

@@ -1,1073 +1,198 @@
 # Project Status
 
-Updated: 2026-09-13
-
-## September 13 verified operations index
-
-This section supersedes earlier present-tense summaries, which remain dated
-historical observations. See [current handoff](docs/OPERATIONS_HANDOFF_2026_09_13.md)
-and `research/status/simulation-readiness-v0-1.json`.
-
-- Reviewed main: `d775fbd2ad01834635b8f82391933ac7141e7408` (PR #292).
-  CI `34762214321`, Pages `34762214329` and Freeze Guard `34762214349` succeeded.
-- Core 100 remains **8/10**, not 9/10 or COMPLETE. Latest scheduled History
-  `34756244643` ran on pre-merge `c7990a63` and rejected CVCUSDT 2025-05 1h:
-  736 rows, one gap, 8 missing bars. Latest LIT 1h rejection: `34739234352`.
-- Current lifecycle policy has seven exact archive allowances covering CTK,
-  CVC and LIT. PR #292 adds CVC/LIT 1h; production acceptance on the merged
-  version has not yet been observed. Raw gaps and historical FAIL remain.
-  No synthetic candles; causal claim NOT_ASSERTED; training uses segmentation
-  and exact lineage revalidation. Do not redo merged PRs #286–#292.
-- BNX formal repair publication and fixed BTC 27-day simulation PASS remain
-  preserved. Fixed BTC V0.1 execution stays retired; full-universe **NOT_READY**.
-- Training `34750015232` succeeded operationally but reported **SKIPPED**,
-  `DETAILED_HISTORY_DATASET_NOT_READY`. Next nominal weekly run is September 20,
-  after the September 15 target. No manual training is triggered by this review.
-- Health `34756817356` correctly alerts on history failure. Pionex alternative
-  assets `34747992983` succeeded as observability, not historical candle delivery.
-- History remains serialized every two hours; real run creation is irregular.
-  No second scheduler, faster retry, provider/R2 operation or authority change.
-- Pionex 197 candidates remain selection-only; Reach still has FAIL evidence,
-  classification and Context Forward have no new manual execution evidence in
-  the latest main dispatch listing. V0.12 expired with missing slots preserved.
-- Website is a dated evidence projection. Deploy success and policy merge do
-  not certify new production data. September 15 full completion is not guaranteed.
-
-## September 12 verified operations index
-
-This section supersedes stale present-tense summaries below. Full-universe
-simulation remains **NOT_READY**. See [current handoff](docs/OPERATIONS_HANDOFF_2026_09_12.md)
-and `research/status/simulation-readiness-v0-1.json`.
-
-- Fixed BTC simulation run `34615465566` is formally PASS: 15 trades and
-  13 rejected plans; its V0.1 workflow is retired after PASS, not waiting for CI execution.
-- Binance latest scheduled run `34680188351`: **8/10**, shard 4 rejected for
-  CTKUSDT April 2025 15m, 41 missing bars. LIT's 70-bar gap remains unresolved.
-- BNX bundle run `34677544161` formally published shard 3 with frozen receipt/hash evidence.
-- CTK V0.3 `34687012733` characterizes the three-interval internal gap only.
-  Downloaded artifact digest matches GitHub; old handoff hashes disagree.
-  Relaunch causality and lifecycle exception are not established or authorized.
-- V0.12 window ended September 12 at 04:00 UTC. Latest scheduled run
-  `34673261420` succeeded with capture skipped; missing slots remain immutable.
-- History cadence is every **two hours**. Health is failing because history
-  fails its quality gate; faster retries do not fix the source gap.
-- Pionex 197 candidates are not materialized histories. Reach/classification
-  still need formal evidence. BTC Funding 81 observations remain fixed-scope PASS.
-- This review changes derived website/docs and adds aggregate evidence only;
-  no runtime cron, provider/R2 execution or frozen quality threshold changes.
-
-## September 11 historical delivery index
-
-PRs #263/#264/#265 landed on main `6a7aad2` with CI passing. This index
-supersedes older present-tense status summaries below for the simulation path;
-the historical/scientific authorities and their failures remain unchanged.
-
-- **Full-universe NOT_READY.** Pionex run `34563615657` selected 197 candidate
-  markets, not 197 materialized histories. Unknown asset classes need review.
-- BTC pilot `34513815680` verified the fixed 27-day sample. Funding run
-  `34563641025` reported PASS with 81 observations for that same window.
-- Reach `34563589773` failed at a boundary probe. The engineering correction
-  bounds candle CLOSE before the holdout, retains safe request diagnostics and
-  preserves independent interval evidence while the overall result stays FAIL.
-- Binance `34594667095`: 7/10 complete; shard 8 rejects LITUSDT 2025-12 15m,
-  70 missing bars. CTK 2025-04 15m and BNX 2022-08 1h are separate earlier
-  rejections. BNX 15m formal publication still needs its own evidence.
-- Proposed execution authority: `config/simulation_btc_execution_v0_1.json`
-  and `research/receipts/2026-09-11-simulation-btc-execution-v0-1-authority.json`.
-  Only after reviewed main merge, successful current-main push CI triggers
-  fixed BTC simulation: three exact R2 GETs, pinned funding artifact, no
-  provider requests/writes; max 20 workflow runs, expiry September 16 UTC.
-  A scoped READY is engine validation only, never full-universe READY.
-- Dashboard updates after monitored cloud jobs complete. Existing seven cron
-  scopes remain unchanged; the new simulation trigger is event-driven.
-- Delivery, readiness matrix and handoff:
-  `docs/SIMULATION_CLOUD_HANDOFF_2026_09_11.md`.
-
-## Project
-
-Qookey Crypto Autopilot
-
-Repository: `qookey109-pixel/crypto-autopilot`
-
-Public dashboard: `https://qookey109-pixel.github.io/crypto-autopilot/`
-
-Repository branch `main` is the live formal authority and is intentionally not self-pinned to a moving commit SHA in this file. Frozen receipts/configs remain immutable detailed evidence; this file is only the current status index.
-
-## Current formal stage
-
-### TradingAgents Research Challenger V0.1 — PREPARED_RESEARCH_ONLY
-
-- A new offline adapter can validate a point-in-time, secret-free export from
-  `TauricResearch/TradingAgents` v0.4.0 and project its five-tier rating plus
-  report coverage into the existing descriptive Research Context.
-- The upstream framework is not vendored or installed. No LLM/provider call,
-  schedule, R2 operation, holdout access, strategy/risk mutation, trade plan or
-  order is authorized.
-- Normalized evidence retains report SHA-256 digests rather than upstream prose
-  and remains `authority=false`. See
-  `config/tradingagents_research_challenger_v0_1.json` and
-  `docs/TRADINGAGENTS_RESEARCH_CHALLENGER_V0_1.md`; the prepared config binding
-  is recorded in
-  `research/receipts/2026-09-15-tradingagents-research-challenger-v0-1-prepared.json`.
-
-### Pionex bounded capacity pilot V0.2 — EFFECTIVE AFTER REVIEWED MAIN MERGE
-
-- V0.2 supersedes V0.1 execution with a BTC-only 27-day sample (2026-08-01
-  through 2026-08-27 UTC), three intervals, at most ten public requests.
-  Completion means this fixed sample only; 150+ markets remain unauthorized.
-- Config: `config/pionex_historical_research_execution_v0_2.json`; receipt:
-  `research/receipts/2026-09-10-pionex-bounded-pilot-v0-2-authority.json`.
-  Contract and incident review: `docs/PIONEX_BOUNDED_CAPACITY_PILOT_V0_2.md`.
-- Run 34494612014 failed at request 22, 15M, with 10,500 returned rows
-  including overlaps. This supports a provider horizon limitation, not proof
-  of exact unique coverage. Its report records no R2 writes.
-- REVIEW_REQUIRED: V0.1 requested across protected dates and hard-coded
-  holdout_accessed=false; past non-access cannot be certified from that flag.
-  Do not read raw data to investigate. V0.2 excludes protected dates in each
-  request and replaces the original CLI in the same manual workflow.
-- No V0.2 execution or data completion is claimed by this engineering change.
-
-**GITHUB AUTOMATIC RESEARCH OPERATIONS V0.1 AUTHORIZED ON PROTECTED-MAIN MERGE / RESEARCH AUTOMATION HEALTH V0.2 IS THE SINGLE COMPLETE CRON CONTROL PLANE / V0.12 SUCCESSOR METADATA WINDOW AUTHORIZED AND CURRENT / V0.10 REMAINING SCHEDULE RETIRED / V0.10 INCOMPLETE WINDOW PRESERVED AS BLOCKED EVIDENCE / V0.12 PRODUCTION STABILITY EVALUATION NOT_AUTHORIZED / CRYPTO CORE 100 V0.1.2 AUTHORIZED / PIONEX ALTERNATIVE ASSETS V0.2 AUTHORIZED / CURRENT EXECUTION OUTCOMES REQUIRE RUN EVIDENCE / CONTEXT FORWARD CAPTURE EXECUTION V0.1 AUTHORIZED MANUAL ONE-SHOT AFTER V0.12 WINDOW / CONTEXT FORWARD 4H SCHEDULE NOT_AUTHORIZED / POST-WINDOW PAPER V0.2 PREPARED WAITING FOR HOLDOUT AUTHORITY / REPLACEMENT HOLDOUT FROZEN_UNOPENED / PAPER-ONLY**
-
-### Pionex Historical Research Pilot Execution V0.1 — EFFECTIVE ONLY AFTER PROTECTED-MAIN MERGE
-
-- The prepared 150+ Pionex-native research-pool definition remains a selection
-  contract, not a materialized historical universe.
-- This separate V0.1 authority permits one cloud-hosted `BTC_USDT_PERP` public
-  K-line pilot at `15M`, `60M`, and `4H`, from maximum available provider
-  history through the run's latest complete candle. It creates measured
-  Parquet-size and continuity evidence before any 150-market materialization.
-- The trigger is manual `workflow_dispatch` only; it neither adds nor changes
-  the automatic workflow inventory. R2 whole-bucket 8 GB FREE-ONLY headroom is
-  checked before Pionex access and again before writes; immutable SHA-256
-  readback and latest-pointer-last ordering are required.
-- Authority: `config/pionex_historical_research_execution_v0_1.json`; receipt:
-  `research/receipts/2026-09-10-pionex-historical-research-execution-v0-1-authority.json`;
-  contract: `docs/PIONEX_HISTORICAL_RESEARCH_EXECUTION_V0_1.md`.
-- The first authorized execution, GitHub Actions run `34446134119` on main
-  commit `9270e81`, failed closed before any R2 write because Pionex rejected
-  the host-derived `endTime` (`MARKET_INVALID_TIME`). Its secret-free 365-byte
-  report records `holdout_accessed=false`, `live_trading_authorized=false` and
-  `r2_writes_performed=false`. The bounded correction derives the cursor from
-  a no-`endTime` public K-line response and discards its newest candle; it does
-  not add a provider, retry loop, schedule or any new authority.
-- It does not authorize an automatic schedule, 150-market materialization,
-  historical-universe admission, backtests, training, source switching,
-  holdout access, private APIs, trade plans, real-money orders or live trading.
-
-- Run `34449227441` on `8dc56c2` also failed with `MARKET_INVALID_TIME`,
-  reporting no R2 writes. The earlier host-clock diagnosis is not established.
-  Public request diagnostics now identify interval, bootstrap/pagination,
-  request number, cursor and returned-row count without raw error bodies.
-  Pionex's legacy public K-line documentation describes a 10,000-record
-  retrieval limit; whether this run reached that limit remains unverified.
-  An error is not an empty terminal page or evidence of complete history.
-
-<details>
-<summary>Historical aggregate stage markers</summary>
-
-**PROJECT CONVERGENCE V0.1 CURRENT INDEX / POST-CUTOFF NO-OP CRON RETIREMENT EFFECTIVE / PIONEX M1/M1A PASS / M1B R2 PASS / BINANCE 2025 R2 PILOT PASS / BINANCE FUNDING V0.2 R2 MATERIALIZATION PASS / BINANCE SPOT R2 TRAINING GOVERNANCE V0.5 HISTORICAL AUTHORITY MANUAL FAIL-CLOSED ONLY AFTER CUTOFF / BINANCE USD-M DETAILED HISTORY V0.1.2 AUTHORIZED / DETAILED HISTORY V0.1/V0.1.1 SUPERSEDED BEFORE EXECUTION / V0.4 WEEKLY AND MONTHLY EXECUTION RETIRED / V0.3 DAILY TRAINING RETIRED / RESEARCH SIGNAL LAYER V0.2 ACTIVE / RESEARCH SIGNAL QUALITY V0.1 AUTHORIZED_READ_ONLY / RESEARCH AUTOMATION HEALTH V0.1 HISTORICAL MANUAL REGRESSION_ONLY / RESEARCH AUTOMATION HEALTH V0.2 AUTHORIZED_READ_ONLY / STRATEGY EDGE VALIDATION V0.1 PREPARED_RESEARCH_ONLY / STRATEGY RESEARCH LOOP V0.1 PREPARED_SYNTHETIC_ONLY / POST-WINDOW RESEARCH SUCCESSOR SCHEDULE V0.1 PREPARED_NOT_ACTIVE / CONTEXT FORWARD CAPTURE V0.1 PREPARED_NOT_ACTIVE / CONTEXT FORWARD CAPTURE EXECUTION V0.1 AUTHORIZED_MANUAL_ONE_SHOT_AFTER_2026-09-12T04:00:00Z / CONTEXT FORWARD 4H SCHEDULE NOT_AUTHORIZED / PIONEX-BINANCE EQUIVALENCE V0.1 DEFINITIVE_FAIL / PIONEX PUBLIC PAPER TRAINING V0.1 MANUAL FAIL-CLOSED ONLY AFTER CUTOFF / V0.5 RENDER FREE TRANSPORT PASS / V0.6 RENDER TRANSPORT TRANSITION PASS / V0.7 RENDER METADATA PROTOCOL HISTORICAL / V0.8 SHARED SECRET HANDSHAKE PASS FROZEN / V0.9 RENDER RELAY SMOKE PASS FROZEN / V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE HISTORICAL / V0.2 SELF-HOSTED SCHEDULE RETIRED / V0.10 GITHUB-HOSTED SCHEDULE RETIRED / V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION HISTORICAL EFFECTIVE / V0.10 PIONEX PERP QUERY EFFECTIVE / V0.10 POST-PERP CAPTURE FAIL_CLOSED / V0.12 SUCCESSOR METADATA WINDOW AUTHORIZED ON MAIN MERGE / V0.10 CAPTURE-WINDOW OPERATIONS PREPARED PASS / V0.10 MID-WINDOW EMERGENCY TEMPLATE PREPARED NOT_AUTHORITY / V0.10 RENDER FINAL PRE-WINDOW READONLY RECHECK PASS / V0.11 SYNTHETIC FAILURE REHEARSAL 12/12 PASS / V0.11 POST-WINDOW EXECUTION PACKAGE PREPARED EXECUTION_NOT_AUTHORIZED / V0.11 PRODUCTION EVALUATION AUTHORITY TEMPLATE PREPARED EXECUTION_NOT_AUTHORIZED / V0.11 METADATA STABILITY EVALUATOR PREPARED EXECUTION_NOT_AUTHORIZED / REPLACEMENT HOLDOUT FROZEN_UNOPENED / METADATA STABILITY NOT_YET_RUN / V0.10 194-SLOT PASS ELIGIBILITY BLOCKED / V0.12 SUCCESSOR WINDOW CURRENT / V0.12 PRODUCTION STABILITY NOT_YET_RUN / HISTORICAL UNIVERSE MEMBERSHIP NOT_READY / TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED / PAPER-ONLY**
-
-</details>
-
-### LIT Archive Diagnosis V0.1 — EFFECTIVE ONLY AFTER REVIEWED MAIN MERGE
-
-- Run 34346196907 rejected LITUSDT, December 2025, 15m: one 70-bar gap and
-  2,906 monthly rows. This is a quality rejection, not a repair conclusion.
-- The bounded `diagnose-lit` manual mode reads only the named official monthly
-  archive and needed daily archives. Config:
-  `config/lit_archive_diagnosis_v0_1.json`; receipt:
-  `research/receipts/2026-09-09-lit-archive-diagnosis-v0-1-authority.json`.
-- It has no R2/secret binding, no raw artifact and no repair authority. A
-  candidate requires a separate publication authority; current history
-  scheduling and all other authority remains unchanged. Contract:
-  `docs/LIT_ARCHIVE_DIAGNOSIS_V0_1.md`.
-
-### History Cadence V0.1 — EFFECTIVE ONLY AFTER REVIEWED MAIN MERGE
-
-- User requested faster online backfill on 2026-09-09. The existing serialized
-  history trigger becomes every two hours at UTC minute 23, September 9–30.
-- Appendix: `config/history_cadence_v0_1.json`; authority receipt:
-  `research/receipts/2026-09-09-history-cadence-v0-1-authority.json`.
-- Original history/recovery/BNX configs and receipts remain unchanged. The
-  original six-hour cadence is superseded only by this reviewed appendix.
-- One shard per run, 330-minute timeout, fair recovery rotation, 128-attempt
-  budget, FREE-ONLY gates and October 1 exclusive expiry remain binding.
-- Current schedule inventory: `config/github_automatic_research_operations_v0_2.json`.
-  Health V0.2 remains unchanged, including its nine-hour long-run tolerance.
-- Contract: `docs/HISTORY_CADENCE_V0_1.md`. No run or data completion is
-  asserted by this change; BNX requires formal production evidence.
-
-### BNX Archive Repair V0.1 — EFFECTIVE ONLY AFTER REVIEWED MAIN MERGE
-
-- Diagnosis run 34241295251 verified the August 2022 BNXUSDT 15m candidate:
-  288 supplied bars, 96 identical overlaps, 2976 total rows. This is evidence,
-  not an assertion of completed production publication.
-- New config `config/bnx_archive_repair_v0_1.json` and receipt
-  `research/receipts/2026-09-09-bnx-archive-repair-v0-1-authority.json`
-  bind the exact five source hashes and candidate hash.
-- Existing history cron and recovery rotation consume this optional appendix
-  after merge. No second scheduler, secret binding or manual publication lane.
-- Only the named missing partition may be created; conflicting existing data
-  fails closed. Original monthly failure remains explicit in shard lineage.
-  All original partition checks and ten-shard completion requirements remain.
-- Real-clock gates, fresh FREE-ONLY headroom and post-write SHA checks apply.
-  No R2/provider execution occurs during PR preparation or synthetic cloud CI.
-- Operating contract: `docs/BNX_ARCHIVE_REPAIR_V0_1.md`.
-  Holdout/source-switch/trading and frozen metadata authorities are unchanged.
-
-### BNX Archive Diagnosis V0.1 — EFFECTIVE ONLY AFTER PROTECTED-MAIN MERGE
-
-- A bounded manual `diagnose-bnx` mode in the existing history workflow
-  compares the pinned BNXUSDT August 2022 15m monthly archive with same-provider
-  daily archives. At most 12 public requests, five daily archives, no retries
-  or redirects; fresh main dispatch required and rerun attempts are rejected.
-- Separate authority: `config/bnx_archive_diagnosis_v0_1.json` and
-  `research/receipts/2026-09-08-bnx-archive-diagnosis-v0-1-authority.json`.
-  Contract: `docs/BNX_ARCHIVE_DIAGNOSIS_V0_1.md`.
-- This diagnostic has no R2 access, secret bindings or raw-data artifacts.
-  Only aggregate evidence and candidate hashes are retained in GitHub.
-  It does not change the seven scheduled workflow inventory.
-- This is a separate public-read diagnostic scope. The original R2 headroom
-  gate remains required for all original backfill/provider and persistence work;
-  the diagnostic cannot publish data or enter training.
-- A candidate requires a separate versioned publication authority. Source gaps,
-  revisions or disagreements remain failures/review evidence. No completion
-  or repair outcome is asserted before an actual cloud run.
-- User execution preference: GitHub-hosted Actions for testing and runtime;
-  local source backup lives on `codex/cloud-handoff-20260908` and is not authority.
-
-### History Recovery V0.1 — EFFECTIVE ONLY AFTER PROTECTED-MAIN MERGE
-
-- Adds a SHA-bound recovery appendix to Crypto Core 100 V0.1.2. The original
-  100 markets, ten shards, archive quality checks and completion gate remain binding.
-- The existing six-hour workflow records bounded immutable attempt metadata
-  and rotates among incomplete shards. A quality-rejected shard stays incomplete
-  and its run stays failed; it no longer indefinitely blocks untouched shards.
-- Authority: `config/binance_usdm_history_recovery_v0_1.json` and
-  `research/receipts/2026-09-08-binance-usdm-history-recovery-v0-1-authority.json`.
-  Operating contract: `docs/HISTORY_RECOVERY_V0_1.md`.
-- The appendix authorizes only the dedicated attempt journal and shard selection
-  after protected-main merge. It does not repair BNXUSDT, exclude markets, change
-  cron, authorize training on partial data or change frozen provider/holdout/trading paths.
-- Journal conflicts or interrupted writes require review. The original expiry
-  remains 2026-10-01T00:00:00Z. Dataset completion and dates require run evidence.
-
-### GitHub Automatic Research Operations V0.1 — AUTHORIZED ON MAIN MERGE
-
-- GitHub `schedule` is the normal execution path for all seven currently
-  authorized online workflows. Routine work does not require an operator to
-  press `Run workflow`.
-- Research Automation Health V0.2 replaces the V0.1 cron and runs every two
-  hours at `:57` UTC. It covers the exact Repository cron inventory and accepts
-  only `schedule` events as health evidence, so a manual or pull-request run
-  cannot hide a missing automatic run.
-- Health evidence is secret-free and retained as a GitHub Actions artifact for
-  90 days. The monitor reads GitHub Actions metadata only and has no provider,
-  R2, holdout, model, trade or order authority.
-- V0.1 health remains manual regression-only historical evidence. A workflow
-  cannot self-authorize a new provider/R2 scope, open the holdout, promote a
-  model or enable trading; those still require separate protected-main review.
-- Contract: `config/github_automatic_research_operations_v0_1.json`; health
-  config: `config/research_automation_health_v0_2.json`; operating guide:
-  `docs/GITHUB_AUTOMATIC_RESEARCH_OPERATIONS_V0_1.md`.
-
-### Context Forward Capture Execution V0.1 — AUTHORIZED MANUAL ONE-SHOT AFTER V0.12 WINDOW
-
-- PR #222 merged to protected `main` at merge commit
-  `f8ffa0473863f6999f2be1082f271cd4f03bf3ff` and adds a separately versioned
-  execution authority without changing the prepared non-executing
-  `config/context_forward_capture_v0_1.json` contract.
-- The prepared capture contract remains `PREPARED_NOT_ACTIVE` with provider and
-  production-R2 authority false. Execution authority exists only in
-  `config/context_forward_capture_execution_v0_1.json` and its exact SHA-bound
-  receipt
-  `research/receipts/2026-09-04-context-forward-capture-execution-v0-1-authority.json`.
-- The one-shot execution window is `2026-09-12T04:00:00Z` through
-  `2026-09-19T04:00:00Z`. Before the not-before boundary or at/after expiry the
-  runner must fail closed before R2 or CoinPaprika access.
-- `.github/workflows/context-forward-capture-execution-v0-1.yml` is
-  `workflow_dispatch` only and has no cron. It is classified separately from
-  normal automatic operations and does not change the seven-workflow schedule
-  inventory monitored by Research Automation Health V0.2.
-- One successful run may make at most two public CoinPaprika requests in frozen
-  order (`/global`, then `/tickers/eth-ethereum`), with zero automatic retries,
-  no authentication and no paid/provider fallback.
-- Production persistence is limited to the normalized snapshot and receipt in
-  the dedicated R2 namespace. Raw provider payload persistence remains false;
-  exact raw-payload SHA-256 fingerprints are retained instead.
-- Whole-bucket FREE-ONLY 8 GB inventory is required before provider access and
-  again before writes. Immutable exact-byte equality, post-write SHA-256
-  readback and receipt-last ordering are mandatory.
-- A valid existing PASS receipt makes the one-shot complete; a later manual run
-  returns `ALREADY_COMPLETE` without another provider request. Partial or
-  conflicting state fails closed for manual review.
-- A 4H schedule is explicitly not authorized. A future V0.2 schedule requires
-  a separate protected-main authority after a valid V0.1 one-shot PASS.
-- Historical backfill, holdout access/tuning, strategy/risk/leverage changes,
-  SHORT execution, model promotion, trade plans, real-money orders and live
-  trading remain unauthorized. Contract:
-  `docs/CONTEXT_FORWARD_CAPTURE_EXECUTION_V0_1.md`.
-
-### V0.12 successor metadata window — AUTHORIZED / CURRENT WINDOW
-
-- The reviewed change atomically removes every V0.10 cron and adds one V0.12
-  GitHub-hosted schedule. V0.10 manual capture, replay and backfill remain
-  unauthorized.
-- The successor window is `2026-09-04T02:00:00Z` through
-  `2026-09-12T03:59:59.999Z`: 194 UTC hourly slots with `:17` and `:47`
-  attempts, for 388 bounded schedule attempts.
-- This 2026-09-04 status sync is inside the authorized clock window. That is a
-  schedule-window statement only; it does not claim that any particular
-  capture, hourly slot or stability result has passed without run evidence.
-- V0.12 uses the independent R2 namespace
-  `metadata/provider-equivalence/v0_12/successor-window-20260904/` and the
-  existing Render Free Frankfurt raw relay. Render code, deployment and secret
-  state are unchanged; Render still receives no R2 credentials.
-- Pionex normalization accepts the official modern
-  `contractType/status` representation or legacy `type/enable` representation.
-  When both exist they must agree; missing, unknown or conflicting values stop
-  before R2 client construction.
-- Future 194-slot stability rules are frozen now, but production R2 evaluation
-  remains unauthorized and requires a separate versioned authority. The
-  replacement holdout remains `FROZEN_UNOPENED`.
-- Authority/config:
-  `config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json`;
-  receipt:
-  `research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json`;
-  contract: `docs/PROVIDER_EQUIVALENCE_V0_12_SUCCESSOR_METADATA_WINDOW_V0_1.md`.
-- Protected-main PR #212 and minimum operational commit
-  `80732edee9a8954b53b4b56115ecb0d506591f0a` are bound append-only by
-  `config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json`
-  and its matching receipt; the pre-binding authority files remain unchanged.
-
-### V0.10 post-#210 scheduled capture — RETIRED / FAIL_CLOSED EVIDENCE PRESERVED
-
-- PR #210 is merged on protected `main` at
-  `a34cf471876971a97200de4974906743642ed61f`; the exact `type=PERP` query is
-  effective and the frozen perpetual symbol scope is now reached.
-- Post-merge scheduled runs #36 through #41 all passed the window gate and
-  atomic-cutover validation, then failed at the same parser boundary:
-  `Pionex status/contractType missing: AAVE_USDT_PERP`. The latest observed run
-  is [`33345766954`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/33345766954).
-- Source-control ordering confirms this failure occurs before the R2 store
-  factory. No R2 client was constructed, no R2 read/write occurred, no capture
-  artifact was uploaded and the replacement holdout remained unopened.
-- The automation-health workflow is operating correctly: it now reports an
-  alert because the current V0.10 capture workflow is failing, while the daily
-  Research Signal Layer and Signal Quality schedules remain healthy.
-- Failed or missing slots cannot be replayed or backfilled. V0.11 production
-  evaluation is still `NOT_YET_RUN`, but the observed missing valid slots mean
-  this frozen window can no longer supply a complete 194-slot PASS dataset.
-- Observation receipt:
-  `research/receipts/2026-08-31-v0-10-post-perp-query-schema-mismatch-observation.json`.
-  The pre-merge #210 config and receipt remain immutable historical evidence.
-- V0.12 retires the remaining V0.10 schedule without changing or regrading
-  these failures. V0.10 has no current schedule, no manual capture authority and
-  no replay/backfill authority.
-
-### Project Convergence V0.1 — PREPARED / EFFECTIVE ON MAIN MERGE
-
-- Current operator entrypoints are reduced to `docs/PROJECT_MAP_V0_1.md`,
-  `docs/STRATEGY_INDEX_V0_1.md` and `docs/AUTOMATION_INDEX_V0_1.md`.
-- The website now keeps typed CSS/JS/image folders and one active large visual.
-  Three unused design experiments are removed from the current tree but remain
-  recoverable from Git history.
-- The Strategy page is rebuilt from six current configs into one
-  `authority=false` projection. It fails closed if provider, R2, holdout,
-  automatic promotion or trading authority appears.
-- The three bounded Pionex Paper/V0.5 cron triggers are retired after their
-  binding `2026-08-27T00:00:00Z` provider cutoff. Manual dispatch remains only
-  as a fail-closed regression surface; frozen configs and receipts are not
-  rewritten and automatic resume remains false.
-- Every workflow and every remaining cron has exactly one machine-checked
-  classification in `config/project_convergence_v0_1.json`.
-- This convergence does not change V0.10, SState core, strategy parameters,
-  provider/R2 access, source switching, holdout access, model promotion or any
-  trading authority.
-
-### Strategy Research Loop V0.1 — PREPARED / SYNTHETIC ONLY
-
-- One project-native contract now joins a deterministic 120-hypothesis
-  candidate registry, Strategy Edge Validation V0.1 and a cost-complete paper
-  performance audit. It does not install either referenced external tool or
-  create a parallel broker/governance path.
-- The registry covers trend, mean-reversion, breakout and volume-flow families
-  across intraday, multiday and swing horizons. Candidate and complete-registry
-  SHA-256 lineage is frozen before evidence exists; no candidate is executed.
-- Paper evidence records direction, holding time, gross/net PnL, fees, funding,
-  observed slippage and initial risk. Audit outputs include expectancy, profit
-  factor, Sharpe/Sortino, drawdown, consecutive losses, winner concentration
-  and deterministic stationary-bootstrap Monte Carlo fragility.
-- The existing Repository `BacktestResult` is adapted into this ledger; no
-  second broker and no invented SHORT execution path are introduced.
-- Candidate order, registry SHA, provider, selected candidate and edge-input
-  fingerprint must match across every layer. Edge failure or lineage mismatch
-  returns `REJECT`; fragile/insufficient paper evidence remains review-only.
-- Even the strongest output is only `EVIDENCE_READY_FOR_HUMAN_REVIEW` with
-  zero promotion/trading authority. V0.1 accepts synthetic fixtures only and
-  creates no workflow or schedule.
-- Config: `config/strategy_research_loop_v0_1.json`; contract:
-  `docs/STRATEGY_RESEARCH_LOOP_V0_1.md`; receipt:
-  `research/receipts/2026-08-28-strategy-research-loop-v0-1-prepared.json`.
-
-### Strategy Edge Validation V0.1 — PREPARED / RESEARCH ONLY
-
-- A deterministic anti-overfitting layer now accepts only a complete UPDATE
-  candidate-return family plus one already-selected candidate's disjoint
-  VALIDATION evidence.
-- Frozen gates cover stationary bootstrap, Deflated Sharpe, PBO/CSCV,
-  Romano-Wolf stepdown, validation Sharpe retention and circular-shift signal
-  alignment permutation.
-- Complete immutable trial-registry and disjoint-partition integrity evidence
-  are mandatory. Missing, partial, misaligned or invalid evidence returns
-  `REJECT`; validation cannot reselect a candidate.
-- Existing fee/slippage, drawdown, exposure and causal/no-lookahead checks
-  remain separate mandatory gates and cannot be overridden by a statistical
-  PASS.
-- Repository implementation and synthetic fixtures are prepared. No workflow,
-  schedule, provider request, R2 operation, production return evaluation,
-  holdout access, model promotion or trading is authorized.
-- Config: `config/strategy_edge_validation_v0_1.json`; operating contract:
-  `docs/STRATEGY_EDGE_VALIDATION_V0_1.md`; preparation receipt:
-  `research/receipts/2026-08-28-strategy-edge-validation-v0-1-prepared.json`.
-
-### Binance USD-M Crypto Core 100 V0.1.2 — AUTHORIZED / EXECUTION OUTCOME NOT ASSERTED HERE
-
-- A separate provider-separated research path expands detailed coverage from
-  the original 15-contract basket to 100 unique Crypto USDT markets.
-- The fixed source window is 2022-08 through 2026-07, with native 15m, 1h and
-  4h Binance Vision trade-Kline archives. It ends before the replacement
-  holdout and performs no holdout candle access.
-- Execution cannot begin before `2026-09-04T02:00:00Z`, after the frozen V0.10
-  metadata-capture window. Before that instant its workflow exits without
-  provider or R2 access. Backfill authority expires at
-  `2026-10-01T00:00:00Z`; later annual cron occurrences also stop before any
-  provider or R2 access, while completed-dataset weekly training remains active.
-- This 2026-09-04 status sync does not infer successful execution from the clock;
-  current shard/run outcome must come from explicit GitHub Actions and R2
-  evidence.
-- Selection preserves the original 15 continuity symbols, requires all 100
-  selected Crypto markets to reach the window end, and excludes heuristic
-  tokenized-stock/ETF and other-asset candidates from materialization. Those
-  candidates remain discovery metadata for a separate future dataset.
-- Ten serialized, resumable R2 shards run at most once every six hours.
-  Every run applies a fresh whole-bucket 8 GB hard stop before provider access
-  and again before writes; exact existing-object equality and post-write
-  SHA-256 readback are mandatory.
-- After the complete dataset exists, a weekly research trainer calculates
-  causal multi-timeframe technical features and performs chronological
-  walk-forward, baseline, cost, drawdown and exposure diagnostics. `REJECT`
-  remains evidence and cannot promote a model.
-- Raw history remains R2-only and is not projected to Pages. GitHub contains
-  the strategy/config/training source and versioned authority.
-- V0.1.2 supersedes V0.1.1 before either predecessor's first provider request
-  or R2 access. V0.1/V0.1.1 configs and receipts remain immutable.
-- Authority/config: `config/binance_usdm_detailed_history_v0_1_2.json` and
-  `research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json`.
-- Current contract: `docs/BINANCE_USDM_CRYPTO_CORE_100_V0_1_2.md`; superseded
-  designs remain historical evidence.
-- This stage does not change V0.10, relabel Binance as Pionex, switch sources,
-  open the holdout, admit a formal backtest, promote a model or trade.
-
-### Pionex Alternative Assets Observability V0.2 — AUTHORIZED / EXECUTION OUTCOME NOT ASSERTED HERE
-
-- A separate Pionex-native metadata catalog covers a 125-candidate registry:
-  90 equity/stock-linked tokens, 31 ETF/ETN/fund-linked tokens and 4 direct
-  metal references (`XAU`, `XAG`, `XPT`, `XPD`). It is not part of Crypto Core
-  100 and never changes that fixed 100-market count.
-- Registry membership is only a point-in-time candidate. Selection requires an
-  exact intersection with Pionex public `PERP + TRADING` symbols at each run;
-  an `X` suffix alone is never accepted as asset-class proof. Unknown suffix
-  matches remain `REVIEW_REQUIRED_NOT_SELECTED`.
-- The metadata-only workflow cannot begin before `2026-09-04T02:00:00Z`. Its
-  first scheduled catalog is `2026-09-04T02:53:00Z`, followed by bounded weekly
-  reviews on September 6, 13, 20 and 27 at `03:53 UTC`. Authority expires before
-  provider/R2 access at `2026-10-01T00:00:00Z`.
-- This 2026-09-04 status sync does not infer a catalog PASS from the scheduled
-  time; the current catalog/run outcome requires explicit execution evidence.
-- V0.2 supersedes the unexecuted V0.1 schedule before its first provider request
-  or R2 access. One workflow now validates the complete catalog structure,
-  compares each run with the prior SHA-bound V0.2 catalog and estimates the
-  four-year `15M / 60M / 4H` capacity without materializing history. Catalog
-  absence is reported as an observation, never automatic delisting proof.
-- Each run performs fresh whole-bucket 8 GB FREE-ONLY headroom checks before the
-  prior-catalog/provider read and before R2 writes. Catalog, analysis, safe
-  projection and manifest are immutable, SHA-256 read back, and the small latest
-  pointer is written last. Persistent generated data remains R2-only.
-- This version does not call K-line, funding, trade or order-book endpoints and
-  does not access the replacement holdout. Proposed Pionex-native
-  `15M / 60M / 4H` history and training remain waiting for V0.11 plus a separate
-  holdout/candle authority; activation is not automatic.
-- Candidate registry: `config/pionex_alternative_assets_v0_1.json`; current
-  config: `config/pionex_alternative_assets_observability_v0_2.json`; authority
-  receipt: `research/receipts/2026-08-30-pionex-alternative-assets-observability-v0-2-authority.json`;
-  operating contract: `docs/PIONEX_ALTERNATIVE_ASSETS_OBSERVABILITY_V0_2.md`.
-- No ownership/equivalence claim, source switch, provider splice, model
-  promotion, trade plan, private API, real-money order or live trading is
-  authorized.
-
-### Post-window Paper Training V0.2 — PREPARED / WAITING FOR HOLDOUT AUTHORITY
-
-- The existing Pionex public adapter and Repository Paper Broker are retained;
-  strategy, risk, leverage and Pionex Demo boundaries are unchanged.
-- A proposed every-four-hour current-market cadence is recorded but has no
-  workflow or active cron.
-- The provider's latest-lookback response may include frozen 2026-08-28 through
-  09-03 candles. A post-window clock therefore cannot by itself authorize
-  resumption.
-- Activation requires the complete V0.10 window, separately authorized V0.11
-  production evaluation and a new holdout/paper-read authority. Until then,
-  provider requests, R2 access, demo automation and all live trading remain
-  false.
-- Config: `config/post_window_paper_training_v0_2.json`; preparation receipt:
-  `research/receipts/2026-08-29-post-window-paper-training-v0-2-prepared.json`.
-
-### Binance Spot R2 Training Governance V0.5 — HISTORICAL AUTHORITY / POST-CUTOFF MANUAL FAIL-CLOSED
-
-- V0.3 daily and V0.4 weekly/monthly execution are retired. V0.5 historically
-  trained once per week at Sunday `02:37 UTC` (`10:37 Asia/Taipei`). Its cron is
-  retired after the binding cutoff; manual dispatch now proves only the
-  fail-closed stop.
-- The first scheduled V0.5 weekly run `32615608243` completed successfully at
-  `2026-08-23 11:32 Asia/Taipei` on `main`; the evidence pipeline passed while
-  `model_quality_gate.status=REJECT`. The rejection remains research evidence
-  and authorizes no promotion or trading.
-- Each weekly run rebuilds the provider-separated dataset, checks complete tails,
-  catalog/audited coverage, feature order and chronological partitions, trains the
-  deterministic daily-direction model, and writes immutable V0.5 evidence.
-- Monthly universe review runs on day 1 at `03:37 UTC` (`11:37 Asia/Taipei`). It
-  compares active-market snapshots, catalog absences and heuristic tokenized-stock
-  classification changes. Catalog absence is not treated as proof of delisting.
-- The initial V0.5 monthly baseline was created successfully by manual run
-  `32589005957` at `2026-08-23 01:51 Asia/Taipei`. This consumed the one-time
-  activation; another manual activation is unauthorized and fails before
-  publication. Scheduled reviews remain separate, and the workflow has no push
-  trigger.
-- The current-active catalog cannot authorize historical universe membership;
-  survivorship bias remains `REVIEW_REQUIRED` and formal backtest admission remains
-  false.
-- Both schedules stop before provider or R2 access at
-  `2026-08-27T00:00:00Z`. Automatic post-window resume is not authorized.
-- Cloudflare R2 remains the only persistent generated-data store. Secret-free
-  evidence is retained online and runner workspaces are removed at the end.
-- Model promotion, source switching, holdout access, trade plans, real-money orders
-  and live trading remain unauthorized.
-- Pre-publish validation completes before any R2 client is constructed. A missing
-  or unsafe review contract cannot update R2 or its latest pointer.
-- The executable V0.5 config is exact-byte bound to its versioned authority
-  receipt. The first V0.5 weekly/monthly comparison uses the SHA-256-verified
-  V0.3 online PASS counts (748 requested / 723 audited / 701,275 rows); a malformed existing
-  V0.5 pointer fails closed instead of falling back.
-- Dataset receipts bind the exact catalog and Parquet SHA/size; Parquet provider,
-  schema, OHLCV bounds, row/symbol/audit and tail evidence are checked before any
-  R2 write. Total rows must retain at least 80% of the comparison baseline.
-  Model/metrics provider, feature, target, authority and raw/canonical hash
-  contracts are likewise checked before publication.
-- Evidence-correctness hardening rejects stale-tail series, enforces the exact
-  ordered feature contract, records chronological train/validation fingerprints,
-  compares every configured class with ready folds against a train-prevalence
-  baseline, and separates
-  successful pipeline execution from the research-only model-quality result.
-- The quality gate checks configured costs, net growth, maximum drawdown and symbol
-  concentration. A rejected model is still published as evidence; it is never
-  promoted automatically.
-- Monthly R2 pointer reads are namespace/schema/provider/run-id/SHA allowlisted.
-  Monthly catalog collapse is blocked; the current review is governance-bound and
-  contract-validated before R2 writes, and the stop window is checked again before
-  every actual upload. Push execution is absent so changes do not replace the
-  prior-month comparison baseline.
-- Operations index and post-window recommendations:
-  `docs/RESEARCH_AUTOMATION_SCHEDULE_V0_1.md`.
-- Current owner/timeline handoff:
-  `docs/RESEARCH_AUTOMATION_HANDOFF_V0_1.md`.
-- Data retention is partially active: Binance Spot `1d` remains `2020-01-01`
-  through the latest complete UTC day. Crypto Core 100 V0.1.2 separately
-  authorizes a fixed 2022-08 through 2026-07, 100-market `15m`/`1h`/`4h`
-  Binance USD-M backfill after the V0.10 window. Rolling updates and the broader
-  derivative-state materializations still require another authority. See
-  `docs/DATA_RETENTION_POLICY_V0_1.md`.
-- V0.6 Shadow Model ablation is prepared but not active after the first V0.5
-  quality `REJECT`: it compares baseline, trend, price/volume and volatility
-  groups locally with calibration and descriptive regime slices. It has no
-  provider reads, R2 writes, holdout access, promotion or trading authority.
-  See `docs/BINANCE_SPOT_SHADOW_V0_6.md`.
-- Research Signal Layer V0.1 is now prepared as a separate, research-only
-  contract for appending only closed latest candles and evaluating timestamped
-  KOL forecasts without lookahead. It is idempotent, rejects historical
-  revisions and provider mixing, and cannot write production R2, promote a
-  model or trigger a trade. External KOL ingestion remains disabled until a
-  separately versioned authority names sources, retention and rate limits.
-  See `docs/RESEARCH_SIGNAL_LAYER_V0_1.md`.
-- Research Signal Layer V0.2 is active on merge: a daily `02:17 UTC` GitHub
-  Actions collector reads only the three configured public HTTPS sources,
-  accepts structured JSON forecasts without prose inference, and publishes
-  immutable source metadata/forecast evidence to the dedicated R2 namespace.
-  It performs fresh 8 GB FREE-ONLY headroom gates before fetch and write. It
-  cannot append historical candles, promote a model or trigger a trade. See
-  `docs/RESEARCH_SIGNAL_LAYER_V0_2.md` and
-  `.github/workflows/research-signal-layer-v0-2.yml`.
-- Research Signal Quality V0.1 runs daily at `02:47 UTC`. It reads only the
-  allowlisted latest, manifest and payload objects from the dedicated signal
-  namespace, verifies both SHA-256 links and reports `FORECAST_READY`,
-  `METADATA_ONLY` or `NO_DATA`. It cannot list/write R2 or access providers.
-- Research Automation Health V0.2 runs every two hours at `:57`. It reads
-  GitHub Actions run metadata only, covers every current cron, accepts only
-  schedule events as health evidence, and alerts on stale, failed or missing
-  expected jobs. Time-bounded and dependency-waiting states remain explicit
-  rather than false failures. See `docs/RESEARCH_AUTOMATION_HEALTH_V0_2.md`.
-- A post-window four-hour/weekly/monthly successor cadence is recorded as
-  `PREPARED_NOT_ACTIVE`. It has no workflow and grants zero provider, R2,
-  holdout, model-promotion or trading authority.
-- The research-only continuous-learning completion target is documented in
-  `docs/CONTINUOUS_LEARNING_ROADMAP_V0_1.md`. Its `2026-09-30` engineering
-  target is a roadmap, not execution authority or a profitability promise.
-
-### Binance Spot R2 Weekly Training and Review V0.4 — HISTORICAL / EXECUTION RETIRED
-
-- V0.4 config, receipt, namespaces and prior R2 objects remain immutable historical
-  evidence. They were not rewritten into V0.5 semantics.
-- V0.4 workflow files are manual validation-only retirement checks: no schedule,
-  provider access, R2 secrets or R2 writes.
-- V0.5 uses separate config, authority receipt, workflow names and R2 namespaces.
-
-### Binance Spot R2 Automated Training V0.3 — HISTORICAL ONLINE PASS / DAILY RETIRED
-
-- Cloudflare R2 is the only persistent generated-data store for immutable Binance
-  Spot 1D internal-training snapshots. GitHub runner files are ephemeral and are
-  explicitly removed after online evidence upload; local repository artifacts
-  are forbidden.
-- Its successful online runs remain immutable evidence. V0.5 is now the current
-  weekly training and monthly catalog-governance execution path.
-- R2 credentials remain in GitHub Actions secrets only. Raw history is not
-  projected to GitHub Pages.
-- The latest training pointer is written only after immutable dataset,
-  catalog, receipt, model, metrics and manifest objects all pass round-trip
-  verification, preserving the prior valid run if a publish is interrupted.
-- The frozen replacement-holdout guard stops the workflow before provider or R2
-  access at `2026-08-27T00:00:00Z`; automatic resume is not authorized.
-- Model output remains research evidence. Source switching, Historical Universe
-  membership, backtest admission, trade plans and trading remain unauthorized.
-- GitHub Actions run
-  [`32564110756`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/32564110756)
-  completed successfully on `main`: 748 markets, 701,275 rows through 2026-08-21,
-  seven R2 objects uploaded and round-trip verified, with `latest.json` written
-  last. The secret-free evidence is frozen in
-  `research/receipts/2026-08-22-binance-spot-r2-automated-training-v0-3-pass.json`.
-
-### Binance Internal Training Universe V0.2 — HISTORICAL BASELINE / LOCAL COPY RETIRED
-
-- The V0.2 result remains historical evidence; its ignored local generated copy
-  was removed after the R2 V0.3 snapshot passed exact SHA-256 round-trip checks.
-- The 2026-08-22 local pass discovered 748 USDT/USDC markets and wrote 701,275
-  daily rows through 2026-08-21 UTC; 723 markets pass continuity audit and 25
-  are retained with `audit_ok=false` for explicit downstream filtering.
-- Crypto, tokenized-stock candidates and other assets are classified explicitly;
-  heuristic classifications never promote an asset into a trading universe.
-- Historical records remain internal-only in R2 and are not projected to GitHub
-  Pages. V0.3 forbids persistent local generated artifacts while preserving
-  Pionex-native relabeling, source switching, W1, holdout-access and trading
-  prohibitions.
-
-### Pionex Public Paper Training V0.1
-
-- Hourly GitHub Actions may read only Pionex public futures market endpoints.
-- It computes causal multi-timeframe technical, volatility, volume,
-  microstructure and derivatives market-state features.
-- Fixed candidate gates feed only the deterministic Repository Paper Broker;
-  metrics, trades, lineage and training rows are retained as run artifacts and
-  projected to the read-only GitHub Pages dashboard.
-- Pionex Demo is manual sampling only. Private API use, demo automation, formal
-  trade plans, R2 access, replacement-holdout access, provider switching,
-  real-money orders and live trading remain unauthorized.
-- The job performs zero provider requests from `2026-08-27T00:00:00Z` onward;
-  resumption requires a new versioned authority after the frozen window.
-
-No live-money authorization exists. `trade_plan_authorized=false`, `real_money_order_authorized=false`, and `live_trading_authorized=false` remain mandatory.
-
-## Current execution / transport authority
-
-Historical V0.10 activation merge commit from PR #127: `8fce944da479dbda0e2899f9b30b9de62351fa27`.
-
-Current metadata-capture path:
-
-- workflow: `.github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml`;
-- runner: `ubuntu-latest`;
-- active window: `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z`;
-- Pionex metadata leg: GitHub-hosted direct public HTTPS with frozen preferred/legacy normalization;
-- Binance USD-M metadata leg: authenticated Render Free / Frankfurt raw relay;
-- V0.10 scheduled capture path: **RETIRED / HISTORICAL**;
-- old V0.2 `[self-hosted, macOS, ARM64]` scheduled path: **RETIRED**;
-- concurrent old/new metadata paths: forbidden;
-- automatic fallback to V0.10 or V0.2: forbidden;
-- Render receives R2 credentials: false.
-
-Render remains FREE / Frankfurt. Current runtime budget is `0 USD/month`.
-
-### V0.10 intermittent schedule delivery — PR #201 MERGED / REGISTRATION EFFECTIVE
-
-- Read-only GitHub Actions API observations at `2026-08-27T03:40:07Z` and
-  `2026-08-27T07:38:17Z` returned zero V0.10 `schedule` runs. Under the frozen
-  timetable, 7 and 15 attempts respectively should already have been emitted.
-- A later scheduled run `33060180846` instantiated at `2026-08-27T09:47:47Z`
-  on the unchanged protected `main` SHA. Window, atomic-cutover and freshness
-  guards passed, then capture failed closed because the Pionex response did not
-  contain any of the 15 frozen symbols. The observer did not read the provider
-  payload or a capture artifact; provider-payload root cause remains
-  **UNCONFIRMED**. The failure occurred before R2 client construction or write,
-  and no holdout data was accessed.
-- At `2026-08-27T13:18:53Z`, that remained the only emitted run out of the
-  first 26 elapsed trigger instants through `12:47`; the immediately subsequent
-  `10:17` and `10:47` instants had also produced no run. Schedule delivery was
-  therefore intermittent, not recovered before the re-registration merge.
-- The workflow remained active on default branch `main`, while other Repository
-  schedules had run. The direct cause is **UNCONFIRMED**; GitHub documents that
-  scheduled events can be delayed or dropped, but that fact alone does not prove
-  the cause of this Repository-specific non-delivery.
-- PR #201 merged to protected `main` at `2026-08-27T13:26:40Z`; merge SHA
-  `cf83b6320bc0f0817d8e6ae15d88fe304b933330`. It applies only a semantically
-  equivalent POSIX cron text rewrite so GitHub re-registers the existing schedule.
-  It does not change UTC
-  `:17/:47`, the frozen window, 194 slots, 388 attempts, provider/symbol scope,
-  freshness, R2 hard stop, runtime, endpoint, secret or execution authority.
-- Required CI and protected-main review passed before merge. Registration text
-  is now effective, but this does not prove future GitHub schedule delivery and
-  does not resolve the Pionex metadata failure. Earlier missed attempts remain
-  scientific failures and may not be manually or retroactively backfilled.
-- The first post-merge trigger instant was `2026-08-27T13:47:00Z`. A read-only
-  Actions API observation at `13:51:28Z` still returned only the single
-  pre-merge run, so no post-merge run was visible four minutes after the trigger.
-  GitHub-side delay remained possible at that observation; delivery recovery is
-  **NOT_CONFIRMED**.
-- A later read-only Actions API observation at `2026-08-28T01:28:05Z` found a
-  post-merge scheduled run `33124856368` on `main` SHA
-  `a325728cf92c2885ef0611fc1a57f45389de6b77` (created `2026-08-27T23:03:07Z`).
-  Its window gate, atomic-cutover validation and stale-run guard passed, but the
-  capture step failed. No workflow log, provider payload or capture artifact was
-  read; the failure root cause remains **UNCONFIRMED**. This proves delivery for
-  that attempt only, not metadata stability or full schedule recovery.
-- Historical pre-merge authority/config:
-  `config/v0_10_mid_window_emergency_schedule_reactivation_v0_1.json`.
-  Historical pre-merge incident receipt:
-  `research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-authority.json`.
-  Post-merge effectivity receipt:
-  `research/receipts/2026-08-27-v0-10-mid-window-emergency-schedule-reactivation-effective.json`.
-  Post-merge run observation receipt:
-  `research/receipts/2026-08-28-v0-10-post-merge-schedule-observation.json`.
-
-Final read-only pre-window Render recheck on 2026-08-21 confirms:
-
-- service Auto-Deploy: **OFF** (`autoDeploy=no`, trigger `off`);
-- service plan: **free**;
-- service region: **frankfurt**;
-- service maintenance mode: disabled;
-- service suspension: none;
-- current/latest live deploy: `dep-da35gfoae00c73fpff8g`;
-- current/latest live deploy commit: `8fce944da479dbda0e2899f9b30b9de62351fa27` (the V0.10 activation merge);
-- no unexpected redeploy occurred after V0.10 activation despite later maintenance/docs merges.
-
-Authority receipt: `research/receipts/2026-08-21-v0-10-render-final-pre-window-readonly-recheck.json`.
-
-This recheck was observation-only: it did not trigger a Render deploy, read/change Render environment values, hit providers, construct/read/write production R2, read capture artifacts, open holdout data, or run V0.11 production evaluation.
-
-## Historical V0.10 frozen metadata scope
-
-Inherited scientific scope is unchanged:
-
-- metadata capture: `2026-08-27T00:00:00Z` through `2026-09-04T01:59:59.999Z`;
-- 194 UTC hourly slots;
-- attempts at UTC `:17` and `:47`;
-- 388 scheduled attempts total;
-- first scheduled attempt: `2026-08-27T00:17:00Z`;
-- last scheduled attempt: `2026-09-04T01:47:00Z`;
-- frozen semantic date-scoped schedules:
-  - `17,47 * 27-31 8 *`
-  - `17,47 * 1-3 9 *`
-  - `17,47 0-1 4 9 *`
-- PR #201 effective semantically equivalent registration text:
-  - `17,47 * 27,28,29,30,31 8 *`
-  - `17,47 * 1,2,3 9 *`
-  - `17,47 0,1 4 9 *`
-- required coverage: at least one complete valid capture per UTC hourly slot;
-- 15 candidate symbols / 45 mapped pairs;
-- replacement holdout: `2026-08-28T00:00:00Z` through `2026-09-03T23:59:59.999Z`;
-- replacement holdout state: **FROZEN_UNOPENED**.
-
-Each complete V0.10 capture uses 3 immutable run-scoped R2 objects. Receipt is written last, post-write SHA-256 readback is required, and every authorized write must pass a fresh whole-bucket 8,000,000,000-byte FREE-ONLY headroom gate.
-
-No V0.10 provider/R2 metadata capture is authorized outside its exact frozen historical window.
-
-## Pre-window readiness and capture-window operations — PREPARED PASS
-
-PRs #153–#161 completed the remaining pre-window testing, failure rehearsal, post-window preparation, read-only operational dashboard projection, capture-window incident policy, mid-window emergency template, and future V0.11 production-evaluation authority template without consuming production metadata evidence.
-
-Key authorities and evidence:
-
-- `research/receipts/2026-08-20-pre-window-readiness-v0-1.json`
-- `research/receipts/2026-08-20-v0-10-scheduled-capture-observer-prepared.json`
-- `config/v0_10_critical_path_freeze_v0_1.json`
-- `config/v0_10_capture_window_operations_v0_1.json`
-- `docs/V0_10_CAPTURE_WINDOW_OPERATIONS_RUNBOOK.md`
-- `research/receipts/2026-08-21-v0-10-capture-window-operations-prepared.json`
-- `config/v0_10_mid_window_emergency_change_template_v0_1.json`
-- `docs/V0_10_MID_WINDOW_EMERGENCY_CHANGE_TEMPLATE.md`
-- `research/receipts/2026-08-21-v0-10-mid-window-emergency-template-prepared.json`
-- `research/receipts/2026-08-21-v0-10-render-final-pre-window-readonly-recheck.json`
-- `config/provider_equivalence_v0_11_synthetic_failure_rehearsal_v0_1.json`
-- `research/receipts/2026-08-21-provider-equivalence-v0-11-synthetic-failure-rehearsal-pass.json`
-- `config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json`
-- `config/provider_equivalence_v0_11_production_evaluation_authority_template_v0_1.json`
-- `docs/V0_11_PRODUCTION_EVALUATION_AUTHORITY_TEMPLATE.md`
-- `research/receipts/2026-08-21-provider-equivalence-v0-11-production-evaluation-authority-template-prepared.json`
-- `web/data/operational-status.json`
-
-Historical V0.10 operational rules and current V0.12 transition:
-
-- the remaining V0.10 schedule is retired atomically when the exact V0.12 change set reaches protected `main`; the V0.10 workflow remains validation-only historical evidence;
-- V0.12 is the only scheduled production metadata-capture path after that merge and may run only inside its exact `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z` window;
-- manual metadata-capture backfill is **NOT_AUTHORIZED**;
-- retroactive hourly-slot backfill is **NOT_AUTHORIZED**;
-- if the `:17` attempt fails, preserve the failure and allow the frozen `:47` scheduled attempt to run normally;
-- if both attempts in one UTC hour fail, preserve both failures and keep that hour as a potential missing slot for post-window production stability evaluation; do not manufacture replacement evidence;
-- an R2 FREE-ONLY headroom `BLOCKED` result must stop before write and may not be bypassed by raising the 8 GB gate, deleting evidence, or performing partial writes;
-- a stale scheduled run over the frozen freshness limit remains a skip and may not bypass the freshness guard;
-- observer scope remains GitHub Actions run/job/step metadata only; it does not read capture artifacts, production R2, provider payloads, Render payloads, or holdout data;
-- automatic repair, automatic redeploy, automatic secret rotation, and automatic budget override remain unauthorized;
-- default mid-window state is **NO PRODUCTION-CRITICAL MUTATION**;
-- any unavoidable production-critical mid-window intervention requires a separate versioned emergency authority plus protected-main PR, must record pre/post-change lineage, and may not change frozen thresholds/scope, open holdout, or retroactively validate prior missing slots;
-- the prepared emergency-change template is `TEMPLATE_PREPARED_NOT_AUTHORITY`; it does not itself authorize any intervention or Render redeploy.
-
-The PR #153 synthetic rehearsal covered 12/12 scenarios and passed in CI. That PASS proves fail-closed behavior only; it is not production metadata-stability evidence and grants no downstream authority.
-
-## V0.11 metadata stability evaluator — PREPARED ONLY / HISTORICAL V0.10-BOUND TEMPLATE
-
-PR #131 froze the evaluator rules and implementation before production stability evidence is read. PR #154 prepared the exact post-window execution sequence without granting execution authority. PR #161 additionally prepared and validated the exact future production-evaluation authority template while leaving the runtime hard-disabled.
-
-Authorities:
-
-- `config/provider_equivalence_v0_11_metadata_stability_evaluation_v0_1.json`
-- `research/receipts/2026-08-20-provider-equivalence-v0-11-metadata-stability-evaluator-prepared.json`
-- `config/provider_equivalence_v0_11_post_window_execution_package_v0_1.json`
-- `config/provider_equivalence_v0_11_production_evaluation_authority_template_v0_1.json`
-- `docs/V0_11_PRODUCTION_EVALUATION_AUTHORITY_TEMPLATE.md`
-- `research/receipts/2026-08-21-provider-equivalence-v0-11-production-evaluation-authority-template-prepared.json`
-- `src/crypto_autopilot/provider_metadata_stability_v0_11.py`
-- `.github/workflows/validate-v0-11-metadata-stability-evaluator.yml`
-
-Frozen evaluator semantics:
-
-- require at least one complete valid V0.10 receipt for each of all 194 hourly slots;
-- duplicate captures inside a slot are valid only if each provider's normalized 15-symbol vector matches exactly;
-- Pionex and Binance USD-M vectors must each remain exactly stable across the entire capture window;
-- missing slot, invalid receipt, normalized-vector SHA mismatch, same-slot disagreement, or cross-window drift => FAIL CLOSED;
-- no post-hoc deadband, provider splicing, symbol-scope shrink, or retroactive slot backfill.
-
-Historical V0.11 execution boundary:
-
-- `V0_11_R2_EVALUATION_EXECUTION_AUTHORIZED=false`;
-- production R2 client construction/read is not authorized;
-- production receipt listing/reading has not run under V0.11;
-- provider and Render requests are not authorized by the prepared evaluator;
-- raw provider objects and holdout objects may not be listed/read;
-- the prepared post-window package is not execution authority;
-- the prepared production-evaluation authority template is not execution authority;
-- no actual V0.11 production evaluation authority may be created or merged before the historical V0.10 metadata capture window ended at `2026-09-04T01:59:59.999Z`;
-- metadata stability remains **NOT_YET_RUN**.
-
-The V0.11 future authority template remains historically bound to its reviewed V0.10 receipt-only path: after a separate protected-main authority merge, construct the R2 client, list/read allowlisted V0.10 `receipt.json` objects, and run the already-frozen V0.11 evaluator. It must remain receipt-only/read-only: no R2 writes/deletes, no raw provider-object reads, no provider/Render requests, no `METADATA_RELAY_TOKEN`, no holdout listing/access, no scheduled/automatic evaluation, and no source-switch/W1/backtest/strategy/trading authority.
-
-The V0.12 successor does not inherit that execution template. Its own config freezes the future stability contract around at least one complete valid V0.12 receipt for each of all 194 UTC hourly slots, exact per-provider vector agreement, no partial-window PASS, and no post-hoc deadband/scope/provider splice. `production_r2_evaluation_authorized_now=false` and `future_separate_versioned_evaluation_authority_required=true` remain the current authority. After `2026-09-12T03:59:59.999Z`, any V0.12 production receipt read or stability evaluation therefore requires a new separately reviewed versioned authority that explicitly binds the V0.12 namespace.
-
-Even a future metadata-stability PASS will not itself authorize holdout access. A separate versioned holdout-access authority is required.
-
-## Frozen historical results
-
-### Pionex M1 / M1A — PASS
-
-Authority: `research/receipts/2026-08-17-m1a-pionex.json`
-
-- 15 frozen candidates;
-- intervals `15M` / `60M` / `4H`;
-- 13,230 candles;
-- no gaps, duplicate timestamps, or invalid candles.
-
-### M1B R2 — PASS
-
-Authority: `research/receipts/2026-08-18-m1b-r2.json`
-
-- 45 objects;
-- 13,230 rows;
-- 425,161 Parquet bytes;
-- SHA-256 verified upload/download and exact candle round trip.
-
-### Binance 2025 R2 pilot — PASS
-
-Authority: `research/receipts/2026-08-18-binance-2025-r2-pilot.json`
-
-- 528 source archives;
-- 206 canonical R2 objects;
-- 671,022 candles;
-- provider remains `binance_usdm`;
-- no Pionex-native relabeling authority.
-
-### Funding V0.2 — PASS
-
-Authorities:
-
-- `research/receipts/2026-08-19-binance-funding-materialization-authority-v0-2.json`
-- `research/receipts/2026-08-19-binance-funding-r2-v0-2-full-preflight.json`
-- `research/receipts/2026-08-19-binance-funding-r2-v0-2-materialization.json`
-
-Result: 1,003 official source archives, 94 annual canonical objects, 192/192 authorized R2 identities verified, 91,747 Funding observations. HYPEUSDT 2026 remains deferred; no interpolation/provider splice is authorized.
-
-### Equivalence V0.1 — DEFINITIVE FAIL
-
-Authorities:
-
-- `config/provider_equivalence_v0_1.json`
-- `research/receipts/2026-08-19-pionex-binance-equivalence-v0-1.json`
-- `research/receipts/2026-08-19-pionex-binance-equivalence-v0-1-direction-forensics.json`
-
-Frozen result: 45 pairs = 18 PASS / 18 REVIEW / 9 FAIL. Direction forensics is descriptive only. `source_switch_authorized=false`. Thresholds/scope must not be changed after evidence to manufacture PASS.
-
-### Render successor line — V0.5 through V0.10
-
-Key authorities:
-
-- `research/receipts/2026-08-19-provider-equivalence-v0-5-render-free-transport-pass.json`
-- `research/receipts/2026-08-19-provider-equivalence-v0-6-render-transport-authority-transition.json`
-- `config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json`
-- `research/receipts/2026-08-19-provider-equivalence-v0-8-shared-relay-secret-handshake-pass.json`
-- `research/receipts/2026-08-20-provider-equivalence-v0-9-render-relay-smoke-pass.json`
-- `config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json`
-- `research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json`
-- `research/receipts/2026-08-21-v0-10-render-final-pre-window-readonly-recheck.json`
-
-V0.8 remains **HISTORICAL** preparation evidence; it must not be rewritten to look like current V0.10 execution authority.
-
-## Historical workflow retirement hygiene
-
-Frozen proof/materialization evidence must not be routinely re-executed just because its historical workflow file still exists.
-
-The following **17 historical workflows** are validation-only / `RETIRED_NO_EXECUTION`:
-
-- `historical-backfill-pilot.yml`;
-- `diagnose-v0-2-self-hosted-mac-binance-transport.yml`;
-- `binance-2025-r2-pilot.yml`;
-- `binance-vision-live-proof.yml`;
-- `binance-vision-r2-proof.yml`;
-- `binance-funding-r2-v0-2-preflight.yml`;
-- `binance-funding-r2-v0-2-materialize.yml`;
-- `m1b-m1a-dataset-upload.yml`;
-- `m1b-r2-roundtrip.yml`;
-- `binance-2025-coverage-scan.yml`;
-- `binance-funding-source-proof.yml`;
-- `binance-funding-coverage.yml`;
-- `binance-max-coverage-discovery.yml`;
-- `m1a-acquisition.yml`;
-- `pionex-binance-equivalence-proof.yml`;
-- `pionex-binance-equivalence-v0-1-forensics.yml`;
-- `historical-universe-long-horizon-review.yml`.
-
-They must have no schedule, no push-triggered production execution, no manual production rerun, no R2 secret binding, no self-hosted runner, and no real provider/materializer command. Reactivation requires a new versioned authority.
-
-This retirement does not delete or invalidate their historical scripts/configs/receipts.
-
-## Workflow reproducibility and supply-chain hardening
-
-PRs #136–#161 include maintenance authorities for execution-environment reproducibility, repository hygiene, CI/supply-chain hardening, repository ruleset validation, pre-window rehearsal, post-window preparation, Dashboard operational projection, capture-window incident-response preparation, mid-window emergency-template preparation, and future V0.11 authority-template preparation. They do not change scientific thresholds, metadata scope, provider authority, holdout authority or trading authority.
-
-Current hardening:
-
-- PR #136 added `requirements/ci-constraints.txt`, freezing the reviewed CI/test dependency snapshot while leaving public `pyproject.toml` compatibility ranges unchanged;
-- V0.10 scheduled capture explicitly selects **Python 3.13** before freshness checks, constrained dependency installation, provider access, or R2 access;
-- PR #137 pins production-critical GitHub Actions to reviewed **immutable 40-character commit SHAs** rather than mutable major tags;
-- critical checkout steps keep `persist-credentials: false`;
-- the critical artifact / GitHub Pages stack uses the reviewed Node 24 generation;
-- PR #140 removed the unused stale `D1_DATABASE_ID` placeholder from `.env.example`; regression prevents that retired D1 placeholder from reappearing as current configuration;
-- PR #141 made Ruff a real read-only CI gate with `ruff==0.16.0` and explicit core correctness rules `E4` / `E7` / `E9` / `F`; its first run exposed four pre-existing lint findings, each manually reviewed and fixed without changing frozen scientific semantics;
-- PR #142 limited the main CI `push` trigger to `main` while preserving all `pull_request` validation, preventing an extra broad-push CI run on ordinary feature-branch updates;
-- PR #143 expanded full main CI to **Python 3.12 and Python 3.13** with `fail-fast: false`; both `test (3.12)` and `test (3.13)` were observed PASS with constrained install, Ruff, full unit tests and R2 budget gates;
-- the active `Protect main` ruleset targets the default branch, requires pull requests, requires the always-running `test (3.12)` and `test (3.13)` checks, restricts deletion, blocks force pushes, and has no configured bypass list;
-- ruleset validation on 2026-08-20 confirmed a direct `main` contents write is rejected with a rule violation requiring a pull request and 2/2 required checks; PR #145 then exercised the docs-only PR path with both required CI matrix jobs;
-- PR #153 froze and executed a 12-scenario synthetic V0.11 failure rehearsal; 12/12 passed without production metadata evidence;
-- PR #154 prepared the exact post-window V0.11 execution sequence while keeping production R2 evaluation hard-disabled;
-- PR #155 added a read-only `authority=false` operational Dashboard projection;
-- PR #156 froze capture-window incident-response rules, including no manual/retroactive backfill and separate emergency authority for any production-critical mid-window mutation;
-- PR #157 froze the exact #156 PASS evidence as a Repository receipt and validated that receipt in CI;
-- PR #158 synchronized the pre-window operational authority index;
-- PR #159 prepared a machine-readable/human-readable mid-window emergency-change template while keeping it `NOT_AUTHORITY`;
-- PR #160 froze the exact #159 template-preparation PASS as Repository evidence;
-- PR #161 prepared and validated the exact future V0.11 production-evaluation authority template while keeping current V0.11 production R2 evaluation hard-disabled;
-- path-scoped V0.10/V0.11/Dashboard checks remain intentionally excluded from global required checks;
-- regression tests protect these boundaries from silent downgrade.
-
-Repository branch protection/ruleset configuration is external GitHub state, not a file-based scientific authority. Direct GitHub verification continues to report `main` as `protected=true`; the active ruleset and PR #145 provide the repository-level security validation tracked by Issue #139.
-
-## Non-negotiable provider and safety boundaries
-
-- Pionex remains execution target/provenance authority for Pionex-native evidence.
-- Binance USD-M/Binance Vision remains provider-separated research evidence.
-- Provider mapping never converts provenance.
-- No provider splicing, silent interpolation, Pionex-native relabeling, or post-hoc provenance rewrite.
-- V0.10 metadata authority is not strategy/backtest/trade/live authority.
-- V0.12 metadata authority is not strategy/backtest/trade/live authority.
-- V0.10 capture-window operations preparation is not new capture authority and does not authorize manual/retroactive backfill.
-- V0.10 emergency-change template is not authority and does not authorize a mid-window mutation or Render redeploy.
-- V0.11 prepared evaluator, post-window package, and production-evaluation authority template are not V0.12 production stability authority.
-- Context Forward Capture Execution V0.1 authorizes one bounded manual forward snapshot only; it is not 4H schedule, backfill, holdout, strategy or trading authority.
-- No staged Trade-Kline W1 materialization yet.
-- Historical Universe membership remains NOT_READY.
-- SState frozen core must not be modified by this phase.
-- No martingale, loss doubling, unlimited averaging, or liquidation-as-stop.
-- Public Binance `exchangeInfo` on this path uses no Binance API key; this is not a project-wide API-key ban. A future authenticated Binance scope needs separate authority and may not be used as a transport-blocker bypass.
-
-## Current blockers
-
-1. Metadata stability: the V0.12 194-slot successor window is current, but production stability evaluation is not authorized and has not run; no PASS may be inferred from the clock or partial evidence.
-2. Holdout access: replacement holdout is `FROZEN_UNOPENED` and requires separate authority after stability PASS.
-3. Provider substitution: Equivalence V0.1 remains definitive FAIL.
-4. Trade-Kline W1 materialization: NOT_AUTHORIZED.
-5. Historical Universe membership: NOT_READY.
-6. Strategy replay/backtest admission: still blocked by authority.
-7. HYPE Funding 2026: deferred; no interpolation/provider splice.
-8. Context Forward continuous history: the first real one-shot is authorized only for `2026-09-12T04:00:00Z` through `2026-09-19T04:00:00Z`; it has not been claimed as executed here and the future 4H schedule is NOT_AUTHORIZED.
-9. Live execution: forbidden; project remains PAPER-ONLY.
-
-## Next formal milestone
-
-Current formal window: V0.12 successor metadata capture, `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z`.
-
-For the V0.12 successor window and its immediate post-window boundary:
-
-1. Keep V0.10 unscheduled and allow only the V0.12 `:17/:47` metadata schedule; do not create a second metadata execution path.
-2. Preserve the exact V0.12 194-slot / 388-attempt / 15-symbol / 45-pair scope.
-3. Preserve every failed, blocked, skipped, stale, or missing attempt as evidence; do not manually or retroactively backfill it.
-4. If `:17` fails, let the existing frozen `:47` attempt run normally rather than manually retrying.
-5. Keep the replacement holdout unopened.
-6. Require the exact window/freshness gate and authenticated Render transport.
-7. Require fresh R2 headroom before each write; never overwrite, delete, or bypass evidence to force a capture through.
-8. Keep production-critical code/runtime/secrets frozen by default; any unavoidable intervention requires a separate versioned emergency authority and protected-main PR.
-9. After the V0.12 window has ended at `2026-09-12T03:59:59.999Z`, verify critical-path lineage without production R2 reads, then create a separate versioned production evaluation authority **before any V0.12 R2 receipt read for stability evaluation**.
-10. After `2026-09-12T04:00:00Z`, the already-authorized Context Forward Capture Execution V0.1 may be manually dispatched once inside its bounded window. A valid one-shot PASS is only a prerequisite for later V0.2 4H-schedule review; it does not activate that schedule automatically.
-
-## Explicitly forbidden next actions
-
-- Do not manually or retroactively backfill failed/missing V0.10 or V0.12 metadata attempts or hourly slots.
-- Do not bypass the frozen freshness guard or 8 GB FREE-ONLY R2 headroom gate.
-- Do not make an unreviewed production-critical V0.12 mid-window code, runtime, secret, transport, or provider change.
-- Do not treat the prepared emergency-change template as an intervention authority.
-- Do not create or merge V0.12 production-stability read/evaluation authority before `2026-09-12T03:59:59.999Z`.
-- Do not manually run production R2 stability evaluation under the prepared V0.11 protocol/template.
-- Do not list/read production V0.12 R2 receipts for stability evaluation before a separate post-window authority is merged.
-- Do not run Context Forward Capture Execution V0.1 before `2026-09-12T04:00:00Z` or at/after its `2026-09-19T04:00:00Z` expiry.
-- Do not treat the Context Forward V0.1 one-shot authority as authorization for a 4H cron, historical backfill, holdout access, strategy changes or trading.
-- Do not reactivate retired historical proof/materialization workflows without new authority.
-- Do not re-enable the V0.2 self-hosted schedule or create a second concurrent metadata path.
-- Do not access/evaluate replacement holdout candles.
-- Do not alter Equivalence V0.1 thresholds/scope or add a post-hoc deadband.
-- Do not source-switch, provider-splice, interpolate missing provider values, or relabel Binance evidence as Pionex-native.
-- Do not expose relay/R2/exchange secrets in Repository, issues, logs, artifacts, tests, or chat.
-- Do not give Render R2 credentials.
-- Do not use third-party proxies, alternate endpoints, API keys, or a paid tier as a transport-blocker bypass.
-- Do not authorize W1, strategy changes, automatic trade plans, real-money orders, or live trading.
+Updated: 2026-09-16
+
+Repository `main` is the formal current authority. This file is the current project-stage, governance-compatibility, and retired-workflow index. Exact versioned configs, receipts, immutable run evidence, and merged code remain the detailed authority for each scope.
+
+## Reviewed repository authority
+
+- Repository: `qookey109-pixel/crypto-autopilot`
+- Reviewed `main`: `f5cf74292fca262ba72c4e0b36f8d757dfb82531`
+- Latest merged change: PR #321, exact reviewed head `880e3ed9203719cc992362918e3858a6dc63f5ec`
+- Current mode: **PAPER-ONLY**
+- FREE-ONLY cloud/runtime budget: **0 USD/month**
+
+For the concise current-operations view, read `CURRENT_STATUS.md` first. Machine-readable companion: `research/status/current-operations-v0-2.json`.
+
+## Current lifecycle
+
+`History COMPLETE -> Training COMPLETED -> Model Quality REJECT -> Threshold Replay COMPLETED / NO SUPPORTED THRESHOLD CHANGE -> Strategy Validation CLOSED -> Holdout CLOSED -> Promotion CLOSED -> Trading CLOSED`
+
+### Core100 History
+
+- Detailed Core100 History acquisition is complete: `10/10` governed shards.
+- Historical reacquisition is not required solely because the trained model was rejected by quality gates.
+- Do not restart completed History shards unless new evidence demonstrates actual dataset-integrity or lineage failure.
+
+### Core100 training
+
+Source run: `34918219864`
+
+- workflow conclusion: `success`
+- training report status: `PASS`
+- symbol count: `100`
+- dataset partition objects: `14,274`
+- dataset rows: `18,235,427`
+- example count: `249,228`
+- dataset fingerprint: `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`
+- all folds ready: `true`
+- run window: `2026-09-15T01:40:40Z` through `2026-09-15T04:38:22Z`
+
+Training/pipeline completion is separate from model-quality acceptance.
+
+### Model quality and threshold replay
+
+Current model-quality result: **REJECT**.
+
+Initial diagnosis:
+
+- fold-1 is the only identified fold that does not beat naive log-loss.
+- configured probability threshold `0.55` emitted zero signals in all four folds.
+- automatic promotion remains disabled.
+
+Exact read-only replay run: `34936331199` — `Core100 Threshold Sweep Replay V0.1`
+
+- workflow conclusion: `success`
+- execution head: `fbebb5cbe424e4a6d6c33cb6e09a12da4849ee07`
+- artifact: `10387278663`
+- digest: `sha256:f983f5364024a911be3f930fce641bd750922a8d95e710951b88d5738f5cfa29`
+- exact dataset fingerprint preserved
+- thresholds evaluated: `0.50, 0.51, 0.52, 0.53, 0.54, 0.55`
+- `0.50`: fold-1 negative, fold-2 positive, fold-3/4 zero signal
+- `0.51`: fold-1/2 negative, fold-3/4 zero signal
+- `0.52-0.55`: zero signals in all folds
+- `supported_thresholds=[]`
+- `threshold_change_supported=false`
+- configured threshold remains unchanged
+
+The replay was diagnostic-only: no provider requests, R2 writes, holdout access, training publication, automatic promotion, formal trade plan, real-money order, or live-trading authority was granted.
+
+## Pionex validation state
+
+Pionex is the final calibration / execution-environment provenance target; Binance USD-M remains the large-scale learning database. The providers remain provenance-separated.
+
+PR #321 is merged and adds a narrow provider historical-boundary rule for bounds-only invalid OHLC candles. It does not repair, fabricate, interpolate, or splice candles.
+
+Current workflow: `.github/workflows/pionex-validation-materialization-v0-1.yml`
+
+- dispatch: manual only
+- public Pionex futures K-lines: authorized for this validation scope
+- R2 validation-dataset writes: authorized for this validation scope
+- previous run `34991627998`: fail-closed before PR #321 on three invalid `AAVE_USDT_PERP / 4H` candles
+- current-main materialization: **PENDING MANUAL DISPATCH**
+- private API/account data: unauthorized
+- replacement holdout access: unauthorized
+- training: unauthorized
+- source switch: unauthorized
+- promotion: unauthorized
+- formal trade plan / real-money / live trading: unauthorized
+
+Do not claim current-main Pionex validation completion until a new run from `main=f5cf7429...` is verified.
+
+## Technical-debt cleanup
+
+The current highest-priority technical debt is control-plane/documentation drift, not a rewrite of the trading/data core.
+
+Tracking: `docs/TECH_DEBT_REGISTER_2026_09_16.md`
+
+Priority sequence:
+
+1. single current-truth entrypoint + machine-readable companion;
+2. README / PROJECT_STATUS / SECURITY / Dashboard projection sync;
+3. current-main open-PR triage;
+4. active-workflow registry instead of hard-coded scheduler counts;
+5. non-blocking quality/security/dependency visibility;
+6. only then consider responsibility-splitting large modules such as `training/quality.py`.
+
+## Open work that matters now
+
+- PR #302 — Core100 post-training REJECT diagnosis. Its replay is complete; the PR remains Draft and requires current-main review before any merge decision.
+- PR #305 — older-base current-state convergence proposal. Useful design has been reused by fresh current-main cleanup work; do not merge it unchanged.
+- PR #306 — Toolkit REST / Cloudflare edge V0.2 research interface; base is older than current main and public deployment remains unauthorized.
+- PR #307 — AI Resource Hub statistical-validation integration; base is older than current main and requires current-main review.
+- PR #315 — Binance/Pionex data-role documentation. Parts of its architecture are already represented on current main; compare before preserving or superseding.
+- PR #322 — current-main technical-debt/current-status convergence branch. Draft; merge is not self-authorized.
+- PRs #166/#167/#168/#199/#249 — preserved legacy salvage drafts, not ready-to-merge work.
+
+Historical CI success on an old branch is not sufficient merge evidence after main has advanced.
+
+## Binding safety and governance
+
+- Replacement holdout `2026-08-28` through `2026-09-03` remains `FROZEN_UNOPENED`.
+- `source_switch_authorized=false`.
+- Pionex-native and Binance USD-M evidence remain provider-separated and must never be relabeled.
+- **Equivalence V0.1** remains a definitive FAIL; thresholds and scope are frozen and must not be regraded.
+- No martingale, loss-doubling, or unlimited averaging down.
+- Render Free / Frankfurt remains the proven public-metadata transport leg where applicable.
+- Render must never receive R2 credentials.
+- R2 credentials stay inside authorized GitHub Actions/local secret boundaries only.
+- Frozen receipts/configs/evidence must not be rewritten to make later stages appear successful.
+- Dashboards are derived evidence projections, not authority.
+- Backtests and research metrics are evidence, not proof of future profitability.
+
+## Reproducibility and CI hardening lineage
+
+These markers preserve the reviewed engineering-hardening lineage required by repository authority tests; they do not add runtime authority.
+
+- Dependency reproducibility uses `requirements/ci-constraints.txt` and validates the supported **Python 3.12 and Python 3.13** matrix, including jobs `test (3.12)` and `test (3.13)`.
+- Production-critical GitHub Actions are pinned to **immutable 40-character commit SHAs**; the Python 3.13 runtime path remains explicitly validated.
+- PR #136 and PR #137 established the constrained dependency/reproducibility hardening baseline; PR #140 continued the reviewed workflow hardening lineage.
+- `D1_DATABASE_ID` is intentionally not a secret placeholder in `.env.example`; PR #141 records the related environment/authority cleanup lineage.
+- Ruff is constrained as `ruff==0.16.0` and CI enforces core correctness classes `E4`, `E7`, and `E9`.
+- PR #142 and PR #143 preserve the reviewed CI `pull_request` validation and supported Python matrix lineage.
+- Issue #139 remains historical engineering context for this reproducibility-hardening sequence.
+
+## Retired historical workflow inventory
+
+Exactly **17 historical workflows** remain retired evidence/validation paths and must not be silently reactivated:
+
+- `historical-backfill-pilot.yml`
+- `diagnose-v0-2-self-hosted-mac-binance-transport.yml`
+- `binance-2025-r2-pilot.yml`
+- `binance-vision-live-proof.yml`
+- `binance-vision-r2-proof.yml`
+- `binance-funding-r2-v0-2-preflight.yml`
+- `binance-funding-r2-v0-2-materialize.yml`
+- `m1b-m1a-dataset-upload.yml`
+- `m1b-r2-roundtrip.yml`
+- `binance-2025-coverage-scan.yml`
+- `binance-funding-source-proof.yml`
+- `binance-funding-coverage.yml`
+- `binance-max-coverage-discovery.yml`
+- `m1a-acquisition.yml`
+- `pionex-binance-equivalence-proof.yml`
+- `pionex-binance-equivalence-v0-1-forensics.yml`
+- `historical-universe-long-horizon-review.yml`
+
+## Frozen historical lineage and dashboard compatibility markers
+
+The research-calendar/dashboard and retired-workflow validators intentionally fail closed if these frozen stage markers disappear. They are retained as compatibility assertions; they do not grant new authority or override the current lifecycle above.
+
+- **V0.8 HISTORICAL** — frozen prepared cutover evidence only; successor execution remained unauthorized under V0.8.
+- **V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE** — historical effective authority.
+- **V0.2 SELF-HOSTED SCHEDULE RETIRED** — self-hosted metadata scheduling remains retired.
+- **V0.10 GITHUB-HOSTED SCHEDULE RETIRED** — V0.10 GitHub-hosted schedule remains retired after the reviewed successor transition.
+- **V0.12 SUCCESSOR METADATA WINDOW** — successor metadata-only capture lineage; its bounded window is historical and no holdout-candle authority is implied.
+- **REPLACEMENT HOLDOUT FROZEN_UNOPENED** — replacement holdout remains unopened.
+- **HISTORICAL UNIVERSE MEMBERSHIP NOT_READY** — full-universe historical membership remains not ready.
+- **TRADE-KLINE W1 MATERIALIZATION NOT_AUTHORIZED** — retired long-horizon pilot remains unable to materialize W1 trade-kline data.
+
+## Current navigation
+
+1. `CURRENT_STATUS.md`
+2. `PROJECT_STATUS.md`
+3. `README.md`
+4. `AGENTS.md`
+5. current versioned config/receipt/run evidence
+6. `docs/TECH_DEBT_REGISTER_2026_09_16.md`
+
+Machine-readable current operations state: `research/status/current-operations-v0-2.json`.
+
+## Preserved pre-convergence snapshot
+
+The previous long-form root documents remain exactly recoverable from reviewed main `f5cf74292fca262ba72c4e0b36f8d757dfb82531`:
+
+- README blob: `0ce5c87ec4da228a6eb3d9a66ef2e8364661df58`
+- PROJECT_STATUS blob: `0815abd975c5c708fbb9578dff400733e1ff6275`
+
+Their old present-tense `8/10 / Training SKIPPED` statements are historical evidence and must not be treated as current operations.
