@@ -1,0 +1,71 @@
+{
+  "schema": "render-relay-502-remediation-review-v0.1",
+  "status": "PREPARED_REVIEW_REQUIRED",
+  "purpose": "Bounded read-only investigation of recurrent V0.12 Render relay HTTP 502 failures before any transport remediation is proposed.",
+  "prepared_from": {
+    "repository": "qookey109-pixel/crypto-autopilot",
+    "main_sha": "8b86cd95754a577581b74cec341b355293caeaa7",
+    "current_failure_run_id": 34424167855,
+    "prior_observation_receipt": "research/receipts/2026-09-05-v0-12-render-relay-502-observation.json",
+    "render_service": {
+      "name": "qookey-binance-transport-v0-5",
+      "id": "srv-da2qlb67bikc73bibobg",
+      "plan": "free",
+      "region": "frankfurt"
+    }
+  },
+  "allowed_review_evidence": {
+    "github_actions": [
+      "workflow run metadata",
+      "secret-redacted job logs",
+      "secret-free artifacts when present"
+    ],
+    "render": [
+      "service availability and deployment metadata",
+      "application/request logs for exact failure windows",
+      "CPU, memory and HTTP request metrics for exact failure windows"
+    ],
+    "repository": [
+      "current relay source and V0.12 workflow/config authority files"
+    ]
+  },
+  "prohibited_actions": [
+    "render_deploy_redeploy_restart_rollback_or_scale",
+    "render_plan_region_or_billing_change",
+    "render_keepalive_or_warmup_change",
+    "render_secret_read_write_rotate_or_request",
+    "workflow_or_cron_change",
+    "manual_v0_12_dispatch_or_rerun",
+    "new_provider_request",
+    "r2_client_list_read_write_or_delete",
+    "source_switch",
+    "holdout_access",
+    "strategy_risk_model_or_trade_authority_change"
+  ],
+  "evidence_requirements": {
+    "preserve_run_created_started_completed_timestamps": true,
+    "correlate_render_observation_window_with_each_failed_run": true,
+    "redact_secrets_and_raw_provider_payloads": true,
+    "distinguish_observed_fact_from_hypothesis": true,
+    "no_root_cause_claim_without_direct_observation": true
+  },
+  "decision_outcomes": {
+    "classified_application_or_upstream_failure": "NEW_SEPARATE_VERSIONED_REMEDIATION_AUTHORITY_REQUIRED",
+    "cold_start_or_edge_wake_only_hypothesis": "CONTINUE_NATURAL_SCHEDULED_OBSERVATION_ONLY",
+    "no_diagnostic_evidence_available": "REVIEW_INCONCLUSIVE_NO_REMEDIATION",
+    "successful_natural_run": "DOES_NOT_REPAIR_OR_REGRADE_PRIOR_WINDOW"
+  },
+  "authority": {
+    "read_only_review_authorized_on_main_merge": false,
+    "render_change_authorized": false,
+    "paid_fallback_authorized": false,
+    "provider_requests_authorized": false,
+    "r2_access_authorized": false,
+    "v0_12_replay_or_backfill_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
