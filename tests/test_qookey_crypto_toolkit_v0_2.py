@@ -69,7 +69,10 @@ class QookeyCryptoToolkitV02Tests(unittest.TestCase):
                 "build_research_report",
             },
         )
-        self.assertEqual(v02["interfaces"]["rest_api"], "DEFERRED")
+        self.assertEqual(
+            v02["interfaces"]["rest_api"],
+            "IMPLEMENTED_PREPARED_RESEARCH_ONLY",
+        )
         self.assertEqual(v02["interfaces"]["telegram"], "DEFERRED")
         self.assertEqual(v02["interfaces"]["mcp"], "DEFERRED")
         self.assertTrue(all(value is False for value in v02["safety_boundary"].values()))

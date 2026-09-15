@@ -120,7 +120,7 @@ def list_capabilities_v0_2() -> dict[str, object]:
             "python": "ENABLED",
             "cli": "ENABLED",
             "github_actions": "SUPPORTED_LOCAL_EXECUTION",
-            "rest_api": "DEFERRED",
+            "rest_api": "IMPLEMENTED_PREPARED_RESEARCH_ONLY",
             "telegram": "DEFERRED",
             "mcp": "DEFERRED",
         },
