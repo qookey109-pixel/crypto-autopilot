@@ -8,7 +8,7 @@ This document classifies currently open pull requests for operational navigation
 - `READY_NOT_MERGED`: validated and mergeable, but still requires explicit merge authority.
 - `DEFERRED_STACK`: useful work that is not on the current P0 path and should not be treated as the next action.
 - `REVIEW_REQUIRED_LEGACY`: older/diverged work whose unique functionality must be compared against current `main` before close/rebuild.
-- `HISTORICAL_EVIDENCE_CANDIDATE`: evidence-only work that may be retained as history or frozen separately after confirming its evidence is already preserved on current `main`.
+- `CLOSED_HISTORICAL_EVIDENCE`: closed without merge only after exact evidence bytes are proven to already exist on current `main`.
 
 Never close a diverged PR merely because a newer feature looks similar. Close only after exact comparison proves it is fully superseded or after its unique content has been intentionally migrated.
 
@@ -33,11 +33,11 @@ These PRs remain potentially useful but are not the current Core100 P0 path. Do 
 | #261 | Tiered Pionex 150+ history plan | Stacked planning stage; depends on older stacked PRs |
 | #262 | Bounded Pionex funding capture execution package | Stacked execution authority proposal; should not be revived outside a fresh reviewed Pionex plan |
 
-## HISTORICAL_EVIDENCE_CANDIDATE
+## CLOSED_HISTORICAL_EVIDENCE
 
-| PR | Role | Review rule |
+| PR | Evidence proof | Result |
 | --- | --- | --- |
-| #256 | Freeze Pionex bounded pilot V0.2 PASS evidence | Confirm receipt/report evidence is already preserved on current `main` before closing as historical |
+| #256 | Its only two changed files match current `main` by exact Git blob SHA: evidence freeze `e36cd4d177f3e0e7eccd007dddd4080d9951b90a`; report `3b3262e14790f0082ae346b5d9bd4b788cc19cd1` | Closed without merge; no evidence lost |
 
 ## REVIEW_REQUIRED_LEGACY
 
@@ -56,15 +56,15 @@ These branches are old enough or diverged enough that ancestry alone does not pr
 
 - PR #290: stale `8/10` documentation handoff — closed as superseded.
 - PR #301: Toolkit REST/edge V0.1 — rebuilt from current `main` as V0.2 PR #306, then closed as superseded.
+- PR #256: evidence-only Pionex bounded-pilot freeze — both changed files already exist byte-for-byte on `main`; closed as historical evidence.
 
 ## Current cleanup order
 
 1. Do not disturb Core100 replay run `34936331199` while it is within its governed runtime window.
 2. When replay completes, update #302 with frozen evidence and a reproducibility/threshold diagnosis.
 3. Keep #305 and #306 ready but unmerged until explicit merge authority.
-4. Review #256 for evidence preservation and close only if current `main` already contains equivalent immutable receipts.
-5. Reconstruct the #255/#257/#258/#260/#261/#262 Pionex stack from current `main` only if that lane becomes active again; do not merge the old stack directly.
-6. Perform file-level salvage review for #166/#167/#168/#199/#220/#249 before any closure.
+4. Reconstruct the #255/#257/#258/#260/#261/#262 Pionex stack from current `main` only if that lane becomes active again; do not merge the old stack directly.
+5. Perform file-level salvage review for #166/#167/#168/#199/#220/#249 before any closure.
 
 ## Safety boundary
 
