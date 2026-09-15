@@ -53,6 +53,18 @@ Merged as `PREPARED_RESEARCH_ONLY`. It is an offline, non-authoritative research
 - Secrets must never be committed, logged, artifacted, or pasted into chat.
 - Frozen configs/receipts/evidence are immutable; create a new version instead of rewriting history.
 
+## Historical authority lineage compatibility
+
+The current project still preserves the frozen lineage names required by fail-closed authority tests:
+
+- **V0.8** remains historical prepared/cutover evidence only.
+- **V0.10** remains the historical effective final atomic metadata-capture cutover lineage; its GitHub-hosted schedule is retired.
+- **V0.12** remains the successor metadata-window lineage and the unique scheduled metadata-capture successor for its frozen window.
+- **Equivalence V0.1** remains a definitive FAIL and must not be regraded by changing scope or thresholds.
+- Replacement holdout remains **FROZEN_UNOPENED**.
+
+These historical labels preserve governance lineage; they do not reopen provider access, holdout access, model promotion, source switching, or trading authority.
+
 ## Useful entrypoints
 
 - [`docs/PROJECT_MAP_V0_1.md`](docs/PROJECT_MAP_V0_1.md) — repository map.
