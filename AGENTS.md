@@ -12,9 +12,9 @@ Read these first, in order:
 6. `docs/STRATEGY_V0_1.md`
 7. `config/strategy_v0_1.json`
 
-Repository `main` is the formal current authority. If chat history, an issue comment, a dashboard fixture, or an older receipt conflicts with current merged authority, preserve the historical evidence but follow the latest valid versioned authority for new work.
+Repository `main` is the formal current authority. Resolve `main` live at read time. If chat history, an issue comment, a dashboard fixture, or an older receipt conflicts with current merged authority, preserve the historical evidence but follow the latest valid versioned authority for new work.
 
-`CURRENT_STATUS.md` is the concise current-operations index and `research/status/current-operations-v0-2.json` is its machine-readable companion. Dated present-tense summaries in `PROJECT_STATUS.md`, `README.md`, historical handoffs, or dashboard fixtures may remain as historical evidence. Do not regress lifecycle state or restart completed work from older prose when later merged evidence supersedes it. Versioned configs, receipts, immutable run evidence, and current merged code still control authority and scope.
+`CURRENT_STATUS.md` is the concise current-operations index and `research/status/current-operations-v0-3.json` is its machine-readable companion. A SHA stored as `evidence_basis.parent_main_sha` records the reviewed parent used to prepare that status version; it is explicitly **not** a claim that the SHA remains the latest `main` after the status version is merged. Dated present-tense summaries in `PROJECT_STATUS.md`, `README.md`, historical handoffs, or dashboard fixtures may remain as historical evidence. Do not regress lifecycle state or restart completed work from older prose when later merged evidence supersedes it. Versioned configs, receipts, immutable run evidence, and current merged code still control authority and scope.
 
 ## Non-negotiable boundaries
 
@@ -45,45 +45,26 @@ Repository `main` is the formal current authority. If chat history, an issue com
 ## V0.10 historical metadata-capture authority
 
 - PR #127 is merged on `main`; V0.10 final atomic metadata-capture cutover is **effective**.
-- Current cutover authority: `config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json` and `research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json`.
-- V0.10 is historical effective authority whose remaining schedule is retired by
-  the reviewed V0.12 successor transition. Its workflow has no schedule and
-  cannot be used for manual capture, replay or backfill.
+- Historical cutover authority: `config/provider_equivalence_v0_10_final_atomic_cutover_v0_1.json` and `research/receipts/2026-08-20-provider-equivalence-v0-10-final-atomic-cutover-authority.json`.
+- V0.10 is historical effective authority whose remaining schedule is retired by the reviewed V0.12 successor transition. Its workflow has no schedule and cannot be used for manual capture, replay or backfill.
 - Historical V0.2 `[self-hosted, macOS, ARM64]` scheduled metadata execution is retired. Preserve its receipts and transport PASS as immutable historical authority; do not silently reactivate it or use it as automatic fallback.
-- Historical V0.7 raw relay `/metadata/binance-exchange-info` remains disabled. Current V0.10 versioned relay path is `/metadata/v0-10/binance-exchange-info`.
+- Historical V0.7 raw relay `/metadata/binance-exchange-info` remains disabled. V0.10 versioned relay path is `/metadata/v0-10/binance-exchange-info`.
 - V0.8 prepared cutover/scaffold remains frozen historical evidence. Do not mutate V0.8 receipts/configs to describe the V0.10 effective state.
 - V0.8 shared-secret handshake and V0.9 relay smoke are frozen PASS evidence and their workflows are regression-only; do not rerun external handshake/smoke routinely.
-- `METADATA_RELAY_TOKEN` is already an out-of-band shared secret between Render and GitHub Actions. Never commit, expose, rotate, or request its value unless a separately authorized security operation requires rotation.
-- Exact metadata capture window remains `2026-08-27T00:00:00Z` through `2026-09-04T01:59:59.999Z`, 194 UTC hourly slots with `:17/:47` attempts.
-- V0.10 metadata capture is metadata-only. It authorizes provider metadata fetch plus metadata-only immutable R2 writes inside the frozen window, subject to the fresh 8 GB headroom gate.
-- Preserve all V0.10 failures and missing slots without replay, backfill or
-  regrading. Do not re-enable V0.10 or V0.2 scheduling.
+- `METADATA_RELAY_TOKEN` is an out-of-band shared secret between Render and GitHub Actions. Never commit, expose, rotate, or request its value unless a separately authorized security operation requires rotation.
+- Exact V0.10 metadata capture window was `2026-08-27T00:00:00Z` through `2026-09-04T01:59:59.999Z`, 194 UTC hourly slots with `:17/:47` attempts.
+- Preserve all V0.10 failures and missing slots without replay, backfill or regrading. Do not re-enable V0.10 or V0.2 scheduling.
 
 ## V0.12 successor metadata-capture authority
 
-- The successor authority is
-  `config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json` with
-  receipt
-  `research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json`.
-- Exact protected-main lineage is append-only in
-  `config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json`
-  and its matching binding receipt; do not rewrite the pre-binding authority
-  files after PR creation.
-- V0.12 was the only scheduled metadata-capture workflow during its exact bounded window:
-  `.github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml`.
-- Its exact window was `2026-09-04T02:00:00Z` through
-  `2026-09-12T03:59:59.999Z`, 194 UTC hourly slots with `:17/:47` attempts. That window is now historical; do not describe V0.12 as the current active scheduled path after the window.
-- It reused the existing authenticated V0.10 Render raw relay without changing
-  Render code, deployment or secrets. Render still must never receive R2
-  credentials.
-- V0.12 may write metadata-only immutable objects only in its independent R2
-  namespace and only after the fresh 8 GB FREE-ONLY headroom gate.
-- Pionex `contractType/status` and legacy `type/enable` representations are
-  accepted only under the frozen agreement rules. Missing, unknown or
-  conflicting representations fail closed before R2 client construction.
-- V0.12 production R2 stability evaluation is not authorized. It requires a
-  separate post-window versioned authority, and even a future PASS does not
-  authorize holdout candle access.
+- The successor lineage is `config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json` with receipt `research/receipts/2026-08-31-provider-equivalence-v0-12-successor-metadata-window-authority.json`.
+- Exact protected-main lineage is append-only in `config/provider_equivalence_v0_12_successor_metadata_window_binding_v0_1.json` and its matching binding receipt; do not rewrite the pre-binding authority files after PR creation.
+- V0.12 was the only scheduled metadata-capture workflow during its exact bounded window: `.github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml`.
+- Its exact window was `2026-09-04T02:00:00Z` through `2026-09-12T03:59:59.999Z`, 194 UTC hourly slots with `:17/:47` attempts. That window is now historical; do not describe V0.12 as the current active scheduled path after the window.
+- It reused the existing authenticated V0.10 Render raw relay without changing Render code, deployment or secrets. Render still must never receive R2 credentials.
+- Frozen V0.12 authority may be retained for historical lineage, but present-tense dashboard/runtime projections must mark the bounded window as ended and must not present its execution authorization as currently active.
+- Pionex `contractType/status` and legacy `type/enable` representations are accepted only under the frozen agreement rules. Missing, unknown or conflicting representations fail closed before R2 client construction.
+- V0.12 production R2 stability evaluation is not authorized. It requires a separate post-window versioned authority, and even a future PASS does not authorize holdout candle access.
 
 ## V0.11 metadata-stability evaluator preparation
 
@@ -97,6 +78,16 @@ Repository `main` is the formal current authority. If chat history, an issue com
 - V0.11 may never list/read raw provider objects or replacement holdout objects under its prepared authority.
 - A future metadata-stability PASS still does not authorize holdout candle access; that requires a separate versioned authority.
 
+## Current Core100 and Pionex validation state
+
+- Core100 History is complete `10/10`.
+- Core100 Training run `34918219864` completed successfully; training report is PASS.
+- Model Quality remains **REJECT** and automatic promotion remains disabled.
+- Threshold replay run `34936331199` completed with no supported threshold change in `0.50` through `0.55`.
+- Pionex Validation Dataset V0.1 remains manual-only. The previous run `34991627998` failed closed before PR #321's narrow invalid-OHLC boundary fix.
+- A new Pionex materialization must be dispatched from the Repository's live `main` at dispatch time. Do not use a status file's evidence-basis SHA as a substitute for resolving current `main`.
+- Pionex validation does not authorize private API/account data, replacement holdout access, training, source switching, model promotion, trade plans, real-money orders or live trading.
+
 ## Holdout and scientific boundary
 
 - Replacement holdout `2026-08-28` through `2026-09-03` remains `FROZEN_UNOPENED`.
@@ -104,7 +95,7 @@ Repository `main` is the formal current authority. If chat history, an issue com
 - Metadata stability is `NOT_YET_RUN` until complete 194-slot evidence is collected and reviewed under a separately authorized V0.11 production evaluation stage.
 - Even a future metadata stability PASS does not itself authorize holdout candles; a separate versioned holdout-access authority is required.
 - W1 materialization, Historical Universe membership, backtest admission, strategy parameter changes, automatic trade plans, real-money orders and live trading remain unauthorized.
-- Public Binance `exchangeInfo` used by this metadata path does not require an API key. This is not a project-wide Binance API-key ban; API keys may be used by a future separately versioned authenticated Binance scope, but never as a transport-blocker bypass.
+- Public Binance `exchangeInfo` used by historical metadata paths does not require an API key. This is not a project-wide Binance API-key ban; any future authenticated Binance scope requires a separate security/authority version and may not be used as a transport-blocker bypass.
 
 ## Evidence and change discipline
 
@@ -112,7 +103,8 @@ Repository `main` is the formal current authority. If chat history, an issue com
 - Frozen receipts/configs are historical evidence. Do not mutate them to make a later stage look successful; create a new versioned authority instead.
 - Record strategy parameter changes in configuration and status docs.
 - Record authority transitions in versioned configs/receipts and synchronize `CURRENT_STATUS.md` plus its machine-readable companion; update `PROJECT_STATUS.md` when it is serving as a current projection.
-- Treat dashboards as normalized views, never as authority; generated dashboard state must be derived from frozen Repository authorities.
+- Treat dashboards as normalized views, never as authority. Build frozen/historical authority projection first, then apply the machine-readable Current Operations projection last for present-tense state.
+- Dated simulation-readiness snapshots may remain evidence but must not overwrite later current Core100/Training/Pionex lifecycle facts on the public homepage.
 - Treat backtest results as evidence, not proof of future profitability.
 - Prefer deterministic fixtures and fail-closed behavior for tests and automation.
 - If an external dependency, free allowance, provider endpoint, secret, or runner is unavailable, fail closed rather than silently switching provider, endpoint, proxy, credentials, or paid tier.
