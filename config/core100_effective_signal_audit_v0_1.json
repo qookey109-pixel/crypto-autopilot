@@ -1,0 +1,58 @@
+{
+  "schema": "core100-effective-signal-audit-policy-v0.1",
+  "status": "AUTHORIZED_ONE_SHOT_AFTER_REVIEWED_MAIN_MERGE",
+  "purpose": "Aggregate-only diagnosis of the exact governed Binance USD-M Core100 training examples after model-quality REJECT.",
+  "lineage": {
+    "prepared_from_main": "90fa08446994e18e83e2778032dd89c513857dea",
+    "training_config": "config/binance_usdm_detailed_history_v0_1_2.json",
+    "training_authority": "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json",
+    "source_training_run_id": 34918219864,
+    "threshold_replay_run_id": 34936331199,
+    "expected_dataset_fingerprint": "91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876",
+    "expected_partition_objects": 14274,
+    "expected_source_rows": 18235427,
+    "expected_example_count": 249228,
+    "expected_symbol_count": 100,
+    "source_end_exclusive_utc": "2026-08-01T00:00:00Z",
+    "replacement_holdout_start_utc": "2026-08-28T00:00:00Z"
+  },
+  "diagnostics": {
+    "top_n": 15,
+    "minimum_symbol_count_per_fold_side": 30,
+    "feature_correlation_sample_limit": 10000,
+    "feature_correlation_threshold": 0.95,
+    "label_balance": true,
+    "actual_same_symbol_label_overlap": true,
+    "timestamp_cluster_concentration": true,
+    "symbol_positive_rate_drift": true,
+    "technical_regime_drift": true,
+    "feature_separation": true,
+    "feature_train_test_drift": true,
+    "feature_redundancy": true,
+    "formal_effective_sample_size_claim": false,
+    "alternative_model_training": false,
+    "threshold_search": false
+  },
+  "execution": {
+    "one_shot": true,
+    "trigger": "protected_main_push_of_exact_authority_receipt",
+    "schedule_authorized": false,
+    "manual_dispatch_authorized": false,
+    "github_hosted_runner_only": true,
+    "output": "secret-free aggregate GitHub Actions artifact only"
+  },
+  "authority": {
+    "production_r2_training_reads_authorized": true,
+    "provider_requests_authorized": false,
+    "r2_writes_authorized": false,
+    "holdout_access_authorized": false,
+    "training_authorized": false,
+    "training_publication_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
