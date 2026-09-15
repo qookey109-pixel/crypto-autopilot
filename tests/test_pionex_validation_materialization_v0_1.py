@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import unittest
 
+from crypto_autopilot.history.pionex_gap_boundary_v0_1 import GapBoundaryKlineClient
 from crypto_autopilot.history.pionex_validation_materialization_v0_1 import (
     ValidationMaterializationRejected,
     _last_aligned_candle_before,
@@ -143,6 +144,42 @@ class PionexValidationMaterializationTests(unittest.TestCase):
         self.assertEqual(result.coverage_status, "PARTIAL_PROVIDER_BOUNDARY_PROBE_FAILED")
         self.assertEqual(len(result.candles), 7)
         self.assertEqual(result.provider_error_type, "RuntimeError")
+        self.assertFalse(result.receipt_fields()["complete_provider_history_claimed"])
+
+    def test_invalid_ohlc_boundary_keeps_only_newer_verified_suffix(self) -> None:
+        config = load_config()
+        cutoff = stamp(config["cutoff_exclusive_utc"])
+        interval = "60M"
+        step = INTERVAL_MS[interval]
+        last = _last_aligned_candle_before(cutoff, interval)
+        boundary = last - step * 7
+        rows = [candle(last - step * index) for index in reversed(range(11))]
+        rows = [
+            Candle(
+                time_ms=item.time_ms,
+                open=item.open,
+                high=100.0 if item.time_ms == boundary else item.high,
+                low=item.low,
+                close=item.close,
+                volume=item.volume,
+            )
+            for item in rows
+        ]
+        client = GapBoundaryKlineClient(FiniteClient(rows))
+        progress = {"requests": 0, "protected_range_violation": 0}
+        result = collect_partition(
+            config,
+            client,
+            symbol="AAVE_USDT_PERP",
+            interval=interval,
+            progress=progress,
+            clock=lambda: stamp("2026-09-16T00:00:00Z"),
+        )
+        self.assertEqual(result.coverage_status, "PARTIAL_PROVIDER_BOUNDARY_PROBE_FAILED")
+        self.assertEqual(result.provider_error_type, "PionexInvalidCandleBoundary")
+        self.assertEqual(len(result.candles), 7)
+        self.assertEqual(result.candles[0].time_ms, boundary + step)
+        self.assertEqual(result.candles[-1].time_ms, last)
         self.assertFalse(result.receipt_fields()["complete_provider_history_claimed"])
 
     def test_protected_range_response_fails_closed(self) -> None:
