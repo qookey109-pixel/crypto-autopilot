@@ -35,18 +35,17 @@ def _candle_from_mapping(item: dict[str, Any]) -> Candle:
 
 
 def _risk_config(values: dict[str, Any] | None = None) -> RiskConfig:
+    defaults = RiskConfig()
     if not values:
-        return RiskConfig()
+        return defaults
     return RiskConfig(
         risk_fraction_per_trade=float(
-            values.get("risk_fraction_per_trade", RiskConfig.risk_fraction_per_trade)
+            values.get("risk_fraction_per_trade", defaults.risk_fraction_per_trade)
         ),
-        max_leverage=float(values.get("max_leverage", RiskConfig.max_leverage)),
-        daily_loss_limit_r=float(
-            values.get("daily_loss_limit_r", RiskConfig.daily_loss_limit_r)
-        ),
+        max_leverage=float(values.get("max_leverage", defaults.max_leverage)),
+        daily_loss_limit_r=float(values.get("daily_loss_limit_r", defaults.daily_loss_limit_r)),
         max_new_trades_per_day=int(
-            values.get("max_new_trades_per_day", RiskConfig.max_new_trades_per_day)
+            values.get("max_new_trades_per_day", defaults.max_new_trades_per_day)
         ),
     )
 
