@@ -4,13 +4,16 @@ Updated: 2026-09-16
 
 This is the concise current-operations entrypoint. Repository `main`, versioned configs/receipts, and immutable run evidence remain the formal authority. Dated prose in older status files is historical evidence, not a reason to regress an already completed lifecycle stage.
 
-## Reviewed repository authority
+## Repository authority semantics
 
-- Repository: `qookey109-pixel/crypto-autopilot`
-- Reviewed `main`: `f5cf74292fca262ba72c4e0b36f8d757dfb82531`
-- Latest merged change: PR #321, `Treat bounds-only Pionex OHLC defects as historical boundary`.
-- PR #321 merged exact reviewed head `880e3ed9203719cc992362918e3858a6dc63f5ec`.
-- Merge-after CI passed on current `main`.
+- Repository: `qookey109-pixel/crypto-autopilot`.
+- **Resolve `main` live at read time.** This file intentionally does not hard-code a claim that any SHA is the latest `main`.
+- Evidence-basis parent main for this status version: `a8f64ca1b2ecfbec6e6d9769fa3726dc007aa266`.
+- Evidence-basis semantics: `REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION`.
+- The evidence-basis SHA is **not** a latest-main claim; it records the reviewed parent from which this status version was prepared.
+- PR #322 merged the first control-plane/documentation convergence batch into that evidence basis.
+
+This avoids a self-reference bug where a file claiming its own future merge commit becomes stale immediately after it is merged.
 
 ## Current Core100 lifecycle
 
@@ -87,22 +90,29 @@ Current properties:
 - no real-money orders;
 - no live trading.
 
-Previous authorized run `34991627998` failed closed on three structurally invalid `AAVE_USDT_PERP / 4H` candles. PR #321 now treats only finite, positive-price, non-negative-volume, non-inverted candles whose sole defect is OHLC high/low containment as a provider historical boundary; it does not fabricate or correct candles.
+Previous authorized run `34991627998` failed closed on three structurally invalid `AAVE_USDT_PERP / 4H` candles. PR #321 treats only finite, positive-price, non-negative-volume, non-inverted candles whose sole defect is OHLC high/low containment as a provider historical boundary; it does not fabricate or correct candles.
 
-A new materialization run from current `main=f5cf7429...` is still required before claiming current-main Pionex validation completion.
+A new materialization run from the Repository's **current live `main` at dispatch time** is still required before claiming Repository-current Pionex validation completion. Do not pin this statement to the status file's evidence-basis SHA.
 
 ## Current technical-debt focus
 
-The largest current technical debt is **control-plane and documentation drift**, not a need to rewrite the trading/data core.
+The largest current technical debt remains **control-plane and projection drift**, not a need to rewrite the trading/data core.
 
-Priority order:
+Already established by the first convergence batch:
 
-1. establish this single current-operations entrypoint plus a machine-readable companion;
-2. project the same current truth into `README.md`, `PROJECT_STATUS.md`, `SECURITY.md`, and the Dashboard without rewriting frozen historical evidence;
-3. triage open PRs against current `main` so stale branches cannot reintroduce superseded assumptions;
-4. replace hard-coded workflow-count assumptions with an explicit active-workflow registry;
-5. add non-blocking dependency/security/type/complexity visibility before considering stricter CI gates;
-6. only after the operational control plane is stable, consider responsibility-splitting large modules such as `training/quality.py`.
+- one current-operations human entrypoint;
+- a machine-readable current-operations companion;
+- root README / PROJECT_STATUS / SECURITY convergence;
+- current-main PR triage;
+- Research Automation Health count derived from exact schedule inventory instead of a hard-coded `7`.
+
+Current cleanup priority:
+
+1. production Dashboard must apply historical authority projection first and Current Operations projection last;
+2. homepage present-tense state must derive from Current Operations rather than the dated September 13 simulation-readiness snapshot;
+3. Dashboard / homepage must stop presenting the expired V0.12 window as an active execution path;
+4. add non-blocking dependency/security/type/complexity visibility only after the control-plane projection is stable;
+5. only after that consider responsibility-splitting large modules such as `training/quality.py`.
 
 Detailed cleanup tracking lives in `docs/TECH_DEBT_REGISTER_2026_09_16.md`.
 
@@ -123,4 +133,4 @@ Older September 13 present-tense summaries that report Core100 as `8/10` or Trai
 
 Do not use those older statements to restart History or classify current Training as incomplete.
 
-Machine-readable companion: `research/status/current-operations-v0-2.json`.
+Machine-readable companion: `research/status/current-operations-v0-3.json`.
