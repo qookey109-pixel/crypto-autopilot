@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Training entry point with exact history-quality revalidation before feature use."""
+"""Training entry point with history revalidation and research-only threshold diagnostics."""
 from __future__ import annotations
 
 import importlib.util
@@ -7,10 +7,12 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+import crypto_autopilot.training.detailed as detailed_training
 from crypto_autopilot.training.history_quality import (
     TrainingHistoryQualityError,
     validate_training_partition,
 )
+from crypto_autopilot.training.threshold_diagnostics import threshold_sweep
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -97,6 +99,92 @@ def build_examples_from_r2(
 
 
 runner.build_examples_from_r2 = build_examples_from_r2
+
+
+_original_run_intraday_training = runner.run_intraday_training
+_original_signal_diagnostics = detailed_training._signal_diagnostics
+
+
+def _fold_capture_key(items) -> tuple[Any, ...]:
+    if not items:
+        raise ValueError("threshold diagnostics require non-empty fold items")
+    first = items[0]
+    last = items[-1]
+    return (
+        len(items),
+        int(first.time_ms),
+        str(first.symbol),
+        int(last.time_ms),
+        str(last.symbol),
+    )
+
+
+def run_intraday_training_with_threshold_diagnostics(
+    examples,
+    *,
+    config,
+    dataset_fingerprint: str,
+    generated_at_utc: str,
+):
+    """Preserve the existing gate while observing score distributions and thresholds."""
+    captures: dict[tuple[Any, ...], dict[str, Any]] = {}
+    training = config["training"]
+
+    def instrumented_signal_diagnostics(
+        items,
+        probabilities,
+        *,
+        threshold: float,
+        fee_bps_per_side: float,
+        slippage_bps_per_side: float,
+    ):
+        key = _fold_capture_key(items)
+        if key not in captures:
+            captures[key] = threshold_sweep(
+                items,
+                probabilities,
+                training=training,
+            )
+        return _original_signal_diagnostics(
+            items,
+            probabilities,
+            threshold=threshold,
+            fee_bps_per_side=fee_bps_per_side,
+            slippage_bps_per_side=slippage_bps_per_side,
+        )
+
+    detailed_training._signal_diagnostics = instrumented_signal_diagnostics
+    try:
+        model, metrics = _original_run_intraday_training(
+            examples,
+            config=config,
+            dataset_fingerprint=dataset_fingerprint,
+            generated_at_utc=generated_at_utc,
+        )
+    finally:
+        detailed_training._signal_diagnostics = _original_signal_diagnostics
+
+    pass_folds = [
+        fold for fold in metrics["walk_forward_folds"] if fold.get("status") == "PASS"
+    ]
+    captured = list(captures.values())
+    if len(pass_folds) != len(captured):
+        raise RuntimeError("threshold diagnostic fold capture mismatch")
+
+    metrics["threshold_diagnostics_v0_1"] = {
+        "status": "PASS",
+        "configured_threshold": float(training["probability_threshold"]),
+        "folds": [
+            {"name": str(fold["name"]), **diagnostic}
+            for fold, diagnostic in zip(pass_folds, captured)
+        ],
+        "diagnostic_only": True,
+        "quality_gate_changed": False,
+    }
+    return model, metrics
+
+
+runner.run_intraday_training = run_intraday_training_with_threshold_diagnostics
 
 
 def main() -> int:

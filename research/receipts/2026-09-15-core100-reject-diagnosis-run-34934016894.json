@@ -1,0 +1,54 @@
+{
+  "schema": "qookey-core100-reject-diagnosis-evidence-v0.1",
+  "status": "PASS_DIAGNOSIS_REJECT_CONFIRMED",
+  "diagnosis_run_id": 34934016894,
+  "diagnosis_head_sha": "1e3b18c8ddfb2a955fd90f9615439a97a9b7f9ae",
+  "artifact_id": 10382841823,
+  "artifact_digest": "sha256:6d5f240e2f5b6bd3f37f1c2de7d2dbea96f106860a0ddc865960fceb51c948b0",
+  "source_training_run_id": 34918219864,
+  "source_dataset_fingerprint": "91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876",
+  "model_quality_gate": {
+    "status": "REJECT",
+    "all_folds_ready": true,
+    "all_folds_beat_naive_log_loss": false,
+    "all_base_cost_scenarios_positive_average_return": false,
+    "automatic_promotion": false
+  },
+  "fold_diagnosis": {
+    "fold_count": 4,
+    "failing_log_loss_folds": [
+      {
+        "name": "fold-1",
+        "train_samples": 131818,
+        "test_samples": 32147,
+        "model_log_loss": 0.6868440595395335,
+        "naive_log_loss": 0.6866175782639343,
+        "delta_vs_naive": 0.00022648127559921072
+      }
+    ],
+    "passing_log_loss_folds": ["fold-2", "fold-3", "fold-4"]
+  },
+  "base_cost_diagnosis": {
+    "probability_threshold": 0.55,
+    "zero_signal_folds": ["fold-1", "fold-2", "fold-3", "fold-4"],
+    "signal_count_per_fold": {
+      "fold-1": 0,
+      "fold-2": 0,
+      "fold-3": 0,
+      "fold-4": 0
+    },
+    "average_net_return_per_fold": {
+      "fold-1": 0.0,
+      "fold-2": 0.0,
+      "fold-3": 0.0,
+      "fold-4": 0.0
+    },
+    "interpretation": "The base-cost gate fails because the configured 0.55 probability threshold emits zero signals in every walk-forward fold. This is distinct from observing negative post-cost returns."
+  },
+  "next_action": "Add threshold-sweep and probability-distribution diagnostics without changing the quality gate, then evaluate candidate thresholds before any config change or retraining decision.",
+  "retraining_authorized": false,
+  "automatic_model_promotion_authorized": false,
+  "formal_trade_plan_authorized": false,
+  "real_money_order_authorized": false,
+  "live_trading_authorized": false
+}
