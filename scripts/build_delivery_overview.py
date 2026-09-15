@@ -122,7 +122,7 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
         <ul id="cloud-run-list" class="cloud-run-list" aria-live="polite"></ul>
         <details><summary>查看資料證據與後續步驟</summary>
           <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{sample_run}" target="_blank" rel="noopener noreferrer">BTC 固定樣本 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{training_run}" target="_blank" rel="noopener noreferrer">Core100 Training ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{replay_run}" target="_blank" rel="noopener noreferrer">Threshold Replay ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{pionex_run}" target="_blank" rel="noopener noreferrer">Pionex 前次 fail-closed run ↗</a></p>
-          <p>September 13 的 8/10、Training skipped、PR #292 blocker 等敘述保留為歷史證據，不再作為 present-tense homepage state。V0.12 bounded metadata window 已結束。</p>
+          <p>較舊的進度敘述保留於 Repository 歷史證據，不再作為 present-tense homepage state。V0.12 bounded metadata window 已結束。</p>
         </details>
       </section>'''
 
