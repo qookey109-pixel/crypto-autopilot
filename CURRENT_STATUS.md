@@ -78,7 +78,7 @@ Runtime guidance:
 
 - replay workflow timeout: `330 minutes`
 - the source training run needed about `2h 58m`
-- because replay rebuilds examples from the governed R2 dataset and reruns the same training path with threshold diagnostics, a long-running replay is expected; do not cancel or rerun it merely because it remains active for tens of minutes or a few hours within its timeout.
+- because replay rebuilds examples from the governed R2 dataset and reruns the same training path with threshold diagnostics, a long-running replay is expected; do not cancel or rerun it merely because it remains active within its timeout.
 
 The one-shot diagnostic authority is bounded to candidate thresholds:
 
@@ -108,12 +108,15 @@ Merged as `PREPARED_RESEARCH_ONLY`. It is an offline, non-authoritative research
 
 Open pull requests are operationally classified in `docs/OPEN_PR_TRIAGE_2026_09_15.md` with a machine-readable companion at `research/status/open-pr-triage-v0-1.json`.
 
+Current expected open PR set:
+
+`#166, #167, #168, #199, #249, #302, #305, #306`
+
 - `ACTIVE`: #302, #305, #306.
-- Pionex simulation/history stack #255/#257/#258/#260/#261/#262 is `DEFERRED_STACK`; do not treat it as the current Core100 next action.
-- #256 is closed as historical evidence after both changed files were proven byte-for-byte identical to current `main` by exact Git blob SHA.
-- #220 is closed as superseded after file-level review: 5/6 changed files are exact matches on `main`; the sixth is a later governance evolution that preserves the original safety assertions while validating the subsequently authorized manual-only execution workflow.
-- #166/#167/#168/#199/#249 all have unique content confirmed absent from current `main` and have been converted to Draft. They are a salvage/rebuild backlog, not ready-to-merge work.
-- PR #290 and PR #301 have already been closed as superseded.
+- #166/#167/#168/#199/#249 all have unique content confirmed absent from current `main` and are Draft. They are a salvage/rebuild backlog, not ready-to-merge work.
+- The old Pionex/Simulation stack #255/#257/#258/#260/#261/#262 is fully closed after exact preservation/supersession review. Do not reopen or merge those old branches; design a fresh version from current `main` if that lane is revived.
+- #256 is closed as historical evidence after both changed files were proven byte-for-byte identical to current `main`.
+- #220, #290 and #301 are closed as superseded after file-level/current-state review.
 
 This classification is navigation only. It does not authorize merge or execution.
 
