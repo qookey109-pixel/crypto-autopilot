@@ -7,8 +7,8 @@
   "categories": {
     "ACTIVE": [302, 305, 306],
     "DEFERRED_STACK": [255, 257, 258, 260, 261, 262],
-    "HISTORICAL_EVIDENCE_CANDIDATE": [256],
     "REVIEW_REQUIRED_LEGACY": [166, 167, 168, 199, 220, 249],
+    "CLOSED_HISTORICAL_EVIDENCE": [256],
     "CLOSED_SUPERSEDED_THIS_PASS": [290, 301]
   },
   "rules": {
@@ -29,10 +29,19 @@
     "action_if_running": "LEAVE_UNTOUCHED",
     "action_if_complete": "FREEZE_AND_ANALYZE_SECRET_FREE_REPLAY_EVIDENCE"
   },
+  "evidence_checks": {
+    "pr_256": {
+      "changed_files": 2,
+      "main_matches_pr_head_byte_for_byte": true,
+      "evidence_freeze_blob_sha": "e36cd4d177f3e0e7eccd007dddd4080d9951b90a",
+      "report_blob_sha": "3b3262e14790f0082ae346b5d9bd4b788cc19cd1",
+      "classification": "HISTORICAL_EVIDENCE_ALREADY_PRESERVED_ON_MAIN"
+    }
+  },
   "notes": {
     "305": "Current-status and documentation convergence; ready but unmerged.",
     "306": "Toolkit V0.2 REST/OpenAPI + Render + Cloudflare edge; CI passed; deployment/public exposure unauthorized.",
-    "256": "Evidence-only PR; close only after proving equivalent immutable receipt/report already exists on current main.",
+    "256": "Closed as historical after both changed files matched current main by exact Git blob SHA.",
     "legacy": "Preserve unique research content until exact functional/file-level supersession is proven."
   }
 }
