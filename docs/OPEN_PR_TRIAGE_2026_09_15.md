@@ -7,7 +7,7 @@ This document classifies currently open pull requests for operational navigation
 - `ACTIVE`: directly relevant to the current September 15 execution path.
 - `READY_NOT_MERGED`: validated and mergeable, but still requires explicit merge authority.
 - `DEFERRED_STACK`: useful work that is not on the current P0 path and should not be treated as the next action.
-- `REVIEW_REQUIRED_LEGACY`: older/diverged work whose unique functionality must be compared against current `main` before close/rebuild.
+- `REVIEW_REQUIRED_LEGACY_DRAFT`: unique legacy work preserved as Draft until deliberate salvage/rebuild review.
 - `CLOSED_HISTORICAL_EVIDENCE`: closed without merge only after exact evidence bytes are proven to already exist on current `main`.
 - `CLOSED_SUPERSEDED`: closed after file-level review proves current `main` already contains the implementation or a later governance-compatible evolution.
 
@@ -48,17 +48,17 @@ These PRs remain potentially useful but are not the current Core100 P0 path. Do 
 | #290 | Stale Core100 `8/10` handoff contradicted later verified History/Training state | Closed as superseded by current-status convergence |
 | #301 | V0.1-only Toolkit REST/edge branch rebuilt cleanly from current `main` as V0.2 PR #306 | Closed as superseded by #306 |
 
-## REVIEW_REQUIRED_LEGACY
+## REVIEW_REQUIRED_LEGACY_DRAFT
 
-These branches are old enough or diverged enough that ancestry alone does not prove supersession. Preserve until a functional/file-level comparison is completed.
+These PRs all have unique content confirmed absent from current `main`. They were converted to Draft on 2026-09-15 so they remain preserved without looking ready to merge.
 
-| PR | Role | Current review result |
-| --- | --- | --- |
-| #166 | Technical Analysis Foundation V0.2 | May contain unique EMA200/structure/multi-timeframe feature work; not yet proven superseded |
-| #167 | Offline research governance layer | May contain unique lineage/registry/resource-aware governance primitives; not yet proven superseded |
-| #168 | Deterministic paper simulation demo | May contain unique execution-lifecycle fixtures or tests; not yet proven superseded |
-| #199 | Integrated Paper Strategy / promotion governance V0.3 | Large strategy/governance branch; requires deliberate migration review |
-| #249 | Render relay 502 bounded review authority | Unique content confirmed: `config/render_relay_502_remediation_review_v0_1.json` is absent from current `main`; preserve |
+| PR | Unique content proof | State | Required treatment |
+| --- | --- | --- | --- |
+| #166 | `src/crypto_autopilot/market_structure.py` absent from current `main` | Draft | Salvage/rebuild Technical Analysis V0.2 intentionally from current main if revived |
+| #167 | `src/crypto_autopilot/experiment_registry.py` absent from current `main` | Draft | Salvage lineage/registry/resource-planning primitives selectively |
+| #168 | `src/crypto_autopilot/paper_simulation_demo.py` absent from current `main` | Draft | Review simulation-demo value against current canonical backtest/simulation path before migration |
+| #199 | `src/crypto_autopilot/integrated_paper_strategy_v0_3.py` absent from current `main` | Draft | Large strategy/governance salvage review; do not merge old branch directly |
+| #249 | `config/render_relay_502_remediation_review_v0_1.json` absent from current `main` | Draft | Preserve as bounded Render-diagnosis research until intentionally superseded or migrated |
 
 ## Current cleanup order
 
@@ -66,7 +66,7 @@ These branches are old enough or diverged enough that ancestry alone does not pr
 2. When replay completes, update #302 with frozen evidence and a reproducibility/threshold diagnosis.
 3. Keep #305 and #306 ready but unmerged until explicit merge authority.
 4. Reconstruct the #255/#257/#258/#260/#261/#262 Pionex stack from current `main` only if that lane becomes active again; do not merge the old stack directly.
-5. Perform file-level salvage review for #166/#167/#168/#199; preserve #249 because unique content is already confirmed.
+5. Treat #166/#167/#168/#199/#249 as a salvage backlog, not current execution work.
 
 ## Safety boundary
 
