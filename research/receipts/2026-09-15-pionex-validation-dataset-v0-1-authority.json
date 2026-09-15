@@ -32,7 +32,7 @@
     "tokenized_precious_metal": 2
   },
   "config": "config/pionex_validation_dataset_v0_1.json",
-  "config_sha256": "6d59a93feca9a5743817e7d671cc370f934a57fa11b7a140c266d82504da4465",
+  "config_sha256": "83972be4bd6bd04d264a1f136283c5b95cb5e200c86cf22be4f02664d0035cbc",
   "date": "2026-09-15",
   "execution_performed_by_this_receipt": false,
   "explicit_non_effect": "This receipt prepares a bounded manual post-merge Pionex validation-data materialization path. It does not itself perform provider requests or R2 writes and grants no training, source-switch, promotion, trade-plan, real-money-order, or live-trading authority.",
