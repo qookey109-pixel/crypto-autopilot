@@ -61,7 +61,8 @@ def test_current_entry_docs_preserve_v08_v10_history_and_reflect_v12_successor()
     assert "V0.8" in status and "HISTORICAL" in status
 
     assert "Project runtime budget is `0 USD/month`" in agents
-    assert "V0.12 is the only scheduled metadata" in agents
+    assert "V0.12 was the only scheduled metadata-capture workflow during its exact bounded window" in agents
+    assert "That window is now historical" in agents
     assert "Render must never receive R2 credentials" in agents
     assert "V0.10 final atomic metadata-capture cutover is **effective**" in agents
 
