@@ -125,6 +125,7 @@ def overlay_current_operations(
     pionex_authority = _require_dict(pionex["authority"], "Pionex authority")
 
     project = _require_dict(dashboard.get("project"), "dashboard project")
+    schedule_registration_present = bool(project.get("successorMetadataScheduleEnabled", False))
     project.update(
         {
             "currentOperationsReviewedMainSha": str(current["reviewed_main_sha"]),
@@ -145,9 +146,9 @@ def overlay_current_operations(
             "currentMetadataCaptureExecutionPath": "NONE_V0_12_WINDOW_ENDED",
             "v0_12SuccessorWindowState": "HISTORICAL_WINDOW_ENDED",
             "v0_12CurrentWindowActive": False,
-            "v0_12ScheduleRegistrationPresent": bool(
-                project.get("successorMetadataScheduleEnabled", False)
-            ),
+            "v0_12ScheduleRegistrationPresent": schedule_registration_present,
+            "successorMetadataCaptureExecutionAuthorized": False,
+            "successorMetadataScheduleEnabled": False,
             "replacementHoldoutState": "FROZEN_UNOPENED",
             "sourceSwitchAuthorized": False,
             "tradePlanAuthorized": False,
