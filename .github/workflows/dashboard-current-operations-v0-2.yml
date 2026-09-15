@@ -131,7 +131,11 @@ jobs:
           PY
 
       - name: Run current dashboard regression tests
-        run: python -m pytest -q tests/test_dashboard_current_operations_v0_2.py tests/test_current_operations_status.py
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_dashboard_current_operations_v0_2.py' -q
+          python -m unittest discover -s tests -p 'test_current_operations_status.py' -q
 
       - name: Upload secret-free projection evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
