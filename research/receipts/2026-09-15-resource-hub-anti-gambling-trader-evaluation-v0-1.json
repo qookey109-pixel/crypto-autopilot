@@ -1,0 +1,124 @@
+{
+  "schema": "resource-hub-integration-evaluation-v0.1",
+  "status": "EVALUATED_RESEARCH_ONLY_NOT_APPROVED_FOR_INTEGRATION",
+  "evaluated_at": "2026-09-15",
+  "crypto_autopilot_base_main_sha": "303c36e777054601316cf039f5d3fb0d7c7d985d",
+  "candidate_provenance": {
+    "resource_id": "anti-gambling-trader-tw",
+    "resource_name": "反詐投資王",
+    "resource_hub_repository": "qookey109-pixel/ai-resource-hub",
+    "resource_hub_commit": "7b19de82cd53d851fa5dd478bc1801d383f6c920",
+    "supply_chain_run_id": 34949371361,
+    "candidate_score": 100,
+    "candidate_decision": "REVIEW_REQUIRED"
+  },
+  "upstream": {
+    "repository": "mars-tw/anti-gambling-trader-tw",
+    "commit": "9d938b64c80ee29363aed496ba4e61d9110a7222",
+    "license": "MIT",
+    "requires_python": ">=3.10",
+    "core_runtime_dependencies": [],
+    "optional_dependency_groups": [
+      "excel: openpyxl>=3.1",
+      "screenshot: Pillow>=10.0, pytesseract>=0.3.10",
+      "backtest: backtrader>=1.9, vectorbt>=0.26",
+      "dev: pytest>=7.0"
+    ],
+    "checked_in_github_actions_workflow_observed": false,
+    "upstream_documentation_reports_test_suite_count": 351,
+    "upstream_test_execution_performed_by_this_evaluation": false
+  },
+  "evidence_reviewed": [
+    "README.md",
+    "pyproject.toml",
+    "core/metrics/performance.py",
+    "core/verdict/statistics.py",
+    "core/backtest/validate.py",
+    "core/broker/base.py",
+    "core/broker/paper.py",
+    "docs/methodology.md",
+    "docs/audit-trail.md",
+    "tests/test_core.py",
+    "tests/test_trading_tools.py"
+  ],
+  "component_evaluation": {
+    "performance_metrics": {
+      "decision": "RESEARCH_CANDIDATE",
+      "fit": "HIGH",
+      "notes": [
+        "Computes trade-log performance metrics including expectancy, payoff ratio, profit factor, drawdown, Sharpe and Sortino.",
+        "Contains fail-closed handling for unreliable timing, notional, contract multiplier and PnL currency metadata.",
+        "Useful as a reference implementation for validation semantics, not as an automatic dependency admission."
+      ]
+    },
+    "significance_testing": {
+      "decision": "RESEARCH_CANDIDATE_WITH_LIMITATIONS",
+      "fit": "HIGH_FOR_CROSS_CHECK_ONLY",
+      "notes": [
+        "Implements one-sided Student-t significance plus centered bootstrap under H0 with deterministic seed support.",
+        "Requires both tests to pass for positive-edge significance.",
+        "Known limitation: assumes trade observations are independent and identically distributed; no block bootstrap is implemented, so serially correlated crypto trade outcomes need separate validation."
+      ]
+    },
+    "temporal_holdout": {
+      "decision": "REFERENCE_ONLY",
+      "fit": "MEDIUM",
+      "notes": [
+        "Uses a single chronological in-sample/out-of-sample holdout with minimum segment sizes and fail-closed timestamp/currency checks.",
+        "Upstream explicitly states this is not multi-fold walk-forward validation.",
+        "Crypto Autopilot must not replace its existing frozen holdout/governance model with this helper."
+      ]
+    },
+    "paper_broker": {
+      "decision": "REJECT_FOR_CRYPTO_PERP_MODEL",
+      "fit": "LOW",
+      "notes": [
+        "Safe-by-default PaperBroker is useful as a design reference.",
+        "Short simulation explicitly omits borrow fees, financing interest, funding rates, margin lock, maintenance margin and forced liquidation.",
+        "Those omissions are material for USD-M perpetual research, so this broker cannot be used as Crypto Autopilot execution or simulation authority."
+      ]
+    },
+    "broker_adapter_and_live_scaffold": {
+      "decision": "REJECT_FOR_INTEGRATION_V0_1",
+      "fit": "OUT_OF_SCOPE",
+      "notes": [
+        "The upstream abstract broker interface includes an explicit live-confirmation gate, which is a useful safety pattern.",
+        "Live broker/exchange templates and scaffold generation would expand execution surface and are not needed for the statistical-evaluation goal.",
+        "No broker API, API key, live runner or order path is authorized by this evaluation."
+      ]
+    },
+    "anti_scam_features": {
+      "decision": "OUT_OF_SCOPE_FOR_CRYPTO_CORE",
+      "fit": "LOW",
+      "notes": [
+        "Potentially useful as a separate user-safety utility, but unrelated to current strategy/data validation integration scope."
+      ]
+    }
+  },
+  "overall_decision": {
+    "state": "EVALUATED_NOT_APPROVED_FOR_INTEGRATION",
+    "recommended_scope": "STATISTICAL_CORE_REFERENCE_AND_CROSS_CHECK_ONLY",
+    "do_not_import_as_runtime_dependency": true,
+    "do_not_use_as_execution_or_broker_authority": true,
+    "recommended_next_step": "Build an isolated equivalence/cross-check harness for selected statistical semantics using synthetic and existing non-holdout trade-log fixtures; compare outputs without touching provider, R2, frozen holdout, strategy parameters, model promotion or order execution.",
+    "license_note": "MIT permits reuse, but any future copied/derived code must retain the applicable copyright and license notice."
+  },
+  "authority": {
+    "automatic_schedule_authorized": false,
+    "code_import_authorized": false,
+    "runtime_dependency_authorized": false,
+    "adapter_creation_authorized": false,
+    "broker_connection_authorized": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "automatic_strategy_mutation_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
