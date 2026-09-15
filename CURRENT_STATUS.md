@@ -106,11 +106,11 @@ Merged as `PREPARED_RESEARCH_ONLY`. It is an offline, non-authoritative research
 
 ## Open PR navigation
 
-Open pull requests are operationally classified in `docs/OPEN_PR_TRIAGE_2026_09_15.md`.
+Open pull requests are operationally classified in `docs/OPEN_PR_TRIAGE_2026_09_15.md` with a machine-readable companion at `research/status/open-pr-triage-v0-1.json`.
 
 - `ACTIVE`: #302, #305, #306.
 - Pionex simulation/history stack #255/#257/#258/#260/#261/#262 is `DEFERRED_STACK`; do not treat it as the current Core100 next action.
-- #256 is a `HISTORICAL_EVIDENCE_CANDIDATE` pending proof that equivalent immutable evidence is already preserved on current `main`.
+- #256 is closed as historical evidence after both of its changed files were proven byte-for-byte identical to current `main` by exact Git blob SHA.
 - #166/#167/#168/#199/#220/#249 are `REVIEW_REQUIRED_LEGACY`; preserve until file-level comparison proves supersession or their unique content is migrated.
 - PR #290 and PR #301 have already been closed as superseded.
 
@@ -133,4 +133,4 @@ This classification is navigation only. It does not authorize merge or execution
 
 Do not use those older statements to restart History or to classify current training as incomplete.
 
-Machine-readable companion: `research/status/current-operations-v0-1.json`.
+Machine-readable current-operations companion: `research/status/current-operations-v0-1.json`.
