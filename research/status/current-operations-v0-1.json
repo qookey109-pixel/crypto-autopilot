@@ -1,0 +1,66 @@
+{
+  "schema": "qookey-current-operations-v0.1",
+  "updated_date": "2026-09-15",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "reviewed_main_sha": "7c5604efcd55d3d7f477e5417fe26bfe0b32b9ce",
+  "mode": "PAPER_ONLY",
+  "core100": {
+    "history_status": "COMPLETE",
+    "history_reacquisition_required": false,
+    "training_run_id": 34918219864,
+    "training_workflow_conclusion": "success",
+    "training_report_status": "PASS",
+    "symbol_count": 100,
+    "dataset_partition_objects": 14274,
+    "dataset_rows": 18235427,
+    "example_count": 249228,
+    "dataset_fingerprint": "91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876",
+    "all_folds_ready": true,
+    "model_quality_gate": {
+      "status": "REJECT",
+      "all_folds_beat_naive_log_loss": false,
+      "all_base_cost_scenarios_positive_average_return": false,
+      "automatic_promotion": false
+    },
+    "initial_diagnosis": {
+      "failing_log_loss_folds": ["fold-1"],
+      "fold_1_model_log_loss": 0.6868440595395335,
+      "fold_1_naive_log_loss": 0.6866175782639343,
+      "fold_1_delta_vs_naive": 0.00022648127559921072,
+      "configured_probability_threshold": 0.55,
+      "zero_signal_folds_at_configured_threshold": [
+        "fold-1",
+        "fold-2",
+        "fold-3",
+        "fold-4"
+      ]
+    },
+    "active_threshold_replay": {
+      "run_id": 34936331199,
+      "workflow": "Core100 Threshold Sweep Replay V0.1",
+      "branch": "codex/core100-reject-diagnosis-20260915",
+      "head_sha": "fbebb5cbe424e4a6d6c33cb6e09a12da4849ee07",
+      "last_observed_status": "in_progress",
+      "candidate_thresholds": [0.5, 0.51, 0.52, 0.53, 0.54, 0.55],
+      "diagnostic_only": true
+    }
+  },
+  "gates": {
+    "strategy_validation": "CLOSED",
+    "holdout": "FROZEN_UNOPENED",
+    "automatic_model_promotion": "CLOSED",
+    "formal_trade_plan": "CLOSED",
+    "real_money_orders": "CLOSED",
+    "live_trading": "CLOSED",
+    "source_switch_authorized": false
+  },
+  "components": {
+    "qookey_crypto_toolkit_v0_2": "MERGED_RESEARCH_ONLY",
+    "tradingagents_research_challenger_v0_1": "PREPARED_RESEARCH_ONLY"
+  },
+  "next_decision": "WAIT_FOR_EXACT_REPLAY_THEN_DIAGNOSE_REPRODUCIBILITY_AND_THRESHOLD_CURVES",
+  "notes": [
+    "Older September 13 present-tense summaries that report Core100 8/10 and training SKIPPED are historical and superseded for current operations.",
+    "This status file does not grant new provider, R2 write, holdout, promotion, trading, or source-switch authority."
+  ]
+}
