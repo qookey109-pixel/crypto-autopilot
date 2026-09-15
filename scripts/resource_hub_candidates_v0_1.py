@@ -5,7 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
-from crypto_autopilot.resource_hub_supply_chain import build_candidate_registry
+from crypto_autopilot.toolkit.resource_hub_supply_chain import build_candidate_registry
 
 
 def parse_args() -> argparse.Namespace:
