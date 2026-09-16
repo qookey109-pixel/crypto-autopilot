@@ -1,0 +1,43 @@
+{
+  "schema": "pionex-validation-materialization-overlay-v0.2",
+  "version": "0.2.0",
+  "status": "IMPLEMENTED_REVIEW_REQUIRED_BEFORE_EXECUTION",
+  "base_config": {
+    "path": "config/pionex_validation_dataset_v0_1.json",
+    "sha256": "83972be4bd6bd04d264a1f136283c5b95cb5e200c86cf22be4f02664d0035cbc",
+    "frozen": true
+  },
+  "provider": "pionex_public_futures",
+  "storage": {
+    "namespace": "market-data/pionex/validation-dataset-v0.2"
+  },
+  "weekly_materialization": {
+    "logical_interval": "1W",
+    "physical_provider_interval": "1D",
+    "alignment": "MONDAY_00_00_UTC",
+    "source_rows_per_complete_week": 7,
+    "open": "FIRST_DAILY_OPEN",
+    "high": "MAX_DAILY_HIGH",
+    "low": "MIN_DAILY_LOW",
+    "close": "LAST_DAILY_CLOSE",
+    "volume": "SUM_DAILY_VOLUME",
+    "incomplete_week_policy": "DROP_AND_DO_NOT_EMIT",
+    "duplicate_or_gap_policy": "FAIL_CLOSED",
+    "provider_splicing_allowed": false,
+    "silent_interpolation_allowed": false,
+    "cross_provider_fallback_allowed": false,
+    "reuse_materialized_native_1d_partition": true,
+    "physical_request_accounting": "CHARGED_TO_NATIVE_1D_SOURCE_PARTITION",
+    "lineage": "WEEKLY_RECEIPT_REFERENCES_EXACT_NATIVE_1D_DATA_KEY_AND_SHA256"
+  },
+  "authority": {
+    "execution_authorized": false,
+    "holdout_access": false,
+    "model_promotion": false,
+    "source_switch": false,
+    "training": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
