@@ -8,10 +8,10 @@ This is the concise current-operations entrypoint. Repository `main`, versioned 
 
 - Repository: `qookey109-pixel/crypto-autopilot`.
 - **Resolve `main` live at read time.** This file intentionally does not hard-code a claim that any SHA is the latest `main`.
-- Evidence-basis parent main for this status version: `a8f64ca1b2ecfbec6e6d9769fa3726dc007aa266`.
+- Evidence-basis parent main for this status version: `5eaf57133d013fad030681182b379a02d915766e`.
 - Evidence-basis semantics: `REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION`.
 - The evidence-basis SHA is **not** a latest-main claim; it records the reviewed parent from which this status version was prepared.
-- PR #322 merged the first control-plane/documentation convergence batch into that evidence basis.
+- PR #335 is the latest reviewed Pionex V0.2 materialization repair in that evidence basis; PR #322 remains the first control-plane/documentation convergence batch.
 
 This avoids a self-reference bug where a file claiming its own future merge commit becomes stale immediately after it is merged.
 
@@ -75,11 +75,31 @@ Pionex remains the final calibration / execution-environment provenance target, 
 
 Current validation workflow:
 
-`.github/workflows/pionex-validation-materialization-v0-1.yml`
+`.github/workflows/pionex-validation-materialization-v0-2.yml`
 
-Current properties:
+Current materialization result: **COMPLETE / PASS**.
 
-- manual `workflow_dispatch` only;
+- workflow run: `35054729471`
+- workflow head: `5eaf57133d013fad030681182b379a02d915766e`
+- report status: `PASS`
+- report stage: `PIONEX_VALIDATION_DATASET_MATERIALIZED_V0_2`
+- selected markets: `197`
+- partitions: `682`
+- provider requests: `1,534`
+- manifest: `market-data/pionex/validation-dataset-v0.2/runs/run=github-35054729471-1/manifest.json`
+- manifest SHA-256: `192eddd1c69dd435d2ea12a0bf68e05e1cbc1a0fd512f4321f631755c61ca225`
+- artifact: `10430054351`
+- artifact digest: `sha256:5f8c3406ee5dc9a491cd800241c1cc7e2dd66bc98fa292da1c8bb05535dede55`
+- R2 latest pointer written last: `true`
+- complete 197-market multiyear history claimed: `false`
+- Core100 Pionex training performed: `false`
+- completion evidence: `research/receipts/2026-09-16-pionex-validation-materialization-v0-2-pass.json`
+
+V0.2 preserves explicit incomplete-coverage states rather than fabricating history. This PASS means the frozen 197-market / 682-partition validation materialization contract completed successfully; it does **not** mean every market has complete multiyear history.
+
+Current authority boundaries remain unchanged:
+
+- manual `workflow_dispatch` only for the governed materialization path;
 - public Pionex futures K-line reads only;
 - validation-dataset R2 writes only;
 - no API key or private-account data;
@@ -87,12 +107,11 @@ Current properties:
 - no training authorization;
 - no source switch;
 - no model promotion;
+- no formal trade plan;
 - no real-money orders;
 - no live trading.
 
-Previous authorized run `34991627998` failed closed on three structurally invalid `AAVE_USDT_PERP / 4H` candles. PR #321 treats only finite, positive-price, non-negative-volume, non-inverted candles whose sole defect is OHLC high/low containment as a provider historical boundary; it does not fabricate or correct candles.
-
-A new materialization run from the Repository's **current live `main` at dispatch time** is still required before claiming Repository-current Pionex validation completion. Do not pin this statement to the status file's evidence-basis SHA.
+The materialization PASS does **not** override the Core100 **Model Quality REJECT** result and does not open Strategy Validation, Holdout, Promotion, or Trading.
 
 ## Current technical-debt focus
 
@@ -129,8 +148,8 @@ Detailed cleanup tracking lives in `docs/TECH_DEBT_REGISTER_2026_09_16.md`.
 
 ## Documentation drift rule
 
-Older September 13 present-tense summaries that report Core100 as `8/10` or Training as `SKIPPED` are historical observations and are superseded for current operations.
+Older September 13 present-tense summaries that report Core100 as `8/10` or Training as `SKIPPED`, and older September 16 summaries that report Pionex validation as V0.1 / pending manual dispatch, are historical observations and are superseded for current operations.
 
-Do not use those older statements to restart History or classify current Training as incomplete.
+Do not use those older statements to restart History, classify current Training as incomplete, or regress the completed Pionex V0.2 materialization stage.
 
 Machine-readable companion: `research/status/current-operations-v0-3.json`.
