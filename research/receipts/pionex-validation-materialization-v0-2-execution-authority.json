@@ -1,0 +1,14 @@
+{
+  "schema": "pionex-validation-materialization-v0.2-execution-authority",
+  "status": "AUTHORIZED_AFTER_REVIEWED_MAIN_MERGE_MANUAL_ONLY",
+  "base_config_sha256": "83972be4bd6bd04d264a1f136283c5b95cb5e200c86cf22be4f02664d0035cbc",
+  "overlay_sha256": "a45753c8b7d5236815e2ffe9e8ff5a6a17df523019dfef9570310a57d378cd4a",
+  "execution_performed_by_this_receipt": false,
+  "holdout_access_authorized": false,
+  "model_promotion_authorized": false,
+  "source_switch_authorized": false,
+  "training_authorized": false,
+  "trade_plan_authorized": false,
+  "real_money_orders_authorized": false,
+  "live_trading_authorized": false
+}
