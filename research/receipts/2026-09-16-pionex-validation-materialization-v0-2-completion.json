@@ -1,0 +1,62 @@
+{
+  "artifact": {
+    "digest": "sha256:5f8c3406ee5dc9a491cd800241c1cc7e2dd66bc98fa292da1c8bb05535dede55",
+    "id": 10430054351,
+    "name": "pionex-validation-materialization-v0-2-35054729471-1",
+    "size_bytes": 1039
+  },
+  "authority": {
+    "base_config_sha256": "83972be4bd6bd04d264a1f136283c5b95cb5e200c86cf22be4f02664d0035cbc",
+    "commit": "5eaf57133d013fad030681182b379a02d915766e",
+    "github_actions_run_id": 35054729471,
+    "overlay_sha256": "a45753c8b7d5236815e2ffe9e8ff5a6a17df523019dfef9570310a57d378cd4a",
+    "repository": "qookey109-pixel/crypto-autopilot",
+    "run_id": "github-35054729471-1"
+  },
+  "coverage": {
+    "complete_197_market_multiyear_history_claimed": false,
+    "counts": {
+      "AGGREGATED_COMPLETE_WEEKS_FROM_PARTIAL_PROVIDER_BOUNDARY_PROBE_FAILED": 1,
+      "AGGREGATED_COMPLETE_WEEKS_FROM_PARTIAL_PROVIDER_LATEST_BEFORE_CUTOFF__PROVIDER_EARLIEST_REACHED": 1,
+      "AGGREGATED_COMPLETE_WEEKS_FROM_PARTIAL_PROVIDER_REQUEST_BOUNDARY": 1,
+      "AGGREGATED_COMPLETE_WEEKS_FROM_PROVIDER_EARLIEST_REACHED": 192,
+      "BOUNDED_RECORD_CAP_REACHED": 79,
+      "NO_PROVIDER_HISTORY_BEFORE_CUTOFF": 9,
+      "PARTIAL_PROVIDER_BOUNDARY_PROBE_FAILED": 43,
+      "PARTIAL_PROVIDER_LATEST_BEFORE_CUTOFF__PROVIDER_EARLIEST_REACHED": 3,
+      "PARTIAL_PROVIDER_REQUEST_BOUNDARY": 2,
+      "PROVIDER_EARLIEST_REACHED": 351
+    },
+    "partition_count": 682,
+    "selected_market_count": 197
+  },
+  "guardrails": {
+    "account_data_accessed": false,
+    "api_key_used": false,
+    "core100_pionex_training_performed": false,
+    "holdout_accessed": false,
+    "live_trading_authorized": false,
+    "model_promotion_authorized": false,
+    "private_api_used": false,
+    "raw_provider_payloads_persisted": false,
+    "real_money_orders_authorized": false,
+    "replacement_holdout_accessed": false,
+    "source_switch_authorized": false,
+    "trade_plan_authorized": false,
+    "training_authorized": false
+  },
+  "materialization": {
+    "manifest_key": "market-data/pionex/validation-dataset-v0.2/runs/run=github-35054729471-1/manifest.json",
+    "manifest_sha256": "192eddd1c69dd435d2ea12a0bf68e05e1cbc1a0fd512f4321f631755c61ca225",
+    "provider_requests": 1534,
+    "r2_latest_pointer_written_last": true,
+    "r2_uploaded_objects": 682,
+    "r2_uploaded_partition_bytes": 19428978,
+    "r2_verified_existing_objects": 684,
+    "r2_writes_performed": true
+  },
+  "provider": "pionex_public_futures",
+  "schema_version": 1,
+  "stage": "PIONEX_VALIDATION_DATASET_MATERIALIZED_V0_2",
+  "status": "PASS"
+}
