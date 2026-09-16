@@ -9,7 +9,7 @@ Repository `main` is the formal current authority and must be resolved live at r
 - Repository: `qookey109-pixel/crypto-autopilot`.
 - Current Operations companion: `research/status/current-operations-v0-3.json`.
 - Current Operations V0.3 stores an **evidence-basis parent SHA**, not a self-referential latest-main claim.
-- Evidence-basis parent for V0.3: `a8f64ca1b2ecfbec6e6d9769fa3726dc007aa266`, the main commit after PR #322 merged and passed post-merge CI/Pages/Freeze Guard.
+- Evidence-basis parent for this status version: `5eaf57133d013fad030681182b379a02d915766e`, the reviewed main commit after PR #335 merged and passed post-merge CI / Freeze Guard.
 - Current mode: **PAPER-ONLY**.
 - FREE-ONLY cloud/runtime budget: **0 USD/month**.
 
@@ -48,15 +48,36 @@ The replay is diagnostic-only and grants no provider request, R2 write, holdout,
 
 Pionex is the final calibration / execution-environment provenance target; Binance USD-M remains the large-scale learning database. The providers remain provenance-separated.
 
-PR #321 merged the narrow bounds-only invalid-OHLC historical-boundary rule without repairing, fabricating, interpolating, or splicing candles.
+Current workflow: `.github/workflows/pionex-validation-materialization-v0-2.yml`
 
-Current workflow: `.github/workflows/pionex-validation-materialization-v0-1.yml`
+Repository materialization state: **COMPLETE / PASS**.
 
-- dispatch: manual only;
-- public Pionex futures K-lines: authorized for this validation scope;
-- R2 validation-dataset writes: authorized for this validation scope;
-- previous run `34991627998`: fail-closed before PR #321;
-- Repository materialization state: **PENDING MANUAL DISPATCH**;
+- final successful run: `35054729471`;
+- run head SHA: `5eaf57133d013fad030681182b379a02d915766e`;
+- report stage: `PIONEX_VALIDATION_DATASET_MATERIALIZED_V0_2`;
+- selected markets: `197`;
+- partitions: `682`;
+- provider requests: `1,534`;
+- artifact: `10430054351`;
+- artifact digest: `sha256:5f8c3406ee5dc9a491cd800241c1cc7e2dd66bc98fa292da1c8bb05535dede55`;
+- manifest key: `market-data/pionex/validation-dataset-v0.2/runs/run=github-35054729471-1/manifest.json`;
+- manifest SHA-256: `192eddd1c69dd435d2ea12a0bf68e05e1cbc1a0fd512f4321f631755c61ca225`;
+- R2 latest pointer written last: `true`;
+- completion evidence: `research/receipts/2026-09-16-pionex-validation-materialization-v0-2-pass.json`.
+
+The completed dataset preserves explicit provider-coverage states. It does **not** claim complete 197-market multiyear history, and it did not perform Core100 Pionex training.
+
+The repair lineage remains narrow and provider-native:
+
+- PR #321 preserved bounds-only invalid-candle historical boundaries without repair/fabrication;
+- PR #332 introduced V0.2 native `1D -> logical 1W` construction;
+- PR #334 preserved explicit `NO_PROVIDER_HISTORY_BEFORE_CUTOFF` zero-history coverage;
+- PR #335 preserved explicit provider-latest-before-cutoff trailing coverage without interpolation or splicing.
+
+Authority after PASS remains unchanged:
+
+- public Pionex futures K-lines: authorized only for the governed validation scope;
+- R2 validation-dataset writes: authorized only for the governed validation scope;
 - private API/account data: unauthorized;
 - replacement holdout access: unauthorized;
 - training: unauthorized;
@@ -64,7 +85,7 @@ Current workflow: `.github/workflows/pionex-validation-materialization-v0-1.yml`
 - promotion: unauthorized;
 - formal trade plan / real-money / live trading: unauthorized.
 
-The next materialization must be dispatched from the Repository's **live `main` at dispatch time**. Do not pin execution to the status file's evidence-basis SHA.
+**Materialization PASS is not Model Quality PASS.** Strategy Validation, Holdout, Promotion, and Trading remain closed because the Core100 model-quality result remains **REJECT** and threshold replay supports no threshold change.
 
 ## Technical-debt cleanup
 
@@ -76,20 +97,17 @@ PR #322 merged the first control-plane convergence batch:
 - Research Automation Health count derived from exact Repository schedule inventory rather than a magic `7`;
 - first fail-closed Dashboard current-operations overlay implementation.
 
-The active follow-up removes two remaining projection defects:
+The control plane must keep present-tense Current Operations later than historical authority/readiness projections, so dated September 13 `8/10 / Training skipped / PR #292` text and older V0.1 Pionex pending-dispatch text cannot return during deployment.
 
-1. Current Status must not self-claim a future/latest merge SHA; V0.3 uses evidence-basis semantics instead.
-2. Public Dashboard/Homepage must apply present-tense Current Operations after historical authority/readiness projections, so dated September 13 `8/10 / Training skipped / PR #292` text cannot return during deployment.
-
-After projection convergence, remaining P2 debt is non-blocking quality/type/complexity/dependency/security visibility. Large-module refactoring remains deferred until the control plane is stable.
+Remaining P2 debt is non-blocking quality/type/complexity/dependency/security visibility. Large-module refactoring remains deferred until the control plane is stable.
 
 Tracking: `docs/TECH_DEBT_REGISTER_2026_09_16.md`.
 
 ## Open work that matters now
 
-- PR #322 is **MERGED**; its merge commit/evidence basis is `a8f64ca1b2ecfbec6e6d9769fa3726dc007aa266`.
+- Pionex Validation Materialization V0.2 is **COMPLETE / PASS** on run `35054729471`; this closes the materialization task only, not downstream research gates.
 - PR #302 — preserve Core100 post-training REJECT diagnostic evidence; old branch code still requires current-main review before any merge decision.
-- PR #305 — older-base convergence proposal; superseded in purpose by merged #322 and current V0.3 follow-up, but unique content must be checked before closure.
+- PR #305 — older-base convergence proposal; superseded in purpose by merged #322 and later current-operations convergence, but unique content must be checked before closure.
 - PR #306 — Toolkit REST / Cloudflare edge V0.2; rebuild from current main if revived; public deployment remains unauthorized.
 - PR #307 — AI Resource Hub statistical-validation integration; rebuild from current main if revived.
 - PR #315 — Binance/Pionex data-role documentation; compare unique content against current merged architecture before preserving or closing.
