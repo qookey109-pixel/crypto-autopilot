@@ -1,0 +1,81 @@
+{
+  "schema": "pionex-validation-materialization-v0.2-completion-evidence",
+  "status": "PASS",
+  "stage": "PIONEX_VALIDATION_DATASET_MATERIALIZED_V0_2",
+  "date": "2026-09-16",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "provider": "pionex_public_futures",
+  "evidence_basis": {
+    "workflow": "Pionex Validation Dataset Materialization V0.2",
+    "workflow_path": ".github/workflows/pionex-validation-materialization-v0-2.yml",
+    "workflow_run_id": 35054729471,
+    "workflow_run_attempt": 1,
+    "workflow_head_branch": "main",
+    "workflow_head_sha": "5eaf57133d013fad030681182b379a02d915766e",
+    "workflow_conclusion": "success",
+    "materialization_run_id": "github-35054729471-1",
+    "report_schema": "pionex-validation-materialization-run-report-v0.2",
+    "artifact_id": 10430054351,
+    "artifact_name": "pionex-validation-materialization-v0-2-35054729471-1",
+    "artifact_size_bytes": 1039,
+    "artifact_digest": "sha256:5f8c3406ee5dc9a491cd800241c1cc7e2dd66bc98fa292da1c8bb05535dede55"
+  },
+  "frozen_inputs": {
+    "base_config_sha256": "83972be4bd6bd04d264a1f136283c5b95cb5e200c86cf22be4f02664d0035cbc",
+    "overlay_sha256": "a45753c8b7d5236815e2ffe9e8ff5a6a17df523019dfef9570310a57d378cd4a"
+  },
+  "materialization": {
+    "selected_market_count": 197,
+    "partition_count": 682,
+    "provider_requests": 1534,
+    "manifest_key": "market-data/pionex/validation-dataset-v0.2/runs/run=github-35054729471-1/manifest.json",
+    "manifest_sha256": "192eddd1c69dd435d2ea12a0bf68e05e1cbc1a0fd512f4321f631755c61ca225",
+    "r2_writes_performed": true,
+    "r2_uploaded_objects": 682,
+    "r2_uploaded_partition_bytes": 19428978,
+    "r2_verified_existing_objects": 684,
+    "r2_latest_pointer_written_last": true,
+    "complete_197_market_multiyear_history_claimed": false,
+    "core100_pionex_training_performed": false
+  },
+  "coverage_counts": {
+    "AGGREGATED_COMPLETE_WEEKS_FROM_PARTIAL_PROVIDER_BOUNDARY_PROBE_FAILED": 1,
+    "AGGREGATED_COMPLETE_WEEKS_FROM_PARTIAL_PROVIDER_LATEST_BEFORE_CUTOFF__PROVIDER_EARLIEST_REACHED": 1,
+    "AGGREGATED_COMPLETE_WEEKS_FROM_PARTIAL_PROVIDER_REQUEST_BOUNDARY": 1,
+    "AGGREGATED_COMPLETE_WEEKS_FROM_PROVIDER_EARLIEST_REACHED": 192,
+    "BOUNDED_RECORD_CAP_REACHED": 79,
+    "NO_PROVIDER_HISTORY_BEFORE_CUTOFF": 9,
+    "PARTIAL_PROVIDER_BOUNDARY_PROBE_FAILED": 43,
+    "PARTIAL_PROVIDER_LATEST_BEFORE_CUTOFF__PROVIDER_EARLIEST_REACHED": 3,
+    "PARTIAL_PROVIDER_REQUEST_BOUNDARY": 2,
+    "PROVIDER_EARLIEST_REACHED": 351
+  },
+  "validation_boundary": {
+    "api_key_used": false,
+    "private_api_used": false,
+    "account_data_accessed": false,
+    "raw_provider_payloads_persisted": false,
+    "replacement_holdout_accessed": false,
+    "holdout_accessed": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "source_switch_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_orders_authorized": false,
+    "live_trading_authorized": false
+  },
+  "authority_boundary": {
+    "proves_pionex_validation_dataset_v0_2_materialization_pass": true,
+    "proves_selected_market_count_197": true,
+    "proves_partition_count_682": true,
+    "proves_complete_197_market_multiyear_history": false,
+    "proves_model_quality_pass": false,
+    "authorizes_replacement_holdout_access": false,
+    "authorizes_training": false,
+    "authorizes_model_promotion": false,
+    "authorizes_source_switch": false,
+    "authorizes_formal_trade_plan": false,
+    "authorizes_real_money_orders": false,
+    "authorizes_live_trading": false
+  }
+}
