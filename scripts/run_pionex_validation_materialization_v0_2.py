@@ -12,7 +12,6 @@ from crypto_autopilot.history.pionex_validation_materialization_v0_1 import (
     PartitionResult,
     ValidationMaterializationRejected,
     asset_class_for_symbol,
-    collect_partition,
     iter_partitions,
     json_bytes,
     partition_count,
@@ -22,6 +21,7 @@ from crypto_autopilot.history.pionex_validation_materialization_v0_1 import (
     validate_config,
 )
 from crypto_autopilot.history.pionex_validation_materialization_v0_2 import (
+    collect_partition_v0_2,
     validate_overlay,
     weekly_from_native_daily,
 )
@@ -205,7 +205,7 @@ def execute(base: dict, overlay: dict, store, client, run_id: str, *, clock) -> 
                     "source_daily_receipt_key": source_data_key.rsplit("/", 1)[0] + "/receipt.json",
                 }
             else:
-                result = collect_partition(
+                result = collect_partition_v0_2(
                     base,
                     client,
                     symbol=symbol,
