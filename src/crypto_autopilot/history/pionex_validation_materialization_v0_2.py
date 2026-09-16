@@ -8,13 +8,14 @@ Monday-UTC ``1W`` candles from complete seven-day groups.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from ..historical import INTERVAL_ALIGNMENT_OFFSET_MS, INTERVAL_MS, audit_candles
 from ..models import Candle
 from .pionex_validation_materialization_v0_1 import (
     PartitionResult,
     ValidationMaterializationRejected,
+    collect_partition as collect_partition_v0_1,
     iso_utc,
     validate_config as validate_v0_1_config,
 )
@@ -25,6 +26,7 @@ WEEK_OFFSET_MS = INTERVAL_ALIGNMENT_OFFSET_MS["1W"]
 EXPECTED_OVERLAY_SCHEMA = "pionex-validation-materialization-overlay-v0.2"
 EXPECTED_OVERLAY_VERSION = "0.2.0"
 EXPECTED_BASE_CONFIG_SHA256 = "83972be4bd6bd04d264a1f136283c5b95cb5e200c86cf22be4f02664d0035cbc"
+ZERO_HISTORY_COVERAGE_STATUS = "NO_PROVIDER_HISTORY_BEFORE_CUTOFF"
 
 
 @dataclass(frozen=True, slots=True)
@@ -146,6 +148,51 @@ def validate_overlay(overlay: Mapping[str, Any]) -> None:
         raise ValidationMaterializationRejected("V0.2 authority widened")
 
 
+def collect_partition_v0_2(
+    base_config: Mapping[str, Any],
+    client: Any,
+    *,
+    symbol: str,
+    interval: str,
+    progress: dict[str, int],
+    clock: Callable[[], int],
+) -> PartitionResult:
+    """Reuse V0.1 collection semantics while preserving an explicit zero-row outcome.
+
+    A successful public-provider response containing zero rows at the frozen
+    cutoff is evidence that this selected symbol/interval has no provider
+    history available before the cutoff. V0.2 records that fact instead of
+    fabricating rows or treating it as a provider failure. Every other V0.1
+    rejection remains fail-closed.
+    """
+    requests_before = progress["requests"]
+    try:
+        return collect_partition_v0_1(
+            base_config,
+            client,
+            symbol=symbol,
+            interval=interval,
+            progress=progress,
+            clock=clock,
+        )
+    except ValidationMaterializationRejected as exc:
+        if str(exc) != "provider returned no data at validation cutoff":
+            raise
+        requests_used = progress["requests"] - requests_before
+        if requests_used != 1:
+            raise ValidationMaterializationRejected(
+                "zero-history provider request accounting mismatch",
+                diagnostics={"symbol": symbol, "interval": interval, "requests": requests_used},
+            ) from None
+        return PartitionResult(
+            symbol=symbol,
+            interval=interval,
+            coverage_status=ZERO_HISTORY_COVERAGE_STATUS,
+            candles=(),
+            requests=requests_used,
+        )
+
+
 def _week_start(time_ms: int) -> int:
     return WEEK_OFFSET_MS + ((time_ms - WEEK_OFFSET_MS) // WEEK_MS) * WEEK_MS
 
@@ -220,6 +267,23 @@ def weekly_from_native_daily(
     validate_v0_1_config(base_config)
     if source_daily_result.symbol != symbol or source_daily_result.interval != "1D":
         raise ValidationMaterializationRejected("weekly lineage must use the same symbol's native 1D partition")
+    if source_daily_result.coverage_status == ZERO_HISTORY_COVERAGE_STATUS:
+        if source_daily_result.candles:
+            raise ValidationMaterializationRejected("zero-history native 1D source unexpectedly contains rows")
+        aggregation = WeeklyAggregationResult(
+            candles=(),
+            source_rows_total=0,
+            source_rows_used=0,
+            dropped_leading_rows=0,
+            dropped_trailing_rows=0,
+        )
+        return WeeklyPartitionResult(
+            symbol=symbol,
+            coverage_status=ZERO_HISTORY_COVERAGE_STATUS,
+            candles=(),
+            source_daily_result=source_daily_result,
+            aggregation=aggregation,
+        )
     aggregation = aggregate_complete_weeks(source_daily_result.candles)
     coverage = f"AGGREGATED_COMPLETE_WEEKS_FROM_{source_daily_result.coverage_status}"
     return WeeklyPartitionResult(
