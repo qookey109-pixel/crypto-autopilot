@@ -9,7 +9,9 @@ from crypto_autopilot.history.pionex_validation_materialization_v0_1 import (
     ValidationMaterializationRejected,
 )
 from crypto_autopilot.history.pionex_validation_materialization_v0_2 import (
+    ZERO_HISTORY_COVERAGE_STATUS,
     aggregate_complete_weeks,
+    collect_partition_v0_2,
     validate_overlay,
     weekly_from_native_daily,
 )
@@ -42,6 +44,34 @@ def daily_rows(start: datetime, count: int) -> list[Candle]:
             )
         )
     return rows
+
+
+class EmptyPionexClient:
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, str, int, int | None]] = []
+
+    def get_klines(
+        self,
+        symbol: str,
+        interval: str,
+        *,
+        limit: int = 500,
+        end_time_ms: int | None = None,
+    ) -> list[Candle]:
+        self.calls.append((symbol, interval, limit, end_time_ms))
+        return []
+
+
+class FailingPionexClient:
+    def get_klines(
+        self,
+        symbol: str,
+        interval: str,
+        *,
+        limit: int = 500,
+        end_time_ms: int | None = None,
+    ) -> list[Candle]:
+        raise OSError("provider unavailable")
 
 
 class PionexValidationMaterializationV02Tests(unittest.TestCase):
@@ -84,6 +114,78 @@ class PionexValidationMaterializationV02Tests(unittest.TestCase):
             aggregate_complete_weeks(rows[:3] + rows[4:])
         with self.assertRaises(ValidationMaterializationRejected):
             aggregate_complete_weeks(rows[:3] + [rows[2]] + rows[3:])
+
+    def test_zero_history_is_explicit_after_successful_empty_provider_response(self) -> None:
+        base_config = json.loads(BASE_CONFIG.read_text())
+        client = EmptyPionexClient()
+        progress = {"requests": 0, "protected_range_violation": 0}
+        result = collect_partition_v0_2(
+            base_config,
+            client,
+            symbol="PONS_USDT_PERP",
+            interval="15M",
+            progress=progress,
+            clock=lambda: stamp(2026, 9, 16),
+        )
+        self.assertEqual(result.coverage_status, ZERO_HISTORY_COVERAGE_STATUS)
+        self.assertEqual(result.candles, ())
+        self.assertEqual(result.requests, 1)
+        self.assertEqual(progress["requests"], 1)
+        self.assertEqual(len(client.calls), 1)
+        receipt = result.receipt_fields()
+        self.assertEqual(receipt["rows"], 0)
+        self.assertIsNone(receipt["first_time_ms"])
+        self.assertIsNone(receipt["last_time_ms"])
+        self.assertFalse(receipt["complete_provider_history_claimed"])
+
+    def test_provider_failure_is_not_reclassified_as_zero_history(self) -> None:
+        base_config = json.loads(BASE_CONFIG.read_text())
+        progress = {"requests": 0, "protected_range_violation": 0}
+        with self.assertRaisesRegex(ValidationMaterializationRejected, "provider request failed"):
+            collect_partition_v0_2(
+                base_config,
+                FailingPionexClient(),
+                symbol="PONS_USDT_PERP",
+                interval="15M",
+                progress=progress,
+                clock=lambda: stamp(2026, 9, 16),
+            )
+        self.assertEqual(progress["requests"], 1)
+
+    def test_weekly_zero_history_preserves_empty_native_daily_lineage(self) -> None:
+        base_config = json.loads(BASE_CONFIG.read_text())
+        source = PartitionResult(
+            symbol="PONS_USDT_PERP",
+            interval="1D",
+            coverage_status=ZERO_HISTORY_COVERAGE_STATUS,
+            candles=(),
+            requests=1,
+        )
+        result = weekly_from_native_daily(base_config, symbol="PONS_USDT_PERP", source_daily_result=source)
+        receipt = result.receipt_fields()
+        self.assertEqual(result.coverage_status, ZERO_HISTORY_COVERAGE_STATUS)
+        self.assertEqual(result.candles, ())
+        self.assertEqual(result.requests, 0)
+        self.assertEqual(receipt["source_rows_total"], 0)
+        self.assertEqual(receipt["source_rows_used"], 0)
+        self.assertEqual(receipt["weekly_rows"], 0)
+        self.assertEqual(receipt["physical_provider_requests_reused"], 1)
+        self.assertFalse(receipt["provider_splicing_performed"])
+        self.assertFalse(receipt["silent_interpolation_performed"])
+        self.assertFalse(receipt["cross_provider_fallback_performed"])
+        self.assertFalse(receipt["complete_provider_history_claimed"])
+
+    def test_zero_history_status_with_rows_fails_closed(self) -> None:
+        base_config = json.loads(BASE_CONFIG.read_text())
+        source = PartitionResult(
+            symbol="BTC_USDT_PERP",
+            interval="1D",
+            coverage_status=ZERO_HISTORY_COVERAGE_STATUS,
+            candles=tuple(daily_rows(datetime(2026, 8, 17, tzinfo=timezone.utc), 7)),
+            requests=1,
+        )
+        with self.assertRaisesRegex(ValidationMaterializationRejected, "unexpectedly contains rows"):
+            weekly_from_native_daily(base_config, symbol="BTC_USDT_PERP", source_daily_result=source)
 
     def test_weekly_partition_reuses_native_daily_requests_and_lineage(self) -> None:
         base_config = json.loads(BASE_CONFIG.read_text())
