@@ -1,0 +1,141 @@
+{
+  "schema": "qookey-open-pr-triage-v0.4",
+  "snapshot_date": "2026-09-17",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
+  "evidence_basis": {
+    "parent_main_sha": "59be8326cb822cd2e618f537c8bbf24b2621af37",
+    "is_latest_main_claim": false,
+    "source_merged_pr": 340
+  },
+  "merge_authority_granted": false,
+  "execution_authority_granted": false,
+  "close_authority_granted": false,
+  "pull_requests": {
+    "336": {
+      "classification": "SUPERSEDED_OLD_BASE",
+      "head_sha_at_snapshot": "cbcfab189eaaafe682ec871222745cfc2d050e67",
+      "base_main_sha_at_snapshot": "5eaf57133d013fad030681182b379a02d915766e",
+      "action": "COMPARE_AGAINST_MERGED_337_339_THEN_CLOSE_ONLY_IF_NO_UNIQUE_CONTENT_REMAINS"
+    },
+    "315": {
+      "classification": "REBUILD_FROM_CURRENT_MAIN",
+      "head_sha_at_snapshot": "893b0aadbd65e81b8d3ff302729810adc8e6aef1",
+      "action": "SALVAGE_ONLY_STILL_MISSING_BINANCE_PIONEX_PROVENANCE_GOVERNANCE"
+    },
+    "307": {
+      "classification": "REBUILD_FROM_CURRENT_MAIN",
+      "head_sha_at_snapshot": "0cff93388b71ac5cf323b1889a0847ffeafb430f",
+      "action": "REBUILD_IF_STATISTICAL_EDGE_CAPABILITY_REMAINS_PRIORITY"
+    },
+    "306": {
+      "classification": "REBUILD_FROM_CURRENT_MAIN",
+      "head_sha_at_snapshot": "9e97b9493920c9b2e46303906d1d8942f2f4de3d",
+      "action": "REBUILD_IF_REST_EDGE_INTERFACE_REMAINS_PRIORITY"
+    },
+    "302": {
+      "classification": "EVIDENCE_PRESERVED_CODE_REVIEW_ONLY",
+      "head_sha_at_snapshot": "978dae1a1a39ee01905c82c2f8cfa4a12088719d",
+      "evidence_preserved_by_pr": 340,
+      "action": "REVIEW_ONLY_UNIQUE_DIAGNOSTIC_CODE_AND_TEST_HARDENING_AGAINST_CURRENT_MAIN"
+    },
+    "331": {
+      "classification": "DEPENDENCY_REVIEW",
+      "dependency": "pyarrow",
+      "change": "21.0.0 -> 25.0.1",
+      "action": "REVIEW_MAJOR_VERSION_COMPATIBILITY_AND_EXACT_HEAD_CI_SEPARATELY"
+    },
+    "330": {
+      "classification": "DEPENDENCY_REVIEW",
+      "dependency": "actions/checkout",
+      "change": "6 -> 7",
+      "action": "REVIEW_MAJOR_VERSION_COMPATIBILITY_AND_WORKFLOW_BEHAVIOR_SEPARATELY"
+    },
+    "329": {
+      "classification": "DEPENDENCY_REVIEW",
+      "dependency": "ruff",
+      "change": "0.16.0 -> 0.16.7",
+      "action": "REVIEW_LINT_COMPATIBILITY_AND_EXACT_HEAD_CI_SEPARATELY"
+    },
+    "328": {
+      "classification": "DEPENDENCY_REVIEW",
+      "dependency": "actions/download-artifact",
+      "change": "7.0.0 -> 8.0.1",
+      "action": "REVIEW_MAJOR_VERSION_ARTIFACT_BEHAVIOR_AND_EXACT_HEAD_CI_SEPARATELY"
+    },
+    "327": {
+      "classification": "DEPENDENCY_REVIEW",
+      "dependency": "actions/cache",
+      "change": "5.1.0 -> 6.1.0",
+      "action": "REVIEW_MAJOR_VERSION_CACHE_BEHAVIOR_AND_EXACT_HEAD_CI_SEPARATELY"
+    },
+    "326": {
+      "classification": "DEPENDENCY_REVIEW",
+      "dependency": "boto3",
+      "change": "1.43.75 -> 1.43.93",
+      "action": "REVIEW_SDK_COMPATIBILITY_AND_EXACT_HEAD_CI_SEPARATELY"
+    },
+    "249": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "0563154e8b7fc68f4fd47476161ac0ec741f3b44",
+      "action": "KEEP_AS_INCIDENT_REVIEW_SALVAGE"
+    },
+    "199": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "a5cb4cfb797dc205167154f6a38925082106edad",
+      "action": "REBUILD_SELECTED_STRATEGY_GOVERNANCE_IF_REVIVED"
+    },
+    "168": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "38f7383a32ce64bb5a718da046af222156164fb4",
+      "action": "KEEP_AS_SIMULATION_REFERENCE"
+    },
+    "167": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "a2d4de6c955d32b5797161831d01adaa3d92d4f7",
+      "action": "REBUILD_SELECTED_RESEARCH_GOVERNANCE_IF_REVIVED"
+    },
+    "166": {
+      "classification": "SALVAGE_DRAFT",
+      "head_sha_at_snapshot": "2b2ddc5deddb54ce77d44c61b4a4f9bef2eaf1dc",
+      "action": "REBUILD_SELECTED_TECHNICAL_ANALYSIS_FEATURES_IF_REVIVED"
+    }
+  },
+  "recently_resolved": {
+    "305": {
+      "outcome": "CLOSED_NOT_MERGED",
+      "role": "SUPERSEDED_CURRENT_STATUS_CONVERGENCE_DRAFT"
+    },
+    "323": {
+      "merge_commit_sha": "415b17fe60b9060f7f103f581ee9fbc610772aa2",
+      "outcome": "MERGED",
+      "role": "CURRENT_OPERATIONS_V0_3_DASHBOARD_HOMEPAGE_PROJECTION_REPAIR"
+    },
+    "337": {
+      "outcome": "MERGED",
+      "role": "PIONEX_V0_2_MATERIALIZATION_COMPLETION_EVIDENCE"
+    },
+    "338": {
+      "merge_commit_sha": "5105cc8310515d40e99aaf02d2cfe5fef12a777f",
+      "outcome": "MERGED",
+      "role": "RESEARCH_AUTOMATION_HEALTH_REPORT_CONTRACT_REPAIR"
+    },
+    "339": {
+      "merge_commit_sha": "2a07b06899a0e7c8fc09f7c50329955cf73fcfdc",
+      "outcome": "MERGED",
+      "role": "PIONEX_V0_2_CURRENT_STATUS_AND_PROJECTION_CONVERGENCE"
+    },
+    "340": {
+      "merge_commit_sha": "59be8326cb822cd2e618f537c8bbf24b2621af37",
+      "outcome": "MERGED_POST_MERGE_CI_PAGES_FREEZE_GUARD_GREEN",
+      "role": "CORE100_REJECT_AND_THRESHOLD_REPLAY_EVIDENCE_PRESERVATION"
+    }
+  },
+  "notes": [
+    "Resolve Repository main live before every merge or close decision; evidence_basis.parent_main_sha is not a latest-main claim.",
+    "PR #340 preserved the four immutable #302 receipts byte-for-byte and did not revive the expired one-shot authority.",
+    "Historical CI success on old branches is not sufficient merge evidence after main advances.",
+    "Dependabot PRs are review-only and each requires independent compatibility review and merge authorization.",
+    "This snapshot grants no merge, close, deployment, provider, R2, holdout, promotion, source-switch, order, or live-trading authority."
+  ]
+}

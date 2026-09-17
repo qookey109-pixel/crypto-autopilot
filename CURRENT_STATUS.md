@@ -115,25 +115,32 @@ The materialization PASS does **not** override the Core100 **Model Quality REJEC
 
 ## Current technical-debt focus
 
-The largest current technical debt remains **control-plane and projection drift**, not a need to rewrite the trading/data core.
+The prior control-plane/dashboard projection drift is now substantially converged. The main cleanup focus has moved to **backlog hygiene plus non-blocking quality/dependency/security visibility**, not a rewrite of the trading/data core.
 
-Already established by the first convergence batch:
+Already established and verified:
 
-- one current-operations human entrypoint;
-- a machine-readable current-operations companion;
+- one current-operations human entrypoint and machine-readable companion;
 - root README / PROJECT_STATUS / SECURITY convergence;
-- current-main PR triage;
-- Research Automation Health count derived from exact schedule inventory instead of a hard-coded `7`.
+- production Dashboard applies historical authority first and Current Operations last;
+- homepage present-tense state derives from Current Operations rather than the dated September 13 simulation-readiness snapshot;
+- expired V0.12 execution state is historical, not current;
+- Pionex V0.2 materialization completion is converged into current status/projections;
+- immutable Core100 REJECT / threshold-replay evidence is preserved on `main`;
+- Research Automation Health count derives from exact schedule inventory rather than a hard-coded `7`;
+- CI emits a non-blocking quality-visibility artifact on Python 3.13;
+- Dependabot provides monthly review-only visibility for `pip` and GitHub Actions.
 
 Current cleanup priority:
 
-1. production Dashboard must apply historical authority projection first and Current Operations projection last;
-2. homepage present-tense state must derive from Current Operations rather than the dated September 13 simulation-readiness snapshot;
-3. Dashboard / homepage must stop presenting the expired V0.12 window as an active execution path;
-4. add non-blocking dependency/security/type/complexity visibility only after the control-plane projection is stable;
-5. only after that consider responsibility-splitting large modules such as `training/quality.py`.
+1. keep the open-PR triage aligned with current `main` and do not merge stale architecture-generation branches directly;
+2. review dependency PRs independently, with extra compatibility scrutiny for major-version jumps;
+3. add non-blocking type/security visibility before considering any new required quality gate;
+4. review only still-unique code hardening from PR #302 and still-useful data-role governance from PR #315 against current `main`;
+5. rebuild #306/#307 from current main only if those capabilities remain priorities;
+6. only after that consider responsibility-splitting large modules such as `training/quality.py`.
 
-Detailed cleanup tracking lives in `docs/TECH_DEBT_REGISTER_2026_09_16.md`.
+Detailed cleanup tracking lives in `docs/TECH_DEBT_REGISTER_2026_09_17.md`.
+Current open-PR navigation lives in `docs/OPEN_PR_TRIAGE_2026_09_17.md` with machine-readable companion `research/status/open-pr-triage-v0-4.json`.
 
 ## Safety and governance still binding
 
