@@ -6,7 +6,8 @@ import argparse
 import json
 from pathlib import Path
 
-from crypto_autopilot.bitget_macd_research import (
+from crypto_autopilot.models import Candle
+from crypto_autopilot.research.bitget_macd import (
     BitgetMacdResearchConfig,
     default_bitget_macd_candidate_grid,
     rank_candidates,
@@ -14,7 +15,6 @@ from crypto_autopilot.bitget_macd_research import (
     run_bitget_macd_long_30m_research,
     run_candidate_grid,
 )
-from crypto_autopilot.models import Candle
 
 
 def _load_candles(path: Path) -> list[Candle]:
