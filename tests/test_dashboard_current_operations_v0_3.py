@@ -74,7 +74,7 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
         self.assertFalse(projection["is_latest_main_claim"])
         self.assertEqual(
             projection["evidence_basis_parent_main_sha"],
-            "a8f64ca1b2ecfbec6e6d9769fa3726dc007aa266",
+            "5105cc8310515d40e99aaf02d2cfe5fef12a777f",
         )
 
     def test_overlay_projects_current_lifecycle_and_closes_expired_v012(self) -> None:
@@ -95,8 +95,12 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
         self.assertFalse(project["core100ThresholdChangeSupported"])
         self.assertEqual(
             project["pionexValidationMaterializationState"],
-            "PENDING_MANUAL_DISPATCH",
+            "COMPLETE_PASS",
         )
+        self.assertEqual(project["pionexValidationMaterializationRunId"], 35054729471)
+        self.assertEqual(project["pionexValidationSelectedMarkets"], 197)
+        self.assertEqual(project["pionexValidationPartitions"], 682)
+        self.assertTrue(project["pionexValidationManualDispatchOnly"])
         self.assertEqual(
             project["currentMetadataCaptureExecutionPath"],
             "NONE_V0_12_WINDOW_ENDED",
@@ -116,8 +120,8 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
             pipeline["Core100 Threshold Replay"]["status"], "COMPLETED_NO_CHANGE"
         )
         self.assertEqual(
-            pipeline["Pionex Validation Dataset V0.1"]["status"],
-            "PENDING_MANUAL_DISPATCH",
+            pipeline["Pionex Validation Dataset V0.2"]["status"],
+            "COMPLETE_PASS",
         )
         self.assertEqual(
             pipeline["V0.12 Successor Metadata Window"]["status"], "HISTORICAL"
@@ -126,7 +130,7 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
         self.assertEqual(gates["V0.12 Metadata Capture"]["status"], "HISTORICAL")
         self.assertEqual(
             gates["Pionex Repository Validation"]["status"],
-            "PENDING_MANUAL_DISPATCH",
+            "COMPLETE_PASS",
         )
         self.assertEqual(gates["Replacement Holdout"]["status"], "NOT_AUTHORIZED")
 
@@ -145,12 +149,15 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
             build_delivery_overview(site, ROOT)
 
             html = (site / "index.html").read_text(encoding="utf-8")
-            self.assertIn("9/16 目前作業狀態", html)
+            self.assertIn("9/17 目前作業狀態", html)
             self.assertIn("10/10 · COMPLETE", html)
             self.assertIn("COMPLETED · PASS", html)
             self.assertIn("Model Quality REJECT", html)
-            self.assertIn("PENDING MANUAL DISPATCH", html)
+            self.assertIn("Pionex Validation", html)
+            self.assertIn("COMPLETE · PASS", html)
+            self.assertIn("35054729471", html)
             self.assertIn("current-operations.js?v=current-ops-v0-3", html)
+            self.assertNotIn("PENDING MANUAL DISPATCH", html)
             self.assertNotIn("8/10 分片", html)
             self.assertNotIn("訓練尚未完成", html)
             self.assertNotIn("PR #292", html)
@@ -167,10 +174,8 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
             self.assertEqual(web_current["trainingStatus"], "COMPLETED_PASS")
             self.assertEqual(web_current["modelQualityStatus"], "REJECT")
             self.assertFalse(web_current["thresholdChangeSupported"])
-            self.assertEqual(
-                web_current["pionexValidationStatus"],
-                "PENDING_MANUAL_DISPATCH",
-            )
+            self.assertEqual(web_current["pionexValidationStatus"], "COMPLETE_PASS")
+            self.assertEqual(web_current["pionexMaterializationRunId"], 35054729471)
             self.assertEqual(web_current["holdoutState"], "FROZEN_UNOPENED")
             self.assertFalse(web_current["sourceSwitchAuthorized"])
             self.assertFalse(web_current["liveTradingAuthorized"])
@@ -187,6 +192,12 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
     def test_overlay_fails_closed_if_current_status_claims_latest_main(self) -> None:
         bad = copy.deepcopy(self.current)
         bad["evidence_basis"]["is_latest_main_claim"] = True
+        with self.assertRaises(RuntimeError):
+            overlay_current_operations(copy.deepcopy(self.dashboard), bad)
+
+    def test_overlay_fails_closed_if_pionex_completion_evidence_drifts(self) -> None:
+        bad = copy.deepcopy(self.current)
+        bad["pionex_validation"]["materialization_run_id"] = 1
         with self.assertRaises(RuntimeError):
             overlay_current_operations(copy.deepcopy(self.dashboard), bad)
 
