@@ -1,0 +1,53 @@
+{
+  "schema": "qookey-bitget-macd-long-30m-research-status-v0.1",
+  "status_date": "2026-09-17",
+  "status": "PREPARED_SYNTHETIC_LOCAL_ONLY",
+  "baseline": {
+    "symbol": "ZECUSDT",
+    "direction": "LONG",
+    "timeframe": "30m",
+    "source_timeframe": "15m",
+    "macd": {
+      "fast": 12,
+      "slow": 26,
+      "signal": 9
+    },
+    "leverage": 3.0,
+    "margin_fraction": 0.2,
+    "stop_loss_fraction": 0.05,
+    "fluctuation_lookback": 5,
+    "min_fluctuation_fraction": 0.012
+  },
+  "cost_assumptions": {
+    "taker_fee_bps_per_side": 6.0,
+    "slippage_bps_per_side": 2.0,
+    "funding": "EXPLICIT_LOCAL_POINTS_ONLY_NO_FABRICATION"
+  },
+  "bitget_fluctuation_filter": {
+    "official_exact_formula_verified": false,
+    "research_semantics": "CLOSED_BAR_HIGH_LOW_RANGE_OVER_LAST_CLOSE",
+    "silent_equivalence_claim_forbidden": true
+  },
+  "candidate_grid": {
+    "count": 2304,
+    "paper_only": true,
+    "strategy_authority_changed": false
+  },
+  "execution": {
+    "real_zec_historical_run_performed": false,
+    "provider_requests_performed": 0,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "holdout_accessed": false,
+    "training_performed": false
+  },
+  "authority": {
+    "strategy_parameter_change_authorized": false,
+    "source_switch_authorized": false,
+    "holdout_access_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
