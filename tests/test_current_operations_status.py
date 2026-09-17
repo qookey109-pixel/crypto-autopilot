@@ -22,7 +22,7 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         current = self.current
 
         self.assertEqual(payload["schema"], "qookey-current-operations-v0.3")
-        self.assertEqual(payload["updated_date"], "2026-09-16")
+        self.assertEqual(payload["updated_date"], "2026-09-17")
         self.assertEqual(payload["repository_authority"], "RESOLVE_MAIN_LIVE_AT_READ_TIME")
         self.assertEqual(payload["mode"], "PAPER_ONLY")
 
@@ -32,7 +32,11 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
         )
         self.assertFalse(basis["is_latest_main_claim"])
-        self.assertEqual(basis["source_merge_pr"], 322)
+        self.assertEqual(basis["source_merge_pr"], 338)
+        self.assertEqual(
+            basis["parent_main_sha"],
+            "5105cc8310515d40e99aaf02d2cfe5fef12a777f",
+        )
         self.assertIn(basis["parent_main_sha"], current)
         self.assertIn("Resolve `main` live at read time", current)
         self.assertIn("not** a latest-main claim", current)
@@ -70,14 +74,32 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         self.assertNotIn("Reviewed `main`:", self.current)
         self.assertNotIn("Merge-after CI passed on current `main`", self.current)
 
-    def test_pionex_repository_rerun_is_explicitly_pending(self) -> None:
+    def test_pionex_v0_2_materialization_completion_is_exact_and_bounded(self) -> None:
         pionex = self.payload["pionex_validation"]
         authority = pionex["authority"]
 
-        self.assertEqual(pionex["boundary_fix_merged_pr"], 321)
         self.assertEqual(
-            pionex["repository_materialization_status"],
-            "PENDING_MANUAL_DISPATCH",
+            pionex["workflow"],
+            ".github/workflows/pionex-validation-materialization-v0-2.yml",
+        )
+        self.assertEqual(pionex["dispatch_mode"], "MANUAL_ONLY")
+        self.assertEqual(pionex["repository_materialization_status"], "COMPLETE_PASS")
+        self.assertEqual(pionex["materialization_run_id"], 35054729471)
+        self.assertEqual(pionex["materialization_run_attempt"], 1)
+        self.assertEqual(pionex["materialization_run_outcome"], "PASS")
+        self.assertEqual(
+            pionex["report_stage"], "PIONEX_VALIDATION_DATASET_MATERIALIZED_V0_2"
+        )
+        self.assertEqual(pionex["artifact_id"], 10430054351)
+        self.assertEqual(pionex["selected_market_count"], 197)
+        self.assertEqual(pionex["partition_count"], 682)
+        self.assertEqual(pionex["provider_requests"], 1534)
+        self.assertTrue(pionex["r2_latest_pointer_written_last"])
+        self.assertFalse(pionex["complete_197_market_multiyear_history_claimed"])
+        self.assertFalse(pionex["core100_pionex_training_performed"])
+        self.assertEqual(
+            pionex["completion_evidence"],
+            "research/receipts/2026-09-16-pionex-validation-materialization-v0-2-completion.json",
         )
         self.assertTrue(authority["public_pionex_kline_reads"])
         self.assertTrue(authority["r2_validation_dataset_writes"])
