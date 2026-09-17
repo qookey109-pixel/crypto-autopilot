@@ -26,8 +26,11 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertIn("10/10 · COMPLETE", summary)
         self.assertIn("COMPLETED · PASS", summary)
         self.assertIn("Model Quality REJECT", summary)
-        self.assertIn("PENDING MANUAL DISPATCH", summary)
+        self.assertIn("Pionex Validation", summary)
+        self.assertIn("COMPLETE · PASS", summary)
+        self.assertIn("35054729471", summary)
         self.assertIn("15 筆成交", summary)
+        self.assertNotIn("PENDING MANUAL DISPATCH", summary)
         self.assertNotIn("8/10 分片", summary)
         self.assertNotIn("訓練尚未完成", summary)
         self.assertNotIn("PR #292", summary)
@@ -37,7 +40,8 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertIn("training 已完成", schedule)
         self.assertIn("V0.12 metadata", schedule)
         self.assertIn("HISTORICAL", schedule)
-        self.assertIn("Pionex Validation Dataset V0.1", schedule)
+        self.assertIn("Pionex Validation Dataset V0.2", schedule)
+        self.assertIn("COMPLETE / PASS", schedule)
 
         self.assertEqual(progress["schema"], "qookey-dashboard-history-progress-v0.2")
         self.assertEqual(progress["status"], "COMPLETE")
@@ -56,9 +60,10 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertEqual(web_current["trainingStatus"], "COMPLETED_PASS")
         self.assertEqual(web_current["modelQualityStatus"], "REJECT")
         self.assertFalse(web_current["thresholdChangeSupported"])
-        self.assertEqual(
-            web_current["pionexValidationStatus"], "PENDING_MANUAL_DISPATCH"
-        )
+        self.assertEqual(web_current["pionexValidationStatus"], "COMPLETE_PASS")
+        self.assertEqual(web_current["pionexMaterializationRunId"], 35054729471)
+        self.assertEqual(web_current["pionexSelectedMarketCount"], 197)
+        self.assertEqual(web_current["pionexPartitionCount"], 682)
         self.assertEqual(web_current["holdoutState"], "FROZEN_UNOPENED")
         self.assertFalse(web_current["sourceSwitchAuthorized"])
         self.assertFalse(web_current["liveTradingAuthorized"])
@@ -72,6 +77,8 @@ class DeliveryOverviewTests(unittest.TestCase):
             "promotion",
             "latest_main_claim",
             "pionex_status",
+            "pionex_run",
+            "pionex_manifest",
             "pionex_private_api",
             "pionex_live_trading",
             "holdout",
@@ -97,6 +104,10 @@ class DeliveryOverviewTests(unittest.TestCase):
                         value["pionex_validation"][
                             "repository_materialization_status"
                         ] = "PASS"
+                    elif change == "pionex_run":
+                        value["pionex_validation"]["materialization_run_id"] = 1
+                    elif change == "pionex_manifest":
+                        value["pionex_validation"]["manifest_sha256"] = "bad"
                     elif change == "pionex_private_api":
                         value["pionex_validation"]["authority"]["private_api"] = True
                     elif change == "pionex_live_trading":
@@ -199,8 +210,10 @@ class DeliveryOverviewTests(unittest.TestCase):
             template = (ROOT / "web/index.html").read_text(encoding="utf-8")
             self.assertIn("<!-- DELIVERY_OVERVIEW_START -->", template)
             self.assertIn("<!-- DELIVERY_SCHEDULE_START -->", template)
-            self.assertIn("9/16 目前作業狀態", generated)
+            self.assertIn("9/17 目前作業狀態", generated)
             self.assertIn("10/10 · COMPLETE", generated)
+            self.assertIn("COMPLETE · PASS", generated)
+            self.assertNotIn("PENDING MANUAL DISPATCH", generated)
             self.assertNotIn("8/10 分片", generated)
             self.assertNotEqual(generated, template)
 
@@ -209,6 +222,7 @@ class DeliveryOverviewTests(unittest.TestCase):
             )
             self.assertEqual(current["trainingRunId"], 34918219864)
             self.assertEqual(current["modelQualityStatus"], "REJECT")
+            self.assertEqual(current["pionexValidationStatus"], "COMPLETE_PASS")
 
     def test_ctk_artifact_bytes_and_report_scope(self) -> None:
         receipt = delivery.read_json(
