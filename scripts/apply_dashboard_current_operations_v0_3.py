@@ -45,6 +45,33 @@ def _upsert_status_item(
         item["critical"] = critical
 
 
+def _validate_pionex_completion(pionex: dict[str, Any]) -> None:
+    expected = {
+        "workflow": ".github/workflows/pionex-validation-materialization-v0-2.yml",
+        "dispatch_mode": "MANUAL_ONLY",
+        "repository_materialization_status": "COMPLETE_PASS",
+        "completion_evidence": "research/receipts/2026-09-16-pionex-validation-materialization-v0-2-completion.json",
+        "materialization_run_id": 35054729471,
+        "materialization_run_attempt": 1,
+        "materialization_run_head_sha": "5eaf57133d013fad030681182b379a02d915766e",
+        "materialization_run_outcome": "PASS",
+        "report_stage": "PIONEX_VALIDATION_DATASET_MATERIALIZED_V0_2",
+        "artifact_id": 10430054351,
+        "artifact_digest": "sha256:5f8c3406ee5dc9a491cd800241c1cc7e2dd66bc98fa292da1c8bb05535dede55",
+        "selected_market_count": 197,
+        "partition_count": 682,
+        "provider_requests": 1534,
+        "manifest_key": "market-data/pionex/validation-dataset-v0.2/runs/run=github-35054729471-1/manifest.json",
+        "manifest_sha256": "192eddd1c69dd435d2ea12a0bf68e05e1cbc1a0fd512f4321f631755c61ca225",
+        "r2_latest_pointer_written_last": True,
+        "complete_197_market_multiyear_history_claimed": False,
+        "core100_pionex_training_performed": False,
+    }
+    for key, value in expected.items():
+        if pionex.get(key) != value:
+            raise RuntimeError(f"Pionex V0.2 completion evidence changed: {key}")
+
+
 def validate_current_operations(current: dict[str, Any]) -> None:
     if current.get("schema") != "qookey-current-operations-v0.3":
         raise RuntimeError("unexpected current-operations schema")
@@ -86,8 +113,7 @@ def validate_current_operations(current: dict[str, Any]) -> None:
         raise RuntimeError("configured threshold changed")
 
     pionex = _require_dict(current.get("pionex_validation"), "pionex validation")
-    if pionex.get("repository_materialization_status") != "PENDING_MANUAL_DISPATCH":
-        raise RuntimeError("Pionex repository validation state changed")
+    _validate_pionex_completion(pionex)
     authority = _require_dict(pionex.get("authority"), "Pionex authority")
     if authority.get("public_pionex_kline_reads") is not True:
         raise RuntimeError("Pionex public validation reads unexpectedly disabled")
@@ -108,8 +134,16 @@ def validate_current_operations(current: dict[str, Any]) -> None:
             raise RuntimeError(f"Pionex validation boundary changed: {key}")
 
     gates = _require_dict(current.get("gates"), "gates")
+    if gates.get("strategy_validation") != "CLOSED":
+        raise RuntimeError("strategy-validation gate changed")
     if gates.get("holdout") != "FROZEN_UNOPENED":
         raise RuntimeError("replacement holdout state changed")
+    if gates.get("automatic_model_promotion") != "CLOSED":
+        raise RuntimeError("automatic-promotion gate changed")
+    if gates.get("formal_trade_plan") != "CLOSED":
+        raise RuntimeError("trade-plan gate changed")
+    if gates.get("real_money_orders") != "CLOSED":
+        raise RuntimeError("real-money gate changed")
     if gates.get("live_trading") != "CLOSED":
         raise RuntimeError("live-trading gate changed")
     if gates.get("source_switch_authorized") is not False:
@@ -155,8 +189,9 @@ def overlay_current_operations(
             "pionexValidationMaterializationState": str(
                 pionex["repository_materialization_status"]
             ),
-            "pionexValidationPreviousRunId": int(pionex["previous_run_id"]),
-            "pionexValidationBoundaryFixPr": int(pionex["boundary_fix_merged_pr"]),
+            "pionexValidationMaterializationRunId": int(pionex["materialization_run_id"]),
+            "pionexValidationSelectedMarkets": int(pionex["selected_market_count"]),
+            "pionexValidationPartitions": int(pionex["partition_count"]),
             "pionexValidationManualDispatchOnly": True,
             "currentMetadataCaptureExecutionPath": "NONE_V0_12_WINDOW_ENDED",
             "v0_12SuccessorWindowState": "HISTORICAL_WINDOW_ENDED",
@@ -202,12 +237,13 @@ def overlay_current_operations(
     )
     _upsert_status_item(
         pipeline,
-        name="Pionex Validation Dataset V0.1",
+        name="Pionex Validation Dataset V0.2",
         detail=(
-            "PR #321 boundary fix 已進 Repository；新的 materialization 仍等待手動 dispatch。"
-            "僅 public K-lines + validation R2，沒有 holdout/training/source-switch/trading authority。"
+            f"Run {pionex['materialization_run_id']} PASS；"
+            f"{pionex['selected_market_count']} markets / {pionex['partition_count']} partitions。"
+            "完成 materialization 不授權 holdout/training/source-switch/promotion/trading。"
         ),
-        status="PENDING_MANUAL_DISPATCH",
+        status="COMPLETE_PASS",
     )
     _upsert_status_item(
         pipeline,
@@ -243,10 +279,13 @@ def overlay_current_operations(
     _upsert_status_item(
         gates,
         name="Pionex Repository Validation",
-        detail="新的 validation materialization 尚待 manual dispatch；未完成前不得宣稱 Repository-current validation complete。",
-        status="PENDING_MANUAL_DISPATCH",
-        tone="pending",
-        critical=True,
+        detail=(
+            f"V0.2 materialization run {pionex['materialization_run_id']} 已 COMPLETE / PASS；"
+            "Model Quality 仍 REJECT，Strategy Validation / Holdout / Promotion / Trading 仍關閉。"
+        ),
+        status="COMPLETE_PASS",
+        tone="pass",
+        critical=False,
     )
     _upsert_status_item(
         gates,
@@ -287,7 +326,7 @@ def overlay_current_operations(
     dashboard["snapshotLabel"] = (
         "Repository Current Operations 投影 · Core100 History/Training COMPLETE / "
         "Model Quality REJECT / Threshold Replay NO CHANGE / "
-        "V0.12 HISTORICAL / Pionex repository validation PENDING"
+        "V0.12 HISTORICAL / Pionex V0.2 materialization COMPLETE_PASS"
     )
     dashboard["currentOperationsProjection"] = {
         "authority": False,

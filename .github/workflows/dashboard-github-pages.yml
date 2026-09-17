@@ -232,9 +232,10 @@ jobs:
           )
           assert project['core100ThresholdReplayRunId'] == 34936331199
           assert project['core100ThresholdChangeSupported'] is False
-          assert project['pionexValidationMaterializationState'] == 'PENDING_MANUAL_DISPATCH'
-          assert project['pionexValidationPreviousRunId'] == 34991627998
-          assert project['pionexValidationBoundaryFixPr'] == 321
+          assert project['pionexValidationMaterializationState'] == 'COMPLETE_PASS'
+          assert project['pionexValidationMaterializationRunId'] == 35054729471
+          assert project['pionexValidationSelectedMarkets'] == 197
+          assert project['pionexValidationPartitions'] == 682
           assert project['pionexValidationManualDispatchOnly'] is True
           assert project['currentMetadataCaptureExecutionPath'] == 'NONE_V0_12_WINDOW_ENDED'
           assert project['v0_12SuccessorWindowState'] == 'HISTORICAL_WINDOW_ENDED'
@@ -309,13 +310,16 @@ jobs:
           assert current_web['trainingStatus'] == 'COMPLETED_PASS'
           assert current_web['modelQualityStatus'] == 'REJECT'
           assert current_web['thresholdChangeSupported'] is False
-          assert current_web['pionexValidationStatus'] == 'PENDING_MANUAL_DISPATCH'
+          assert current_web['pionexValidationStatus'] == 'COMPLETE_PASS'
+          assert current_web['pionexMaterializationRunId'] == 35054729471
           assert current_web['evidenceBasisIsLatestMainClaim'] is False
 
           html = Path('_site/index.html').read_text(encoding='utf-8')
-          assert '9/16 目前作業狀態' in html
+          assert '9/17 目前作業狀態' in html
           assert '10/10 · COMPLETE' in html
           assert 'COMPLETED · PASS' in html
+          assert 'COMPLETE · PASS' in html
+          assert 'PENDING MANUAL DISPATCH' not in html
           assert '8/10 分片' not in html
           assert '訓練尚未完成' not in html
           assert 'PR #292' not in html

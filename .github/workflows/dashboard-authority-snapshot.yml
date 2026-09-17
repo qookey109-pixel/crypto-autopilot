@@ -153,9 +153,10 @@ jobs:
           )
           assert project['core100ThresholdReplayRunId'] == 34936331199
           assert project['core100ThresholdChangeSupported'] is False
-          assert project['pionexValidationMaterializationState'] == 'PENDING_MANUAL_DISPATCH'
-          assert project['pionexValidationPreviousRunId'] == 34991627998
-          assert project['pionexValidationBoundaryFixPr'] == 321
+          assert project['pionexValidationMaterializationState'] == 'COMPLETE_PASS'
+          assert project['pionexValidationMaterializationRunId'] == 35054729471
+          assert project['pionexValidationSelectedMarkets'] == 197
+          assert project['pionexValidationPartitions'] == 682
           assert project['pionexValidationManualDispatchOnly'] is True
           assert project['currentMetadataCaptureExecutionPath'] == 'NONE_V0_12_WINDOW_ENDED'
           assert project['v0_12SuccessorWindowState'] == 'HISTORICAL_WINDOW_ENDED'
@@ -202,7 +203,7 @@ jobs:
           assert pipeline['Core100 History'] == 'COMPLETE'
           assert pipeline['Core100 Training'] == 'COMPLETED'
           assert pipeline['Core100 Threshold Replay'] == 'COMPLETED_NO_CHANGE'
-          assert pipeline['Pionex Validation Dataset V0.1'] == 'PENDING_MANUAL_DISPATCH'
+          assert pipeline['Pionex Validation Dataset V0.2'] == 'COMPLETE_PASS'
 
           gates = {row['name']: row['status'] for row in data['gates']}
           assert gates['V0.10 Metadata Cutover'] == 'HISTORICAL'
@@ -210,7 +211,7 @@ jobs:
           assert gates['V0.12 Metadata Capture'] == 'HISTORICAL'
           assert gates['Metadata Stability'] == 'NOT_YET_RUN'
           assert gates['Core100 Model Quality'] == 'REJECT'
-          assert gates['Pionex Repository Validation'] == 'PENDING_MANUAL_DISPATCH'
+          assert gates['Pionex Repository Validation'] == 'COMPLETE_PASS'
           assert gates['Replacement Holdout'] == 'NOT_AUTHORIZED'
 
           assert current_web['schema'] == 'qookey-current-operations-web-v0.3'
@@ -219,7 +220,8 @@ jobs:
           assert current_web['trainingStatus'] == 'COMPLETED_PASS'
           assert current_web['modelQualityStatus'] == 'REJECT'
           assert current_web['thresholdChangeSupported'] is False
-          assert current_web['pionexValidationStatus'] == 'PENDING_MANUAL_DISPATCH'
+          assert current_web['pionexValidationStatus'] == 'COMPLETE_PASS'
+          assert current_web['pionexMaterializationRunId'] == 35054729471
           assert current_web['evidenceBasisIsLatestMainClaim'] is False
 
           text = path.read_text(encoding='utf-8')
@@ -255,9 +257,11 @@ jobs:
           assert '資料健康度' in html
           assert '績效中心' in html
           assert '風險與閘門' in html
-          assert '9/16 目前作業狀態' in html
+          assert '9/17 目前作業狀態' in html
           assert '10/10 · COMPLETE' in html
           assert 'COMPLETED · PASS' in html
+          assert 'COMPLETE · PASS' in html
+          assert 'PENDING MANUAL DISPATCH' not in html
           assert '8/10 分片' not in html
           assert '訓練尚未完成' not in html
           assert 'PR #292' not in html
@@ -270,9 +274,12 @@ jobs:
           assert data['project']['core100HistoryState'] == 'COMPLETE_10_OF_10'
           assert data['project']['core100TrainingState'] == 'COMPLETED_PASS'
           assert data['project']['core100ModelQualityState'] == 'REJECT'
+          assert data['project']['pionexValidationMaterializationState'] == 'COMPLETE_PASS'
+          assert data['project']['pionexValidationMaterializationRunId'] == 35054729471
           assert data['project']['replacementHoldoutState'] == 'FROZEN_UNOPENED'
           assert data['project']['liveTradingAuthorized'] is False
           assert current['repositoryAuthority'] == 'RESOLVE_MAIN_LIVE_AT_READ_TIME'
+          assert current['pionexValidationStatus'] == 'COMPLETE_PASS'
           assert current['evidenceBasisIsLatestMainClaim'] is False
           PY
 
