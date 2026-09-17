@@ -173,6 +173,8 @@ class ResearchAutomationHealthTests(unittest.TestCase):
             coverage = validate_schedule_coverage([expectation], workflow_dir)
             self.assertTrue(coverage["complete"])
             self.assertFalse(coverage["manual_events_count_as_health"])
+            self.assertEqual(coverage["unmonitored_scheduled_workflows"], [])
+            self.assertEqual(coverage["duplicate_monitored_workflows"], [])
 
 
 if __name__ == "__main__":
