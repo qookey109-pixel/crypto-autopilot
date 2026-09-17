@@ -229,6 +229,8 @@ def validate_schedule_coverage(
         "monitored_workflow_count": len(monitored),
         "complete": True,
         "manual_events_count_as_health": False,
+        "unmonitored_scheduled_workflows": [],
+        "duplicate_monitored_workflows": [],
         "workflows": scheduled,
     }
 
