@@ -15,6 +15,33 @@ def read_json(path: str, root: Path = ROOT) -> dict:
     return json.loads((root / path).read_text(encoding="utf-8"))
 
 
+def _validate_pionex_completion(pionex: dict) -> None:
+    expected = {
+        "workflow": ".github/workflows/pionex-validation-materialization-v0-2.yml",
+        "dispatch_mode": "MANUAL_ONLY",
+        "repository_materialization_status": "COMPLETE_PASS",
+        "completion_evidence": "research/receipts/2026-09-16-pionex-validation-materialization-v0-2-completion.json",
+        "materialization_run_id": 35054729471,
+        "materialization_run_attempt": 1,
+        "materialization_run_head_sha": "5eaf57133d013fad030681182b379a02d915766e",
+        "materialization_run_outcome": "PASS",
+        "report_stage": "PIONEX_VALIDATION_DATASET_MATERIALIZED_V0_2",
+        "artifact_id": 10430054351,
+        "artifact_digest": "sha256:5f8c3406ee5dc9a491cd800241c1cc7e2dd66bc98fa292da1c8bb05535dede55",
+        "selected_market_count": 197,
+        "partition_count": 682,
+        "provider_requests": 1534,
+        "manifest_key": "market-data/pionex/validation-dataset-v0.2/runs/run=github-35054729471-1/manifest.json",
+        "manifest_sha256": "192eddd1c69dd435d2ea12a0bf68e05e1cbc1a0fd512f4321f631755c61ca225",
+        "r2_latest_pointer_written_last": True,
+        "complete_197_market_multiyear_history_claimed": False,
+        "core100_pionex_training_performed": False,
+    }
+    for key, value in expected.items():
+        if pionex.get(key) != value:
+            raise ValueError(f"Pionex V0.2 completion evidence changed: {key}")
+
+
 def _validate_current(current: dict) -> tuple[dict, dict, dict]:
     if current.get("schema") != "qookey-current-operations-v0.3":
         raise ValueError("Unexpected current-operations schema")
@@ -48,8 +75,7 @@ def _validate_current(current: dict) -> tuple[dict, dict, dict]:
         raise ValueError("Configured threshold changed")
 
     pionex = current.get("pionex_validation") or {}
-    if pionex.get("repository_materialization_status") != "PENDING_MANUAL_DISPATCH":
-        raise ValueError("Pionex validation state changed")
+    _validate_pionex_completion(pionex)
     authority = pionex.get("authority") or {}
     if authority.get("public_pionex_kline_reads") is not True:
         raise ValueError("Pionex public validation read authority changed")
@@ -70,8 +96,16 @@ def _validate_current(current: dict) -> tuple[dict, dict, dict]:
             raise ValueError(f"Unsafe Pionex homepage projection boundary: {key}")
 
     gates = current.get("gates") or {}
+    if gates.get("strategy_validation") != "CLOSED":
+        raise ValueError("Strategy-validation boundary changed")
     if gates.get("holdout") != "FROZEN_UNOPENED":
         raise ValueError("Holdout boundary changed")
+    if gates.get("automatic_model_promotion") != "CLOSED":
+        raise ValueError("Promotion boundary changed")
+    if gates.get("formal_trade_plan") != "CLOSED":
+        raise ValueError("Trade-plan boundary changed")
+    if gates.get("real_money_orders") != "CLOSED":
+        raise ValueError("Real-money boundary changed")
     if gates.get("source_switch_authorized") is not False or gates.get("live_trading") != "CLOSED":
         raise ValueError("Trading/source-switch boundary changed")
     return core, replay, pionex
@@ -102,26 +136,26 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
 
     training_run = int(core["training_run_id"])
     replay_run = int(replay["run_id"])
-    pionex_run = int(pionex["previous_run_id"])
+    pionex_run = int(pionex["materialization_run_id"])
     sample_run = int(btc["workflow_run_id"])
     current_date = html.escape(str(current["updated_date"]))
 
     summary = f'''      <section class="panel readiness-summary" aria-labelledby="readiness-heading">
-        <h3 id="readiness-heading">9/16 目前作業狀態</h3>
+        <h3 id="readiness-heading">9/17 目前作業狀態</h3>
         <p><strong>Core100 資料與訓練已完成；Model Quality REJECT</strong>。完整策略驗證、holdout、promotion 與 trading 仍關閉。</p>
         <div class="delivery-metrics" aria-label="目前已核實進度">
           <article><p>BTC 27 天固定樣本</p><strong>已完成 · {btc['executed_trade_count']} 筆成交</strong><p>歷史 engine validation only；不代表全市場策略有效。</p></article>
           <article><p>Binance Core 100</p><strong>10/10 · COMPLETE</strong><p>不得因 model-quality REJECT 自動重啟歷史取得。</p></article>
           <article><p>Core100 Training</p><strong>COMPLETED · PASS</strong><p>Run {training_run}；pipeline PASS 與 model-quality acceptance 分離。</p></article>
-          <article><p>Pionex Validation</p><strong>PENDING MANUAL DISPATCH</strong><p>PR #321 boundary fix 已進 Repository；仍需新的 Repository-current run。</p></article>
+          <article><p>Pionex Validation</p><strong>COMPLETE · PASS</strong><p>V0.2 run {pionex_run}；{pionex['selected_market_count']} markets / {pionex['partition_count']} partitions。</p></article>
         </div>
         <p>模型品質閘門：<strong>REJECT</strong>。Threshold replay run {replay_run} 已完成；0.50–0.55 沒有 supported threshold change，configured threshold 保持不變。</p>
-        <p>Pionex 前次 run {pionex_run} fail-closed；新的 materialization 必須從 dispatch 當下的 Repository live <code>main</code> 執行，不能把 status evidence-basis SHA 當成 latest-main claim。</p>
+        <p>Pionex V0.2 materialization 已完成，但這不代表完整 197-market multiyear history，也沒有執行 Core100 Pionex training；Strategy Validation、holdout、promotion、source switch 與 trading 仍關閉。</p>
         <p>Current Operations 更新日期：{current_date}。下列 Actions 狀態只代表工作流程結果。</p>
         <p id="cloud-run-updated">雲端執行狀態尚未載入。</p>
         <ul id="cloud-run-list" class="cloud-run-list" aria-live="polite"></ul>
         <details><summary>查看資料證據與後續步驟</summary>
-          <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{sample_run}" target="_blank" rel="noopener noreferrer">BTC 固定樣本 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{training_run}" target="_blank" rel="noopener noreferrer">Core100 Training ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{replay_run}" target="_blank" rel="noopener noreferrer">Threshold Replay ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{pionex_run}" target="_blank" rel="noopener noreferrer">Pionex 前次 fail-closed run ↗</a></p>
+          <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{sample_run}" target="_blank" rel="noopener noreferrer">BTC 固定樣本 ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{training_run}" target="_blank" rel="noopener noreferrer">Core100 Training ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{replay_run}" target="_blank" rel="noopener noreferrer">Threshold Replay ↗</a> · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{pionex_run}" target="_blank" rel="noopener noreferrer">Pionex V0.2 Materialization ↗</a></p>
           <p>較舊的進度敘述保留於 Repository 歷史證據，不再作為 present-tense homepage state。V0.12 bounded metadata window 已結束。</p>
         </details>
       </section>'''
@@ -178,7 +212,7 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
         <h3>後續排程（臺灣時間）</h3>
         <p>由 GitHub Actions 雲端執行；時間為預定觸發時間，可能延遲。排程存在不代表目前 lifecycle stage 尚未完成。</p>
         <div class="table-wrap"><table><thead><tr><th>作業</th><th>預定時間</th><th>條件與狀態</th></tr></thead><tbody>''' + "\n".join(rows) + '''</tbody></table></div>
-        <p>Pionex Validation Dataset V0.1 是 manual-only workflow，目前仍等待新的 Repository-current materialization；沒有新增自動排程，也沒有 holdout/training/source-switch/trading authority。</p>
+        <p>Pionex Validation Dataset V0.2 是 manual-only workflow，materialization 已 COMPLETE / PASS；沒有新增自動排程，也沒有 holdout/training/source-switch/promotion/trading authority。</p>
         <p><a href="https://github.com/qookey109-pixel/crypto-autopilot/blob/main/CURRENT_STATUS.md" target="_blank" rel="noopener noreferrer">Current Operations ↗</a></p>
       </section>'''
 
@@ -222,6 +256,9 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
         "thresholdReplayRunId": replay_run,
         "thresholdChangeSupported": replay["threshold_change_supported"],
         "pionexValidationStatus": pionex["repository_materialization_status"],
+        "pionexMaterializationRunId": pionex_run,
+        "pionexSelectedMarketCount": pionex["selected_market_count"],
+        "pionexPartitionCount": pionex["partition_count"],
         "holdoutState": current["gates"]["holdout"],
         "sourceSwitchAuthorized": current["gates"]["source_switch_authorized"],
         "liveTradingAuthorized": False,
