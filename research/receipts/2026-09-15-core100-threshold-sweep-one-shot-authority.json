@@ -1,0 +1,31 @@
+{
+  "schema": "qookey-core100-threshold-sweep-one-shot-authority-v0.1",
+  "status": "AUTHORIZED_READ_ONLY_ONE_SHOT",
+  "authorization_basis": "User directed continued project execution on 2026-09-15; this authority is limited to the next research-only threshold diagnostic step.",
+  "authorized_branch": "codex/core100-reject-diagnosis-20260915",
+  "authorized_code_parent_sha": "7885052de6f1cded1e32c5d53004fe3d55f78af4",
+  "expires_at_utc": "2026-09-16T12:00:00Z",
+  "source_training_run_id": 34918219864,
+  "source_training_head_sha": "dc10ce590c8731fbef21115e0e3d3423cbcc7cf1",
+  "source_dataset_fingerprint": "91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876",
+  "source_partition_objects": 14274,
+  "source_dataset_rows": 18235427,
+  "source_example_count": 249228,
+  "expected_model_quality_gate": "REJECT",
+  "candidate_thresholds": [0.5, 0.51, 0.52, 0.53, 0.54, 0.55],
+  "execution": {
+    "one_shot": true,
+    "maximum_runs": 1,
+    "r2_reads_authorized": true,
+    "r2_writes_authorized": false,
+    "provider_requests_authorized": false,
+    "holdout_access_authorized": false,
+    "training_publication_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "source_switch_authorized": false
+  },
+  "purpose": "Reproduce the exact completed Core100 walk-forward folds from the governed R2 dataset and measure probability distributions plus 0.50-0.55 threshold cost diagnostics without publishing a new model, changing the quality gate, touching holdout data, or authorizing trading."
+}

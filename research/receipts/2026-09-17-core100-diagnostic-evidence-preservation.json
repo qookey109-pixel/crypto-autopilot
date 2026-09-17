@@ -1,0 +1,44 @@
+{
+  "schema": "qookey-core100-diagnostic-evidence-preservation-v0.1",
+  "status": "PRESERVED_HISTORICAL_EVIDENCE_NO_NEW_AUTHORITY",
+  "preservation_date": "2026-09-17",
+  "source_pull_request": 302,
+  "source_head_sha": "978dae1a1a39ee01905c82c2f8cfa4a12088719d",
+  "target_parent_main_sha": "2a07b06899a0e7c8fc09f7c50329955cf73fcfdc",
+  "preserved_files": [
+    {
+      "path": "research/receipts/2026-09-15-core100-reject-diagnosis-run-34934016894.json",
+      "source_blob_sha": "c9408a812152c68196e8d388e34cd45348622f68"
+    },
+    {
+      "path": "research/receipts/2026-09-15-core100-reject-diagnosis-scope.json",
+      "source_blob_sha": "be164c1f399e56f9e6085482144c254666db48c2"
+    },
+    {
+      "path": "research/receipts/2026-09-15-core100-threshold-sweep-one-shot-authority.json",
+      "source_blob_sha": "c3b1061ebc1729d3598503e472413f7a2ea0d07e"
+    },
+    {
+      "path": "research/receipts/2026-09-15-core100-threshold-sweep-replay-run-34936331199.json",
+      "source_blob_sha": "f9ed5b0338b683449f005ba7ce34d0431574723a"
+    }
+  ],
+  "historical_authority_interpretation": {
+    "one_shot_authority_expires_at_utc": "2026-09-16T12:00:00Z",
+    "one_shot_authority_expired": true,
+    "one_shot_run_already_consumed": true,
+    "further_r2_diagnostic_reads_authorized": false,
+    "retraining_authorized": false,
+    "threshold_change_authorized": false,
+    "quality_gate_change_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "preservation_only": true,
+  "execution_performed_by_preservation": false,
+  "purpose": "Preserve the immutable Core100 REJECT diagnosis and threshold replay lineage from superseded Draft PR #302 on current repository history without reviving its old branch, reauthorizing its expired one-shot diagnostic scope, or changing any model, threshold, holdout, source, promotion, or trading gate."
+}
