@@ -161,6 +161,37 @@ class DailyOpportunityEngineTests(unittest.TestCase):
         self.assertEqual(report.status, "NO_CANDIDATE")
         self.assertEqual(report.selected, ())
 
+
+    def test_range_extremity_reaches_router_without_trend_setup(self) -> None:
+        universe = [
+            UniverseCandidate("RANGE_USDT_PERP", 6_000_000.0, 4.0, 100.0, 60_000),
+        ]
+        snapshots = {
+            "RANGE_USDT_PERP": technical(
+                close=100.0,
+                ema20=100.0,
+                ema50=100.0,
+                ema200=100.0,
+                slope_atr=0.0,
+                macd_histogram=0.0,
+                rsi14=30.0,
+                bollinger_position=0.10,
+                volume_ratio=1.2,
+            )
+        }
+
+        report = rank_daily_opportunities(
+            universe, snapshots, regime(state="MIXED"), as_of_ms=1000
+        )
+
+        self.assertEqual(report.status, "CANDIDATES_READY")
+        self.assertEqual(report.selected[0].symbol, "RANGE_USDT_PERP")
+        self.assertEqual(report.selected[0].attention_profile, "RANGE_EXTREMITY")
+        self.assertGreater(
+            report.selected[0].range_extremity_score,
+            report.selected[0].directional_score,
+        )
+
     def test_future_technical_evidence_fails_closed(self) -> None:
         universe = [
             UniverseCandidate("AAA_USDT_PERP", 5_000_000.0, 5.0, 120.0, 50_000),
