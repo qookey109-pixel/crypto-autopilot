@@ -100,10 +100,12 @@ class PortfolioProposal:
     as_of_ms: int
     family_validation_report_sha256: str
     sizing_equity_usd: float
+    entry_price: float
+    stop_price: float
     approved_notional_usd: float
     realized_risk_usd: float
     target_risk_usd: float
-    stop_price: float
+    risk_utilization_fraction: float
 
 
 def _canonical_sha256(payload: Mapping[str, object]) -> str:
@@ -169,10 +171,12 @@ def build_portfolio_proposal(
         raise ValueError("sizing direction is not supported by strategy family")
     values = (
         sizing_plan.equity_usd,
+        sizing_plan.entry_price,
+        sizing_plan.stop_price,
         sizing_plan.approved_notional_usd,
         sizing_plan.realized_risk_usd,
         sizing_plan.target_risk_usd,
-        sizing_plan.stop_price,
+        sizing_plan.risk_utilization_fraction,
     )
     if not all(math.isfinite(value) and value > 0.0 for value in values):
         raise ValueError("portfolio proposal sizing values must be finite and positive")
@@ -186,10 +190,12 @@ def build_portfolio_proposal(
         "as_of_ms": as_of_ms,
         "family_validation_report_sha256": report_sha,
         "sizing_equity_usd": sizing_plan.equity_usd,
+        "entry_price": sizing_plan.entry_price,
+        "stop_price": sizing_plan.stop_price,
         "approved_notional_usd": sizing_plan.approved_notional_usd,
         "realized_risk_usd": sizing_plan.realized_risk_usd,
         "target_risk_usd": sizing_plan.target_risk_usd,
-        "stop_price": sizing_plan.stop_price,
+        "risk_utilization_fraction": sizing_plan.risk_utilization_fraction,
     }
     proposal_id = f"portfolio-v0-1-{_canonical_sha256(payload)}"
     return PortfolioProposal(
@@ -201,10 +207,12 @@ def build_portfolio_proposal(
         as_of_ms=as_of_ms,
         family_validation_report_sha256=report_sha,
         sizing_equity_usd=sizing_plan.equity_usd,
+        entry_price=sizing_plan.entry_price,
+        stop_price=sizing_plan.stop_price,
         approved_notional_usd=sizing_plan.approved_notional_usd,
         realized_risk_usd=sizing_plan.realized_risk_usd,
         target_risk_usd=sizing_plan.target_risk_usd,
-        stop_price=sizing_plan.stop_price,
+        risk_utilization_fraction=sizing_plan.risk_utilization_fraction,
     )
 
 
