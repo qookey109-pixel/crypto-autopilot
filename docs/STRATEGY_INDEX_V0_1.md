@@ -22,6 +22,7 @@ They are not interchangeable and are not added together into an invented score.
 | Paper Execution | `config/paper_execution_v0_1.json` | PREPARED_PAPER_ONLY | bind validated family lineage and approved risk notional into deterministic idempotent Repository Paper Broker LONG intents; no automatic/live execution |
 | Paper Fill / Order Lifecycle | `config/paper_fill_lifecycle_v0_1.json` | PREPARED_PAPER_SIMULATION_ONLY | simulate causal LONG fills, partial fills, slippage, fees and stop/target lifecycle from accepted paper intents; normalized liquidity only, no live execution |
 | Paper Account / Position State | `config/paper_account_state_v0_1.json` | PREPARED_PAPER_STATE_ONLY | rebuild immutable cash/equity/open-position state from lifecycle evidence and marks; export current open exposure back to Portfolio Admission |
+| Paper Cycle Orchestrator | `config/paper_cycle_orchestrator_v0_1.json` | PREPARED_MANUAL_CYCLE_ONLY | rebuild current account context, evaluate one explicit basket, and prepare all-or-none paper intents without broker submission or lifecycle execution |
 
 ## Analysis flow
 

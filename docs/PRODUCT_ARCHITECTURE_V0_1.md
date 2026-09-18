@@ -14,7 +14,7 @@ The product priority order is:
 2. **Strategy Router** — determine which validated strategy family, if any, fits each selected asset and current market regime.
 3. **Risk / Position Sizing** — determine stop distance, target risk, feasible position size and leverage constraints.
 4. **Portfolio Admission** — apply total-risk, per-asset concentration, strategy-overlap and gross-exposure gates to the explicit proposed basket.
-5. **Automated Execution** — only after all upstream gates pass, create deterministic paper intent, fill/lifecycle evidence and account state; any future live-capable exchange routing remains separately authorized.
+5. **Automated Execution** — only after all upstream gates pass, prepare one deterministic paper cycle from current account state, then require explicit paper submission before fill/lifecycle and account-state advancement; any future live-capable exchange routing remains separately authorized.
 6. **Post-trade Learning** — record outcomes and feed research/evaluation systems without silently changing production strategy authority.
 
 ## Priority 1 — Daily Opportunity Engine
@@ -108,7 +108,16 @@ Paper Fill / Order Lifecycle simulation
         ↓
 Paper Account / Position State
         ↓
-Open exposure feedback to Portfolio Admission
+Paper Cycle Orchestrator
+        ↓
+Portfolio Admission with current existing exposure
+        ↓
+Paper intents ready for explicit submission
+        ↓
+explicit Repository Paper Broker submission
+        ↓
+Paper Fill / Order Lifecycle
+        ↺ account state advances
         ↓
 Future exchange adapter under separate authority
         ↓
@@ -127,6 +136,11 @@ Paper Account / Position State V0.1 rebuilds immutable cash/equity/open-position
 state from lifecycle evidence and explicit marks. Its open positions feed the
 next Portfolio Admission pass as existing exposure; it writes no persistent
 broker/account state.
+
+Paper Cycle Orchestrator V0.1 uses that account snapshot as the canonical equity
+and exposure source for the next explicit candidate basket. It may prepare
+Paper Execution intents, but it performs zero PaperBroker submissions and zero
+lifecycle simulations.
 
 ## Single-asset research boundary
 
