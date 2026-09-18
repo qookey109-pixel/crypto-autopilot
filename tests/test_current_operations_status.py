@@ -22,9 +22,9 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         current = self.current
 
         self.assertEqual(payload["schema"], "qookey-current-operations-v0.3")
-        self.assertEqual(payload["updated_date"], "2026-09-17")
+        self.assertEqual(payload["updated_date"], "2026-09-18")
         self.assertEqual(payload["repository_authority"], "RESOLVE_MAIN_LIVE_AT_READ_TIME")
-        self.assertEqual(payload["mode"], "PAPER_ONLY")
+        self.assertEqual(payload["mode"], "PAPER_AND_LIVE_PAPER_ONLY")
 
         basis = payload["evidence_basis"]
         self.assertEqual(
@@ -32,10 +32,10 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
         )
         self.assertFalse(basis["is_latest_main_claim"])
-        self.assertEqual(basis["source_merge_pr"], 338)
+        self.assertEqual(basis["source_merge_pr"], 366)
         self.assertEqual(
             basis["parent_main_sha"],
-            "5105cc8310515d40e99aaf02d2cfe5fef12a777f",
+            "a26902fd7a116af442a9b19249b895d0612bfc4f",
         )
         self.assertIn(basis["parent_main_sha"], current)
         self.assertIn("Resolve `main` live at read time", current)
@@ -127,8 +127,21 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         self.assertEqual(gates["automatic_model_promotion"], "CLOSED")
         self.assertEqual(gates["formal_trade_plan"], "CLOSED")
         self.assertEqual(gates["real_money_orders"], "CLOSED")
+        self.assertEqual(
+            gates["live_paper_simulation"],
+            "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY",
+        )
         self.assertEqual(gates["live_trading"], "CLOSED")
         self.assertFalse(gates["source_switch_authorized"])
+
+        live_paper = self.payload["live_paper"]
+        self.assertTrue(live_paper["public_live_market_data"])
+        self.assertTrue(live_paper["live_paper_simulation"])
+        self.assertTrue(live_paper["paper_state_persistence"])
+        self.assertFalse(live_paper["private_exchange_api"])
+        self.assertFalse(live_paper["replacement_holdout_access"])
+        self.assertFalse(live_paper["real_money_orders"])
+        self.assertFalse(live_paper["live_real_trading"])
 
     def test_control_plane_contract_requires_current_overlay(self) -> None:
         control = self.payload["control_plane"]
