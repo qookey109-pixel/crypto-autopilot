@@ -311,6 +311,46 @@ def validate_strategy_library_evidence(
     }
 
 
+def family_validation_input_from_dict(
+    payload: Mapping[str, Any],
+) -> tuple[str, tuple[FamilyEdgeReceipt, ...]]:
+    if payload.get("schema") != "qookey-strategy-family-validation-input-v0.1":
+        raise StrategyFamilyValidationError("unsupported strategy family validation input")
+    family = payload.get("family")
+    items = payload.get("receipts")
+    if not isinstance(family, str) or not family.strip():
+        raise StrategyFamilyValidationError("family is required")
+    if not isinstance(items, list):
+        raise StrategyFamilyValidationError("receipts must be a JSON array")
+
+    receipts: list[FamilyEdgeReceipt] = []
+    for index, item in enumerate(items):
+        if not isinstance(item, Mapping):
+            raise StrategyFamilyValidationError(
+                f"receipts[{index}] must be a JSON object"
+            )
+        edge_report = item.get("edge_report")
+        if not isinstance(edge_report, Mapping):
+            raise StrategyFamilyValidationError(
+                f"receipts[{index}].edge_report must be a JSON object"
+            )
+        try:
+            receipts.append(
+                family_edge_receipt_from_report(
+                    family=family,
+                    symbol=str(item["symbol"]),
+                    regime_state=str(item["regime_state"]),
+                    direction=str(item["direction"]),
+                    edge_report=edge_report,
+                )
+            )
+        except KeyError as error:
+            raise StrategyFamilyValidationError(
+                f"receipts[{index}] is missing {error.args[0]}"
+            ) from error
+    return family, tuple(receipts)
+
+
 def policy_from_config(payload: Mapping[str, Any]) -> StrategyFamilyValidationPolicy:
     if payload.get("schema") != "qookey-strategy-family-validation-v0.1":
         raise StrategyFamilyValidationError("unsupported strategy family validation config")
