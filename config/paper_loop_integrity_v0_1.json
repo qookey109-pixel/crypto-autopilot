@@ -1,0 +1,49 @@
+{
+  "schema": "qookey-paper-loop-integrity-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_AUDIT_ONLY",
+  "product_stage": "PAPER_LOOP_MULTI_CYCLE_INTEGRITY",
+  "policy": {
+    "minimum_rounds": 2,
+    "maximum_rounds": 8,
+    "require_exact_checkpoint_chaining": true,
+    "require_forward_snapshot_time": true,
+    "require_unique_cycle_ids": true,
+    "require_unique_session_ids": true,
+    "require_unique_batch_ids": true,
+    "require_unique_advance_ids": true,
+    "require_unique_forward_intent_ids": true,
+    "provider_access_authorized": false,
+    "persistent_state_write_authorized": false,
+    "automatic_execution_authorized": false,
+    "live_trading_authorized": false
+  },
+  "behavior": {
+    "complete_forward_rounds_only": true,
+    "minimum_two_rounds": true,
+    "all_stage_ids_recomputed": true,
+    "checkpoint_payloads_chain_exactly": true,
+    "cycle_snapshot_matches_start_checkpoint": true,
+    "cycle_exposure_matches_start_checkpoint": true,
+    "session_cycle_lineage_verified": true,
+    "batch_session_lineage_verified": true,
+    "advance_batch_and_snapshot_lineage_verified": true,
+    "end_checkpoint_advance_lineage_verified": true,
+    "forward_intent_ids_unique_across_rounds": true,
+    "same_transcript_same_integrity_id": true,
+    "performance_ranking_performed": false,
+    "execution_performed": false
+  },
+  "authority": {
+    "audit_only": true,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "persistent_state_write_authorized": false,
+    "automatic_execution_authorized": false,
+    "strategy_ranking_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
