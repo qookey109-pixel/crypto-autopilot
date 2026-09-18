@@ -45,6 +45,7 @@ class PaperExecutionIntent:
     intent_id: str
     symbol: str
     strategy_family: str
+    family_validation_report_sha256: str
     direction: str
     as_of_ms: int
     entry_price: float
@@ -87,7 +88,7 @@ def prepare_paper_execution(
     *,
     symbol: str,
     strategy_family: str,
-    family_review_state: str,
+    family_validation_report: Mapping[str, object],
     as_of_ms: int,
     sizing_plan: PositionSizingPlan,
     policy: PaperExecutionPolicy = PaperExecutionPolicy(),
@@ -109,8 +110,48 @@ def prepare_paper_execution(
     except ValueError:
         return PaperExecutionDecision("NO_EXECUTION", "unregistered_strategy_family")
 
+    if family_validation_report.get("schema") != (
+        "qookey-strategy-family-validation-report-v0.1"
+    ):
+        return PaperExecutionDecision("NO_EXECUTION", "invalid_family_validation_schema")
+    if family_validation_report.get("family") != strategy_family:
+        return PaperExecutionDecision("NO_EXECUTION", "family_validation_family_mismatch")
+
+    family_review_state = family_validation_report.get("state")
     if policy.require_family_review_ready and family_review_state != FAMILY_REVIEW_READY:
         return PaperExecutionDecision("NO_EXECUTION", "family_review_not_ready")
+
+    validation_authority = family_validation_report.get("authority")
+    if not isinstance(validation_authority, Mapping):
+        return PaperExecutionDecision("NO_EXECUTION", "family_validation_authority_missing")
+    if validation_authority.get("research_evidence_only") is not True:
+        return PaperExecutionDecision(
+            "NO_EXECUTION", "family_validation_not_research_only"
+        )
+    if validation_authority.get("promotion_authority") != 0:
+        return PaperExecutionDecision(
+            "NO_EXECUTION", "family_validation_promotion_authority_nonzero"
+        )
+    for key in (
+        "position_sizing_authorized",
+        "paper_execution_authorized",
+        "trade_plan_authorized",
+        "real_money_order_authorized",
+        "live_trading_authorized",
+    ):
+        if validation_authority.get(key) is not False:
+            return PaperExecutionDecision(
+                "NO_EXECUTION", f"family_validation_authority_not_closed:{key}"
+            )
+
+    family_validation_sha256 = hashlib.sha256(
+        json.dumps(
+            dict(family_validation_report),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+        ).encode("utf-8")
+    ).hexdigest()
 
     if sizing_plan.status != "SIZING_READY":
         return PaperExecutionDecision("NO_EXECUTION", "position_sizing_not_ready")
@@ -147,6 +188,7 @@ def prepare_paper_execution(
         "symbol": symbol,
         "strategy_family": strategy_family,
         "family_review_state": family_review_state,
+        "family_validation_report_sha256": family_validation_sha256,
         "direction": sizing_plan.direction,
         "as_of_ms": as_of_ms,
         "entry_price": sizing_plan.entry_price,
@@ -160,6 +202,7 @@ def prepare_paper_execution(
         intent_id=_canonical_intent_id(payload),
         symbol=symbol,
         strategy_family=strategy_family,
+        family_validation_report_sha256=family_validation_sha256,
         direction=sizing_plan.direction,
         as_of_ms=as_of_ms,
         entry_price=sizing_plan.entry_price,
