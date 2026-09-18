@@ -1,0 +1,49 @@
+{
+  "schema": "qookey-live-paper-simulation-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_LIVE_PAPER_SIMULATION",
+  "product_stage": "LIVE_PAPER_SIMULATION",
+  "mode": "SHADOW_LIVE_PAPER",
+  "policy": {
+    "maximum_candidates": 5,
+    "maximum_source_age_ms": 60000,
+    "order_book_depth_limit": 20,
+    "recent_trade_limit": 100,
+    "public_live_market_data_authorized": true,
+    "live_paper_simulation_authorized": true,
+    "persistent_paper_state_authorized": true,
+    "overlapping_active_sessions_authorized": false,
+    "private_exchange_api_authorized": false,
+    "holdout_access_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  },
+  "market_data": {
+    "initial_provider": "PIONEX_PUBLIC",
+    "api_key_required": false,
+    "order_book_used_for_visible_entry_liquidity": true,
+    "recent_public_trades_used_for_frame_range": true,
+    "candle_volume_to_liquidity_inference_allowed": false,
+    "paper_mark_source": "BEST_BID_ASK_MIDPOINT"
+  },
+  "runtime": {
+    "one_active_basket_session_at_a_time": true,
+    "active_session_lifecycle_replayed_each_tick": true,
+    "open_positions_can_hit_stop_or_target_on_later_ticks": true,
+    "new_cycle_blocked_while_active_session_remains_open": true,
+    "candidate_generation_is_upstream_explicit": true,
+    "strategy_ranking_performed": false
+  },
+  "authority": {
+    "public_live_market_data_authorized": true,
+    "live_paper_simulation_authorized": true,
+    "paper_state_persistence_authorized": true,
+    "pionex_private_api_authorized": false,
+    "r2_market_history_authorized": false,
+    "holdout_access_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
