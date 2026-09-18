@@ -6,6 +6,10 @@ from dataclasses import asdict
 from pathlib import Path
 
 from crypto_autopilot.exchanges.paper import PaperBroker
+from crypto_autopilot.paper.account_v0_1 import (
+    materialize_paper_account,
+    paper_account_input_from_dict,
+)
 from crypto_autopilot.paper.cycle_v0_1 import (
     PaperCyclePolicy,
     paper_cycle_input_from_dict,
@@ -276,14 +280,21 @@ class PaperCycleOrchestratorV01Tests(unittest.TestCase):
         self.assertEqual(report["broker_submissions_performed"], 0)
 
     def test_account_existing_exposure_feeds_next_portfolio_gate(self) -> None:
+        account = open_account_input()
+        initial, records, marks = paper_account_input_from_dict(account)
+        snapshot = materialize_paper_account(
+            initial_equity_usd=initial,
+            records=records,
+            marks=marks,
+        )
         report = prepare_paper_cycle(
-            account_input=open_account_input(),
+            account_input=account,
             candidate_inputs=(
                 candidate(
                     symbol="BTC_USDT_PERP",
                     family="MEAN_REVERSION",
                     as_of_ms=3_000,
-                    sizing_equity_usd=100.43,
+                    sizing_equity_usd=snapshot.equity_usd,
                 ),
             ),
         )
