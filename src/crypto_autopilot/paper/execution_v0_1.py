@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 
 from crypto_autopilot.exchanges.paper import PaperBroker, PaperOrder
+from crypto_autopilot.portfolio.admission_v0_1 import build_portfolio_proposal
 from crypto_autopilot.risk import PositionSizingPlan
 from crypto_autopilot.strategy_library import get_strategy_family
 
@@ -21,6 +22,7 @@ class PaperExecutionPolicy:
     long_paper_execution_authorized: bool = True
     short_paper_execution_authorized: bool = False
     require_family_review_ready: bool = True
+    require_portfolio_admission: bool = True
     automatic_submission_authorized: bool = False
     live_trading_authorized: bool = False
 
@@ -29,6 +31,7 @@ class PaperExecutionPolicy:
             self.long_paper_execution_authorized,
             self.short_paper_execution_authorized,
             self.require_family_review_ready,
+            self.require_portfolio_admission,
             self.automatic_submission_authorized,
             self.live_trading_authorized,
         )
@@ -46,6 +49,8 @@ class PaperExecutionIntent:
     symbol: str
     strategy_family: str
     family_validation_report_sha256: str
+    portfolio_proposal_id: str
+    portfolio_admission_report_sha256: str
     direction: str
     as_of_ms: int
     entry_price: float
@@ -89,6 +94,7 @@ def prepare_paper_execution(
     symbol: str,
     strategy_family: str,
     family_validation_report: Mapping[str, object],
+    portfolio_admission_report: Mapping[str, object],
     as_of_ms: int,
     sizing_plan: PositionSizingPlan,
     policy: PaperExecutionPolicy = PaperExecutionPolicy(),
@@ -183,12 +189,87 @@ def prepare_paper_execution(
     if sizing_plan.approved_notional_usd <= 0.0:
         return PaperExecutionDecision("NO_EXECUTION", "non_positive_paper_notional")
 
+    if policy.require_portfolio_admission:
+        if portfolio_admission_report.get("schema") != (
+            "qookey-portfolio-admission-report-v0.1"
+        ):
+            return PaperExecutionDecision(
+                "NO_EXECUTION", "invalid_portfolio_admission_schema"
+            )
+        if portfolio_admission_report.get("state") != "PORTFOLIO_ADMITTED":
+            return PaperExecutionDecision(
+                "NO_EXECUTION", "portfolio_not_admitted"
+            )
+        portfolio_authority = portfolio_admission_report.get("authority")
+        if not isinstance(portfolio_authority, Mapping):
+            return PaperExecutionDecision(
+                "NO_EXECUTION", "portfolio_admission_authority_missing"
+            )
+        if portfolio_authority.get("research_paper_admission_only") is not True:
+            return PaperExecutionDecision(
+                "NO_EXECUTION", "portfolio_admission_not_research_paper_only"
+            )
+        for key in (
+            "strategy_ranking_authorized",
+            "automatic_subset_selection_authorized",
+            "paper_execution_authorized",
+            "short_paper_execution_authorized",
+            "real_money_order_authorized",
+            "live_trading_authorized",
+        ):
+            if portfolio_authority.get(key) is not False:
+                return PaperExecutionDecision(
+                    "NO_EXECUTION", f"portfolio_admission_authority_not_closed:{key}"
+                )
+
+        try:
+            portfolio_proposal = build_portfolio_proposal(
+                symbol=symbol,
+                strategy_family=strategy_family,
+                family_validation_report=family_validation_report,
+                as_of_ms=as_of_ms,
+                sizing_plan=sizing_plan,
+            )
+        except ValueError:
+            return PaperExecutionDecision(
+                "NO_EXECUTION", "portfolio_proposal_reconstruction_failed"
+            )
+
+        admitted_ids = portfolio_admission_report.get("admitted_proposal_ids")
+        rejected_ids = portfolio_admission_report.get("rejected_proposal_ids")
+        if not isinstance(admitted_ids, list) or not isinstance(rejected_ids, list):
+            return PaperExecutionDecision(
+                "NO_EXECUTION", "portfolio_admission_ids_missing"
+            )
+        if portfolio_proposal.proposal_id not in admitted_ids:
+            return PaperExecutionDecision(
+                "NO_EXECUTION", "portfolio_proposal_not_admitted"
+            )
+        if portfolio_proposal.proposal_id in rejected_ids:
+            return PaperExecutionDecision(
+                "NO_EXECUTION", "portfolio_proposal_marked_rejected"
+            )
+        portfolio_admission_sha256 = hashlib.sha256(
+            json.dumps(
+                dict(portfolio_admission_report),
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=True,
+            ).encode("utf-8")
+        ).hexdigest()
+    else:
+        return PaperExecutionDecision(
+            "NO_EXECUTION", "portfolio_admission_required_by_v0_1"
+        )
+
     payload: dict[str, object] = {
         "schema": "qookey-paper-execution-intent-v0.1",
         "symbol": symbol,
         "strategy_family": strategy_family,
         "family_review_state": family_review_state,
         "family_validation_report_sha256": family_validation_sha256,
+        "portfolio_proposal_id": portfolio_proposal.proposal_id,
+        "portfolio_admission_report_sha256": portfolio_admission_sha256,
         "direction": sizing_plan.direction,
         "as_of_ms": as_of_ms,
         "entry_price": sizing_plan.entry_price,
@@ -203,6 +284,8 @@ def prepare_paper_execution(
         symbol=symbol,
         strategy_family=strategy_family,
         family_validation_report_sha256=family_validation_sha256,
+        portfolio_proposal_id=portfolio_proposal.proposal_id,
+        portfolio_admission_report_sha256=portfolio_admission_sha256,
         direction=sizing_plan.direction,
         as_of_ms=as_of_ms,
         entry_price=sizing_plan.entry_price,
@@ -307,6 +390,10 @@ def paper_execution_policy_from_config(
         raise ValueError(
             "behavior.require_family_review_ready must be a JSON boolean"
         )
+    if not isinstance(behavior.get("require_portfolio_admission"), bool):
+        raise ValueError(
+            "behavior.require_portfolio_admission must be a JSON boolean"
+        )
 
     return PaperExecutionPolicy(
         long_paper_execution_authorized=bool(
@@ -317,6 +404,9 @@ def paper_execution_policy_from_config(
         ),
         require_family_review_ready=bool(
             behavior["require_family_review_ready"]
+        ),
+        require_portfolio_admission=bool(
+            behavior["require_portfolio_admission"]
         ),
         automatic_submission_authorized=bool(
             authority["automatic_submission_authorized"]
