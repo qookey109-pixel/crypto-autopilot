@@ -186,6 +186,41 @@ class PaperLoopCheckpointV01Tests(unittest.TestCase):
             1,
         )
 
+    def test_json_round_trip_preserves_checkpoint_validation(self) -> None:
+        advance = make_advance(
+            bars=open_bars(),
+            next_marks=(
+                {
+                    "symbol": "BTC_USDT_PERP",
+                    "time_ms": 2_500,
+                    "price": 100.5,
+                },
+            ),
+        )
+        serialized = json.loads(json.dumps(advance))
+
+        checkpoint = create_paper_loop_checkpoint(
+            account_advance_report=serialized,
+            confirmation_advance_id=serialized["advance_id"],
+        )
+
+        self.assertEqual(
+            checkpoint["next_snapshot_id"],
+            serialized["next_snapshot_id"],
+        )
+        self.assertTrue(checkpoint["next_cycle_allowed"])
+
+    def test_total_record_count_must_match_next_account_input(self) -> None:
+        advance = make_advance(bars=closed_bars())
+        tampered = copy.deepcopy(advance)
+        tampered["total_record_count"] = 2
+
+        with self.assertRaises(ValueError):
+            create_paper_loop_checkpoint(
+                account_advance_report=tampered,
+                confirmation_advance_id=advance["advance_id"],
+            )
+
     def test_exact_advance_id_confirmation_is_required(self) -> None:
         advance = make_advance(bars=closed_bars())
 
