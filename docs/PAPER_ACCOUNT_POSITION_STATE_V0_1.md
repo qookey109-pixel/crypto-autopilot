@@ -273,6 +273,22 @@ Those require later contracts and evidence.
 Paper Account / Position State V0.1 grants only deterministic paper-state
 materialization and exposure export.
 
+## Downstream cycle preparation
+
+Paper Cycle Orchestrator V0.1 uses the immutable account snapshot as the
+canonical equity/timestamp source for the next explicit candidate basket.
+
+Open positions are exported as existing Portfolio Admission exposure before any
+new paper intent can become ready.
+
+The cycle layer still performs no PaperBroker submission, lifecycle simulation
+or persistent state write.
+
+## Authority
+
+Paper Account / Position State V0.1 grants only deterministic paper-state
+materialization and exposure export.
+
 It grants no provider access, R2 access, replacement-holdout access, persistent
 state writes, automatic/scheduled submission, SHORT paper execution, formal
 trade-plan authority, real-money order authority or live-trading authority.
