@@ -10,6 +10,44 @@ from pathlib import Path
 from crypto_autopilot.storage.r2 import R2Store
 
 
+
+
+
+@dataclass(frozen=True, slots=True)
+class PaperRunStorePolicy:
+    local_json_authorized: bool = True
+    r2_authorized: bool = True
+    github_artifact_secondary_export_authorized: bool = True
+    stored_object_becomes_execution_authority: bool = False
+    holdout_access_authorized: bool = False
+    real_money_order_authorized: bool = False
+    live_real_trading_authorized: bool = False
+
+    def __post_init__(self) -> None:
+        flags = (
+            self.local_json_authorized,
+            self.r2_authorized,
+            self.github_artifact_secondary_export_authorized,
+            self.stored_object_becomes_execution_authority,
+            self.holdout_access_authorized,
+            self.real_money_order_authorized,
+            self.live_real_trading_authorized,
+        )
+        if any(not isinstance(value, bool) for value in flags):
+            raise ValueError("paper run store policy flags must be booleans")
+        if not self.local_json_authorized or not self.r2_authorized:
+            raise ValueError("Paper Run Store V0.1 requires local and R2 backends")
+        if not self.github_artifact_secondary_export_authorized:
+            raise ValueError("GitHub Artifact secondary export must remain permitted")
+        if (
+            self.stored_object_becomes_execution_authority
+            or self.holdout_access_authorized
+            or self.real_money_order_authorized
+            or self.live_real_trading_authorized
+        ):
+            raise ValueError("Paper Run Store V0.1 storage cannot grant trading authority")
+
+
 @dataclass(frozen=True, slots=True)
 class PaperRunStoreReceipt:
     backend: str
@@ -203,3 +241,40 @@ def run_store_receipt_evidence(receipt: PaperRunStoreReceipt) -> dict[str, objec
             "live_real_trading_authorized": False,
         },
     }
+
+
+def paper_run_store_policy_from_config(
+    payload: Mapping[str, object],
+) -> PaperRunStorePolicy:
+    if payload.get("schema") != "qookey-paper-run-store-v0.1":
+        raise ValueError("unsupported paper run store config")
+    backends = payload.get("backends")
+    authority = payload.get("authority")
+    if not isinstance(backends, Mapping) or not isinstance(authority, Mapping):
+        raise ValueError("paper run store backends/authority objects are required")
+    local = backends.get("local_json")
+    r2 = backends.get("cloudflare_r2")
+    artifact = backends.get("github_artifact")
+    if not isinstance(local, Mapping) or not isinstance(r2, Mapping) or not isinstance(
+        artifact, Mapping
+    ):
+        raise ValueError("paper run store backend configs are required")
+    fields = {
+        "local_json_authorized": local.get("authorized"),
+        "r2_authorized": r2.get("authorized"),
+        "github_artifact_secondary_export_authorized": artifact.get(
+            "authorized_as_secondary_export"
+        ),
+        "stored_object_becomes_execution_authority": authority.get(
+            "stored_object_becomes_execution_authority"
+        ),
+        "holdout_access_authorized": authority.get("holdout_access_authorized"),
+        "real_money_order_authorized": authority.get("real_money_order_authorized"),
+        "live_real_trading_authorized": authority.get(
+            "live_real_trading_authorized"
+        ),
+    }
+    for key, value in fields.items():
+        if not isinstance(value, bool):
+            raise ValueError(f"{key} must be a JSON boolean")
+    return PaperRunStorePolicy(**fields)
