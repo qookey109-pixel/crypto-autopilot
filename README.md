@@ -14,7 +14,7 @@ Qookey Crypto Autopilot is multi-asset and opportunity-first, not a single-coin 
 4. Automated Execution — downstream paper/live-capable execution under separate authority.
 5. Post-trade Learning — feed outcomes back into research without silently promoting strategy authority.
 
-See [`docs/PRODUCT_ARCHITECTURE_V0_1.md`](docs/PRODUCT_ARCHITECTURE_V0_1.md), [`docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md`](docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md), [`docs/STRATEGY_ROUTER_V0_1.md`](docs/STRATEGY_ROUTER_V0_1.md), [`docs/STRATEGY_LIBRARY_V0_1.md`](docs/STRATEGY_LIBRARY_V0_1.md), and [`docs/STRATEGY_FAMILY_VALIDATION_V0_1.md`](docs/STRATEGY_FAMILY_VALIDATION_V0_1.md).
+See [`docs/PRODUCT_ARCHITECTURE_V0_1.md`](docs/PRODUCT_ARCHITECTURE_V0_1.md), [`docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md`](docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md), [`docs/STRATEGY_ROUTER_V0_1.md`](docs/STRATEGY_ROUTER_V0_1.md), [`docs/STRATEGY_LIBRARY_V0_1.md`](docs/STRATEGY_LIBRARY_V0_1.md), [`docs/STRATEGY_FAMILY_VALIDATION_V0_1.md`](docs/STRATEGY_FAMILY_VALIDATION_V0_1.md), and [`docs/RISK_POSITION_SIZING_V0_1.md`](docs/RISK_POSITION_SIZING_V0_1.md).
 
 ## Start here
 
