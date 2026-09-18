@@ -1,0 +1,46 @@
+{
+  "schema": "qookey-strategy-family-validation-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "purpose": "Aggregate existing Strategy Edge Validation V0.1 reports into family-level multi-asset/generalization review evidence without duplicating the statistical validation core.",
+  "child_evidence": {
+    "required_schema": "qookey-strategy-edge-validation-report-v0.1",
+    "edge_pass_required": true,
+    "replacement_holdout_allowed": false,
+    "promotion_authority_allowed": false,
+    "trading_authority_allowed": false
+  },
+  "policy": {
+    "minimum_receipts": 6,
+    "minimum_distinct_assets": 3,
+    "minimum_distinct_regimes": 2,
+    "require_single_provider": true,
+    "require_all_edge_pass": true
+  },
+  "states": [
+    "REJECT",
+    "INSUFFICIENT_GENERALIZATION_COVERAGE",
+    "FAMILY_EVIDENCE_READY_FOR_HUMAN_REVIEW"
+  ],
+  "library_summary": {
+    "ranking_performed": false,
+    "winner_selected": false,
+    "automatic_strategy_selection": false,
+    "automatic_registry_state_mutation": false
+  },
+  "authority": {
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_promotion_authorized": false,
+    "model_promotion_authorized": false,
+    "position_sizing_authorized": false,
+    "paper_execution_authorized": false,
+    "short_execution_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
