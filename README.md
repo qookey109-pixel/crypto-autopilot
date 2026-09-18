@@ -15,7 +15,7 @@ Qookey Crypto Autopilot is multi-asset and opportunity-first, not a single-coin 
 5. Automated Execution — deterministic paper cycle preparation, explicit intent submission, fill/lifecycle simulation and paper account state; only later live-capable execution under separate authority.
 6. Post-trade Learning — feed outcomes back into research without silently promoting strategy authority.
 
-See [`docs/PRODUCT_ARCHITECTURE_V0_1.md`](docs/PRODUCT_ARCHITECTURE_V0_1.md), [`docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md`](docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md), [`docs/STRATEGY_ROUTER_V0_1.md`](docs/STRATEGY_ROUTER_V0_1.md), [`docs/STRATEGY_LIBRARY_V0_1.md`](docs/STRATEGY_LIBRARY_V0_1.md), [`docs/STRATEGY_FAMILY_VALIDATION_V0_1.md`](docs/STRATEGY_FAMILY_VALIDATION_V0_1.md), [`docs/RISK_POSITION_SIZING_V0_1.md`](docs/RISK_POSITION_SIZING_V0_1.md), [`docs/PORTFOLIO_ADMISSION_V0_1.md`](docs/PORTFOLIO_ADMISSION_V0_1.md), [`docs/PAPER_EXECUTION_V0_1.md`](docs/PAPER_EXECUTION_V0_1.md), [`docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md`](docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md), [`docs/PAPER_ACCOUNT_POSITION_STATE_V0_1.md`](docs/PAPER_ACCOUNT_POSITION_STATE_V0_1.md), [`docs/PAPER_CYCLE_ORCHESTRATOR_V0_1.md`](docs/PAPER_CYCLE_ORCHESTRATOR_V0_1.md), [`docs/PAPER_SUBMISSION_SESSION_V0_1.md`](docs/PAPER_SUBMISSION_SESSION_V0_1.md), [`docs/PAPER_LIFECYCLE_BATCH_V0_1.md`](docs/PAPER_LIFECYCLE_BATCH_V0_1.md), [`docs/PAPER_ACCOUNT_ADVANCE_V0_1.md`](docs/PAPER_ACCOUNT_ADVANCE_V0_1.md), [`docs/PAPER_LOOP_CHECKPOINT_V0_1.md`](docs/PAPER_LOOP_CHECKPOINT_V0_1.md), [`docs/PAPER_LOOP_RESUME_V0_1.md`](docs/PAPER_LOOP_RESUME_V0_1.md), [`docs/PAPER_LOOP_INTEGRITY_V0_1.md`](docs/PAPER_LOOP_INTEGRITY_V0_1.md), [`docs/PAPER_LOOP_RUN_PACKAGE_V0_1.md`](docs/PAPER_LOOP_RUN_PACKAGE_V0_1.md), [`docs/LIVE_PAPER_SIMULATION_V0_1.md`](docs/LIVE_PAPER_SIMULATION_V0_1.md), and [`docs/PAPER_RUN_STORE_V0_1.md`](docs/PAPER_RUN_STORE_V0_1.md).
+See [`docs/PRODUCT_ARCHITECTURE_V0_1.md`](docs/PRODUCT_ARCHITECTURE_V0_1.md), [`docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md`](docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md), [`docs/STRATEGY_ROUTER_V0_1.md`](docs/STRATEGY_ROUTER_V0_1.md), [`docs/STRATEGY_LIBRARY_V0_1.md`](docs/STRATEGY_LIBRARY_V0_1.md), [`docs/STRATEGY_FAMILY_VALIDATION_V0_1.md`](docs/STRATEGY_FAMILY_VALIDATION_V0_1.md), [`docs/STRATEGY_RESEARCH_SCORECARD_V0_1.md`](docs/STRATEGY_RESEARCH_SCORECARD_V0_1.md), [`docs/RISK_POSITION_SIZING_V0_1.md`](docs/RISK_POSITION_SIZING_V0_1.md), [`docs/PORTFOLIO_ADMISSION_V0_1.md`](docs/PORTFOLIO_ADMISSION_V0_1.md), [`docs/PAPER_EXECUTION_V0_1.md`](docs/PAPER_EXECUTION_V0_1.md), [`docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md`](docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md), [`docs/PAPER_ACCOUNT_POSITION_STATE_V0_1.md`](docs/PAPER_ACCOUNT_POSITION_STATE_V0_1.md), [`docs/PAPER_CYCLE_ORCHESTRATOR_V0_1.md`](docs/PAPER_CYCLE_ORCHESTRATOR_V0_1.md), [`docs/PAPER_SUBMISSION_SESSION_V0_1.md`](docs/PAPER_SUBMISSION_SESSION_V0_1.md), [`docs/PAPER_LIFECYCLE_BATCH_V0_1.md`](docs/PAPER_LIFECYCLE_BATCH_V0_1.md), [`docs/PAPER_ACCOUNT_ADVANCE_V0_1.md`](docs/PAPER_ACCOUNT_ADVANCE_V0_1.md), [`docs/PAPER_LOOP_CHECKPOINT_V0_1.md`](docs/PAPER_LOOP_CHECKPOINT_V0_1.md), [`docs/PAPER_LOOP_RESUME_V0_1.md`](docs/PAPER_LOOP_RESUME_V0_1.md), [`docs/PAPER_LOOP_INTEGRITY_V0_1.md`](docs/PAPER_LOOP_INTEGRITY_V0_1.md), [`docs/PAPER_LOOP_RUN_PACKAGE_V0_1.md`](docs/PAPER_LOOP_RUN_PACKAGE_V0_1.md), [`docs/PAPER_RUN_PACKAGE_ARTIFACT_EXPORT_V0_1.md`](docs/PAPER_RUN_PACKAGE_ARTIFACT_EXPORT_V0_1.md), [`docs/LIVE_PAPER_SIMULATION_V0_1.md`](docs/LIVE_PAPER_SIMULATION_V0_1.md), and [`docs/PAPER_RUN_STORE_V0_1.md`](docs/PAPER_RUN_STORE_V0_1.md).
 
 ## Start here
 
@@ -29,7 +29,7 @@ For current work, read in this order:
 
 Repository `main` is the formal current authority and must be resolved live at read time. Current Operations V0.3 intentionally does **not** claim that its stored evidence-basis SHA is the latest `main`; that SHA records the reviewed parent used to prepare the status version.
 
-## Current Core100 state — 2026-09-16
+## Current Core100 state — 2026-09-19
 
 `History COMPLETE -> Training COMPLETED -> Model Quality REJECT -> Threshold Replay COMPLETED / NO SUPPORTED THRESHOLD CHANGE -> Strategy Validation CLOSED -> Holdout CLOSED -> Promotion CLOSED -> Trading CLOSED`
 
@@ -47,20 +47,25 @@ Do **not** restart the completed History program solely because model quality re
 
 ## Current Pionex validation state
 
-PR #321 merged the narrow bounds-only invalid-OHLC provider-boundary behavior without correcting, fabricating, interpolating, or provider-splicing candles.
+Pionex remains the final calibration / execution-environment provenance target,
+while Binance USD-M remains the large-scale learning database.
 
-The current validation workflow is `.github/workflows/pionex-validation-materialization-v0-1.yml` and remains manual-only. The previous authorized run `34991627998` failed closed before the PR #321 fix. A new materialization must be dispatched from the Repository's **live `main` at dispatch time** before Repository-current Pionex validation can be called complete.
+Current Repository materialization state: **V0.2 COMPLETE / PASS**.
 
-Still closed:
+- workflow: `.github/workflows/pionex-validation-materialization-v0-2.yml`
+- successful run: `35054729471`
+- selected markets: `197`
+- partitions: `682`
+- provider requests: `1,534`
+- replacement holdout: `FROZEN_UNOPENED`
+- Core100 model quality remains **REJECT**
 
-- private API / account data;
-- replacement holdout access;
-- training on the Pionex validation dataset;
-- source switching;
-- automatic model promotion;
-- formal trade plans;
-- real-money orders;
-- live trading.
+This materialization PASS does not claim complete 197-market multiyear history
+and does not authorize training, source switch, promotion or real-money trading.
+
+Separate Live Paper V0.1 authority permits public Pionex market data plus
+simulated paper lifecycle/account updates only. Private account/order endpoints,
+real-money orders and real live trading remain closed.
 
 ## Technical-debt cleanup
 
