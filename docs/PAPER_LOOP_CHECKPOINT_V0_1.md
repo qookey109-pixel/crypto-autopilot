@@ -55,9 +55,13 @@ Checkpoint id binds:
 - previous account snapshot id;
 - next account snapshot id;
 - SHA-256 of `next_account_input`;
-- SHA-256 of current Portfolio existing exposures.
+- SHA-256 of current Portfolio existing exposures;
+- SHA-256 of the exact Paper Account policy used to rematerialize the checkpoint.
 
 The same verified Advance report therefore produces the same checkpoint id.
+
+The Account policy is carried explicitly so a later Resume cannot silently use
+different insolvency, mark-coherence or exposure-export semantics.
 
 ## Next-cycle boundary
 
@@ -82,8 +86,11 @@ next_cycle_allowed = false
 
 Checkpoint readiness itself does not submit or schedule a new Paper Cycle.
 
-The next cycle still requires an explicit invocation with the checkpoint's
-`next_account_input`.
+The next cycle still requires an explicit invocation.
+
+Paper Loop Resume V0.1 is the governed downstream consumer: it validates the
+checkpoint id, reuses the carried Account policy and passes the verified
+`next_account_input` into the existing Paper Cycle engine.
 
 ## No persistence
 

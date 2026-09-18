@@ -27,6 +27,7 @@ They are not interchangeable and are not added together into an invented score.
 | Paper Lifecycle Batch | `config/paper_lifecycle_batch_v0_1.json` | PREPARED_EXPLICIT_PAPER_LIFECYCLE_BATCH_ONLY | require exact session-id confirmation and complete accepted-basket lifecycle inputs; reuse existing Lifecycle engine and emit Account-ready records without provider/persistence/live path |
 | Paper Account Advance | `config/paper_account_advance_v0_1.json` | PREPARED_EXPLICIT_ACCOUNT_REMATERIALIZATION_ONLY | require exact batch-id confirmation, replace latest lifecycle record by intent, rematerialize account, and emit next account input without persistence/live path |
 | Paper Loop Checkpoint | `config/paper_loop_checkpoint_v0_1.json` | PREPARED_PORTABLE_HANDOFF_ONLY | require exact advance-id confirmation, rematerialize next account, reconcile exposure and package deterministic next-cycle handoff without persistence/live path |
+| Paper Loop Resume | `config/paper_loop_resume_v0_1.json` | PREPARED_EXPLICIT_MANUAL_RESUME_ONLY | require exact checkpoint-id confirmation, validate account/policy/exposure lineage and reuse the existing Paper Cycle engine without submission/persistence/live path |
 
 ## Analysis flow
 

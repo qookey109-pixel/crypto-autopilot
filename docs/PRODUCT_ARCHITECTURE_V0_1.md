@@ -160,8 +160,13 @@ input for another manual cycle without persisting state.
 
 Paper Loop Checkpoint V0.1 verifies the Advance report, rematerializes the next
 account again, reconciles Portfolio exposure, and packages the exact
-next_account_input with deterministic lineage for the next manual cycle. It
-stores nothing.
+next_account_input plus Account policy with deterministic lineage for the next
+manual cycle. It stores nothing.
+
+Paper Loop Resume V0.1 is the explicit checkpoint-consumption boundary. It
+requires exact checkpoint-id confirmation, validates the checkpoint again, and
+reuses the existing Paper Cycle engine with the carried account input/policy.
+It performs zero broker submissions and zero lifecycle simulations.
 
 ## Single-asset research boundary
 

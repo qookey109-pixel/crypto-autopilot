@@ -1,0 +1,44 @@
+{
+  "schema": "qookey-paper-loop-resume-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_EXPLICIT_MANUAL_RESUME_ONLY",
+  "product_stage": "PAPER_LOOP_RESUME",
+  "policy": {
+    "require_exact_checkpoint_id_confirmation": true,
+    "require_checkpoint_lineage_validation": true,
+    "require_cycle_account_snapshot_match": true,
+    "require_cycle_exposure_match": true,
+    "explicit_manual_cycle_resume_authorized": true,
+    "automatic_cycle_authorized": false,
+    "automatic_submission_authorized": false,
+    "persistent_state_write_authorized": false,
+    "provider_access_authorized": false,
+    "live_trading_authorized": false
+  },
+  "behavior": {
+    "checkpoint_id_recomputed_before_resume": true,
+    "checkpoint_account_policy_reused": true,
+    "next_account_input_reused_without_rewrite": true,
+    "existing_exposure_reconciled_with_resumed_cycle": true,
+    "cycle_engine_reused": true,
+    "candidate_ranking_performed": false,
+    "broker_submission_performed": false,
+    "lifecycle_simulation_performed": false,
+    "persistent_state_written": false
+  },
+  "authority": {
+    "explicit_manual_cycle_resume_authorized": true,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "persistent_state_write_authorized": false,
+    "automatic_cycle_authorized": false,
+    "automatic_submission_authorized": false,
+    "scheduled_execution_authorized": false,
+    "short_paper_execution_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
