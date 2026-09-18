@@ -8,6 +8,7 @@ from dataclasses import asdict, dataclass
 
 from crypto_autopilot.paper.execution_v0_1 import (
     PaperExecutionDecision,
+    PaperExecutionIntent,
     PaperExecutionReceipt,
 )
 
@@ -655,6 +656,153 @@ def lifecycle_evidence(
             "Bar-level stop/target collisions use the configured deterministic policy.",
         ],
     }
+
+
+def lifecycle_input_from_dict(
+    payload: Mapping[str, object],
+) -> tuple[
+    PaperExecutionDecision,
+    PaperExecutionReceipt,
+    float,
+    tuple[PaperLiquidityBar, ...],
+]:
+    if payload.get("schema") != "qookey-paper-fill-lifecycle-input-v0.1":
+        raise ValueError("unsupported paper fill lifecycle input schema")
+    execution = payload.get("paper_execution_evidence")
+    if not isinstance(execution, Mapping):
+        raise ValueError("paper_execution_evidence object is required")
+    if execution.get("schema") != "qookey-paper-execution-evidence-v0.1":
+        raise ValueError("unsupported paper execution evidence schema")
+
+    execution_authority = execution.get("authority")
+    if not isinstance(execution_authority, Mapping):
+        raise ValueError("paper execution authority object is required")
+    for key in (
+        "automatic_submission_authorized",
+        "short_paper_execution_authorized",
+        "formal_trade_plan_authorized",
+        "real_money_order_authorized",
+        "live_trading_authorized",
+    ):
+        if execution_authority.get(key) is not False:
+            raise ValueError(f"paper execution authority must remain closed: {key}")
+
+    decision_payload = execution.get("decision")
+    receipt_payload = execution.get("receipt")
+    if not isinstance(decision_payload, Mapping):
+        raise ValueError("paper execution decision object is required")
+    if not isinstance(receipt_payload, Mapping):
+        raise ValueError("accepted paper execution receipt object is required")
+    intent_payload = decision_payload.get("intent")
+    if not isinstance(intent_payload, Mapping):
+        raise ValueError("paper execution intent object is required")
+
+    intent_numeric_keys = (
+        "as_of_ms",
+        "entry_price",
+        "stop_price",
+        "notional_usd",
+        "target_risk_usd",
+        "realized_risk_usd",
+        "risk_utilization_fraction",
+    )
+    if any(isinstance(intent_payload.get(key), bool) for key in intent_numeric_keys):
+        raise ValueError("paper execution intent numeric fields cannot be booleans")
+    if not isinstance(intent_payload.get("as_of_ms"), int):
+        raise ValueError("paper execution intent as_of_ms must be a JSON integer")
+    if not isinstance(receipt_payload.get("replayed"), bool):
+        raise ValueError("paper execution receipt replayed must be a JSON boolean")
+    if isinstance(receipt_payload.get("notional_usd"), bool):
+        raise ValueError("paper execution receipt notional cannot be boolean")
+
+    try:
+        intent = PaperExecutionIntent(
+            intent_id=str(intent_payload["intent_id"]),
+            symbol=str(intent_payload["symbol"]),
+            strategy_family=str(intent_payload["strategy_family"]),
+            family_validation_report_sha256=str(
+                intent_payload["family_validation_report_sha256"]
+            ),
+            portfolio_proposal_id=str(intent_payload["portfolio_proposal_id"]),
+            portfolio_admission_report_sha256=str(
+                intent_payload["portfolio_admission_report_sha256"]
+            ),
+            direction=str(intent_payload["direction"]),
+            as_of_ms=intent_payload["as_of_ms"],
+            entry_price=float(intent_payload["entry_price"]),
+            stop_price=float(intent_payload["stop_price"]),
+            notional_usd=float(intent_payload["notional_usd"]),
+            target_risk_usd=float(intent_payload["target_risk_usd"]),
+            realized_risk_usd=float(intent_payload["realized_risk_usd"]),
+            risk_utilization_fraction=float(
+                intent_payload["risk_utilization_fraction"]
+            ),
+            status=str(
+                intent_payload.get("status", "READY_FOR_PAPER_BROKER")
+            ),
+        )
+        decision = PaperExecutionDecision(
+            status=str(decision_payload["status"]),
+            reason=str(decision_payload["reason"]),
+            intent=intent,
+        )
+        receipt = PaperExecutionReceipt(
+            status=str(receipt_payload["status"]),
+            intent_id=str(receipt_payload["intent_id"]),
+            order_id=str(receipt_payload["order_id"]),
+            symbol=str(receipt_payload["symbol"]),
+            side=str(receipt_payload["side"]),
+            notional_usd=float(receipt_payload["notional_usd"]),
+            broker_status=str(receipt_payload["broker_status"]),
+            replayed=receipt_payload["replayed"],
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError(f"invalid paper execution evidence: {error}") from error
+
+    if isinstance(payload.get("target_price"), bool):
+        raise ValueError("target_price cannot be boolean")
+    try:
+        target_price = float(payload["target_price"])
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError(f"invalid target_price: {error}") from error
+
+    bar_items = payload.get("bars")
+    if not isinstance(bar_items, list):
+        raise ValueError("bars must be a JSON array")
+    bars: list[PaperLiquidityBar] = []
+    for index, item in enumerate(bar_items):
+        if not isinstance(item, Mapping):
+            raise ValueError(f"bars[{index}] must be a JSON object")
+        if not isinstance(item.get("time_ms"), int) or isinstance(
+            item.get("time_ms"), bool
+        ):
+            raise ValueError(f"bars[{index}].time_ms must be a JSON integer")
+        numeric_keys = (
+            "open",
+            "high",
+            "low",
+            "close",
+            "available_notional_usd",
+        )
+        if any(isinstance(item.get(key), bool) for key in numeric_keys):
+            raise ValueError(f"bars[{index}] numeric fields cannot be booleans")
+        try:
+            bars.append(
+                PaperLiquidityBar(
+                    time_ms=item["time_ms"],
+                    open=float(item["open"]),
+                    high=float(item["high"]),
+                    low=float(item["low"]),
+                    close=float(item["close"]),
+                    available_notional_usd=float(
+                        item["available_notional_usd"]
+                    ),
+                )
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            raise ValueError(f"invalid bars[{index}]: {error}") from error
+
+    return decision, receipt, target_price, tuple(bars)
 
 
 def lifecycle_policy_from_config(
