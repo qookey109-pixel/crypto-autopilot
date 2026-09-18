@@ -21,6 +21,7 @@ from crypto_autopilot.paper.execution_v0_1 import (
     submit_paper_execution,
 )
 from crypto_autopilot.paper.lifecycle_v0_1 import (
+    PaperLifecyclePolicy,
     PaperLiquidityBar,
     build_paper_lifecycle_plan,
     lifecycle_evidence,
@@ -108,10 +109,7 @@ def lifecycle_record(
     lifecycle = lifecycle_evidence(
         plan=plan,
         result=result,
-        policy=__import__(
-            "crypto_autopilot.paper.lifecycle_v0_1",
-            fromlist=["PaperLifecyclePolicy"],
-        ).PaperLifecyclePolicy(),
+        policy=PaperLifecyclePolicy(),
     )
     return {
         "paper_execution_evidence": execution,
