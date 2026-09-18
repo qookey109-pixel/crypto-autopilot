@@ -1,16 +1,15 @@
 # Automation Index V0.1
 
-Current review: 2026-09-13. [Verified operations and handoff](OPERATIONS_HANDOFF_2026_09_13.md).
+Current review: 2026-09-19. [Verified operations and handoff](OPERATIONS_HANDOFF_2026_09_13.md).
 History is every two hours under `config/history_cadence_v0_1.json`.
 V0.12's window has ended; fixed BTC simulation V0.1 is PASS and retired.
 Seven workflow files retain cron declarations, but not all remain executable.
 
-Latest History `34756244643` is a pre-PR292 CVC 1h failure, still 8/10.
-Wait for scheduled evidence on the merged policy, not another CI result.
-Training `34750015232` is workflow success with data-gated SKIPPED; next nominal
-weekly run is September 20. A pre-deadline execution needs a separately reviewed
-decision; do not manually trigger training or add cron from this index.
-Health `34756817356` is correctly alerting on History failure.
+Core100 History is now **10/10 COMPLETE**. The completed training run
+`34918219864` passed operational execution, while the downstream Model Quality
+gate is **REJECT**. Threshold replay `34936331199` found no supported threshold
+change. Do not restart completed History or loosen model-quality gates from this
+index.
 Pionex alternative assets `34747992983` succeeded as metadata observability only.
 The local Codex `crypto` monitor prompt was refreshed to resolve current main
 and its latest handoff at every run. It remains PAUSED; no monitor was resumed
@@ -76,8 +75,9 @@ manual dispatch is never required and never counts as cron-health evidence.
   Latest-lookback requests may include the frozen 2026-08-28 through 09-03
   candles, so no workflow or cron is created until V0.11 and a separate
   holdout/paper-read authority are complete.
-- Fixed BTC simulation V0.1 passed run 34615465566 and is retired; no continuous Paper simulation is currently running. The older public-paper V0.1 cron is
-  retired after its cutoff, and V0.2 remains prepared without a workflow.
+- Fixed BTC simulation V0.1 passed run 34615465566 and is retired. Current
+  Live Paper V0.1 has an explicit manual run coordinator, but **no continuous
+  Live Paper cron exists**. The older public-paper V0.1 cron remains retired.
 - Pionex Alternative Assets historical candles (`15M / 60M / 4H`) remain
   unauthorized. The active observability schedule reads symbol metadata only;
   K-lines, funding, trades and order books require V0.11 plus a separate
@@ -97,3 +97,5 @@ workflow grant itself provider, R2, holdout, promotion or trading authority.
 ## Manual-only audit/export workflows
 
 - `paper-loop-run-package-artifact-v0-1.yml` — verifies an existing Paper Loop Run Package and uploads a GitHub Artifact secondary audit copy. It has no schedule, provider access, holdout access or execution authority.
+
+- `live-paper-run-coordinator-v0-1.yml` — runs exactly one persistent Live Paper step against R2 from an explicit input JSON. It is manual-only, has no cron, and cannot enable private exchange APIs, Scorecard auto-selection, real-money orders or real live trading.

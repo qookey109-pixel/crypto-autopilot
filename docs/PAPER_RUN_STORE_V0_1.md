@@ -14,7 +14,10 @@ It is intentionally separate from trading logic.
 The first supported object classes include:
 
 - `live-state`;
-- future live tick reports;
+- `live-tick`;
+- `live-run`;
+- `live-run-step`;
+- `live-run-result`;
 - Paper Loop Run Packages;
 - other deterministic paper evidence with an explicit object id.
 
