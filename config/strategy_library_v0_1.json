@@ -1,0 +1,88 @@
+{
+  "schema": "qookey-strategy-library-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "product_stage": "MULTI_STRATEGY_LIBRARY",
+  "families": [
+    {
+      "family": "TREND_FOLLOWING",
+      "category": "DIRECTIONAL",
+      "attention_profiles": ["DIRECTIONAL"],
+      "directions": ["LONG", "SHORT"],
+      "requires_market_structure": true,
+      "validation_state": "ROUTING_RULE_PREPARED",
+      "reusable_scope": "MULTI_ASSET_RESEARCH",
+      "generalization_required": true
+    },
+    {
+      "family": "BREAKOUT",
+      "category": "STRUCTURE",
+      "attention_profiles": ["DIRECTIONAL"],
+      "directions": ["LONG", "SHORT"],
+      "requires_market_structure": true,
+      "validation_state": "ROUTING_RULE_PREPARED",
+      "reusable_scope": "MULTI_ASSET_RESEARCH",
+      "generalization_required": true
+    },
+    {
+      "family": "MOMENTUM",
+      "category": "DIRECTIONAL",
+      "attention_profiles": ["DIRECTIONAL"],
+      "directions": ["LONG", "SHORT"],
+      "requires_market_structure": false,
+      "validation_state": "ROUTING_RULE_PREPARED",
+      "reusable_scope": "MULTI_ASSET_RESEARCH",
+      "generalization_required": true
+    },
+    {
+      "family": "MEAN_REVERSION",
+      "category": "RANGE",
+      "attention_profiles": ["RANGE_EXTREMITY"],
+      "directions": ["LONG", "SHORT"],
+      "requires_market_structure": true,
+      "validation_state": "ROUTING_RULE_PREPARED",
+      "reusable_scope": "MULTI_ASSET_RESEARCH",
+      "generalization_required": true
+    },
+    {
+      "family": "HIGH_VOLATILITY_TREND",
+      "category": "VOLATILITY_DIRECTIONAL",
+      "attention_profiles": ["DIRECTIONAL"],
+      "directions": ["LONG", "SHORT"],
+      "requires_market_structure": true,
+      "validation_state": "ROUTING_RULE_PREPARED",
+      "reusable_scope": "MULTI_ASSET_RESEARCH",
+      "generalization_required": true
+    },
+    {
+      "family": "LOW_VOLATILITY_RANGE",
+      "category": "VOLATILITY_RANGE",
+      "attention_profiles": ["RANGE_EXTREMITY"],
+      "directions": ["LONG", "SHORT"],
+      "requires_market_structure": true,
+      "validation_state": "ROUTING_RULE_PREPARED",
+      "reusable_scope": "MULTI_ASSET_RESEARCH",
+      "generalization_required": true
+    }
+  ],
+  "single_asset_boundary": {
+    "asset_specific_strategy_can_be_primary_platform_architecture": false,
+    "asset_specific_strategy_can_enter_registry_without_generalization_validation": false,
+    "zec_v0_3_registered_as_reusable_family": false
+  },
+  "authority": {
+    "strategy_edge_claimed": false,
+    "position_sizing_authorized": false,
+    "paper_execution_authorized": false,
+    "short_execution_authorized": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "strategy_promotion_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}

@@ -9,9 +9,10 @@ any versioned authority.
 2. `docs/PRODUCT_ARCHITECTURE_V0_1.md` — multi-asset, daily-opportunity-first product architecture.
 3. `docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md` — multi-asset attention candidate selector.
 4. `docs/STRATEGY_ROUTER_V0_1.md` — dynamic multi-strategy compatibility router.
-5. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
-6. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
-7. The exact config and receipt named by the stage being changed.
+5. `docs/STRATEGY_LIBRARY_V0_1.md` — governed reusable strategy-family registry and lifecycle metadata.
+6. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
+7. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
+8. The exact config and receipt named by the stage being changed.
 
 ## Current bounded data and Paper stages
 
