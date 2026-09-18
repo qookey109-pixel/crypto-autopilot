@@ -5,7 +5,7 @@ import json
 import unittest
 from pathlib import Path
 
-from crypto_autopilot.strategy_research_scorecard_v0_1 import (
+from crypto_autopilot.research.strategy_scorecard_v0_1 import (
     StrategyResearchScorecardPolicy,
     build_strategy_research_scorecard,
     scorecard_policy_from_config,
