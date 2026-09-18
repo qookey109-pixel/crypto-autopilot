@@ -379,6 +379,89 @@ def _cycle_id(
     return f"paper-cycle-v0-1-{_sha256(payload)}"
 
 
+def paper_cycle_report_id_from_mapping(
+    payload: Mapping[str, object],
+) -> str:
+    """Recompute the deterministic cycle id from one serialized cycle report."""
+
+    if payload.get("schema") != "qookey-paper-cycle-report-v0.1":
+        raise ValueError("unsupported paper cycle report schema")
+    account_snapshot_id = payload.get("account_snapshot_id")
+    state = payload.get("state")
+    if not isinstance(account_snapshot_id, str) or not account_snapshot_id:
+        raise ValueError("paper cycle account_snapshot_id is required")
+    if not isinstance(state, str) or not state:
+        raise ValueError("paper cycle state is required")
+
+    portfolio_report = payload.get("portfolio_admission")
+    if portfolio_report is not None and not isinstance(portfolio_report, Mapping):
+        raise ValueError("paper cycle portfolio_admission must be an object or null")
+
+    raw_decisions = payload.get("paper_execution_decisions", [])
+    if not isinstance(raw_decisions, list):
+        raise ValueError("paper_execution_decisions must be a JSON array")
+
+    decision_rows: list[dict[str, object]] = []
+    for index, row in enumerate(raw_decisions):
+        if not isinstance(row, Mapping):
+            raise ValueError(f"paper_execution_decisions[{index}] must be an object")
+        proposal_id = row.get("proposal_id")
+        decision = row.get("decision")
+        if not isinstance(proposal_id, str) or not proposal_id:
+            raise ValueError(
+                f"paper_execution_decisions[{index}].proposal_id is required"
+            )
+        if not isinstance(decision, Mapping):
+            raise ValueError(
+                f"paper_execution_decisions[{index}].decision must be an object"
+            )
+        decision_status = decision.get("status")
+        decision_reason = decision.get("reason")
+        if not isinstance(decision_status, str) or not decision_status:
+            raise ValueError(
+                f"paper_execution_decisions[{index}].decision.status is required"
+            )
+        if not isinstance(decision_reason, str) or not decision_reason:
+            raise ValueError(
+                f"paper_execution_decisions[{index}].decision.reason is required"
+            )
+        intent = decision.get("intent")
+        if intent is not None and not isinstance(intent, Mapping):
+            raise ValueError(
+                f"paper_execution_decisions[{index}].decision.intent must be object/null"
+            )
+        intent_id = None
+        if isinstance(intent, Mapping):
+            raw_intent_id = intent.get("intent_id")
+            if not isinstance(raw_intent_id, str) or not raw_intent_id:
+                raise ValueError(
+                    f"paper_execution_decisions[{index}].decision.intent.intent_id is required"
+                )
+            intent_id = raw_intent_id
+        decision_rows.append(
+            {
+                "proposal_id": proposal_id,
+                "decision_status": decision_status,
+                "decision_reason": decision_reason,
+                "intent_id": intent_id,
+            }
+        )
+
+    decision_rows.sort(key=lambda item: str(item["proposal_id"]))
+    canonical: dict[str, object] = {
+        "schema": "qookey-paper-cycle-id-v0.1",
+        "account_snapshot_id": account_snapshot_id,
+        "state": state,
+        "portfolio_report_sha256": (
+            None
+            if portfolio_report is None
+            else _sha256(_canonicalize(portfolio_report))
+        ),
+        "decisions": decision_rows,
+    }
+    return f"paper-cycle-v0-1-{_sha256(canonical)}"
+
+
 def _authority() -> dict[str, object]:
     return {
         "manual_cycle_preparation_only": True,

@@ -17,9 +17,10 @@ any versioned authority.
 10. `docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md` — deterministic paper fills, partial fills, costs and stop/target lifecycle over normalized liquidity bars.
 11. `docs/PAPER_ACCOUNT_POSITION_STATE_V0_1.md` — immutable paper cash/equity/open-position snapshot and Portfolio existing-exposure export.
 12. `docs/PAPER_CYCLE_ORCHESTRATOR_V0_1.md` — manual deterministic account → portfolio → paper-intent preparation; no broker submission.
-13. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
-14. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
-15. The exact config and receipt named by the stage being changed.
+13. `docs/PAPER_SUBMISSION_SESSION_V0_1.md` — exact-cycle-id-confirmed complete-basket submission into the in-memory Repository Paper Broker.
+14. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
+15. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
+16. The exact config and receipt named by the stage being changed.
 
 ## Current bounded data and Paper stages
 

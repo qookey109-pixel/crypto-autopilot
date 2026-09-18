@@ -212,14 +212,16 @@ V0.1 does not:
 - place real-money orders;
 - enable live trading.
 
-## Next stage
+## Downstream explicit submission
 
-After this manual preparation contract is merged, the next safe automation work
-is **explicit paper submission/session coordination** with a separately
-versioned authority boundary.
+Paper Submission Session V0.1 is now the separate downstream boundary.
 
-That future stage must not infer permission for unattended scheduling or
-real-money execution from this contract.
+It requires exact cycle-id confirmation, recomputes the cycle id from report
+contents, preflights the complete admitted basket and submits only to the
+existing in-memory Repository Paper Broker.
+
+It still grants no unattended scheduling, persistent broker state or real-money
+execution authority.
 
 ## Authority
 
