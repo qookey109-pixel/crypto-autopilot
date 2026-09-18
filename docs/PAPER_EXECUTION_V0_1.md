@@ -26,8 +26,12 @@ A paper intent can be prepared only when all of the following are true:
    `FAMILY_EVIDENCE_READY_FOR_HUMAN_REVIEW`;
 5. the family report preserves zero promotion/trading authority;
 6. Risk / Position Sizing V0.1 returns `SIZING_READY`;
-7. the sizing direction is supported by the registered family;
-8. the direction is currently authorized for Repository Paper Broker use.
+7. a complete Portfolio Admission V0.1 report is supplied;
+8. the portfolio report state is `PORTFOLIO_ADMITTED`;
+9. the exact reconstructed proposal id appears in `admitted_proposal_ids`;
+10. portfolio admission authority remains closed;
+11. the sizing direction is supported by the registered family;
+12. the direction is currently authorized for Repository Paper Broker use.
 
 A Router match alone is not sufficient.
 
@@ -64,6 +68,23 @@ Paper Execution does not:
 - infer leverage;
 - infer exchange precision.
 
+## Portfolio-admission lineage
+
+Paper Execution reconstructs its exact Portfolio V0.1 proposal from the same
+family-validation report, symbol, strategy family, timestamp and sizing plan.
+
+The complete portfolio-admission report must:
+
+- use schema `qookey-portfolio-admission-report-v0.1`;
+- have state `PORTFOLIO_ADMITTED`;
+- include the reconstructed proposal id in `admitted_proposal_ids`;
+- not mark that proposal rejected;
+- preserve zero strategy-ranking, subset-selection, PaperBroker and live authority.
+
+The complete portfolio report is SHA-256 hashed and bound into the paper intent.
+A changed portfolio basket or authority record therefore changes the paper
+intent id.
+
 ## Deterministic idempotency
 
 The paper intent id is a SHA-256-derived identifier over:
@@ -71,6 +92,8 @@ The paper intent id is a SHA-256-derived identifier over:
 - symbol;
 - registered strategy family;
 - family-validation report SHA-256;
+- portfolio proposal id;
+- portfolio-admission report SHA-256;
 - review state;
 - direction;
 - as-of timestamp;
@@ -139,6 +162,7 @@ PYTHONPATH=src python scripts/run_paper_execution_v0_1.py \
   --symbol BTC_USDT_PERP \
   --strategy-family TREND_FOLLOWING \
   --family-validation-report /tmp/trend-family-report.json \
+  --portfolio-admission-report /tmp/portfolio-admission-report.json \
   --direction LONG \
   --equity-usd 100 \
   --entry-price 100 \
@@ -151,10 +175,12 @@ This command:
 1. loads the versioned Risk V0.1 policy;
 2. calculates the sizing plan;
 3. loads the complete family-validation report;
-4. prepares the deterministic paper intent;
-5. submits it to a new in-memory Repository Paper Broker instance if all gates
+4. loads a separately produced Portfolio Admission V0.1 report;
+5. reconstructs and verifies the exact admitted portfolio proposal;
+6. prepares the deterministic paper intent;
+7. submits it to a new in-memory Repository Paper Broker instance if all gates
    pass;
-6. prints deterministic JSON evidence.
+8. prints deterministic JSON evidence.
 
 It performs no provider request, R2 operation, holdout read, persistent broker
 write or exchange call.
@@ -178,17 +204,16 @@ integration path without enabling an unattended trading loop.
 
 ## Next stage
 
-After this contract is merged and verified, the next product concern is the
-portfolio layer:
+Portfolio Admission V0.1 is now upstream of this contract.
 
-- multiple simultaneous candidate/family matches;
-- per-asset and total portfolio exposure;
-- correlation/concentration control;
-- strategy overlap;
-- portfolio-level risk budget;
-- deciding whether to keep one route, combine routes, or reject all.
+Future work may separately add:
 
-That layer must remain upstream of any future automatic execution scheduler.
+- a validated subset/allocation optimizer with explicit ranking evidence;
+- measured point-in-time correlation/covariance;
+- a realistic paper fill/settlement simulator;
+- unattended paper orchestration under separate authority.
+
+None of those is implied by V0.1 paper intent recording.
 
 ## Authority
 
