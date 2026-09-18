@@ -1033,6 +1033,126 @@ def run_live_paper_tick(
     }
 
 
+
+def live_paper_tick_report_id_from_mapping(
+    payload: Mapping[str, object],
+) -> str:
+    """Validate and recompute one serialized Live Paper tick report id."""
+
+    if payload.get("schema") != "qookey-live-paper-tick-report-v0.1":
+        raise ValueError("unsupported live paper tick report schema")
+    tick_id = payload.get("tick_id")
+    state_name = payload.get("state")
+    previous_state_id = payload.get("previous_state_id")
+    next_state_id = payload.get("next_state_id")
+    if not isinstance(tick_id, str) or not tick_id:
+        raise ValueError("live paper tick_id is required")
+    if not isinstance(state_name, str) or not state_name:
+        raise ValueError("live paper tick state is required")
+    if not isinstance(previous_state_id, str) or not previous_state_id:
+        raise ValueError("live paper previous_state_id is required")
+    if not isinstance(next_state_id, str) or not next_state_id:
+        raise ValueError("live paper next_state_id is required")
+
+    tick_time_ms = payload.get("tick_time_ms")
+    if (
+        not isinstance(tick_time_ms, int)
+        or isinstance(tick_time_ms, bool)
+        or tick_time_ms < 0
+    ):
+        raise ValueError("live paper tick_time_ms must be non-negative integer")
+
+    next_state = payload.get("next_state")
+    if not isinstance(next_state, Mapping):
+        raise ValueError("live paper tick next_state is required")
+    if verify_live_paper_state(next_state) != next_state_id:
+        raise ValueError("live paper tick next_state id mismatch")
+    if next_state.get("last_tick_ms") != tick_time_ms:
+        raise ValueError("live paper tick time does not match next state")
+
+    checkpoint = next_state.get("checkpoint_report")
+    if not isinstance(checkpoint, Mapping):
+        raise ValueError("live paper tick checkpoint payload is required")
+    if payload.get("checkpoint_id") != checkpoint.get("checkpoint_id"):
+        raise ValueError("live paper tick checkpoint id mismatch")
+
+    optional_ids = (
+        "progressed_batch_id",
+        "progressed_advance_id",
+        "cycle_id",
+        "session_id",
+        "batch_id",
+        "advance_id",
+    )
+    for key in optional_ids:
+        value = payload.get(key)
+        if value is not None and (not isinstance(value, str) or not value):
+            raise ValueError(f"live paper tick {key} must be string/null")
+
+    cycle_state = payload.get("cycle_state")
+    if cycle_state is not None and (
+        not isinstance(cycle_state, str) or not cycle_state
+    ):
+        raise ValueError("live paper tick cycle_state must be string/null")
+
+    provider_requests = payload.get("provider_requests_performed")
+    persistent_writes = payload.get("persistent_state_writes_performed")
+    if (
+        not isinstance(provider_requests, int)
+        or isinstance(provider_requests, bool)
+        or provider_requests < 0
+    ):
+        raise ValueError("live paper provider request count is invalid")
+    if (
+        not isinstance(persistent_writes, int)
+        or isinstance(persistent_writes, bool)
+        or persistent_writes < 0
+    ):
+        raise ValueError("live paper persistent write count is invalid")
+
+    receipt = payload.get("storage_receipt")
+    if receipt is None:
+        if persistent_writes != 0:
+            raise ValueError("live paper tick reports writes without storage receipt")
+    elif not isinstance(receipt, Mapping):
+        raise ValueError("live paper storage_receipt must be object/null")
+
+    authority = payload.get("authority")
+    if not isinstance(authority, Mapping):
+        raise ValueError("live paper tick authority object is required")
+    for key in (
+        "public_live_market_data_authorized",
+        "live_paper_simulation_authorized",
+        "persistent_paper_state_authorized",
+    ):
+        if authority.get(key) is not True:
+            raise ValueError(f"live paper tick authority missing: {key}")
+    if authority.get("overlapping_active_sessions_authorized") is not False:
+        raise ValueError("live paper overlapping sessions must remain closed")
+    for key in (
+        "private_exchange_api_authorized",
+        "holdout_access_authorized",
+        "real_money_order_authorized",
+        "live_real_trading_authorized",
+    ):
+        if authority.get(key) is not False:
+            raise ValueError(f"live paper tick authority must remain closed: {key}")
+
+    tick_payload = {
+        "schema": "qookey-live-paper-tick-id-v0.1",
+        "previous_state_id": previous_state_id,
+        "next_state_id": next_state_id,
+        "tick_time_ms": tick_time_ms,
+        "progressed_batch_id": payload.get("progressed_batch_id"),
+        "progressed_advance_id": payload.get("progressed_advance_id"),
+        "new_cycle_id": payload.get("cycle_id"),
+        "new_session_id": payload.get("session_id"),
+        "new_batch_id": payload.get("batch_id"),
+        "new_advance_id": payload.get("advance_id"),
+    }
+    return f"live-paper-tick-v0-1-{_sha256(tick_payload)}"
+
+
 def live_paper_policy_from_config(
     payload: Mapping[str, object],
 ) -> LivePaperPolicy:
