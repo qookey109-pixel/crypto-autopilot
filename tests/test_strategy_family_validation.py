@@ -7,6 +7,7 @@ from pathlib import Path
 from crypto_autopilot.strategy_family_validation import (
     StrategyFamilyValidationError,
     family_edge_receipt_from_report,
+    family_validation_input_from_dict,
     policy_from_config,
     validate_strategy_family,
     validate_strategy_library_evidence,
@@ -185,6 +186,36 @@ class StrategyFamilyValidationV01Tests(unittest.TestCase):
         self.assertEqual(
             report["state_counts"]["FAMILY_EVIDENCE_READY_FOR_HUMAN_REVIEW"], 2
         )
+
+    def test_input_parser_binds_complete_child_edge_reports(self) -> None:
+        payload = {
+            "schema": "qookey-strategy-family-validation-input-v0.1",
+            "family": "TREND_FOLLOWING",
+            "receipts": [
+                {
+                    "symbol": symbol,
+                    "regime_state": regime,
+                    "direction": "LONG",
+                    "edge_report": edge_report(index),
+                }
+                for index, (symbol, regime) in enumerate(
+                    (
+                        ("BTC_USDT_PERP", "BTC_CONCENTRATION"),
+                        ("ETH_USDT_PERP", "BTC_CONCENTRATION"),
+                        ("SOL_USDT_PERP", "BTC_CONCENTRATION"),
+                        ("BTC_USDT_PERP", "MIXED"),
+                        ("ETH_USDT_PERP", "MIXED"),
+                        ("SOL_USDT_PERP", "MIXED"),
+                    )
+                )
+            ],
+        }
+
+        family, receipts = family_validation_input_from_dict(payload)
+
+        self.assertEqual(family, "TREND_FOLLOWING")
+        self.assertEqual(len(receipts), 6)
+        self.assertTrue(all(item.edge_verdict == "PASS" for item in receipts))
 
     def test_config_policy_is_strict_and_matches_frozen_defaults(self) -> None:
         payload = json.loads(CONFIG.read_text(encoding="utf-8"))
