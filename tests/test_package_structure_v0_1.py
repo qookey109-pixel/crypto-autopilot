@@ -31,6 +31,7 @@ ALLOWED_ROOT_MODULES = {
     "sstate_adapter.py",
     "sstate_evidence.py",
     "strategy.py",
+    "strategy_library.py",
     "strategy_router.py",
     "strategy_edge_validation.py",
     "strategy_research_loop.py",
