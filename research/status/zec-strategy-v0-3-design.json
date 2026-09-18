@@ -15,20 +15,43 @@
     "signal_timeframe": "30m",
     "context_timeframe": "4h",
     "source_timeframe": "15m",
-    "candidate_count_max": 32,
+    "candidate_count_max": 64,
     "candidate_axes": {
-      "macd": ["12/26/9", "12/30/7"],
-      "trend_regime": ["TREND_STRICT", "TREND_BASIC"],
-      "volatility_filter": ["ATR_FILTER_OFF", "ATR_ROLLING_EXTREME_GUARD"],
-      "initial_stop_atr": [2.0, 2.5],
-      "account_risk_fraction": [0.005, 0.01]
+      "macd": [
+        "12/26/9",
+        "12/30/7"
+      ],
+      "trend_regime": [
+        "TREND_STRICT",
+        "TREND_BASIC"
+      ],
+      "volatility_filter": [
+        "ATR_FILTER_OFF",
+        "ATR_ROLLING_EXTREME_GUARD"
+      ],
+      "account_risk_fraction": [
+        0.01,
+        0.025,
+        0.05,
+        0.1
+      ],
+      "stop_model": [
+        "VOL_STOP_2ATR_BB_HALF",
+        "VOL_STOP_2_5ATR_BB_HALF"
+      ]
     },
     "common_rules": {
-      "maximum_leverage": 3.0,
+      "maximum_leverage": 3,
       "averaging_down": false,
       "martingale": false,
       "pyramiding": false,
-      "entry_next_30m_open": true
+      "entry_next_30m_open": true,
+      "stop_distance_percentage_cap": null,
+      "stop_distance_source": "max(ATR_multiple, 0.5 * full_bollinger_band_width)",
+      "stop_distance_and_account_risk_separated": true,
+      "target_risk_may_be_leverage_limited": true,
+      "record_target_and_realized_risk": true,
+      "tighten_stop_to_consume_risk_budget": false
     }
   },
   "validation": {
@@ -40,9 +63,9 @@
     "centered_bootstrap_alpha": 0.05,
     "maximum_edge_decay_fraction": 0.5,
     "slippage_bps_per_side": {
-      "diagnostic": 2.0,
-      "primary": 5.0,
-      "stress": 10.0
+      "diagnostic": 2,
+      "primary": 5,
+      "stress": 10
     },
     "single_champion_only": true,
     "confirmation_can_reselect_candidate": false,
