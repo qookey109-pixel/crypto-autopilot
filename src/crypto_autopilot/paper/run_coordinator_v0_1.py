@@ -327,6 +327,9 @@ def verify_live_paper_run_step(payload: Mapping[str, object]) -> str:
         )
     ):
         raise ValueError("live paper run step candidate_specs_sha256 is invalid")
+    candidate_specs = payload.get("candidate_specs")
+    if not isinstance(candidate_specs, list):
+        raise ValueError("live paper run step candidate_specs must be an array")
 
     expected_request = _request_id(
         run_id=run_id,
@@ -334,11 +337,11 @@ def verify_live_paper_run_step(payload: Mapping[str, object]) -> str:
         previous_step_id=previous_step_id,
         previous_state_id=previous_state_id,
         tick_time_ms=tick_time_ms,
-        candidate_specs=payload.get("candidate_specs", []),  # type: ignore[arg-type]
+        candidate_specs=candidate_specs,
     )
     if payload.get("request_id") != expected_request:
         raise ValueError("live paper run step request id mismatch")
-    if _sha256(payload.get("candidate_specs", [])) != candidate_specs_sha256:
+    if _sha256(candidate_specs) != candidate_specs_sha256:
         raise ValueError("live paper run step candidate specs hash mismatch")
 
     _verify_coordinator_authority(payload.get("authority"))
