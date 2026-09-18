@@ -92,7 +92,7 @@ class PaperExecutionV01Tests(unittest.TestCase):
             direction="LONG",
             equity_usd=100.0,
             entry_price=100.0,
-            stop_price=99.8,
+            stop_price=99.0,
         )
         report = family_report()
         portfolio = portfolio_report_for(
@@ -118,7 +118,7 @@ class PaperExecutionV01Tests(unittest.TestCase):
         self.assertEqual(decision.intent.notional_usd, sizing.approved_notional_usd)
         self.assertEqual(decision.intent.stop_price, sizing.stop_price)
         self.assertEqual(decision.intent.realized_risk_usd, sizing.realized_risk_usd)
-        self.assertEqual(decision.intent.notional_usd, 300.0)
+        self.assertEqual(decision.intent.notional_usd, 100.0)
         self.assertTrue(decision.intent.portfolio_proposal_id.startswith("portfolio-v0-1-"))
 
     def test_submission_reuses_existing_repository_paper_broker_idempotency(self) -> None:
