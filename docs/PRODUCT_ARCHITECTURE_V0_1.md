@@ -158,6 +158,11 @@ Lifecycle Batch. It verifies the batch id, replaces latest lifecycle evidence by
 paper intent, rematerializes the complete account, and emits the next account
 input for another manual cycle without persisting state.
 
+Paper Loop Checkpoint V0.1 verifies the Advance report, rematerializes the next
+account again, reconciles Portfolio exposure, and packages the exact
+next_account_input with deterministic lineage for the next manual cycle. It
+stores nothing.
+
 ## Single-asset research boundary
 
 BTC, ETH, SOL, ZEC or any other individual asset may have dedicated research experiments.
