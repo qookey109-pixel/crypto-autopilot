@@ -25,6 +25,12 @@ class DailyOpportunityPolicy:
     bearish_rsi_ceiling: float = 45.0
     bullish_bollinger_position_floor: float = 0.55
     bearish_bollinger_position_ceiling: float = 0.45
+    range_ema20_slope_atr_ceiling: float = 0.10
+    range_ema20_ema50_compression_fraction: float = 0.005
+    range_rsi_lower: float = 35.0
+    range_rsi_upper: float = 65.0
+    range_bollinger_lower: float = 0.20
+    range_bollinger_upper: float = 0.80
     require_ready_regime: bool = True
 
     def __post_init__(self) -> None:
@@ -36,6 +42,12 @@ class DailyOpportunityPolicy:
             self.bearish_rsi_ceiling,
             self.bullish_bollinger_position_floor,
             self.bearish_bollinger_position_ceiling,
+            self.range_ema20_slope_atr_ceiling,
+            self.range_ema20_ema50_compression_fraction,
+            self.range_rsi_lower,
+            self.range_rsi_upper,
+            self.range_bollinger_lower,
+            self.range_bollinger_upper,
         )
         if not all(math.isfinite(value) for value in numeric):
             raise ValueError("daily opportunity policy values must be finite")
@@ -51,6 +63,14 @@ class DailyOpportunityPolicy:
             raise ValueError("bullish_rsi_floor must be in [0, 100]")
         if not 0.0 <= self.bearish_rsi_ceiling <= 100.0:
             raise ValueError("bearish_rsi_ceiling must be in [0, 100]")
+        if self.range_ema20_slope_atr_ceiling < 0.0:
+            raise ValueError("range_ema20_slope_atr_ceiling cannot be negative")
+        if not 0.0 <= self.range_ema20_ema50_compression_fraction <= 1.0:
+            raise ValueError("range compression fraction must be in [0, 1]")
+        if not 0.0 <= self.range_rsi_lower < self.range_rsi_upper <= 100.0:
+            raise ValueError("range RSI bounds must be ordered within [0, 100]")
+        if not 0.0 <= self.range_bollinger_lower < self.range_bollinger_upper <= 1.0:
+            raise ValueError("range Bollinger bounds must be ordered within [0, 1]")
 
 
 @dataclass(frozen=True, slots=True)
@@ -61,6 +81,8 @@ class DailyOpportunityDecision:
     bias: str
     liquidity_score: float
     directional_score: float
+    range_extremity_score: float
+    attention_profile: str
     regime_state: str
     reasons: tuple[str, ...]
 
@@ -155,6 +177,49 @@ def _directional_score(
     return score, tuple(reasons)
 
 
+def _range_extremity_score(
+    snapshot: TechnicalSnapshot,
+    *,
+    policy: DailyOpportunityPolicy,
+) -> tuple[float, tuple[str, ...]]:
+    """Score attention-worthy range compression plus statistical extremity.
+
+    This is not a mean-reversion strategy decision. It only prevents the
+    upstream candidate selector from discarding range/extreme markets before
+    the Strategy Router can evaluate them.
+    """
+
+    assert snapshot.ema20_ema50_distance_fraction is not None
+    assert snapshot.ema20_slope_atr is not None
+    assert snapshot.rsi14 is not None
+    assert snapshot.bollinger_position is not None
+    assert snapshot.volume_ratio is not None
+
+    compressed = (
+        abs(snapshot.ema20_ema50_distance_fraction)
+        <= policy.range_ema20_ema50_compression_fraction
+    )
+    flat = abs(snapshot.ema20_slope_atr) <= policy.range_ema20_slope_atr_ceiling
+    if not (compressed and flat):
+        return 0.0, ()
+
+    score = 30.0
+    reasons = ["ema20_ema50_compression", "flat_ema20_slope"]
+    if snapshot.rsi14 <= policy.range_rsi_lower or snapshot.rsi14 >= policy.range_rsi_upper:
+        score += 20.0
+        reasons.append("rsi_extreme")
+    if (
+        snapshot.bollinger_position <= policy.range_bollinger_lower
+        or snapshot.bollinger_position >= policy.range_bollinger_upper
+    ):
+        score += 20.0
+        reasons.append("bollinger_extreme")
+    if snapshot.volume_ratio >= policy.volume_ratio_floor:
+        score += 5.0
+        reasons.append("volume_participation")
+    return score, tuple(reasons)
+
+
 def rank_daily_opportunities(
     universe: Sequence[UniverseCandidate],
     technical_by_symbol: Mapping[str, TechnicalSnapshot],
@@ -213,6 +278,8 @@ def rank_daily_opportunities(
                     bias="UNAVAILABLE",
                     liquidity_score=0.0,
                     directional_score=0.0,
+                    range_extremity_score=0.0,
+                    attention_profile="UNAVAILABLE",
                     regime_state=regime.state,
                     reasons=("liquidity_or_spread_gate_failed",),
                 )
@@ -231,6 +298,8 @@ def rank_daily_opportunities(
                     bias="UNAVAILABLE",
                     liquidity_score=0.0,
                     directional_score=0.0,
+                    range_extremity_score=0.0,
+                    attention_profile="UNAVAILABLE",
                     regime_state=regime.state,
                     reasons=("technical_evidence_unavailable",),
                 )
@@ -249,6 +318,7 @@ def rank_daily_opportunities(
         short_score, short_reasons = _directional_score(
             snapshot, direction="SHORT_BIAS", policy=policy
         )
+        range_score, range_reasons = _range_extremity_score(snapshot, policy=policy)
 
         if long_score > short_score:
             bias = "LONG_BIAS"
@@ -263,8 +333,16 @@ def rank_daily_opportunities(
             directional = long_score
             reasons = tuple(sorted(set(long_reasons + short_reasons)))
 
-        attention = round(min(100.0, liquidity + directional), 2)
-        eligible = attention >= policy.minimum_attention_score and bias != "NEUTRAL"
+        if range_score > directional:
+            attention_profile = "RANGE_EXTREMITY"
+            attention_component = range_score
+            reasons = range_reasons
+        else:
+            attention_profile = "DIRECTIONAL"
+            attention_component = directional
+
+        attention = round(min(100.0, liquidity + attention_component), 2)
+        eligible = attention >= policy.minimum_attention_score
         decisions.append(
             DailyOpportunityDecision(
                 symbol=item.symbol,
@@ -273,6 +351,8 @@ def rank_daily_opportunities(
                 bias=bias,
                 liquidity_score=round(liquidity, 2),
                 directional_score=round(directional, 2),
+                range_extremity_score=round(range_score, 2),
+                attention_profile=attention_profile,
                 regime_state=regime.state,
                 reasons=reasons + (("attention_gate_passed",) if eligible else ("attention_gate_failed",)),
             )
