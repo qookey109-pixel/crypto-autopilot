@@ -93,6 +93,12 @@ def _require_sha256(value: str, label: str) -> None:
         raise StrategyFamilyValidationError(f"{label} must be lowercase hexadecimal")
 
 
+def _strict_bool(value: object, label: str) -> bool:
+    if not isinstance(value, bool):
+        raise StrategyFamilyValidationError(f"{label} must be a JSON boolean")
+    return value
+
+
 def _canonical_sha256(payload: Mapping[str, Any]) -> str:
     encoded = json.dumps(
         payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True
@@ -132,12 +138,23 @@ def family_edge_receipt_from_report(
             edge_input_fingerprint=str(edge_report["input_fingerprint"]),
             edge_report_sha256=_canonical_sha256(payload),
             edge_verdict=str(edge_report["verdict"]),
-            research_evidence_only=bool(authority["research_evidence_only"]),
-            holdout_accessed=bool(authority["holdout_accessed"]),
+            research_evidence_only=_strict_bool(
+                authority["research_evidence_only"], "authority.research_evidence_only"
+            ),
+            holdout_accessed=_strict_bool(
+                authority["holdout_accessed"], "authority.holdout_accessed"
+            ),
             promotion_authority=int(authority["promotion_authority"]),
-            trade_plan_authorized=bool(authority["trade_plan_authorized"]),
-            real_money_order_authorized=bool(authority["real_money_order_authorized"]),
-            live_trading_authorized=bool(authority["live_trading_authorized"]),
+            trade_plan_authorized=_strict_bool(
+                authority["trade_plan_authorized"], "authority.trade_plan_authorized"
+            ),
+            real_money_order_authorized=_strict_bool(
+                authority["real_money_order_authorized"],
+                "authority.real_money_order_authorized",
+            ),
+            live_trading_authorized=_strict_bool(
+                authority["live_trading_authorized"], "authority.live_trading_authorized"
+            ),
         )
     except (KeyError, TypeError, ValueError) as error:
         if isinstance(error, StrategyFamilyValidationError):
@@ -305,8 +322,12 @@ def policy_from_config(payload: Mapping[str, Any]) -> StrategyFamilyValidationPo
             minimum_receipts=int(policy["minimum_receipts"]),
             minimum_distinct_assets=int(policy["minimum_distinct_assets"]),
             minimum_distinct_regimes=int(policy["minimum_distinct_regimes"]),
-            require_single_provider=bool(policy["require_single_provider"]),
-            require_all_edge_pass=bool(policy["require_all_edge_pass"]),
+            require_single_provider=_strict_bool(
+                policy["require_single_provider"], "policy.require_single_provider"
+            ),
+            require_all_edge_pass=_strict_bool(
+                policy["require_all_edge_pass"], "policy.require_all_edge_pass"
+            ),
         )
     except (KeyError, TypeError, ValueError) as error:
         raise StrategyFamilyValidationError(
