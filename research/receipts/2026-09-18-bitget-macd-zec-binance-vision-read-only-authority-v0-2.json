@@ -1,0 +1,56 @@
+{
+  "schema": "qookey-bitget-macd-zec-binance-vision-read-only-authority-v0.2",
+  "status": "AUTHORIZED_PUBLIC_READ_ONLY_ONE_SHOT",
+  "date": "2026-09-18",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authorized_source_main_sha": "a0e216a41feaca61433bae9ca93c870a5baea9cc",
+  "preregistered_validation": {
+    "merged_pr": 344,
+    "merge_sha": "a0e216a41feaca61433bae9ca93c870a5baea9cc",
+    "candidate_grid_count": 2304,
+    "confirmation_can_change_parameters": false
+  },
+  "prior_attempt": {
+    "version": "v0.1",
+    "workflow_run_id": 35297163219,
+    "authority_consumed": true,
+    "zec_history_partition_reads_performed": false,
+    "status": "FAIL_CLOSED_ZEC_NOT_IN_GOVERNED_CORE100_CATALOG"
+  },
+  "user_authorization": {
+    "public_binance_vision_zec_read_only_authorized": true,
+    "authorization_date": "2026-09-18",
+    "merge_authority_granted_by_this_receipt": false
+  },
+  "authorized_scope": {
+    "provider": "binance_usdm",
+    "delivery": "binance_vision_public_monthly",
+    "symbol": "ZECUSDT",
+    "interval": "15m",
+    "source_month_start": "2022-08",
+    "source_month_end": "2026-07",
+    "monthly_archive_count": 48,
+    "checksum_reads_authorized": true,
+    "archive_reads_authorized": true,
+    "r2_access_authorized": false,
+    "provider_fallback_authorized": false,
+    "raw_candle_persistence_authorized": false
+  },
+  "execution": {
+    "one_shot": true,
+    "max_runs": 1,
+    "workflow": ".github/workflows/bitget-macd-zec-binance-vision-readonly-v0-2.yml",
+    "secret_free_summary_artifact_only": true
+  },
+  "safety_boundary": {
+    "formal_backtest_admission_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
