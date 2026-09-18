@@ -134,8 +134,10 @@ public live market data
         ↓
 Live Paper Simulation / tick-by-tick lifecycle progress
         ↓
+Live Paper Run Coordinator / append-only committed step
+        ↓
 Checkpoint + Paper Run Store
-        ↺ next live-paper tick
+        ↺ explicit next live-paper step
 
 Audit sidecar:
 completed rounds
@@ -213,6 +215,13 @@ current Pionex public order books/trades, advance one active paper basket across
 ticks, trigger simulated stop/target lifecycle events, update Paper Account /
 Checkpoint state and persist the next deterministic state through Paper Run
 Store V0.1. It has no private exchange-order API and cannot create a real order.
+
+Live Paper Run Coordinator V0.1 wraps that existing tick engine in an
+append-only persistent run ledger. It verifies prior committed steps and stored
+state, persists state/tick/step/request-result evidence, and can replay an
+already committed request without another provider call. It is explicit/manual,
+has no mutable latest pointer, no cron, no candidate generator and no Scorecard
+auto-selection path.
 
 Paper Run Store V0.1 provides explicit Local JSON and Cloudflare R2
 content-addressed persistence for paper evidence. Storage never upgrades the
