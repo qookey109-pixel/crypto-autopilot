@@ -414,6 +414,13 @@ def paper_account_advance_report_id_from_mapping(
     capacity = payload.get("portfolio_capacity_exported")
     if not isinstance(next_account_input, Mapping):
         raise ValueError("paper account advance next_account_input is required")
+    if next_account_input.get("schema") != "qookey-paper-account-state-input-v0.1":
+        raise ValueError("paper account advance next_account_input schema is invalid")
+    next_records = next_account_input.get("records")
+    if not isinstance(next_records, list):
+        raise ValueError("paper account advance next_account_input records must be an array")
+    if len(next_records) != counts["total_record_count"]:
+        raise ValueError("paper account advance total_record_count does not match next account")
     if not isinstance(account, Mapping):
         raise ValueError("paper account advance account evidence is required")
     if not isinstance(exposures, list):
