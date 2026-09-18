@@ -1,0 +1,83 @@
+name: Paper Run Package Artifact Export V0.1
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_path:
+        description: Repository-relative path to a verified Paper Loop Run Package JSON
+        required: true
+        type: string
+      retention_days:
+        description: GitHub Artifact retention days
+        required: false
+        default: "30"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: paper-run-package-artifact-v0-1-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate requested package path
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${{ inputs.package_path }}" in
+            /*|*..*)
+              echo "package_path must be a repository-relative path without traversal" >&2
+              exit 2
+              ;;
+          esac
+          test -f "${{ inputs.package_path }}"
+
+      - name: Export verified Run Package evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf artifacts/paper-run-package-v0-1
+          PYTHONPATH=src python scripts/export_paper_run_package_artifact_v0_1.py \
+            --package "${{ inputs.package_path }}" \
+            --output-dir artifacts/paper-run-package-v0-1 \
+            > artifacts/paper-run-package-export-receipt.stdout.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(
+              Path("artifacts/paper-run-package-export-receipt.stdout.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          assert receipt["state"] == "ARTIFACT_EXPORT_READY"
+          assert receipt["authority"]["secondary_audit_export_only"] is True
+          assert receipt["authority"]["artifact_is_execution_authority"] is False
+          assert receipt["authority"]["provider_access_authorized"] is False
+          assert receipt["authority"]["holdout_access_authorized"] is False
+          assert receipt["authority"]["real_money_order_authorized"] is False
+          assert receipt["authority"]["live_real_trading_authorized"] is False
+          PY
+
+      - name: Upload secondary audit artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: paper-run-package-v0-1-${{ github.run_id }}
+          path: |
+            artifacts/paper-run-package-v0-1/
+            artifacts/paper-run-package-export-receipt.stdout.json
+          if-no-files-found: error
+          retention-days: ${{ inputs.retention_days }}
