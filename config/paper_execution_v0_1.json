@@ -5,9 +5,10 @@
   "product_stage": "PAPER_EXECUTION",
   "inputs": {
     "registered_strategy_family_required": true,
-    "family_review_state_required": "FAMILY_EVIDENCE_READY_FOR_HUMAN_REVIEW",
     "position_sizing_state_required": "SIZING_READY",
-    "approved_notional_source": "PositionSizingPlan.approved_notional_usd"
+    "approved_notional_source": "PositionSizingPlan.approved_notional_usd",
+    "family_validation_report_required": true,
+    "family_validation_report_sha256_bound_to_intent": true
   },
   "behavior": {
     "require_family_review_ready": true,
@@ -20,7 +21,8 @@
     "realistic_fill_simulator": false,
     "settlement_simulation": false,
     "slippage_simulation": false,
-    "funding_simulation": false
+    "funding_simulation": false,
+    "family_validation_authority_must_remain_closed": true
   },
   "authority": {
     "repository_paper_broker_long_authorized": true,
