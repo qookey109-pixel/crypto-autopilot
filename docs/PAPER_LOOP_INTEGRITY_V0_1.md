@@ -138,6 +138,18 @@ and includes:
 Equity change is descriptive audit information only. It is not a strategy
 score, edge claim or profitability verdict.
 
+## Portable transcript package
+
+Paper Loop Run Package / Transcript V0.1 is the downstream audit-packaging
+layer after an Integrity PASS.
+
+It requires exact Integrity-id confirmation, re-runs this Integrity audit over
+the complete supplied transcript, creates a per-round/per-stage SHA-256
+manifest and embeds the terminal Checkpoint.
+
+The Run Package performs no execution and
+`package_is_execution_authority=false` remains binding.
+
 ## CLI
 
 ```bash

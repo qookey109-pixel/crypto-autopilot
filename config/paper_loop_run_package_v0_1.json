@@ -1,0 +1,44 @@
+{
+  "schema": "qookey-paper-loop-run-package-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_PORTABLE_AUDIT_PACKAGE_ONLY",
+  "product_stage": "PAPER_LOOP_RUN_PACKAGE",
+  "policy": {
+    "require_exact_integrity_id_confirmation": true,
+    "require_integrity_reaudit": true,
+    "require_complete_stage_manifest": true,
+    "include_full_transcript": true,
+    "include_integrity_proof": true,
+    "persistent_state_write_authorized": false,
+    "provider_access_authorized": false,
+    "execution_authorized": false,
+    "live_trading_authorized": false
+  },
+  "behavior": {
+    "integrity_report_id_recomputed": true,
+    "integrity_transcript_reaudited": true,
+    "full_transcript_included": true,
+    "full_integrity_proof_included": true,
+    "per_round_stage_manifest_included": true,
+    "terminal_checkpoint_included": true,
+    "same_input_same_package_id": true,
+    "package_is_execution_authority": false,
+    "persistent_state_written": false,
+    "provider_requests_performed": false,
+    "execution_performed": false
+  },
+  "authority": {
+    "portable_audit_package_authorized": true,
+    "package_is_execution_authority": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "persistent_state_write_authorized": false,
+    "automatic_execution_authorized": false,
+    "automatic_submission_authorized": false,
+    "strategy_ranking_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}

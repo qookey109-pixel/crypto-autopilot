@@ -23,9 +23,10 @@ any versioned authority.
 16. `docs/PAPER_LOOP_CHECKPOINT_V0_1.md` — exact-advance-id-confirmed portable next-account handoff with rematerialization/exposure reconciliation.
 17. `docs/PAPER_LOOP_RESUME_V0_1.md` — exact-checkpoint-id-confirmed checkpoint consumption into the existing manual Paper Cycle engine.
 18. `docs/PAPER_LOOP_INTEGRITY_V0_1.md` — audit-only two-or-more-round lineage, Checkpoint chaining and deterministic replay verification.
-19. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
-20. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
-21. The exact config and receipt named by the stage being changed.
+19. `docs/PAPER_LOOP_RUN_PACKAGE_V0_1.md` — portable self-verifying transcript/proof package with per-stage SHA manifest; not execution authority.
+20. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
+21. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
+22. The exact config and receipt named by the stage being changed.
 
 ## Current bounded data and Paper stages
 
