@@ -99,6 +99,7 @@ class PortfolioProposal:
     direction: str
     as_of_ms: int
     family_validation_report_sha256: str
+    sizing_equity_usd: float
     approved_notional_usd: float
     realized_risk_usd: float
     target_risk_usd: float
@@ -167,6 +168,7 @@ def build_portfolio_proposal(
     if sizing_plan.direction not in family.directions:
         raise ValueError("sizing direction is not supported by strategy family")
     values = (
+        sizing_plan.equity_usd,
         sizing_plan.approved_notional_usd,
         sizing_plan.realized_risk_usd,
         sizing_plan.target_risk_usd,
@@ -183,6 +185,7 @@ def build_portfolio_proposal(
         "direction": sizing_plan.direction,
         "as_of_ms": as_of_ms,
         "family_validation_report_sha256": report_sha,
+        "sizing_equity_usd": sizing_plan.equity_usd,
         "approved_notional_usd": sizing_plan.approved_notional_usd,
         "realized_risk_usd": sizing_plan.realized_risk_usd,
         "target_risk_usd": sizing_plan.target_risk_usd,
@@ -197,6 +200,7 @@ def build_portfolio_proposal(
         direction=sizing_plan.direction,
         as_of_ms=as_of_ms,
         family_validation_report_sha256=report_sha,
+        sizing_equity_usd=sizing_plan.equity_usd,
         approved_notional_usd=sizing_plan.approved_notional_usd,
         realized_risk_usd=sizing_plan.realized_risk_usd,
         target_risk_usd=sizing_plan.target_risk_usd,
@@ -282,6 +286,17 @@ def admit_portfolio(
     proposal_ids = tuple(item.proposal_id for item in proposal_tuple)
     if len(set(proposal_ids)) != len(proposal_ids):
         raise ValueError("portfolio proposal ids must be unique")
+
+    if any(
+        not math.isclose(
+            item.sizing_equity_usd,
+            equity_usd,
+            rel_tol=0.0,
+            abs_tol=1e-8,
+        )
+        for item in proposal_tuple
+    ):
+        raise ValueError("all portfolio proposals must use the portfolio equity basis")
 
     (
         total_risk,
@@ -381,6 +396,23 @@ def portfolio_policy_from_config(payload: Mapping[str, object]) -> PortfolioPoli
     policy = payload.get("policy")
     if not isinstance(policy, Mapping):
         raise ValueError("policy object is required")
+
+    overlap_groups = payload.get("overlap_groups")
+    if not isinstance(overlap_groups, Mapping):
+        raise ValueError("overlap_groups object is required")
+    expected_groups: dict[str, list[str]] = defaultdict(list)
+    for family, group in OVERLAP_GROUPS.items():
+        expected_groups[group].append(family)
+    normalized_expected = {
+        group: sorted(families) for group, families in sorted(expected_groups.items())
+    }
+    normalized_config: dict[str, list[str]] = {}
+    for group, families in overlap_groups.items():
+        if not isinstance(group, str) or not isinstance(families, list):
+            raise ValueError("overlap_groups must map strings to arrays")
+        normalized_config[group] = sorted(str(family) for family in families)
+    if normalized_config != normalized_expected:
+        raise ValueError("configured strategy overlap groups do not match code registry")
 
     numeric_keys = (
         "maximum_total_realized_risk_fraction",
