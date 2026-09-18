@@ -535,6 +535,169 @@ def audit_paper_loop_integrity(
     }
 
 
+def paper_loop_integrity_report_id_from_mapping(
+    payload: Mapping[str, object],
+) -> str:
+    """Validate and recompute one serialized Paper Loop Integrity report id."""
+
+    if payload.get("schema") != "qookey-paper-loop-integrity-report-v0.1":
+        raise ValueError("unsupported paper loop integrity report schema")
+    if payload.get("state") != "MULTI_CYCLE_INTEGRITY_PASS":
+        raise ValueError("paper loop integrity report is not a PASS state")
+
+    integrity_id = payload.get("integrity_id")
+    start_checkpoint_id = payload.get("start_checkpoint_id")
+    terminal_checkpoint_id = payload.get("terminal_checkpoint_id")
+    transcript_sha256 = payload.get("transcript_sha256")
+    if not isinstance(integrity_id, str) or not integrity_id:
+        raise ValueError("paper loop integrity integrity_id is required")
+    if not isinstance(start_checkpoint_id, str) or not start_checkpoint_id:
+        raise ValueError("paper loop integrity start_checkpoint_id is required")
+    if not isinstance(terminal_checkpoint_id, str) or not terminal_checkpoint_id:
+        raise ValueError("paper loop integrity terminal_checkpoint_id is required")
+    if not isinstance(transcript_sha256, str) or len(transcript_sha256) != 64:
+        raise ValueError("paper loop integrity transcript_sha256 is invalid")
+
+    round_count = payload.get("round_count")
+    unique_forward_intent_count = payload.get("unique_forward_intent_count")
+    if (
+        not isinstance(round_count, int)
+        or isinstance(round_count, bool)
+        or round_count < 2
+    ):
+        raise ValueError("paper loop integrity round_count must be >= 2")
+    if (
+        not isinstance(unique_forward_intent_count, int)
+        or isinstance(unique_forward_intent_count, bool)
+        or unique_forward_intent_count < 1
+    ):
+        raise ValueError("paper loop integrity unique intent count must be positive")
+
+    rounds = payload.get("rounds")
+    if not isinstance(rounds, list) or len(rounds) != round_count:
+        raise ValueError("paper loop integrity round summaries do not match round_count")
+
+    seen_intents: set[str] = set()
+    prior_end_checkpoint_id: str | None = None
+    for index, row in enumerate(rounds):
+        if not isinstance(row, Mapping):
+            raise ValueError(f"integrity rounds[{index}] must be an object")
+        required_strings = (
+            "start_checkpoint_id",
+            "resume_id",
+            "cycle_id",
+            "session_id",
+            "batch_id",
+            "advance_id",
+            "end_checkpoint_id",
+            "start_snapshot_id",
+            "end_snapshot_id",
+        )
+        for key in required_strings:
+            value = row.get(key)
+            if not isinstance(value, str) or not value:
+                raise ValueError(f"integrity rounds[{index}].{key} is required")
+        if row.get("round_index") != index:
+            raise ValueError("integrity round_index sequence is invalid")
+        if index == 0 and row["start_checkpoint_id"] != start_checkpoint_id:
+            raise ValueError("integrity first round start checkpoint mismatch")
+        if prior_end_checkpoint_id is not None and row["start_checkpoint_id"] != prior_end_checkpoint_id:
+            raise ValueError("integrity round summary checkpoint chain is broken")
+        prior_end_checkpoint_id = str(row["end_checkpoint_id"])
+
+        for key in ("start_as_of_ms", "end_as_of_ms"):
+            value = row.get(key)
+            if not isinstance(value, int) or isinstance(value, bool):
+                raise ValueError(f"integrity rounds[{index}].{key} must be integer")
+        if row["end_as_of_ms"] < row["start_as_of_ms"]:
+            raise ValueError("integrity round summary time regressed")
+
+        start_equity = _strict_number(
+            row.get("start_equity_usd"), f"integrity rounds[{index}].start_equity"
+        )
+        end_equity = _strict_number(
+            row.get("end_equity_usd"), f"integrity rounds[{index}].end_equity"
+        )
+        equity_change = _strict_number(
+            row.get("equity_change_usd"), f"integrity rounds[{index}].equity_change"
+        )
+        if round(end_equity - start_equity, 8) != equity_change:
+            raise ValueError("integrity round summary equity change mismatch")
+
+        intent_ids = row.get("new_intent_ids")
+        if not isinstance(intent_ids, list) or not intent_ids:
+            raise ValueError("integrity round summary new_intent_ids are required")
+        if any(not isinstance(item, str) or not item for item in intent_ids):
+            raise ValueError("integrity round summary intent ids are invalid")
+        if len(set(intent_ids)) != len(intent_ids):
+            raise ValueError("integrity round summary contains duplicate intent ids")
+        duplicate = seen_intents.intersection(intent_ids)
+        if duplicate:
+            raise ValueError("integrity report reuses forward intent ids")
+        seen_intents.update(intent_ids)
+
+    if prior_end_checkpoint_id != terminal_checkpoint_id:
+        raise ValueError("integrity terminal checkpoint does not match round summaries")
+    if len(seen_intents) != unique_forward_intent_count:
+        raise ValueError("integrity unique intent count mismatch")
+
+    start_equity = _strict_number(
+        payload.get("start_equity_usd"), "integrity start_equity_usd"
+    )
+    terminal_equity = _strict_number(
+        payload.get("terminal_equity_usd"), "integrity terminal_equity_usd"
+    )
+    net_change = _strict_number(
+        payload.get("net_equity_change_usd"), "integrity net_equity_change_usd"
+    )
+    if round(terminal_equity - start_equity, 8) != net_change:
+        raise ValueError("integrity net equity change mismatch")
+    if rounds[0].get("start_snapshot_id") != payload.get("start_snapshot_id"):
+        raise ValueError("integrity start snapshot mismatch")
+    if rounds[-1].get("end_snapshot_id") != payload.get("terminal_snapshot_id"):
+        raise ValueError("integrity terminal snapshot mismatch")
+    if rounds[0].get("start_equity_usd") != start_equity:
+        raise ValueError("integrity start equity does not match first round")
+    if rounds[-1].get("end_equity_usd") != terminal_equity:
+        raise ValueError("integrity terminal equity does not match last round")
+
+    for key in (
+        "provider_requests_performed",
+        "persistent_state_writes_performed",
+        "executions_performed",
+    ):
+        value = payload.get(key)
+        if not isinstance(value, int) or isinstance(value, bool) or value != 0:
+            raise ValueError(f"paper loop integrity {key} must equal zero")
+
+    authority = payload.get("authority")
+    if not isinstance(authority, Mapping):
+        raise ValueError("paper loop integrity authority object is required")
+    if authority.get("audit_only") is not True:
+        raise ValueError("paper loop integrity must remain audit-only")
+    for key in (
+        "provider_requests_performed",
+        "r2_accessed",
+        "holdout_accessed",
+        "persistent_state_write_authorized",
+        "automatic_execution_authorized",
+        "strategy_ranking_authorized",
+        "real_money_order_authorized",
+        "live_trading_authorized",
+    ):
+        if authority.get(key) is not False:
+            raise ValueError(f"paper loop integrity authority must remain closed: {key}")
+
+    canonical = {
+        "schema": "qookey-paper-loop-integrity-id-v0.1",
+        "start_checkpoint_id": start_checkpoint_id,
+        "terminal_checkpoint_id": terminal_checkpoint_id,
+        "transcript_sha256": transcript_sha256,
+        "round_summaries": rounds,
+    }
+    return f"paper-loop-integrity-v0-1-{_sha256(canonical)}"
+
+
 def paper_loop_integrity_policy_from_config(
     payload: Mapping[str, object],
 ) -> PaperLoopIntegrityPolicy:
