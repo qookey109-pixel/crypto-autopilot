@@ -136,6 +136,8 @@ Live Paper Simulation / tick-by-tick lifecycle progress
         ↓
 Live Paper Run Coordinator / append-only committed step
         ↓
+Recovery / Reconciliation audit + result-seal-only repair
+        ↓
 Checkpoint + Paper Run Store
         ↺ explicit next live-paper step
 
@@ -222,6 +224,12 @@ state, persists state/tick/step/request-result evidence, and can replay an
 already committed request without another provider call. It is explicit/manual,
 has no mutable latest pointer, no cron, no candidate generator and no Scorecard
 auto-selection path.
+
+Live Paper Run Recovery / Reconciliation V0.1 audits persisted run chains and
+may repair only a missing immutable request-result seal when the complete step,
+both states and tick evidence all verify. It performs no provider replay and
+cannot rewrite state, tick or step evidence. Forks, missing evidence and
+ambiguous orphan ticks remain REVIEW_REQUIRED.
 
 Paper Run Store V0.1 provides explicit Local JSON and Cloudflare R2
 content-addressed persistence for paper evidence. Storage never upgrades the

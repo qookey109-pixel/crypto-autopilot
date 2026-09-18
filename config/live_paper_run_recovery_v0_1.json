@@ -1,0 +1,47 @@
+{
+  "schema": "qookey-live-paper-run-recovery-v0.1",
+  "status_date": "2026-09-19",
+  "status": "PREPARED_AUDIT_AND_RESULT_SEAL_REPAIR_ONLY",
+  "product_stage": "LIVE_PAPER_RUN_RECOVERY",
+  "policy": {
+    "require_verified_run_header": true,
+    "require_contiguous_step_chain": true,
+    "require_persisted_state_evidence": true,
+    "require_persisted_tick_evidence": true,
+    "allow_missing_result_seal_repair": true,
+    "result_seal_repair_only": true,
+    "provider_access_authorized": false,
+    "live_market_data_access_authorized": false,
+    "account_state_mutation_authorized": false,
+    "step_state_tick_rewrite_authorized": false,
+    "automatic_schedule_authorized": false,
+    "private_exchange_api_authorized": false,
+    "holdout_access_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  },
+  "repair_contract": {
+    "safe_repair_object": "live-run-result",
+    "repair_requires_complete_verified_step": true,
+    "repair_requires_both_states": true,
+    "repair_requires_persisted_tick": true,
+    "provider_replay_for_repair": false,
+    "state_rewrite_for_repair": false,
+    "tick_rewrite_for_repair": false,
+    "step_rewrite_for_repair": false,
+    "fork_auto_resolution": false,
+    "orphan_tick_auto_adoption": false
+  },
+  "authority": {
+    "audit_authorized": true,
+    "missing_result_seal_repair_authorized": true,
+    "provider_access_authorized": false,
+    "live_market_data_access_authorized": false,
+    "account_state_mutation_authorized": false,
+    "private_exchange_api_authorized": false,
+    "holdout_access_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}

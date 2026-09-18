@@ -34,6 +34,7 @@ They are not interchangeable and are not added together into an invented score.
 | Paper Run Package Artifact Export | `config/paper_run_package_artifact_export_v0_1.json` | PREPARED_SECONDARY_AUDIT_EXPORT_ONLY | re-verify a Run Package and prepare canonical package/manifest/SHA evidence for manual GitHub Artifact upload; Artifact never becomes execution authority |
 | Live Paper Simulation | `config/live_paper_simulation_v0_1.json` | PREPARED_LIVE_PAPER_SIMULATION | allow public Pionex market data and tick-by-tick paper lifecycle/account/checkpoint progress; private API, real-money orders and real live trading remain false |
 | Live Paper Run Coordinator | `config/live_paper_run_coordinator_v0_1.json` | PREPARED_EXPLICIT_PERSISTENT_COORDINATION_ONLY | chain verified Live Paper ticks into restartable append-only run steps and committed-request replay; manual-only, no auto candidate/Scorecard selection, no real orders |
+| Live Paper Run Recovery / Reconciliation | `config/live_paper_run_recovery_v0_1.json` | PREPARED_AUDIT_AND_RESULT_SEAL_REPAIR_ONLY | audit persisted run chains and repair only missing immutable request-result seals after complete state/tick/step verification; no provider replay or state mutation |
 | Paper Run Store | `config/paper_run_store_v0_1.json` | PREPARED_PAPER_EVIDENCE_PERSISTENCE | persist deterministic paper state/evidence through Local JSON or existing Cloudflare R2 adapter; stored objects never become execution authority |
 
 ## Analysis flow

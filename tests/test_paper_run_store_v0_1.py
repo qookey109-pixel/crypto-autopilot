@@ -36,6 +36,9 @@ class FakeR2:
         self.objects[key] = payload
         return SimpleNamespace(bytes=len(payload))
 
+    def list_keys(self, prefix: str) -> tuple[str, ...]:
+        return tuple(sorted(key for key in self.objects if key.startswith(prefix)))
+
 
 class PaperRunStoreV01Tests(unittest.TestCase):
     def test_local_store_is_content_addressed_and_idempotent(self) -> None:
@@ -86,6 +89,39 @@ class PaperRunStoreV01Tests(unittest.TestCase):
                 store.put_json("../state", "id", {"x": 1})
             with self.assertRaises(ValueError):
                 store.put_json("state", "../id", {"x": 1})
+
+    def test_local_store_lists_json_ids_by_kind(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = LocalPaperRunStore(Path(tmp).resolve())
+            store.put_json("live-run-step", "step-b", {"value": 2})
+            store.put_json("live-run-step", "step-a", {"value": 1})
+            store.put_json("live-state", "state-a", {"value": 3})
+
+            self.assertEqual(
+                store.list_json_ids("live-run-step"),
+                ("step-a", "step-b"),
+            )
+            self.assertEqual(
+                store.list_json_ids("live-state"),
+                ("state-a",),
+            )
+            self.assertEqual(store.list_json_ids("missing-kind"), ())
+
+    def test_r2_store_lists_only_ids_under_requested_kind(self) -> None:
+        fake = FakeR2()
+        store = R2PaperRunStore(fake)  # type: ignore[arg-type]
+        store.put_json("live-run-step", "step-b", {"value": 2})
+        store.put_json("live-run-step", "step-a", {"value": 1})
+        store.put_json("live-state", "state-a", {"value": 3})
+
+        self.assertEqual(
+            store.list_json_ids("live-run-step"),
+            ("step-a", "step-b"),
+        )
+        self.assertEqual(
+            store.list_json_ids("live-state"),
+            ("state-a",),
+        )
 
     def test_versioned_config_matches_policy(self) -> None:
         payload = json.loads(CONFIG.read_text(encoding="utf-8"))

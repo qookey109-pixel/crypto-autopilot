@@ -1,6 +1,6 @@
 # Paper Run Store V0.1
 
-Status date: 2026-09-18
+Status date: 2026-09-19
 
 Status: **PREPARED PAPER-EVIDENCE PERSISTENCE / NOT EXECUTION AUTHORITY**
 
@@ -63,6 +63,25 @@ Credentials remain outside Git and are supplied only by environment / secret
 manager.
 
 The existing R2 adapter already verifies SHA metadata on read when available.
+
+## Read-only object listing
+
+Recovery / Reconciliation may enumerate object ids by one exact kind.
+
+Local JSON listing is restricted to:
+
+```text
+<explicit-root>/<kind>/*.json
+```
+
+R2 listing is restricted to:
+
+```text
+paper-run-store/v0.1/<kind>/
+```
+
+Listing is read-only evidence discovery. It does not grant provider access,
+account mutation or execution authority.
 
 ## GitHub Artifact
 
