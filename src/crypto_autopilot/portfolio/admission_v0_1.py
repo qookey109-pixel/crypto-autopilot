@@ -398,6 +398,108 @@ def _authority() -> dict[str, object]:
     }
 
 
+def _position_sizing_plan_from_mapping(
+    payload: Mapping[str, object],
+) -> PositionSizingPlan:
+    if not isinstance(payload.get("stop_preserved"), bool):
+        raise ValueError("position sizing stop_preserved must be a JSON boolean")
+    clipped_by = payload.get("clipped_by")
+    if not isinstance(clipped_by, list) or any(
+        not isinstance(item, str) for item in clipped_by
+    ):
+        raise ValueError("position sizing clipped_by must be an array of strings")
+    try:
+        return PositionSizingPlan(
+            status=str(payload["status"]),
+            reason=str(payload["reason"]),
+            direction=str(payload["direction"]),
+            equity_usd=float(payload["equity_usd"]),
+            entry_price=float(payload["entry_price"]),
+            stop_price=float(payload["stop_price"]),
+            stop_distance_fraction=float(payload["stop_distance_fraction"]),
+            target_risk_usd=float(payload["target_risk_usd"]),
+            realized_risk_usd=float(payload["realized_risk_usd"]),
+            target_notional_usd=float(payload["target_notional_usd"]),
+            approved_notional_usd=float(payload["approved_notional_usd"]),
+            required_leverage=float(payload["required_leverage"]),
+            realized_leverage=float(payload["realized_leverage"]),
+            risk_utilization_fraction=float(payload["risk_utilization_fraction"]),
+            clipped_by=tuple(clipped_by),
+            stop_preserved=bool(payload["stop_preserved"]),
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError(f"invalid position sizing plan: {error}") from error
+
+
+def portfolio_admission_input_from_dict(
+    payload: Mapping[str, object],
+) -> tuple[float, tuple[PortfolioProposal, ...], tuple[PortfolioExposure, ...]]:
+    if payload.get("schema") != "qookey-portfolio-admission-input-v0.1":
+        raise ValueError("unsupported portfolio admission input schema")
+    if isinstance(payload.get("equity_usd"), bool):
+        raise ValueError("equity_usd cannot be boolean")
+    try:
+        equity_usd = float(payload["equity_usd"])
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError(f"invalid equity_usd: {error}") from error
+
+    proposal_items = payload.get("proposals")
+    existing_items = payload.get("existing_exposures", [])
+    if not isinstance(proposal_items, list):
+        raise ValueError("proposals must be a JSON array")
+    if not isinstance(existing_items, list):
+        raise ValueError("existing_exposures must be a JSON array")
+
+    proposals: list[PortfolioProposal] = []
+    for index, item in enumerate(proposal_items):
+        if not isinstance(item, Mapping):
+            raise ValueError(f"proposals[{index}] must be a JSON object")
+        family_report = item.get("family_validation_report")
+        sizing_payload = item.get("position_sizing_plan")
+        if not isinstance(family_report, Mapping):
+            raise ValueError(
+                f"proposals[{index}].family_validation_report must be an object"
+            )
+        if not isinstance(sizing_payload, Mapping):
+            raise ValueError(
+                f"proposals[{index}].position_sizing_plan must be an object"
+            )
+        try:
+            proposals.append(
+                build_portfolio_proposal(
+                    symbol=str(item["symbol"]),
+                    strategy_family=str(item["strategy_family"]),
+                    family_validation_report=family_report,
+                    as_of_ms=int(item["as_of_ms"]),
+                    sizing_plan=_position_sizing_plan_from_mapping(sizing_payload),
+                )
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            raise ValueError(f"invalid proposals[{index}]: {error}") from error
+
+    existing: list[PortfolioExposure] = []
+    for index, item in enumerate(existing_items):
+        if not isinstance(item, Mapping):
+            raise ValueError(f"existing_exposures[{index}] must be a JSON object")
+        try:
+            existing.append(
+                PortfolioExposure(
+                    exposure_id=str(item["exposure_id"]),
+                    symbol=str(item["symbol"]),
+                    strategy_family=str(item["strategy_family"]),
+                    direction=str(item["direction"]),
+                    notional_usd=float(item["notional_usd"]),
+                    realized_risk_usd=float(item["realized_risk_usd"]),
+                )
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            raise ValueError(
+                f"invalid existing_exposures[{index}]: {error}"
+            ) from error
+
+    return equity_usd, tuple(proposals), tuple(existing)
+
+
 def portfolio_policy_from_config(payload: Mapping[str, object]) -> PortfolioPolicy:
     if payload.get("schema") != "qookey-portfolio-admission-v0.1":
         raise ValueError("unsupported portfolio admission config")
