@@ -278,6 +278,18 @@ class PaperAccountStateV01Tests(unittest.TestCase):
                 marks=(PaperMark("BTC_USDT_PERP", 3_000, 100.5),),
             )
 
+    def test_tampered_paper_receipt_notional_is_rejected(self) -> None:
+        record = lifecycle_record(bars=(bar(2_000),))
+        tampered = copy.deepcopy(record)
+        tampered["paper_execution_evidence"]["receipt"]["notional_usd"] = 99.0
+
+        with self.assertRaises(ValueError):
+            materialize_paper_account(
+                initial_equity_usd=100.0,
+                records=(tampered,),
+                marks=(PaperMark("BTC_USDT_PERP", 3_000, 100.5),),
+            )
+
     def test_tampered_lifecycle_accounting_is_rejected(self) -> None:
         record = lifecycle_record(bars=(bar(2_000),))
         tampered = copy.deepcopy(record)
@@ -384,6 +396,11 @@ class PaperAccountStateV01Tests(unittest.TestCase):
         bad["marks"][0]["price"] = True
         with self.assertRaises(ValueError):
             paper_account_input_from_dict(bad)
+
+        bad_string = json.loads(json.dumps(payload))
+        bad_string["marks"][0]["price"] = "100.5"
+        with self.assertRaises(ValueError):
+            paper_account_input_from_dict(bad_string)
 
     def test_versioned_policy_matches_defaults_and_strict_types(self) -> None:
         payload = json.loads(CONFIG.read_text(encoding="utf-8"))
