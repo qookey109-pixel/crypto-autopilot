@@ -1,0 +1,46 @@
+{
+  "schema": "qookey-paper-account-advance-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_EXPLICIT_ACCOUNT_REMATERIALIZATION_ONLY",
+  "product_stage": "PAPER_ACCOUNT_ADVANCE",
+  "policy": {
+    "require_exact_batch_id_confirmation": true,
+    "reject_lifecycle_id_change_for_existing_intent": true,
+    "reject_event_time_regression": true,
+    "reject_same_time_different_report": true,
+    "allow_identical_record_replay": true,
+    "persistent_state_write_authorized": false,
+    "provider_access_authorized": false,
+    "live_trading_authorized": false
+  },
+  "behavior": {
+    "previous_account_input_is_validated": true,
+    "batch_id_recomputed_before_advance": true,
+    "records_keyed_by_intent_id": true,
+    "existing_intent_requires_same_lifecycle_id": true,
+    "forward_lifecycle_record_replaces_previous": true,
+    "identical_batch_record_is_idempotent": true,
+    "event_time_regression_rejected": true,
+    "same_event_time_different_report_rejected": true,
+    "original_initial_equity_preserved": true,
+    "next_account_input_emitted": true,
+    "portfolio_exposure_exported_when_active": true,
+    "persistent_state_written": false
+  },
+  "authority": {
+    "explicit_account_rematerialization_authorized": true,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "persistent_state_write_authorized": false,
+    "automatic_cycle_authorized": false,
+    "automatic_submission_authorized": false,
+    "scheduled_execution_authorized": false,
+    "short_paper_execution_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
