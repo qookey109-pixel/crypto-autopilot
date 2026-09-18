@@ -18,6 +18,7 @@ They are not interchangeable and are not added together into an invented score.
 | Multi-Strategy Library | `config/strategy_library_v0_1.json` | PREPARED_RESEARCH_ONLY | canonical six-family registry and lifecycle/authority metadata used by Strategy Router |
 | Strategy Family Validation | `config/strategy_family_validation_v0_1.json` | PREPARED_RESEARCH_ONLY | aggregate existing Edge PASS evidence into cross-asset/cross-regime family generalization review without ranking or promotion |
 | Risk / Position Sizing | `config/risk_position_sizing_v0_1.json` | PREPARED_RESEARCH_ONLY | preserve upstream stop, separate target vs realized risk, and bound notional by leverage/notional constraints without order authority |
+| Portfolio Admission | `config/portfolio_admission_v0_1.json` | PREPARED_RESEARCH_PAPER_ONLY | evaluate explicit multi-asset/multi-strategy baskets against total-risk, concentration, overlap and gross-notional gates without ranking or subset optimization |
 | Paper Execution | `config/paper_execution_v0_1.json` | PREPARED_PAPER_ONLY | bind validated family lineage and approved risk notional into deterministic idempotent Repository Paper Broker LONG intents; no automatic/live execution |
 
 ## Analysis flow
