@@ -5,24 +5,36 @@
   "product_stage": "DAILY_OPPORTUNITY_ENGINE",
   "multi_asset": true,
   "single_asset_primary_architecture": false,
-  "directional_biases": ["LONG_BIAS", "SHORT_BIAS", "NEUTRAL"],
+  "directional_biases": [
+    "LONG_BIAS",
+    "SHORT_BIAS",
+    "NEUTRAL"
+  ],
   "policy": {
     "maximum_candidates": 5,
-    "minimum_attention_score": 65.0,
-    "maximum_spread_bps": 30.0,
-    "volume_ratio_floor": 1.0,
-    "bullish_rsi_floor": 55.0,
-    "bearish_rsi_ceiling": 45.0,
+    "minimum_attention_score": 65,
+    "maximum_spread_bps": 30,
+    "volume_ratio_floor": 1,
+    "bullish_rsi_floor": 55,
+    "bearish_rsi_ceiling": 45,
     "bullish_bollinger_position_floor": 0.55,
     "bearish_bollinger_position_ceiling": 0.45,
-    "require_ready_regime": true
+    "require_ready_regime": true,
+    "range_ema20_slope_atr_ceiling": 0.1,
+    "range_ema20_ema50_compression_fraction": 0.005,
+    "range_rsi_lower": 35,
+    "range_rsi_upper": 65,
+    "range_bollinger_lower": 0.2,
+    "range_bollinger_upper": 0.8
   },
   "score": {
-    "maximum": 100.0,
-    "liquidity_points": 25.0,
-    "directional_points": 75.0,
+    "maximum": 100,
+    "liquidity_points": 25,
+    "directional_points": 75,
     "statistical_edge_claim": false,
-    "order_authority": false
+    "order_authority": false,
+    "profile_combination": "MAX_NOT_SUM",
+    "range_extremity_points": 75
   },
   "behavior": {
     "may_return_zero_candidates": true,
@@ -30,7 +42,8 @@
     "strategy_router_called": false,
     "position_sizing_performed": false,
     "provider_io_performed": false,
-    "storage_io_performed": false
+    "storage_io_performed": false,
+    "range_extremity_candidates_reach_router": true
   },
   "authority": {
     "provider_access_authorized": false,
@@ -43,5 +56,9 @@
     "real_money_order_authorized": false,
     "live_trading_authorized": false,
     "merge_authority_granted": false
-  }
+  },
+  "attention_profiles": [
+    "DIRECTIONAL",
+    "RANGE_EXTREMITY"
+  ]
 }
