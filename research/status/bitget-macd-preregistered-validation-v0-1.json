@@ -1,0 +1,41 @@
+{
+  "schema": "qookey-bitget-macd-preregistered-validation-status-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREREGISTERED_NOT_EXECUTED",
+  "base_main": "747e10b473e9d198d4eb72f9a6f6e19491888005",
+  "dataset": {
+    "symbol": "ZECUSDT",
+    "source_timeframe": "15m",
+    "target_timeframe": "30m",
+    "real_historical_data_accessed": false
+  },
+  "validation": {
+    "development_fraction": 0.70,
+    "development_folds": 4,
+    "top_k": 24,
+    "min_trades_per_development_window": 5,
+    "confirmation_fraction": 0.30,
+    "confirmation_can_change_parameters": false,
+    "confirmation_slippage_stress_bps_per_side": [2.0, 5.0, 10.0],
+    "candidate_grid_count": 2304,
+    "formal_project_holdout_accessed": false
+  },
+  "execution": {
+    "provider_requests_performed": 0,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "training_performed": false
+  },
+  "authority": {
+    "real_zec_historical_read_authorized": false,
+    "provider_read_authorized": false,
+    "r2_read_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "source_switch_authorized": false,
+    "holdout_access_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
