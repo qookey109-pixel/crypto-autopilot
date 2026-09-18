@@ -433,6 +433,13 @@ def simulate_paper_lifecycle(
                             exit_reason=reason,
                             policy=policy,
                         )
+                    emit(
+                        bar.time_ms,
+                        "UNFILLED_REMAINDER_CANCELLED",
+                        notional_usd=round(remaining, 8),
+                        reason="target_not_above_executable_entry",
+                    )
+                    entry_complete = True
                     continue
                 quantity = fill_notional / fill_price
                 fee = fill_notional * policy.taker_fee_bps / 10_000.0
