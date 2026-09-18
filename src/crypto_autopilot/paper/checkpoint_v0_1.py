@@ -59,6 +59,17 @@ class PaperLoopCheckpointPolicy:
             raise ValueError("Paper Loop Checkpoint V0.1 authority exceeds its scope")
 
 
+def _canonicalize(value: object) -> object:
+    if isinstance(value, Mapping):
+        return {
+            str(key): _canonicalize(item)
+            for key, item in sorted(value.items())
+        }
+    if isinstance(value, (list, tuple)):
+        return [_canonicalize(item) for item in value]
+    return value
+
+
 def _sha256(payload: Mapping[str, object]) -> str:
     encoded = json.dumps(
         dict(payload), sort_keys=True, separators=(",", ":"), ensure_ascii=True
@@ -138,8 +149,9 @@ def create_paper_loop_checkpoint(
     expected_snapshot = account_evidence.get("snapshot")
     if not isinstance(expected_snapshot, Mapping):
         raise ValueError("paper account advance account snapshot is required")
-    actual_snapshot = asdict(snapshot)
-    if actual_snapshot != dict(expected_snapshot):
+    actual_snapshot = _canonicalize(asdict(snapshot))
+    expected_snapshot_json = _canonicalize(expected_snapshot)
+    if actual_snapshot != expected_snapshot_json:
         raise ValueError("next_account_input does not rematerialize declared account snapshot")
     if snapshot.snapshot_id != account_advance_report.get("next_snapshot_id"):
         raise ValueError("rematerialized snapshot id does not match advance report")
