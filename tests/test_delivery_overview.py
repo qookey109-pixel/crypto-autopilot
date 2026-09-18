@@ -66,7 +66,11 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertEqual(web_current["pionexPartitionCount"], 682)
         self.assertEqual(web_current["holdoutState"], "FROZEN_UNOPENED")
         self.assertFalse(web_current["sourceSwitchAuthorized"])
+        self.assertEqual(web_current["mode"], "PAPER_AND_LIVE_PAPER_ONLY")
+        self.assertTrue(web_current["publicLiveMarketDataAuthorized"])
+        self.assertTrue(web_current["livePaperSimulationAuthorized"])
         self.assertFalse(web_current["liveTradingAuthorized"])
+        self.assertFalse(web_current["liveRealTradingAuthorized"])
 
     def test_current_operations_tamper_fails_closed(self) -> None:
         original = delivery.read_json
@@ -210,7 +214,7 @@ class DeliveryOverviewTests(unittest.TestCase):
             template = (ROOT / "web/index.html").read_text(encoding="utf-8")
             self.assertIn("<!-- DELIVERY_OVERVIEW_START -->", template)
             self.assertIn("<!-- DELIVERY_SCHEDULE_START -->", template)
-            self.assertIn("9/17 目前作業狀態", generated)
+            self.assertIn("9/18 目前作業狀態", generated)
             self.assertIn("10/10 · COMPLETE", generated)
             self.assertIn("COMPLETE · PASS", generated)
             self.assertNotIn("PENDING MANUAL DISPATCH", generated)
