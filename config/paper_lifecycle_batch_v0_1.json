@@ -1,0 +1,42 @@
+{
+  "schema": "qookey-paper-lifecycle-batch-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_EXPLICIT_PAPER_LIFECYCLE_BATCH_ONLY",
+  "product_stage": "PAPER_LIFECYCLE_BATCH_COORDINATION",
+  "policy": {
+    "maximum_intents": 5,
+    "require_exact_session_id_confirmation": true,
+    "require_complete_session_basket": true,
+    "explicit_lifecycle_simulation_authorized": true,
+    "automatic_lifecycle_simulation_authorized": false,
+    "scheduled_lifecycle_simulation_authorized": false,
+    "provider_access_authorized": false,
+    "persistent_state_write_authorized": false,
+    "live_trading_authorized": false
+  },
+  "behavior": {
+    "session_id_recomputed_before_simulation": true,
+    "complete_session_basket_required": true,
+    "one_lifecycle_input_per_session_proposal": true,
+    "proposal_order_canonicalized": true,
+    "reuse_single_lifecycle_engine": true,
+    "account_records_emitted": true,
+    "provider_requests_performed": false,
+    "persistent_state_written": false
+  },
+  "authority": {
+    "explicit_paper_lifecycle_simulation_authorized": true,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_lifecycle_simulation_authorized": false,
+    "scheduled_lifecycle_simulation_authorized": false,
+    "persistent_state_write_authorized": false,
+    "short_paper_execution_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
