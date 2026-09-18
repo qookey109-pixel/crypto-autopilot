@@ -25,6 +25,7 @@ They are not interchangeable and are not added together into an invented score.
 | Paper Cycle Orchestrator | `config/paper_cycle_orchestrator_v0_1.json` | PREPARED_MANUAL_CYCLE_ONLY | rebuild current account context, evaluate one explicit basket, and prepare all-or-none paper intents without broker submission or lifecycle execution |
 | Paper Submission Session | `config/paper_submission_session_v0_1.json` | PREPARED_EXPLICIT_PAPER_SUBMISSION_ONLY | require exact cycle-id confirmation and complete-basket preflight before idempotent in-memory PaperBroker submission; no scheduling/persistence/live path |
 | Paper Lifecycle Batch | `config/paper_lifecycle_batch_v0_1.json` | PREPARED_EXPLICIT_PAPER_LIFECYCLE_BATCH_ONLY | require exact session-id confirmation and complete accepted-basket lifecycle inputs; reuse existing Lifecycle engine and emit Account-ready records without provider/persistence/live path |
+| Paper Account Advance | `config/paper_account_advance_v0_1.json` | PREPARED_EXPLICIT_ACCOUNT_REMATERIALIZATION_ONLY | require exact batch-id confirmation, replace latest lifecycle record by intent, rematerialize account, and emit next account input without persistence/live path |
 
 ## Analysis flow
 
