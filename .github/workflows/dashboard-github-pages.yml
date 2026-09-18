@@ -24,6 +24,8 @@ on:
       - "scripts/build_delivery_overview.py"
       - "research/status/simulation-readiness-v0-1.json"
       - "research/status/current-operations-v0-3.json"
+      - "config/live_paper_simulation_v0_1.json"
+      - "config/paper_run_store_v0_1.json"
       - "scripts/validate_dashboard_static.py"
       - "research/receipts/**"
       - "config/provider_equivalence_v0_7_render_metadata_capture_protocol_v0_1.json"
@@ -246,7 +248,11 @@ jobs:
           assert project['replacementHoldoutState'] == 'FROZEN_UNOPENED'
           assert project['sourceSwitchAuthorized'] is False
           assert project['tradePlanAuthorized'] is False
+          assert project['publicLiveMarketDataAuthorized'] is True
+          assert project['livePaperSimulationAuthorized'] is True
+          assert project['paperStatePersistenceAuthorized'] is True
           assert project['liveTradingAuthorized'] is False
+          assert project['liveRealTradingAuthorized'] is False
 
           assert project['githubAutomaticOperationsState'] == 'AUTHORIZED_ON_MAIN_MERGE'
           assert project['githubAutomaticScheduledWorkflowCount'] == len(automation_health['workflows'])
@@ -260,7 +266,7 @@ jobs:
           assert project['strategyEdgeMethodCount'] == 6
           assert project['strategyResearchExecutionAuthorized'] is False
           assert project['strategyModelPromotionAuthority'] == 0
-          assert project['mode'] == 'PAPER-ONLY'
+          assert project['mode'] == 'PAPER / LIVE-PAPER ONLY'
 
           datetime.fromisoformat(data['generatedAtUtc'].replace('Z', '+00:00'))
           assert calendar['authority'] is False
@@ -301,6 +307,8 @@ jobs:
           assert security['authorizesHoldoutAccess'] is False
           assert security['authorizesSourceSwitch'] is False
           assert security['authorizesTradePlans'] is False
+          assert security['authorizesLivePaperSimulation'] is True
+          assert security['authorizesPaperStatePersistence'] is True
           assert security['authorizesLiveTrading'] is False
 
           assert current_web['schema'] == 'qookey-current-operations-web-v0.3'
@@ -315,7 +323,7 @@ jobs:
           assert current_web['evidenceBasisIsLatestMainClaim'] is False
 
           html = Path('_site/index.html').read_text(encoding='utf-8')
-          assert '9/17 目前作業狀態' in html
+          assert '9/18 目前作業狀態' in html
           assert '10/10 · COMPLETE' in html
           assert 'COMPLETED · PASS' in html
           assert 'COMPLETE · PASS' in html
