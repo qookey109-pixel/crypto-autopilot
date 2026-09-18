@@ -84,17 +84,32 @@ The current bar must not be included in the percentile reference window.
 
 Fixed percentage stop loss is removed from the V0.3 hypothesis.
 
-Candidate axes:
+Candidate stop axes:
 
-- initial stop: 2.0 ATR or 2.5 ATR
-- account risk cap: 0.5% or 1.0% of current equity
+- `VOL_STOP_2ATR_BB_HALF`: stop distance = max(2.0 × ATR14, 0.5 × Bollinger Band width)
+- `VOL_STOP_2_5ATR_BB_HALF`: stop distance = max(2.5 × ATR14, 0.5 × Bollinger Band width)
+
+The Bollinger component is adaptive: one-half of the full upper-to-lower band width. Stop distance and account-risk sizing are deliberately separate.
+
+There is **no arbitrary percentage cap on stop distance**. If the causal volatility model requires a stop 20%, 30% or more below entry, the research engine preserves that distance rather than tightening it merely to fit a percentage rule.
+
+Candidate account-risk budgets:
+
+- 1.0% of current equity
+- 2.5% of current equity
+- 5.0% of current equity
+- 10.0% of current equity
+
+These values control target loss-at-stop, not stop placement.
 
 Common rules, not sweep axes:
 
 - maximum leverage: 3x
-- position size is bounded by both risk-to-stop distance and leverage/margin limits
+- position size is bounded by both target risk-to-stop distance and leverage/margin limits
+- if the 3x leverage ceiling prevents the target risk budget from being reached, the engine must use the smaller feasible position and record both target and realized risk
+- a trade must be skipped rather than moved closer to liquidation or given a tighter artificial stop merely to consume the requested risk budget
 - bearish MACD crossover exits at the next 30m open
-- initial stop may only tighten, never widen
+- initial stop may only tighten, never widen after entry
 - no averaging down
 - no martingale
 - no pyramiding
@@ -109,10 +124,10 @@ The frozen structural family is therefore:
 - 2 MACD variants
 - 2 4h trend variants
 - 2 volatility variants
-- 2 ATR stop variants
-- 2 account-risk variants
+- 2 adaptive ATR/Bollinger stop variants
+- 4 account-risk variants
 
-Maximum candidate count: **32**.
+Maximum candidate count: **64**.
 
 This is intentionally far smaller than the V0.2 grid of 2,304.
 
@@ -125,7 +140,7 @@ For V0.3 it may be used only as development evidence.
 Development must:
 
 - use chronological folds
-- evaluate the complete 32-candidate matrix
+- evaluate the complete 64-candidate matrix
 - select exactly one champion before fresh confirmation is accessed
 - use robust-first ranking rather than best total return
 - require the existing stable-neighbor logic where neighboring candidates exist
