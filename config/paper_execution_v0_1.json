@@ -1,0 +1,41 @@
+{
+  "schema": "qookey-paper-execution-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_PAPER_ONLY",
+  "product_stage": "PAPER_EXECUTION",
+  "inputs": {
+    "registered_strategy_family_required": true,
+    "family_review_state_required": "FAMILY_EVIDENCE_READY_FOR_HUMAN_REVIEW",
+    "position_sizing_state_required": "SIZING_READY",
+    "approved_notional_source": "PositionSizingPlan.approved_notional_usd"
+  },
+  "behavior": {
+    "require_family_review_ready": true,
+    "deterministic_intent_id": true,
+    "idempotent_repository_paper_broker_submission": true,
+    "recalculate_position_size": false,
+    "mutate_stop": false,
+    "provider_io_performed": false,
+    "storage_io_performed": false,
+    "realistic_fill_simulator": false,
+    "settlement_simulation": false,
+    "slippage_simulation": false,
+    "funding_simulation": false
+  },
+  "authority": {
+    "repository_paper_broker_long_authorized": true,
+    "short_paper_execution_authorized": false,
+    "automatic_submission_authorized": false,
+    "scheduled_paper_execution_authorized": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_promotion_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
