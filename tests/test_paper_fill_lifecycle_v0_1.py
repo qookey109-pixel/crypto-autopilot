@@ -175,6 +175,81 @@ class PaperFillLifecycleV01Tests(unittest.TestCase):
         self.assertEqual(result.status, "CANCELLED_UNFILLED")
         self.assertEqual(result.reason, "target_crossed_before_first_fill")
 
+    def test_adverse_entry_slippage_does_not_chase_through_target(self) -> None:
+        decision, receipt = accepted_chain()
+        plan = build_paper_lifecycle_plan(
+            decision=decision,
+            receipt=receipt,
+            target_price=100.01,
+        )
+
+        result = simulate_paper_lifecycle(
+            plan=plan,
+            bars=(
+                bar(
+                    2_000,
+                    open_=100.0,
+                    high=100.005,
+                    low=99.9,
+                    close=100.0,
+                    available=4_000.0,
+                ),
+            ),
+        )
+
+        self.assertEqual(result.status, "CANCELLED_UNFILLED")
+        self.assertEqual(result.reason, "target_not_above_executable_entry")
+        self.assertEqual(result.fills, ())
+
+    def test_partial_position_cancels_remainder_when_additional_fill_would_cross_target(self) -> None:
+        decision, receipt = accepted_chain()
+        plan = build_paper_lifecycle_plan(
+            decision=decision,
+            receipt=receipt,
+            target_price=101.0,
+        )
+
+        result = simulate_paper_lifecycle(
+            plan=plan,
+            bars=(
+                bar(
+                    2_000,
+                    open_=100.0,
+                    high=100.5,
+                    low=99.0,
+                    close=100.2,
+                    available=1_000.0,
+                ),
+                bar(
+                    3_000,
+                    open_=100.99,
+                    high=100.995,
+                    low=100.5,
+                    close=100.8,
+                    available=5_000.0,
+                ),
+                bar(
+                    4_000,
+                    open_=100.8,
+                    high=100.9,
+                    low=100.4,
+                    close=100.7,
+                    available=5_000.0,
+                ),
+            ),
+        )
+
+        self.assertEqual(result.status, "OPEN_POSITION")
+        self.assertAlmostEqual(result.filled_notional_usd, 50.0)
+        self.assertAlmostEqual(result.unfilled_notional_usd, 50.0)
+        self.assertTrue(
+            any(
+                event.kind == "UNFILLED_REMAINDER_CANCELLED"
+                and ("reason", "target_not_above_executable_entry") in event.details
+                for event in result.events
+            )
+        )
+
     def test_same_bar_stop_target_collision_is_stop_first(self) -> None:
         decision, receipt = accepted_chain()
         plan = build_paper_lifecycle_plan(
@@ -403,6 +478,13 @@ class PaperFillLifecycleV01Tests(unittest.TestCase):
         bad_replayed["paper_execution_evidence"]["receipt"]["replayed"] = "false"
         with self.assertRaises(ValueError):
             lifecycle_input_from_dict(bad_replayed)
+
+        bad_authority = json.loads(json.dumps(payload))
+        bad_authority["paper_execution_evidence"]["authority"][
+            "provider_requests_performed"
+        ] = True
+        with self.assertRaises(ValueError):
+            lifecycle_input_from_dict(bad_authority)
 
     def test_versioned_policy_matches_defaults_and_boolean_types_are_strict(self) -> None:
         payload = json.loads(CONFIG.read_text(encoding="utf-8"))
