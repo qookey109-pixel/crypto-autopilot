@@ -368,6 +368,114 @@ def advance_paper_account(
     }
 
 
+def paper_account_advance_report_id_from_mapping(
+    payload: Mapping[str, object],
+) -> str:
+    """Recompute one serialized Account Advance id and verify summary consistency."""
+
+    if payload.get("schema") != "qookey-paper-account-advance-report-v0.1":
+        raise ValueError("unsupported paper account advance report schema")
+    if payload.get("state") not in {"ACCOUNT_ADVANCED", "ACCOUNT_ADVANCE_NO_CHANGE"}:
+        raise ValueError("paper account advance report is not a successful state")
+
+    required_ids = (
+        "advance_id",
+        "batch_id",
+        "previous_snapshot_id",
+        "next_snapshot_id",
+    )
+    for key in required_ids:
+        value = payload.get(key)
+        if not isinstance(value, str) or not value:
+            raise ValueError(f"paper account advance {key} is required")
+
+    count_keys = (
+        "added_record_count",
+        "replaced_record_count",
+        "unchanged_record_count",
+        "total_record_count",
+    )
+    counts: dict[str, int] = {}
+    for key in count_keys:
+        value = payload.get(key)
+        if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+            raise ValueError(f"paper account advance {key} must be non-negative integer")
+        counts[key] = value
+
+    changed = counts["added_record_count"] + counts["replaced_record_count"]
+    if payload.get("state") == "ACCOUNT_ADVANCE_NO_CHANGE" and changed != 0:
+        raise ValueError("no-change account advance cannot add or replace records")
+    if payload.get("state") == "ACCOUNT_ADVANCED" and changed == 0:
+        raise ValueError("advanced account state requires added/replaced records")
+
+    next_account_input = payload.get("next_account_input")
+    account = payload.get("account")
+    exposures = payload.get("portfolio_existing_exposures")
+    capacity = payload.get("portfolio_capacity_exported")
+    if not isinstance(next_account_input, Mapping):
+        raise ValueError("paper account advance next_account_input is required")
+    if not isinstance(account, Mapping):
+        raise ValueError("paper account advance account evidence is required")
+    if not isinstance(exposures, list):
+        raise ValueError("paper account advance portfolio exposures must be an array")
+    if not isinstance(capacity, bool):
+        raise ValueError("paper account advance portfolio_capacity_exported must be boolean")
+
+    if account.get("schema") != "qookey-paper-account-state-report-v0.1":
+        raise ValueError("paper account advance account evidence schema is invalid")
+    snapshot = account.get("snapshot")
+    if not isinstance(snapshot, Mapping):
+        raise ValueError("paper account advance account snapshot is required")
+    if snapshot.get("snapshot_id") != payload.get("next_snapshot_id"):
+        raise ValueError("paper account advance next snapshot id does not match account evidence")
+    if snapshot.get("open_position_count") != len(exposures) and capacity:
+        raise ValueError("paper account advance exposure count does not match open positions")
+    if snapshot.get("status") == "ACCOUNT_ACTIVE" and not capacity:
+        raise ValueError("active paper account must export portfolio capacity")
+    if snapshot.get("status") == "ACCOUNT_INSOLVENT" and capacity:
+        raise ValueError("insolvent paper account cannot export portfolio capacity")
+
+    for key in (
+        "provider_requests_performed",
+        "persistent_state_writes_performed",
+    ):
+        value = payload.get(key)
+        if not isinstance(value, int) or isinstance(value, bool) or value != 0:
+            raise ValueError(f"paper account advance {key} must equal zero")
+
+    authority = payload.get("authority")
+    if not isinstance(authority, Mapping):
+        raise ValueError("paper account advance authority object is required")
+    if authority.get("explicit_account_rematerialization_only") is not True:
+        raise ValueError("paper account advance must remain rematerialization-only")
+    for key in (
+        "provider_requests_performed",
+        "r2_accessed",
+        "holdout_accessed",
+        "persistent_state_write_authorized",
+        "automatic_cycle_authorized",
+        "automatic_submission_authorized",
+        "scheduled_execution_authorized",
+        "short_paper_execution_authorized",
+        "formal_trade_plan_authorized",
+        "real_money_order_authorized",
+        "live_trading_authorized",
+    ):
+        if authority.get(key) is not False:
+            raise ValueError(f"paper account advance authority must remain closed: {key}")
+
+    advance_payload: dict[str, object] = {
+        "schema": "qookey-paper-account-advance-id-v0.1",
+        "previous_snapshot_id": payload["previous_snapshot_id"],
+        "batch_id": payload["batch_id"],
+        "next_snapshot_id": payload["next_snapshot_id"],
+        "added_record_count": counts["added_record_count"],
+        "replaced_record_count": counts["replaced_record_count"],
+        "unchanged_record_count": counts["unchanged_record_count"],
+    }
+    return f"paper-account-advance-v0-1-{_sha256(advance_payload)}"
+
+
 def paper_account_advance_policy_from_config(
     payload: Mapping[str, object],
 ) -> PaperAccountAdvancePolicy:
