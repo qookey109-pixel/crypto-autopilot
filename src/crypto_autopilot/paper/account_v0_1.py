@@ -162,9 +162,16 @@ def _validate_paper_execution_evidence(
     if receipt.get("status") != "PAPER_ACCEPTED":
         raise ValueError("paper execution receipt is not accepted")
 
+    if receipt.get("broker_status") != "ACCEPTED":
+        raise ValueError("paper execution broker receipt is not accepted")
     intent_id = intent.get("intent_id")
     if not isinstance(intent_id, str) or not intent_id:
         raise ValueError("paper execution intent_id is required")
+    if intent.get("status") != "READY_FOR_PAPER_BROKER":
+        raise ValueError("paper execution intent status is not ready")
+    symbol = intent.get("symbol")
+    if not isinstance(symbol, str) or not symbol.strip():
+        raise ValueError("paper execution intent symbol is required")
     if receipt.get("intent_id") != intent_id or receipt.get("order_id") != intent_id:
         raise ValueError("paper execution receipt does not match intent")
     if receipt.get("symbol") != intent.get("symbol") or receipt.get("side") != intent.get(
@@ -173,6 +180,13 @@ def _validate_paper_execution_evidence(
         raise ValueError("paper execution receipt symbol/side does not match intent")
     if not isinstance(receipt.get("replayed"), bool):
         raise ValueError("paper execution receipt replayed must be boolean")
+
+    intent_notional = _strict_number(intent.get("notional_usd"), "intent notional_usd")
+    receipt_notional = _strict_number(
+        receipt.get("notional_usd"), "receipt notional_usd"
+    )
+    if not math.isclose(intent_notional, receipt_notional, rel_tol=0.0, abs_tol=1e-8):
+        raise ValueError("paper execution receipt notional does not match intent")
 
     family = intent.get("strategy_family")
     if not isinstance(family, str):
@@ -629,8 +643,10 @@ def paper_account_input_from_dict(
             item.get("time_ms"), bool
         ):
             raise ValueError(f"marks[{index}].time_ms must be a JSON integer")
-        if isinstance(item.get("price"), bool):
-            raise ValueError(f"marks[{index}].price cannot be boolean")
+        if not isinstance(item.get("price"), (int, float)) or isinstance(
+            item.get("price"), bool
+        ):
+            raise ValueError(f"marks[{index}].price must be JSON numeric")
         try:
             marks.append(
                 PaperMark(
