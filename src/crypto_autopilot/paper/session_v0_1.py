@@ -414,6 +414,65 @@ def submit_paper_cycle_session(
     }
 
 
+def paper_submission_session_report_id_from_mapping(
+    payload: Mapping[str, object],
+) -> str:
+    """Recompute the deterministic session id from one serialized session report."""
+
+    if payload.get("schema") != "qookey-paper-submission-session-report-v0.1":
+        raise ValueError("unsupported paper submission session report schema")
+    cycle_id = payload.get("cycle_id")
+    if not isinstance(cycle_id, str) or not cycle_id:
+        raise ValueError("paper submission session cycle_id is required")
+
+    evidence_rows = payload.get("paper_execution_evidence")
+    if not isinstance(evidence_rows, list) or not evidence_rows:
+        raise ValueError("paper submission session execution evidence is required")
+
+    rows: list[tuple[str, str]] = []
+    seen_proposals: set[str] = set()
+    seen_intents: set[str] = set()
+    for index, row in enumerate(evidence_rows):
+        if not isinstance(row, Mapping):
+            raise ValueError(
+                f"paper_execution_evidence[{index}] must be a JSON object"
+            )
+        proposal_id = row.get("proposal_id")
+        evidence = row.get("paper_execution_evidence")
+        if not isinstance(proposal_id, str) or not proposal_id:
+            raise ValueError(
+                f"paper_execution_evidence[{index}].proposal_id is required"
+            )
+        if proposal_id in seen_proposals:
+            raise ValueError("duplicate paper submission session proposal id")
+        seen_proposals.add(proposal_id)
+        if not isinstance(evidence, Mapping):
+            raise ValueError(
+                f"paper_execution_evidence[{index}].paper_execution_evidence must be object"
+            )
+        decision = evidence.get("decision")
+        if not isinstance(decision, Mapping):
+            raise ValueError("paper execution evidence decision is required")
+        intent = decision.get("intent")
+        if not isinstance(intent, Mapping):
+            raise ValueError("paper execution evidence intent is required")
+        intent_id = intent.get("intent_id")
+        if not isinstance(intent_id, str) or not intent_id:
+            raise ValueError("paper execution evidence intent_id is required")
+        if intent_id in seen_intents:
+            raise ValueError("duplicate paper submission session intent id")
+        seen_intents.add(intent_id)
+        rows.append((proposal_id, intent_id))
+
+    rows.sort(key=lambda item: item[0])
+    session_payload: dict[str, object] = {
+        "schema": "qookey-paper-submission-session-id-v0.1",
+        "cycle_id": cycle_id,
+        "intent_ids": [intent_id for _, intent_id in rows],
+    }
+    return f"paper-session-v0-1-{_sha256(session_payload)}"
+
+
 def paper_submission_session_policy_from_config(
     payload: Mapping[str, object],
 ) -> PaperSubmissionSessionPolicy:

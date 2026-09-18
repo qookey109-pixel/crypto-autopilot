@@ -147,6 +147,12 @@ boundary. It requires exact cycle-id confirmation, preflights the complete
 admitted basket, supports idempotent replay only for identical payloads, and
 still grants no scheduling, persistence or live-trading authority.
 
+Paper Lifecycle Batch Coordination V0.1 is the next explicit simulation
+boundary. It requires exact session-id confirmation and one caller-supplied
+lifecycle input per accepted proposal, reuses the existing single-intent
+Lifecycle engine, and emits Account-compatible records without provider or
+persistent-state access.
+
 ## Single-asset research boundary
 
 BTC, ETH, SOL, ZEC or any other individual asset may have dedicated research experiments.
