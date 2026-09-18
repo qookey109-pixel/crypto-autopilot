@@ -12,6 +12,30 @@ class PaperBrokerTests(unittest.TestCase):
         self.assertEqual(a, b)
         self.assertEqual(len(broker.orders), 1)
 
+    def test_duplicate_order_id_with_different_payload_fails_closed(self) -> None:
+        broker = PaperBroker()
+        broker.submit_long(
+            order_id="sig-1",
+            symbol="BTC_USDT_PERP",
+            notional_usd=100,
+        )
+
+        with self.assertRaises(ValueError):
+            broker.submit_long(
+                order_id="sig-1",
+                symbol="BTC_USDT_PERP",
+                notional_usd=101,
+            )
+
+        with self.assertRaises(ValueError):
+            broker.submit_long(
+                order_id="sig-1",
+                symbol="ETH_USDT_PERP",
+                notional_usd=100,
+            )
+
+        self.assertEqual(len(broker.orders), 1)
+
     def test_live_path_is_disabled(self) -> None:
         broker = PaperBroker()
         with self.assertRaises(LiveTradingDisabledError):
