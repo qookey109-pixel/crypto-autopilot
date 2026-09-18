@@ -20,6 +20,7 @@ ALLOWED_ROOT_MODULES = {
     "historical.py",
     "lineage.py",
     "models.py",
+    "opportunity_engine.py",
     "provider_metadata_capture_v0_10.py",
     "provider_metadata_capture_v0_12.py",
     "provider_metadata_capture_v0_2.py",
