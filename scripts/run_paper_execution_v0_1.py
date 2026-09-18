@@ -26,12 +26,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
             "Run a local in-memory Paper Execution V0.1 integration from an "
-            "existing family-validation report and explicit risk inputs."
+            "existing family-validation and portfolio-admission reports plus explicit risk inputs."
         )
     )
     parser.add_argument("--symbol", required=True)
     parser.add_argument("--strategy-family", required=True)
     parser.add_argument("--family-validation-report", type=Path, required=True)
+    parser.add_argument("--portfolio-admission-report", type=Path, required=True)
     parser.add_argument("--direction", choices=("LONG", "SHORT"), required=True)
     parser.add_argument("--equity-usd", type=float, required=True)
     parser.add_argument("--entry-price", type=float, required=True)
@@ -59,6 +60,7 @@ def main() -> int:
             _load_json(arguments.paper_config)
         )
         family_report = _load_json(arguments.family_validation_report)
+        portfolio_report = _load_json(arguments.portfolio_admission_report)
 
         sizing = plan_position_size(
             direction=arguments.direction,
@@ -74,6 +76,7 @@ def main() -> int:
             symbol=arguments.symbol,
             strategy_family=arguments.strategy_family,
             family_validation_report=family_report,
+            portfolio_admission_report=portfolio_report,
             as_of_ms=arguments.as_of_ms,
             sizing_plan=sizing,
             policy=paper_policy,
