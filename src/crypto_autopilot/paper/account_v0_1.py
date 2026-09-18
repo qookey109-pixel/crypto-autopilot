@@ -266,8 +266,8 @@ def _validate_lifecycle_evidence(
     )
 
     events = result.get("events")
-    if not isinstance(events, list) or not events:
-        raise ValueError("paper lifecycle events must be a non-empty array")
+    if not isinstance(events, (list, tuple)) or not events:
+        raise ValueError("paper lifecycle events must be a non-empty sequence")
     event_times: list[int] = []
     for index, event in enumerate(events):
         if not isinstance(event, Mapping):
@@ -478,7 +478,7 @@ def portfolio_exposures_from_account(
     if not policy.export_portfolio_exposures:
         raise ValueError("portfolio exposure export is disabled by policy")
     if snapshot.status == "ACCOUNT_INSOLVENT":
-        return ()
+        raise ValueError("insolvent paper account cannot export new portfolio capacity")
     return tuple(
         PortfolioExposure(
             exposure_id=position.lifecycle_id,
