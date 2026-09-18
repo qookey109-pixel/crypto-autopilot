@@ -118,6 +118,18 @@ PAPER_INTENTS_READY_FOR_EXPLICIT_SUBMISSION
 
 Resume itself still performs zero broker submissions.
 
+## Multi-cycle integrity audit
+
+Paper Loop Integrity / Multi-Cycle Replay V0.1 can audit two or more completed
+Resume-led rounds after the fact.
+
+It recomputes Resume/Cycle/Session/Batch/Advance/Checkpoint ids, requires exact
+Checkpoint payload chaining across rounds and verifies that deterministic replay
+of the same transcript produces the same integrity id.
+
+The Integrity layer is audit-only and does not execute Resume or any downstream
+stage.
+
 ## CLI
 
 ```bash
