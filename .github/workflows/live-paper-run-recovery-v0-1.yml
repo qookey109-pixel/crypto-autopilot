@@ -1,0 +1,111 @@
+name: Live Paper Run Recovery V0.1
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Exact Live Paper run id to reconcile
+        required: true
+        type: string
+      repair_missing_result_seals:
+        description: Repair only fully verified missing request-result seals
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-paper-run-recovery-v0-1-${{ inputs.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Reconcile persistent Live Paper run
+        id: recovery
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p artifacts
+          args=(
+            --run-id "${{ inputs.run_id }}"
+            --store-backend r2
+          )
+          if [[ "${{ inputs.repair_missing_result_seals }}" == "true" ]]; then
+            args+=(--repair-missing-result-seals)
+          fi
+
+          set +e
+          PYTHONPATH=src python scripts/reconcile_live_paper_run_v0_1.py \
+            "${args[@]}" \
+            > artifacts/live-paper-run-recovery-report.json
+          exit_code=$?
+          set -e
+          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(
+              Path("artifacts/live-paper-run-recovery-report.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          assert report["state"] in {
+              "RUN_CONSISTENT",
+              "RUN_EMPTY_RETRY_FROM_INITIAL_STATE_SAFE",
+              "MISSING_RESULT_SEALS_REPAIRABLE",
+              "MISSING_RESULT_SEALS_REPAIRED",
+              "REVIEW_REQUIRED",
+              "REJECT",
+          }
+          authority = report["authority"]
+          assert authority["provider_access_authorized"] is False
+          assert authority["live_market_data_access_authorized"] is False
+          assert authority["account_state_mutation_authorized"] is False
+          assert authority["step_state_tick_rewrite_authorized"] is False
+          assert authority["automatic_schedule_authorized"] is False
+          assert authority["private_exchange_api_authorized"] is False
+          assert authority["holdout_access_authorized"] is False
+          assert authority["real_money_order_authorized"] is False
+          assert authority["live_real_trading_authorized"] is False
+          PY
+
+      - name: Upload recovery report as secondary evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: live-paper-run-recovery-v0-1-${{ github.run_id }}
+          path: artifacts/live-paper-run-recovery-report.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce reconciliation outcome
+        shell: bash
+        run: |
+          code="${{ steps.recovery.outputs.exit_code }}"
+          if [[ "$code" == "0" ]]; then
+            exit 0
+          fi
+          echo "Recovery/reconciliation requires review or rejected invalid evidence." >&2
+          exit "$code"
