@@ -271,6 +271,24 @@ V0.1 does not claim to model:
 
 Those require additional evidence or dedicated later versions.
 
+## Downstream account state
+
+Paper Account / Position State V0.1 consumes the latest lifecycle evidence
+together with the matching Paper Execution evidence.
+
+It rebuilds:
+
+- paper cash and equity;
+- closed realized net PnL;
+- open entry fees;
+- open mark-to-market PnL;
+- open position state;
+- current exposure for the next Portfolio Admission pass.
+
+Lifecycle remains responsible for fill/exit semantics. The account layer does
+not close a position merely because a later mark crosses a protective boundary;
+it fails closed and requires lifecycle advancement first.
+
 ## Authority
 
 Paper Fill / Order Lifecycle V0.1 grants paper simulation only.
