@@ -47,8 +47,8 @@ def _validate_current(current: dict) -> tuple[dict, dict, dict]:
         raise ValueError("Unexpected current-operations schema")
     if current.get("repository_authority") != "RESOLVE_MAIN_LIVE_AT_READ_TIME":
         raise ValueError("Repository authority semantics changed")
-    if current.get("mode") != "PAPER_ONLY":
-        raise ValueError("Homepage projection must remain PAPER_ONLY")
+    if current.get("mode") != "PAPER_AND_LIVE_PAPER_ONLY":
+        raise ValueError("Homepage projection must remain PAPER_AND_LIVE_PAPER_ONLY")
 
     basis = current.get("evidence_basis") or {}
     if basis.get("semantics") != "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION":
@@ -107,7 +107,26 @@ def _validate_current(current: dict) -> tuple[dict, dict, dict]:
     if gates.get("real_money_orders") != "CLOSED":
         raise ValueError("Real-money boundary changed")
     if gates.get("source_switch_authorized") is not False or gates.get("live_trading") != "CLOSED":
-        raise ValueError("Trading/source-switch boundary changed")
+        raise ValueError("Real trading/source-switch boundary changed")
+    if gates.get("live_paper_simulation") != "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY":
+        raise ValueError("Live-paper simulation boundary changed")
+
+    live_paper = current.get("live_paper") or {}
+    expected_live_paper = {
+        "status": "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY",
+        "contract": "config/live_paper_simulation_v0_1.json",
+        "run_store_contract": "config/paper_run_store_v0_1.json",
+        "public_live_market_data": True,
+        "live_paper_simulation": True,
+        "paper_state_persistence": True,
+        "private_exchange_api": False,
+        "replacement_holdout_access": False,
+        "real_money_orders": False,
+        "live_real_trading": False,
+    }
+    for key, value in expected_live_paper.items():
+        if live_paper.get(key) != value:
+            raise ValueError(f"Live-paper current projection changed: {key}")
     return core, replay, pionex
 
 
@@ -141,8 +160,8 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
     current_date = html.escape(str(current["updated_date"]))
 
     summary = f'''      <section class="panel readiness-summary" aria-labelledby="readiness-heading">
-        <h3 id="readiness-heading">9/17 目前作業狀態</h3>
-        <p><strong>Core100 資料與訓練已完成；Model Quality REJECT</strong>。完整策略驗證、holdout、promotion 與 trading 仍關閉。</p>
+        <h3 id="readiness-heading">9/18 目前作業狀態</h3>
+        <p><strong>Core100 資料與訓練已完成；Model Quality REJECT</strong>。真錢策略驗證、holdout、promotion 與 real trading 仍關閉；public-market Live Paper simulation 已獨立授權。</p>
         <div class="delivery-metrics" aria-label="目前已核實進度">
           <article><p>BTC 27 天固定樣本</p><strong>已完成 · {btc['executed_trade_count']} 筆成交</strong><p>歷史 engine validation only；不代表全市場策略有效。</p></article>
           <article><p>Binance Core 100</p><strong>10/10 · COMPLETE</strong><p>不得因 model-quality REJECT 自動重啟歷史取得。</p></article>
@@ -150,7 +169,7 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
           <article><p>Pionex Validation</p><strong>COMPLETE · PASS</strong><p>V0.2 run {pionex_run}；{pionex['selected_market_count']} markets / {pionex['partition_count']} partitions。</p></article>
         </div>
         <p>模型品質閘門：<strong>REJECT</strong>。Threshold replay run {replay_run} 已完成；0.50–0.55 沒有 supported threshold change，configured threshold 保持不變。</p>
-        <p>Pionex V0.2 materialization 已完成，但這不代表完整 197-market multiyear history，也沒有執行 Core100 Pionex training；Strategy Validation、holdout、promotion、source switch 與 trading 仍關閉。</p>
+        <p>Pionex V0.2 materialization 已完成，但這不代表完整 197-market multiyear history，也沒有執行 Core100 Pionex training；Strategy Validation、holdout、promotion、source switch 與 real trading 仍關閉。Live Paper 僅使用公開市場資料與模擬帳戶。</p>
         <p>Current Operations 更新日期：{current_date}。下列 Actions 狀態只代表工作流程結果。</p>
         <p id="cloud-run-updated">雲端執行狀態尚未載入。</p>
         <ul id="cloud-run-list" class="cloud-run-list" aria-live="polite"></ul>
@@ -242,7 +261,7 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
     web_current = {
         "schema": "qookey-current-operations-web-v0.3",
         "authority": False,
-        "mode": "PAPER_ONLY",
+        "mode": "PAPER_AND_LIVE_PAPER_ONLY",
         "repositoryAuthority": current["repository_authority"],
         "evidenceBasisParentMainSha": current["evidence_basis"]["parent_main_sha"],
         "evidenceBasisIsLatestMainClaim": False,
@@ -261,7 +280,10 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
         "pionexPartitionCount": pionex["partition_count"],
         "holdoutState": current["gates"]["holdout"],
         "sourceSwitchAuthorized": current["gates"]["source_switch_authorized"],
+        "livePaperSimulationAuthorized": True,
+        "publicLiveMarketDataAuthorized": True,
         "liveTradingAuthorized": False,
+        "liveRealTradingAuthorized": False,
     }
     return summary, schedule, progress, web_current
 

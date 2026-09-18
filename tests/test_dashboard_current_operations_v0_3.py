@@ -74,7 +74,7 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
         self.assertFalse(projection["is_latest_main_claim"])
         self.assertEqual(
             projection["evidence_basis_parent_main_sha"],
-            "5105cc8310515d40e99aaf02d2cfe5fef12a777f",
+            "a26902fd7a116af442a9b19249b895d0612bfc4f",
         )
 
     def test_overlay_projects_current_lifecycle_and_closes_expired_v012(self) -> None:
@@ -112,7 +112,12 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
         self.assertFalse(project["successorMetadataScheduleEnabled"])
         self.assertEqual(project["replacementHoldoutState"], "FROZEN_UNOPENED")
         self.assertFalse(project["sourceSwitchAuthorized"])
+        self.assertEqual(project["mode"], "PAPER / LIVE-PAPER ONLY")
+        self.assertTrue(project["publicLiveMarketDataAuthorized"])
+        self.assertTrue(project["livePaperSimulationAuthorized"])
+        self.assertTrue(project["paperStatePersistenceAuthorized"])
         self.assertFalse(project["liveTradingAuthorized"])
+        self.assertFalse(project["liveRealTradingAuthorized"])
 
         self.assertEqual(pipeline["Core100 History"]["status"], "COMPLETE")
         self.assertEqual(pipeline["Core100 Training"]["status"], "COMPLETED")
@@ -125,6 +130,10 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
         )
         self.assertEqual(
             pipeline["V0.12 Successor Metadata Window"]["status"], "HISTORICAL"
+        )
+        self.assertEqual(
+            pipeline["Live Paper Simulation V0.1"]["status"],
+            "LIVE_PAPER_AUTHORIZED",
         )
         self.assertEqual(gates["Core100 Model Quality"]["status"], "REJECT")
         self.assertEqual(gates["V0.12 Metadata Capture"]["status"], "HISTORICAL")
@@ -140,6 +149,8 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
         self.assertFalse(security["authorizesHoldoutAccess"])
         self.assertFalse(security["authorizesSourceSwitch"])
         self.assertFalse(security["authorizesTradePlans"])
+        self.assertTrue(security["authorizesLivePaperSimulation"])
+        self.assertTrue(security["authorizesPaperStatePersistence"])
         self.assertFalse(security["authorizesLiveTrading"])
 
     def test_homepage_build_removes_stale_present_tense_state(self) -> None:
@@ -149,7 +160,7 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
             build_delivery_overview(site, ROOT)
 
             html = (site / "index.html").read_text(encoding="utf-8")
-            self.assertIn("9/17 目前作業狀態", html)
+            self.assertIn("9/18 目前作業狀態", html)
             self.assertIn("10/10 · COMPLETE", html)
             self.assertIn("COMPLETED · PASS", html)
             self.assertIn("Model Quality REJECT", html)
@@ -178,7 +189,14 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
             self.assertEqual(web_current["pionexMaterializationRunId"], 35054729471)
             self.assertEqual(web_current["holdoutState"], "FROZEN_UNOPENED")
             self.assertFalse(web_current["sourceSwitchAuthorized"])
+            self.assertEqual(
+                web_current["mode"],
+                "PAPER_AND_LIVE_PAPER_ONLY",
+            )
+            self.assertTrue(web_current["publicLiveMarketDataAuthorized"])
+            self.assertTrue(web_current["livePaperSimulationAuthorized"])
             self.assertFalse(web_current["liveTradingAuthorized"])
+            self.assertFalse(web_current["liveRealTradingAuthorized"])
             self.assertFalse(web_current["evidenceBasisIsLatestMainClaim"])
 
             history = json.loads(

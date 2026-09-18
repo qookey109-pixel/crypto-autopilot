@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-09-17
+Updated: 2026-09-18
 
 Repository `main` is the formal current authority and must be resolved live at read time. This file is the project-stage, governance-compatibility, and retired-workflow index. Exact versioned configs, receipts, immutable run evidence, and merged code remain the detailed authority for each scope.
 
@@ -9,15 +9,15 @@ Repository `main` is the formal current authority and must be resolved live at r
 - Repository: `qookey109-pixel/crypto-autopilot`.
 - Current Operations companion: `research/status/current-operations-v0-3.json`.
 - Current Operations V0.3 stores an **evidence-basis parent SHA**, not a self-referential latest-main claim.
-- Evidence-basis parent for this status version: `5105cc8310515d40e99aaf02d2cfe5fef12a777f`, the reviewed main commit after PR #338 merged and passed post-merge CI / Freeze Guard.
-- Current mode: **PAPER-ONLY**.
+- Evidence-basis parent for this status version: `a26902fd7a116af442a9b19249b895d0612bfc4f`, the reviewed main commit after PR #366 merged and passed post-merge CI / Freeze Guard.
+- Current mode: **PAPER / LIVE-PAPER ONLY**. Public live market data and simulated live-paper execution/persistence are separate from real trading authority.
 - FREE-ONLY cloud/runtime budget: **0 USD/month**.
 
 For present-tense operations read `CURRENT_STATUS.md` first, then resolve the Repository's live `main`. Dated prose and dashboard fixtures are evidence/projections, not substitutes for live Repository authority.
 
 ## Current lifecycle
 
-`History COMPLETE -> Training COMPLETED -> Model Quality REJECT -> Threshold Replay COMPLETED / NO SUPPORTED THRESHOLD CHANGE -> Strategy Validation CLOSED -> Holdout CLOSED -> Promotion CLOSED -> Trading CLOSED`
+`History COMPLETE -> Training COMPLETED -> Model Quality REJECT -> Threshold Replay COMPLETED / NO SUPPORTED THRESHOLD CHANGE -> Strategy Validation CLOSED -> Holdout CLOSED -> Promotion CLOSED -> REAL TRADING CLOSED / LIVE-PAPER SEPARATELY AUTHORIZED`
 
 ### Core100 History and training
 
@@ -84,7 +84,8 @@ Authority after PASS remains unchanged:
 - training: unauthorized;
 - source switch: unauthorized;
 - promotion: unauthorized;
-- formal trade plan / real-money / live trading: unauthorized.
+- formal real-money trade plan / real-money orders / real live trading: unauthorized.
+- public-market-data live-paper simulation is governed separately by `config/live_paper_simulation_v0_1.json` and does not change the validation-dataset authority above.
 
 **Materialization PASS is not Model Quality PASS.** Strategy Validation, Holdout, Promotion, and Trading remain closed because the Core100 model-quality result remains **REJECT** and threshold replay supports no threshold change.
 
@@ -119,6 +120,7 @@ Historical CI success on an old branch is not sufficient merge evidence after ma
 
 ## Binding safety and governance
 
+- Live Paper Simulation V0.1 permits current public Pionex market data, simulated paper fills/lifecycle/account updates, and explicit paper-state persistence only; it has no private exchange-order path.
 - Replacement holdout `2026-08-28` through `2026-09-03` remains `FROZEN_UNOPENED`.
 - `source_switch_authorized=false`.
 - Pionex-native and Binance USD-M evidence remain provider-separated and must never be relabeled.

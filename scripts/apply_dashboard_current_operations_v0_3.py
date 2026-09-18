@@ -77,8 +77,8 @@ def validate_current_operations(current: dict[str, Any]) -> None:
         raise RuntimeError("unexpected current-operations schema")
     if current.get("repository_authority") != "RESOLVE_MAIN_LIVE_AT_READ_TIME":
         raise RuntimeError("repository authority semantics changed")
-    if current.get("mode") != "PAPER_ONLY":
-        raise RuntimeError("current operations must remain PAPER_ONLY")
+    if current.get("mode") != "PAPER_AND_LIVE_PAPER_ONLY":
+        raise RuntimeError("current operations must remain PAPER_AND_LIVE_PAPER_ONLY")
 
     basis = _require_dict(current.get("evidence_basis"), "evidence basis")
     if basis.get("semantics") != "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION":
@@ -145,9 +145,28 @@ def validate_current_operations(current: dict[str, Any]) -> None:
     if gates.get("real_money_orders") != "CLOSED":
         raise RuntimeError("real-money gate changed")
     if gates.get("live_trading") != "CLOSED":
-        raise RuntimeError("live-trading gate changed")
+        raise RuntimeError("real-live-trading gate changed")
+    if gates.get("live_paper_simulation") != "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY":
+        raise RuntimeError("live-paper simulation gate changed")
     if gates.get("source_switch_authorized") is not False:
         raise RuntimeError("source-switch boundary changed")
+
+    live_paper = _require_dict(current.get("live_paper"), "live paper")
+    expected_live_paper = {
+        "status": "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY",
+        "contract": "config/live_paper_simulation_v0_1.json",
+        "run_store_contract": "config/paper_run_store_v0_1.json",
+        "public_live_market_data": True,
+        "live_paper_simulation": True,
+        "paper_state_persistence": True,
+        "private_exchange_api": False,
+        "replacement_holdout_access": False,
+        "real_money_orders": False,
+        "live_real_trading": False,
+    }
+    for key, value in expected_live_paper.items():
+        if live_paper.get(key) != value:
+            raise RuntimeError(f"live-paper current operations changed: {key}")
 
     control = _require_dict(current.get("control_plane"), "control plane")
     if control.get("self_referential_latest_main_sha_allowed") is not False:
@@ -199,10 +218,15 @@ def overlay_current_operations(
             "v0_12ScheduleRegistrationPresent": schedule_registration_present,
             "successorMetadataCaptureExecutionAuthorized": False,
             "successorMetadataScheduleEnabled": False,
+            "mode": "PAPER / LIVE-PAPER ONLY",
             "replacementHoldoutState": "FROZEN_UNOPENED",
             "sourceSwitchAuthorized": False,
             "tradePlanAuthorized": False,
+            "publicLiveMarketDataAuthorized": True,
+            "livePaperSimulationAuthorized": True,
+            "paperStatePersistenceAuthorized": True,
             "liveTradingAuthorized": False,
+            "liveRealTradingAuthorized": False,
         }
     )
     dashboard["project"] = project
@@ -244,6 +268,15 @@ def overlay_current_operations(
             "完成 materialization 不授權 holdout/training/source-switch/promotion/trading。"
         ),
         status="COMPLETE_PASS",
+    )
+    _upsert_status_item(
+        pipeline,
+        name="Live Paper Simulation V0.1",
+        detail=(
+            "Public Pionex market data + simulated fills/lifecycle/account updates are authorized. "
+            "Private exchange APIs, real-money orders and real live trading remain closed."
+        ),
+        status="LIVE_PAPER_AUTHORIZED",
     )
     _upsert_status_item(
         pipeline,
@@ -309,6 +342,8 @@ def overlay_current_operations(
             "authorizesSourceSwitch": False,
             "authorizesPionexNativeRelabeling": False,
             "authorizesTradePlans": False,
+            "authorizesLivePaperSimulation": True,
+            "authorizesPaperStatePersistence": True,
             "authorizesLiveTrading": False,
         }
     )
@@ -326,7 +361,7 @@ def overlay_current_operations(
     dashboard["snapshotLabel"] = (
         "Repository Current Operations 投影 · Core100 History/Training COMPLETE / "
         "Model Quality REJECT / Threshold Replay NO CHANGE / "
-        "V0.12 HISTORICAL / Pionex V0.2 materialization COMPLETE_PASS"
+        "V0.12 HISTORICAL / Pionex V0.2 materialization COMPLETE_PASS / LIVE-PAPER AUTHORIZED"
     )
     dashboard["currentOperationsProjection"] = {
         "authority": False,

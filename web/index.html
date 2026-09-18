@@ -28,12 +28,12 @@
         <button class="nav-item" data-view="gates">風險與閘門</button>
       </nav>
       <span class="sr-only" id="nav-scroll-hint">在較窄的畫面可左右滑動查看更多頁面。</span>
-      <div class="header-actions"><span class="paper-pill"><i class="status-dot safe"></i>PAPER-ONLY</span><button class="icon-button" id="refresh-button" aria-label="重新整理資料" title="重新整理資料">↻</button></div>
+      <div class="header-actions"><span class="paper-pill"><i class="status-dot safe"></i>PAPER / LIVE-PAPER</span><button class="icon-button" id="refresh-button" aria-label="重新整理資料" title="重新整理資料">↻</button></div>
     </div>
   </header>
 
   <main id="top">
-    <p class="sr-only">目前只做紙上交易；真實交易目前停用。</p>
+    <p class="sr-only">目前只做紙上與 Live Paper 模擬；真實交易目前停用。</p>
     <h1 class="page-title" id="page-title">總覽</h1>
 
     <section class="view overview-content active" id="view-overview">
@@ -170,7 +170,7 @@
     <section class="view" id="view-performance"><div class="metrics-row"><article class="metric-card"><p class="card-kicker">報酬率</p><strong id="paper-return">—</strong><span>成本後 Paper 報酬</span></article><article class="metric-card"><p class="card-kicker">勝率</p><strong id="paper-win-rate">—</strong><span>已結束模擬交易</span></article><article class="metric-card"><p class="card-kicker">獲利因子</p><strong id="paper-profit-factor">—</strong><span>無虧損時不定義</span></article><article class="metric-card"><p class="card-kicker">最大回撤</p><strong id="paper-drawdown">—</strong><span>Trade-close equity</span></article></div><article class="empty-state panel"><div class="empty-icon">∿</div><h3>公開資料 Paper Training</h3><p id="paper-performance-note">結果僅用於研究與前向訓練，不構成獲利或真實交易證明。</p></article></section>
     <section class="view" id="view-backtests"><article class="panel evidence-panel"><div class="panel-header"><div><p class="card-kicker">BACKTEST EVIDENCE CONTRACT</p><h3>回測 Authority 瀏覽器</h3><p class="panel-intro">顯示資料集 lineage、provider、run SHA、期間與 admission；研究結果不等於正式准入。</p></div><span class="badge danger" id="backtests-state">未授權 · NOT_AUTHORIZED</span></div><div class="table-wrap"><table><thead><tr><th>研究名稱</th><th>Provider</th><th>資料集 Authority</th><th>期間</th><th>策略版本</th><th>Run SHA</th><th>Admission</th><th>結果</th></tr></thead><tbody id="backtest-table"><tr><td colspan="8">目前沒有取得正式 backtest admission 的證據；不從其他研究結果自行推定。</td></tr></tbody></table></div></article></section>
     <section class="view" id="view-gates"><article class="panel"><div class="panel-header"><div><p class="card-kicker">FAIL-CLOSED</p><h3>全部專案安全閘門</h3></div><span class="badge danger">無真實交易路徑</span></div><div class="gate-grid" id="all-gates"></div></article></section>
-    <footer class="site-footer"><p>這個網站是 Repository authority 的唯讀投影，不是 authority 本身。</p><span>QOOKEY / PAPER-ONLY / 0 USD RUNTIME BUDGET</span></footer>
+    <footer class="site-footer"><p>這個網站是 Repository authority 的唯讀投影，不是 authority 本身。</p><span>QOOKEY / PAPER + LIVE-PAPER / REAL TRADING OFF</span></footer>
   </main>
   <script src="./assets/js/app.js?v=delivery-review-20260912" defer></script>
 </body>
