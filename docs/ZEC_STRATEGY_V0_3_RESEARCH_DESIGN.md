@@ -2,6 +2,16 @@
 
 Status date: 2026-09-18
 
+## Scope boundary
+
+ZEC V0.3 is an **asset-specific research module only**. It must not become the product's primary architecture, daily default asset, or automatic trade target.
+
+The platform-level objective is multi-asset and opportunity-first:
+
+`governed universe -> daily opportunity selection -> strategy routing -> risk sizing -> execution`
+
+A future ZEC result may contribute evidence to a reusable strategy family, but platform-wide use requires separate multi-asset/generalization validation.
+
 ## Motivation
 
 ZEC MACD V0.2 completed successfully as an experiment but failed as strategy evidence. None of the 24 development-selected candidates produced a positive return in the final confirmation window even at the lowest preregistered 2 bps per-side slippage stress.
