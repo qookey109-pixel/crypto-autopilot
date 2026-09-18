@@ -1,0 +1,31 @@
+{
+  "schema": "qookey-paper-loop-checkpoint-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_PORTABLE_HANDOFF_ONLY",
+  "product_stage": "PAPER_LOOP_CHECKPOINT",
+  "policy": {
+    "require_exact_advance_id_confirmation": true,
+    "require_account_rematerialization": true,
+    "require_exposure_reconciliation": true,
+    "include_next_account_input": true,
+    "persistent_state_write_authorized": false,
+    "provider_access_authorized": false,
+    "automatic_cycle_authorized": false,
+    "live_trading_authorized": false
+  },
+  "authority": {
+    "portable_handoff_authorized": true,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "persistent_state_write_authorized": false,
+    "automatic_cycle_authorized": false,
+    "automatic_submission_authorized": false,
+    "scheduled_execution_authorized": false,
+    "short_paper_execution_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}

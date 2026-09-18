@@ -173,6 +173,15 @@ A successful report contains:
 The emitted `next_account_input` is the intended input for the next manual
 Paper Cycle.
 
+## Downstream portable checkpoint
+
+Paper Loop Checkpoint V0.1 is the optional deterministic handoff boundary after
+Account Advance.
+
+It requires exact advance-id confirmation, rematerializes the emitted account,
+reconciles Portfolio exposure and carries the verified `next_account_input`
+forward without persisting it.
+
 ## CLI
 
 ```bash

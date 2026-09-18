@@ -26,6 +26,7 @@ They are not interchangeable and are not added together into an invented score.
 | Paper Submission Session | `config/paper_submission_session_v0_1.json` | PREPARED_EXPLICIT_PAPER_SUBMISSION_ONLY | require exact cycle-id confirmation and complete-basket preflight before idempotent in-memory PaperBroker submission; no scheduling/persistence/live path |
 | Paper Lifecycle Batch | `config/paper_lifecycle_batch_v0_1.json` | PREPARED_EXPLICIT_PAPER_LIFECYCLE_BATCH_ONLY | require exact session-id confirmation and complete accepted-basket lifecycle inputs; reuse existing Lifecycle engine and emit Account-ready records without provider/persistence/live path |
 | Paper Account Advance | `config/paper_account_advance_v0_1.json` | PREPARED_EXPLICIT_ACCOUNT_REMATERIALIZATION_ONLY | require exact batch-id confirmation, replace latest lifecycle record by intent, rematerialize account, and emit next account input without persistence/live path |
+| Paper Loop Checkpoint | `config/paper_loop_checkpoint_v0_1.json` | PREPARED_PORTABLE_HANDOFF_ONLY | require exact advance-id confirmation, rematerialize next account, reconcile exposure and package deterministic next-cycle handoff without persistence/live path |
 
 ## Analysis flow
 
