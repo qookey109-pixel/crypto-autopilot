@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 from .models import RiskDecision
@@ -352,3 +353,41 @@ def plan_position_size(
         risk_utilization_fraction=round(risk_utilization, 8),
         clipped_by=tuple(clipped_by),
     )
+
+
+def position_sizing_policy_from_config(
+    payload: Mapping[str, object],
+) -> PositionSizingPolicy:
+    if payload.get("schema") != "qookey-risk-position-sizing-v0.1":
+        raise ValueError("unsupported risk position sizing config")
+    risk = payload.get("risk_budget")
+    constraints = payload.get("constraints")
+    if not isinstance(risk, Mapping) or not isinstance(constraints, Mapping):
+        raise ValueError("risk_budget and constraints objects are required")
+
+    numeric_fields = (
+        risk.get("risk_fraction_per_trade"),
+        risk.get("daily_loss_limit_r"),
+        risk.get("max_new_positions_per_day"),
+        constraints.get("max_leverage"),
+        constraints.get("minimum_notional_usd"),
+    )
+    if any(isinstance(value, bool) for value in numeric_fields):
+        raise ValueError("risk position sizing numeric fields cannot be booleans")
+    maximum_notional = constraints.get("maximum_notional_usd")
+    if isinstance(maximum_notional, bool):
+        raise ValueError("maximum_notional_usd cannot be boolean")
+
+    try:
+        return PositionSizingPolicy(
+            risk_fraction_per_trade=float(risk["risk_fraction_per_trade"]),
+            max_leverage=float(constraints["max_leverage"]),
+            daily_loss_limit_r=float(risk["daily_loss_limit_r"]),
+            max_new_positions_per_day=int(risk["max_new_positions_per_day"]),
+            minimum_notional_usd=float(constraints["minimum_notional_usd"]),
+            maximum_notional_usd=(
+                None if maximum_notional is None else float(maximum_notional)
+            ),
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError(f"invalid risk position sizing config: {error}") from error
