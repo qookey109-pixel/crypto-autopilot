@@ -140,18 +140,23 @@ The current PaperBroker has no SHORT submit path and V0.1 does not invent one.
 
 The existing broker is an intent recorder, not a realistic fill simulator.
 
-It does not yet model:
+The broker itself still does not model fills or exits.
 
-- order-book fills;
-- slippage;
+Paper Fill / Order Lifecycle V0.1 now provides a separate downstream simulator
+for:
+
+- causal LONG entry fills;
+- normalized-liquidity participation caps;
 - partial fills;
-- funding settlement;
-- liquidation;
-- exchange rejection;
-- persistent broker state;
-- stop/target monitoring.
+- adverse slippage;
+- entry/exit taker fees;
+- stop gaps;
+- target exits;
+- conservative same-bar stop/target collisions;
+- unfilled-remainder cancellation.
 
-Those are separate later paper-simulation/execution concerns.
+The lifecycle layer still does not claim real order-book depth and does not model
+funding settlement, liquidation, exchange rejection or persistent broker state.
 
 ## Local integration CLI
 
@@ -206,14 +211,18 @@ integration path without enabling an unattended trading loop.
 
 Portfolio Admission V0.1 is now upstream of this contract.
 
+Paper Fill / Order Lifecycle V0.1 is now downstream of accepted paper intents.
+
 Future work may separately add:
 
 - a validated subset/allocation optimizer with explicit ranking evidence;
 - measured point-in-time correlation/covariance;
-- a realistic paper fill/settlement simulator;
+- funding and settlement simulation;
+- liquidation / exchange-rejection modeling where justified;
+- persistent paper-account state;
 - unattended paper orchestration under separate authority.
 
-None of those is implied by V0.1 paper intent recording.
+None of those is implied by V0.1 paper intent recording or lifecycle simulation.
 
 ## Authority
 
