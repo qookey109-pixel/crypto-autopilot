@@ -429,10 +429,12 @@ def position_sizing_plan_from_mapping(
     if not isinstance(payload.get("stop_preserved"), bool):
         raise ValueError("position sizing stop_preserved must be a JSON boolean")
     clipped_by = payload.get("clipped_by")
-    if not isinstance(clipped_by, list) or any(
+    if not isinstance(clipped_by, (list, tuple)) or any(
         not isinstance(item, str) for item in clipped_by
     ):
-        raise ValueError("position sizing clipped_by must be an array of strings")
+        raise ValueError(
+            "position sizing clipped_by must be a sequence of strings"
+        )
     try:
         return PositionSizingPlan(
             status=str(payload["status"]),
