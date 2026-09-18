@@ -25,6 +25,11 @@ Portfolio Admission
 Paper Execution
         ↓
 Repository Paper Broker
+        ↓
+Paper Fill / Order Lifecycle
+        ↓
+Paper Account / Position State
+        ↺ existing exposure into next Portfolio Admission
 ```
 
 A sizing plan that is safe in isolation is not automatically safe in a
@@ -89,6 +94,12 @@ Existing exposure is counted before new proposals for:
 
 The gate therefore cannot evaluate a new order as though the current book were
 empty.
+
+Paper Account / Position State V0.1 now provides the canonical product-stage
+source for current paper exposure. Its export uses current mark notional and the
+current mark-to-stop nominal loss for each open LONG position.
+
+An insolvent paper account cannot export new Portfolio Admission capacity.
 
 ## Frozen V0.1 limits
 
