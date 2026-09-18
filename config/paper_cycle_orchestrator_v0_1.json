@@ -1,0 +1,44 @@
+{
+  "schema": "qookey-paper-cycle-orchestrator-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_MANUAL_CYCLE_ONLY",
+  "product_stage": "PAPER_CYCLE_PREPARATION",
+  "policy": {
+    "maximum_candidates": 5,
+    "require_candidate_as_of_not_before_account": true,
+    "require_all_intents_ready": true,
+    "automatic_broker_submission_authorized": false,
+    "lifecycle_simulation_authorized": false,
+    "persistent_state_write_authorized": false
+  },
+  "behavior": {
+    "account_state_is_canonical_equity_source": true,
+    "account_open_positions_feed_existing_exposure": true,
+    "candidate_order_canonicalized_by_proposal_id": true,
+    "portfolio_basket_ranked": false,
+    "subset_selection_performed": false,
+    "paper_intents_prepared_only_after_portfolio_admission": true,
+    "partial_basket_submission_allowed": false,
+    "explicit_broker_submission_required_after_cycle": true,
+    "broker_submission_performed_by_cycle": false,
+    "lifecycle_simulation_performed_by_cycle": false,
+    "persistent_state_written_by_cycle": false
+  },
+  "authority": {
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_ranking_authorized": false,
+    "automatic_subset_selection_authorized": false,
+    "automatic_broker_submission_authorized": false,
+    "scheduled_execution_authorized": false,
+    "lifecycle_simulation_authorized": false,
+    "persistent_state_write_authorized": false,
+    "short_paper_execution_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
