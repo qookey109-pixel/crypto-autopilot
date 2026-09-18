@@ -486,6 +486,33 @@ class PaperFillLifecycleV01Tests(unittest.TestCase):
         with self.assertRaises(ValueError):
             lifecycle_input_from_dict(bad_authority)
 
+    def test_direct_policy_and_bar_types_fail_closed(self) -> None:
+        with self.assertRaises(ValueError):
+            PaperLifecyclePolicy(maximum_entry_bars=True)
+
+        with self.assertRaises(ValueError):
+            PaperLifecyclePolicy(taker_fee_bps=True)
+
+        with self.assertRaises(ValueError):
+            PaperLiquidityBar(
+                time_ms=True,
+                open=100.0,
+                high=101.0,
+                low=99.0,
+                close=100.0,
+                available_notional_usd=1000.0,
+            )
+
+        with self.assertRaises(ValueError):
+            PaperLiquidityBar(
+                time_ms=2000,
+                open=100.0,
+                high=101.0,
+                low=99.0,
+                close=100.0,
+                available_notional_usd=True,
+            )
+
     def test_versioned_policy_matches_defaults_and_boolean_types_are_strict(self) -> None:
         payload = json.loads(CONFIG.read_text(encoding="utf-8"))
 
