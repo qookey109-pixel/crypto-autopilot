@@ -1,6 +1,6 @@
 # Current Operations Status
 
-Updated: 2026-09-17
+Updated: 2026-09-18
 
 This is the concise current-operations entrypoint. Repository `main`, versioned configs/receipts, and immutable run evidence remain the formal authority. Dated prose in older status files is historical evidence, not a reason to regress an already completed lifecycle stage.
 
@@ -8,16 +8,16 @@ This is the concise current-operations entrypoint. Repository `main`, versioned 
 
 - Repository: `qookey109-pixel/crypto-autopilot`.
 - **Resolve `main` live at read time.** This file intentionally does not hard-code a claim that any SHA is the latest `main`.
-- Evidence-basis parent main for this status version: `5105cc8310515d40e99aaf02d2cfe5fef12a777f`.
+- Evidence-basis parent main for this status version: `a26902fd7a116af442a9b19249b895d0612bfc4f`.
 - Evidence-basis semantics: `REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION`.
 - The evidence-basis SHA is **not** a latest-main claim; it records the reviewed parent from which this status version was prepared.
-- PR #338 is the latest reviewed merge in that evidence basis; PR #337 records the Pionex V0.2 materialization completion evidence; PR #322 remains the first control-plane/documentation convergence batch.
+- PR #366 is the latest reviewed merge in that evidence basis; PR #365 records multi-cycle paper-loop integrity and PR #337 records the Pionex V0.2 materialization completion evidence.
 
 This avoids a self-reference bug where a file claiming its own future merge commit becomes stale immediately after it is merged.
 
 ## Current Core100 lifecycle
 
-`History COMPLETE -> Training COMPLETED -> Model Quality REJECT -> Threshold Replay COMPLETED / NO SUPPORTED THRESHOLD CHANGE -> Strategy Validation CLOSED -> Holdout CLOSED -> Promotion CLOSED -> Trading CLOSED`
+`History COMPLETE -> Training COMPLETED -> Model Quality REJECT -> Threshold Replay COMPLETED / NO SUPPORTED THRESHOLD CHANGE -> Strategy Validation CLOSED -> Holdout CLOSED -> Promotion CLOSED -> REAL TRADING CLOSED / LIVE-PAPER SEPARATELY AUTHORIZED`
 
 ### History
 
@@ -109,7 +109,9 @@ Current authority boundaries remain unchanged:
 - no model promotion;
 - no formal trade plan;
 - no real-money orders;
-- no live trading.
+- no real live trading.
+
+Separate from those validation gates, Live Paper Simulation V0.1 authorizes public live Pionex market data plus simulated paper execution/account updates only. It does not use private account/order endpoints.
 
 The materialization PASS does **not** override the Core100 **Model Quality REJECT** result and does not open Strategy Validation, Holdout, Promotion, or Trading.
 
@@ -144,7 +146,9 @@ Current open-PR navigation lives in `docs/OPEN_PR_TRIAGE_2026_09_17.md` with mac
 
 ## Safety and governance still binding
 
-- Current mode: **PAPER-ONLY**.
+- Current mode: **PAPER / LIVE-PAPER ONLY**.
+- Public live market data + live paper simulation: authorized only under `config/live_paper_simulation_v0_1.json`.
+- Private exchange APIs, real-money orders and real live trading: **CLOSED**.
 - `source_switch_authorized=false`.
 - Replacement holdout `2026-08-28` through `2026-09-03` remains `FROZEN_UNOPENED`.
 - Pionex-native and Binance USD-M evidence must remain provenance-separated.
