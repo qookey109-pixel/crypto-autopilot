@@ -529,6 +529,12 @@ def coordinate_live_paper_run_step(
             raise ValueError("committed live paper request references missing run step")
         if verify_live_paper_run_step(stored_step) != step_id:
             raise ValueError("committed live paper run step failed verification")
+        if stored_step.get("request_id") != request_id:
+            raise ValueError("committed live paper run step request lineage mismatch")
+        if stored_step.get("run_id") != run_id:
+            raise ValueError("committed live paper run step run lineage mismatch")
+        if stored_step.get("sequence") != sequence:
+            raise ValueError("committed live paper run step sequence mismatch")
         return {
             "schema": "qookey-live-paper-run-coordinator-report-v0.1",
             "state": "COMMITTED_STEP_REPLAYED",
