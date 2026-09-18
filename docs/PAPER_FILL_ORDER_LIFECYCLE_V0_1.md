@@ -271,6 +271,15 @@ V0.1 does not claim to model:
 
 Those require additional evidence or dedicated later versions.
 
+## Batch coordination
+
+Paper Lifecycle Batch Coordination V0.1 wraps this same single-intent engine for
+the complete accepted Paper Submission Session basket.
+
+It adds no second fill model. It canonicalizes proposal order, verifies exact
+session lineage, invokes this lifecycle engine once per accepted intent and
+emits Paper Account-compatible records.
+
 ## Downstream account state
 
 Paper Account / Position State V0.1 consumes the latest lifecycle evidence
