@@ -69,7 +69,6 @@ them in the same change would add package churn without clarifying ownership.
 - `provider_metadata_stability_v0_11.py`
 - `strategy_edge_validation.py`
 - `strategy_research_loop.py`
-- `strategy_research_scorecard_v0_1.py`
 
 These paths are named by workflows, frozen evidence or current versioned
 governance. They stay in place until a separately reviewed version explicitly
