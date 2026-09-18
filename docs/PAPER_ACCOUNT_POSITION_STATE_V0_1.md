@@ -268,6 +268,17 @@ V0.1 does not model:
 
 Those require later contracts and evidence.
 
+## Account advancement
+
+Paper Account Advance V0.1 updates the complete latest-record set after an
+explicit Lifecycle Batch.
+
+It preserves original initial equity, replaces only forward lifecycle evidence
+for an existing paper intent, allows identical evidence replay without
+double-counting, and emits the next complete Account input.
+
+The Account materializer itself remains immutable and stateless.
+
 ## Downstream cycle preparation
 
 Paper Cycle Orchestrator V0.1 uses the immutable account snapshot as the
