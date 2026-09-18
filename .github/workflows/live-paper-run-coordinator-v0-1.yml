@@ -1,0 +1,92 @@
+name: Live Paper Run Coordinator V0.1
+
+on:
+  workflow_dispatch:
+    inputs:
+      input_path:
+        description: Repository-relative Live Paper Coordinator input JSON
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-paper-run-coordinator-v0-1-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  run-one-step:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Validate input path
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${{ inputs.input_path }}" in
+            /*|*..*)
+              echo "input_path must be repository-relative without traversal" >&2
+              exit 2
+              ;;
+          esac
+          test -f "${{ inputs.input_path }}"
+
+      - name: Run exactly one persistent Live Paper step
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          PYTHONPATH=src python scripts/run_live_paper_coordinator_v0_1.py \
+            --input "${{ inputs.input_path }}" \
+            --store-backend r2 \
+            > artifacts/live-paper-run-coordinator-report.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(
+              Path("artifacts/live-paper-run-coordinator-report.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          assert report["state"] in {
+              "LIVE_PAPER_RUN_STEP_COMMITTED",
+              "COMMITTED_STEP_REPLAYED",
+          }
+          authority = report["authority"]
+          assert authority["public_live_market_data_authorized"] is True
+          assert authority["live_paper_simulation_authorized"] is True
+          assert authority["paper_state_persistence_authorized"] is True
+          assert authority["automatic_schedule_authorized"] is False
+          assert authority["automatic_candidate_generation_authorized"] is False
+          assert authority["scorecard_auto_selection_authorized"] is False
+          assert authority["private_exchange_api_authorized"] is False
+          assert authority["holdout_access_authorized"] is False
+          assert authority["real_money_order_authorized"] is False
+          assert authority["live_real_trading_authorized"] is False
+          PY
+
+      - name: Upload coordinator report as secondary evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: live-paper-run-coordinator-v0-1-${{ github.run_id }}
+          path: artifacts/live-paper-run-coordinator-report.json
+          if-no-files-found: error
+          retention-days: 30
