@@ -207,6 +207,8 @@ def prepare_paper_cycle(
         "broker_submissions_performed": 0,
         "lifecycle_simulations_performed": 0,
         "persistent_state_writes_performed": 0,
+        "explicit_submission_required": True,
+        "explicit_submission_allowed": False,
         "authority": _authority(),
     }
 
@@ -341,7 +343,6 @@ def prepare_paper_cycle(
         "prepared_intents": prepared_for_output,
         "paper_execution_decisions": decision_output,
         "existing_exposures": [asdict(item) for item in existing],
-        "explicit_submission_required": True,
         "explicit_submission_allowed": all_ready,
     }
 
