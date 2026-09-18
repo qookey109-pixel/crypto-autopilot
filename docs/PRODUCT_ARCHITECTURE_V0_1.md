@@ -142,6 +142,11 @@ and exposure source for the next explicit candidate basket. It may prepare
 Paper Execution intents, but it performs zero PaperBroker submissions and zero
 lifecycle simulations.
 
+Paper Submission Session V0.1 is the separate explicit paper-only submission
+boundary. It requires exact cycle-id confirmation, preflights the complete
+admitted basket, supports idempotent replay only for identical payloads, and
+still grants no scheduling, persistence or live-trading authority.
+
 ## Single-asset research boundary
 
 BTC, ETH, SOL, ZEC or any other individual asset may have dedicated research experiments.
