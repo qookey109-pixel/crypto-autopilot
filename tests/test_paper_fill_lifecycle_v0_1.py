@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import unittest
+from dataclasses import asdict
 from pathlib import Path
 
 from crypto_autopilot.paper.execution_v0_1 import (
@@ -14,6 +15,7 @@ from crypto_autopilot.paper.lifecycle_v0_1 import (
     PaperLiquidityBar,
     build_paper_lifecycle_plan,
     lifecycle_evidence,
+    lifecycle_input_from_dict,
     lifecycle_policy_from_config,
     simulate_paper_lifecycle,
 )
@@ -343,6 +345,64 @@ class PaperFillLifecycleV01Tests(unittest.TestCase):
         self.assertFalse(evidence["authority"]["automatic_submission_authorized"])
         self.assertFalse(evidence["authority"]["real_money_order_authorized"])
         self.assertFalse(evidence["authority"]["live_trading_authorized"])
+
+    def test_machine_readable_input_rebuilds_accepted_chain(self) -> None:
+        decision, receipt = accepted_chain()
+        execution_evidence = {
+            "schema": "qookey-paper-execution-evidence-v0.1",
+            "decision": {
+                "status": decision.status,
+                "reason": decision.reason,
+                "intent": asdict(decision.intent),
+            },
+            "receipt": asdict(receipt),
+            "authority": {
+                "repository_paper_broker_only": True,
+                "provider_requests_performed": False,
+                "r2_accessed": False,
+                "holdout_accessed": False,
+                "automatic_submission_authorized": False,
+                "short_paper_execution_authorized": False,
+                "formal_trade_plan_authorized": False,
+                "real_money_order_authorized": False,
+                "live_trading_authorized": False,
+            },
+            "limitations": [],
+        }
+        payload = {
+            "schema": "qookey-paper-fill-lifecycle-input-v0.1",
+            "paper_execution_evidence": execution_evidence,
+            "target_price": 105.0,
+            "bars": [
+                {
+                    "time_ms": 2000,
+                    "open": 100.0,
+                    "high": 101.0,
+                    "low": 99.0,
+                    "close": 100.0,
+                    "available_notional_usd": 4000.0,
+                }
+            ],
+        }
+
+        rebuilt_decision, rebuilt_receipt, target, bars = lifecycle_input_from_dict(
+            json.loads(json.dumps(payload))
+        )
+
+        self.assertEqual(rebuilt_decision, decision)
+        self.assertEqual(rebuilt_receipt, receipt)
+        self.assertEqual(target, 105.0)
+        self.assertEqual(len(bars), 1)
+
+        bad = json.loads(json.dumps(payload))
+        bad["bars"][0]["available_notional_usd"] = True
+        with self.assertRaises(ValueError):
+            lifecycle_input_from_dict(bad)
+
+        bad_replayed = json.loads(json.dumps(payload))
+        bad_replayed["paper_execution_evidence"]["receipt"]["replayed"] = "false"
+        with self.assertRaises(ValueError):
+            lifecycle_input_from_dict(bad_replayed)
 
     def test_versioned_policy_matches_defaults_and_boolean_types_are_strict(self) -> None:
         payload = json.loads(CONFIG.read_text(encoding="utf-8"))
