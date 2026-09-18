@@ -120,6 +120,16 @@ Each account record has the exact shape consumed by Paper Account V0.1:
 This removes manual evidence assembly between lifecycle simulation and account
 materialization.
 
+## Downstream account advance
+
+Paper Account Advance V0.1 consumes the complete Batch report together with the
+previous complete Account input.
+
+It requires exact batch-id confirmation, replaces existing lifecycle evidence by
+paper intent only when evidence moves forward, and emits the next Account input.
+
+The Batch layer itself still writes no state.
+
 ## Deterministic batch id
 
 The batch id binds:
