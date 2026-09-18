@@ -1,0 +1,35 @@
+{
+  "schema": "qookey-paper-run-package-artifact-export-v0.1",
+  "status_date": "2026-09-19",
+  "status": "PREPARED_SECONDARY_AUDIT_EXPORT_ONLY",
+  "product_stage": "PAPER_RUN_PACKAGE_ARTIFACT_EXPORT",
+  "policy": {
+    "require_verified_package": true,
+    "canonical_json_required": true,
+    "github_artifact_secondary_export_authorized": true,
+    "artifact_is_execution_authority": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "account_state_mutation_authorized": false,
+    "automatic_execution_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  },
+  "output_contract": {
+    "package_json": true,
+    "manifest_json": true,
+    "sha256s": true,
+    "export_receipt_json": true,
+    "github_artifact_retention_is_evidence_retention_only": true
+  },
+  "authority": {
+    "secondary_export_authorized": true,
+    "stored_artifact_becomes_execution_authority": false,
+    "private_exchange_api_authorized": false,
+    "holdout_access_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}

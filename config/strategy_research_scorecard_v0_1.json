@@ -1,0 +1,47 @@
+{
+  "schema": "qookey-strategy-research-scorecard-v0.1",
+  "status_date": "2026-09-19",
+  "status": "PREPARED_RESEARCH_RANKING_ONLY",
+  "product_stage": "STRATEGY_RESEARCH_SCORECARD",
+  "input_contract": {
+    "required_schema": "qookey-strategy-family-validation-report-v0.1",
+    "provider_requests_performed": false,
+    "replacement_holdout_allowed": false,
+    "family_reports_must_preserve_zero_execution_authority": true
+  },
+  "policy": {
+    "receipt_coverage_weight": 0.20,
+    "asset_breadth_weight": 0.25,
+    "regime_breadth_weight": 0.20,
+    "direction_breadth_weight": 0.10,
+    "edge_consistency_weight": 0.25,
+    "ready_state_multiplier": 1.0,
+    "insufficient_state_multiplier": 0.65,
+    "breadth_saturation_multiple": 2.0,
+    "research_ranking_authorized": true,
+    "winner_selection_authorized": false,
+    "automatic_strategy_selection_authorized": false,
+    "position_sizing_authorized": false,
+    "paper_execution_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  },
+  "interpretation": {
+    "score_means": "RESEARCH_REVIEW_PRIORITY_ONLY",
+    "score_is_expected_profitability": false,
+    "rank_1_is_winner": false,
+    "rank_can_feed_paper_cycle_directly": false,
+    "tie_breaker": "FAMILY_NAME_ASCENDING"
+  },
+  "authority": {
+    "research_ranking_authorized": true,
+    "winner_selection_authorized": false,
+    "automatic_strategy_selection_authorized": false,
+    "strategy_registry_mutation_authorized": false,
+    "private_exchange_api_authorized": false,
+    "holdout_access_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}

@@ -65,10 +65,13 @@ The existing R2 adapter already verifies SHA metadata on read when available.
 
 GitHub Artifact is permitted as a **secondary export**, not an authority source.
 
-V0.1 does not claim a direct Artifact upload backend yet.
+Paper Run Store itself still does not implement a generic Artifact storage
+backend. A separate versioned layer,
+`Paper Run Package Artifact Export V0.1`, now verifies one Run Package and
+provides a manual GitHub Actions `upload-artifact` path for secondary audit
+copies.
 
-A later workflow may upload the same canonical JSON as temporary CI evidence,
-but:
+The separation is intentional:
 
 ```text
 GitHub Artifact != account authority

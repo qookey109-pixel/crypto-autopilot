@@ -11,24 +11,26 @@ any versioned authority.
 4. `docs/STRATEGY_ROUTER_V0_1.md` — dynamic multi-strategy compatibility router.
 5. `docs/STRATEGY_LIBRARY_V0_1.md` — governed reusable strategy-family registry and lifecycle metadata.
 6. `docs/STRATEGY_FAMILY_VALIDATION_V0_1.md` — cross-asset/cross-regime family generalization review layered on existing Edge Validation.
-7. `docs/RISK_POSITION_SIZING_V0_1.md` — stop-preserving account-risk and bounded position-sizing research layer.
-8. `docs/PORTFOLIO_ADMISSION_V0_1.md` — explicit-basket total-risk, concentration and strategy-overlap admission gate.
-9. `docs/PAPER_EXECUTION_V0_1.md` — deterministic handoff into the existing Repository Paper Broker after portfolio admission; LONG intent recording only, no automatic/live path.
-10. `docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md` — deterministic paper fills, partial fills, costs and stop/target lifecycle over normalized liquidity bars.
-11. `docs/PAPER_ACCOUNT_POSITION_STATE_V0_1.md` — immutable paper cash/equity/open-position snapshot and Portfolio existing-exposure export.
-12. `docs/PAPER_CYCLE_ORCHESTRATOR_V0_1.md` — manual deterministic account → portfolio → paper-intent preparation; no broker submission.
-13. `docs/PAPER_SUBMISSION_SESSION_V0_1.md` — exact-cycle-id-confirmed complete-basket submission into the in-memory Repository Paper Broker.
-14. `docs/PAPER_LIFECYCLE_BATCH_V0_1.md` — exact-session-id-confirmed complete-basket lifecycle simulation and Account-ready record emission.
-15. `docs/PAPER_ACCOUNT_ADVANCE_V0_1.md` — exact-batch-id-confirmed latest-record replacement and next Account rematerialization.
-16. `docs/PAPER_LOOP_CHECKPOINT_V0_1.md` — exact-advance-id-confirmed portable next-account handoff with rematerialization/exposure reconciliation.
-17. `docs/PAPER_LOOP_RESUME_V0_1.md` — exact-checkpoint-id-confirmed checkpoint consumption into the existing manual Paper Cycle engine.
-18. `docs/PAPER_LOOP_INTEGRITY_V0_1.md` — audit-only two-or-more-round lineage, Checkpoint chaining and deterministic replay verification.
-19. `docs/PAPER_LOOP_RUN_PACKAGE_V0_1.md` — portable self-verifying transcript/proof package with per-stage SHA manifest; not execution authority.
-20. `docs/LIVE_PAPER_SIMULATION_V0_1.md` — public-live-market-data paper runtime with tick-by-tick lifecycle progress; no private or real order path.
-21. `docs/PAPER_RUN_STORE_V0_1.md` — explicit Local JSON / Cloudflare R2 content-addressed paper-state persistence.
-22. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
-23. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
-24. The exact config and receipt named by the stage being changed.
+7. `docs/STRATEGY_RESEARCH_SCORECARD_V0_1.md` — deterministic research-priority ranking of family evidence; no strategy-selection authority.
+8. `docs/RISK_POSITION_SIZING_V0_1.md` — stop-preserving account-risk and bounded position-sizing research layer.
+9. `docs/PORTFOLIO_ADMISSION_V0_1.md` — explicit-basket total-risk, concentration and strategy-overlap admission gate.
+10. `docs/PAPER_EXECUTION_V0_1.md` — deterministic handoff into the existing Repository Paper Broker after portfolio admission; LONG intent recording only, no automatic/live path.
+11. `docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md` — deterministic paper fills, partial fills, costs and stop/target lifecycle over normalized liquidity bars.
+12. `docs/PAPER_ACCOUNT_POSITION_STATE_V0_1.md` — immutable paper cash/equity/open-position snapshot and Portfolio existing-exposure export.
+13. `docs/PAPER_CYCLE_ORCHESTRATOR_V0_1.md` — manual deterministic account → portfolio → paper-intent preparation; no broker submission.
+14. `docs/PAPER_SUBMISSION_SESSION_V0_1.md` — exact-cycle-id-confirmed complete-basket submission into the in-memory Repository Paper Broker.
+15. `docs/PAPER_LIFECYCLE_BATCH_V0_1.md` — exact-session-id-confirmed complete-basket lifecycle simulation and Account-ready record emission.
+16. `docs/PAPER_ACCOUNT_ADVANCE_V0_1.md` — exact-batch-id-confirmed latest-record replacement and next Account rematerialization.
+17. `docs/PAPER_LOOP_CHECKPOINT_V0_1.md` — exact-advance-id-confirmed portable next-account handoff with rematerialization/exposure reconciliation.
+18. `docs/PAPER_LOOP_RESUME_V0_1.md` — exact-checkpoint-id-confirmed checkpoint consumption into the existing manual Paper Cycle engine.
+19. `docs/PAPER_LOOP_INTEGRITY_V0_1.md` — audit-only two-or-more-round lineage, Checkpoint chaining and deterministic replay verification.
+20. `docs/PAPER_LOOP_RUN_PACKAGE_V0_1.md` — portable self-verifying transcript/proof package with per-stage SHA manifest; not execution authority.
+21. `docs/PAPER_RUN_PACKAGE_ARTIFACT_EXPORT_V0_1.md` — verified canonical Run Package export plus manual GitHub Artifact secondary copy; not execution authority.
+22. `docs/LIVE_PAPER_SIMULATION_V0_1.md` — public-live-market-data paper runtime with tick-by-tick lifecycle progress; no private or real order path.
+23. `docs/PAPER_RUN_STORE_V0_1.md` — explicit Local JSON / Cloudflare R2 content-addressed paper-state persistence.
+24. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
+25. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
+26. The exact config and receipt named by the stage being changed.
 
 ## Current bounded data and Paper stages
 
@@ -39,11 +41,11 @@ any versioned authority.
 | Pionex alternative assets | `config/pionex_alternative_assets_observability_v0_2.json` | V0.1 supplies the 125-candidate registry; V0.2 authorizes one post-window metadata validation/diff/capacity path; historical candles still need separate authority |
 | Pionex Paper successor | `config/post_window_paper_training_v0_2.json` | prepared, but no workflow or provider access until V0.11 and a separate holdout-access authority |
 
-The Paper successor reuses the existing Repository Paper Broker and Pionex
-public adapter. It does not create a second broker, force a trade count or add a
-live-order path. No automatic Paper Broker simulation is currently running:
-V0.1 is retired after its cutoff and V0.2 remains prepared pending separate
-holdout/paper-read authority.
+The legacy Paper successor contract remains historical/prepared research
+lineage. Current Live Paper V0.1 separately authorizes public Pionex market data,
+simulated paper lifecycle/account advancement and explicit paper-state
+persistence. It still does not create a private exchange order path, force a
+trade count, open replacement holdout or authorize real-money trading.
 
 ## Current directory roles
 

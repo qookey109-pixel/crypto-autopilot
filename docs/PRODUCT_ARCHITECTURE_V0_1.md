@@ -1,6 +1,6 @@
 # Qookey Crypto Autopilot — Product Architecture V0.1
 
-Status date: 2026-09-18
+Status date: 2026-09-19
 
 ## Product objective
 
@@ -96,6 +96,10 @@ Strategy Router
         ↓
 Validated strategy + regime match / NO_TRADE
         ↓
+Strategy Family Validation
+        ↓
+Research Scorecard / Ranking (research priority only)
+        ↓
 Risk & Position Sizing
         ↓
 Paper Account / Position State
@@ -139,6 +143,8 @@ completed rounds
 Paper Loop Integrity / Multi-Cycle Replay
         ↓
 Paper Loop Run Package / Transcript
+        ↓
+GitHub Artifact Export / secondary audit copy
 ```
 
 Live trading and real-money orders remain separately gated. Product architecture does not itself authorize either.
@@ -192,6 +198,15 @@ Paper Loop Run Package / Transcript V0.1 is the portable audit sidecar after
 Integrity PASS. It re-audits the full transcript, binds every stage payload in a
 SHA-256 manifest, embeds the terminal Checkpoint and packages the complete proof
 without becoming execution authority.
+
+Paper Run Package Artifact Export V0.1 fully verifies that package again,
+writes canonical package/manifest/SHA evidence, and permits a manual GitHub
+Actions upload-artifact secondary copy. Artifact retention never changes
+Checkpoint, Account or execution authority.
+
+Strategy Research Scorecard V0.1 consumes existing Strategy Family Validation
+reports and deterministically ranks only research-review priority. It does not
+select a strategy for Portfolio Admission, Paper Cycle or Live Paper execution.
 
 Live Paper Simulation V0.1 is the public-live-data paper runtime. It may read
 current Pionex public order books/trades, advance one active paper basket across

@@ -92,3 +92,8 @@ schedule cannot be added accidentally.
 The machine-readable normal-operation contract is
 `config/github_automatic_research_operations_v0_1.json`. It does not let a
 workflow grant itself provider, R2, holdout, promotion or trading authority.
+
+
+## Manual-only audit/export workflows
+
+- `paper-loop-run-package-artifact-v0-1.yml` — verifies an existing Paper Loop Run Package and uploads a GitHub Artifact secondary audit copy. It has no schedule, provider access, holdout access or execution authority.
