@@ -447,6 +447,10 @@ def paper_lifecycle_batch_report_id_from_mapping(
             raise ValueError("batch result lifecycle_id does not match lifecycle plan")
         if result.get("lifecycle_id") != lifecycle_id:
             raise ValueError("batch result lifecycle_id does not match lifecycle result")
+        if row.get("status") != result.get("status"):
+            raise ValueError("batch result status does not match lifecycle result")
+        if row.get("reason") != result.get("reason"):
+            raise ValueError("batch result reason does not match lifecycle result")
         report_hash = _sha256(lifecycle_report)
         result_rows[proposal_id] = (lifecycle_id, report_hash)
 
