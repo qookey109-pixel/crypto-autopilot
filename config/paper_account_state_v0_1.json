@@ -1,0 +1,51 @@
+{
+  "schema": "qookey-paper-account-state-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_PAPER_STATE_ONLY",
+  "product_stage": "PAPER_ACCOUNT_POSITION_STATE",
+  "policy": {
+    "insolvency_equity_floor_usd": 0.0,
+    "require_single_mark_timestamp": true,
+    "reject_mark_crossing_protective_boundary": true,
+    "export_portfolio_exposures": true
+  },
+  "accounting": {
+    "derivatives_notional_debits_cash": false,
+    "closed_net_pnl_adjusts_cash": true,
+    "open_entry_fee_adjusts_cash": true,
+    "open_unrealized_gross_pnl_adjusts_equity": true,
+    "unrealized_exit_fee_reserved": false,
+    "funding_modeled": false,
+    "margin_maintenance_modeled": false,
+    "liquidation_modeled": false
+  },
+  "state_behavior": {
+    "immutable_rebuild_from_latest_lifecycle_evidence": true,
+    "one_latest_report_per_lifecycle_id": true,
+    "one_lifecycle_per_paper_intent": true,
+    "marks_required_exactly_for_open_symbols": true,
+    "marks_must_not_precede_lifecycle": true,
+    "protective_boundary_crossing_mark_requires_lifecycle_advance": true,
+    "open_positions_export_to_portfolio_admission": true,
+    "persistent_state_written": false
+  },
+  "portfolio_export": {
+    "notional_basis": "CURRENT_MARK_NOTIONAL",
+    "risk_basis": "CURRENT_MARK_TO_STOP_NOMINAL_LOSS",
+    "insolvent_account_export_allowed": false
+  },
+  "authority": {
+    "paper_state_materialization_authorized": true,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "persistent_state_write_authorized": false,
+    "automatic_submission_authorized": false,
+    "scheduled_execution_authorized": false,
+    "short_paper_execution_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
