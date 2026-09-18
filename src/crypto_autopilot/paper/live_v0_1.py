@@ -284,37 +284,44 @@ def _sha256(value: object) -> str:
 def _lifecycle_policy_from_mapping(
     payload: Mapping[str, object],
 ) -> PaperLifecyclePolicy:
-    keys = (
+    numeric_keys = (
         "taker_fee_bps",
         "entry_slippage_bps",
         "exit_slippage_bps",
         "maximum_bar_participation_fraction",
-        "maximum_entry_bars",
+    )
+    for key in numeric_keys:
+        value = payload.get(key)
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise ValueError(f"live paper lifecycle policy {key} must be numeric")
+    maximum_entry_bars = payload.get("maximum_entry_bars")
+    if not isinstance(maximum_entry_bars, int) or isinstance(maximum_entry_bars, bool):
+        raise ValueError("live paper lifecycle maximum_entry_bars must be integer")
+    boolean_keys = (
         "conservative_same_bar_exit",
         "cancel_if_stop_invalidated_before_first_fill",
         "cancel_if_target_crossed_before_first_fill",
         "close_at_end_of_data",
     )
-    if any(key not in payload for key in keys):
-        raise ValueError("live paper state lifecycle policy is incomplete")
+    for key in boolean_keys:
+        if not isinstance(payload.get(key), bool):
+            raise ValueError(f"live paper lifecycle policy {key} must be boolean")
     return PaperLifecyclePolicy(
-        taker_fee_bps=payload["taker_fee_bps"],  # type: ignore[arg-type]
-        entry_slippage_bps=payload["entry_slippage_bps"],  # type: ignore[arg-type]
-        exit_slippage_bps=payload["exit_slippage_bps"],  # type: ignore[arg-type]
-        maximum_bar_participation_fraction=payload[
-            "maximum_bar_participation_fraction"
-        ],  # type: ignore[arg-type]
-        maximum_entry_bars=payload["maximum_entry_bars"],  # type: ignore[arg-type]
-        conservative_same_bar_exit=payload[
-            "conservative_same_bar_exit"
-        ],  # type: ignore[arg-type]
+        taker_fee_bps=float(payload["taker_fee_bps"]),
+        entry_slippage_bps=float(payload["entry_slippage_bps"]),
+        exit_slippage_bps=float(payload["exit_slippage_bps"]),
+        maximum_bar_participation_fraction=float(
+            payload["maximum_bar_participation_fraction"]
+        ),
+        maximum_entry_bars=maximum_entry_bars,
+        conservative_same_bar_exit=payload["conservative_same_bar_exit"],
         cancel_if_stop_invalidated_before_first_fill=payload[
             "cancel_if_stop_invalidated_before_first_fill"
-        ],  # type: ignore[arg-type]
+        ],
         cancel_if_target_crossed_before_first_fill=payload[
             "cancel_if_target_crossed_before_first_fill"
-        ],  # type: ignore[arg-type]
-        close_at_end_of_data=payload["close_at_end_of_data"],  # type: ignore[arg-type]
+        ],
+        close_at_end_of_data=payload["close_at_end_of_data"],
     )
 
 
