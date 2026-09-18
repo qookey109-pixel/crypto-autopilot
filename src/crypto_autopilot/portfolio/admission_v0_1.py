@@ -408,7 +408,7 @@ def _authority() -> dict[str, object]:
     }
 
 
-def _position_sizing_plan_from_mapping(
+def position_sizing_plan_from_mapping(
     payload: Mapping[str, object],
 ) -> PositionSizingPlan:
     numeric_keys = (
@@ -498,7 +498,7 @@ def portfolio_admission_input_from_dict(
                     strategy_family=str(item["strategy_family"]),
                     family_validation_report=family_report,
                     as_of_ms=item["as_of_ms"],
-                    sizing_plan=_position_sizing_plan_from_mapping(sizing_payload),
+                    sizing_plan=position_sizing_plan_from_mapping(sizing_payload),
                 )
             )
         except (KeyError, TypeError, ValueError) as error:
