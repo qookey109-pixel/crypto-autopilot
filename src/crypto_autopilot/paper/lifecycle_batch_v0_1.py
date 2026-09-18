@@ -396,6 +396,115 @@ def simulate_paper_lifecycle_batch(
     }
 
 
+def paper_lifecycle_batch_report_id_from_mapping(
+    payload: Mapping[str, object],
+) -> str:
+    """Recompute one serialized lifecycle-batch id and verify Account record pairing."""
+
+    if payload.get("schema") != "qookey-paper-lifecycle-batch-report-v0.1":
+        raise ValueError("unsupported paper lifecycle batch report schema")
+    if payload.get("state") != "PAPER_LIFECYCLE_BATCH_COMPLETE":
+        raise ValueError("paper lifecycle batch is not complete")
+    session_id = payload.get("session_id")
+    if not isinstance(session_id, str) or not session_id:
+        raise ValueError("paper lifecycle batch session_id is required")
+
+    intent_count = payload.get("intent_count")
+    if (
+        not isinstance(intent_count, int)
+        or isinstance(intent_count, bool)
+        or intent_count < 1
+    ):
+        raise ValueError("paper lifecycle batch intent_count must be positive integer")
+
+    results = payload.get("results")
+    account_records = payload.get("account_records")
+    if not isinstance(results, list) or not isinstance(account_records, list):
+        raise ValueError("paper lifecycle batch results/account_records must be arrays")
+    if len(results) != intent_count or len(account_records) != intent_count:
+        raise ValueError("paper lifecycle batch counts do not match intent_count")
+
+    result_rows: dict[str, tuple[str, str]] = {}
+    for index, row in enumerate(results):
+        if not isinstance(row, Mapping):
+            raise ValueError(f"results[{index}] must be an object")
+        proposal_id = row.get("proposal_id")
+        lifecycle_id = row.get("lifecycle_id")
+        lifecycle_report = row.get("paper_lifecycle_report")
+        if not isinstance(proposal_id, str) or not proposal_id:
+            raise ValueError(f"results[{index}].proposal_id is required")
+        if proposal_id in result_rows:
+            raise ValueError("duplicate paper lifecycle batch proposal id")
+        if not isinstance(lifecycle_id, str) or not lifecycle_id:
+            raise ValueError(f"results[{index}].lifecycle_id is required")
+        if not isinstance(lifecycle_report, Mapping):
+            raise ValueError(f"results[{index}].paper_lifecycle_report is required")
+        plan = lifecycle_report.get("plan")
+        result = lifecycle_report.get("result")
+        if not isinstance(plan, Mapping) or not isinstance(result, Mapping):
+            raise ValueError("paper lifecycle report plan/result are required")
+        if plan.get("lifecycle_id") != lifecycle_id:
+            raise ValueError("batch result lifecycle_id does not match lifecycle plan")
+        if result.get("lifecycle_id") != lifecycle_id:
+            raise ValueError("batch result lifecycle_id does not match lifecycle result")
+        if row.get("status") != result.get("status"):
+            raise ValueError("batch result status does not match lifecycle result")
+        if row.get("reason") != result.get("reason"):
+            raise ValueError("batch result reason does not match lifecycle result")
+        report_hash = _sha256(lifecycle_report)
+        result_rows[proposal_id] = (lifecycle_id, report_hash)
+
+    account_rows: dict[str, tuple[str, str]] = {}
+    for index, record in enumerate(account_records):
+        if not isinstance(record, Mapping):
+            raise ValueError(f"account_records[{index}] must be an object")
+        execution = record.get("paper_execution_evidence")
+        lifecycle_report = record.get("paper_lifecycle_report")
+        if not isinstance(execution, Mapping) or not isinstance(
+            lifecycle_report, Mapping
+        ):
+            raise ValueError(
+                f"account_records[{index}] requires execution/lifecycle evidence"
+            )
+        decision = execution.get("decision")
+        if not isinstance(decision, Mapping):
+            raise ValueError("account record paper execution decision is required")
+        intent = decision.get("intent")
+        if not isinstance(intent, Mapping):
+            raise ValueError("account record paper execution intent is required")
+        proposal_id = intent.get("portfolio_proposal_id")
+        if not isinstance(proposal_id, str) or not proposal_id:
+            raise ValueError("account record portfolio_proposal_id is required")
+        if proposal_id in account_rows:
+            raise ValueError("duplicate paper lifecycle account-record proposal id")
+        plan = lifecycle_report.get("plan")
+        if not isinstance(plan, Mapping):
+            raise ValueError("account record lifecycle plan is required")
+        lifecycle_id = plan.get("lifecycle_id")
+        if not isinstance(lifecycle_id, str) or not lifecycle_id:
+            raise ValueError("account record lifecycle_id is required")
+        account_rows[proposal_id] = (lifecycle_id, _sha256(lifecycle_report))
+
+    if set(result_rows) != set(account_rows):
+        raise ValueError("batch results and account-record proposal sets differ")
+    for proposal_id, value in result_rows.items():
+        if account_rows[proposal_id] != value:
+            raise ValueError(
+                f"batch account record does not match result for {proposal_id}"
+            )
+
+    canonical_proposals = sorted(result_rows)
+    batch_payload: dict[str, object] = {
+        "schema": "qookey-paper-lifecycle-batch-id-v0.1",
+        "session_id": session_id,
+        "proposal_ids": canonical_proposals,
+        "lifecycle_report_sha256s": [
+            result_rows[proposal_id][1] for proposal_id in canonical_proposals
+        ],
+    }
+    return f"paper-lifecycle-batch-v0-1-{_sha256(batch_payload)}"
+
+
 def paper_lifecycle_batch_policy_from_config(
     payload: Mapping[str, object],
 ) -> PaperLifecycleBatchPolicy:
