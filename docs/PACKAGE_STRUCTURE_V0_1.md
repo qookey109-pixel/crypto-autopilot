@@ -22,6 +22,7 @@ are explicit stable or version-bound exceptions.
 | `features/` | Technical, multi-timeframe, market-state and order-flow feature construction |
 | `history/` | Historical admission, liquidity, replay, SState context and universe review |
 | `paper/` | Paper-only exploration, deterministic simulation and candidate training |
+| `portfolio/` | Portfolio-level admission, exposure concentration and strategy-overlap governance |
 | `providers/` | Provider comparison, forensics and prepared capture-suspension helpers |
 | `research/` | Evaluation integrity, experiment registry, research context and signal governance |
 | `storage/` | R2, Parquet, object layout, budget and ephemeral-output enforcement |
