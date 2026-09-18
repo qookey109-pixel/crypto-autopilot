@@ -6,9 +6,10 @@ any versioned authority.
 ## Read in this order
 
 1. `PROJECT_STATUS.md` — current formal stage and safety boundary.
-2. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
-3. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
-4. The exact config and receipt named by the stage being changed.
+2. `docs/PRODUCT_ARCHITECTURE_V0_1.md` — multi-asset, daily-opportunity-first product architecture.
+3. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
+4. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
+5. The exact config and receipt named by the stage being changed.
 
 ## Current bounded data and Paper stages
 

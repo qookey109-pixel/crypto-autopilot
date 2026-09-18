@@ -1,0 +1,45 @@
+{
+  "schema": "qookey-product-architecture-v0.1",
+  "status_date": "2026-09-18",
+  "product_type": "MULTI_ASSET_OPPORTUNITY_SELECTION_AND_AUTOMATED_TRADING_PLATFORM",
+  "single_asset_primary_architecture": false,
+  "priority_order": [
+    "DAILY_OPPORTUNITY_ENGINE",
+    "STRATEGY_ROUTER",
+    "RISK_AND_POSITION_SIZING",
+    "AUTOMATED_EXECUTION",
+    "POST_TRADE_LEARNING"
+  ],
+  "daily_opportunity_engine": {
+    "starts_from_governed_multi_asset_universe": true,
+    "may_return_zero_candidates": true,
+    "fixed_daily_trade_count_required": false,
+    "output_is_order_authority": false
+  },
+  "strategy_router": {
+    "asset_specific_research_is_module_only": true,
+    "no_compatible_strategy_result": "NO_TRADE",
+    "single_asset_result_requires_generalization_validation_before_platform_wide_use": true
+  },
+  "risk": {
+    "stop_distance_and_account_risk_separated": true,
+    "martingale_allowed": false,
+    "loss_doubling_allowed": false,
+    "unlimited_averaging_down_allowed": false
+  },
+  "execution": {
+    "downstream_of_opportunity_strategy_and_risk_gates": true,
+    "paper_first": true
+  },
+  "authority": {
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}

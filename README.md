@@ -4,6 +4,18 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 
 > **Current mode: PAPER-ONLY.** No formal trade plan, real-money order, automatic model promotion, source switch, or live-trading path is authorized.
 
+## Product architecture priority
+
+Qookey Crypto Autopilot is multi-asset and opportunity-first, not a single-coin strategy project.
+
+1. Daily Opportunity Engine — find the best current research/trading candidates from the governed universe, including the valid outcome of no trade.
+2. Strategy Router — match each candidate to an evidence-supported strategy/regime or return `NO_TRADE`.
+3. Risk / Position Sizing — separate market-driven stop distance from account-risk budgeting.
+4. Automated Execution — downstream paper/live-capable execution under separate authority.
+5. Post-trade Learning — feed outcomes back into research without silently promoting strategy authority.
+
+See [`docs/PRODUCT_ARCHITECTURE_V0_1.md`](docs/PRODUCT_ARCHITECTURE_V0_1.md) and [`config/product_architecture_v0_1.json`](config/product_architecture_v0_1.json).
+
 ## Start here
 
 For current work, read in this order:
