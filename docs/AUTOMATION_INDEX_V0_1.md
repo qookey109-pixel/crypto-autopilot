@@ -99,3 +99,4 @@ workflow grant itself provider, R2, holdout, promotion or trading authority.
 - `paper-loop-run-package-artifact-v0-1.yml` — verifies an existing Paper Loop Run Package and uploads a GitHub Artifact secondary audit copy. It has no schedule, provider access, holdout access or execution authority.
 
 - `live-paper-run-coordinator-v0-1.yml` — runs exactly one persistent Live Paper step against R2 from an explicit input JSON. It is manual-only, has no cron, and cannot enable private exchange APIs, Scorecard auto-selection, real-money orders or real live trading.
+- `live-paper-run-recovery-v0-1.yml` — audits one persisted Live Paper run and may repair only a missing immutable request-result seal after full state/tick/step verification. It is manual-only, performs no provider call, has no cron and never rewrites state/tick/step evidence.
