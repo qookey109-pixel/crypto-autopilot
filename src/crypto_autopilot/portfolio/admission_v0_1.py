@@ -8,7 +8,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
 
 from crypto_autopilot.risk import PositionSizingPlan
-from crypto_autopilot.strategy_library import get_strategy_family
+from crypto_autopilot.strategy_library import get_strategy_family, strategy_family_ids
 
 
 FAMILY_REVIEW_READY = "FAMILY_EVIDENCE_READY_FOR_HUMAN_REVIEW"
@@ -21,6 +21,16 @@ OVERLAP_GROUPS: dict[str, str] = {
     "MEAN_REVERSION": "RANGE",
     "LOW_VOLATILITY_RANGE": "RANGE",
 }
+
+
+def _validate_overlap_registry() -> None:
+    if set(OVERLAP_GROUPS) != set(strategy_family_ids()):
+        raise ValueError(
+            "portfolio overlap groups must cover the complete strategy library"
+        )
+
+
+_validate_overlap_registry()
 
 
 @dataclass(frozen=True, slots=True)
@@ -401,6 +411,21 @@ def _authority() -> dict[str, object]:
 def _position_sizing_plan_from_mapping(
     payload: Mapping[str, object],
 ) -> PositionSizingPlan:
+    numeric_keys = (
+        "equity_usd",
+        "entry_price",
+        "stop_price",
+        "stop_distance_fraction",
+        "target_risk_usd",
+        "realized_risk_usd",
+        "target_notional_usd",
+        "approved_notional_usd",
+        "required_leverage",
+        "realized_leverage",
+        "risk_utilization_fraction",
+    )
+    if any(isinstance(payload.get(key), bool) for key in numeric_keys):
+        raise ValueError("position sizing numeric fields cannot be booleans")
     if not isinstance(payload.get("stop_preserved"), bool):
         raise ValueError("position sizing stop_preserved must be a JSON boolean")
     clipped_by = payload.get("clipped_by")
@@ -464,6 +489,8 @@ def portfolio_admission_input_from_dict(
             raise ValueError(
                 f"proposals[{index}].position_sizing_plan must be an object"
             )
+        if isinstance(item.get("as_of_ms"), bool):
+            raise ValueError(f"proposals[{index}].as_of_ms cannot be boolean")
         try:
             proposals.append(
                 build_portfolio_proposal(
@@ -481,6 +508,13 @@ def portfolio_admission_input_from_dict(
     for index, item in enumerate(existing_items):
         if not isinstance(item, Mapping):
             raise ValueError(f"existing_exposures[{index}] must be a JSON object")
+        if any(
+            isinstance(item.get(key), bool)
+            for key in ("notional_usd", "realized_risk_usd")
+        ):
+            raise ValueError(
+                f"existing_exposures[{index}] numeric fields cannot be booleans"
+            )
         try:
             existing.append(
                 PortfolioExposure(
