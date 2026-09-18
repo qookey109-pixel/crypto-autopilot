@@ -21,9 +21,10 @@ any versioned authority.
 14. `docs/PAPER_LIFECYCLE_BATCH_V0_1.md` — exact-session-id-confirmed complete-basket lifecycle simulation and Account-ready record emission.
 15. `docs/PAPER_ACCOUNT_ADVANCE_V0_1.md` — exact-batch-id-confirmed latest-record replacement and next Account rematerialization.
 16. `docs/PAPER_LOOP_CHECKPOINT_V0_1.md` — exact-advance-id-confirmed portable next-account handoff with rematerialization/exposure reconciliation.
-17. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
-18. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
-19. The exact config and receipt named by the stage being changed.
+17. `docs/PAPER_LOOP_RESUME_V0_1.md` — exact-checkpoint-id-confirmed checkpoint consumption into the existing manual Paper Cycle engine.
+18. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
+19. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
+20. The exact config and receipt named by the stage being changed.
 
 ## Current bounded data and Paper stages
 
