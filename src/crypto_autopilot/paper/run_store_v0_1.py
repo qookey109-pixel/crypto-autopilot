@@ -245,7 +245,33 @@ class R2PaperRunStore:
         clean_kind = _clean_component(kind, "kind")
         prefix = f"{self.prefix}/{clean_kind}/"
         identifiers: list[str] = []
-        for key in self.store.list_keys(prefix):
+
+        list_keys = getattr(self.store, "list_keys", None)
+        if callable(list_keys):
+            keys = tuple(list_keys(prefix))
+        else:
+            client = getattr(self.store, "client", None)
+            bucket = getattr(self.store, "bucket", None)
+            if client is None or not isinstance(bucket, str) or not bucket:
+                raise ValueError("R2 paper run store cannot list object ids")
+            paginator = client.get_paginator("list_objects_v2")
+            discovered: list[str] = []
+            for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
+                contents = page.get("Contents", [])
+                if not isinstance(contents, list):
+                    raise ValueError("R2 list response Contents must be an array")
+                for row in contents:
+                    if not isinstance(row, dict):
+                        raise ValueError("R2 list response object must be a mapping")
+                    key = row.get("Key")
+                    if not isinstance(key, str) or not key:
+                        raise ValueError("R2 list response key is invalid")
+                    discovered.append(key)
+            keys = tuple(sorted(set(discovered)))
+
+        for key in keys:
+            if not isinstance(key, str):
+                raise ValueError("R2 paper run store key must be a string")
             if not key.startswith(prefix) or not key.endswith(".json"):
                 continue
             suffix = key[len(prefix):-5]
