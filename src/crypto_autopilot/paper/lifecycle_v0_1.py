@@ -168,6 +168,22 @@ def build_paper_lifecycle_plan(
     intent = decision.intent
     if receipt.status != "PAPER_ACCEPTED":
         raise ValueError("paper execution receipt is not accepted")
+    if intent.status != "READY_FOR_PAPER_BROKER":
+        raise ValueError("paper execution intent is not ready")
+    if intent.as_of_ms < 0:
+        raise ValueError("paper execution intent as_of_ms cannot be negative")
+    numeric_intent = (
+        intent.entry_price,
+        intent.stop_price,
+        intent.notional_usd,
+        intent.target_risk_usd,
+        intent.realized_risk_usd,
+        intent.risk_utilization_fraction,
+    )
+    if not all(math.isfinite(value) for value in numeric_intent):
+        raise ValueError("paper execution intent numeric fields must be finite")
+    if intent.entry_price <= 0.0 or intent.stop_price <= 0.0 or intent.notional_usd <= 0.0:
+        raise ValueError("paper execution intent price/notional values must be positive")
     if receipt.intent_id != intent.intent_id or receipt.order_id != intent.intent_id:
         raise ValueError("paper receipt does not match execution intent")
     if receipt.symbol != intent.symbol or receipt.side != intent.direction:
@@ -373,6 +389,51 @@ def simulate_paper_lifecycle(
                 fill_price = _adverse_long_entry(
                     bar.open, policy.entry_slippage_bps
                 )
+                if fill_price >= plan.target_price:
+                    if total_quantity <= 0.0:
+                        emit(
+                            bar.time_ms,
+                            "ORDER_CANCELLED",
+                            reason="target_not_above_executable_entry",
+                        )
+                        return _result(
+                            plan=plan,
+                            status="CANCELLED_UNFILLED",
+                            reason="target_not_above_executable_entry",
+                            fills=fills,
+                            events=events,
+                        )
+                    emit(
+                        bar.time_ms,
+                        "ENTRY_NO_FILL",
+                        reason="target_not_above_executable_entry",
+                    )
+                    fill_notional = 0.0
+                if fill_notional <= 0.0:
+                    exit_hit = _exit_reason_for_long(
+                        bar,
+                        stop_price=plan.stop_price,
+                        target_price=plan.target_price,
+                        conservative_same_bar_exit=policy.conservative_same_bar_exit,
+                    )
+                    if exit_hit is not None:
+                        raw_exit, reason = exit_hit
+                        emit(
+                            bar.time_ms,
+                            "UNFILLED_REMAINDER_CANCELLED",
+                            notional_usd=round(remaining, 8),
+                            reason="position_exited_during_entry_window",
+                        )
+                        return _closed_result(
+                            plan=plan,
+                            fills=fills,
+                            events=events,
+                            time_ms=bar.time_ms,
+                            raw_exit_price=raw_exit,
+                            exit_reason=reason,
+                            policy=policy,
+                        )
+                    continue
                 quantity = fill_notional / fill_price
                 fee = fill_notional * policy.taker_fee_bps / 10_000.0
                 fill = PaperFill(
@@ -677,6 +738,15 @@ def lifecycle_input_from_dict(
     execution_authority = execution.get("authority")
     if not isinstance(execution_authority, Mapping):
         raise ValueError("paper execution authority object is required")
+    if execution_authority.get("repository_paper_broker_only") is not True:
+        raise ValueError("paper execution evidence must be Repository Paper Broker only")
+    for key in (
+        "provider_requests_performed",
+        "r2_accessed",
+        "holdout_accessed",
+    ):
+        if execution_authority.get(key) is not False:
+            raise ValueError(f"paper execution evidence must remain offline: {key}")
     for key in (
         "automatic_submission_authorized",
         "short_paper_execution_authorized",
