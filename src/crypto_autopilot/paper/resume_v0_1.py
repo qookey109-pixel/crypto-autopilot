@@ -11,6 +11,7 @@ from crypto_autopilot.paper.checkpoint_v0_1 import (
 )
 from crypto_autopilot.paper.cycle_v0_1 import (
     PaperCyclePolicy,
+    paper_cycle_report_id_from_mapping,
     prepare_paper_cycle,
 )
 from crypto_autopilot.paper.execution_v0_1 import PaperExecutionPolicy
@@ -205,6 +206,96 @@ def resume_paper_loop(
             "Checkpoint consumption grants no automatic or live execution authority.",
         ],
     }
+
+
+def paper_loop_resume_report_id_from_mapping(
+    payload: Mapping[str, object],
+) -> str:
+    """Fully validate and recompute one serialized Paper Loop Resume id."""
+
+    if payload.get("schema") != "qookey-paper-loop-resume-report-v0.1":
+        raise ValueError("unsupported paper loop resume report schema")
+    state = payload.get("state")
+    if state not in {"PAPER_LOOP_RESUMED", "CHECKPOINT_BLOCKED"}:
+        raise ValueError("paper loop resume report state is invalid")
+
+    checkpoint_id = payload.get("checkpoint_id")
+    resume_id = payload.get("resume_id")
+    if not isinstance(checkpoint_id, str) or not checkpoint_id:
+        raise ValueError("paper loop resume checkpoint_id is required")
+    if not isinstance(resume_id, str) or not resume_id:
+        raise ValueError("paper loop resume resume_id is required")
+
+    candidate_count = payload.get("candidate_count")
+    if (
+        not isinstance(candidate_count, int)
+        or isinstance(candidate_count, bool)
+        or candidate_count < 0
+    ):
+        raise ValueError("paper loop resume candidate_count must be non-negative integer")
+
+    for key in (
+        "provider_requests_performed",
+        "broker_submissions_performed",
+        "lifecycle_simulations_performed",
+        "persistent_state_writes_performed",
+    ):
+        value = payload.get(key)
+        if not isinstance(value, int) or isinstance(value, bool) or value != 0:
+            raise ValueError(f"paper loop resume {key} must equal zero")
+
+    authority = payload.get("authority")
+    if not isinstance(authority, Mapping):
+        raise ValueError("paper loop resume authority object is required")
+    if authority.get("explicit_manual_cycle_resume_only") is not True:
+        raise ValueError("paper loop resume must remain explicit-manual-only")
+    for key in (
+        "provider_requests_performed",
+        "r2_accessed",
+        "holdout_accessed",
+        "persistent_state_write_authorized",
+        "automatic_cycle_authorized",
+        "automatic_submission_authorized",
+        "scheduled_execution_authorized",
+        "short_paper_execution_authorized",
+        "formal_trade_plan_authorized",
+        "real_money_order_authorized",
+        "live_trading_authorized",
+    ):
+        if authority.get(key) is not False:
+            raise ValueError(f"paper loop resume authority must remain closed: {key}")
+
+    if state == "CHECKPOINT_BLOCKED":
+        if payload.get("reason") != "checkpoint_disallows_next_cycle":
+            raise ValueError("blocked paper loop resume reason is invalid")
+        if payload.get("cycle_report") is not None:
+            raise ValueError("blocked paper loop resume cannot contain cycle report")
+        cycle_id = None
+    else:
+        cycle_id = payload.get("cycle_id")
+        cycle_state = payload.get("cycle_state")
+        cycle_report = payload.get("cycle_report")
+        if not isinstance(cycle_id, str) or not cycle_id:
+            raise ValueError("resumed paper loop cycle_id is required")
+        if not isinstance(cycle_state, str) or not cycle_state:
+            raise ValueError("resumed paper loop cycle_state is required")
+        if not isinstance(cycle_report, Mapping):
+            raise ValueError("resumed paper loop cycle_report is required")
+        recomputed_cycle_id = paper_cycle_report_id_from_mapping(cycle_report)
+        if recomputed_cycle_id != cycle_id:
+            raise ValueError("resumed paper loop cycle id does not match cycle report")
+        if cycle_report.get("cycle_id") != cycle_id:
+            raise ValueError("resumed paper loop embedded cycle id mismatch")
+        if cycle_report.get("state") != cycle_state:
+            raise ValueError("resumed paper loop cycle state mismatch")
+
+    canonical: dict[str, object] = {
+        "schema": "qookey-paper-loop-resume-id-v0.1",
+        "checkpoint_id": checkpoint_id,
+        "state": state,
+        "cycle_id": cycle_id,
+    }
+    return f"paper-loop-resume-v0-1-{_sha256(canonical)}"
 
 
 def paper_loop_resume_policy_from_config(
