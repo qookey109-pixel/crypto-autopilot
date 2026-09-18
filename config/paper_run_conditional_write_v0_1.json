@@ -1,0 +1,42 @@
+{
+  "schema": "qookey-paper-run-conditional-write-v0.1",
+  "status_date": "2026-09-19",
+  "status": "PREPARED_STORAGE_PRIMITIVE_ONLY",
+  "product_stage": "PAPER_RUN_CONDITIONAL_WRITE",
+  "policy": {
+    "atomic_create_if_absent_required": true,
+    "overwrite_existing_authorized": false,
+    "coordinator_integration_authorized": false,
+    "automatic_retry_authorized": false,
+    "provider_access_authorized": false,
+    "live_market_data_access_authorized": false,
+    "account_state_mutation_authorized": false,
+    "automatic_schedule_authorized": false,
+    "private_exchange_api_authorized": false,
+    "holdout_access_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  },
+  "behavior": {
+    "local_atomic_create_uses_exclusive_create": true,
+    "r2_atomic_create_uses_if_none_match_star": true,
+    "existing_key_is_conflict": true,
+    "conflict_is_not_safe_retry": true,
+    "coordinator_behavior_changed": false,
+    "workflow_created": false,
+    "schedule_created": false
+  },
+  "authority": {
+    "storage_primitive_only": true,
+    "coordinator_integration_authorized": false,
+    "provider_access_authorized": false,
+    "live_market_data_access_authorized": false,
+    "account_state_mutation_authorized": false,
+    "automatic_schedule_authorized": false,
+    "private_exchange_api_authorized": false,
+    "holdout_access_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
