@@ -4,7 +4,7 @@ import hashlib
 import json
 import math
 from collections.abc import Mapping, Sequence
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 
 from crypto_autopilot.paper.lifecycle_v0_1 import (
     PaperLifecyclePolicy,
