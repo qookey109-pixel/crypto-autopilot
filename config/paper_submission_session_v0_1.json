@@ -1,0 +1,44 @@
+{
+  "schema": "qookey-paper-submission-session-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_EXPLICIT_PAPER_SUBMISSION_ONLY",
+  "product_stage": "EXPLICIT_PAPER_SUBMISSION_SESSION",
+  "policy": {
+    "maximum_intents": 5,
+    "require_exact_cycle_id_confirmation": true,
+    "require_complete_ready_basket": true,
+    "explicit_paper_submission_authorized": true,
+    "automatic_submission_authorized": false,
+    "scheduled_submission_authorized": false,
+    "persistent_broker_state_authorized": false,
+    "lifecycle_simulation_authorized": false,
+    "live_trading_authorized": false
+  },
+  "behavior": {
+    "cycle_id_recomputed_before_submission": true,
+    "complete_admitted_basket_required": true,
+    "prepared_intents_must_match_decisions": true,
+    "existing_broker_orders_preflighted": true,
+    "idempotent_replay_allowed_when_payload_identical": true,
+    "idempotency_collision_rejected": true,
+    "partial_basket_submission_allowed": false,
+    "lifecycle_simulation_performed": false,
+    "persistent_broker_state_written": false
+  },
+  "authority": {
+    "explicit_in_memory_paper_submission_authorized": true,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_submission_authorized": false,
+    "scheduled_submission_authorized": false,
+    "persistent_broker_state_authorized": false,
+    "lifecycle_simulation_authorized": false,
+    "short_paper_execution_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
