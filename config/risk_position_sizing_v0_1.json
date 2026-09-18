@@ -1,0 +1,48 @@
+{
+  "schema": "qookey-risk-position-sizing-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "product_stage": "RISK_POSITION_SIZING",
+  "risk_budget": {
+    "risk_fraction_per_trade": 0.01,
+    "daily_loss_limit_r": 3.0,
+    "max_new_positions_per_day": 3
+  },
+  "constraints": {
+    "max_leverage": 3.0,
+    "minimum_notional_usd": 0.0,
+    "maximum_notional_usd": null
+  },
+  "behavior": {
+    "stop_source": "UPSTREAM_MARKET_OR_STRATEGY_INVALIDATION",
+    "stop_preserved": true,
+    "tighten_stop_to_consume_target_risk": false,
+    "partial_risk_deployment_allowed": true,
+    "target_risk_recorded": true,
+    "realized_risk_recorded": true,
+    "long_and_short_research_sizing_supported": true,
+    "martingale_allowed": false,
+    "loss_doubling_allowed": false,
+    "unlimited_averaging_down_allowed": false
+  },
+  "constraints_semantics": {
+    "leverage_cap_reduces_position_not_stop": true,
+    "maximum_notional_reduces_position_not_stop": true,
+    "minimum_notional_must_not_force_risk_budget_breach": true,
+    "exchange_specific_precision_not_inferred": true
+  },
+  "authority": {
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_promotion_authorized": false,
+    "model_promotion_authorized": false,
+    "paper_execution_authorized": false,
+    "short_execution_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
