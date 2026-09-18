@@ -155,6 +155,20 @@ class LocalPaperRunStore:
             raise ValueError("stored paper run JSON must be an object")
         return payload
 
+    def list_json_ids(self, kind: str) -> tuple[str, ...]:
+        clean_kind = _clean_component(kind, "kind")
+        directory = self.root / clean_kind
+        if not directory.exists():
+            return ()
+        if not directory.is_dir():
+            raise ValueError("paper run store kind path must be a directory")
+        identifiers: list[str] = []
+        for path in directory.iterdir():
+            if not path.is_file() or path.suffix != ".json":
+                continue
+            identifiers.append(_clean_component(path.stem, "object_id"))
+        return tuple(sorted(set(identifiers)))
+
 
 class R2PaperRunStore:
     """Content-addressed paper-run JSON store over the existing R2 adapter."""
@@ -226,6 +240,19 @@ class R2PaperRunStore:
         if not isinstance(payload, dict):
             raise ValueError("stored paper run JSON must be an object")
         return payload
+
+    def list_json_ids(self, kind: str) -> tuple[str, ...]:
+        clean_kind = _clean_component(kind, "kind")
+        prefix = f"{self.prefix}/{clean_kind}/"
+        identifiers: list[str] = []
+        for key in self.store.list_keys(prefix):
+            if not key.startswith(prefix) or not key.endswith(".json"):
+                continue
+            suffix = key[len(prefix):-5]
+            if "/" in suffix or not suffix:
+                continue
+            identifiers.append(_clean_component(suffix, "object_id"))
+        return tuple(sorted(set(identifiers)))
 
 
 def run_store_receipt_evidence(receipt: PaperRunStoreReceipt) -> dict[str, object]:
