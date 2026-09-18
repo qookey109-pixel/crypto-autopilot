@@ -26,8 +26,20 @@ class PaperBroker:
     def submit_long(self, *, order_id: str, symbol: str, notional_usd: float) -> PaperOrder:
         if not order_id:
             raise ValueError("order_id is required for idempotency")
-        if any(order.order_id == order_id for order in self.orders):
-            return next(order for order in self.orders if order.order_id == order_id)
+        existing = next(
+            (order for order in self.orders if order.order_id == order_id),
+            None,
+        )
+        if existing is not None:
+            if (
+                existing.symbol != symbol
+                or existing.side != "LONG"
+                or existing.notional_usd != notional_usd
+            ):
+                raise ValueError(
+                    "idempotency key collision: existing paper order payload differs"
+                )
+            return existing
         if notional_usd <= 0:
             raise ValueError("notional_usd must be positive")
         order = PaperOrder(order_id, symbol, "LONG", notional_usd)
