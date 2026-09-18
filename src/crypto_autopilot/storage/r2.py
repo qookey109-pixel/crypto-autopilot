@@ -83,6 +83,27 @@ class R2Store:
             )
         return payload
 
+    def list_keys(self, prefix: str) -> tuple[str, ...]:
+        """List object keys under one prefix without reading object bodies."""
+
+        clean = prefix.strip()
+        if not clean:
+            raise ValueError("R2 list prefix is required")
+        paginator = self.client.get_paginator("list_objects_v2")
+        keys: list[str] = []
+        for page in paginator.paginate(Bucket=self.bucket, Prefix=clean):
+            contents = page.get("Contents", [])
+            if not isinstance(contents, list):
+                raise ValueError("R2 list response Contents must be an array")
+            for row in contents:
+                if not isinstance(row, dict):
+                    raise ValueError("R2 list response object must be a mapping")
+                key = row.get("Key")
+                if not isinstance(key, str) or not key:
+                    raise ValueError("R2 list response key is invalid")
+                keys.append(key)
+        return tuple(sorted(set(keys)))
+
     def get_bytes_if_exists(self, key: str) -> bytes | None:
         """Read an object if it exists and verify the SHA-256 metadata when present."""
 
