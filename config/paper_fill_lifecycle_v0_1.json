@@ -1,0 +1,52 @@
+{
+  "schema": "qookey-paper-fill-lifecycle-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_PAPER_SIMULATION_ONLY",
+  "product_stage": "PAPER_FILL_ORDER_LIFECYCLE",
+  "policy": {
+    "taker_fee_bps": 5.0,
+    "entry_slippage_bps": 2.0,
+    "exit_slippage_bps": 2.0,
+    "maximum_bar_participation_fraction": 0.05,
+    "maximum_entry_bars": 3,
+    "conservative_same_bar_exit": true,
+    "cancel_if_stop_invalidated_before_first_fill": true,
+    "cancel_if_target_crossed_before_first_fill": true,
+    "close_at_end_of_data": false
+  },
+  "market_input_contract": {
+    "bars_must_be_strictly_increasing": true,
+    "only_bars_after_intent_as_of_are_eligible": true,
+    "available_notional_usd_required": true,
+    "provider_volume_to_notional_inference_allowed": false,
+    "order_book_depth_claimed": false
+  },
+  "lifecycle_behavior": {
+    "entry_price_source": "BAR_OPEN_PLUS_ADVERSE_SLIPPAGE",
+    "partial_fills_supported": true,
+    "entry_remainder_cancelled_after_window": true,
+    "stop_gap_supported": true,
+    "target_gap_supported": true,
+    "same_bar_stop_target_policy": "STOP_FIRST",
+    "entry_and_exit_taker_fee_modeled": true,
+    "unfilled_remainder_cancelled_on_position_exit": true,
+    "open_position_forced_closed_at_end_of_data": false,
+    "funding_modeled": false,
+    "liquidation_modeled": false,
+    "exchange_rejection_modeled": false
+  },
+  "authority": {
+    "paper_simulation_authorized": true,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "persistent_broker_state_authorized": false,
+    "automatic_submission_authorized": false,
+    "scheduled_execution_authorized": false,
+    "short_paper_execution_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}

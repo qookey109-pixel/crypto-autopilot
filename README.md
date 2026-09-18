@@ -12,10 +12,10 @@ Qookey Crypto Autopilot is multi-asset and opportunity-first, not a single-coin 
 2. Strategy Router — match each candidate to an evidence-supported strategy/regime or return `NO_TRADE`.
 3. Risk / Position Sizing — separate market-driven stop distance from account-risk budgeting.
 4. Portfolio Admission — apply total-risk, concentration and strategy-overlap gates to an explicit basket.
-5. Automated Execution — downstream paper/live-capable execution under separate authority.
+5. Automated Execution — deterministic paper intent, fill/lifecycle simulation, and only later live-capable execution under separate authority.
 6. Post-trade Learning — feed outcomes back into research without silently promoting strategy authority.
 
-See [`docs/PRODUCT_ARCHITECTURE_V0_1.md`](docs/PRODUCT_ARCHITECTURE_V0_1.md), [`docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md`](docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md), [`docs/STRATEGY_ROUTER_V0_1.md`](docs/STRATEGY_ROUTER_V0_1.md), [`docs/STRATEGY_LIBRARY_V0_1.md`](docs/STRATEGY_LIBRARY_V0_1.md), [`docs/STRATEGY_FAMILY_VALIDATION_V0_1.md`](docs/STRATEGY_FAMILY_VALIDATION_V0_1.md), [`docs/RISK_POSITION_SIZING_V0_1.md`](docs/RISK_POSITION_SIZING_V0_1.md), [`docs/PORTFOLIO_ADMISSION_V0_1.md`](docs/PORTFOLIO_ADMISSION_V0_1.md), and [`docs/PAPER_EXECUTION_V0_1.md`](docs/PAPER_EXECUTION_V0_1.md).
+See [`docs/PRODUCT_ARCHITECTURE_V0_1.md`](docs/PRODUCT_ARCHITECTURE_V0_1.md), [`docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md`](docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md), [`docs/STRATEGY_ROUTER_V0_1.md`](docs/STRATEGY_ROUTER_V0_1.md), [`docs/STRATEGY_LIBRARY_V0_1.md`](docs/STRATEGY_LIBRARY_V0_1.md), [`docs/STRATEGY_FAMILY_VALIDATION_V0_1.md`](docs/STRATEGY_FAMILY_VALIDATION_V0_1.md), [`docs/RISK_POSITION_SIZING_V0_1.md`](docs/RISK_POSITION_SIZING_V0_1.md), [`docs/PORTFOLIO_ADMISSION_V0_1.md`](docs/PORTFOLIO_ADMISSION_V0_1.md), [`docs/PAPER_EXECUTION_V0_1.md`](docs/PAPER_EXECUTION_V0_1.md), and [`docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md`](docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md).
 
 ## Start here
 
