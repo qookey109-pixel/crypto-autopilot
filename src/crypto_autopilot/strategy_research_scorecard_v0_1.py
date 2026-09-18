@@ -366,6 +366,7 @@ def build_strategy_research_scorecard(
         rows.append(enriched)
 
     priority_order = [str(row["family"]) for row in rankable]
+    rows_sha256 = _sha256(rows)
     scorecard_payload = {
         "schema": "qookey-strategy-research-scorecard-id-v0.1",
         "family_report_sha256s": sorted(
@@ -373,6 +374,7 @@ def build_strategy_research_scorecard(
         ),
         "policy": asdict(policy),
         "priority_order": priority_order,
+        "rows_sha256": rows_sha256,
     }
     scorecard_id = f"strategy-research-scorecard-v0-1-{_sha256(scorecard_payload)}"
     return {
@@ -382,6 +384,7 @@ def build_strategy_research_scorecard(
         "family_count": len(rows),
         "ranked_family_count": len(rankable),
         "research_priority_order": priority_order,
+        "rows_sha256": rows_sha256,
         "rows": rows,
         "ranking_performed": True,
         "winner_selected": False,
@@ -485,11 +488,15 @@ def verify_strategy_research_scorecard(
         if authority.get(key) is not False:
             raise ValueError(f"scorecard authority must remain closed: {key}")
 
+    rows_sha256 = _sha256(rows)
+    if payload.get("rows_sha256") != rows_sha256:
+        raise ValueError("strategy research scorecard rows hash mismatch")
     payload_for_id = {
         "schema": "qookey-strategy-research-scorecard-id-v0.1",
         "family_report_sha256s": sorted(report_hashes),
         "policy": asdict(policy),
         "priority_order": list(priority),
+        "rows_sha256": rows_sha256,
     }
     expected = f"strategy-research-scorecard-v0-1-{_sha256(payload_for_id)}"
     if payload.get("scorecard_id") != expected:
