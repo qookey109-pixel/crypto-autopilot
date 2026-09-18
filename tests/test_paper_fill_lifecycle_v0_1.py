@@ -347,7 +347,7 @@ class PaperFillLifecycleV01Tests(unittest.TestCase):
 
         result = simulate_paper_lifecycle(
             plan=plan,
-            bars=(bar(2_000, close=102.0),),
+            bars=(bar(2_000, high=103.0, close=102.0),),
             policy=PaperLifecyclePolicy(close_at_end_of_data=True),
         )
 
