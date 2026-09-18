@@ -14,7 +14,7 @@ The product priority order is:
 2. **Strategy Router** — determine which validated strategy family, if any, fits each selected asset and current market regime.
 3. **Risk / Position Sizing** — determine stop distance, target risk, feasible position size and leverage constraints.
 4. **Portfolio Admission** — apply total-risk, per-asset concentration, strategy-overlap and gross-exposure gates to the explicit proposed basket.
-5. **Automated Execution** — only after all upstream gates pass, route a paper/live-capable execution plan through the appropriate exchange adapter under separately authorized trading authority.
+5. **Automated Execution** — only after all upstream gates pass, create deterministic paper intent and fill/lifecycle evidence; any future live-capable exchange routing remains separately authorized.
 6. **Post-trade Learning** — record outcomes and feed research/evaluation systems without silently changing production strategy authority.
 
 ## Priority 1 — Daily Opportunity Engine
@@ -100,9 +100,13 @@ Risk & Position Sizing
         ↓
 Portfolio Admission / REVIEW_REQUIRED
         ↓
-Paper execution
+Paper execution intent
         ↓
-Exchange adapter
+Repository Paper Broker acceptance
+        ↓
+Paper Fill / Order Lifecycle simulation
+        ↓
+Future exchange adapter under separate authority
         ↓
 Order / stop / exit monitoring
         ↓
@@ -110,6 +114,10 @@ Trade journal and research feedback
 ```
 
 Live trading and real-money orders remain separately gated. Product architecture does not itself authorize either.
+
+Paper Fill / Order Lifecycle V0.1 is simulation-only. It may model partial fills,
+slippage, fees and protective exits from normalized paper-liquidity inputs, but
+it does not establish real order-book depth or live-exchange authority.
 
 ## Single-asset research boundary
 
