@@ -244,6 +244,11 @@ def _validate_lifecycle_evidence(
     if not isinstance(reason, str) or not reason:
         raise ValueError("paper lifecycle reason is required")
 
+    result_requested = _strict_number(
+        result.get("requested_notional_usd"), "result requested_notional_usd"
+    )
+    if not math.isclose(result_requested, requested_notional, rel_tol=0.0, abs_tol=1e-8):
+        raise ValueError("lifecycle result requested notional does not match plan")
     filled_notional = _strict_number(
         result.get("filled_notional_usd"), "result filled_notional_usd"
     )
@@ -251,6 +256,27 @@ def _validate_lifecycle_evidence(
     entry_fees = _strict_number(result.get("entry_fees_usd"), "result entry_fees_usd")
     if filled_notional < 0.0 or quantity < 0.0 or entry_fees < 0.0:
         raise ValueError("paper lifecycle fill values cannot be negative")
+
+    unfilled_notional = _strict_number(
+        result.get("unfilled_notional_usd"), "result unfilled_notional_usd"
+    )
+    fill_fraction = _strict_number(
+        result.get("fill_fraction"), "result fill_fraction"
+    )
+    if unfilled_notional < 0.0 or not 0.0 <= fill_fraction <= 1.0:
+        raise ValueError("paper lifecycle unfilled/fill_fraction values are invalid")
+    if not math.isclose(
+        filled_notional + unfilled_notional,
+        requested_notional,
+        rel_tol=0.0,
+        abs_tol=1e-6,
+    ):
+        raise ValueError("paper lifecycle fill accounting does not balance")
+    expected_fraction = (
+        0.0 if requested_notional <= 0.0 else filled_notional / requested_notional
+    )
+    if not math.isclose(fill_fraction, expected_fraction, rel_tol=0.0, abs_tol=1e-6):
+        raise ValueError("paper lifecycle fill fraction is inconsistent")
 
     average_entry_raw = result.get("average_entry_price")
     average_entry = (
@@ -280,21 +306,45 @@ def _validate_lifecycle_evidence(
         raise ValueError("paper lifecycle event times must be non-decreasing")
     last_event_time = event_times[-1]
 
+    exit_time = result.get("exit_time_ms")
+    raw_exit = result.get("raw_exit_price")
+    exit_price = result.get("exit_price")
+    exit_fee = _strict_number(result.get("exit_fee_usd"), "result exit_fee_usd")
+    gross_pnl_raw = result.get("gross_pnl_usd")
+
     if status == "CANCELLED_UNFILLED":
         if filled_notional != 0.0 or quantity != 0.0 or average_entry is not None:
             raise ValueError("cancelled-unfilled lifecycle cannot contain an open fill")
-        if net_pnl is not None:
-            raise ValueError("cancelled-unfilled lifecycle cannot contain net PnL")
+        if entry_fees != 0.0 or exit_fee != 0.0:
+            raise ValueError("cancelled-unfilled lifecycle cannot contain fees")
+        if net_pnl is not None or gross_pnl_raw is not None:
+            raise ValueError("cancelled-unfilled lifecycle cannot contain PnL")
+        if exit_time is not None or raw_exit is not None or exit_price is not None:
+            raise ValueError("cancelled-unfilled lifecycle cannot contain exit fields")
     else:
         if filled_notional <= 0.0 or quantity <= 0.0 or average_entry is None:
             raise ValueError("open/closed lifecycle requires positive filled position")
-        if not stop_price < average_entry < target_price:
+        if average_entry <= 0.0 or not stop_price < average_entry < target_price:
             raise ValueError("paper lifecycle LONG geometry is inconsistent")
 
-    if status == "OPEN_POSITION" and net_pnl is not None:
-        raise ValueError("open lifecycle cannot contain realized net PnL")
-    if status == "CLOSED" and net_pnl is None:
-        raise ValueError("closed lifecycle requires realized net PnL")
+    if status == "OPEN_POSITION":
+        if net_pnl is not None or gross_pnl_raw is not None:
+            raise ValueError("open lifecycle cannot contain realized PnL")
+        if exit_time is not None or raw_exit is not None or exit_price is not None:
+            raise ValueError("open lifecycle cannot contain exit fields")
+        if exit_fee != 0.0:
+            raise ValueError("open lifecycle cannot contain exit fee")
+
+    if status == "CLOSED":
+        if net_pnl is None or gross_pnl_raw is None:
+            raise ValueError("closed lifecycle requires gross and net PnL")
+        _strict_number(gross_pnl_raw, "result gross_pnl_usd")
+        _strict_number(raw_exit, "result raw_exit_price")
+        _strict_number(exit_price, "result exit_price")
+        if not isinstance(exit_time, int) or isinstance(exit_time, bool) or exit_time < 0:
+            raise ValueError("closed lifecycle requires non-negative integer exit_time_ms")
+        if exit_fee < 0.0:
+            raise ValueError("closed lifecycle exit fee cannot be negative")
 
     return _NormalizedLifecycleRecord(
         lifecycle_id=lifecycle_id,
