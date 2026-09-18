@@ -6,17 +6,11 @@ from dataclasses import dataclass
 from .features.regime import MarketRegimeSnapshot
 from .features.structure import MarketStructureSnapshot
 from .opportunity_engine import DailyOpportunityDecision
+from .strategy_library import strategy_family_ids
 from .technical import TechnicalSnapshot
 
 
-STRATEGY_FAMILIES = (
-    "TREND_FOLLOWING",
-    "BREAKOUT",
-    "MOMENTUM",
-    "MEAN_REVERSION",
-    "HIGH_VOLATILITY_TREND",
-    "LOW_VOLATILITY_RANGE",
-)
+STRATEGY_FAMILIES = strategy_family_ids()
 
 
 @dataclass(frozen=True, slots=True)
@@ -472,6 +466,10 @@ def route_strategy_families(
         )
         if match is not None
     )
+
+    registered = set(STRATEGY_FAMILIES)
+    if any(match.family not in registered for match in matches):
+        raise ValueError("router emitted an unregistered strategy family")
 
     if not matches:
         return StrategyRoutingDecision(
