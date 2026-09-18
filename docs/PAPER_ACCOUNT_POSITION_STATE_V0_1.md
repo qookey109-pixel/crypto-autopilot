@@ -268,11 +268,6 @@ V0.1 does not model:
 
 Those require later contracts and evidence.
 
-## Authority
-
-Paper Account / Position State V0.1 grants only deterministic paper-state
-materialization and exposure export.
-
 ## Downstream cycle preparation
 
 Paper Cycle Orchestrator V0.1 uses the immutable account snapshot as the
