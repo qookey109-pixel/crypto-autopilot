@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
 
@@ -55,6 +54,14 @@ class PaperCyclePolicy:
         )
         if any(not isinstance(value, bool) for value in flags):
             raise ValueError("paper cycle policy flags must be booleans")
+        if not self.require_candidate_as_of_not_before_account:
+            raise ValueError(
+                "Paper Cycle V0.1 requires candidate timestamps at/after account state"
+            )
+        if not self.require_all_intents_ready:
+            raise ValueError(
+                "Paper Cycle V0.1 requires the complete admitted basket to be intent-ready"
+            )
         if self.automatic_broker_submission_authorized:
             raise ValueError("Paper Cycle V0.1 cannot authorize broker submission")
         if self.lifecycle_simulation_authorized:
@@ -311,10 +318,14 @@ def prepare_paper_cycle(
             }
         )
     )
-    if cycle_policy.require_all_intents_ready and not all_ready:
-        prepared_for_output = [asdict(item) for item in prepared]
-    else:
-        prepared_for_output = [asdict(item) for item in prepared]
+    prepared_for_output = [asdict(item) for item in prepared]
+    decision_output = [
+        {
+            "proposal_id": candidate.proposal.proposal_id,
+            "decision": asdict(decision),
+        }
+        for candidate, decision in decisions
+    ]
 
     return {
         **base,
@@ -328,8 +339,10 @@ def prepare_paper_cycle(
         "reasons": reasons,
         "portfolio_admission": portfolio_report,
         "prepared_intents": prepared_for_output,
+        "paper_execution_decisions": decision_output,
         "existing_exposures": [asdict(item) for item in existing],
         "explicit_submission_required": True,
+        "explicit_submission_allowed": all_ready,
     }
 
 
