@@ -1,10 +1,7 @@
 import unittest
 
 from crypto_autopilot.models import Candle
-from crypto_autopilot.research.bitget_macd import (
-    BitgetMacdResearchConfig,
-    THIRTY_MINUTES_MS,
-)
+from crypto_autopilot.research.bitget_macd import BitgetMacdResearchConfig
 from crypto_autopilot.research.bitget_macd_validation import (
     BitgetMacdValidationPlan,
     build_preregistered_windows,
