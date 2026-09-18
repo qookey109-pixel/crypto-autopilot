@@ -1085,3 +1085,24 @@ def live_paper_policy_from_config(
         real_money_order_authorized=policy["real_money_order_authorized"],
         live_real_trading_authorized=policy["live_real_trading_authorized"],
     )
+
+
+def live_paper_tick_input_from_dict(
+    payload: Mapping[str, object],
+) -> tuple[Mapping[str, object], int, tuple[object, ...]]:
+    if payload.get("schema") != "qookey-live-paper-tick-input-v0.1":
+        raise ValueError("unsupported live paper tick input schema")
+    state = payload.get("state")
+    tick_time_ms = payload.get("tick_time_ms")
+    candidate_specs = payload.get("candidate_specs")
+    if not isinstance(state, Mapping):
+        raise ValueError("live paper tick state object is required")
+    if (
+        not isinstance(tick_time_ms, int)
+        or isinstance(tick_time_ms, bool)
+        or tick_time_ms < 0
+    ):
+        raise ValueError("live paper tick_time_ms must be non-negative integer")
+    if not isinstance(candidate_specs, list):
+        raise ValueError("live paper candidate_specs must be a JSON array")
+    return state, tick_time_ms, tuple(candidate_specs)
