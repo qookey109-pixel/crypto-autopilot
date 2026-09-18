@@ -418,6 +418,34 @@ def _verify_committed_result(
     return step_id, run_id, sequence
 
 
+
+def build_live_paper_run_result(
+    *,
+    request_id: str,
+    step_id: str,
+    run_id: str,
+    sequence: int,
+) -> dict[str, object]:
+    """Build the canonical immutable request-result seal for one committed step."""
+
+    return _committed_result(
+        request_id=request_id,
+        step_id=step_id,
+        run_id=run_id,
+        sequence=sequence,
+    )
+
+
+def verify_live_paper_run_result(
+    payload: Mapping[str, object],
+    *,
+    request_id: str,
+) -> tuple[str, str, int]:
+    """Validate one serialized committed request-result seal."""
+
+    return _verify_committed_result(payload, request_id=request_id)
+
+
 def _store_get(
     store: PaperRunStoreLike,
     kind: str,
