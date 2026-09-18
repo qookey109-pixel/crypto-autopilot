@@ -122,8 +122,10 @@ Input shape:
 
 The CLI writes only JSON to stdout.
 
-It does not create a repository artifact, local state file, R2 object, database
-row or PaperBroker state.
+It does not itself create a repository artifact, local state file, R2 object,
+database row or PaperBroker state. A separate
+`Paper Run Package Artifact Export V0.1` layer may fully re-verify this output
+and upload a secondary GitHub Artifact copy without changing its authority.
 
 ## Naming boundary
 
@@ -155,7 +157,7 @@ V0.1 does not:
 - simulate lifecycle bars;
 - advance account state;
 - persist package data;
-- upload GitHub artifacts;
+- upload GitHub artifacts directly (handled by the separate secondary-export layer);
 - access providers;
 - access R2 or replacement holdout;
 - rank strategies;
