@@ -65,7 +65,9 @@
     "paper_successor": "config/post_window_paper_training_v0_2.json",
     "paper_successor_state": "PREPARED_WAITING_FOR_HOLDOUT_AUTHORITY",
     "paper_run_package_artifact_export": "config/paper_run_package_artifact_export_v0_1.json",
-    "paper_run_package_artifact_export_state": "MANUAL_SECONDARY_AUDIT_EXPORT_ONLY_NO_SCHEDULE_NO_EXECUTION_AUTHORITY"
+    "paper_run_package_artifact_export_state": "MANUAL_SECONDARY_AUDIT_EXPORT_ONLY_NO_SCHEDULE_NO_EXECUTION_AUTHORITY",
+    "live_paper_run_coordinator": "config/live_paper_run_coordinator_v0_1.json",
+    "live_paper_run_coordinator_state": "MANUAL_APPEND_ONLY_R2_OR_LOCAL_COORDINATION_NO_SCHEDULE_NO_REAL_ORDERS"
   },
   "scheduled_workflows": {
     "current_window": [
@@ -149,6 +151,7 @@
       "dashboard-github-pages.yml",
       "dashboard-static-smoke.yml",
       "lit-archive-diagnosis-v0-1.yml",
+      "live-paper-run-coordinator-v0-1.yml",
       "paper-loop-run-package-artifact-v0-1.yml",
       "pionex-alternative-assets-observability-v0-2.yml",
       "pionex-asset-classification-execution-v0-1.yml",
@@ -239,6 +242,8 @@
     "pionex_validation_dataset_schedule_added": false,
     "trade_plan_authorized": false,
     "real_money_order_authorized": false,
-    "live_trading_authorized": false
+    "live_trading_authorized": false,
+    "live_paper_run_coordinator_authority_added": true,
+    "live_paper_run_coordinator_schedule_added": false
   }
 }
