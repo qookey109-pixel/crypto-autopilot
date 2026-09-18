@@ -1,0 +1,103 @@
+name: Bitget MACD ZEC Binance Vision Read-Only V0.2
+
+on:
+  push:
+    branches:
+      - codex/bitget-zec-real-history-readonly-v0-1-20260918
+    paths:
+      - "research/receipts/2026-09-18-bitget-macd-zec-binance-vision-read-only-authority-v0-2.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitget-macd-zec-binance-vision-readonly-v0-2
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - name: Validate one-shot public read authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_RUN_ATTEMPT}" != "1" ]; then
+            echo "one-shot experiment forbids workflow reruns"
+            exit 1
+          fi
+          receipt="research/receipts/2026-09-18-bitget-macd-zec-binance-vision-read-only-authority-v0-2.json"
+          if git cat-file -e "HEAD^:${receipt}" 2>/dev/null; then
+            echo "authority receipt existed before this trigger commit; refusing repeat execution"
+            exit 1
+          fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(
+              Path("research/receipts/2026-09-18-bitget-macd-zec-binance-vision-read-only-authority-v0-2.json").read_text()
+          )
+          assert receipt["schema"] == "qookey-bitget-macd-zec-binance-vision-read-only-authority-v0.2"
+          assert receipt["status"] == "AUTHORIZED_PUBLIC_READ_ONLY_ONE_SHOT"
+          assert receipt["authorized_source_main_sha"] == "a0e216a41feaca61433bae9ca93c870a5baea9cc"
+          assert receipt["prior_attempt"]["workflow_run_id"] == 35297163219
+          assert receipt["prior_attempt"]["authority_consumed"] is True
+          assert receipt["prior_attempt"]["zec_history_partition_reads_performed"] is False
+          assert receipt["execution"]["one_shot"] is True
+          assert receipt["execution"]["max_runs"] == 1
+          assert receipt["authorized_scope"]["archive_reads_authorized"] is True
+          assert receipt["authorized_scope"]["checksum_reads_authorized"] is True
+          assert receipt["authorized_scope"]["r2_access_authorized"] is False
+          assert receipt["authorized_scope"]["provider_fallback_authorized"] is False
+          assert all(value is False for value in receipt["safety_boundary"].values())
+          PY
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Run preregistered public ZEC research
+        run: |
+          python scripts/run_bitget_macd_zec_binance_vision_readonly_v0_2.py             --output bitget-zec-public-output/report.json
+
+      - name: Assert result safety boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("bitget-zec-public-output/report.json").read_text())
+          assert report["status"] == "PASS"
+          assert report["source"]["symbol"] == "ZECUSDT"
+          assert report["source"]["interval"] == "15m"
+          assert report["source"]["archive_count"] == 48
+          assert report["preregistration"]["candidate_grid_count"] == 2304
+          assert report["validation"]["candidate_count"] == 2304
+          assert report["execution"]["r2_access_performed"] is False
+          assert report["execution"]["r2_writes_performed"] is False
+          assert report["execution"]["raw_candles_persisted"] is False
+          assert report["execution"]["training_performed"] is False
+          assert all(value is False for value in report["authority"].values())
+          PY
+
+      - name: Upload secret-free research evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: bitget-macd-zec-binance-vision-readonly-${{ github.run_id }}-${{ github.run_attempt }}
+          path: bitget-zec-public-output/report.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf bitget-zec-public-output
