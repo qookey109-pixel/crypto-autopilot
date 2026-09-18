@@ -10,9 +10,10 @@ any versioned authority.
 3. `docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md` — multi-asset attention candidate selector.
 4. `docs/STRATEGY_ROUTER_V0_1.md` — dynamic multi-strategy compatibility router.
 5. `docs/STRATEGY_LIBRARY_V0_1.md` — governed reusable strategy-family registry and lifecycle metadata.
-6. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
-7. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
-8. The exact config and receipt named by the stage being changed.
+6. `docs/STRATEGY_FAMILY_VALIDATION_V0_1.md` — cross-asset/cross-regime family generalization review layered on existing Edge Validation.
+7. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
+8. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
+9. The exact config and receipt named by the stage being changed.
 
 ## Current bounded data and Paper stages
 
