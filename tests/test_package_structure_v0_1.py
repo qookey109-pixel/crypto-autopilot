@@ -34,6 +34,7 @@ ALLOWED_ROOT_MODULES = {
     "strategy_library.py",
     "strategy_router.py",
     "strategy_edge_validation.py",
+    "strategy_family_validation.py",
     "strategy_research_loop.py",
     "technical.py",
     "universe.py",
