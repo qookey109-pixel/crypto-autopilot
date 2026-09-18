@@ -34,6 +34,8 @@ class PaperLifecyclePolicy:
             self.exit_slippage_bps,
             self.maximum_bar_participation_fraction,
         )
+        if any(isinstance(value, bool) for value in numeric):
+            raise ValueError("paper lifecycle numeric policy values cannot be booleans")
         if not all(math.isfinite(value) for value in numeric):
             raise ValueError("paper lifecycle numeric policy values must be finite")
         if self.taker_fee_bps < 0.0:
@@ -44,6 +46,10 @@ class PaperLifecyclePolicy:
             raise ValueError(
                 "maximum_bar_participation_fraction must be in (0, 1]"
             )
+        if not isinstance(self.maximum_entry_bars, int) or isinstance(
+            self.maximum_entry_bars, bool
+        ):
+            raise ValueError("maximum_entry_bars must be an integer")
         if self.maximum_entry_bars < 1:
             raise ValueError("maximum_entry_bars must be positive")
         flags = (
@@ -72,6 +78,8 @@ class PaperLiquidityBar:
     available_notional_usd: float
 
     def __post_init__(self) -> None:
+        if not isinstance(self.time_ms, int) or isinstance(self.time_ms, bool):
+            raise ValueError("bar time_ms must be an integer")
         if self.time_ms < 0:
             raise ValueError("bar time_ms cannot be negative")
         values = (
@@ -81,6 +89,8 @@ class PaperLiquidityBar:
             self.close,
             self.available_notional_usd,
         )
+        if any(isinstance(value, bool) for value in values):
+            raise ValueError("paper lifecycle bar values cannot be booleans")
         if not all(math.isfinite(value) for value in values):
             raise ValueError("paper lifecycle bar values must be finite")
         if min(self.open, self.high, self.low, self.close) <= 0.0:
