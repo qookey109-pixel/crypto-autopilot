@@ -1,15 +1,15 @@
 {
   "schema": "qookey-current-operations-v0.3",
-  "updated_date": "2026-09-17",
+  "updated_date": "2026-09-18",
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
-    "parent_main_sha": "5105cc8310515d40e99aaf02d2cfe5fef12a777f",
+    "parent_main_sha": "a26902fd7a116af442a9b19249b895d0612bfc4f",
     "semantics": "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
     "is_latest_main_claim": false,
-    "source_merge_pr": 338
+    "source_merge_pr": 366
   },
-  "mode": "PAPER_ONLY",
+  "mode": "PAPER_AND_LIVE_PAPER_ONLY",
   "core100": {
     "history_status": "COMPLETE",
     "history_complete_shards": 10,
@@ -37,7 +37,14 @@
       "workflow_conclusion": "success",
       "artifact_id": 10387278663,
       "artifact_digest": "sha256:f983f5364024a911be3f930fce641bd750922a8d95e710951b88d5738f5cfa29",
-      "candidate_thresholds": [0.5, 0.51, 0.52, 0.53, 0.54, 0.55],
+      "candidate_thresholds": [
+        0.5,
+        0.51,
+        0.52,
+        0.53,
+        0.54,
+        0.55
+      ],
       "supported_thresholds": [],
       "threshold_change_supported": false,
       "configured_threshold": 0.55,
@@ -88,7 +95,8 @@
     "formal_trade_plan": "CLOSED",
     "real_money_orders": "CLOSED",
     "live_trading": "CLOSED",
-    "source_switch_authorized": false
+    "source_switch_authorized": false,
+    "live_paper_simulation": "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY"
   },
   "control_plane": {
     "current_truth_entrypoint": "CURRENT_STATUS.md",
@@ -110,6 +118,20 @@
     "The V0.2 PASS explicitly does not claim complete 197-market multiyear history and did not perform Core100 Pionex training.",
     "PR #337 records the merged completion evidence; Model Quality remains REJECT and downstream research/trading gates remain closed.",
     "Open PR navigation was refreshed on 2026-09-17 in open-pr-triage-v0-4 after PR #340 evidence preservation.",
-    "This file grants no provider, holdout, promotion, trading, source-switch, or private-account authority beyond already merged versioned authority."
-  ]
+    "This file grants no provider, holdout, promotion, trading, source-switch, or private-account authority beyond already merged versioned authority.",
+    "Live Paper Simulation V0.1 separates public live market data and simulated paper execution from real live trading; private exchange APIs and real-money orders remain closed.",
+    "Paper Run Store V0.1 authorizes content-addressed Local JSON / R2 persistence for paper evidence only; stored objects do not become execution authority."
+  ],
+  "live_paper": {
+    "status": "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY",
+    "contract": "config/live_paper_simulation_v0_1.json",
+    "run_store_contract": "config/paper_run_store_v0_1.json",
+    "public_live_market_data": true,
+    "live_paper_simulation": true,
+    "paper_state_persistence": true,
+    "private_exchange_api": false,
+    "replacement_holdout_access": false,
+    "real_money_orders": false,
+    "live_real_trading": false
+  }
 }
