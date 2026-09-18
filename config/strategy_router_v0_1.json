@@ -1,0 +1,68 @@
+{
+  "schema": "qookey-strategy-router-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "product_stage": "STRATEGY_ROUTER",
+  "inputs": {
+    "daily_opportunity_candidate_required": true,
+    "technical_snapshot_required": true,
+    "market_regime_required": true,
+    "market_structure_optional_but_required_by_structure_families": true,
+    "point_in_time_only": true
+  },
+  "strategy_families": [
+    "TREND_FOLLOWING",
+    "BREAKOUT",
+    "MOMENTUM",
+    "MEAN_REVERSION",
+    "HIGH_VOLATILITY_TREND",
+    "LOW_VOLATILITY_RANGE"
+  ],
+  "policy": {
+    "trend_slope_atr_floor": 0.15,
+    "momentum_rsi_long_floor": 60.0,
+    "momentum_rsi_short_ceiling": 40.0,
+    "momentum_volume_ratio_floor": 1.1,
+    "breakout_volume_ratio_floor": 1.0,
+    "high_volatility_atr_fraction_floor": 0.03,
+    "low_volatility_atr_fraction_ceiling": 0.015,
+    "mean_reversion_rsi_long_ceiling": 35.0,
+    "mean_reversion_rsi_short_floor": 65.0,
+    "mean_reversion_bollinger_long_ceiling": 0.2,
+    "mean_reversion_bollinger_short_floor": 0.8,
+    "macro_conflict": {
+      "long_blocked_in": ["BROAD_RISK_OFF"],
+      "short_blocked_in": ["ALT_EXPANSION"]
+    }
+  },
+  "behavior": {
+    "multiple_strategy_matches_allowed": true,
+    "zero_matches_returns": "NO_TRADE",
+    "descriptive_bias_may_differ_from_mean_reversion_direction": true,
+    "strategy_families_are_not_combined_into_one_score": true,
+    "final_strategy_selection_deferred_to_portfolio_risk": true,
+    "provider_io_performed": false,
+    "storage_io_performed": false,
+    "position_sizing_performed": false,
+    "order_planning_performed": false
+  },
+  "generalization": {
+    "single_asset_module_can_be_primary_platform_architecture": false,
+    "single_asset_module_can_enter_reusable_registry_without_generalization_validation": false,
+    "zec_v0_3_treated_as_platform_wide_authority": false
+  },
+  "authority": {
+    "strategy_edge_claimed": false,
+    "strategy_promotion_authorized": false,
+    "short_execution_authorized": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
