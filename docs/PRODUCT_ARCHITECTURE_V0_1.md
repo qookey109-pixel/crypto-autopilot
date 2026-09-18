@@ -153,6 +153,11 @@ lifecycle input per accepted proposal, reuses the existing single-intent
 Lifecycle engine, and emits Account-compatible records without provider or
 persistent-state access.
 
+Paper Account Advance V0.1 is the explicit state-transition boundary after a
+Lifecycle Batch. It verifies the batch id, replaces latest lifecycle evidence by
+paper intent, rematerializes the complete account, and emits the next account
+input for another manual cycle without persisting state.
+
 ## Single-asset research boundary
 
 BTC, ETH, SOL, ZEC or any other individual asset may have dedicated research experiments.
