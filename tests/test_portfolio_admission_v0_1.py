@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import unittest
+from dataclasses import asdict
 from pathlib import Path
 
 from crypto_autopilot.portfolio.admission_v0_1 import (
@@ -9,6 +10,7 @@ from crypto_autopilot.portfolio.admission_v0_1 import (
     PortfolioPolicy,
     admit_portfolio,
     build_portfolio_proposal,
+    portfolio_admission_input_from_dict,
     portfolio_policy_from_config,
 )
 from crypto_autopilot.risk import plan_position_size
@@ -288,6 +290,40 @@ class PortfolioAdmissionV01Tests(unittest.TestCase):
         report = admit_portfolio(equity_usd=100.0, proposals=())
         self.assertEqual(report["state"], "NO_PROPOSALS")
         self.assertEqual(report["admitted_proposal_ids"], [])
+
+    def test_machine_readable_input_rebuilds_governed_proposals(self) -> None:
+        sizing = plan_position_size(
+            direction="LONG",
+            equity_usd=100.0,
+            entry_price=100.0,
+            stop_price=99.0,
+        )
+        payload = {
+            "schema": "qookey-portfolio-admission-input-v0.1",
+            "equity_usd": 100.0,
+            "existing_exposures": [],
+            "proposals": [
+                {
+                    "symbol": "BTC_USDT_PERP",
+                    "strategy_family": "TREND_FOLLOWING",
+                    "as_of_ms": 1000,
+                    "family_validation_report": family_report("TREND_FOLLOWING"),
+                    "position_sizing_plan": asdict(sizing),
+                }
+            ],
+        }
+
+        equity, proposals, existing = portfolio_admission_input_from_dict(payload)
+
+        self.assertEqual(equity, 100.0)
+        self.assertEqual(len(proposals), 1)
+        self.assertEqual(existing, ())
+        self.assertEqual(proposals[0].sizing_equity_usd, 100.0)
+
+        bad = json.loads(json.dumps(payload))
+        bad["proposals"][0]["position_sizing_plan"]["approved_notional_usd"] = True
+        with self.assertRaises(ValueError):
+            portfolio_admission_input_from_dict(bad)
 
     def test_versioned_config_matches_frozen_policy(self) -> None:
         payload = json.loads(CONFIG.read_text(encoding="utf-8"))
