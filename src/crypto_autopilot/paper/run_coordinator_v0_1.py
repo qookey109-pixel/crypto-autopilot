@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Mapping, Sequence
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from typing import Protocol
 
 from crypto_autopilot.paper.live_v0_1 import (
@@ -462,6 +462,12 @@ def coordinate_live_paper_run_step(
         raise ValueError("provide exactly one of initial_state or previous_step")
 
     clean_name = _validate_run_name(run_name)
+    if (
+        not isinstance(tick_time_ms, int)
+        or isinstance(tick_time_ms, bool)
+        or tick_time_ms < 0
+    ):
+        raise ValueError("live paper coordinator tick_time_ms is invalid")
     canonical_candidates = _canonicalize(tuple(candidate_specs))
     if not isinstance(canonical_candidates, list):
         raise AssertionError("canonical candidate specs must be a list")
