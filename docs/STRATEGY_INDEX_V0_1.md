@@ -29,6 +29,7 @@ They are not interchangeable and are not added together into an invented score.
 | Paper Loop Checkpoint | `config/paper_loop_checkpoint_v0_1.json` | PREPARED_PORTABLE_HANDOFF_ONLY | require exact advance-id confirmation, rematerialize next account, reconcile exposure and package deterministic next-cycle handoff without persistence/live path |
 | Paper Loop Resume | `config/paper_loop_resume_v0_1.json` | PREPARED_EXPLICIT_MANUAL_RESUME_ONLY | require exact checkpoint-id confirmation, validate account/policy/exposure lineage and reuse the existing Paper Cycle engine without submission/persistence/live path |
 | Paper Loop Integrity / Multi-Cycle Replay | `config/paper_loop_integrity_v0_1.json` | PREPARED_AUDIT_ONLY | audit 2–8 complete forward rounds, recompute all stage ids, require exact Checkpoint chaining and deterministic transcript replay without executing or ranking strategies |
+| Paper Loop Run Package / Transcript | `config/paper_loop_run_package_v0_1.json` | PREPARED_PORTABLE_AUDIT_PACKAGE_ONLY | re-audit Integrity transcript, bind complete proof/stage manifest/terminal Checkpoint into deterministic portable JSON; package is not execution authority |
 
 ## Analysis flow
 
