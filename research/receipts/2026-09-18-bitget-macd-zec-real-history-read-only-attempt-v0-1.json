@@ -1,0 +1,46 @@
+{
+  "schema": "qookey-bitget-macd-zec-real-history-read-only-attempt-v0.1",
+  "status": "FAIL_CLOSED_ZEC_NOT_IN_GOVERNED_CORE100_CATALOG",
+  "date": "2026-09-18",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "workflow_run_id": 35297163219,
+  "workflow_run_attempt": 1,
+  "workflow_head_sha": "79024974bce30b88f2b89f201f075fe79de873ba",
+  "source_main_sha": "a0e216a41feaca61433bae9ca93c870a5baea9cc",
+  "authority_receipt": "research/receipts/2026-09-18-bitget-macd-zec-real-history-read-only-authority.json",
+  "authority_consumed": true,
+  "failure": {
+    "stage": "GOVERNED_CATALOG_MEMBERSHIP_CHECK",
+    "error_class": "BitgetMacdRealHistoryError",
+    "reason": "ZECUSDT must appear exactly once in the governed Core100 catalog",
+    "candidate_grid_started": false,
+    "confirmation_started": false,
+    "result_artifact_created": false
+  },
+  "data_access": {
+    "r2_catalog_and_state_reads_performed": true,
+    "r2_shard_receipt_reads_performed": true,
+    "zec_history_partition_reads_performed": false,
+    "r2_writes_performed": false,
+    "provider_requests_performed": 0,
+    "raw_candles_persisted": false
+  },
+  "interpretation": {
+    "strategy_failure_claimed": false,
+    "data_quality_failure_claimed": false,
+    "zec_absent_from_core100_selection": true,
+    "reexecution_under_same_authority_allowed": false
+  },
+  "authority": {
+    "new_data_source_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
