@@ -98,32 +98,39 @@ Validated strategy + regime match / NO_TRADE
         ↓
 Risk & Position Sizing
         ↓
-Portfolio Admission / REVIEW_REQUIRED
-        ↓
-Paper execution intent
-        ↓
-Repository Paper Broker acceptance
-        ↓
-Paper Fill / Order Lifecycle simulation
-        ↓
 Paper Account / Position State
         ↓
 Paper Cycle Orchestrator
         ↓
 Portfolio Admission with current existing exposure
         ↓
-Paper intents ready for explicit submission
+paper intents ready for explicit submission
         ↓
-explicit Repository Paper Broker submission
+Paper Submission Session / exact cycle-id confirmation
         ↓
-Paper Fill / Order Lifecycle
-        ↺ account state advances
+Repository Paper Broker acceptance
         ↓
-Future exchange adapter under separate authority
+Paper Lifecycle Batch / exact session-id confirmation
         ↓
-Order / stop / exit monitoring
+Paper Fill / Order Lifecycle for complete accepted basket
         ↓
-Trade journal and research feedback
+account_records
+        ↓
+Paper Account Advance / exact batch-id confirmation
+        ↓
+next Paper Account / Position State
+        ↓
+Paper Loop Checkpoint / exact advance-id confirmation
+        ↓
+Paper Loop Resume / exact checkpoint-id confirmation
+        ↺ next Paper Cycle
+
+Audit sidecar:
+completed rounds
+        ↓
+Paper Loop Integrity / Multi-Cycle Replay
+        ↓
+Paper Loop Run Package / Transcript
 ```
 
 Live trading and real-money orders remain separately gated. Product architecture does not itself authorize either.
@@ -172,6 +179,11 @@ Paper Loop Integrity / Multi-Cycle Replay V0.1 is audit-only. It verifies two
 or more complete forward rounds, recomputes every stage id, requires exact
 Checkpoint chaining, checks snapshot/exposure continuity and proves that the
 same transcript re-audits to the same deterministic integrity id.
+
+Paper Loop Run Package / Transcript V0.1 is the portable audit sidecar after
+Integrity PASS. It re-audits the full transcript, binds every stage payload in a
+SHA-256 manifest, embeds the terminal Checkpoint and packages the complete proof
+without becoming execution authority or writing persistent state.
 
 ## Single-asset research boundary
 
