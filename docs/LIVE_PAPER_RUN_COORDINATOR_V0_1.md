@@ -118,8 +118,13 @@ V0.1 deliberately does not hide that condition behind a mutable pointer.
 Operator review is required if a retry after such an interrupted commit sees
 changed provider evidence.
 
-A future version may introduce a transactional lease / compare-and-swap layer
-if a storage backend can prove those semantics.
+Live Paper Run Recovery / Reconciliation V0.1 now provides the bounded
+non-provider recovery path for this boundary. It can repair only a missing
+immutable request-result seal after the complete step/state/tick evidence all
+verify. It never refetches market data or rewrites state/tick/step evidence.
+
+A future version may still introduce a transactional lease /
+compare-and-swap layer if a storage backend can prove those semantics.
 
 ## Candidate boundary
 
