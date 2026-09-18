@@ -21,7 +21,7 @@ are explicit stable or version-bound exceptions.
 | `exchanges/` | Public/provider adapters and the Repository Paper Broker exchange boundary |
 | `features/` | Technical, multi-timeframe, market-state and order-flow feature construction |
 | `history/` | Historical admission, liquidity, replay, SState context and universe review |
-| `paper/` | Paper/live-paper exploration, deterministic cycle/session preparation, tick-by-tick public-market paper runtime, content-addressed run persistence, lifecycle/account/checkpoint handoff, multi-cycle integrity audit, portable run packaging and candidate training |
+| `paper/` | Paper/live-paper exploration, deterministic cycle/session preparation, tick-by-tick public-market paper runtime, content-addressed run persistence, lifecycle/account/checkpoint handoff, multi-cycle integrity audit, portable run packaging/artifact export and candidate training |
 | `portfolio/` | Portfolio-level admission, exposure concentration and strategy-overlap governance |
 | `providers/` | Provider comparison, forensics and prepared capture-suspension helpers |
 | `research/` | Evaluation integrity, experiment registry, research context and signal governance |
@@ -69,6 +69,7 @@ them in the same change would add package churn without clarifying ownership.
 - `provider_metadata_stability_v0_11.py`
 - `strategy_edge_validation.py`
 - `strategy_research_loop.py`
+- `strategy_research_scorecard_v0_1.py`
 
 These paths are named by workflows, frozen evidence or current versioned
 governance. They stay in place until a separately reviewed version explicitly
