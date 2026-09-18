@@ -43,9 +43,13 @@ def test_current_entry_docs_preserve_v08_v10_history_and_reflect_v12_successor()
         assert "V0.8" in text
         assert "V0.10" in text
         assert "V0.12" in text
-        assert "PAPER-ONLY" in text
         assert "FROZEN_UNOPENED" in text
         assert "Equivalence V0.1" in text or "EQUIVALENCE V0.1" in text
+
+    assert "PAPER / LIVE-PAPER ONLY" in status
+    assert "PAPER / LIVE-PAPER ONLY" in readme
+    assert "real-money" in readme.lower()
+    assert "real live trading" in readme.lower()
 
     # V0.8 remains immutable historical preparation evidence; it must not be
     # rewritten to look like the effective V0.10 execution authority.
