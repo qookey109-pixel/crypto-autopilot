@@ -203,6 +203,16 @@ PYTHONPATH=src python scripts/run_live_paper_tick_v0_1.py \
 R2 credentials come only from the environment / secret manager and are never
 included in state or reports.
 
+## Restartable run coordination
+
+Live Paper Run Coordinator V0.1 is the persistence/control layer above this
+single-tick engine.
+
+It can chain verified ticks into an append-only run ledger, reload the prior
+committed state from Paper Run Store, and replay a previously committed request
+without another provider call. Coordinator V0.1 remains manual-only and does not
+authorize a cron, candidate generator, Scorecard auto-selection or real order.
+
 ## Holdout boundary
 
 Replacement holdout remains `FROZEN_UNOPENED`.
