@@ -125,6 +125,14 @@ Paper Loop Checkpoint / exact advance-id confirmation
 Paper Loop Resume / exact checkpoint-id confirmation
         ↺ next Paper Cycle
 
+Live-paper runtime:
+public live market data
+        ↓
+Live Paper Simulation / tick-by-tick lifecycle progress
+        ↓
+Checkpoint + Paper Run Store
+        ↺ next live-paper tick
+
 Audit sidecar:
 completed rounds
         ↓
@@ -183,7 +191,17 @@ same transcript re-audits to the same deterministic integrity id.
 Paper Loop Run Package / Transcript V0.1 is the portable audit sidecar after
 Integrity PASS. It re-audits the full transcript, binds every stage payload in a
 SHA-256 manifest, embeds the terminal Checkpoint and packages the complete proof
-without becoming execution authority or writing persistent state.
+without becoming execution authority.
+
+Live Paper Simulation V0.1 is the public-live-data paper runtime. It may read
+current Pionex public order books/trades, advance one active paper basket across
+ticks, trigger simulated stop/target lifecycle events, update Paper Account /
+Checkpoint state and persist the next deterministic state through Paper Run
+Store V0.1. It has no private exchange-order API and cannot create a real order.
+
+Paper Run Store V0.1 provides explicit Local JSON and Cloudflare R2
+content-addressed persistence for paper evidence. Storage never upgrades the
+stored object's trading authority.
 
 ## Single-asset research boundary
 
