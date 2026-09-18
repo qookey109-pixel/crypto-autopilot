@@ -489,15 +489,15 @@ def portfolio_admission_input_from_dict(
             raise ValueError(
                 f"proposals[{index}].position_sizing_plan must be an object"
             )
-        if isinstance(item.get("as_of_ms"), bool):
-            raise ValueError(f"proposals[{index}].as_of_ms cannot be boolean")
+        if not isinstance(item.get("as_of_ms"), int) or isinstance(item.get("as_of_ms"), bool):
+            raise ValueError(f"proposals[{index}].as_of_ms must be a JSON integer")
         try:
             proposals.append(
                 build_portfolio_proposal(
                     symbol=str(item["symbol"]),
                     strategy_family=str(item["strategy_family"]),
                     family_validation_report=family_report,
-                    as_of_ms=int(item["as_of_ms"]),
+                    as_of_ms=item["as_of_ms"],
                     sizing_plan=_position_sizing_plan_from_mapping(sizing_payload),
                 )
             )
@@ -568,6 +568,8 @@ def portfolio_policy_from_config(payload: Mapping[str, object]) -> PortfolioPoli
     )
     if any(isinstance(policy.get(key), bool) for key in numeric_keys):
         raise ValueError("portfolio numeric policy fields cannot be booleans")
+    if not isinstance(policy.get("maximum_routes_per_symbol"), int):
+        raise ValueError("policy.maximum_routes_per_symbol must be a JSON integer")
     for key in (
         "opposing_directions_same_symbol_allowed",
         "automatic_subset_selection_authorized",
