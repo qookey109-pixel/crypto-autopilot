@@ -111,6 +111,16 @@ A successful report contains:
 
 The session does not generate fills.
 
+## Downstream lifecycle batch
+
+Paper Lifecycle Batch Coordination V0.1 now consumes the accepted Session
+report.
+
+It requires exact session-id confirmation and one lifecycle input per accepted
+proposal, then reuses Paper Fill / Order Lifecycle V0.1 for the complete basket.
+
+The Session stage itself still performs zero lifecycle simulations.
+
 ## CLI
 
 ```bash
