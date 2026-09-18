@@ -17,6 +17,7 @@ They are not interchangeable and are not added together into an invented score.
 | Strategy Router | `config/strategy_router_v0_1.json` | PREPARED_RESEARCH_ONLY | map one selected asset to zero or more compatible strategy families or NO_TRADE |
 | Multi-Strategy Library | `config/strategy_library_v0_1.json` | PREPARED_RESEARCH_ONLY | canonical six-family registry and lifecycle/authority metadata used by Strategy Router |
 | Strategy Family Validation | `config/strategy_family_validation_v0_1.json` | PREPARED_RESEARCH_ONLY | aggregate existing Edge PASS evidence into cross-asset/cross-regime family generalization review without ranking or promotion |
+| Risk / Position Sizing | `config/risk_position_sizing_v0_1.json` | PREPARED_RESEARCH_ONLY | preserve upstream stop, separate target vs realized risk, and bound notional by leverage/notional constraints without order authority |
 
 ## Analysis flow
 
@@ -49,8 +50,9 @@ The TradingAgents challenger is also not a new strategy score. Its upstream
 rating and report hashes may be evaluated only as comparable research evidence;
 they cannot replace the canonical strategy, Risk Engine or Paper Broker.
 
-The product-stage Daily Opportunity Engine, Strategy Router and Multi-Strategy
-Library are selectors/registries rather than additional entry-score components.
+The product-stage Daily Opportunity Engine, Strategy Router, Multi-Strategy
+Library and Risk / Position Sizing layer are selectors/registries/planners rather
+than additional entry-score components.
 Their outputs must not be added to the Paper baseline score. Router family names
 come from the governed strategy library registry, and a family remains
 research-only until separate multi-asset/generalization evidence supports a
