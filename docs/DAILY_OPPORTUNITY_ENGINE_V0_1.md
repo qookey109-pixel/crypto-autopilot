@@ -29,7 +29,7 @@ It performs no provider request, R2 read/write, holdout access, model inference,
 
 ## V0.1 score
 
-Maximum score: 100.
+Maximum score: 100. Liquidity contributes 25 points, then the engine uses the larger of the directional profile or the range-extremity profile for the remaining 75 points. The two profiles are never added together.
 
 ### Liquidity quality — 25
 
@@ -52,11 +52,29 @@ For each direction:
 
 The larger directional score becomes the descriptive bias. A tie is `NEUTRAL`.
 
+### Range-extremity attention profile — 75
+
+This alternative profile exists so the upstream selector does not discard range / mean-reversion research opportunities before the Strategy Router can inspect them. It is still an attention profile, not a strategy decision.
+
+The profile activates only when both conditions hold:
+
+- absolute EMA20/EMA50 distance <= 0.5%
+- absolute EMA20 slope/ATR <= 0.10
+
+Once that compression/flatness gate is satisfied:
+
+- compression + flat slope: 30
+- RSI <= 35 or >= 65: 20
+- Bollinger position <= 0.20 or >= 0.80: 20
+- volume ratio >= 1.0: 5
+
+The engine compares this score with the directional score and uses the larger profile for attention ranking. It does **not** infer that mean reversion is profitable or that the eventual strategy direction must match the descriptive directional bias.
+
 ## Important boundary
 
 The attention score is a transparent research heuristic. It is **not** evidence of statistical edge and it is not a trading recommendation.
 
-A selected asset must still pass downstream:
+An asset can therefore reach the downstream router through either a directional profile or a range-extremity profile. A selected asset must still pass downstream:
 
 1. Strategy Router
 2. strategy-specific validation
@@ -96,6 +114,10 @@ Frozen research defaults:
 - bearish RSI confirmation: <= 45
 - bullish Bollinger position confirmation: >= 0.55
 - bearish Bollinger position confirmation: <= 0.45
+- range EMA20 slope/ATR ceiling: 0.10
+- range EMA20/EMA50 compression ceiling: 0.5%
+- range RSI extremes: <= 35 or >= 65
+- range Bollinger extremes: <= 0.20 or >= 0.80
 - ready causal market regime required: true
 
 These are product-research heuristics, not validated profitability thresholds. Future changes require a new version rather than silently rewriting V0.1.
