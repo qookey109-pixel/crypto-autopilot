@@ -94,6 +94,47 @@ class PortfolioAdmissionV01Tests(unittest.TestCase):
         self.assertFalse(report["ranking_performed"])
         self.assertFalse(report["subset_selection_performed"])
 
+    def test_risk_ready_three_x_single_symbol_is_rejected_by_portfolio_notional_cap(self) -> None:
+        sizing = plan_position_size(
+            direction="LONG",
+            equity_usd=100.0,
+            entry_price=100.0,
+            stop_price=99.8,
+        )
+        item = build_portfolio_proposal(
+            symbol="BTC_USDT_PERP",
+            strategy_family="TREND_FOLLOWING",
+            family_validation_report=family_report("TREND_FOLLOWING"),
+            as_of_ms=1_000,
+            sizing_plan=sizing,
+        )
+
+        self.assertEqual(sizing.status, "SIZING_READY")
+        self.assertAlmostEqual(sizing.approved_notional_usd, 300.0)
+
+        report = admit_portfolio(equity_usd=100.0, proposals=(item,))
+
+        self.assertEqual(report["state"], "PORTFOLIO_REVIEW_REQUIRED")
+        self.assertIn("symbol_notional_above_cap:BTC_USDT_PERP", report["reasons"])
+
+    def test_proposals_must_share_portfolio_equity_basis(self) -> None:
+        sizing = plan_position_size(
+            direction="LONG",
+            equity_usd=200.0,
+            entry_price=100.0,
+            stop_price=99.0,
+        )
+        item = build_portfolio_proposal(
+            symbol="BTC_USDT_PERP",
+            strategy_family="TREND_FOLLOWING",
+            family_validation_report=family_report("TREND_FOLLOWING"),
+            as_of_ms=1_000,
+            sizing_plan=sizing,
+        )
+
+        with self.assertRaises(ValueError):
+            admit_portfolio(equity_usd=100.0, proposals=(item,))
+
     def test_symbol_concentration_rejects_entire_explicit_basket(self) -> None:
         proposals = (
             proposal(symbol="BTC_USDT_PERP", family="TREND_FOLLOWING"),
@@ -256,6 +297,7 @@ class PortfolioAdmissionV01Tests(unittest.TestCase):
         self.assertFalse(payload["behavior"]["ranking_performed"])
         self.assertFalse(payload["behavior"]["subset_optimizer_present"])
         self.assertFalse(payload["authority"]["live_trading_authorized"])
+        self.assertEqual(set(payload["overlap_groups"]), {"DIRECTIONAL", "RANGE"})
 
     def test_config_boolean_types_are_strict(self) -> None:
         payload = json.loads(CONFIG.read_text(encoding="utf-8"))
