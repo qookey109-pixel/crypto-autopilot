@@ -313,6 +313,7 @@ class PortfolioAdmissionV01Tests(unittest.TestCase):
             ],
         }
 
+        payload = json.loads(json.dumps(payload))
         equity, proposals, existing = portfolio_admission_input_from_dict(payload)
 
         self.assertEqual(equity, 100.0)
