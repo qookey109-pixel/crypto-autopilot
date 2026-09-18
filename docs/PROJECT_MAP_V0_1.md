@@ -12,10 +12,11 @@ any versioned authority.
 5. `docs/STRATEGY_LIBRARY_V0_1.md` — governed reusable strategy-family registry and lifecycle metadata.
 6. `docs/STRATEGY_FAMILY_VALIDATION_V0_1.md` — cross-asset/cross-regime family generalization review layered on existing Edge Validation.
 7. `docs/RISK_POSITION_SIZING_V0_1.md` — stop-preserving account-risk and bounded position-sizing research layer.
-8. `docs/PAPER_EXECUTION_V0_1.md` — deterministic handoff into the existing Repository Paper Broker; LONG intent recording only, no automatic/live path.
-9. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
-10. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
-11. The exact config and receipt named by the stage being changed.
+8. `docs/PORTFOLIO_ADMISSION_V0_1.md` — explicit-basket total-risk, concentration and strategy-overlap admission gate.
+9. `docs/PAPER_EXECUTION_V0_1.md` — deterministic handoff into the existing Repository Paper Broker after portfolio admission; LONG intent recording only, no automatic/live path.
+10. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
+11. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
+12. The exact config and receipt named by the stage being changed.
 
 ## Current bounded data and Paper stages
 
