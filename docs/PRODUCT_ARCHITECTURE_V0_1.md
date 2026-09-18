@@ -168,6 +168,11 @@ requires exact checkpoint-id confirmation, validates the checkpoint again, and
 reuses the existing Paper Cycle engine with the carried account input/policy.
 It performs zero broker submissions and zero lifecycle simulations.
 
+Paper Loop Integrity / Multi-Cycle Replay V0.1 is audit-only. It verifies two
+or more complete forward rounds, recomputes every stage id, requires exact
+Checkpoint chaining, checks snapshot/exposure continuity and proves that the
+same transcript re-audits to the same deterministic integrity id.
+
 ## Single-asset research boundary
 
 BTC, ETH, SOL, ZEC or any other individual asset may have dedicated research experiments.
