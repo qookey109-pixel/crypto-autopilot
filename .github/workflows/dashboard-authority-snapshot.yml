@@ -14,6 +14,8 @@ on:
       - "CURRENT_STATUS.md"
       - "PROJECT_STATUS.md"
       - "research/status/current-operations-v0-3.json"
+      - "config/live_paper_simulation_v0_1.json"
+      - "config/paper_run_store_v0_1.json"
       - "research/status/simulation-readiness-v0-1.json"
       - "research/receipts/2026-08-17-m1a-pionex.json"
       - "research/receipts/2026-08-18-binance-2025-r2-pilot.json"
@@ -107,7 +109,7 @@ jobs:
           assert data['locale'] == 'zh-Hant-TW'
           assert data['snapshotType'] == 'NORMALIZED_VIEW_OF_FROZEN_REPOSITORY_AUTHORITIES'
           assert data['schema'] == 'qookey-dashboard-authority-snapshot-v0.13'
-          assert project['mode'] == 'PAPER-ONLY'
+          assert project['mode'] == 'PAPER / LIVE-PAPER ONLY'
 
           # Historical lineage is preserved.
           assert project['fundingMaterializationComplete'] is True
@@ -167,7 +169,11 @@ jobs:
           assert project['replacementHoldoutState'] == 'FROZEN_UNOPENED'
           assert project['sourceSwitchAuthorized'] is False
           assert project['tradePlanAuthorized'] is False
+          assert project['publicLiveMarketDataAuthorized'] is True
+          assert project['livePaperSimulationAuthorized'] is True
+          assert project['paperStatePersistenceAuthorized'] is True
           assert project['liveTradingAuthorized'] is False
+          assert project['liveRealTradingAuthorized'] is False
 
           assert project['githubAutomaticOperationsState'] == 'AUTHORIZED_ON_MAIN_MERGE'
           assert project['githubAutomaticScheduledWorkflowCount'] == len(automation_health['workflows'])
@@ -191,6 +197,8 @@ jobs:
           assert security['authorizesSourceSwitch'] is False
           assert security['authorizesPionexNativeRelabeling'] is False
           assert security['authorizesTradePlans'] is False
+          assert security['authorizesLivePaperSimulation'] is True
+          assert security['authorizesPaperStatePersistence'] is True
           assert security['authorizesLiveTrading'] is False
 
           pipeline = {row['name']: row['status'] for row in data['pipeline']}
