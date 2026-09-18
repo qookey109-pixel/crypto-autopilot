@@ -46,6 +46,7 @@ DOMAIN_PACKAGES = {
     "features",
     "history",
     "paper",
+    "portfolio",
     "providers",
     "research",
     "storage",

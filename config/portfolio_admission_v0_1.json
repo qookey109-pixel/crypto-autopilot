@@ -1,0 +1,54 @@
+{
+  "schema": "qookey-portfolio-admission-v0.1",
+  "status_date": "2026-09-18",
+  "status": "PREPARED_RESEARCH_PAPER_ONLY",
+  "product_stage": "PORTFOLIO_ADMISSION",
+  "policy": {
+    "maximum_total_realized_risk_fraction": 0.03,
+    "maximum_symbol_realized_risk_fraction": 0.015,
+    "maximum_overlap_group_realized_risk_fraction": 0.02,
+    "maximum_gross_notional_fraction": 3.0,
+    "maximum_symbol_notional_fraction": 1.5,
+    "maximum_routes_per_symbol": 2,
+    "opposing_directions_same_symbol_allowed": false,
+    "automatic_subset_selection_authorized": false
+  },
+  "overlap_groups": {
+    "DIRECTIONAL": [
+      "TREND_FOLLOWING",
+      "BREAKOUT",
+      "MOMENTUM",
+      "HIGH_VOLATILITY_TREND"
+    ],
+    "RANGE": [
+      "MEAN_REVERSION",
+      "LOW_VOLATILITY_RANGE"
+    ]
+  },
+  "behavior": {
+    "explicit_basket_required": true,
+    "ranking_performed": false,
+    "winner_selected": false,
+    "subset_optimizer_present": false,
+    "existing_open_exposure_counted": true,
+    "family_validation_report_required_per_proposal": true,
+    "position_sizing_ready_required_per_proposal": true,
+    "portfolio_admission_required_before_paper_execution": true
+  },
+  "authority": {
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_ranking_authorized": false,
+    "automatic_subset_selection_authorized": false,
+    "strategy_promotion_authorized": false,
+    "model_promotion_authorized": false,
+    "paper_execution_authorized": false,
+    "short_paper_execution_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}

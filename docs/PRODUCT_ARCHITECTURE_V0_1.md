@@ -13,8 +13,9 @@ The product priority order is:
 1. **Daily Opportunity Engine** — determine which assets are worth attention today.
 2. **Strategy Router** — determine which validated strategy family, if any, fits each selected asset and current market regime.
 3. **Risk / Position Sizing** — determine stop distance, target risk, feasible position size and leverage constraints.
-4. **Automated Execution** — only after all upstream gates pass, route a paper/live-capable execution plan through the appropriate exchange adapter under separately authorized trading authority.
-5. **Post-trade Learning** — record outcomes and feed research/evaluation systems without silently changing production strategy authority.
+4. **Portfolio Admission** — apply total-risk, per-asset concentration, strategy-overlap and gross-exposure gates to the explicit proposed basket.
+5. **Automated Execution** — only after all upstream gates pass, route a paper/live-capable execution plan through the appropriate exchange adapter under separately authorized trading authority.
+6. **Post-trade Learning** — record outcomes and feed research/evaluation systems without silently changing production strategy authority.
 
 ## Priority 1 — Daily Opportunity Engine
 
@@ -65,9 +66,22 @@ Stop placement and account-risk budgeting are independent.
 
 No martingale, loss doubling or unlimited averaging down is allowed.
 
-## Priority 4 — Automated execution
+## Priority 4 — Portfolio admission
 
-Execution is downstream of opportunity selection, strategy compatibility and risk validation.
+Single-route sizing does not establish portfolio safety.
+
+- existing open exposure must be counted before new proposals
+- total realized risk must remain within the portfolio budget
+- per-asset risk and notional concentration must remain bounded
+- overlapping strategy families must not silently multiply correlated exposure
+- opposing directions on one symbol require explicit future support
+- V0.1 does not invent a strategy ranking or automatically optimize a subset
+
+A risk-safe route may therefore still be rejected at the portfolio layer.
+
+## Priority 5 — Automated execution
+
+Execution is downstream of opportunity selection, strategy compatibility, risk validation and portfolio admission.
 
 The intended flow is:
 
@@ -83,6 +97,8 @@ Strategy Router
 Validated strategy + regime match / NO_TRADE
         ↓
 Risk & Position Sizing
+        ↓
+Portfolio Admission / REVIEW_REQUIRED
         ↓
 Paper execution
         ↓

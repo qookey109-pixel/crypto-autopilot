@@ -8,7 +8,10 @@
     "position_sizing_state_required": "SIZING_READY",
     "approved_notional_source": "PositionSizingPlan.approved_notional_usd",
     "family_validation_report_required": true,
-    "family_validation_report_sha256_bound_to_intent": true
+    "family_validation_report_sha256_bound_to_intent": true,
+    "portfolio_admission_report_required": true,
+    "portfolio_proposal_must_be_admitted": true,
+    "portfolio_admission_report_sha256_bound_to_intent": true
   },
   "behavior": {
     "require_family_review_ready": true,
@@ -22,7 +25,9 @@
     "settlement_simulation": false,
     "slippage_simulation": false,
     "funding_simulation": false,
-    "family_validation_authority_must_remain_closed": true
+    "family_validation_authority_must_remain_closed": true,
+    "require_portfolio_admission": true,
+    "portfolio_admission_authority_must_remain_closed": true
   },
   "authority": {
     "repository_paper_broker_long_authorized": true,
