@@ -1,27 +1,29 @@
 {
   "schema": "qookey-bitget-macd-zec-real-history-read-only-status-v0.1",
   "status_date": "2026-09-18",
-  "status": "PREPARED_AWAITING_ONE_SHOT_AUTHORITY_RECEIPT",
+  "status": "FAIL_CLOSED_AUTHORITY_CONSUMED_ZEC_NOT_IN_CORE100",
   "base_main": "a0e216a41feaca61433bae9ca93c870a5baea9cc",
+  "attempt": {
+    "workflow_run_id": 35297163219,
+    "workflow_head_sha": "79024974bce30b88f2b89f201f075fe79de873ba",
+    "authority_consumed": true,
+    "failure_stage": "GOVERNED_CATALOG_MEMBERSHIP_CHECK",
+    "zec_history_partition_reads_performed": false,
+    "r2_writes_performed": false,
+    "provider_requests_performed": 0,
+    "candidate_grid_started": false
+  },
   "source": {
     "provider": "binance_usdm",
     "dataset": "crypto_core_100",
     "symbol": "ZECUSDT",
     "interval": "15m",
-    "source_month_start": "2022-08",
-    "source_month_end": "2026-07",
     "expected_dataset_fingerprint": "91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876",
-    "expected_partition_count": 48
+    "governed_catalog_membership": false
   },
-  "execution": {
-    "performed": false,
-    "r2_catalog_reads_performed": false,
-    "r2_history_reads_performed": false,
-    "r2_writes_performed": false,
-    "provider_requests_performed": 0,
-    "raw_candles_persisted": false
-  },
+  "next_gate": "SEPARATE_PUBLIC_BINANCE_VISION_ZEC_READ_ONLY_AUTHORITY_REQUIRED",
   "authority": {
+    "new_data_source_authorized": false,
     "formal_backtest_admission_authorized": false,
     "strategy_parameter_change_authorized": false,
     "source_switch_authorized": false,
