@@ -13,6 +13,9 @@ They are not interchangeable and are not added together into an invented score.
 | Edge validation | `config/strategy_edge_validation_v0_1.json` | PREPARED_RESEARCH_ONLY | six anti-overfitting and disjoint-validation methods |
 | Parameter sweep | `config/strategy_parameter_sweep_v0_1.json` | FRAMEWORK_ONLY | protocol only; candidate values and split are still undefined |
 | TradingAgents challenger | `config/tradingagents_research_challenger_v0_1.json` | PREPARED_RESEARCH_ONLY | normalize point-in-time multi-agent research as descriptive context; no upstream execution or trading authority |
+| Daily Opportunity Engine | `config/daily_opportunity_engine_v0_1.json` | PREPARED_RESEARCH_ONLY | multi-asset attention selector; DIRECTIONAL and RANGE_EXTREMITY profiles; may return NO_CANDIDATE |
+| Strategy Router | `config/strategy_router_v0_1.json` | PREPARED_RESEARCH_ONLY | map one selected asset to zero or more compatible strategy families or NO_TRADE |
+| Multi-Strategy Library | `config/strategy_library_v0_1.json` | PREPARED_RESEARCH_ONLY | canonical six-family registry and lifecycle/authority metadata used by Strategy Router |
 
 ## Analysis flow
 
@@ -41,3 +44,10 @@ not a seventh score or a strategy promotion.
 The TradingAgents challenger is also not a new strategy score. Its upstream
 rating and report hashes may be evaluated only as comparable research evidence;
 they cannot replace the canonical strategy, Risk Engine or Paper Broker.
+
+The product-stage Daily Opportunity Engine, Strategy Router and Multi-Strategy
+Library are selectors/registries rather than additional entry-score components.
+Their outputs must not be added to the Paper baseline score. Router family names
+come from the governed strategy library registry, and a family remains
+research-only until separate multi-asset/generalization evidence supports a
+later lifecycle transition.
