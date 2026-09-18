@@ -102,6 +102,141 @@ def _account_policy_from_evidence(payload: Mapping[str, object]) -> PaperAccount
     )
 
 
+def paper_loop_checkpoint_account_policy_from_mapping(
+    payload: Mapping[str, object],
+) -> PaperAccountPolicy:
+    """Rebuild the exact Paper Account policy carried by a checkpoint."""
+
+    policy_payload = payload.get("account_policy")
+    if not isinstance(policy_payload, Mapping):
+        raise ValueError("paper loop checkpoint account_policy is required")
+    return _account_policy_from_evidence({"policy": policy_payload})
+
+
+def paper_loop_checkpoint_report_id_from_mapping(
+    payload: Mapping[str, object],
+) -> str:
+    """Fully validate and recompute one serialized Paper Loop checkpoint id."""
+
+    if payload.get("schema") != "qookey-paper-loop-checkpoint-report-v0.1":
+        raise ValueError("unsupported paper loop checkpoint report schema")
+    if payload.get("state") != "PAPER_LOOP_CHECKPOINT_READY":
+        raise ValueError("paper loop checkpoint is not ready")
+
+    for key in (
+        "checkpoint_id",
+        "advance_id",
+        "batch_id",
+        "previous_snapshot_id",
+        "next_snapshot_id",
+        "next_account_input_sha256",
+        "portfolio_exposures_sha256",
+        "account_policy_sha256",
+    ):
+        value = payload.get(key)
+        if not isinstance(value, str) or not value:
+            raise ValueError(f"paper loop checkpoint {key} is required")
+
+    next_cycle_allowed = payload.get("next_cycle_allowed")
+    if not isinstance(next_cycle_allowed, bool):
+        raise ValueError("paper loop checkpoint next_cycle_allowed must be boolean")
+
+    next_account_input = payload.get("next_account_input")
+    account_snapshot = payload.get("account_snapshot")
+    exposures = payload.get("portfolio_existing_exposures")
+    if not isinstance(next_account_input, Mapping):
+        raise ValueError("paper loop checkpoint next_account_input is required")
+    if not isinstance(account_snapshot, Mapping):
+        raise ValueError("paper loop checkpoint account_snapshot is required")
+    if not isinstance(exposures, list):
+        raise ValueError("paper loop checkpoint exposures must be an array")
+
+    account_policy = paper_loop_checkpoint_account_policy_from_mapping(payload)
+    account_policy_payload = asdict(account_policy)
+
+    account_input_sha = _sha256(dict(next_account_input))
+    if account_input_sha != payload["next_account_input_sha256"]:
+        raise ValueError("paper loop checkpoint next_account_input hash mismatch")
+    exposure_sha = _sha256({"exposures": exposures})
+    if exposure_sha != payload["portfolio_exposures_sha256"]:
+        raise ValueError("paper loop checkpoint exposure hash mismatch")
+    account_policy_sha = _sha256(account_policy_payload)
+    if account_policy_sha != payload["account_policy_sha256"]:
+        raise ValueError("paper loop checkpoint account policy hash mismatch")
+
+    initial_equity, records, marks = paper_account_input_from_dict(next_account_input)
+    snapshot = materialize_paper_account(
+        initial_equity_usd=initial_equity,
+        records=records,
+        marks=marks,
+        policy=account_policy,
+    )
+    actual_snapshot = _canonicalize(asdict(snapshot))
+    if actual_snapshot != _canonicalize(account_snapshot):
+        raise ValueError("checkpoint account snapshot does not rematerialize")
+    if snapshot.snapshot_id != payload["next_snapshot_id"]:
+        raise ValueError("checkpoint next_snapshot_id does not match account state")
+
+    if snapshot.status == "ACCOUNT_ACTIVE":
+        actual_exposures = [
+            asdict(item)
+            for item in portfolio_exposures_from_account(
+                snapshot,
+                policy=account_policy,
+            )
+        ]
+        if not next_cycle_allowed:
+            raise ValueError("active checkpoint must allow next manual cycle")
+    else:
+        actual_exposures = []
+        if next_cycle_allowed:
+            raise ValueError("insolvent checkpoint cannot allow next manual cycle")
+
+    if actual_exposures != exposures:
+        raise ValueError("checkpoint exposures do not match rematerialized account")
+
+    for key in (
+        "provider_requests_performed",
+        "persistent_state_writes_performed",
+    ):
+        value = payload.get(key)
+        if not isinstance(value, int) or isinstance(value, bool) or value != 0:
+            raise ValueError(f"paper loop checkpoint {key} must equal zero")
+
+    authority = payload.get("authority")
+    if not isinstance(authority, Mapping):
+        raise ValueError("paper loop checkpoint authority object is required")
+    if authority.get("portable_handoff_only") is not True:
+        raise ValueError("paper loop checkpoint must remain portable-handoff-only")
+    for key in (
+        "provider_requests_performed",
+        "r2_accessed",
+        "holdout_accessed",
+        "persistent_state_write_authorized",
+        "automatic_cycle_authorized",
+        "automatic_submission_authorized",
+        "scheduled_execution_authorized",
+        "short_paper_execution_authorized",
+        "formal_trade_plan_authorized",
+        "real_money_order_authorized",
+        "live_trading_authorized",
+    ):
+        if authority.get(key) is not False:
+            raise ValueError(f"paper loop checkpoint authority must remain closed: {key}")
+
+    checkpoint_payload: dict[str, object] = {
+        "schema": "qookey-paper-loop-checkpoint-id-v0.1",
+        "advance_id": payload["advance_id"],
+        "batch_id": payload["batch_id"],
+        "previous_snapshot_id": payload["previous_snapshot_id"],
+        "next_snapshot_id": payload["next_snapshot_id"],
+        "next_account_input_sha256": account_input_sha,
+        "portfolio_exposures_sha256": exposure_sha,
+        "account_policy_sha256": account_policy_sha,
+    }
+    return f"paper-loop-checkpoint-v0-1-{_sha256(checkpoint_payload)}"
+
+
 def create_paper_loop_checkpoint(
     *,
     account_advance_report: Mapping[str, object],
@@ -179,6 +314,8 @@ def create_paper_loop_checkpoint(
     account_input_sha = _sha256(dict(next_account_input))
     exposure_payload = {"exposures": actual_exposures}
     exposure_sha = _sha256(exposure_payload)
+    account_policy_payload = asdict(account_policy)
+    account_policy_sha = _sha256(account_policy_payload)
     checkpoint_payload: dict[str, object] = {
         "schema": "qookey-paper-loop-checkpoint-id-v0.1",
         "advance_id": advance_id,
@@ -187,6 +324,7 @@ def create_paper_loop_checkpoint(
         "next_snapshot_id": snapshot.snapshot_id,
         "next_account_input_sha256": account_input_sha,
         "portfolio_exposures_sha256": exposure_sha,
+        "account_policy_sha256": account_policy_sha,
     }
     checkpoint_id = f"paper-loop-checkpoint-v0-1-{_sha256(checkpoint_payload)}"
 
@@ -200,6 +338,8 @@ def create_paper_loop_checkpoint(
         "next_snapshot_id": snapshot.snapshot_id,
         "next_account_input_sha256": account_input_sha,
         "portfolio_exposures_sha256": exposure_sha,
+        "account_policy_sha256": account_policy_sha,
+        "account_policy": account_policy_payload,
         "next_cycle_allowed": next_cycle_allowed,
         "next_account_input": dict(next_account_input),
         "account_snapshot": actual_snapshot,
