@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 
 from crypto_autopilot.exchanges.paper import PaperBroker, PaperOrder
@@ -238,3 +239,44 @@ def paper_execution_evidence(
             "Paper acceptance is not evidence of strategy profitability.",
         ],
     }
+
+
+def paper_execution_policy_from_config(
+    payload: Mapping[str, object],
+) -> PaperExecutionPolicy:
+    if payload.get("schema") != "qookey-paper-execution-v0.1":
+        raise ValueError("unsupported paper execution config")
+    authority = payload.get("authority")
+    behavior = payload.get("behavior")
+    if not isinstance(authority, Mapping) or not isinstance(behavior, Mapping):
+        raise ValueError("authority and behavior objects are required")
+
+    keys = (
+        "repository_paper_broker_long_authorized",
+        "short_paper_execution_authorized",
+        "automatic_submission_authorized",
+        "live_trading_authorized",
+    )
+    for key in keys:
+        if not isinstance(authority.get(key), bool):
+            raise ValueError(f"authority.{key} must be a JSON boolean")
+    if not isinstance(behavior.get("require_family_review_ready"), bool):
+        raise ValueError(
+            "behavior.require_family_review_ready must be a JSON boolean"
+        )
+
+    return PaperExecutionPolicy(
+        long_paper_execution_authorized=bool(
+            authority["repository_paper_broker_long_authorized"]
+        ),
+        short_paper_execution_authorized=bool(
+            authority["short_paper_execution_authorized"]
+        ),
+        require_family_review_ready=bool(
+            behavior["require_family_review_ready"]
+        ),
+        automatic_submission_authorized=bool(
+            authority["automatic_submission_authorized"]
+        ),
+        live_trading_authorized=bool(authority["live_trading_authorized"]),
+    )
