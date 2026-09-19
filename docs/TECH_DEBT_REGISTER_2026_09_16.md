@@ -6,7 +6,7 @@ Repository `main` is authority and must be resolved live at read time. This regi
 
 ### TD-001 — Multiple present-tense status authorities
 
-Status: **CORE CONVERGENCE MERGED / SELF-REFERENCE FIX IN PR #323**
+Status: **COMPLETE VIA PR #322/#323**
 
 Merged by PR #322:
 
@@ -26,34 +26,30 @@ Implemented on PR #323:
 - Repository `main` must be resolved live at read time;
 - tests reject self-referential latest-main semantics.
 
-Exit criterion:
+Exit result:
 
-- PR #323 exact-head CI and Dashboard validation green, then separate merge authorization.
+- PR #323 merged after exact-head CI and Dashboard validation; Current Operations V0.3 remains the fail-closed authority projection while live Repository `main` is resolved at read time.
 
 ### TD-002 — Pionex Repository-current evidence gap
 
-Status: **OPEN / OPERATIONAL**
+Status: **COMPLETE / SUPERSEDED BY V0.2 MATERIALIZATION PASS**
 
-Problem:
+Resolution:
 
-- PR #321 merged the narrow bounds-only invalid-candle boundary fix.
-- Previous materialization run `34991627998` failed closed before that fix.
-- No new materialization result from the Repository's current live `main` has yet been frozen as post-fix validation evidence.
+- Pionex Validation Dataset Materialization V0.2 completed successfully on run `35054729471` from `main`;
+- current status records stage `PIONEX_VALIDATION_DATASET_MATERIALIZED_V0_2`;
+- 197 selected markets and 682 partitions were materialized under the governed validation contract;
+- completion evidence is preserved at `research/receipts/2026-09-16-pionex-validation-materialization-v0-2-completion.json`;
+- incomplete provider-history states remain explicit; this is not a claim of complete 197-market multiyear history;
+- no replacement-holdout access, Core100 Pionex training, source switch, model promotion, real-money order or real live-trading authority was opened.
 
-Target:
-
-- manually dispatch `.github/workflows/pionex-validation-materialization-v0-1.yml` from live `main` after current control-plane work is stable;
-- verify the secret-free report and preserve only the allowed validation evidence.
-
-Exit criteria:
-
-- Repository-current run ID, outcome, artifact digest, partition/coverage status, and authority assertions are recorded without opening holdout/training/source-switch/trading authority.
+The older V0.1 current-evidence gap no longer represents present-tense work.
 
 ## P1 — control-plane projections
 
 ### TD-003 — Dashboard / homepage projection drift
 
-Status: **IMPLEMENTED ON PR #323 / EXACT-HEAD VALIDATION IN PROGRESS**
+Status: **COMPLETE VIA PR #323**
 
 Previous problem:
 
@@ -83,23 +79,18 @@ Status: **COMPLETE VIA PR #322**
 
 ### TD-005 — Open PR backlog crosses architecture generations
 
-Status: **TRIAGED / REFRESHED FOR PR #323**
+Status: **COMPLETE / BACKLOG CONVERGED 2026-09-19**
 
-Current classification is recorded in:
+Resolution:
 
-- `docs/OPEN_PR_TRIAGE_2026_09_16.md`;
-- `research/status/open-pr-triage-v0-3.json`.
+- old architecture-generation drafts were compared against current `main` before closure;
+- useful ZEC V0.2 evidence was preserved on current main without reviving one-shot execution authority;
+- reusable Statistical Edge Gate V0.1 was salvaged separately from older Resource Hub/ZEC drafts;
+- ZEC V0.3 design/provenance/status were preserved separately without data-access or experiment-execution authority;
+- already-merged/current capabilities were not duplicated when closing paper-simulation, research-governance, technical-analysis, Pionex-role, REST/edge, Render-relay and integrated-promotion drafts;
+- GitHub open pull-request count reached **0** before the 2026-09-19 Project Status convergence PR.
 
-Current lanes:
-
-- `ACTIVE_CURRENT`: #323;
-- recently merged control-plane batch: #322;
-- `REBUILD_FROM_CURRENT_MAIN`: #315, #307, #306;
-- `SUPERSEDED_PENDING_PRESERVATION_PROOF`: #305;
-- `PRESERVE_DIAGNOSTIC_EVIDENCE`: #302;
-- `SALVAGE_DRAFT`: #249, #199, #168, #167, #166.
-
-Do not merge an old branch merely because its historical CI was green. Do not close #305 until unique useful content is proven preserved or intentionally superseded.
+The historical triage files remain dated evidence. Future PRs must be evaluated against live `main`; historical green CI is not sufficient merge evidence after main advances.
 
 ## P2 — workflow and quality maintenance
 
