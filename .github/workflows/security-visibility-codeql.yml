@@ -1,0 +1,45 @@
+name: Security Visibility — CodeQL
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  codeql-visibility:
+    name: CodeQL visibility (Python)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4
+        with:
+          languages: python
+          build-mode: none
+
+      - name: Analyze Python security visibility
+        uses: github/codeql-action/analyze@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4
+        with:
+          upload: never
+          upload-database: false
+          output: codeql-results
+
+      - name: Upload informational SARIF artifact
+        if: ${{ always() }}
+        continue-on-error: true
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4
+        with:
+          name: codeql-security-visibility-${{ github.run_id }}-${{ github.run_attempt }}
+          path: codeql-results
+          retention-days: 30
+          if-no-files-found: warn
