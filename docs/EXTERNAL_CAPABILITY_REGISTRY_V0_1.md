@@ -34,6 +34,45 @@ DEPRECATED
 
 V0.1 stops at **CANDIDATE**.
 
+
+## Downstream evaluation index — 2026-09-19
+
+The registry JSON remains intentionally candidate-only. The entries below are
+**separate downstream evaluation receipts**; they do not silently promote a
+candidate to APPROVED or ACTIVE.
+
+| Capability | Evaluation outcome | Retained scope |
+|---|---|---|
+| `crypto_market_data_mcp` | Evaluated; runtime not approved | Prefetched derivatives-context contract reference |
+| `agentfeed` | Evaluated; runtime not approved | Liquidation tape quality and side-semantics reference |
+| `tradingcalc_mcp` | Evaluated; runtime not approved | Remote risk-formula challenger reference |
+| `tradingview_mcp` | Evaluated; runtime not approved | Technical/backtest challenger reference |
+| `depthy_mcp` | Evaluated; runtime not approved | Hyperliquid microstructure provider challenger |
+| `0xarchive_mcp` | Evaluated; runtime not approved | Historical/data-quality challenger |
+| `telegram_mcp` | Evaluated; not selected as default transport | Reference only; provider-neutral operator contract preferred |
+| `cloudflare_mcp` | Evaluated; runtime not approved | Read-only observability/build/audit allowlist if needed |
+| `github_official_mcp` | Evaluated; runtime not approved | Read-only repo/PR/Actions diagnostics if needed |
+| `github_actions_mcp` | Evaluated; redundant, not selected | Prefer official GitHub MCP read-only Actions surface |
+
+Evidence lives under `research/receipts/2026-09-19-*-evaluation-v0-1.json`
+and the corresponding evaluation documents in `docs/`.
+
+### Convergence rule
+
+Do not re-evaluate or integrate one of these candidates merely because it is
+still labeled `CANDIDATE / REVIEW_REQUIRED` in the V0.1 inventory.
+
+Re-open a candidate only when at least one of these is true:
+
+- the project has a concrete capability gap;
+- the pinned upstream architecture materially changes;
+- a new exact upstream commit is intentionally proposed;
+- a separate authority explicitly opens the required runtime/network/secret
+  boundary.
+
+This keeps the registry useful as provenance inventory without turning every
+discovered MCP server into a project dependency.
+
 ## Registered candidates
 
 ### Market data and microstructure
