@@ -243,7 +243,7 @@
         "data_quality_metrics"
       ],
       "requirements": {
-        "credential": "SERVICE_DEPENDENT",
+        "credential": "OAUTH_ACCOUNT_MCP_MARKET_READ",
         "paid_runtime": true,
         "external_network": true
       },
