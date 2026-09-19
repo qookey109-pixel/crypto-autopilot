@@ -1,0 +1,85 @@
+{
+  "schema": "qookey-zec-strategy-v0-3-external-research-sources-v0.1",
+  "status_date": "2026-09-18",
+  "purpose": "Research design provenance only; no external repository is vendored or executed by this record.",
+  "sources": [
+    {
+      "repository": "https://github.com/Fincept-Corporation/FinceptTerminal",
+      "observed_commit": "d6eac68e2726be6f1419a7af1dab292cb70acb54",
+      "observed_license": "AGPL-3.0 text plus repository-specific commercial/internal-use and trademark terms",
+      "integration_role": "architecture_concepts_only",
+      "allowed_use_in_v0_3": [
+        "research-desk decomposition",
+        "separation of data, analytics, backtest, risk and execution concerns"
+      ],
+      "code_copy_authorized_by_project": false,
+      "vendoring_planned": false,
+      "runtime_dependency_planned": false,
+      "reason": "Avoid license/trade-dress coupling; use independently implemented concepts only."
+    },
+    {
+      "repository": "https://github.com/TauricResearch/TradingAgents",
+      "observed_commit": "be952b8eccb49720509af544c6675233bc1f10d0",
+      "observed_license": "Apache-2.0",
+      "integration_role": "research_challenger_architecture",
+      "allowed_use_in_v0_3": [
+        "bull/bear evidence challenge",
+        "risk review",
+        "structured research decision records"
+      ],
+      "existing_project_adapter": "src/crypto_autopilot/research/tradingagents_challenger.py",
+      "llm_direct_trade_signal_allowed": false,
+      "code_copy_authorized_by_project": false,
+      "vendoring_planned": false,
+      "runtime_dependency_planned": false,
+      "reason": "Existing fail-closed adapter already preserves point-in-time and authority boundaries."
+    },
+    {
+      "repository": "https://github.com/jarrodwatts/jev-trader",
+      "observed_commit": "b587759e459ea049590102e54a0b07800864cdc3",
+      "observed_license": "MIT",
+      "integration_role": "future_execution_quality_reference",
+      "allowed_use_in_v0_3": [
+        "spread awareness",
+        "order-book imbalance",
+        "depth bands",
+        "taker-flow/CVD",
+        "latency accounting",
+        "maker/post-only paper execution concepts"
+      ],
+      "historical_microstructure_data_authorized": false,
+      "code_copy_authorized_by_project": false,
+      "vendoring_planned": false,
+      "runtime_dependency_planned": false,
+      "reason": "Current ZEC research data is candle-only; microstructure features need separate data authority."
+    },
+    {
+      "repository": "https://github.com/mars-tw/anti-gambling-trader-tw",
+      "observed_commit": "9d938b64c80ee29363aed496ba4e61d9110a7222",
+      "observed_license": "MIT",
+      "integration_role": "statistical_method_reference",
+      "allowed_use_in_v0_3": [
+        "centered-bootstrap edge testing",
+        "out-of-sample discipline",
+        "edge-decay checks",
+        "multiple-comparison controls",
+        "fail-closed interpretation"
+      ],
+      "project_implementation": "independent",
+      "code_copy_authorized_by_project": false,
+      "vendoring_planned": false,
+      "runtime_dependency_planned": false,
+      "reason": "Methods are adopted as research principles; implementation is independently written and tested."
+    }
+  ],
+  "authority": {
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "strategy_execution_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
