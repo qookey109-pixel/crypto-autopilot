@@ -108,14 +108,20 @@ Implemented:
 
 ### TD-007 — Quality visibility is narrower than project size
 
-Status: **OPEN**
+Status: **NON-BLOCKING VISIBILITY EXPANDED / SEMANTIC TYPE CHECKER DEFERRED**
 
-Current blocking CI intentionally limits Ruff to core correctness classes and does not run a type checker.
+Current blocking CI intentionally remains unchanged.
 
-Target:
+Implemented informational visibility now includes:
 
-- add non-blocking reports first for broader lint/type/complexity/dead-code visibility;
-- do not immediately expand required gates and destabilize protected main.
+- the existing size / AST / decision-point complexity inventory;
+- TODO / FIXME / HACK marker counts;
+- Python parameter / return annotation coverage without pretending this is semantic type checking;
+- conservative heuristic dead-code candidates limited to unreferenced private module-level definitions;
+- a broader non-blocking Ruff diagnostic view using `F,I,UP,B,C90`;
+- artifact publication remains `continue-on-error: true` and enforces no thresholds.
+
+A semantic type checker is still deferred to a later dependency-maintenance decision. These reports do not become promotion, validation, holdout, source-switch or trading gates.
 
 ### TD-008 — Dependency/security maintenance visibility
 
