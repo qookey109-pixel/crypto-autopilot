@@ -26,7 +26,9 @@
     "edge_validation": "config/strategy_edge_validation_v0_1.json",
     "parameter_sweep": "config/strategy_parameter_sweep_v0_1.json",
     "display_projection": "web/data/strategy.json",
-    "research_scorecard": "config/strategy_research_scorecard_v0_1.json"
+    "research_scorecard": "config/strategy_research_scorecard_v0_1.json",
+    "external_market_context": "config/external_market_context_sources_v0_1.json",
+    "external_market_context_state": "SIX_PINNED_SOURCES_PREFETCHED_EVIDENCE_NORMALIZATION_ONLY_NO_NETWORK_NO_ROUTER_CHANGE"
   },
   "current_data_and_paper": {
     "automatic_operations": "config/github_automatic_research_operations_v0_1.json",
@@ -231,6 +233,9 @@
     "btc_fixed_sample_v0_1_retired_after_formal_pass": true,
     "sstate_core_changed": false,
     "strategy_parameters_changed": false,
+    "external_market_context_registry_added": true,
+    "external_market_context_network_capture_added": false,
+    "external_market_context_router_behavior_changed": false,
     "provider_or_r2_authority_added": true,
     "provider_or_r2_scope_replaced_before_execution": true,
     "replacement_holdout_access_authorized": false,
