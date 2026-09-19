@@ -1,0 +1,401 @@
+{
+  "schema": "qookey-external-capability-registry-v0.1",
+  "status_date": "2026-09-19",
+  "status": "CANDIDATE_REGISTRY_ONLY",
+  "discovery_catalog": "https://mcp.so/zh/servers",
+  "lifecycle": [
+    "DISCOVERED",
+    "CANDIDATE",
+    "EVALUATED",
+    "APPROVED",
+    "ACTIVE",
+    "DEPRECATED"
+  ],
+  "policy": {
+    "automatic_install_authorized": false,
+    "runtime_execution_authorized": false,
+    "external_network_authorized": false,
+    "secret_access_authorized": false,
+    "wallet_payment_authorized": false,
+    "repository_mutation_authorized": false,
+    "workflow_mutation_authorized": false,
+    "cloud_infrastructure_mutation_authorized": false,
+    "telegram_write_authorized": false,
+    "strategy_router_integration_authorized": false,
+    "daily_opportunity_integration_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  },
+  "capabilities": [
+    {
+      "capability_id": "crypto_market_data_mcp",
+      "name": "Crypto Market Data MCP",
+      "category": "MARKET_DATA",
+      "lifecycle_state": "CANDIDATE",
+      "decision": "REVIEW_REQUIRED",
+      "project_role": "multi_exchange_market_context",
+      "repository": "eliasfire617/crypto-market-data-mcp",
+      "default_branch": "main",
+      "commit_sha": "7720d7116e26e578037c519d6fdae0d9ba0e8a75",
+      "license": "MIT",
+      "license_verified": true,
+      "archived": false,
+      "capability_summary": [
+        "price",
+        "ohlcv",
+        "orderbook",
+        "trades",
+        "funding_rate",
+        "funding_history",
+        "open_interest",
+        "long_short_ratio",
+        "liquidations"
+      ],
+      "requirements": {
+        "credential": "NONE_FOR_LOCAL_PUBLIC_ENDPOINT_MODE",
+        "paid_runtime": false,
+        "external_network": true
+      },
+      "risk": {
+        "level": "MEDIUM",
+        "upstream_write_capable": false,
+        "payment_capable": false,
+        "secret_bearing": false
+      },
+      "production_eligible": false,
+      "adapter_authorized": false,
+      "runtime_authorized": false
+    },
+    {
+      "capability_id": "agentfeed",
+      "name": "AgentFeed",
+      "category": "MARKET_MICROSTRUCTURE",
+      "lifecycle_state": "CANDIDATE",
+      "decision": "REVIEW_REQUIRED",
+      "project_role": "liquidation_and_positioning_challenger",
+      "repository": "seekdaseek/agentfeed",
+      "default_branch": "main",
+      "commit_sha": "0e1db87a65dc0cc0b890c2257e10e12cd3966cf7",
+      "license": "MIT",
+      "license_verified": true,
+      "archived": false,
+      "capability_summary": [
+        "historical_liquidation_tape",
+        "liquidation_heatmap",
+        "cascade_scan",
+        "venue_liquidation_share",
+        "funding_extremes",
+        "open_interest",
+        "long_short_ratio",
+        "orderbook_imbalance"
+      ],
+      "requirements": {
+        "credential": "X402_WALLET_PAYMENT",
+        "paid_runtime": true,
+        "external_network": true
+      },
+      "risk": {
+        "level": "HIGH",
+        "upstream_write_capable": false,
+        "payment_capable": true,
+        "secret_bearing": true
+      },
+      "production_eligible": false,
+      "adapter_authorized": false,
+      "runtime_authorized": false
+    },
+    {
+      "capability_id": "tradingcalc_mcp",
+      "name": "Tradingcalc MCP",
+      "category": "RISK_CROSSCHECK",
+      "lifecycle_state": "CANDIDATE",
+      "decision": "REVIEW_REQUIRED",
+      "project_role": "deterministic_risk_formula_challenger",
+      "repository": "SKalinin909/tradingcalc-mcp",
+      "default_branch": "main",
+      "commit_sha": "ca78963c57cba09d599be3f28363695132b479b9",
+      "license": "MIT",
+      "license_verified": true,
+      "archived": false,
+      "capability_summary": [
+        "pnl",
+        "liquidation_price",
+        "breakeven",
+        "position_sizing",
+        "funding_cost",
+        "risk_reward",
+        "scenario_planning",
+        "self_verification"
+      ],
+      "requirements": {
+        "credential": "OPTIONAL_FOR_MCP_REQUIRED_FOR_REST",
+        "paid_runtime": true,
+        "external_network": true
+      },
+      "risk": {
+        "level": "MEDIUM",
+        "upstream_write_capable": false,
+        "payment_capable": false,
+        "secret_bearing": true
+      },
+      "production_eligible": false,
+      "adapter_authorized": false,
+      "runtime_authorized": false
+    },
+    {
+      "capability_id": "tradingview_mcp",
+      "name": "TradingView MCP",
+      "category": "RESEARCH_CHALLENGER",
+      "lifecycle_state": "CANDIDATE",
+      "decision": "REVIEW_REQUIRED",
+      "project_role": "technical_and_backtest_challenger",
+      "repository": "atilaahmettaner/tradingview-mcp",
+      "default_branch": "main",
+      "commit_sha": "a1e54b07e5c21b375363607920f297c5adfbeed4",
+      "license": "MIT",
+      "license_verified": true,
+      "archived": false,
+      "capability_summary": [
+        "technical_screeners",
+        "asset_analysis",
+        "volume_breakout",
+        "multi_timeframe_analysis",
+        "backtesting"
+      ],
+      "requirements": {
+        "credential": "SOURCE_DEPENDENT",
+        "paid_runtime": false,
+        "external_network": true
+      },
+      "risk": {
+        "level": "MEDIUM",
+        "upstream_write_capable": false,
+        "payment_capable": false,
+        "secret_bearing": false
+      },
+      "production_eligible": false,
+      "adapter_authorized": false,
+      "runtime_authorized": false
+    },
+    {
+      "capability_id": "depthy_mcp",
+      "name": "Depthy MCP",
+      "category": "MARKET_MICROSTRUCTURE",
+      "lifecycle_state": "CANDIDATE",
+      "decision": "REVIEW_REQUIRED",
+      "project_role": "hyperliquid_and_prediction_market_context",
+      "repository": "depthy-io/depthy-mcp",
+      "default_branch": "main",
+      "commit_sha": "6c7c23839635dd4c8addb5ed23604d6a3373efdc",
+      "license": "MIT",
+      "license_verified": true,
+      "archived": false,
+      "capability_summary": [
+        "hyperliquid_depth",
+        "orderbook_walls",
+        "liquidation_clusters",
+        "cascade_signal",
+        "open_interest_change",
+        "polymarket_smart_money",
+        "prediction_market_volume_anomaly"
+      ],
+      "requirements": {
+        "credential": "DEPTHY_API_KEY",
+        "paid_runtime": false,
+        "external_network": true
+      },
+      "risk": {
+        "level": "MEDIUM",
+        "upstream_write_capable": false,
+        "payment_capable": false,
+        "secret_bearing": true
+      },
+      "production_eligible": false,
+      "adapter_authorized": false,
+      "runtime_authorized": false
+    },
+    {
+      "capability_id": "0xarchive_mcp",
+      "name": "0xArchive MCP",
+      "category": "HISTORICAL_MARKET_DATA",
+      "lifecycle_state": "CANDIDATE",
+      "decision": "REVIEW_REQUIRED",
+      "project_role": "hyperliquid_lighter_historical_challenger",
+      "repository": "0xArchiveIO/0xarchive-mcp",
+      "default_branch": "hosted",
+      "commit_sha": "5c0531cb685779b5fa8cbff3443f9a7f74fed659",
+      "license": "MIT",
+      "license_verified": true,
+      "archived": false,
+      "capability_summary": [
+        "orderbooks",
+        "trades",
+        "candles",
+        "funding",
+        "open_interest",
+        "liquidations",
+        "data_quality_metrics"
+      ],
+      "requirements": {
+        "credential": "SERVICE_DEPENDENT",
+        "paid_runtime": true,
+        "external_network": true
+      },
+      "risk": {
+        "level": "MEDIUM",
+        "upstream_write_capable": false,
+        "payment_capable": false,
+        "secret_bearing": true
+      },
+      "production_eligible": false,
+      "adapter_authorized": false,
+      "runtime_authorized": false
+    },
+    {
+      "capability_id": "telegram_mcp",
+      "name": "Telegram MCP",
+      "category": "NOTIFICATION",
+      "lifecycle_state": "CANDIDATE",
+      "decision": "REVIEW_REQUIRED",
+      "project_role": "future_operator_notification_and_command_transport",
+      "repository": "chigwell/telegram-mcp",
+      "default_branch": "main",
+      "commit_sha": "c95e136f5f852f4ce6f400dc03d0d9f6ef0b4e42",
+      "license": "Apache-2.0",
+      "license_verified": true,
+      "archived": false,
+      "capability_summary": [
+        "read_chats",
+        "send_messages",
+        "edit_messages",
+        "media",
+        "multi_account",
+        "read_only_tool_mode"
+      ],
+      "requirements": {
+        "credential": "TELEGRAM_API_ID_API_HASH_AND_SESSION",
+        "paid_runtime": false,
+        "external_network": true
+      },
+      "risk": {
+        "level": "HIGH",
+        "upstream_write_capable": true,
+        "payment_capable": false,
+        "secret_bearing": true
+      },
+      "production_eligible": false,
+      "adapter_authorized": false,
+      "runtime_authorized": false
+    },
+    {
+      "capability_id": "cloudflare_mcp",
+      "name": "Cloudflare MCP",
+      "category": "INFRASTRUCTURE",
+      "lifecycle_state": "CANDIDATE",
+      "decision": "REVIEW_REQUIRED",
+      "project_role": "future_cloudflare_operations_assistant",
+      "repository": "cloudflare/mcp-server-cloudflare",
+      "default_branch": "main",
+      "commit_sha": "db9084730dd45ebb6ac4dd5d3181d189cc96e98d",
+      "license": "Apache-2.0",
+      "license_verified": true,
+      "archived": false,
+      "capability_summary": [
+        "cloudflare_resource_inspection",
+        "workers_operations",
+        "storage_operations",
+        "cloud_infrastructure_management"
+      ],
+      "requirements": {
+        "credential": "CLOUDFLARE_AUTHORIZATION",
+        "paid_runtime": false,
+        "external_network": true
+      },
+      "risk": {
+        "level": "HIGH",
+        "upstream_write_capable": true,
+        "payment_capable": false,
+        "secret_bearing": true
+      },
+      "production_eligible": false,
+      "adapter_authorized": false,
+      "runtime_authorized": false
+    },
+    {
+      "capability_id": "github_official_mcp",
+      "name": "GitHub Official MCP Server",
+      "category": "DEVELOPER_CI",
+      "lifecycle_state": "CANDIDATE",
+      "decision": "REVIEW_REQUIRED",
+      "project_role": "future_repository_agent_interface",
+      "repository": "github/github-mcp-server",
+      "default_branch": "main",
+      "commit_sha": "85598ba6e1256f7ebf4867b95d63b833c4549264",
+      "license": "MIT",
+      "license_verified": true,
+      "archived": false,
+      "capability_summary": [
+        "repository_read",
+        "issues",
+        "pull_requests",
+        "code_context",
+        "repository_write_surfaces"
+      ],
+      "requirements": {
+        "credential": "GITHUB_AUTHORIZATION",
+        "paid_runtime": false,
+        "external_network": true
+      },
+      "risk": {
+        "level": "HIGH",
+        "upstream_write_capable": true,
+        "payment_capable": false,
+        "secret_bearing": true
+      },
+      "production_eligible": false,
+      "adapter_authorized": false,
+      "runtime_authorized": false
+    },
+    {
+      "capability_id": "github_actions_mcp",
+      "name": "GitHub Actions MCP",
+      "category": "DEVELOPER_CI",
+      "lifecycle_state": "CANDIDATE",
+      "decision": "REVIEW_REQUIRED",
+      "project_role": "future_workflow_observability_and_control",
+      "repository": "devopsier/github-actions-mcp",
+      "default_branch": "main",
+      "commit_sha": "b13a4df3d3feedf123d3b53f21c4a739f5ab4907",
+      "license": "ISC",
+      "license_verified": true,
+      "license_evidence": "package.json",
+      "archived": false,
+      "capability_summary": [
+        "workflow_listing",
+        "workflow_runs",
+        "job_status",
+        "workflow_trigger",
+        "workflow_control",
+        "repository_operations"
+      ],
+      "requirements": {
+        "credential": "GITHUB_TOKEN",
+        "paid_runtime": false,
+        "external_network": true
+      },
+      "risk": {
+        "level": "HIGH",
+        "upstream_write_capable": true,
+        "payment_capable": false,
+        "secret_bearing": true
+      },
+      "production_eligible": false,
+      "adapter_authorized": false,
+      "runtime_authorized": false
+    }
+  ]
+}
