@@ -10,6 +10,7 @@ It is **not** a single-coin strategy project and no asset-specific strategy may 
 
 The product priority order is:
 
+0. **External Market Context** — normalize causally available order-book, liquidation, signed-price, news, sentiment and trending evidence without granting it execution authority.
 1. **Daily Opportunity Engine** — determine which assets are worth attention today.
 2. **Strategy Router** — determine which validated strategy family, if any, fits each selected asset and current market regime.
 3. **Risk / Position Sizing** — determine stop distance, target risk, feasible position size and leverage constraints.
@@ -87,6 +88,8 @@ The intended flow is:
 
 ```text
 Governed multi-asset universe
+        ↓
+External Market Context (optional causal evidence sidecar)
         ↓
 Daily Opportunity Engine
         ↓
@@ -234,6 +237,13 @@ ambiguous orphan ticks remain REVIEW_REQUIRED.
 Paper Run Store V0.1 provides explicit Local JSON and Cloudflare R2
 content-addressed persistence for paper evidence. Storage never upgrades the
 stored object's trading authority.
+
+External Market Context V0.1 registers and pins six external research/context
+sources: Crypto Orderbook MCP, Crypto Liquidations MCP, Pulse Verity, Crypto
+RSS MCP, Crypto Sentiment MCP and Crypto Trending MCP. V0.1 only normalizes
+already-fetched evidence and performs no network I/O. It does not change Daily
+Opportunity scoring or Strategy Router thresholds; using those new features in
+routing requires a later versioned validation.
 
 ## Single-asset research boundary
 
