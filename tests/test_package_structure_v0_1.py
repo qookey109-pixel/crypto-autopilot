@@ -22,6 +22,7 @@ ALLOWED_ROOT_MODULES = {
     "models.py",
     "opportunity_engine.py",
     "operator_messaging_v0_1.py",
+    "operator_status_resolver_v0_1.py",
     "provider_metadata_capture_v0_10.py",
     "provider_metadata_capture_v0_12.py",
     "provider_metadata_capture_v0_2.py",
