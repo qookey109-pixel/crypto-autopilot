@@ -70,6 +70,7 @@
     "network_capture_authorized": false,
     "mcp_runtime_embedding_authorized": false,
     "provider_api_key_storage_authorized": false,
+    "external_text_instruction_authority": false,
     "strategy_router_threshold_change_authorized": false,
     "daily_opportunity_score_change_authorized": false,
     "automatic_candidate_generation_authorized": false,
