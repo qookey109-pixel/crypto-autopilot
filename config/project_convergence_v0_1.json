@@ -259,6 +259,18 @@
     "paper_run_conditional_write_schedule_added": false,
     "external_market_context_registry_added": true,
     "external_market_context_network_capture_added": false,
-    "external_market_context_router_behavior_changed": false
+    "external_market_context_router_behavior_changed": false,
+    "external_capability_registry_added": true,
+    "external_capability_runtime_authorized": false,
+    "external_capability_network_authorized": false,
+    "external_capability_secret_access_authorized": false,
+    "external_capability_payment_authorized": false,
+    "external_capability_mutation_authorized": false
+  },
+  "external_capabilities": {
+    "registry": "config/external_capability_registry_v0_1.json",
+    "documentation": "docs/EXTERNAL_CAPABILITY_REGISTRY_V0_1.md",
+    "validator": "src/crypto_autopilot/toolkit/external_capability_registry_v0_1.py",
+    "state": "TEN_EXACT_SHA_CANDIDATES_REVIEW_REQUIRED_NO_INSTALL_NO_RUNTIME_NO_NETWORK_NO_SECRET_NO_PAYMENT_NO_MUTATION"
   }
 }
