@@ -109,6 +109,9 @@ class ExternalMarketContextV01Tests(unittest.TestCase):
         self.assertFalse(
             snapshot["authority"]["automatic_strategy_selection_authorized"]
         )
+        self.assertFalse(
+            snapshot["authority"]["external_text_instruction_authority"]
+        )
 
     def test_future_evidence_fails_closed(self) -> None:
         with self.assertRaises(ValueError):
@@ -159,6 +162,50 @@ class ExternalMarketContextV01Tests(unittest.TestCase):
                         "observed_at_ms": 1,
                         "available_at_ms": 2,
                         "payload": {"sentiment_balance": 1.0},
+                    }
+                ],
+            )
+
+    def test_future_pulse_print_fails_closed(self) -> None:
+        with self.assertRaises(ValueError):
+            build_external_market_context_snapshot(
+                symbol="BTCUSDT",
+                as_of_ms=10,
+                evidence=[
+                    {
+                        "source_id": "pulse_verity",
+                        "symbol": "BTCUSDT",
+                        "observed_at_ms": 1,
+                        "available_at_ms": 2,
+                        "payload": {
+                            "price": 100.0,
+                            "grade": "consensus",
+                            "signature_verified": True,
+                            "print_timestamp_ms": 11,
+                        },
+                    }
+                ],
+            )
+
+    def test_external_text_control_character_fails_closed(self) -> None:
+        with self.assertRaises(ValueError):
+            build_external_market_context_snapshot(
+                symbol="BTCUSDT",
+                as_of_ms=10,
+                evidence=[
+                    {
+                        "source_id": "crypto_rss_mcp",
+                        "symbol": None,
+                        "observed_at_ms": 1,
+                        "available_at_ms": 2,
+                        "payload": {
+                            "entries": [
+                                {
+                                    "title": "bad\\ncontrol",
+                                    "published_ms": 1,
+                                }
+                            ]
+                        },
                     }
                 ],
             )
