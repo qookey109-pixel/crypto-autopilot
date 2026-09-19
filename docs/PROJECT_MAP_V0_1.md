@@ -30,9 +30,10 @@ any versioned authority.
 23. `docs/LIVE_PAPER_RUN_COORDINATOR_V0_1.md` — restartable append-only Live Paper run-step coordination over Local/R2 Run Store; manual-only, no cron or real orders.
 24. `docs/LIVE_PAPER_RUN_RECOVERY_V0_1.md` — persisted-run reconciliation plus missing-result-seal-only repair; no provider replay and no state/tick/step rewrite.
 25. `docs/PAPER_RUN_STORE_V0_1.md` — explicit Local JSON / Cloudflare R2 content-addressed paper-state persistence and read-only object listing.
-26. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
-27. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
-28. The exact config and receipt named by the stage being changed.
+26. `docs/PAPER_RUN_CONDITIONAL_WRITE_V0_1.md` — storage-only atomic create-if-absent primitive for future run-slot claims; not wired into Coordinator.
+27. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
+28. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
+29. The exact config and receipt named by the stage being changed.
 
 ## Current bounded data and Paper stages
 
