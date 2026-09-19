@@ -29,6 +29,7 @@ class ExternalMarketContextPolicy:
     network_capture_authorized: bool = False
     mcp_runtime_embedding_authorized: bool = False
     provider_api_key_storage_authorized: bool = False
+    external_text_instruction_authority: bool = False
     strategy_router_threshold_change_authorized: bool = False
     daily_opportunity_score_change_authorized: bool = False
     automatic_candidate_generation_authorized: bool = False
@@ -46,6 +47,7 @@ class ExternalMarketContextPolicy:
             self.network_capture_authorized,
             self.mcp_runtime_embedding_authorized,
             self.provider_api_key_storage_authorized,
+            self.external_text_instruction_authority,
             self.strategy_router_threshold_change_authorized,
             self.daily_opportunity_score_change_authorized,
             self.automatic_candidate_generation_authorized,
@@ -97,6 +99,17 @@ def _positive_number(value: object, label: str) -> float:
     if number <= 0:
         raise ValueError(f"{label} must be positive")
     return number
+
+
+def _clean_external_text(value: object, label: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{label} must be non-empty string")
+    text = value.strip()
+    if len(text) > 240:
+        raise ValueError(f"{label} is too long")
+    if any(ord(character) < 32 and character not in "\t" for character in text):
+        raise ValueError(f"{label} contains control characters")
+    return text
 
 
 def _normalize_orderbook(payload: Mapping[str, object]) -> dict[str, object]:
@@ -152,21 +165,27 @@ def _normalize_liquidations(payload: Mapping[str, object]) -> dict[str, object]:
     }
 
 
-def _normalize_pulse(payload: Mapping[str, object]) -> dict[str, object]:
+def _normalize_pulse(
+    payload: Mapping[str, object],
+    as_of_ms: int,
+) -> dict[str, object]:
     verified = payload.get("signature_verified")
     if not isinstance(verified, bool):
         raise ValueError("pulse signature_verified must be boolean")
     grade = payload.get("grade")
     if not isinstance(grade, str) or not grade.strip():
         raise ValueError("pulse grade is required")
+    print_timestamp_ms = _non_negative_int(
+        payload.get("print_timestamp_ms"),
+        "print_timestamp_ms",
+    )
+    if print_timestamp_ms > as_of_ms:
+        raise ValueError("future Pulse print is not causally available")
     return {
         "price": _positive_number(payload.get("price"), "pulse price"),
         "grade": grade.strip().lower(),
         "signature_verified": verified,
-        "print_timestamp_ms": _non_negative_int(
-            payload.get("print_timestamp_ms"),
-            "print_timestamp_ms",
-        ),
+        "print_timestamp_ms": print_timestamp_ms,
     }
 
 
@@ -179,13 +198,11 @@ def _normalize_rss(payload: Mapping[str, object], as_of_ms: int) -> dict[str, ob
     for entry in entries:
         if not isinstance(entry, Mapping):
             raise ValueError("rss entry must be an object")
-        title = entry.get("title")
-        if not isinstance(title, str) or not title.strip():
-            raise ValueError("rss entry title is required")
+        title = _clean_external_text(entry.get("title"), "rss entry title")
         published_ms = _non_negative_int(entry.get("published_ms"), "rss published_ms")
         if published_ms > as_of_ms:
             raise ValueError("future rss entry is not causally available")
-        titles.append(title.strip())
+        titles.append(title)
         latest_published_ms = (
             published_ms
             if latest_published_ms is None
@@ -209,9 +226,7 @@ def _normalize_sentiment(payload: Mapping[str, object]) -> dict[str, object]:
             raise ValueError("trending_words must be an array")
         cleaned: list[str] = []
         for word in words:
-            if not isinstance(word, str) or not word.strip():
-                raise ValueError("trending word must be non-empty string")
-            cleaned.append(word.strip())
+            cleaned.append(_clean_external_text(word, "trending word"))
         result["trending_words"] = cleaned[:20]
     if not result:
         raise ValueError("sentiment payload contains no supported metrics")
@@ -246,7 +261,7 @@ def _normalize_payload(
     if source_id == "crypto_liquidations_mcp":
         return _normalize_liquidations(payload)
     if source_id == "pulse_verity":
-        return _normalize_pulse(payload)
+        return _normalize_pulse(payload, as_of_ms)
     if source_id == "crypto_rss_mcp":
         return _normalize_rss(payload, as_of_ms)
     if source_id == "crypto_sentiment_mcp":
@@ -322,6 +337,7 @@ def build_external_market_context_snapshot(
             "network_capture_authorized": False,
             "mcp_runtime_embedding_authorized": False,
             "provider_api_key_storage_authorized": False,
+            "external_text_instruction_authority": False,
             "strategy_router_threshold_change_authorized": False,
             "daily_opportunity_score_change_authorized": False,
             "automatic_candidate_generation_authorized": False,
@@ -345,12 +361,17 @@ def external_market_context_policy_from_config(
     policy = payload.get("policy")
     if not isinstance(source_rows, list) or not isinstance(policy, Mapping):
         raise ValueError("external market context sources/policy are required")
-    source_ids = [row.get("source_id") for row in source_rows if isinstance(row, Mapping)]
-    if sorted(source_ids) != sorted(SOURCE_IDS):
-        raise ValueError("external market context source registry mismatch")
+    source_ids: list[str] = []
     for row in source_rows:
         if not isinstance(row, Mapping):
             raise ValueError("external source registry row must be an object")
+        source_id = row.get("source_id")
+        if not isinstance(source_id, str):
+            raise ValueError("external source registry source_id must be string")
+        source_ids.append(source_id)
+    if sorted(source_ids) != sorted(SOURCE_IDS):
+        raise ValueError("external market context source registry mismatch")
+    for row in source_rows:
         sha = row.get("upstream_commit_sha")
         if not isinstance(sha, str) or len(sha) != 40:
             raise ValueError("external source commit pin must be a 40-character SHA")
@@ -362,6 +383,7 @@ def external_market_context_policy_from_config(
         "network_capture_authorized",
         "mcp_runtime_embedding_authorized",
         "provider_api_key_storage_authorized",
+        "external_text_instruction_authority",
         "strategy_router_threshold_change_authorized",
         "daily_opportunity_score_change_authorized",
         "automatic_candidate_generation_authorized",
