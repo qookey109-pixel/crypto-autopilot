@@ -1,0 +1,53 @@
+{
+  "schema": "qookey-zec-macd-v0-2-evidence-preservation-v0.2",
+  "status": "PRESERVED_HISTORICAL_EVIDENCE_NO_EXECUTION_AUTHORITY",
+  "date": "2026-09-19",
+  "source_prs": [
+    345,
+    346,
+    347
+  ],
+  "primary_source_head_sha": "da8679face1cddb6039dfaeff4b60b1614490577",
+  "target_parent_main_sha": "777665e92fabe9727605ae6b4037966e8216b959",
+  "github_run_reverification": {
+    "v0_1_run_id": 35297163219,
+    "v0_1_conclusion": "failure",
+    "v0_2_run_id": 35298599786,
+    "v0_2_conclusion": "success",
+    "v0_2_head_sha": "251206ba3d32c327abe09d225f7e256ddebc46c7"
+  },
+  "preserved_files": [
+    "research/receipts/2026-09-18-bitget-macd-zec-binance-vision-read-only-completion-v0-2.json",
+    "research/receipts/2026-09-18-bitget-macd-zec-real-history-read-only-attempt-v0-1.json",
+    "research/status/bitget-macd-zec-binance-vision-read-only-v0-2.json",
+    "docs/BITGET_MACD_ZEC_VALIDATION_V0_2_EVIDENCE.md",
+    "research/receipts/2026-09-19-zec-macd-v0-2-evidence-preservation-v0-2.json"
+  ],
+  "excluded_from_preservation": [
+    "one-shot execution workflows",
+    "consumed execution authority receipts",
+    "provider/R2 execution runners",
+    "any reexecution path"
+  ],
+  "execution": {
+    "performed_by_preservation": false,
+    "provider_requests_performed": 0,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "raw_candles_persisted": false
+  },
+  "authority": {
+    "v0_1_authority_revivable": false,
+    "v0_2_authority_revivable": false,
+    "new_data_read_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
