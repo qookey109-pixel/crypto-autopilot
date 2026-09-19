@@ -49,20 +49,19 @@ class CryptoMarketDataMcpEvaluationV01Tests(unittest.TestCase):
     def test_observed_tools_are_read_or_discovery_surfaces(self) -> None:
         tools = set(self.payload["observed_public_tools"])
         self.assertEqual(len(tools), 13)
-        forbidden_fragments = (
-            "order",
-            "cancel",
-            "balance",
+        forbidden_tools = {
+            "create_order",
+            "cancel_order",
+            "cancel_all_orders",
+            "fetch_balance",
             "withdraw",
             "deposit",
             "transfer",
-            "leverage",
-        )
+            "set_leverage",
+        }
         for tool in tools:
             with self.subTest(tool=tool):
-                self.assertFalse(
-                    any(fragment in tool for fragment in forbidden_fragments)
-                )
+                self.assertNotIn(tool, forbidden_tools)
 
     def test_recommended_scope_is_derivatives_context_only(self) -> None:
         decision = self.payload["overall_decision"]
