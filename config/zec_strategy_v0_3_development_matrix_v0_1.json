@@ -1,0 +1,100 @@
+{
+  "schema": "qookey-zec-strategy-v0-3-development-matrix-v0.1",
+  "status": "PREPARED_OFFLINE_DEVELOPMENT_CONTRACT_ONLY",
+  "symbol": "ZECUSDT",
+  "direction": "LONG_ONLY_RESEARCH",
+  "source_timeframe": "15m",
+  "signal_timeframe": "30m",
+  "context_timeframe": "4h",
+  "development_window": {
+    "start_utc": "2022-08-01T00:00:00Z",
+    "end_exclusive_utc": "2026-08-01T00:00:00Z",
+    "data_role": "DEVELOPMENT_ONLY_ALREADY_SEEN",
+    "folds": [
+      {
+        "fold_id": "dev-2022-08_to_2023-08",
+        "start_utc": "2022-08-01T00:00:00Z",
+        "end_exclusive_utc": "2023-08-01T00:00:00Z"
+      },
+      {
+        "fold_id": "dev-2023-08_to_2024-08",
+        "start_utc": "2023-08-01T00:00:00Z",
+        "end_exclusive_utc": "2024-08-01T00:00:00Z"
+      },
+      {
+        "fold_id": "dev-2024-08_to_2025-08",
+        "start_utc": "2024-08-01T00:00:00Z",
+        "end_exclusive_utc": "2025-08-01T00:00:00Z"
+      },
+      {
+        "fold_id": "dev-2025-08_to_2026-08",
+        "start_utc": "2025-08-01T00:00:00Z",
+        "end_exclusive_utc": "2026-08-01T00:00:00Z"
+      }
+    ]
+  },
+  "fresh_confirmation_window": {
+    "fold_id": "fresh-confirmation-2026-08-01_to_2026-09-16",
+    "start_utc": "2026-08-01T00:00:00Z",
+    "end_exclusive_utc": "2026-09-16T00:00:00Z",
+    "accessed": false,
+    "access_authorized": false
+  },
+  "candidate_axes": {
+    "macd": [
+      "12/26/9",
+      "12/30/7"
+    ],
+    "trend_regime": [
+      "TREND_STRICT",
+      "TREND_BASIC"
+    ],
+    "volatility_filter": [
+      "ATR_FILTER_OFF",
+      "ATR_ROLLING_EXTREME_GUARD"
+    ],
+    "stop_model": [
+      "VOL_STOP_2ATR_BB_HALF",
+      "VOL_STOP_2_5ATR_BB_HALF"
+    ],
+    "account_risk_fraction": [
+      0.01,
+      0.025,
+      0.05,
+      0.1
+    ]
+  },
+  "expected_candidate_count": 64,
+  "development_protocol": {
+    "complete_candidate_fold_matrix_required": true,
+    "selective_omission_allowed": false,
+    "robust_first_selection_required": true,
+    "stable_neighbor_evidence_required": true,
+    "exactly_one_champion_before_fresh_confirmation": true,
+    "fresh_confirmation_can_reselect_candidate": false,
+    "candidate_selection_from_fresh_confirmation_allowed": false
+  },
+  "execution_rules": {
+    "maximum_leverage": 3,
+    "entry_next_30m_open": true,
+    "stop_distance_percentage_cap": null,
+    "averaging_down": false,
+    "martingale": false,
+    "pyramiding": false,
+    "funding_fabrication_allowed": false
+  },
+  "authority": {
+    "offline_contract_validation_authorized": true,
+    "offline_development_runner_authorized": false,
+    "fresh_data_read_authorized": false,
+    "provider_network_access_authorized": false,
+    "r2_read_authorized": false,
+    "r2_write_authorized": false,
+    "formal_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
