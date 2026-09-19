@@ -9,6 +9,39 @@ from typing import Any, Mapping
 
 
 SCHEMA = "qookey-zec-strategy-v0-3-development-matrix-v0.1"
+FROZEN_DEVELOPMENT_START = "2022-08-01T00:00:00Z"
+FROZEN_DEVELOPMENT_END = "2026-08-01T00:00:00Z"
+FROZEN_CONFIRMATION_START = "2026-08-01T00:00:00Z"
+FROZEN_CONFIRMATION_END = "2026-09-16T00:00:00Z"
+FROZEN_AXES: dict[str, list[object]] = {
+    "macd": ["12/26/9", "12/30/7"],
+    "trend_regime": ["TREND_STRICT", "TREND_BASIC"],
+    "volatility_filter": ["ATR_FILTER_OFF", "ATR_ROLLING_EXTREME_GUARD"],
+    "stop_model": ["VOL_STOP_2ATR_BB_HALF", "VOL_STOP_2_5ATR_BB_HALF"],
+    "account_risk_fraction": [0.01, 0.025, 0.05, 0.1],
+}
+FROZEN_FOLDS = [
+    (
+        "dev-2022-08_to_2023-08",
+        "2022-08-01T00:00:00Z",
+        "2023-08-01T00:00:00Z",
+    ),
+    (
+        "dev-2023-08_to_2024-08",
+        "2023-08-01T00:00:00Z",
+        "2024-08-01T00:00:00Z",
+    ),
+    (
+        "dev-2024-08_to_2025-08",
+        "2024-08-01T00:00:00Z",
+        "2025-08-01T00:00:00Z",
+    ),
+    (
+        "dev-2025-08_to_2026-08",
+        "2025-08-01T00:00:00Z",
+        "2026-08-01T00:00:00Z",
+    ),
+]
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,13 +68,7 @@ def build_zec_v0_3_candidate_grid(config: Mapping[str, Any]) -> tuple[ZecV03Cand
     if not isinstance(axes, Mapping):
         raise ValueError("candidate_axes must be an object")
 
-    names = (
-        "macd",
-        "trend_regime",
-        "volatility_filter",
-        "stop_model",
-        "account_risk_fraction",
-    )
+    names = tuple(FROZEN_AXES)
     values: list[tuple[object, ...]] = []
     for name in names:
         axis = axes.get(name)
@@ -54,9 +81,16 @@ def build_zec_v0_3_candidate_grid(config: Mapping[str, Any]) -> tuple[ZecV03Cand
     candidates: list[ZecV03Candidate] = []
     for index, combination in enumerate(itertools.product(*values), start=1):
         macd, trend, volatility, stop, risk = combination
-        if not all(isinstance(value, str) and value for value in (macd, trend, volatility, stop)):
+        if not all(
+            isinstance(value, str) and value
+            for value in (macd, trend, volatility, stop)
+        ):
             raise ValueError("string candidate axes must contain non-empty strings")
-        if isinstance(risk, bool) or not isinstance(risk, (int, float)) or not 0.0 < float(risk) <= 1.0:
+        if (
+            isinstance(risk, bool)
+            or not isinstance(risk, (int, float))
+            or not 0.0 < float(risk) <= 1.0
+        ):
             raise ValueError("account_risk_fraction must be within (0, 1]")
         candidates.append(
             ZecV03Candidate(
@@ -71,7 +105,9 @@ def build_zec_v0_3_candidate_grid(config: Mapping[str, Any]) -> tuple[ZecV03Cand
     return tuple(candidates)
 
 
-def validate_zec_v0_3_development_contract(config: Mapping[str, Any]) -> dict[str, object]:
+def validate_zec_v0_3_development_contract(
+    config: Mapping[str, Any],
+) -> dict[str, object]:
     if config.get("schema") != SCHEMA:
         raise ValueError("unexpected ZEC V0.3 development contract schema")
     if config.get("status") != "PREPARED_OFFLINE_DEVELOPMENT_CONTRACT_ONLY":
@@ -85,10 +121,21 @@ def validate_zec_v0_3_development_contract(config: Mapping[str, Any]) -> dict[st
     ):
         raise ValueError("unexpected ZEC V0.3 timeframe contract")
 
+    axes = config.get("candidate_axes")
+    if not isinstance(axes, Mapping) or dict(axes) != FROZEN_AXES:
+        raise ValueError("ZEC V0.3 candidate axes drifted from the frozen design")
+
     development = config.get("development_window")
     confirmation = config.get("fresh_confirmation_window")
     if not isinstance(development, Mapping) or not isinstance(confirmation, Mapping):
         raise ValueError("development and fresh-confirmation windows are required")
+    if (
+        development.get("start_utc") != FROZEN_DEVELOPMENT_START
+        or development.get("end_exclusive_utc") != FROZEN_DEVELOPMENT_END
+        or confirmation.get("start_utc") != FROZEN_CONFIRMATION_START
+        or confirmation.get("end_exclusive_utc") != FROZEN_CONFIRMATION_END
+    ):
+        raise ValueError("ZEC V0.3 temporal boundaries drifted from the frozen design")
 
     development_start = _parse_utc(development.get("start_utc"), "development.start_utc")
     development_end = _parse_utc(
@@ -107,30 +154,33 @@ def validate_zec_v0_3_development_contract(config: Mapping[str, Any]) -> dict[st
         raise ValueError("development/fresh-confirmation windows overlap or are unordered")
     if development.get("data_role") != "DEVELOPMENT_ONLY_ALREADY_SEEN":
         raise ValueError("development history must remain already-seen development evidence")
-    if confirmation.get("accessed") is not False or confirmation.get("access_authorized") is not False:
+    if (
+        confirmation.get("accessed") is not False
+        or confirmation.get("access_authorized") is not False
+    ):
         raise ValueError("fresh confirmation must remain unopened and unauthorized")
 
     folds = development.get("folds")
-    if not isinstance(folds, list) or not folds:
-        raise ValueError("chronological development folds are required")
+    if not isinstance(folds, list) or len(folds) != len(FROZEN_FOLDS):
+        raise ValueError("exact frozen chronological development folds are required")
+    actual_folds: list[tuple[str, str, str]] = []
     cursor = development_start
-    fold_ids: list[str] = []
     for index, fold in enumerate(folds):
         if not isinstance(fold, Mapping):
             raise ValueError(f"development fold must be an object: {index}")
         fold_id = fold.get("fold_id")
-        if not isinstance(fold_id, str) or not fold_id:
-            raise ValueError(f"development fold id is invalid: {index}")
-        fold_start = _parse_utc(fold.get("start_utc"), f"fold[{index}].start_utc")
-        fold_end = _parse_utc(fold.get("end_exclusive_utc"), f"fold[{index}].end_exclusive_utc")
+        fold_start_raw = fold.get("start_utc")
+        fold_end_raw = fold.get("end_exclusive_utc")
+        if not all(isinstance(value, str) and value for value in (fold_id, fold_start_raw, fold_end_raw)):
+            raise ValueError(f"development fold identity is invalid: {index}")
+        fold_start = _parse_utc(fold_start_raw, f"fold[{index}].start_utc")
+        fold_end = _parse_utc(fold_end_raw, f"fold[{index}].end_exclusive_utc")
         if fold_start != cursor or fold_end <= fold_start:
             raise ValueError("development folds must be contiguous, ordered and non-empty")
         cursor = fold_end
-        fold_ids.append(fold_id)
-    if cursor != development_end:
-        raise ValueError("development folds must cover the full development window")
-    if len(fold_ids) != len(set(fold_ids)):
-        raise ValueError("development fold ids must be unique")
+        actual_folds.append((fold_id, fold_start_raw, fold_end_raw))
+    if cursor != development_end or actual_folds != FROZEN_FOLDS:
+        raise ValueError("development folds drifted from the frozen design")
 
     candidates = build_zec_v0_3_candidate_grid(config)
     expected = config.get("expected_candidate_count")
@@ -147,7 +197,10 @@ def validate_zec_v0_3_development_contract(config: Mapping[str, Any]) -> dict[st
         "fresh_confirmation_can_reselect_candidate": False,
         "candidate_selection_from_fresh_confirmation_allowed": False,
     }
-    if not isinstance(protocol, Mapping) or any(protocol.get(k) is not v for k, v in required_protocol.items()):
+    if (
+        not isinstance(protocol, Mapping)
+        or any(protocol.get(key) is not value for key, value in required_protocol.items())
+    ):
         raise ValueError("ZEC V0.3 development protocol boundary mismatch")
 
     authority = config.get("authority")
