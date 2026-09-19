@@ -1,0 +1,140 @@
+{
+  "schema": "external-capability-integration-evaluation-v0.1",
+  "status": "EVALUATED_RESEARCH_ONLY_NOT_APPROVED_FOR_RUNTIME",
+  "evaluated_at": "2026-09-19",
+  "crypto_autopilot_base_main_sha": "1ec62a13c8cd3544d481baf061bab4315fdf6b4c",
+  "candidate_provenance": {
+    "registry_schema": "qookey-external-capability-registry-v0.1",
+    "capability_id": "agentfeed",
+    "candidate_state": "CANDIDATE",
+    "candidate_decision": "REVIEW_REQUIRED"
+  },
+  "upstream": {
+    "repository": "seekdaseek/agentfeed",
+    "commit": "0e1db87a65dc0cc0b890c2257e10e12cd3966cf7",
+    "license": "MIT",
+    "runtime": "Node.js >=18",
+    "payment_protocol": "x402",
+    "payment_asset": "USDC",
+    "payment_networks": [
+      "Solana",
+      "Base"
+    ],
+    "paid_runtime": true,
+    "upstream_wallet_payment_supported": true,
+    "upstream_private_key_client_pattern_documented": true,
+    "upstream_test_execution_performed_by_this_evaluation": false
+  },
+  "evidence_reviewed": [
+    "README.md",
+    "LICENSE",
+    "package.json",
+    "mcp.js",
+    "payments.js",
+    "liqcollector.js",
+    "tools/liquidations.js",
+    "tools/cascade.js",
+    "tools/positioning.js",
+    "AGENTFEED_SPEC.md",
+    ".env.example"
+  ],
+  "component_evaluation": {
+    "historical_liquidation_tape": {
+      "decision": "RESEARCH_CANDIDATE_WITH_VENUE_QUALITY_FLAGS_REQUIRED",
+      "fit": "HIGH",
+      "notes": [
+        "The reviewed collector stores normalized USDT-perpetual liquidation rows from Bybit, OKX and Binance into SQLite.",
+        "Upstream explicitly documents Bybit as its highest-integrity liquidation stream while Binance and OKX are structurally sampled or throttled.",
+        "Any future Crypto Autopilot use must preserve exchange provenance and per-venue coverage quality instead of treating the aggregate as uniformly complete."
+      ]
+    },
+    "liquidation_side_semantics": {
+      "decision": "RESEARCH_CANDIDATE_REQUIRES_EXPLICIT_CONVENTION",
+      "fit": "HIGH",
+      "notes": [
+        "The reviewed collector normalizes side semantics to position-side meaning rather than raw order-side meaning.",
+        "Binance order side is explicitly inverted before storage, while Bybit and OKX use different source conventions.",
+        "A future adapter must preserve a named internal convention such as LONG_LIQUIDATED / SHORT_LIQUIDATED and must not infer trade direction from a generic BUY/SELL label."
+      ]
+    },
+    "cascade_and_leader_aggregates": {
+      "decision": "CHALLENGER_ONLY",
+      "fit": "MEDIUM_HIGH",
+      "notes": [
+        "Cascade and liquidation-leader tools derive aggregates from the local liquidation tape.",
+        "Because Binance and OKX are structurally undercounted, cross-venue cascade totals can inherit venue-specific observation bias.",
+        "Severity labels and dominant-side summaries therefore remain descriptive challenger features until independently validated."
+      ]
+    },
+    "positioning_and_derivatives": {
+      "decision": "DUPLICATIVE_CHALLENGER",
+      "fit": "MEDIUM",
+      "notes": [
+        "AgentFeed exposes funding, open interest and long/short positioning that overlap Prefetched Derivatives Context V0.1.",
+        "The reviewed positioning implementation uses Bybit public REST for SOL/BTC and represents long/short shares as percentages rather than fractions.",
+        "These surfaces should not replace the already-created native derivatives contract or canonical provider authority."
+      ]
+    },
+    "squeeze_score_and_interpreted_signals": {
+      "decision": "REJECT_AS_DIRECT_STRATEGY_AUTHORITY",
+      "fit": "LOW_FOR_DIRECT_ROUTING",
+      "notes": [
+        "Upstream publishes composite labels such as squeeze score, crowding reads and other interpreted market signals.",
+        "Those outputs embed upstream thresholds and semantics that are not validated under Crypto Autopilot governance.",
+        "They must not directly select a strategy, change Router thresholds, generate candidates or authorize a trade."
+      ]
+    },
+    "x402_payment_and_wallet_surface": {
+      "decision": "REJECT_FOR_RUNTIME_V0_1",
+      "fit": "OUT_OF_SCOPE",
+      "notes": [
+        "Paid MCP and HTTP tools settle USDC through x402 and the upstream client/plugin documentation supports automatic wallet payment.",
+        "The server code records payer-wallet and settlement transaction metadata after payment.",
+        "Crypto Autopilot's current zero-cost and secret-isolation boundaries do not authorize a funded wallet, private key, x402 settlement or paid call."
+      ]
+    },
+    "free_tools": {
+      "decision": "REFERENCE_ONLY",
+      "fit": "LOW_MEDIUM",
+      "notes": [
+        "The reviewed MCP surface includes some free tools, but using the hosted service would still add a remote runtime dependency.",
+        "No hosted AgentFeed endpoint call is authorized by this evaluation, including free endpoints."
+      ]
+    }
+  },
+  "overall_decision": {
+    "state": "EVALUATED_NOT_APPROVED_FOR_RUNTIME_INTEGRATION",
+    "recommended_scope": "LIQUIDATION_TAPE_QUALITY_AND_SIDE_SEMANTICS_REFERENCE_ONLY",
+    "do_not_use_paid_runtime": true,
+    "do_not_create_or_fund_wallet": true,
+    "do_not_store_private_key": true,
+    "do_not_use_composite_scores_as_strategy_authority": true,
+    "do_not_treat_cross_venue_liquidation_coverage_as_uniform": true,
+    "recommended_next_step": "Build an isolated no-network liquidation-context quality contract using synthetic/non-holdout fixtures. Require explicit venue, coverage_quality, side_semantics, observed_at and available_at metadata; reject generic BUY/SELL trade-direction interpretation, paid-runtime provenance without a captured receipt, and any strategy/trading authority."
+  },
+  "authority": {
+    "automatic_schedule_authorized": false,
+    "code_import_authorized": false,
+    "runtime_dependency_authorized": false,
+    "mcp_runtime_authorized": false,
+    "external_network_authorized": false,
+    "agentfeed_endpoint_authorized": false,
+    "wallet_creation_authorized": false,
+    "wallet_funding_authorized": false,
+    "private_key_access_authorized": false,
+    "x402_payment_authorized": false,
+    "paid_call_authorized": false,
+    "adapter_creation_authorized": false,
+    "strategy_router_integration_authorized": false,
+    "daily_opportunity_integration_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  }
+}
