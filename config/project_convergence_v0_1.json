@@ -225,6 +225,9 @@
       "validate-v0-7-render-metadata-capture-protocol.yml",
       "validate-v0-8-shared-secret-preflight.yml",
       "validate-v0-9-render-relay-smoke.yml"
+    ],
+    "current_quality_or_security_visibility": [
+      "security-visibility-codeql.yml"
     ]
   },
   "boundaries": {

@@ -125,12 +125,22 @@ A semantic type checker is still deferred to a later dependency-maintenance deci
 
 ### TD-008 — Dependency/security maintenance visibility
 
-Status: **OPEN**
+Status: **NON-BLOCKING VISIBILITY IMPLEMENTED / REQUIRED GATE NOT AUTHORIZED**
 
-Target:
+Dependency visibility:
 
-- add review-only dependency-update visibility; no auto-merge;
-- evaluate CodeQL or equivalent non-blocking static security analysis before making it required.
+- `.github/dependabot.yml` already performs monthly `pip` and `github-actions` update proposals;
+- Dependabot remains review-only; this project config adds no auto-merge path.
+
+Security visibility:
+
+- `.github/workflows/security-visibility-codeql.yml` runs Python CodeQL on pull requests and pushes to `main`;
+- the CodeQL v4 action is pinned to exact upstream commit `1c5b675653bb5c22dbe9b12b556ec555138e09fd`;
+- there is intentionally no scheduled scan;
+- analysis uses `upload: never` and publishes SARIF only as a 30-day GitHub Actions artifact;
+- the job is `continue-on-error: true`, so security visibility is not a required promotion, merge, holdout, source-switch or trading gate.
+
+Any future move to required CodeQL or Code Scanning upload needs a separate reviewed governance change.
 
 ## P3 — code structure
 
