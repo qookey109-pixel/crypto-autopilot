@@ -7,8 +7,9 @@ any versioned authority.
 
 1. `PROJECT_STATUS.md` — current formal stage and safety boundary.
 2. `docs/PRODUCT_ARCHITECTURE_V0_1.md` — multi-asset, daily-opportunity-first product architecture.
-3. `docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md` — multi-asset attention candidate selector.
-4. `docs/STRATEGY_ROUTER_V0_1.md` — dynamic multi-strategy compatibility router.
+3. `docs/EXTERNAL_MARKET_CONTEXT_V0_1.md` — six pinned external crypto-context sources normalized from prefetched evidence; no network capture or Router behavior change.
+4. `docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md` — multi-asset attention candidate selector.
+5. `docs/STRATEGY_ROUTER_V0_1.md` — dynamic multi-strategy compatibility router.
 5. `docs/STRATEGY_LIBRARY_V0_1.md` — governed reusable strategy-family registry and lifecycle metadata.
 6. `docs/STRATEGY_FAMILY_VALIDATION_V0_1.md` — cross-asset/cross-regime family generalization review layered on existing Edge Validation.
 7. `docs/STRATEGY_RESEARCH_SCORECARD_V0_1.md` — deterministic research-priority ranking of family evidence; no strategy-selection authority.
