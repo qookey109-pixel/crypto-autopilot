@@ -88,6 +88,28 @@ Resolution fails if:
 
 This avoids silently guessing how a future status schema should be interpreted.
 
+## Local CLI
+
+The provider-neutral resolver is executable without Telegram, GitHub or any
+other network transport:
+
+```bash
+PYTHONPATH=src python scripts/operator_status_v0_1.py status
+PYTHONPATH=src python scripts/operator_status_v0_1.py paper_status
+PYTHONPATH=src python scripts/operator_status_v0_1.py help --format json
+```
+
+The CLI reads only `research/status/current-operations-v0-3.json` by default.
+A different offline file may be supplied with `--status-file`.
+
+Unknown commands, missing files, malformed JSON or schema drift fail closed
+with exit code `2`. The failure envelope explicitly records that no network
+access, execution or state mutation occurred.
+
+This is the intended reusable boundary for a future Telegram or other transport:
+the transport only supplies command text and delivers the returned text/JSON;
+it does not receive trading authority from the resolver.
+
 ## Authority
 
 Authorized:
