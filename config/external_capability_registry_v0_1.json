@@ -129,11 +129,13 @@
         "funding_cost",
         "risk_reward",
         "scenario_planning",
+        "average_entry",
+        "hedge_ratio",
         "self_verification"
       ],
       "requirements": {
-        "credential": "OPTIONAL_FOR_MCP_REQUIRED_FOR_REST",
-        "paid_runtime": true,
+        "credential": "OPTIONAL_BEARER_FOR_HIGHER_QUOTA",
+        "paid_runtime": false,
         "external_network": true
       },
       "risk": {
