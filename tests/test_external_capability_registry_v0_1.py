@@ -44,6 +44,29 @@ class ExternalCapabilityRegistryV01Tests(unittest.TestCase):
             )
         )
 
+    def test_project_convergence_indexes_registry_without_runtime_authority(self) -> None:
+        convergence = json.loads(
+            (ROOT / "config" / "project_convergence_v0_1.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        registry = convergence["external_capabilities"]
+        self.assertEqual(
+            registry["registry"],
+            "config/external_capability_registry_v0_1.json",
+        )
+        self.assertEqual(
+            registry["documentation"],
+            "docs/EXTERNAL_CAPABILITY_REGISTRY_V0_1.md",
+        )
+        boundaries = convergence["boundaries"]
+        self.assertTrue(boundaries["external_capability_registry_added"])
+        self.assertFalse(boundaries["external_capability_runtime_authorized"])
+        self.assertFalse(boundaries["external_capability_network_authorized"])
+        self.assertFalse(boundaries["external_capability_secret_access_authorized"])
+        self.assertFalse(boundaries["external_capability_payment_authorized"])
+        self.assertFalse(boundaries["external_capability_mutation_authorized"])
+
     def test_registry_grants_zero_runtime_authority(self) -> None:
         result = validate_external_capability_registry(self.payload)
         authority = result["authority"]
