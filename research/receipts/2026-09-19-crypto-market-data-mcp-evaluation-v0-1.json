@@ -1,0 +1,171 @@
+{
+  "schema": "external-capability-integration-evaluation-v0.1",
+  "status": "EVALUATED_RESEARCH_ONLY_NOT_APPROVED_FOR_RUNTIME",
+  "evaluated_at": "2026-09-19",
+  "crypto_autopilot_base_main_sha": "b1aaddcfe61d1e90c805a0826d3c62351a8d874a",
+  "candidate_provenance": {
+    "registry_schema": "qookey-external-capability-registry-v0.1",
+    "capability_id": "crypto_market_data_mcp",
+    "candidate_state": "CANDIDATE",
+    "candidate_decision": "REVIEW_REQUIRED"
+  },
+  "upstream": {
+    "repository": "eliasfire617/crypto-market-data-mcp",
+    "commit": "7720d7116e26e578037c519d6fdae0d9ba0e8a75",
+    "license": "MIT",
+    "version": "0.1.0",
+    "requires_python": ">=3.10",
+    "runtime_dependencies": [
+      "fastmcp>=3.4",
+      "ccxt>=4.5"
+    ],
+    "supported_exchanges": [
+      "bybit",
+      "binance",
+      "okx",
+      "hyperliquid",
+      "gate",
+      "kucoin"
+    ],
+    "documented_tool_count": 13,
+    "local_stdio_api_key_required": false,
+    "hosted_http_api_key_required": true,
+    "public_exchange_api_key_required": false,
+    "upstream_test_execution_performed_by_this_evaluation": false
+  },
+  "evidence_reviewed": [
+    "README.md",
+    "pyproject.toml",
+    "server.py",
+    "auth.py",
+    "ratelimit.py",
+    "requirements.txt",
+    "repository searches for create_order/cancel_order/fetch_balance/withdraw/apiKey/secret/password/private"
+  ],
+  "observed_public_tools": [
+    "list_exchanges",
+    "get_capabilities",
+    "search_symbols",
+    "get_price",
+    "get_order_book",
+    "get_ohlcv",
+    "get_recent_trades",
+    "get_funding_rate",
+    "get_funding_rate_history",
+    "compare_funding",
+    "get_open_interest",
+    "get_long_short_ratio",
+    "get_liquidations"
+  ],
+  "component_evaluation": {
+    "read_only_market_data_surface": {
+      "decision": "RESEARCH_CANDIDATE",
+      "fit": "HIGH",
+      "notes": [
+        "The reviewed server constructs CCXT exchange clients without exchange API keys and exposes public market-data methods only.",
+        "Repository searches found no create_order, cancel_order, fetch_balance or withdraw path in the reviewed source surface.",
+        "This is suitable as a reference or future read-only adapter source, not as proof that every future upstream commit remains read-only."
+      ]
+    },
+    "funding_rate_context": {
+      "decision": "RESEARCH_CANDIDATE_WITH_NORMALIZATION_REQUIRED",
+      "fit": "HIGH",
+      "notes": [
+        "Current and historical perpetual funding rates can complement existing technical context.",
+        "The upstream compare_funding tool annualizes venue rates and emits an arb_spread summary.",
+        "Crypto Autopilot must preserve venue, raw funding rate, interval and observation timestamp; an upstream arbitrage label must not become a trade instruction."
+      ]
+    },
+    "open_interest_context": {
+      "decision": "RESEARCH_CANDIDATE",
+      "fit": "HIGH",
+      "notes": [
+        "Open-interest amount/value is useful for derivatives positioning and regime research.",
+        "Exchange coverage is capability-dependent and must be fail-closed rather than silently filled from another provider.",
+        "Open interest is context only until independently validated against downstream strategy/regime outcomes."
+      ]
+    },
+    "long_short_ratio_context": {
+      "decision": "RESEARCH_CANDIDATE_WITH_SCOPE_LIMIT",
+      "fit": "MEDIUM_HIGH",
+      "notes": [
+        "The reviewed implementation uses Binance USD-M global long/short account ratio only.",
+        "The metric is venue- and methodology-specific and must retain Binance provenance and period.",
+        "It must not be treated as a universal market-positioning ratio across exchanges."
+      ]
+    },
+    "orderbook_ohlcv_trades": {
+      "decision": "DUPLICATIVE_REFERENCE_ONLY",
+      "fit": "MEDIUM",
+      "notes": [
+        "Order book, OHLCV and recent-trade tools overlap capabilities already present elsewhere in Crypto Autopilot and External Market Context V0.1.",
+        "They may be useful for cross-provider diagnostics but should not create a second canonical market-data authority."
+      ]
+    },
+    "liquidation_context": {
+      "decision": "REFERENCE_ONLY_LIMITED_COVERAGE",
+      "fit": "MEDIUM",
+      "notes": [
+        "Liquidation support depends on CCXT venue capability and the upstream default is Gate.",
+        "Crypto Autopilot already has a dedicated liquidation-source candidate, so this surface is better treated as a cross-check than primary liquidation authority."
+      ]
+    },
+    "retry_cache_and_timeout_semantics": {
+      "decision": "DESIGN_REFERENCE",
+      "fit": "HIGH",
+      "notes": [
+        "The upstream runtime uses bounded retries, per-request/overall timeouts, per-exchange concurrency limits and short TTL caches.",
+        "Those patterns are useful operational references, but importing the runtime is unnecessary for the first integration stage."
+      ]
+    },
+    "hosted_auth_and_billing": {
+      "decision": "OUT_OF_SCOPE_FOR_PROJECT_RUNTIME",
+      "fit": "LOW",
+      "notes": [
+        "HTTP mode adds bearer-key tiers, quotas and optional gateway trust.",
+        "Crypto Autopilot does not need to run or monetize this MCP server.",
+        "No hosted key, gateway-bypass configuration or billing tier is authorized by this evaluation."
+      ]
+    }
+  },
+  "overall_decision": {
+    "state": "EVALUATED_NOT_APPROVED_FOR_RUNTIME_INTEGRATION",
+    "recommended_scope": "PREFETCHED_DERIVATIVES_CONTEXT_CONTRACT_REFERENCE",
+    "priority_fields": [
+      "funding_rate",
+      "funding_interval_hours",
+      "open_interest_amount",
+      "open_interest_value",
+      "long_short_ratio",
+      "long_pct",
+      "short_pct"
+    ],
+    "do_not_import_as_runtime_dependency": true,
+    "do_not_use_upstream_arb_spread_as_trade_instruction": true,
+    "do_not_replace_binance_or_pionex_canonical_market_authority": true,
+    "recommended_next_step": "Build a no-network prefetched derivatives-context contract for funding, open interest and Binance long/short ratio using synthetic/non-holdout fixtures only; preserve venue, symbol, observation time and availability time; do not alter Strategy Router or Daily Opportunity behavior until a separate validation.",
+    "license_note": "MIT permits reuse subject to retaining the applicable copyright and license notice if code is copied or derived."
+  },
+  "authority": {
+    "automatic_schedule_authorized": false,
+    "code_import_authorized": false,
+    "runtime_dependency_authorized": false,
+    "mcp_runtime_authorized": false,
+    "external_network_authorized": false,
+    "provider_access_authorized": false,
+    "upstream_http_api_key_authorized": false,
+    "gateway_auth_bypass_authorized": false,
+    "adapter_creation_authorized": false,
+    "strategy_router_integration_authorized": false,
+    "daily_opportunity_integration_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  }
+}
