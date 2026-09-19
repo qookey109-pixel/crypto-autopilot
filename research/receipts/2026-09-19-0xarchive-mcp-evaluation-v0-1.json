@@ -1,0 +1,109 @@
+{
+  "schema": "external-capability-integration-evaluation-v0.1",
+  "status": "EVALUATED_RESEARCH_ONLY_NOT_APPROVED_FOR_RUNTIME",
+  "evaluated_at": "2026-09-19",
+  "crypto_autopilot_base_main_sha": "a25c96ac4ea932898e6bb65b4ab8e30f2c06f1fe",
+  "candidate_provenance": {
+    "registry_schema": "qookey-external-capability-registry-v0.1",
+    "capability_id": "0xarchive_mcp",
+    "candidate_state": "CANDIDATE",
+    "candidate_decision": "REVIEW_REQUIRED"
+  },
+  "upstream": {
+    "repository": "0xArchiveIO/0xarchive-mcp",
+    "default_branch": "hosted",
+    "commit": "5c0531cb685779b5fa8cbff3443f9a7f74fed659",
+    "license": "MIT",
+    "archived": false,
+    "commit_verified_by_github": true,
+    "implementation_source_present": false,
+    "transport": "REMOTE_STREAMABLE_HTTP",
+    "authentication": "OAUTH_ACCOUNT",
+    "oauth_scope": "mcp:market.read",
+    "api_key_required": false,
+    "local_server_required": false,
+    "access_limits_plan_dependent": true,
+    "upstream_test_execution_performed_by_this_evaluation": false
+  },
+  "evidence_reviewed": [
+    "README.md",
+    "LICENSE",
+    "repository root at pinned commit"
+  ],
+  "component_evaluation": {
+    "historical_market_data": {
+      "decision": "HISTORICAL_CHALLENGER_CANDIDATE",
+      "fit": "HIGH",
+      "notes": [
+        "Documented datasets include Hyperliquid and Lighter trades, candles, funding, open interest, liquidations and order books.",
+        "These venues complement but do not replace the project's canonical Binance/Pionex research sources.",
+        "Long requests require bounded windows and pagination; partial pages must not be treated as complete history."
+      ]
+    },
+    "data_quality_metadata": {
+      "decision": "HIGH_VALUE_CHALLENGER_METADATA",
+      "fit": "HIGH",
+      "notes": [
+        "Coverage, freshness, incident, latency and status tools can qualify whether a requested historical interval is adequately observed.",
+        "Future comparisons should preserve quality metadata and pagination completion beside the market values."
+      ]
+    },
+    "liquidation_data": {
+      "decision": "SCHEMA_AND_COVERAGE_REVIEW_REQUIRED",
+      "fit": "MEDIUM_HIGH",
+      "notes": [
+        "Recorded liquidation data may only enter an event-level adapter after side semantics, timestamps, availability and coverage are verified.",
+        "Projected forced-liquidation levels are derived estimates and must remain distinct from observed liquidation events.",
+        "No 0xArchive data may infer real missingness or cross-venue correction weights from this evaluation."
+      ]
+    },
+    "cross_venue_context": {
+      "decision": "SOURCE_LABELLED_COMPARISON_ONLY",
+      "fit": "MEDIUM_HIGH",
+      "notes": [
+        "Funding and market-structure comparisons must retain venue-specific units and timestamps.",
+        "Hyperliquid/Lighter context cannot silently replace Binance/Pionex market authority."
+      ]
+    },
+    "local_auditability": {
+      "decision": "HOSTED_BACKEND_NOT_LOCALLY_AUDITABLE",
+      "fit": "LIMITED",
+      "notes": [
+        "The pinned repository contains documentation and connection metadata rather than the hosted server implementation.",
+        "Collection, normalization and quality calculations cannot be independently proven from this repository alone."
+      ]
+    }
+  },
+  "overall_decision": {
+    "state": "EVALUATED_NOT_APPROVED_FOR_RUNTIME_INTEGRATION",
+    "recommended_scope": "HISTORICAL_AND_DATA_QUALITY_CHALLENGER_ONLY",
+    "do_not_switch_canonical_source": true,
+    "do_not_mix_projected_liquidation_levels_with_observed_events": true,
+    "do_not_treat_partial_pages_as_complete": true,
+    "recommended_next_step": "Retain as a provider candidate. Only build a bounded read-only adapter if a concrete Hyperliquid/Lighter historical-validation question requires it, with coverage and pagination receipts mandatory."
+  },
+  "authority": {
+    "oauth_login_authorized": false,
+    "account_access_authorized": false,
+    "paid_runtime_authorized": false,
+    "runtime_dependency_authorized": false,
+    "mcp_runtime_authorized": false,
+    "external_network_authorized": false,
+    "bulk_download_authorized": false,
+    "websocket_authorized": false,
+    "adapter_creation_authorized": false,
+    "source_switch_authorized": false,
+    "liquidation_aggregation_authorized": false,
+    "coverage_weighting_authorized": false,
+    "signal_generation_authorized": false,
+    "strategy_router_integration_authorized": false,
+    "daily_opportunity_integration_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "portfolio_admission_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  }
+}
