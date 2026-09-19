@@ -8,33 +8,34 @@ any versioned authority.
 1. `PROJECT_STATUS.md` — current formal stage and safety boundary.
 2. `docs/PRODUCT_ARCHITECTURE_V0_1.md` — multi-asset, daily-opportunity-first product architecture.
 3. `docs/EXTERNAL_MARKET_CONTEXT_V0_1.md` — six pinned external crypto-context sources normalized from prefetched evidence; no network capture or Router behavior change.
-4. `docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md` — multi-asset attention candidate selector.
-5. `docs/STRATEGY_ROUTER_V0_1.md` — dynamic multi-strategy compatibility router.
-6. `docs/STRATEGY_LIBRARY_V0_1.md` — governed reusable strategy-family registry and lifecycle metadata.
-7. `docs/STRATEGY_FAMILY_VALIDATION_V0_1.md` — cross-asset/cross-regime family generalization review layered on existing Edge Validation.
-8. `docs/STRATEGY_RESEARCH_SCORECARD_V0_1.md` — deterministic research-priority ranking of family evidence; no strategy-selection authority.
-9. `docs/RISK_POSITION_SIZING_V0_1.md` — stop-preserving account-risk and bounded position-sizing research layer.
-10. `docs/PORTFOLIO_ADMISSION_V0_1.md` — explicit-basket total-risk, concentration and strategy-overlap admission gate.
-11. `docs/PAPER_EXECUTION_V0_1.md` — deterministic handoff into the existing Repository Paper Broker after portfolio admission; LONG intent recording only, no automatic/live path.
-12. `docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md` — deterministic paper fills, partial fills, costs and stop/target lifecycle over normalized liquidity bars.
-13. `docs/PAPER_ACCOUNT_POSITION_STATE_V0_1.md` — immutable paper cash/equity/open-position snapshot and Portfolio existing-exposure export.
-14. `docs/PAPER_CYCLE_ORCHESTRATOR_V0_1.md` — manual deterministic account → portfolio → paper-intent preparation; no broker submission.
-15. `docs/PAPER_SUBMISSION_SESSION_V0_1.md` — exact-cycle-id-confirmed complete-basket submission into the in-memory Repository Paper Broker.
-16. `docs/PAPER_LIFECYCLE_BATCH_V0_1.md` — exact-session-id-confirmed complete-basket lifecycle simulation and Account-ready record emission.
-17. `docs/PAPER_ACCOUNT_ADVANCE_V0_1.md` — exact-batch-id-confirmed latest-record replacement and next Account rematerialization.
-18. `docs/PAPER_LOOP_CHECKPOINT_V0_1.md` — exact-advance-id-confirmed portable next-account handoff with rematerialization/exposure reconciliation.
-19. `docs/PAPER_LOOP_RESUME_V0_1.md` — exact-checkpoint-id-confirmed checkpoint consumption into the existing manual Paper Cycle engine.
-20. `docs/PAPER_LOOP_INTEGRITY_V0_1.md` — audit-only two-or-more-round lineage, Checkpoint chaining and deterministic replay verification.
-21. `docs/PAPER_LOOP_RUN_PACKAGE_V0_1.md` — portable self-verifying transcript/proof package with per-stage SHA manifest; not execution authority.
-22. `docs/PAPER_RUN_PACKAGE_ARTIFACT_EXPORT_V0_1.md` — verified canonical Run Package export plus manual GitHub Artifact secondary copy; not execution authority.
-23. `docs/LIVE_PAPER_SIMULATION_V0_1.md` — public-live-market-data paper runtime with tick-by-tick lifecycle progress; no private or real order path.
-24. `docs/LIVE_PAPER_RUN_COORDINATOR_V0_1.md` — restartable append-only Live Paper run-step coordination over Local/R2 Run Store; manual-only, no cron or real orders.
-25. `docs/LIVE_PAPER_RUN_RECOVERY_V0_1.md` — persisted-run reconciliation plus missing-result-seal-only repair; no provider replay and no state/tick/step rewrite.
-26. `docs/PAPER_RUN_STORE_V0_1.md` — explicit Local JSON / Cloudflare R2 content-addressed paper-state persistence and read-only object listing.
-27. `docs/PAPER_RUN_CONDITIONAL_WRITE_V0_1.md` — storage-only atomic create-if-absent primitive for future run-slot claims; not wired into Coordinator.
-28. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
-29. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
-30. The exact config and receipt named by the stage being changed.
+4. `docs/EXTERNAL_CAPABILITY_REGISTRY_V0_1.md` — exact-SHA MCP/external-tool candidate inventory with review-only lifecycle and zero runtime authority.
+5. `docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md` — multi-asset attention candidate selector.
+6. `docs/STRATEGY_ROUTER_V0_1.md` — dynamic multi-strategy compatibility router.
+7. `docs/STRATEGY_LIBRARY_V0_1.md` — governed reusable strategy-family registry and lifecycle metadata.
+8. `docs/STRATEGY_FAMILY_VALIDATION_V0_1.md` — cross-asset/cross-regime family generalization review layered on existing Edge Validation.
+9. `docs/STRATEGY_RESEARCH_SCORECARD_V0_1.md` — deterministic research-priority ranking of family evidence; no strategy-selection authority.
+10. `docs/RISK_POSITION_SIZING_V0_1.md` — stop-preserving account-risk and bounded position-sizing research layer.
+11. `docs/PORTFOLIO_ADMISSION_V0_1.md` — explicit-basket total-risk, concentration and strategy-overlap admission gate.
+12. `docs/PAPER_EXECUTION_V0_1.md` — deterministic handoff into the existing Repository Paper Broker after portfolio admission; LONG intent recording only, no automatic/live path.
+13. `docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md` — deterministic paper fills, partial fills, costs and stop/target lifecycle over normalized liquidity bars.
+14. `docs/PAPER_ACCOUNT_POSITION_STATE_V0_1.md` — immutable paper cash/equity/open-position snapshot and Portfolio existing-exposure export.
+15. `docs/PAPER_CYCLE_ORCHESTRATOR_V0_1.md` — manual deterministic account → portfolio → paper-intent preparation; no broker submission.
+16. `docs/PAPER_SUBMISSION_SESSION_V0_1.md` — exact-cycle-id-confirmed complete-basket submission into the in-memory Repository Paper Broker.
+17. `docs/PAPER_LIFECYCLE_BATCH_V0_1.md` — exact-session-id-confirmed complete-basket lifecycle simulation and Account-ready record emission.
+18. `docs/PAPER_ACCOUNT_ADVANCE_V0_1.md` — exact-batch-id-confirmed latest-record replacement and next Account rematerialization.
+19. `docs/PAPER_LOOP_CHECKPOINT_V0_1.md` — exact-advance-id-confirmed portable next-account handoff with rematerialization/exposure reconciliation.
+20. `docs/PAPER_LOOP_RESUME_V0_1.md` — exact-checkpoint-id-confirmed checkpoint consumption into the existing manual Paper Cycle engine.
+21. `docs/PAPER_LOOP_INTEGRITY_V0_1.md` — audit-only two-or-more-round lineage, Checkpoint chaining and deterministic replay verification.
+22. `docs/PAPER_LOOP_RUN_PACKAGE_V0_1.md` — portable self-verifying transcript/proof package with per-stage SHA manifest; not execution authority.
+23. `docs/PAPER_RUN_PACKAGE_ARTIFACT_EXPORT_V0_1.md` — verified canonical Run Package export plus manual GitHub Artifact secondary copy; not execution authority.
+24. `docs/LIVE_PAPER_SIMULATION_V0_1.md` — public-live-market-data paper runtime with tick-by-tick lifecycle progress; no private or real order path.
+25. `docs/LIVE_PAPER_RUN_COORDINATOR_V0_1.md` — restartable append-only Live Paper run-step coordination over Local/R2 Run Store; manual-only, no cron or real orders.
+26. `docs/LIVE_PAPER_RUN_RECOVERY_V0_1.md` — persisted-run reconciliation plus missing-result-seal-only repair; no provider replay and no state/tick/step rewrite.
+27. `docs/PAPER_RUN_STORE_V0_1.md` — explicit Local JSON / Cloudflare R2 content-addressed paper-state persistence and read-only object listing.
+28. `docs/PAPER_RUN_CONDITIONAL_WRITE_V0_1.md` — storage-only atomic create-if-absent primitive for future run-slot claims; not wired into Coordinator.
+29. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
+30. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
+31. The exact config and receipt named by the stage being changed.
 
 ## Current bounded data and Paper stages
 
