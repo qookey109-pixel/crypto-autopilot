@@ -1,0 +1,85 @@
+{
+  "schema": "qookey-external-market-context-sources-v0.1",
+  "status_date": "2026-09-19",
+  "status": "PREPARED_PREFETCHED_EVIDENCE_INGESTION_ONLY",
+  "purpose": "Normalize selected external crypto context sources without granting network or trading authority.",
+  "sources": [
+    {
+      "source_id": "crypto_orderbook_mcp",
+      "upstream_repository": "kukapay/crypto-orderbook-mcp",
+      "upstream_commit_sha": "29a1410482a378e8f49baee289c5a9d3a200074e",
+      "license": "MIT",
+      "role": "market_microstructure",
+      "capabilities": ["bid_depth", "ask_depth", "orderbook_imbalance", "mid_price", "cross_exchange_comparison"],
+      "credential_requirement": "NONE_FOR_PUBLIC_EXCHANGE_MARKET_DATA",
+      "network_capture_authorized": false
+    },
+    {
+      "source_id": "crypto_liquidations_mcp",
+      "upstream_repository": "kukapay/crypto-liquidations-mcp",
+      "upstream_commit_sha": "d9a02cda38bdb0f3556fe9a112997f29c82e1900",
+      "license": "MIT",
+      "role": "liquidation_pressure",
+      "capabilities": ["recent_liquidation_events", "buy_sell_liquidation_notional", "liquidation_event_count"],
+      "credential_requirement": "NONE_FOR_BINANCE_PUBLIC_WEBSOCKET",
+      "network_capture_authorized": false
+    },
+    {
+      "source_id": "pulse_verity",
+      "upstream_repository": "PulseBet/pulse-verity",
+      "upstream_commit_sha": "a81ab1d4b645537c6af62159a940fe1cd614954c",
+      "license": "MIT",
+      "role": "signed_price_crosscheck",
+      "capabilities": ["signed_index_price", "batch_price", "settlement_print", "offline_signature_verification"],
+      "credential_requirement": "OPTIONAL_FOR_SAMPLE_BTC_ETH_SOL_KEY_REQUIRED_FOR_WIDER_ACCESS",
+      "network_capture_authorized": false
+    },
+    {
+      "source_id": "crypto_rss_mcp",
+      "upstream_repository": "kukapay/crypto-rss-mcp",
+      "upstream_commit_sha": "2cc6a514bfe1c028ddf55193dcfa1073ae2ab3fe",
+      "license": "MIT",
+      "role": "news_event_context",
+      "capabilities": ["rss_feed_entries", "keyword_filtering", "opml_feed_catalog"],
+      "credential_requirement": "NONE_FOR_PUBLIC_RSS",
+      "network_capture_authorized": false
+    },
+    {
+      "source_id": "crypto_sentiment_mcp",
+      "upstream_repository": "kukapay/crypto-sentiment-mcp",
+      "upstream_commit_sha": "a002ecef5cdd5351e3dd8e03f50c87ef48e3f7dc",
+      "license": "MIT",
+      "role": "social_sentiment_context",
+      "capabilities": ["sentiment_balance", "social_volume", "social_dominance", "social_shift", "trending_words"],
+      "credential_requirement": "SANTIMENT_API_KEY",
+      "network_capture_authorized": false
+    },
+    {
+      "source_id": "crypto_trending_mcp",
+      "upstream_repository": "kukapay/crypto-trending-mcp",
+      "upstream_commit_sha": "2bc2349ac606e3677f877de32d82a47cd1f6b86d",
+      "license": "MIT",
+      "role": "candidate_discovery_context",
+      "capabilities": ["coingecko_trending_rank", "price_changes", "volume", "market_cap"],
+      "credential_requirement": "NONE_BUT_PLAYWRIGHT_BROWSER_REQUIRED_UPSTREAM",
+      "network_capture_authorized": false
+    }
+  ],
+  "policy": {
+    "prefetched_evidence_ingestion_authorized": true,
+    "network_capture_authorized": false,
+    "mcp_runtime_embedding_authorized": false,
+    "provider_api_key_storage_authorized": false,
+    "external_text_instruction_authority": false,
+    "strategy_router_threshold_change_authorized": false,
+    "daily_opportunity_score_change_authorized": false,
+    "automatic_candidate_generation_authorized": false,
+    "automatic_strategy_selection_authorized": false,
+    "r2_write_authorized": false,
+    "holdout_access_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  }
+}

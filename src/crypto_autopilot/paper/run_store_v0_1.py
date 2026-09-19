@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import tempfile
@@ -56,6 +57,10 @@ class PaperRunStoreReceipt:
     location: str
     bytes: int
     replayed: bool
+
+
+class PaperRunObjectAlreadyExistsError(ValueError):
+    """Raised when an atomic create-if-absent precondition loses the race."""
 
 
 def _canonical_bytes(payload: Mapping[str, object]) -> bytes:
@@ -136,6 +141,47 @@ class LocalPaperRunStore:
         finally:
             if temporary.exists():
                 temporary.unlink()
+
+        return PaperRunStoreReceipt(
+            backend="LOCAL_JSON",
+            kind=kind,
+            object_id=object_id,
+            location=str(destination),
+            bytes=len(body),
+            replayed=False,
+        )
+
+    def put_json_if_absent(
+        self,
+        kind: str,
+        object_id: str,
+        payload: Mapping[str, object],
+    ) -> PaperRunStoreReceipt:
+        """Atomically create one local JSON object and never replay/overwrite it."""
+
+        destination = self._path(kind, object_id)
+        body = _canonical_bytes(payload)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            descriptor = os.open(
+                destination,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+                0o600,
+            )
+        except FileExistsError as exc:
+            raise PaperRunObjectAlreadyExistsError(
+                f"paper run conditional create conflict: {kind}/{object_id}"
+            ) from exc
+
+        try:
+            with os.fdopen(descriptor, "wb") as handle:
+                handle.write(body)
+                handle.flush()
+                os.fsync(handle.fileno())
+        except Exception:
+            if destination.exists():
+                destination.unlink()
+            raise
 
         return PaperRunStoreReceipt(
             backend="LOCAL_JSON",
@@ -228,6 +274,58 @@ class R2PaperRunStore:
             object_id=object_id,
             location=key,
             bytes=receipt.bytes,
+            replayed=False,
+        )
+
+    def put_json_if_absent(
+        self,
+        kind: str,
+        object_id: str,
+        payload: Mapping[str, object],
+    ) -> PaperRunStoreReceipt:
+        """Create one R2 JSON object only when the exact key does not exist."""
+
+        key = self._key(kind, object_id)
+        body = _canonical_bytes(payload)
+        client = getattr(self.store, "client", None)
+        bucket = getattr(self.store, "bucket", None)
+        if client is None or not isinstance(bucket, str) or not bucket:
+            raise ValueError(
+                "R2 paper run conditional create requires the S3-compatible client"
+            )
+
+        sha256 = hashlib.sha256(body).hexdigest()
+        try:
+            client.put_object(
+                Bucket=bucket,
+                Key=key,
+                Body=body,
+                ContentType="application/json",
+                Metadata={
+                    "sha256": sha256,
+                    "paper-run-kind": _clean_component(kind, "kind"),
+                    "paper-run-id": _clean_component(object_id, "object_id"),
+                },
+                IfNoneMatch="*",
+            )
+        except Exception as exc:
+            response_payload = getattr(exc, "response", {}) or {}
+            code = str(response_payload.get("Error", {}).get("Code", ""))
+            status = response_payload.get("ResponseMetadata", {}).get(
+                "HTTPStatusCode"
+            )
+            if code in {"PreconditionFailed", "412"} or status == 412:
+                raise PaperRunObjectAlreadyExistsError(
+                    f"paper run conditional create conflict: {kind}/{object_id}"
+                ) from exc
+            raise
+
+        return PaperRunStoreReceipt(
+            backend="R2_JSON",
+            kind=kind,
+            object_id=object_id,
+            location=key,
+            bytes=len(body),
             replayed=False,
         )
 
