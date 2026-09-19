@@ -69,6 +69,22 @@ class ZecV03DevelopmentContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "exactly 64"):
             validate_zec_v0_3_development_contract(mutated)
 
+    def test_same_size_axis_substitution_fails_closed(self) -> None:
+        mutated = deepcopy(self.config)
+        mutated["candidate_axes"]["macd"][1] = "10/24/8"
+
+        with self.assertRaisesRegex(ValueError, "candidate axes drifted"):
+            validate_zec_v0_3_development_contract(mutated)
+
+    def test_frozen_window_drift_fails_closed(self) -> None:
+        mutated = deepcopy(self.config)
+        mutated["fresh_confirmation_window"]["end_exclusive_utc"] = (
+            "2026-09-17T00:00:00Z"
+        )
+
+        with self.assertRaisesRegex(ValueError, "temporal boundaries drifted"):
+            validate_zec_v0_3_development_contract(mutated)
+
 
 if __name__ == "__main__":
     unittest.main()
