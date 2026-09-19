@@ -4,7 +4,7 @@ import json
 import unittest
 from pathlib import Path
 
-from crypto_autopilot.market_context_external_v0_1 import (
+from crypto_autopilot.research.external_market_context_v0_1 import (
     ExternalMarketContextPolicy,
     build_external_market_context_snapshot,
     external_market_context_policy_from_config,
@@ -201,7 +201,7 @@ class ExternalMarketContextV01Tests(unittest.TestCase):
                         "payload": {
                             "entries": [
                                 {
-                                    "title": "bad\\ncontrol",
+                                    "title": "bad\ncontrol",
                                     "published_ms": 1,
                                 }
                             ]
