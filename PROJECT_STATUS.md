@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-09-18
+Updated: 2026-09-19
 
 Repository `main` is the formal current authority and must be resolved live at read time. This file is the project-stage, governance-compatibility, and retired-workflow index. Exact versioned configs, receipts, immutable run evidence, and merged code remain the detailed authority for each scope.
 
@@ -108,15 +108,14 @@ Tracking: `docs/TECH_DEBT_REGISTER_2026_09_16.md`.
 ## Open work that matters now
 
 - Pionex Validation Materialization V0.2 is **COMPLETE / PASS** on run `35054729471`; this closes the materialization task only, not downstream research gates.
-- PR #336 — older-base Pionex V0.2 status convergence draft; its duplicate receipt and stale base must not be merged as-is.
-- PR #302 — preserve Core100 post-training REJECT diagnostic evidence; old branch code still requires current-main review before any merge decision.
-- PR #305 — older-base convergence proposal; superseded in purpose by merged #322 and later current-operations convergence, but unique content must be checked before closure.
-- PR #306 — Toolkit REST / Cloudflare edge V0.2; rebuild from current main if revived; public deployment remains unauthorized.
-- PR #307 — AI Resource Hub statistical-validation integration; rebuild from current main if revived.
-- PR #315 — Binance/Pionex data-role documentation; compare unique content against current merged architecture before preserving or closing.
-- PRs #166/#167/#168/#199/#249 — preserved legacy salvage drafts, not ready-to-merge work.
+- Core100 remains **Model Quality REJECT** and threshold replay still supports **no threshold change**; Strategy Validation, replacement holdout, Promotion and real trading remain closed.
+- ZEC MACD V0.2 historical evidence is preserved on current main as **execution PASS / strategy evidence REJECT**. No V0.1/V0.2 reexecution authority was revived.
+- ZEC Strategy V0.3 now has a preserved preregistered design plus the reusable Statistical Edge Gate V0.1. The design authorizes no fresh-data read or experiment execution.
+- External Capability Registry candidates have downstream evaluation receipts and a convergence index. Candidate inventory status does not imply runtime approval.
+- Operator messaging now has a provider-neutral offline path: parser -> status resolver -> local CLI for `help`, `status` and `paper_status`; no Telegram/network/secret/trading authority is implied.
+- As of this 2026-09-19 status convergence, GitHub has **zero open pull requests** after preserving useful evidence/design work and closing superseded historical drafts.
 
-Historical CI success on an old branch is not sufficient merge evidence after main advances.
+Historical CI success on an old branch is not sufficient merge evidence after main advances. Any newly opened PR must be evaluated against live `main`.
 
 ## Binding safety and governance
 
