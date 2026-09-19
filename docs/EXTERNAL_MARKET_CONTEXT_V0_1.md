@@ -55,6 +55,10 @@ Each already-fetched row supplies:
 - `available_at_ms`;
 - a source payload.
 
+The builder treats RSS titles and social/trending words as **untrusted external data**.
+They never gain instruction authority, and V0.1 bounds their length and rejects
+control characters.
+
 The builder rejects:
 
 - unsupported sources;
@@ -62,7 +66,9 @@ The builder rejects:
 - wrong-symbol evidence;
 - evidence available after the decision timestamp;
 - evidence claiming availability before observation;
-- malformed source-specific metrics.
+- malformed source-specific metrics;
+- Pulse prints timestamped after the decision time;
+- overlong/control-character external text.
 
 The result is
 `qookey-external-market-context-snapshot-v0.1`.
@@ -160,6 +166,7 @@ Not authorized:
 - network capture;
 - embedded MCP runtime;
 - API-key storage;
+- external text instruction authority;
 - Strategy Router threshold changes;
 - Daily Opportunity score changes;
 - automatic candidate generation;
