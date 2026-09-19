@@ -1,0 +1,102 @@
+{
+  "schema": "qookey-bitget-macd-zec-binance-vision-read-only-completion-v0.2",
+  "status": "COMPLETE_EXECUTION_PASS_RESEARCH_REJECT_NO_SELECTED_CONFIRMATION_POSITIVE",
+  "date": "2026-09-18",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "workflow": {
+    "run_id": 35298599786,
+    "run_attempt": 1,
+    "head_sha": "251206ba3d32c327abe09d225f7e256ddebc46c7",
+    "conclusion": "success"
+  },
+  "artifact": {
+    "id": 10528883728,
+    "name": "bitget-macd-zec-binance-vision-readonly-35298599786-1",
+    "digest": "sha256:207d186881c8a637f2047162b53d3a620bee2202da8a15798cf82b7bb9c3b50b",
+    "report_sha256": "3ad232da5a11392d42872c9b47477bc3517e925deac504197f92f70c3d2c8306"
+  },
+  "source": {
+    "provider": "binance_usdm",
+    "delivery": "binance_vision_public_monthly",
+    "symbol": "ZECUSDT",
+    "interval": "15m",
+    "source_month_start": "2022-08",
+    "source_month_end": "2026-07",
+    "archive_count": 48,
+    "row_count": 140256,
+    "first_time_ms": 1659312000000,
+    "last_time_ms": 1785541500000,
+    "provider_requests_performed": 96,
+    "r2_access_performed": false,
+    "r2_writes_performed": false,
+    "raw_candles_persisted": false
+  },
+  "preregistration": {
+    "source_main_sha": "a0e216a41feaca61433bae9ca93c870a5baea9cc",
+    "plan_sha256": "5e15a0b0dc4330bc439534cca1571b71f6d19564e1007c732d00651a3b7543b6",
+    "candidate_grid_count": 2304,
+    "development_fraction": 0.7,
+    "development_folds": 4,
+    "top_k": 24,
+    "confirmation_result_count": 72,
+    "confirmation_slippage_bps_per_side": [2.0, 5.0, 10.0],
+    "confirmation_used_for_selection": false,
+    "formal_project_holdout_accessed": false
+  },
+  "user_baseline": {
+    "full_period": {
+      "return_pct": -81.27940538,
+      "max_drawdown_pct": 89.71164932,
+      "profit_factor": 0.84596018,
+      "trade_count": 2394,
+      "win_rate": 0.32121972
+    },
+    "confirmation": {
+      "2_bps": {"return_pct": 0.89361327, "max_drawdown_pct": 48.56116685, "profit_factor": 1.00120815, "trade_count": 805},
+      "5_bps": {"return_pct": -23.90878648, "max_drawdown_pct": 55.80370753, "profit_factor": 0.96374115, "trade_count": 805},
+      "10_bps": {"return_pct": -53.10400477, "max_drawdown_pct": 66.66024141, "profit_factor": 0.90263438, "trade_count": 805}
+    }
+  },
+  "selected_candidate_confirmation": {
+    "positive_return_counts": {"2_bps": 0, "5_bps": 0, "10_bps": 0},
+    "positive_at_all_stresses_count": 0,
+    "best_observed_confirmation": {
+      "development_rank": 17,
+      "config": {
+        "fast_period": 12,
+        "slow_period": 30,
+        "signal_period": 7,
+        "stop_loss_fraction": 0.06,
+        "leverage": 3.0,
+        "margin_fraction": 0.1,
+        "risk_cap_fraction": 0.01,
+        "fluctuation_lookback": 5,
+        "min_fluctuation_fraction": 0.012,
+        "taker_fee_bps_per_side": 6.0
+      },
+      "2_bps": {"return_pct": -1.1527418, "max_drawdown_pct": 17.81970908, "profit_factor": 0.99368032, "trade_count": 841},
+      "5_bps": {"return_pct": -9.01936966, "max_drawdown_pct": 20.93200026, "profit_factor": 0.95003209, "trade_count": 841},
+      "10_bps": {"return_pct": -20.75677744, "max_drawdown_pct": 27.07244004, "profit_factor": 0.8829306, "trade_count": 841}
+    }
+  },
+  "interpretation": {
+    "execution_passed": true,
+    "strategy_evidence_passed": false,
+    "reason": "None of the 24 development-selected candidates produced positive return in the confirmation window even at the lowest preregistered 2 bps per-side slippage stress.",
+    "bitget_filter_formula_verified": false,
+    "profitability_claim_authorized": false
+  },
+  "authority": {
+    "reexecution_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "strategy_parameter_change_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
