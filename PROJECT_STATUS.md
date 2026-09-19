@@ -101,7 +101,7 @@ PR #322 merged the first control-plane convergence batch:
 
 The control plane must keep present-tense Current Operations later than historical authority/readiness projections, so dated September 13 `8/10 / Training skipped / PR #292` text and older V0.1 Pionex pending-dispatch text cannot return during deployment.
 
-Remaining P2 debt is non-blocking quality/type/complexity/dependency/security visibility. Large-module refactoring remains deferred until the control plane is stable.
+P2 quality/dependency/security visibility is now established through the non-blocking Quality Visibility V0.2 report, existing review-only Dependabot proposals, and non-blocking CodeQL SARIF artifacts. No semantic type checker or new required security gate has been introduced. Large-module refactoring remains deferred under TD-009.
 
 Tracking: `docs/TECH_DEBT_REGISTER_2026_09_16.md`.
 
