@@ -123,6 +123,7 @@ The repository keeps one read-only change-inspection skill at `.agents/skills/ch
 - [`docs/AUTOMATION_INDEX_V0_1.md`](docs/AUTOMATION_INDEX_V0_1.md) — automation index.
 - [`docs/STRATEGY_INDEX_V0_1.md`](docs/STRATEGY_INDEX_V0_1.md) — Paper baseline and research layers.
 - [`docs/TRADINGAGENTS_RESEARCH_CHALLENGER_V0_1.md`](docs/TRADINGAGENTS_RESEARCH_CHALLENGER_V0_1.md) — challenger contract.
+- [`docs/EXTERNAL_CAPABILITY_REGISTRY_V0_1.md`](docs/EXTERNAL_CAPABILITY_REGISTRY_V0_1.md) — exact-SHA candidate inventory for MCP/external capabilities; candidate-only, no install/runtime authority.
 - Public dashboard: https://qookey109-pixel.github.io/crypto-autopilot/
 
 ## Preserved pre-convergence snapshot
