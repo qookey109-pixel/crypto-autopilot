@@ -146,17 +146,23 @@ Any future move to required CodeQL or Code Scanning upload needs a separate revi
 
 ### TD-009 — Large responsibility concentration in training modules
 
-Status: **DEFERRED**
+Status: **CHARACTERIZATION BASELINE ADDED / REFACTOR DEFERRED**
 
 Observation:
 
-- `training/quality.py` is large enough to merit responsibility review.
+- `training/quality.py` remains large enough to merit responsibility review.
 
-Target:
+Characterization baseline now locks:
 
-- first add characterization tests around current behavior;
-- split responsibilities only after control-plane and Pionex validation work are stable;
-- no behavior-changing rewrite solely for file size.
+- exact V0.5 config/authority-pair validation output;
+- canonical config-path loading and non-canonical fail-closed behavior;
+- V0.3 bootstrap-baseline identity/count/authority invariants;
+- validator input immutability for these governance surfaces;
+- exact byte-level SHA-256 behavior.
+
+The existing broader training-quality suite continues to cover dataset, model, weekly-review, R2-boundary and fail-closed behavior.
+
+No responsibility split is performed by this step. Any future refactor must preserve these characterization tests and existing behavior; no rewrite is justified solely by file size.
 
 ## Explicit non-goals
 
