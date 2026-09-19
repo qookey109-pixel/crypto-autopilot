@@ -1,0 +1,24 @@
+{
+  "schema": "qookey-operator-messaging-policy-v0.1",
+  "status_date": "2026-09-19",
+  "status": "PROVIDER_NEUTRAL_OFFLINE_CONTRACT_ONLY",
+  "read_only_commands": [
+    "help",
+    "status",
+    "paper_status"
+  ],
+  "policy": {
+    "notifications_authorized": true,
+    "read_only_command_requests_authorized": true,
+    "write_command_requests_authorized": false,
+    "automatic_command_execution_authorized": false,
+    "network_delivery_authorized": false,
+    "telegram_bot_runtime_authorized": false,
+    "telegram_user_session_authorized": false,
+    "secret_access_authorized": false,
+    "strategy_router_integration_authorized": false,
+    "portfolio_admission_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  }
+}
