@@ -147,12 +147,25 @@ The allowed synthetic-only descriptive-context contract is implemented in `docs/
 
 This implementation still does **not** call World Monitor, Binance, Pionex, R2 or frozen holdout. It is a synthetic contract proof only, not a live-source integration.
 
-## What comes next
+## External capability registry
 
-A future reviewed version may add an `integration-registry.json` lifecycle such as:
+The previously proposed integration-registry lifecycle now exists as
+`External Capability Registry V0.1`:
 
 ```text
-discovered → candidate → evaluated → approved → active → deprecated
+DISCOVERED → CANDIDATE → EVALUATED → APPROVED → ACTIVE → DEPRECATED
 ```
 
-The evaluation receipts and synthetic research contracts above only record reviewed decisions and bounded contract proofs; they do not create approved/active registry entries. Any adapter execution, automatic PR, recurring schedule, tool installation, provider call, strategy mutation, or trading authority requires a separate reviewed version and explicit authority.
+The first registry contains exact-SHA reviewed MCP/external-tool candidates and
+stops deliberately at `CANDIDATE / REVIEW_REQUIRED`.
+
+See:
+
+- `config/external_capability_registry_v0_1.json`
+- `docs/EXTERNAL_CAPABILITY_REGISTRY_V0_1.md`
+
+This does not upgrade Resource Hub discovery candidates or the new MCP
+candidates into approved/active integrations. Any adapter execution, automatic
+PR, recurring schedule, tool installation, provider call, credential use,
+payment, strategy mutation, or trading authority still requires a separate
+reviewed version and explicit authority.
