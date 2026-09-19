@@ -1,0 +1,100 @@
+{
+  "schema": "qookey-zec-strategy-v0-3-design-status-v0.1",
+  "status_date": "2026-09-18",
+  "status": "DESIGN_PREPARED_NOT_EXECUTED",
+  "base_main": "a0e216a41feaca61433bae9ca93c870a5baea9cc",
+  "motivation": {
+    "v0_2_execution_passed": true,
+    "v0_2_strategy_evidence_passed": false,
+    "v0_2_selected_candidates_positive_at_2_bps": 0,
+    "v0_2_selected_candidates": 24
+  },
+  "hypothesis": {
+    "symbol": "ZECUSDT",
+    "direction": "LONG_ONLY_RESEARCH",
+    "signal_timeframe": "30m",
+    "context_timeframe": "4h",
+    "source_timeframe": "15m",
+    "candidate_count_max": 64,
+    "candidate_axes": {
+      "macd": [
+        "12/26/9",
+        "12/30/7"
+      ],
+      "trend_regime": [
+        "TREND_STRICT",
+        "TREND_BASIC"
+      ],
+      "volatility_filter": [
+        "ATR_FILTER_OFF",
+        "ATR_ROLLING_EXTREME_GUARD"
+      ],
+      "account_risk_fraction": [
+        0.01,
+        0.025,
+        0.05,
+        0.1
+      ],
+      "stop_model": [
+        "VOL_STOP_2ATR_BB_HALF",
+        "VOL_STOP_2_5ATR_BB_HALF"
+      ]
+    },
+    "common_rules": {
+      "maximum_leverage": 3,
+      "averaging_down": false,
+      "martingale": false,
+      "pyramiding": false,
+      "entry_next_30m_open": true,
+      "stop_distance_percentage_cap": null,
+      "stop_distance_source": "max(ATR_multiple, 0.5 * full_bollinger_band_width)",
+      "stop_distance_and_account_risk_separated": true,
+      "target_risk_may_be_leverage_limited": true,
+      "record_target_and_realized_risk": true,
+      "tighten_stop_to_consume_risk_budget": false
+    }
+  },
+  "validation": {
+    "prior_2022_08_through_2026_07_data_role": "DEVELOPMENT_ONLY_ALREADY_SEEN",
+    "fresh_confirmation_start_utc": "2026-08-01T00:00:00Z",
+    "fresh_confirmation_end_exclusive_utc": "2026-09-16T00:00:00Z",
+    "fresh_confirmation_accessed": false,
+    "minimum_realized_trades": 30,
+    "centered_bootstrap_alpha": 0.05,
+    "maximum_edge_decay_fraction": 0.5,
+    "slippage_bps_per_side": {
+      "diagnostic": 2,
+      "primary": 5,
+      "stress": 10
+    },
+    "single_champion_only": true,
+    "confirmation_can_reselect_candidate": false,
+    "formal_project_holdout_accessed": false
+  },
+  "external_sources": {
+    "registry": "research/references/zec-strategy-v0-3-external-sources.json",
+    "fincept_code_vendored": false,
+    "tradingagents_direct_signal": false,
+    "jev_microstructure_used_in_historical_v0_3": false,
+    "anti_gambling_code_vendored": false
+  },
+  "execution": {
+    "performed": false,
+    "provider_requests_performed": 0,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "training_performed": false
+  },
+  "authority": {
+    "fresh_data_read_authorized": false,
+    "strategy_execution_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "source_switch_authorized": false,
+    "holdout_access_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}
