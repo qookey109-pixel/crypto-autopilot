@@ -1,0 +1,125 @@
+{
+  "schema": "external-capability-integration-evaluation-v0.1",
+  "status": "EVALUATED_RESEARCH_ONLY_NOT_APPROVED_FOR_RUNTIME",
+  "evaluated_at": "2026-09-19",
+  "crypto_autopilot_base_main_sha": "2ba47623e579ecc40a00f656d3114dd1659f6b43",
+  "candidate_provenance": {
+    "registry_schema": "qookey-external-capability-registry-v0.1",
+    "capability_id": "tradingcalc_mcp",
+    "candidate_state": "CANDIDATE",
+    "candidate_decision": "REVIEW_REQUIRED"
+  },
+  "upstream": {
+    "repository": "SKalinin909/tradingcalc-mcp",
+    "commit": "ca78963c57cba09d599be3f28363695132b479b9",
+    "version": "2.9.1",
+    "license": "MIT",
+    "archived": false,
+    "transport": "STREAMABLE_HTTP_REMOTE",
+    "documented_tool_count": 31,
+    "anonymous_daily_quota": 20,
+    "free_api_key_daily_quota": 200,
+    "anonymous_runtime_available": true,
+    "optional_bearer_key_available": true,
+    "core_formula_source_present_in_reviewed_repository": false,
+    "canonical_vector_source_present_in_reviewed_repository": false,
+    "upstream_test_execution_performed_by_this_evaluation": false,
+    "external_network_required_for_actual_calculation": true
+  },
+  "evidence_reviewed": [
+    "README.md",
+    "LICENSE",
+    "package.json",
+    "server.json",
+    "examples/risk-agent-wrapper.ts",
+    "repository root at pinned commit"
+  ],
+  "component_evaluation": {
+    "explicit_input_trade_math": {
+      "decision": "CHALLENGER_CROSSCHECK_CANDIDATE",
+      "fit": "HIGH",
+      "notes": [
+        "PnL, break-even, liquidation, position sizing, funding cost, average entry and hedge ratio are useful deterministic-style cross-check surfaces.",
+        "These functions overlap existing Crypto Autopilot risk and execution calculations and must not become a second canonical risk authority.",
+        "A future comparison should use identical synthetic/non-holdout inputs and record discrepancies rather than silently accepting upstream outputs."
+      ]
+    },
+    "local_auditability": {
+      "decision": "INSUFFICIENT_FOR_FORMULA_EQUIVALENCE_PROOF",
+      "fit": "LIMITED",
+      "notes": [
+        "The reviewed repository does not contain the hosted core formula implementation.",
+        "The claimed 35 canonical verification vectors are not available here as independently inspectable source fixtures.",
+        "The deterministic and verification claims are therefore service metadata, not an independently reproduced local proof."
+      ]
+    },
+    "integrated_pre_trade_gate": {
+      "decision": "REJECT_AS_PROJECT_AUTHORITY",
+      "fit": "LOW_FOR_DIRECT_ADMISSION",
+      "notes": [
+        "The example RiskAgent exposes approved/verdict/isSafe/preTradeGate outputs and demonstrates gating execution on them.",
+        "Those outputs embed upstream defaults and thresholds not governed by Crypto Autopilot.",
+        "They must not authorize Portfolio Admission, strategy selection, paper/live execution or real-money orders."
+      ]
+    },
+    "remote_runtime_and_auth": {
+      "decision": "RUNTIME_REQUIRES_SEPARATE_REVIEW",
+      "fit": "MEDIUM",
+      "notes": [
+        "Actual calculator use is hosted over Streamable HTTP or through tradingcalc-sdk.",
+        "Anonymous access is documented as free at 20 calls/day; an optional free bearer key raises the documented quota to 200/day.",
+        "No hosted call or bearer-key use is authorized by this evaluation."
+      ]
+    },
+    "service_self_verification": {
+      "decision": "CHALLENGER_EVIDENCE_ONLY",
+      "fit": "MEDIUM",
+      "notes": [
+        "system.verify is documented to run 35 canonical vectors on the hosted service.",
+        "Without local source for the vectors and implementation, a remote PASS cannot establish independent mathematical equivalence.",
+        "A future runtime receipt may record the result only as upstream challenger evidence."
+      ]
+    },
+    "onchain_and_prediction_market_tools": {
+      "decision": "OUT_OF_SCOPE_FOR_CURRENT_INTEGRATION",
+      "fit": "LOW",
+      "notes": [
+        "The reviewed service also exposes on-chain and Kalshi-oriented tools.",
+        "They are not needed for the current risk cross-check objective and are not activated by this evaluation."
+      ]
+    }
+  },
+  "overall_decision": {
+    "state": "EVALUATED_NOT_APPROVED_FOR_RUNTIME_INTEGRATION",
+    "recommended_scope": "REMOTE_RISK_FORMULA_CHALLENGER_REFERENCE_ONLY",
+    "do_not_replace_project_risk_authority": true,
+    "do_not_use_approved_or_verdict_as_execution_authority": true,
+    "do_not_import_execution_gate_wrapper": true,
+    "do_not_treat_system_verify_as_independent_local_proof": true,
+    "recommended_next_step": "Check whether Crypto Autopilot already has sufficient native deterministic risk-calculation tests. Only if a real gap exists, add a small local synthetic cross-check harness; otherwise stop this branch of expansion rather than duplicating risk code.",
+    "license_note": "MIT permits reuse subject to the applicable license notice if code is copied or derived."
+  },
+  "authority": {
+    "automatic_schedule_authorized": false,
+    "code_import_authorized": false,
+    "runtime_dependency_authorized": false,
+    "mcp_runtime_authorized": false,
+    "external_network_authorized": false,
+    "tradingcalc_endpoint_authorized": false,
+    "bearer_api_key_authorized": false,
+    "adapter_creation_authorized": false,
+    "strategy_router_integration_authorized": false,
+    "daily_opportunity_integration_authorized": false,
+    "portfolio_admission_authorized": false,
+    "execution_gate_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_backtest_admission_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  }
+}
