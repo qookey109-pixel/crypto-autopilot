@@ -1,0 +1,121 @@
+{
+  "schema": "external-capability-integration-evaluation-v0.1",
+  "status": "EVALUATED_RESEARCH_ONLY_NOT_APPROVED_FOR_RUNTIME",
+  "evaluated_at": "2026-09-19",
+  "crypto_autopilot_base_main_sha": "08611512916c4921dc732b26052859b8a701e758",
+  "candidate_provenance": {
+    "registry_schema": "qookey-external-capability-registry-v0.1",
+    "capability_id": "github_official_mcp",
+    "candidate_state": "CANDIDATE",
+    "candidate_decision": "REVIEW_REQUIRED"
+  },
+  "upstream": {
+    "repository": "github/github-mcp-server",
+    "commit": "85598ba6e1256f7ebf4867b95d63b833c4549264",
+    "license": "MIT",
+    "archived": false,
+    "official_github_repository": true,
+    "remote_server_available": true,
+    "local_server_available": true,
+    "oauth_supported": true,
+    "pat_supported": true,
+    "github_app_supported": true,
+    "native_read_only_mode": true,
+    "toolset_filtering": true,
+    "individual_tool_filtering": true,
+    "tool_exclusion_filtering": true,
+    "upstream_runtime_execution_performed_by_this_evaluation": false
+  },
+  "evidence_reviewed": [
+    "README.md",
+    "server.json",
+    "docs/server-configuration.md",
+    "docs/remote-server.md",
+    "pkg/github/tools.go",
+    "repository searches for read-only/toolset behavior"
+  ],
+  "component_evaluation": {
+    "repository_pr_actions_reads": {
+      "decision": "READ_ONLY_DIAGNOSTIC_CANDIDATE",
+      "fit": "HIGH_IF_PROJECT_RUNTIME_NEEDS_GITHUB",
+      "notes": [
+        "Repository content/commit, pull-request read and Actions status/log tools could support operator diagnostics.",
+        "The project already has an established GitHub workflow, so a second runtime should only be added for a concrete unattended/operator requirement."
+      ]
+    },
+    "read_only_mode": {
+      "decision": "REQUIRED_UPPER_BOUND_FOR_ANY_FUTURE_PROJECT_RUNTIME",
+      "fit": "HIGH",
+      "notes": [
+        "The pinned server supports X-MCP-Readonly, /readonly, --read-only and GITHUB_READ_ONLY depending on transport.",
+        "Upstream documents read-only mode as taking precedence over other tool configuration and disabling non-read-only tools."
+      ]
+    },
+    "tool_filtering": {
+      "decision": "REQUIRED_MINIMUM_SURFACE",
+      "fit": "HIGH",
+      "notes": [
+        "The pinned server supports specific toolsets, individual tools and explicit exclusions.",
+        "A future project adapter should expose only the exact repository/PR/Actions read surfaces it needs rather than the default or all toolsets."
+      ]
+    },
+    "write_capabilities": {
+      "decision": "REJECT_FOR_CURRENT_PROJECT_RUNTIME",
+      "fit": "LOW_WITH_CURRENT_NEED",
+      "notes": [
+        "The source inventory contains repository/file, issue, pull-request, workflow and other mutation tools.",
+        "Those capabilities overlap authority already governed by the project's explicit branch/PR/CI workflow."
+      ]
+    },
+    "authentication": {
+      "decision": "SEPARATE_LEAST_PRIVILEGE_BOUNDARY_REQUIRED",
+      "fit": "HIGH_IMPORTANCE",
+      "notes": [
+        "OAuth/PAT/GitHub App permissions remain effective independently of MCP filtering.",
+        "A future integration must combine least-privilege GitHub permissions with MCP read-only/tool allowlisting."
+      ]
+    },
+    "lockdown_mode": {
+      "decision": "OPTIONAL_CONTENT_HARDENING_NOT_AUTHORIZATION",
+      "fit": "MEDIUM",
+      "notes": [
+        "Upstream documents lockdown mode as best-effort prompt-injection/content filtering.",
+        "It is not a security or permission boundary and cannot replace read-only mode or credential scoping."
+      ]
+    }
+  },
+  "overall_decision": {
+    "state": "EVALUATED_NOT_APPROVED_FOR_RUNTIME_INTEGRATION",
+    "recommended_scope": "READ_ONLY_REPO_PR_ACTIONS_DIAGNOSTIC_ALLOWLIST_IF_NEEDED",
+    "do_not_duplicate_existing_github_workflow_without_gap": true,
+    "require_read_only_mode_for_future_runtime": true,
+    "require_least_privilege_credential": true,
+    "require_tool_allowlist": true,
+    "do_not_treat_lockdown_as_authorization": true,
+    "recommended_next_step": "Keep as evaluated reference. Add no project runtime unless a concrete unattended/operator GitHub diagnostic requirement cannot be met by the existing controlled workflow."
+  },
+  "authority": {
+    "github_oauth_authorized": false,
+    "github_pat_authorized": false,
+    "github_app_authorized": false,
+    "mcp_runtime_authorized": false,
+    "external_network_authorized": false,
+    "repository_mutation_authorized": false,
+    "branch_creation_authorized": false,
+    "file_write_authorized": false,
+    "issue_write_authorized": false,
+    "pull_request_write_authorized": false,
+    "pull_request_merge_authorized": false,
+    "workflow_mutation_authorized": false,
+    "release_mutation_authorized": false,
+    "governance_mutation_authorized": false,
+    "secret_access_authorized": false,
+    "strategy_router_integration_authorized": false,
+    "portfolio_admission_authorized": false,
+    "holdout_access_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  }
+}
