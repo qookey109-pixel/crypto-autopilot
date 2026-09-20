@@ -31,7 +31,7 @@ def test_policy_matches_every_repository_cron_exactly() -> None:
     expectations = [expectation_from_config(row) for row in health["workflows"]]
     coverage = validate_schedule_coverage(expectations, ROOT / ".github/workflows")
     assert coverage["complete"] is True
-    assert coverage["scheduled_workflow_count"] == 7
+    assert coverage["scheduled_workflow_count"] == 9
     assert coverage["workflows"] == scheduled
 
 
