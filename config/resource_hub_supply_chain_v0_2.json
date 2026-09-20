@@ -1,0 +1,74 @@
+{
+  "schema": "qookey-resource-hub-supply-chain-policy-v0.2",
+  "status": "AUTHORIZED_READ_ONLY_CHANGE_WATCH_ON_MAIN_MERGE",
+  "source": {
+    "repository": "qookey109-pixel/ai-resource-hub",
+    "ref": "main",
+    "catalog_path": "data/resources.json"
+  },
+  "schedule": {
+    "cron_utc": "13 1 * * *",
+    "timezone": "Asia/Taipei",
+    "local_time": "09:13",
+    "cadence": "DAILY"
+  },
+  "baseline": {
+    "source_commit": "3318a49e784c9a40925f7277e12d2dd55dd79a60",
+    "catalog_blob_sha": "2b10ee6fbbcbd49fab1b635f12d4d3a9a5e7e5c2",
+    "catalog_updated_at": "2026-09-19"
+  },
+  "target_category_weights": {
+    "Finance / Crypto": 60,
+    "Data / Analytics": 28,
+    "Search / Research": 24,
+    "OSINT / Intelligence": 18
+  },
+  "domain_signal_weights": {
+    "crypto": 20,
+    "trading": 20,
+    "investment": 18,
+    "backtest": 18,
+    "risk": 15,
+    "market": 14,
+    "market data": 18,
+    "macro": 14,
+    "forecast": 14,
+    "time-series": 14,
+    "timeseries": 14,
+    "sentiment": 12,
+    "geopolit": 10,
+    "finance": 18,
+    "portfolio": 14,
+    "portfolio management": 18,
+    "asset allocation": 18,
+    "price data": 16,
+    "exchange": 12,
+    "ohlcv": 14,
+    "candles": 12
+  },
+  "weak_domain_signals": [
+    "market",
+    "portfolio"
+  ],
+  "minimum_strong_signals_without_finance_category": 1,
+  "minimum_score": 35,
+  "max_candidates": 50,
+  "safety": {
+    "workflow_dispatch_only": false,
+    "schedule_authorized": true,
+    "public_catalog_read_authorized": true,
+    "automatic_install_authorized": false,
+    "automatic_execution_authorized": false,
+    "automatic_adapter_creation_authorized": false,
+    "automatic_pull_request_authorized": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_strategy_mutation_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
