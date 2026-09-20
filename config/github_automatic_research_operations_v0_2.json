@@ -65,6 +65,20 @@
         "53 3 6,13,20,27 9 *"
       ],
       "scope": "BOUNDED_PIONEX_METADATA_OBSERVABILITY_ONLY"
+    },
+    {
+      "workflow": "resource-hub-supply-chain-v0-2.yml",
+      "cron_utc": [
+        "13 1 * * *"
+      ],
+      "scope": "READ_ONLY_PUBLIC_RESOURCE_HUB_CHANGE_WATCH"
+    },
+    {
+      "workflow": "dashboard-github-pages.yml",
+      "cron_utc": [
+        "43 4 * * *"
+      ],
+      "scope": "NON_AUTHORITATIVE_DASHBOARD_BACKSTOP_CONTENT_HASH_DEDUP"
     }
   ],
   "waiting_not_automatically_unblocked": [
