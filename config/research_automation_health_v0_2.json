@@ -27,8 +27,12 @@
       "active_from_utc": "2026-09-04T02:00:00Z",
       "active_until_utc": "2026-09-12T04:00:00Z",
       "max_age_seconds": 7200,
-      "allowed_events": ["schedule"],
-      "allowed_conclusions": ["success"]
+      "allowed_events": [
+        "schedule"
+      ],
+      "allowed_conclusions": [
+        "success"
+      ]
     },
     {
       "workflow": "research-signal-layer-v0-2.yml",
@@ -36,8 +40,12 @@
       "mode": "continuous",
       "active_from_utc": "2026-08-24T03:47:45Z",
       "max_age_seconds": 108000,
-      "allowed_events": ["schedule"],
-      "allowed_conclusions": ["success"]
+      "allowed_events": [
+        "schedule"
+      ],
+      "allowed_conclusions": [
+        "success"
+      ]
     },
     {
       "workflow": "research-signal-quality-v0-1.yml",
@@ -45,8 +53,12 @@
       "mode": "continuous",
       "active_from_utc": "2026-08-24T00:00:00Z",
       "max_age_seconds": 108000,
-      "allowed_events": ["schedule"],
-      "allowed_conclusions": ["success"]
+      "allowed_events": [
+        "schedule"
+      ],
+      "allowed_conclusions": [
+        "success"
+      ]
     },
     {
       "workflow": "research-automation-health-v0-2.yml",
@@ -54,8 +66,12 @@
       "mode": "continuous",
       "active_from_utc": "2026-09-01T00:00:00Z",
       "max_age_seconds": 14400,
-      "allowed_events": ["schedule"],
-      "allowed_conclusions": ["success"]
+      "allowed_events": [
+        "schedule"
+      ],
+      "allowed_conclusions": [
+        "success"
+      ]
     },
     {
       "workflow": "binance-usdm-detailed-history-v0-1.yml",
@@ -64,8 +80,12 @@
       "active_from_utc": "2026-09-04T02:00:00Z",
       "active_until_utc": "2026-10-01T00:00:00Z",
       "max_age_seconds": 32400,
-      "allowed_events": ["schedule"],
-      "allowed_conclusions": ["success"]
+      "allowed_events": [
+        "schedule"
+      ],
+      "allowed_conclusions": [
+        "success"
+      ]
     },
     {
       "workflow": "binance-usdm-detailed-training-v0-1.yml",
@@ -73,8 +93,13 @@
       "mode": "conditional",
       "active_from_utc": "2026-09-04T02:00:00Z",
       "max_age_seconds": 691200,
-      "allowed_events": ["schedule"],
-      "allowed_conclusions": ["success", "skipped"]
+      "allowed_events": [
+        "schedule"
+      ],
+      "allowed_conclusions": [
+        "success",
+        "skipped"
+      ]
     },
     {
       "workflow": "pionex-alternative-assets-observability-v0-2.yml",
@@ -83,8 +108,38 @@
       "active_from_utc": "2026-09-04T02:00:00Z",
       "active_until_utc": "2026-10-01T00:00:00Z",
       "max_age_seconds": 691200,
-      "allowed_events": ["schedule"],
-      "allowed_conclusions": ["success"]
+      "allowed_events": [
+        "schedule"
+      ],
+      "allowed_conclusions": [
+        "success"
+      ]
+    },
+    {
+      "workflow": "resource-hub-supply-chain-v0-2.yml",
+      "label": "Daily Resource Hub read-only change watch",
+      "mode": "continuous",
+      "active_from_utc": "2026-09-21T00:00:00Z",
+      "max_age_seconds": 108000,
+      "allowed_events": [
+        "schedule"
+      ],
+      "allowed_conclusions": [
+        "success"
+      ]
+    },
+    {
+      "workflow": "dashboard-github-pages.yml",
+      "label": "Daily dashboard projection backstop",
+      "mode": "continuous",
+      "active_from_utc": "2026-09-21T00:00:00Z",
+      "max_age_seconds": 108000,
+      "allowed_events": [
+        "schedule"
+      ],
+      "allowed_conclusions": [
+        "success"
+      ]
     }
   ],
   "authority": {
