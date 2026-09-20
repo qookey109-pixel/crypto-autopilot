@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: live-paper-run-coordinator-v0-1
+  group: live-paper-persistence-v0-1
   cancel-in-progress: false
 
 jobs:
