@@ -1,6 +1,8 @@
 name: Dashboard GitHub Pages
 
 on:
+  schedule:
+    - cron: "43 4 * * *"
   workflow_run:
     workflows:
       - "Pionex Historical Reach Discovery V0.3"
@@ -8,6 +10,9 @@ on:
       - "Pionex Funding History V0.1"
       - "Binance USD-M Crypto Core 100 History V0.1.2"
       - "Research Automation Health V0.2"
+      - "Research Signal Layer V0.2"
+      - "Research Signal Quality V0.1"
+      - "Resource Hub Supply Chain V0.2"
       - "BTC Fixed Sample Simulation V0.1"
     types: [completed]
   push:
@@ -16,6 +21,8 @@ on:
       - "web/**"
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/build_research_calendar_projection.py"
+      - "scripts/build_automation_schedule_projection.py"
+      - "scripts/build_dashboard_content_hash.py"
       - "scripts/build_alternative_assets_projection.py"
       - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
@@ -40,6 +47,10 @@ on:
       - "config/post_window_research_successor_schedule_v0_1.json"
       - "config/github_automatic_research_operations_v0_1.json"
       - "config/research_automation_health_v0_2.json"
+      - "config/automation_schedule_projection_v0_1.json"
+      - "config/resource_hub_supply_chain_v0_2.json"
+      - "config/external_capability_registry_v0_1.json"
+      - "config/zec_strategy_v0_3_development_matrix_v0_1.json"
       - "config/post_window_paper_training_v0_2.json"
       - "config/strategy_edge_validation_v0_1.json"
       - "config/strategy_research_loop_v0_1.json"
@@ -60,6 +71,8 @@ on:
       - "web/**"
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/build_research_calendar_projection.py"
+      - "scripts/build_automation_schedule_projection.py"
+      - "scripts/build_dashboard_content_hash.py"
       - "scripts/build_alternative_assets_projection.py"
       - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
@@ -82,6 +95,10 @@ on:
       - "config/post_window_research_successor_schedule_v0_1.json"
       - "config/github_automatic_research_operations_v0_1.json"
       - "config/research_automation_health_v0_2.json"
+      - "config/automation_schedule_projection_v0_1.json"
+      - "config/resource_hub_supply_chain_v0_2.json"
+      - "config/external_capability_registry_v0_1.json"
+      - "config/zec_strategy_v0_3_development_matrix_v0_1.json"
       - "config/post_window_paper_training_v0_2.json"
       - "config/strategy_edge_validation_v0_1.json"
       - "config/strategy_research_loop_v0_1.json"
@@ -108,6 +125,8 @@ concurrency:
 
 jobs:
   build:
+    outputs:
+      deploy_required: ${{ steps.content-hash.outputs.deploy_required }}
     if: >-
       github.event_name != 'workflow_run' ||
       (github.event.workflow_run.head_branch == 'main' &&
@@ -153,6 +172,8 @@ jobs:
             --output _site/data/dashboard.json
           python scripts/build_research_calendar_projection.py \
             --output _site/data/research-calendar.json
+          python scripts/build_automation_schedule_projection.py \
+            --output _site/data/operations-schedule.json
           PYTHONPATH=src python scripts/build_alternative_assets_projection.py \
             --output _site/data/alternative-assets.json
           python scripts/apply_dashboard_latest_authority.py \
@@ -180,6 +201,7 @@ jobs:
 
           data = json.loads(Path('_site/data/dashboard.json').read_text(encoding='utf-8'))
           calendar = json.loads(Path('_site/data/research-calendar.json').read_text(encoding='utf-8'))
+          operations = json.loads(Path('_site/data/operations-schedule.json').read_text(encoding='utf-8'))
           evidence = json.loads(Path('_site/data/research-evidence.json').read_text(encoding='utf-8'))
           strategy = json.loads(Path('_site/data/strategy.json').read_text(encoding='utf-8'))
           alternative = json.loads(Path('_site/data/alternative-assets.json').read_text(encoding='utf-8'))
@@ -272,6 +294,16 @@ jobs:
           assert calendar['authority'] is False
           assert calendar['safetyBoundary']['backtestAdmissionAuthorized'] is False
           datetime.fromisoformat(calendar['projectionGeneratedAtUtc'].replace('Z', '+00:00'))
+          assert operations['authority'] is False
+          assert operations['schema'] == 'qookey-automation-schedule-projection-v0.1'
+          assert operations['sourceStatus']['resourceHub']['state'] == (
+              'SCHEDULED_READ_ONLY_CHANGE_WATCH'
+          )
+          assert operations['sourceStatus']['externalCapabilityRegistry']['candidateCount'] == 10
+          assert operations['sourceStatus']['zecV0_3']['expectedCells'] == 256
+          assert operations['sourceStatus']['zecV0_3']['completedCells'] == 0
+          assert all(value is False for value in operations['safetyBoundary'].values())
+          datetime.fromisoformat(operations['projectionGeneratedAtUtc'].replace('Z', '+00:00'))
           assert evidence['authority'] is False
           assert evidence['positions'] == []
           assert evidence['backtests'] == []
@@ -334,6 +366,29 @@ jobs:
           assert 'current-operations.js?v=current-ops-v0-3' in html
           PY
 
+      - name: Build and compare business content hash
+        id: content-hash
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/build_dashboard_content_hash.py \
+            --site _site \
+            --output _site/data/content-hash.txt \
+            --manifest _site/data/content-manifest.json
+          deploy_required=true
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            remote_hash="$(
+              curl --fail --silent --show-error \
+                "https://qookey109-pixel.github.io/crypto-autopilot/data/content-hash.txt" \
+                2>/dev/null || true
+            )"
+            local_hash="$(tr -d '\r\n' < _site/data/content-hash.txt)"
+            if [[ -n "${remote_hash}" && "${remote_hash}" == "${local_hash}" ]]; then
+              deploy_required=false
+            fi
+          fi
+          echo "deploy_required=${deploy_required}" >> "${GITHUB_OUTPUT}"
+
       - name: Upload PR build evidence
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -344,13 +399,13 @@ jobs:
           if-no-files-found: error
 
       - name: Upload GitHub Pages artifact
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.content-hash.outputs.deploy_required == 'true'
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
           path: _site
 
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && needs.build.outputs.deploy_required == 'true'
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
