@@ -104,9 +104,9 @@ def test_effective_registration_receipt_remains_historical_after_v012_retirement
 
 def test_status_and_dashboard_project_effective_post_merge_lineage() -> None:
     status = STATUS.read_text(encoding="utf-8")
-    assert "V0.10 MID-WINDOW SCHEDULE RE-REGISTRATION HISTORICAL EFFECTIVE" in status
+    assert "V0.10 FINAL ATOMIC METADATA CAPTURE CUTOVER EFFECTIVE" in status
+    assert "V0.10 GITHUB-HOSTED SCHEDULE RETIRED" in status
     assert "PR #201 DRAFT / NOT EFFECTIVE" not in status
-    assert "V0.10 PIONEX PERP QUERY EFFECTIVE" in status
     assert "PROPOSED IN PR #210 / NOT EFFECTIVE" not in status
 
     lineage = dashboard_authority.validate_render_lineage()
