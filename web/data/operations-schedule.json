@@ -1,0 +1,356 @@
+{
+  "schema": "qookey-automation-schedule-projection-v0.1",
+  "authority": false,
+  "timezone": "Asia/Taipei",
+  "projectionGeneratedAtUtc": null,
+  "summary": {
+    "scheduledJobCount": 8,
+    "waitingAuthorityCount": 3,
+    "plannedNotScheduledCount": 5,
+    "core100HistoryStatus": "COMPLETE",
+    "core100HistoryRetirementPending": true,
+    "zecDevelopmentExpectedCells": 256,
+    "zecDevelopmentCompletedCells": 0
+  },
+  "sourceStatus": {
+    "resourceHub": {
+      "state": "SCHEDULED_READ_ONLY_CHANGE_WATCH",
+      "baselineCommit": "3318a49e784c9a40925f7277e12d2dd55dd79a60",
+      "catalogUpdatedAt": "2026-09-19",
+      "automaticPullRequestAuthorized": false,
+      "automaticExecutionAuthorized": false
+    },
+    "externalCapabilityRegistry": {
+      "state": "CANDIDATE_REGISTRY_ONLY",
+      "candidateCount": 10,
+      "runtimeExecutionAuthorized": false,
+      "automaticInstallAuthorized": false
+    },
+    "zecV0_3": {
+      "state": "WAITING_EXECUTION_AUTHORITY",
+      "candidateCount": 64,
+      "foldCount": 4,
+      "expectedCells": 256,
+      "completedCells": 0,
+      "freshConfirmationAccessAuthorized": false
+    }
+  },
+  "items": [
+    {
+      "id": "resource-hub-change-watch-v0-2",
+      "title": "外部資源追蹤",
+      "workflow": ".github/workflows/resource-hub-supply-chain-v0-2.yml",
+      "trigger": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "expected_crons": [
+        "13 1 * * *"
+      ],
+      "local_schedule": "每日 09:13",
+      "dependency_ids": [],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": 97200,
+      "status": "SCHEDULED_READ_ONLY",
+      "authority_link": "config/resource_hub_supply_chain_v0_2.json",
+      "detail": "只讀 AI Resource Hub 公開 catalog；source commit 不變時不重建候選，變更時仍只產生 REVIEW_REQUIRED artifact。"
+    },
+    {
+      "id": "research-signal-v0-2",
+      "title": "Research Signal",
+      "workflow": ".github/workflows/research-signal-layer-v0-2.yml",
+      "trigger": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "expected_crons": [
+        "17 2 * * *"
+      ],
+      "local_schedule": "每日 10:17",
+      "dependency_ids": [],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": 97200,
+      "status": "ACTIVE",
+      "authority_link": "config/research_signal_layer_v0_2.json",
+      "detail": "沿用既有核准資料範圍，研究輸出不取得模型晉升或交易 authority。"
+    },
+    {
+      "id": "research-signal-quality-v0-1",
+      "title": "Signal Quality",
+      "workflow": ".github/workflows/research-signal-quality-v0-1.yml",
+      "trigger": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "expected_crons": [
+        "47 2 * * *"
+      ],
+      "local_schedule": "每日 10:47 補查",
+      "dependency_ids": [
+        "research-signal-v0-2"
+      ],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": 97200,
+      "status": "ACTIVE_BACKSTOP",
+      "authority_link": "config/research_signal_quality_v0_1.json",
+      "detail": "目前仍由 10:47 cron 補查；事件式跟隨上游完成尚未在本批啟用。"
+    },
+    {
+      "id": "context-forward-capture-v0-1",
+      "title": "外部 Context",
+      "workflow": ".github/workflows/context-forward-capture-execution-v0-1.yml",
+      "trigger": [
+        "workflow_dispatch"
+      ],
+      "expected_crons": [],
+      "local_schedule": "未排程",
+      "dependency_ids": [
+        "research-signal-v0-2"
+      ],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": null,
+      "status": "WAITING_SCHEDULE_AUTHORITY",
+      "authority_link": "config/context_forward_capture_execution_v0_1.json",
+      "detail": "現行 authority 是 one-shot/manual；每日 11:13 需另開新版 authority，不能直接把既有 false 改成 true。"
+    },
+    {
+      "id": "live-paper-hourly-v0-2",
+      "title": "多資產掃描與 Paper",
+      "workflow": ".github/workflows/live-paper-run-coordinator-v0-1.yml",
+      "trigger": [
+        "workflow_dispatch"
+      ],
+      "expected_crons": [],
+      "local_schedule": "目標每小時 :23",
+      "dependency_ids": [],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": null,
+      "status": "WAITING_AUTHORITY",
+      "authority_link": "config/live_paper_run_coordinator_v0_1.json",
+      "detail": "目前只有手動 Live Paper coordinator；每小時候選掃描與 NO_TRADE 排程仍等待新版 authority。"
+    },
+    {
+      "id": "automation-health-v0-2",
+      "title": "健康與排程檢查",
+      "workflow": ".github/workflows/research-automation-health-v0-2.yml",
+      "trigger": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "expected_crons": [
+        "57 */2 * * *"
+      ],
+      "local_schedule": "每兩小時 :57",
+      "dependency_ids": [],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": 10800,
+      "status": "ACTIVE",
+      "authority_link": "config/research_automation_health_v0_2.json",
+      "detail": "只以合法自動事件判斷執行 freshness；依賴與業務結果分開顯示。"
+    },
+    {
+      "id": "dashboard-pages-projection",
+      "title": "網站投影與補查",
+      "workflow": ".github/workflows/dashboard-github-pages.yml",
+      "trigger": [
+        "push",
+        "pull_request",
+        "workflow_run",
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "expected_crons": [
+        "43 4 * * *"
+      ],
+      "local_schedule": "上游完成後 + 每日 12:43 補查",
+      "dependency_ids": [],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": 90000,
+      "status": "ACTIVE_CONTENT_HASH_DEDUP",
+      "authority_link": ".github/workflows/dashboard-github-pages.yml",
+      "detail": "網站仍是 authority=false 投影；業務內容 hash 相同時不重複部署。"
+    },
+    {
+      "id": "core100-history-v0-1-2",
+      "title": "Core100 History",
+      "workflow": ".github/workflows/binance-usdm-detailed-history-v0-1.yml",
+      "trigger": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "expected_crons": [
+        "23 */2 9-30 9 *"
+      ],
+      "local_schedule": "九月偶數小時 :23",
+      "dependency_ids": [],
+      "active_from": "2026-09-09T00:00:00Z",
+      "active_until": "2026-10-01T00:00:00Z",
+      "freshness_seconds": null,
+      "status": "COMPLETE_CRON_RETIREMENT_PENDING",
+      "authority_link": "config/binance_usdm_detailed_history_v0_1_2.json",
+      "detail": "10/10 已完成；正式移除抓取 cron 仍需獨立 retirement PR，網站不得把 cron 存在誤認為資料未完成。"
+    },
+    {
+      "id": "core100-training-v0-1-2",
+      "title": "Core100 Training",
+      "workflow": ".github/workflows/binance-usdm-detailed-training-v0-1.yml",
+      "trigger": [
+        "schedule",
+        "workflow_dispatch",
+        "push"
+      ],
+      "expected_crons": [
+        "37 4 * * 0"
+      ],
+      "local_schedule": "每週日 12:37",
+      "dependency_ids": [
+        "core100-history-v0-1-2"
+      ],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": 691200,
+      "status": "SCHEDULED_NEEDS_FINGERPRINT_DEDUPE",
+      "authority_link": "config/binance_usdm_detailed_history_v0_1_2.json",
+      "detail": "資料已完成；訓練前比較實驗指紋的 NO_CHANGE 去重仍是後續 P1。"
+    },
+    {
+      "id": "pionex-alternative-observability-v0-2",
+      "title": "Pionex 商品觀測",
+      "workflow": ".github/workflows/pionex-alternative-assets-observability-v0-2.yml",
+      "trigger": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "expected_crons": [
+        "53 2 4 9 *",
+        "53 3 6,13,20,27 9 *"
+      ],
+      "local_schedule": "原核准九月觀測窗",
+      "dependency_ids": [],
+      "active_from": "2026-09-04T02:00:00Z",
+      "active_until": "2026-10-01T00:00:00Z",
+      "freshness_seconds": null,
+      "status": "ACTIVE_UNTIL_ORIGINAL_EXPIRY",
+      "authority_link": "config/pionex_alternative_assets_observability_v0_2.json",
+      "detail": "維持原有效期間；期限後續接需另行審核。"
+    },
+    {
+      "id": "external-tool-evaluation-weekly",
+      "title": "外部工具評估",
+      "workflow": null,
+      "trigger": [],
+      "expected_crons": [],
+      "local_schedule": "目標每週一 13:13",
+      "dependency_ids": [
+        "resource-hub-change-watch-v0-2"
+      ],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": null,
+      "status": "PLANNED_NOT_SCHEDULED",
+      "authority_link": "config/external_capability_registry_v0_1.json",
+      "detail": "只重開有來源變更或能力缺口的候選；自動深度評估與提案 PR 尚未啟用。"
+    },
+    {
+      "id": "shadow-comparison-weekly",
+      "title": "Shadow 比較",
+      "workflow": null,
+      "trigger": [],
+      "expected_crons": [],
+      "local_schedule": "目標每週三 14:13",
+      "dependency_ids": [],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": null,
+      "status": "PLANNED_NOT_SCHEDULED",
+      "authority_link": "config/binance_spot_shadow_v0_6.json",
+      "detail": "僅可使用已核准且時間／來源可比的證據；本批不新增執行。"
+    },
+    {
+      "id": "maintenance-weekly",
+      "title": "維護檢查",
+      "workflow": null,
+      "trigger": [],
+      "expected_crons": [],
+      "local_schedule": "目標每週五 13:13",
+      "dependency_ids": [],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": null,
+      "status": "PLANNED_NOT_SCHEDULED",
+      "authority_link": "PROJECT_STATUS.md",
+      "detail": "依賴、安全報告、artifact 容量與來源可用性後續整合。"
+    },
+    {
+      "id": "weekly-handoff",
+      "title": "週報與 Handoff 提案",
+      "workflow": null,
+      "trigger": [],
+      "expected_crons": [],
+      "local_schedule": "目標每週日 18:13",
+      "dependency_ids": [],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": null,
+      "status": "PLANNED_NOT_SCHEDULED",
+      "authority_link": "PROJECT_STATUS.md",
+      "detail": "彙整完成、失敗、等待、待審與下一步；本批僅顯示目標。"
+    },
+    {
+      "id": "monthly-terms-review",
+      "title": "額度與條款複查",
+      "workflow": null,
+      "trigger": [],
+      "expected_crons": [],
+      "local_schedule": "目標每月 1 日 14:43",
+      "dependency_ids": [],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": null,
+      "status": "PLANNED_NOT_SCHEDULED",
+      "authority_link": "PROJECT_STATUS.md",
+      "detail": "驗證零成本條件與規則到期日；本批不增加付費服務。"
+    },
+    {
+      "id": "zec-v0-3-development",
+      "title": "ZEC V0.3 Development",
+      "workflow": null,
+      "trigger": [],
+      "expected_crons": [],
+      "local_schedule": "新 authority 合併後一次性",
+      "dependency_ids": [],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": null,
+      "status": "WAITING_EXECUTION_AUTHORITY",
+      "authority_link": "config/zec_strategy_v0_3_development_matrix_v0_1.json",
+      "detail": "64 candidates × 4 folds = 256 cells；real historical development execution 仍鎖定。"
+    }
+  ],
+  "sourceAuthorities": [
+    "config/automation_schedule_projection_v0_1.json",
+    "config/resource_hub_supply_chain_v0_2.json",
+    "config/external_capability_registry_v0_1.json",
+    "research/status/current-operations-v0-3.json",
+    "config/zec_strategy_v0_3_development_matrix_v0_1.json"
+  ],
+  "safetyBoundary": {
+    "automaticActivationAuthorized": false,
+    "providerAccessAuthorized": false,
+    "r2ReadAuthorized": false,
+    "r2WriteAuthorized": false,
+    "holdoutAccessAuthorized": false,
+    "sourceSwitchAuthorized": false,
+    "automaticModelPromotionAuthorized": false,
+    "formalTradePlanAuthorized": false,
+    "realMoneyOrderAuthorized": false,
+    "liveTradingAuthorized": false
+  }
+}
