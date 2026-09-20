@@ -27,28 +27,31 @@ The engine supports:
 - deterministic robust-first diagnostic ranking;
 - local-neighbor enumeration.
 
-## Important selection boundary
+## Development selection boundary
 
-The preregistered design says the development champion must satisfy a
-stable-neighbor rule, but neither the ZEC design nor the general parameter-sweep
-framework freezes the required neighbor count or allowed worst-fold metric drop.
+The remaining selection ambiguity is now closed by
+`config/zec_strategy_v0_3_selection_policy_v0_1.json`.
 
-Therefore this implementation intentionally reports:
+Before any real V0.3 development matrix is executed, the policy freezes:
 
-`BLOCKED_STABLE_NEIGHBOR_POLICY_NOT_FROZEN`
+- at least 30 realized trades in every development fold;
+- worst-fold return strictly above 0%;
+- robust-first ranking by worst return, median return, drawdown, trade count,
+  then deterministic candidate id;
+- at least two independently eligible adjacent neighbors;
+- each stable neighbor must retain at least 75% of the selected leader's
+  worst-fold return.
 
-It may expose a deterministic **diagnostic leader**, but it must not label that
-candidate a frozen champion.
+The raw ranking object remains diagnostic-only. The separate
+`select_zec_v0_3_development_champion(...)` step applies the frozen policy and
+returns one of:
 
-The ranking order is diagnostic only:
+- `DEVELOPMENT_CHAMPION_FROZEN`;
+- `ISOLATED_DEVELOPMENT_PEAK_REJECTED`;
+- `NO_ELIGIBLE_DEVELOPMENT_CANDIDATE`.
 
-1. highest worst-fold return;
-2. highest median-fold return;
-3. lower worst-fold drawdown;
-4. higher total trade count;
-5. deterministic candidate id.
-
-No profitability threshold is invented.
+Fresh confirmation is never used for development selection and a failed
+selection must not silently fall through to the next-ranked candidate.
 
 ## Execution authority
 
