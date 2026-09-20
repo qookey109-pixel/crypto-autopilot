@@ -131,8 +131,8 @@ def build_candidate_registry(
     if minimum_strong_signals < 1:
         raise ValueError("minimum_strong_signals_without_finance_category must be >= 1")
 
+    policy_schema = str(policy.get("schema") or "")
     required_false = (
-        "schedule_authorized",
         "automatic_install_authorized",
         "automatic_execution_authorized",
         "automatic_adapter_creation_authorized",
@@ -150,8 +150,21 @@ def build_candidate_registry(
     enabled = [name for name in required_false if safety.get(name) is not False]
     if enabled:
         raise ValueError(f"read-only safety boundary failed: {enabled}")
-    if safety.get("workflow_dispatch_only") is not True:
-        raise ValueError("workflow_dispatch_only must remain true in V0.1")
+
+    if policy_schema == "qookey-resource-hub-supply-chain-policy-v0.1.1":
+        if safety.get("workflow_dispatch_only") is not True:
+            raise ValueError("workflow_dispatch_only must remain true in V0.1")
+        if safety.get("schedule_authorized") is not False:
+            raise ValueError("V0.1 schedule_authorized must remain false")
+    elif policy_schema == "qookey-resource-hub-supply-chain-policy-v0.2":
+        if safety.get("workflow_dispatch_only") is not False:
+            raise ValueError("V0.2 workflow_dispatch_only must be false")
+        if safety.get("schedule_authorized") is not True:
+            raise ValueError("V0.2 schedule_authorized must be true")
+        if safety.get("public_catalog_read_authorized") is not True:
+            raise ValueError("V0.2 public catalog read must be authorized")
+    else:
+        raise ValueError(f"unsupported Resource Hub supply-chain policy schema: {policy_schema}")
 
     minimum_score = int(policy.get("minimum_score", 35))
     max_candidates = int(policy.get("max_candidates", 50))
