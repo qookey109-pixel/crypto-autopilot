@@ -17,11 +17,16 @@ from crypto_autopilot.research.zec_v0_3_development_runner import (
     evaluate_zec_v0_3_candidate_fold,
     rank_zec_v0_3_development_results,
     run_zec_v0_3_development_matrix,
+    select_zec_v0_3_development_champion,
+)
+from crypto_autopilot.research.zec_v0_3_selection_policy import (
+    validate_zec_v0_3_selection_policy,
 )
 
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "config" / "zec_strategy_v0_3_development_matrix_v0_1.json"
+SELECTION_POLICY = ROOT / "config" / "zec_strategy_v0_3_selection_policy_v0_1.json"
 FIFTEEN_MINUTES_MS = 15 * 60 * 1000
 FOUR_HOURS_MS = 4 * 60 * 60 * 1000
 
@@ -197,10 +202,7 @@ class ZecV03OfflineDevelopmentRunnerTests(unittest.TestCase):
         self.assertEqual(summaries[0].candidate_id, candidates[1].candidate_id)
         self.assertEqual(ranking.diagnostic_leader_id, candidates[1].candidate_id)
         self.assertFalse(ranking.champion_frozen)
-        self.assertEqual(
-            ranking.selection_status,
-            "BLOCKED_STABLE_NEIGHBOR_POLICY_NOT_FROZEN",
-        )
+        self.assertEqual(ranking.selection_status, "DIAGNOSTIC_RANKING_ONLY")
         self.assertFalse(ranking.fresh_confirmation_accessed)
         self.assertFalse(ranking.live_trading_authorized)
 
@@ -210,6 +212,135 @@ class ZecV03OfflineDevelopmentRunnerTests(unittest.TestCase):
                 fold_ids=fold_ids,
                 results=rows[:-1],
             )
+
+
+    def test_frozen_selection_policy_rejects_isolated_peak(self) -> None:
+        policy_payload = json.loads(SELECTION_POLICY.read_text(encoding="utf-8"))
+        policy, policy_sha = validate_zec_v0_3_selection_policy(policy_payload)
+        fold_ids = ("fold-a", "fold-b")
+        rows = []
+        for candidate in self.candidates:
+            base = 0.5
+            if candidate.candidate_id == "zec-v0-3-01":
+                base = 4.0
+            rows.extend(
+                (
+                    _matrix_result(
+                        candidate.candidate_id,
+                        fold_ids[0],
+                        return_pct=base,
+                        drawdown=5.0,
+                        trades=40,
+                    ),
+                    _matrix_result(
+                        candidate.candidate_id,
+                        fold_ids[1],
+                        return_pct=base,
+                        drawdown=5.5,
+                        trades=40,
+                    ),
+                )
+            )
+
+        selection = select_zec_v0_3_development_champion(
+            candidates=self.candidates,
+            fold_ids=fold_ids,
+            results=tuple(rows),
+            policy=policy,
+            policy_sha256=policy_sha,
+        )
+
+        self.assertEqual(selection.status, "ISOLATED_DEVELOPMENT_PEAK_REJECTED")
+        self.assertIsNone(selection.selected_candidate_id)
+        self.assertFalse(selection.champion_frozen)
+        self.assertFalse(selection.fresh_confirmation_accessed)
+        self.assertFalse(selection.formal_holdout_accessed)
+        self.assertFalse(selection.live_trading_authorized)
+
+    def test_frozen_selection_policy_can_freeze_stable_development_champion(self) -> None:
+        policy_payload = json.loads(SELECTION_POLICY.read_text(encoding="utf-8"))
+        policy, policy_sha = validate_zec_v0_3_selection_policy(policy_payload)
+        fold_ids = ("fold-a", "fold-b")
+        rows = []
+        special = {
+            "zec-v0-3-01": (4.0, 5.0),
+            "zec-v0-3-02": (3.4, 4.1),
+            "zec-v0-3-05": (3.2, 3.8),
+        }
+        for candidate in self.candidates:
+            fold_returns = special.get(candidate.candidate_id, (0.5, 0.6))
+            rows.extend(
+                (
+                    _matrix_result(
+                        candidate.candidate_id,
+                        fold_ids[0],
+                        return_pct=fold_returns[0],
+                        drawdown=5.0,
+                        trades=40,
+                    ),
+                    _matrix_result(
+                        candidate.candidate_id,
+                        fold_ids[1],
+                        return_pct=fold_returns[1],
+                        drawdown=5.5,
+                        trades=40,
+                    ),
+                )
+            )
+
+        selection = select_zec_v0_3_development_champion(
+            candidates=self.candidates,
+            fold_ids=fold_ids,
+            results=tuple(rows),
+            policy=policy,
+            policy_sha256=policy_sha,
+        )
+
+        self.assertEqual(selection.status, "DEVELOPMENT_CHAMPION_FROZEN")
+        self.assertEqual(selection.selected_candidate_id, "zec-v0-3-01")
+        self.assertTrue(selection.champion_frozen)
+        self.assertIn("zec-v0-3-02", selection.stable_neighbor_ids)
+        self.assertIn("zec-v0-3-05", selection.stable_neighbor_ids)
+        self.assertGreaterEqual(len(selection.stable_neighbor_ids), 2)
+        self.assertFalse(selection.fresh_confirmation_accessed)
+        self.assertFalse(selection.formal_holdout_accessed)
+        self.assertFalse(selection.live_trading_authorized)
+
+    def test_selection_policy_requires_30_trades_in_every_fold(self) -> None:
+        policy_payload = json.loads(SELECTION_POLICY.read_text(encoding="utf-8"))
+        policy, policy_sha = validate_zec_v0_3_selection_policy(policy_payload)
+        fold_ids = ("fold-a", "fold-b")
+        rows = []
+        for candidate in self.candidates:
+            rows.extend(
+                (
+                    _matrix_result(
+                        candidate.candidate_id,
+                        fold_ids[0],
+                        return_pct=2.0,
+                        drawdown=4.0,
+                        trades=29,
+                    ),
+                    _matrix_result(
+                        candidate.candidate_id,
+                        fold_ids[1],
+                        return_pct=2.0,
+                        drawdown=4.0,
+                        trades=40,
+                    ),
+                )
+            )
+
+        selection = select_zec_v0_3_development_champion(
+            candidates=self.candidates,
+            fold_ids=fold_ids,
+            results=tuple(rows),
+            policy=policy,
+            policy_sha256=policy_sha,
+        )
+
+        self.assertEqual(selection.status, "NO_ELIGIBLE_DEVELOPMENT_CANDIDATE")
+        self.assertFalse(selection.champion_frozen)
 
     def test_repository_contract_blocks_real_development_execution(self) -> None:
         with self.assertRaisesRegex(
