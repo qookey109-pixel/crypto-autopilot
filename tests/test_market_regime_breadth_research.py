@@ -74,15 +74,17 @@ def test_fixed_universe_breadth_is_equal_weight_and_causal() -> None:
 
 def test_breadth_fails_closed_on_misaligned_market() -> None:
     markets = {f"ALT{index}USDT": _candles(20.0 + index, 0.2) for index in range(20)}
-    shifted = list(markets["ALT0USDT"])
-    shifted[-1] = Candle(
-        time_ms=shifted[-1].time_ms + STEP,
-        open=shifted[-1].open,
-        high=shifted[-1].high,
-        low=shifted[-1].low,
-        close=shifted[-1].close,
-        volume=shifted[-1].volume,
-    )
+    shifted = [
+        Candle(
+            time_ms=candle.time_ms + STEP,
+            open=candle.open,
+            high=candle.high,
+            low=candle.low,
+            close=candle.close,
+            volume=candle.volume,
+        )
+        for candle in markets["ALT0USDT"]
+    ]
     markets["ALT0USDT"] = tuple(shifted)
 
     with pytest.raises(ValueError, match="aligned timestamp grid"):
