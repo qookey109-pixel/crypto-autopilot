@@ -124,9 +124,9 @@ def test_workflows_use_constrained_installs_main_guard_and_shared_lock() -> None
 
     for workflow in (coordinator, recovery):
         assert "requirements/ci-constraints.txt" in workflow
-        assert 'test "\${GITHUB_REF}" = "refs/heads/main"' in workflow
+        assert 'test "${GITHUB_REF}" = "refs/heads/main"' in workflow
         assert "group: live-paper-persistence-v0-1" in workflow
 
-    assert '--input "\${{ inputs.input_path }}"' not in coordinator
+    assert '--input "${{ inputs.input_path }}"' not in coordinator
     assert "research/inputs/live-paper" in coordinator
-    assert 'INPUT_PATH: \${{ inputs.input_path }}' in coordinator
+    assert 'INPUT_PATH: ${{ inputs.input_path }}' in coordinator
