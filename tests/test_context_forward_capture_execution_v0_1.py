@@ -125,7 +125,7 @@ class ContextForwardCaptureExecutionV01Tests(unittest.TestCase):
         self.assertFalse(receipt["holdout_access_authorized"])
         self.assertFalse(receipt["live_trading_authorized"])
 
-    def test_new_manual_workflow_is_classified_without_changing_cron_count(self) -> None:
+    def test_manual_workflow_stays_unscheduled_while_batch2_crons_are_classified(self) -> None:
         convergence = json.loads(CONVERGENCE.read_text(encoding="utf-8"))
         groups = convergence["workflow_groups"]
         classified = {
@@ -141,7 +141,7 @@ class ContextForwardCaptureExecutionV01Tests(unittest.TestCase):
             for item in values
             if isinstance(item, dict) and item.get("cron_utc")
         ]
-        self.assertEqual(len(cron_entries), 7)
+        self.assertEqual(len(cron_entries), 9)
 
 
 if __name__ == "__main__":
