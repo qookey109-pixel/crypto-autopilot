@@ -12,18 +12,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: live-paper-run-coordinator-v0-1-${{ github.ref }}
+  group: live-paper-persistence-v0-1
   cancel-in-progress: false
 
 jobs:
   run-one-step:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-      R2_BUCKET: ${{ secrets.R2_BUCKET }}
-      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -33,28 +28,54 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install package
-        run: python -m pip install -e .
+      - name: Install constrained package
+        run: python -m pip install -c requirements/ci-constraints.txt .
 
-      - name: Validate input path
+      - name: Require formal main-branch execution
         shell: bash
         run: |
           set -euo pipefail
-          case "${{ inputs.input_path }}" in
-            /*|*..*)
-              echo "input_path must be repository-relative without traversal" >&2
-              exit 2
-              ;;
-          esac
-          test -f "${{ inputs.input_path }}"
+          test "${GITHUB_REF}" = "refs/heads/main"
+
+      - name: Validate input path
+        env:
+          INPUT_PATH: ${{ inputs.input_path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          repository_root = Path.cwd().resolve()
+          approved_root = (repository_root / "research/inputs/live-paper").resolve()
+          raw = os.environ["INPUT_PATH"]
+          if not raw or "\n" in raw or "\r" in raw or "\x00" in raw:
+              raise SystemExit("input_path contains invalid characters")
+          candidate = (repository_root / raw).resolve()
+          if approved_root != candidate.parent and approved_root not in candidate.parents:
+              raise SystemExit(
+                  "input_path must resolve under research/inputs/live-paper"
+              )
+          if candidate.suffix.lower() != ".json" or not candidate.is_file():
+              raise SystemExit("input_path must be an existing JSON file")
+          relative = candidate.relative_to(repository_root).as_posix()
+          with Path(os.environ["GITHUB_ENV"]).open("a", encoding="utf-8") as handle:
+              handle.write(f"SAFE_INPUT_PATH={relative}\n")
+          PY
 
       - name: Run exactly one persistent Live Paper step
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p artifacts
           PYTHONPATH=src python scripts/run_live_paper_coordinator_v0_1.py \
-            --input "${{ inputs.input_path }}" \
+            --input "${SAFE_INPUT_PATH}" \
             --store-backend r2 \
             > artifacts/live-paper-run-coordinator-report.json
           python - <<'PY'

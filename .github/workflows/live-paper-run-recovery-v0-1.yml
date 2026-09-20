@@ -17,18 +17,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: live-paper-run-recovery-v0-1-${{ inputs.run_id }}
+  group: live-paper-persistence-v0-1
   cancel-in-progress: false
 
 jobs:
   reconcile:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-      R2_BUCKET: ${{ secrets.R2_BUCKET }}
-      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -38,11 +33,22 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install package
-        run: python -m pip install -e .
+      - name: Install constrained package
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Require formal main-branch execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF}" = "refs/heads/main"
 
       - name: Reconcile persistent Live Paper run
         id: recovery
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         shell: bash
         run: |
           set -uo pipefail

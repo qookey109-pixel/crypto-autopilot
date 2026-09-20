@@ -39,6 +39,8 @@ def main() -> int:
             repository=args.repository,
             workflow=item.workflow,
             token=token,
+            branch="main",
+            allowed_events=item.allowed_events,
         )
         for item in expectations
     }

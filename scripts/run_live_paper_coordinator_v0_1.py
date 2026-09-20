@@ -3,7 +3,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from crypto_autopilot.paper.live_v0_1 import (
     PionexLivePaperFeed,
@@ -20,6 +22,77 @@ from crypto_autopilot.paper.run_store_v0_1 import (
     paper_run_store_policy_from_config,
 )
 from crypto_autopilot.storage.r2 import R2Store
+
+
+@dataclass(slots=True)
+class _OperationJournal:
+    provider_requests_known: int = 0
+    provider_status: str = "KNOWN"
+    store_write_attempts: int = 0
+    store_objects_created_known: int = 0
+    store_objects_replayed_known: int = 0
+    store_status: str = "KNOWN"
+
+    def evidence(self) -> dict[str, object]:
+        return {
+            "provider_requests": {
+                "status": self.provider_status,
+                "known_performed": self.provider_requests_known,
+            },
+            "persistence_writes": {
+                "status": self.store_status,
+                "attempted": self.store_write_attempts,
+                "known_created": self.store_objects_created_known,
+                "known_replayed": self.store_objects_replayed_known,
+            },
+        }
+
+
+class _TrackedFeed:
+    def __init__(self, feed: Any, journal: _OperationJournal) -> None:
+        self.feed = feed
+        self.journal = journal
+
+    def fetch_frame(
+        self,
+        symbol: str,
+        *,
+        tick_time_ms: int,
+        since_ms: int,
+    ):
+        try:
+            frame = self.feed.fetch_frame(
+                symbol,
+                tick_time_ms=tick_time_ms,
+                since_ms=since_ms,
+            )
+        except Exception:
+            self.journal.provider_status = "UNKNOWN_OR_PARTIAL"
+            raise
+        self.journal.provider_requests_known += int(frame.provider_request_count)
+        return frame
+
+
+class _TrackedStore:
+    def __init__(self, store: Any, journal: _OperationJournal) -> None:
+        self.store = store
+        self.journal = journal
+
+    def get_json(self, kind: str, object_id: str):
+        return self.store.get_json(kind, object_id)
+
+    def put_json(self, kind: str, object_id: str, payload):
+        self.journal.store_write_attempts += 1
+        try:
+            receipt = self.store.put_json(kind, object_id, payload)
+        except Exception:
+            self.journal.store_status = "UNKNOWN_OR_PARTIAL"
+            raise
+        if bool(getattr(receipt, "replayed", False)):
+            self.journal.store_objects_replayed_known += 1
+        else:
+            self.journal.store_objects_created_known += 1
+        return receipt
 
 
 def _load_json(path: Path) -> dict[str, object]:
@@ -67,6 +140,45 @@ def _build_store(
     raise ValueError("Live Paper Run Coordinator requires local or r2 store")
 
 
+def _failure_report(
+    *,
+    stage: str,
+    error: Exception,
+    journal: _OperationJournal,
+) -> dict[str, object]:
+    provider_known = journal.provider_status == "KNOWN"
+    store_known = journal.store_status == "KNOWN"
+    return {
+        "schema": "qookey-live-paper-run-coordinator-report-v0.1",
+        "state": "REJECT",
+        "reason": f"{stage.lower()}_failed",
+        "error_stage": stage,
+        "error_type": type(error).__name__,
+        "provider_requests_performed": (
+            journal.provider_requests_known if provider_known else None
+        ),
+        "provider_requests_status": journal.provider_status,
+        "persistent_objects_created": (
+            journal.store_objects_created_known if store_known else None
+        ),
+        "persistent_writes_status": journal.store_status,
+        "operation_accounting": journal.evidence(),
+        "authority": {
+            "public_live_market_data_authorized": True,
+            "live_paper_simulation_authorized": True,
+            "paper_state_persistence_authorized": True,
+            "append_only_run_ledger": True,
+            "automatic_schedule_authorized": False,
+            "automatic_candidate_generation_authorized": False,
+            "scorecard_auto_selection_authorized": False,
+            "private_exchange_api_authorized": False,
+            "holdout_access_authorized": False,
+            "real_money_order_authorized": False,
+            "live_real_trading_authorized": False,
+        },
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
@@ -98,16 +210,25 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    journal = _OperationJournal()
+    stage = "LOAD_POLICY"
     try:
         coordinator_policy = live_paper_run_coordinator_policy_from_config(
             _load_json(args.coordinator_config)
         )
         live_policy = live_paper_policy_from_config(_load_json(args.live_config))
-        store = _build_store(
-            args.store_backend,
-            local_root=args.local_root,
-            store_config=_load_json(args.store_config),
+
+        stage = "BUILD_STORE"
+        store = _TrackedStore(
+            _build_store(
+                args.store_backend,
+                local_root=args.local_root,
+                store_config=_load_json(args.store_config),
+            ),
+            journal,
         )
+
+        stage = "LOAD_INPUT"
         (
             run_name,
             tick_time_ms,
@@ -116,47 +237,30 @@ def main() -> int:
             previous_step_id,
         ) = live_paper_run_coordinator_input_from_dict(_load_json(args.input))
 
+        stage = "LOAD_PREVIOUS_STEP"
         previous_step = None
         if previous_step_id is not None:
             previous_step = store.get_json("live-run-step", previous_step_id)
             if previous_step is None:
-                raise ValueError(
-                    f"previous run step not found in store: {previous_step_id}"
-                )
+                raise ValueError("previous run step not found in store")
 
+        stage = "COORDINATE_RUN_STEP"
         report = coordinate_live_paper_run_step(
             run_name=run_name,
             tick_time_ms=tick_time_ms,
             candidate_specs=candidate_specs,
-            feed=PionexLivePaperFeed(policy=live_policy),
+            feed=_TrackedFeed(PionexLivePaperFeed(policy=live_policy), journal),
             store=store,
             initial_state=initial_state,
             previous_step=previous_step,
             policy=coordinator_policy,
             live_policy=live_policy,
         )
+        report = dict(report)
+        report["operation_accounting"] = journal.evidence()
         code = 0
     except (OSError, json.JSONDecodeError, ValueError, RuntimeError) as error:
-        report = {
-            "schema": "qookey-live-paper-run-coordinator-report-v0.1",
-            "state": "REJECT",
-            "reason": f"input_policy_store_or_runtime_invalid:{error}",
-            "provider_requests_performed": 0,
-            "persistent_objects_created": 0,
-            "authority": {
-                "public_live_market_data_authorized": True,
-                "live_paper_simulation_authorized": True,
-                "paper_state_persistence_authorized": True,
-                "append_only_run_ledger": True,
-                "automatic_schedule_authorized": False,
-                "automatic_candidate_generation_authorized": False,
-                "scorecard_auto_selection_authorized": False,
-                "private_exchange_api_authorized": False,
-                "holdout_access_authorized": False,
-                "real_money_order_authorized": False,
-                "live_real_trading_authorized": False
-            }
-        }
+        report = _failure_report(stage=stage, error=error, journal=journal)
         code = 2
 
     print(json.dumps(report, sort_keys=True, separators=(",", ":")))

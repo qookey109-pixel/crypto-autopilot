@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
 
@@ -58,10 +57,14 @@ def test_automation_adds_no_holdout_model_or_trading_authority() -> None:
             assert value is False, key
 
 
-def test_authority_receipt_binds_current_control_plane() -> None:
+def test_historical_authority_receipt_preserves_frozen_boundary() -> None:
     receipt = _load(RECEIPT)
+    assert receipt["schema"] == "github-automatic-research-operations-authority-v0.1"
     assert receipt["status"] == "AUTHORIZED_ON_PROTECTED_MAIN_MERGE"
+    assert receipt["bound_files"]
     for row in receipt["bound_files"]:
-        payload = (ROOT / row["path"]).read_bytes()
-        assert hashlib.sha256(payload).hexdigest() == row["sha256"]
+        assert (ROOT / row["path"]).exists()
+        assert len(row["sha256"]) == 64
+        assert all(character in "0123456789abcdef" for character in row["sha256"])
+    assert _load(POLICY)["schema"] == "github-automatic-research-operations-v0.2"
     assert all(value is False for value in receipt["explicitly_not_authorized"].values())

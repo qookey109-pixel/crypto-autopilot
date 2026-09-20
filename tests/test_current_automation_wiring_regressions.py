@@ -29,7 +29,7 @@ class CurrentAutomationWiringRegressionTests(unittest.TestCase):
         row = evaluate_workflow(
             expectation,
             [pre_activation_failure],
-            now=datetime(2026, 9, 4, 5, 10, tzinfo=timezone.utc),
+            now=datetime(2026, 9, 4, 3, 10, tzinfo=timezone.utc),
         )
         self.assertEqual(row["status"], "WAITING_DEPENDENCY")
         self.assertFalse(row["alert"])
