@@ -11,6 +11,7 @@ STYLES = ROOT / "assets" / "css" / "styles.css"
 ACTIVE_IMAGE = ROOT / "assets" / "images" / "cloud-garden-v4.jpg"
 OPERATIONAL_STATUS = ROOT / "data" / "operational-status.json"
 RESEARCH_CALENDAR = ROOT / "data" / "research-calendar.json"
+OPERATIONS_SCHEDULE = ROOT / "data" / "operations-schedule.json"
 RESEARCH_EVIDENCE = ROOT / "data" / "research-evidence.json"
 RESEARCH_EVIDENCE_SCHEMA = ROOT / "data" / "research-evidence.schema.json"
 ALTERNATIVE_ASSETS = ROOT / "data" / "alternative-assets.json"
@@ -25,6 +26,7 @@ REQUIRED = (
     ROOT / "data" / "paper-training.json",
     ROOT / "data" / "strategy.json",
     RESEARCH_CALENDAR,
+    OPERATIONS_SCHEDULE,
     RESEARCH_EVIDENCE,
     RESEARCH_EVIDENCE_SCHEMA,
     ALTERNATIVE_ASSETS,
@@ -71,6 +73,7 @@ REQUIRED_ZH_HANT_LABELS = (
     "風險與閘門",
     "真實交易目前停用",
     "研究時程與授權狀態",
+    "自動化排程與來源狀態",
     "SState 是 4H 市場狀態與背景准入閘門",
     "投影建立：尚未提供",
     "Paper 觀測：尚未完成",
@@ -251,6 +254,67 @@ def main() -> int:
     ):
         if required_source not in calendar_sources:
             raise RuntimeError(f"dashboard research calendar lineage missing: {required_source}")
+
+    operations = json.loads(OPERATIONS_SCHEDULE.read_text(encoding="utf-8"))
+    if operations.get("schema") != "qookey-automation-schedule-projection-v0.1":
+        raise RuntimeError("dashboard automation schedule projection schema changed")
+    if operations.get("authority") is not False:
+        raise RuntimeError("dashboard automation schedule must remain non-authoritative")
+    if operations.get("timezone") != "Asia/Taipei":
+        raise RuntimeError("dashboard automation schedule timezone changed")
+    operations_generated_at = operations.get("projectionGeneratedAtUtc")
+    if operations_generated_at is not None:
+        try:
+            datetime.fromisoformat(str(operations_generated_at).replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise RuntimeError("dashboard automation schedule generation time is invalid") from exc
+    operations_security = operations.get("safetyBoundary") or {}
+    if not operations_security or any(
+        value is not False for value in operations_security.values()
+    ):
+        raise RuntimeError("dashboard automation schedule safety boundary changed")
+    operations_summary = operations.get("summary") or {}
+    if operations_summary.get("core100HistoryStatus") != "COMPLETE":
+        raise RuntimeError("automation projection lost Core100 completion")
+    if operations_summary.get("zecDevelopmentExpectedCells") != 256:
+        raise RuntimeError("automation projection ZEC matrix size changed")
+    if operations_summary.get("zecDevelopmentCompletedCells") != 0:
+        raise RuntimeError("automation projection must not invent ZEC execution")
+    source_status = operations.get("sourceStatus") or {}
+    resource_status = source_status.get("resourceHub") or {}
+    registry_status = source_status.get("externalCapabilityRegistry") or {}
+    zec_status = source_status.get("zecV0_3") or {}
+    if resource_status.get("state") != "SCHEDULED_READ_ONLY_CHANGE_WATCH":
+        raise RuntimeError("Resource Hub projection state changed")
+    if resource_status.get("automaticPullRequestAuthorized") is not False:
+        raise RuntimeError("Resource Hub projection cannot auto-create PRs")
+    if registry_status.get("candidateCount") != 10:
+        raise RuntimeError("external capability registry count changed")
+    if registry_status.get("runtimeExecutionAuthorized") is not False:
+        raise RuntimeError("external capability runtime must remain closed")
+    if zec_status.get("state") != "WAITING_EXECUTION_AUTHORITY":
+        raise RuntimeError("ZEC projection must remain waiting for execution authority")
+    operations_items = operations.get("items") or []
+    required_operation_ids = {
+        "resource-hub-change-watch-v0-2",
+        "research-signal-v0-2",
+        "research-signal-quality-v0-1",
+        "context-forward-capture-v0-1",
+        "live-paper-hourly-v0-2",
+        "automation-health-v0-2",
+        "dashboard-pages-projection",
+        "core100-history-v0-1-2",
+        "core100-training-v0-1-2",
+        "pionex-alternative-observability-v0-2",
+        "external-tool-evaluation-weekly",
+        "shadow-comparison-weekly",
+        "maintenance-weekly",
+        "weekly-handoff",
+        "monthly-terms-review",
+        "zec-v0-3-development",
+    }
+    if {item.get("id") for item in operations_items} != required_operation_ids:
+        raise RuntimeError("dashboard automation schedule items changed without review")
 
     evidence = json.loads(RESEARCH_EVIDENCE.read_text(encoding="utf-8"))
     evidence_schema = json.loads(RESEARCH_EVIDENCE_SCHEMA.read_text(encoding="utf-8"))
