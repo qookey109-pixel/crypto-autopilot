@@ -22,6 +22,7 @@ from .zec_v0_3_development_contract import (
     build_zec_v0_3_candidate_grid,
     validate_zec_v0_3_development_contract,
 )
+from .zec_v0_3_selection_policy import ZecV03SelectionPolicy
 
 
 FOUR_HOURS_MS = 4 * 60 * 60 * 1000
@@ -106,9 +107,24 @@ class ZecV03DevelopmentRanking:
     ranked_candidate_ids: tuple[str, ...]
     diagnostic_leader_id: str
     leader_neighbor_ids: tuple[str, ...]
-    selection_status: str = "BLOCKED_STABLE_NEIGHBOR_POLICY_NOT_FROZEN"
+    selection_status: str = "DIAGNOSTIC_RANKING_ONLY"
     champion_frozen: bool = False
     fresh_confirmation_accessed: bool = False
+    live_trading_authorized: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class ZecV03DevelopmentSelection:
+    status: str
+    selected_candidate_id: str | None
+    stable_neighbor_ids: tuple[str, ...]
+    ranked_eligible_candidate_ids: tuple[str, ...]
+    policy_sha256: str
+    selected_worst_return_pct: float | None
+    selected_median_return_pct: float | None
+    champion_frozen: bool
+    fresh_confirmation_accessed: bool = False
+    formal_holdout_accessed: bool = False
     live_trading_authorized: bool = False
 
 
@@ -621,6 +637,91 @@ def rank_zec_v0_3_development_results(
         leader_neighbor_ids=_candidate_neighbors(candidates, leader.candidate_id),
     )
     return ranked, ranking
+
+
+def select_zec_v0_3_development_champion(
+    *,
+    candidates: Sequence[ZecV03Candidate],
+    fold_ids: Sequence[str],
+    results: Sequence[ZecV03CandidateFoldResult],
+    policy: ZecV03SelectionPolicy,
+    policy_sha256: str,
+) -> ZecV03DevelopmentSelection:
+    """Freeze one development champion without consuming fresh confirmation."""
+
+    if len(policy_sha256) != 64:
+        raise ValueError("selection policy SHA-256 is required")
+    ranked, _ = rank_zec_v0_3_development_results(
+        candidates=candidates,
+        fold_ids=fold_ids,
+        results=results,
+    )
+    by_summary = {item.candidate_id: item for item in ranked}
+    by_result = {(item.candidate_id, item.fold_id): item for item in results}
+
+    eligible_ids: list[str] = []
+    for summary in ranked:
+        per_fold = [by_result[(summary.candidate_id, fold_id)] for fold_id in fold_ids]
+        enough_trades = all(
+            item.metrics.trade_count >= policy.minimum_realized_trades_per_fold
+            for item in per_fold
+        )
+        positive_worst_fold = (
+            summary.worst_return_pct
+            > policy.minimum_worst_fold_return_pct_exclusive
+        )
+        if enough_trades and positive_worst_fold:
+            eligible_ids.append(summary.candidate_id)
+
+    if not eligible_ids:
+        return ZecV03DevelopmentSelection(
+            status="NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
+            selected_candidate_id=None,
+            stable_neighbor_ids=(),
+            ranked_eligible_candidate_ids=(),
+            policy_sha256=policy_sha256,
+            selected_worst_return_pct=None,
+            selected_median_return_pct=None,
+            champion_frozen=False,
+        )
+
+    selected_id = eligible_ids[0]
+    selected = by_summary[selected_id]
+    minimum_neighbor_return = (
+        selected.worst_return_pct
+        * policy.minimum_neighbor_worst_return_retention_fraction
+    )
+    stable_neighbors: list[str] = []
+    eligible_set = set(eligible_ids)
+    for neighbor_id in _candidate_neighbors(candidates, selected_id):
+        if neighbor_id not in eligible_set:
+            continue
+        neighbor = by_summary[neighbor_id]
+        if neighbor.worst_return_pct >= minimum_neighbor_return:
+            stable_neighbors.append(neighbor_id)
+
+    if len(stable_neighbors) < policy.minimum_stable_neighbors:
+        return ZecV03DevelopmentSelection(
+            status="ISOLATED_DEVELOPMENT_PEAK_REJECTED",
+            selected_candidate_id=None,
+            stable_neighbor_ids=tuple(sorted(stable_neighbors)),
+            ranked_eligible_candidate_ids=tuple(eligible_ids),
+            policy_sha256=policy_sha256,
+            selected_worst_return_pct=selected.worst_return_pct,
+            selected_median_return_pct=selected.median_return_pct,
+            champion_frozen=False,
+        )
+
+    return ZecV03DevelopmentSelection(
+        status="DEVELOPMENT_CHAMPION_FROZEN",
+        selected_candidate_id=selected_id,
+        stable_neighbor_ids=tuple(sorted(stable_neighbors)),
+        ranked_eligible_candidate_ids=tuple(eligible_ids),
+        policy_sha256=policy_sha256,
+        selected_worst_return_pct=selected.worst_return_pct,
+        selected_median_return_pct=selected.median_return_pct,
+        champion_frozen=True,
+    )
 
 
 def run_zec_v0_3_development_matrix(
