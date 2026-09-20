@@ -201,6 +201,8 @@ Their old present-tense `8/10 / Training SKIPPED` statements are historical evid
 
 ## Automation V2 Batch 2 — external research and website projection
 
+Automatic Operations V0.3 is the current Batch 2 schedule inventory. V0.2 remains byte-stable because the History Cadence authority binds it as frozen evidence.
+
 This batch adds a versioned, read-only external-source change watch and a
 non-authoritative automation schedule projection.
 
