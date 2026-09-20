@@ -31,8 +31,8 @@
     "external_market_context_state": "SIX_PINNED_SOURCES_PREFETCHED_EVIDENCE_NORMALIZATION_ONLY_NO_NETWORK_NO_ROUTER_CHANGE"
   },
   "current_data_and_paper": {
-    "automatic_operations": "config/github_automatic_research_operations_v0_1.json",
-    "automatic_operations_state": "GITHUB_SCHEDULE_IS_NORMAL_PATH_MANUAL_DOES_NOT_COUNT_AS_HEALTH",
+    "automatic_operations": "config/github_automatic_research_operations_v0_3.json",
+    "automatic_operations_state": "GITHUB_SCHEDULE_V0_3_INCLUDES_RESOURCE_HUB_READ_ONLY_WATCH_AND_DASHBOARD_BACKSTOP",
     "current_metadata_successor": "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
     "current_metadata_successor_state": "V0_12_AUTHORIZED_ON_MAIN_MERGE_V0_10_SCHEDULE_RETIRED",
     "crypto_core_100": "config/binance_usdm_detailed_history_v0_1_2.json",
