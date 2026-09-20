@@ -1,0 +1,183 @@
+name: Resource Hub Supply Chain V0.2
+
+on:
+  schedule:
+    - cron: "13 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: resource-hub-supply-chain-v0-2
+  cancel-in-progress: false
+
+jobs:
+  watch-candidates:
+    if: \${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Assert scheduled read-only policy boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          policy = json.loads(
+              Path("config/resource_hub_supply_chain_v0_2.json").read_text()
+          )
+          assert policy["schema"] == "qookey-resource-hub-supply-chain-policy-v0.2"
+          assert policy["status"] == "AUTHORIZED_READ_ONLY_CHANGE_WATCH_ON_MAIN_MERGE"
+          assert policy["schedule"]["cron_utc"] == "13 1 * * *"
+          safety = policy["safety"]
+          assert safety["workflow_dispatch_only"] is False
+          assert safety["schedule_authorized"] is True
+          assert safety["public_catalog_read_authorized"] is True
+          allowed_true = {"schedule_authorized", "public_catalog_read_authorized"}
+          for key, value in safety.items():
+              if key in allowed_true:
+                  assert value is True, key
+              elif key == "workflow_dispatch_only":
+                  assert value is False
+              else:
+                  assert value is False, key
+          PY
+
+      - name: Resolve exact Resource Hub source commit
+        id: hub
+        env:
+          GITHUB_TOKEN: \${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p resource-hub-input resource-hub-output previous-state
+          curl --fail --silent --show-error --location \
+            --header 'Accept: application/vnd.github+json' \
+            --header "Authorization: Bearer \${GITHUB_TOKEN}" \
+            https://api.github.com/repos/qookey109-pixel/ai-resource-hub/commits/main \
+            > resource-hub-input/commit.json
+          HUB_SHA="$(python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          payload = json.loads(Path("resource-hub-input/commit.json").read_text())
+          sha = str(payload.get("sha", ""))
+          if not re.fullmatch(r"[0-9a-f]{40}", sha):
+              raise SystemExit("failed to resolve exact AI Resource Hub commit SHA")
+          print(sha)
+          PY
+          )"
+          echo "hub_sha=\${HUB_SHA}" >> "\${GITHUB_OUTPUT}"
+
+      - name: Restore latest successful source state
+        env:
+          GH_TOKEN: \${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          previous_run_id="$(
+            gh run list \
+              --workflow "Resource Hub Supply Chain V0.2" \
+              --branch main \
+              --status success \
+              --limit 20 \
+              --json databaseId \
+              --jq '.[0].databaseId // empty'
+          )"
+          if [[ -n "\${previous_run_id}" ]]; then
+            gh run download "\${previous_run_id}" \
+              --name resource-hub-source-state-v0-2 \
+              --dir previous-state || true
+          fi
+
+      - name: Fetch catalog at exact source commit
+        env:
+          HUB_SHA: \${{ steps.hub.outputs.hub_sha }}
+          GITHUB_TOKEN: \${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            --header "Authorization: Bearer \${GITHUB_TOKEN}" \
+            "https://raw.githubusercontent.com/qookey109-pixel/ai-resource-hub/\${HUB_SHA}/data/resources.json" \
+            > resource-hub-input/resources.json
+
+      - name: Compare source and evaluate only when changed
+        env:
+          HUB_SHA: \${{ steps.hub.outputs.hub_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(
+            --catalog resource-hub-input/resources.json
+            --policy config/resource_hub_supply_chain_v0_2.json
+            --source-commit "\${HUB_SHA}"
+            --state-output resource-hub-output/state.json
+            --candidates-output resource-hub-output/candidates.json
+          )
+          if [[ -f previous-state/state.json ]]; then
+            args+=(--previous-state previous-state/state.json)
+          fi
+          PYTHONPATH=src python scripts/resource_hub_change_watch_v0_2.py "\${args[@]}"
+
+      - name: Assert no automatic integration authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.loads(Path("resource-hub-output/state.json").read_text())
+          assert state["schema"] == "qookey-resource-hub-change-watch-state-v0.2"
+          authority = state["authority"]
+          assert authority["scheduled_public_catalog_read_authorized"] is True
+          for key, value in authority.items():
+              if key != "scheduled_public_catalog_read_authorized":
+                  assert value is False, key
+          if state["status"] == "NO_CHANGE":
+              assert state["evaluation"]["candidate_evaluation_performed"] is False
+              assert not Path("resource-hub-output/candidates.json").exists()
+          else:
+              assert state["evaluation"]["candidate_evaluation_performed"] is True
+              assert Path("resource-hub-output/candidates.json").is_file()
+              candidates = json.loads(
+                  Path("resource-hub-output/candidates.json").read_text()
+              )
+              assert candidates["status"] == "RESEARCH_ONLY"
+              assert candidates["authority"]["automatic_pull_request_authorized"] is False
+              assert candidates["authority"]["automatic_execution_authorized"] is False
+          PY
+
+      - name: Upload source state
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: resource-hub-source-state-v0-2
+          path: resource-hub-output/state.json
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Upload changed candidate registry
+        if: \${{ hashFiles('resource-hub-output/candidates.json') != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: resource-hub-changed-candidates-v0-2-\${{ github.run_id }}
+          path: resource-hub-output/candidates.json
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Remove disposable runner files
+        if: always()
+        run: rm -rf resource-hub-input resource-hub-output previous-state
