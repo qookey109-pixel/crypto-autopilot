@@ -1,0 +1,45 @@
+{
+  "schema": "qookey-zec-strategy-v0-3-development-selection-policy-v0.1",
+  "status": "FROZEN_BEFORE_DEVELOPMENT_EXECUTION",
+  "primary_metric": "worst_fold_return_pct",
+  "eligibility": {
+    "minimum_realized_trades_per_fold": 30,
+    "minimum_worst_fold_return_pct_exclusive": 0
+  },
+  "ranking_order": [
+    "highest_worst_fold_return_pct",
+    "highest_median_fold_return_pct",
+    "lowest_worst_fold_drawdown_pct",
+    "highest_total_realized_trades",
+    "deterministic_candidate_id"
+  ],
+  "stable_neighbor": {
+    "definition": "ONE_ADJACENT_VALUE_ON_EXACTLY_ONE_FROZEN_AXIS",
+    "minimum_count": 2,
+    "minimum_worst_return_retention_fraction": 0.75,
+    "neighbor_must_be_eligible": true
+  },
+  "complete_matrix_required": true,
+  "selective_omission_allowed": false,
+  "fresh_confirmation_used_for_selection": false,
+  "rationale": {
+    "minimum_trades": "Matches the downstream statistical edge gate's 30-sample floor as a conservative per-development-fold activity screen; it is not a claim of statistical sufficiency.",
+    "positive_worst_fold": "Prevents a zero-trade or loss-making annual fold from winning only because other candidates lose more.",
+    "stable_neighbors": "Requires at least two adjacent eligible configurations so a narrow isolated parameter peak cannot be frozen.",
+    "retention_fraction": "A stable neighbor must retain at least 75% of the leader's worst-fold return. This ex-ante sensitivity tolerance is a project governance choice, not an empirically optimized threshold."
+  },
+  "authority": {
+    "selection_policy_frozen": true,
+    "offline_development_runner_authorized": false,
+    "fresh_data_read_authorized": false,
+    "fresh_confirmation_access_authorized": false,
+    "r2_read_authorized": false,
+    "r2_write_authorized": false,
+    "formal_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
