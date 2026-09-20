@@ -172,7 +172,7 @@ jobs:
             --output _site/data/dashboard.json
           python scripts/build_research_calendar_projection.py \
             --output _site/data/research-calendar.json
-          python scripts/build_automation_schedule_projection.py \
+          PYTHONPATH=src python scripts/build_automation_schedule_projection.py \
             --output _site/data/operations-schedule.json
           PYTHONPATH=src python scripts/build_alternative_assets_projection.py \
             --output _site/data/alternative-assets.json
