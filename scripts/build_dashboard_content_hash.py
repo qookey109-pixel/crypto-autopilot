@@ -7,11 +7,14 @@ from pathlib import Path
 from typing import Any
 
 
+GLOBAL_VOLATILE_JSON_KEYS = frozenset(
+    {
+        "generatedAtUtc",
+        "projectionGeneratedAtUtc",
+        "projection_generated_at_utc",
+    }
+)
 VOLATILE_JSON_KEYS: dict[str, frozenset[str]] = {
-    "data/dashboard.json": frozenset({"generatedAtUtc"}),
-    "data/research-calendar.json": frozenset({"projectionGeneratedAtUtc"}),
-    "data/strategy.json": frozenset({"generatedAtUtc"}),
-    "data/operations-schedule.json": frozenset({"projectionGeneratedAtUtc"}),
     "data/cloud-runs.json": frozenset({"observedAtUtc"}),
 }
 EXCLUDED = {
@@ -36,7 +39,9 @@ def _strip_keys(value: Any, keys: frozenset[str]) -> Any:
 def _normalized_bytes(path: Path, relative: str) -> bytes:
     if relative.endswith(".json"):
         payload = json.loads(path.read_text(encoding="utf-8"))
-        keys = VOLATILE_JSON_KEYS.get(relative, frozenset())
+        keys = GLOBAL_VOLATILE_JSON_KEYS | VOLATILE_JSON_KEYS.get(
+            relative, frozenset()
+        )
         normalized = _strip_keys(payload, keys)
         return json.dumps(
             normalized,
