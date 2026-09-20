@@ -751,7 +751,7 @@ def main() -> int:
     if automatic_operations.get("status") != "AUTHORIZED_ON_PROTECTED_MAIN_MERGE":
         raise RuntimeError("automatic-operations authority state changed")
     scheduled = automatic_operations.get("scheduled_workflows") or []
-    if not isinstance(scheduled, list) or len(scheduled) != 7:
+    if not isinstance(scheduled, list) or len(scheduled) != 9:
         raise RuntimeError("automatic-operations schedule inventory changed")
     automatic_boundary = require_dict(
         automatic_operations.get("authority") or {}, "automatic-operations boundary"
