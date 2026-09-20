@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
 
@@ -114,12 +114,22 @@ def evaluate_workflow(
     ]
     ordered = sorted(eligible_runs, key=_run_time, reverse=True)
     if not ordered:
-        if expectation.mode == "conditional":
-            return {**base, "status": "WAITING_DEPENDENCY", "alert": False, "last_run": None}
         grace_start = active_from or now
         elapsed = max(0.0, (now - grace_start).total_seconds())
-        status = "STARTUP_GRACE" if elapsed <= expectation.max_age_seconds else "STALE_NO_RUN"
-        return {**base, "status": status, "alert": status == "STALE_NO_RUN", "last_run": None}
+        if expectation.mode == "conditional" and elapsed <= expectation.max_age_seconds:
+            status = "WAITING_DEPENDENCY"
+        else:
+            status = (
+                "STARTUP_GRACE"
+                if elapsed <= expectation.max_age_seconds
+                else "STALE_NO_RUN"
+            )
+        return {
+            **base,
+            "status": status,
+            "alert": status == "STALE_NO_RUN",
+            "last_run": None,
+        }
 
     latest = ordered[0]
     started = _run_time(latest)
@@ -146,13 +156,43 @@ def evaluate_workflow(
     if conclusion not in expectation.allowed_conclusions:
         return {**base, "status": "FAILED", "alert": True, "last_run": last_run}
     if expectation.mode == "conditional":
-        return {**base, "status": "HEALTHY_CONDITIONAL", "alert": False, "last_run": last_run}
+        stale = age_seconds > expectation.max_age_seconds
+        return {
+            **base,
+            "status": "STALE" if stale else "HEALTHY_CONDITIONAL",
+            "alert": stale,
+            "last_run": last_run,
+        }
     stale = age_seconds > expectation.max_age_seconds
     return {
         **base,
         "status": "STALE" if stale else "HEALTHY",
         "alert": stale,
         "last_run": last_run,
+    }
+
+
+def _health_dimensions(row: Mapping[str, Any]) -> dict[str, Any]:
+    """Expose execution, dependency and business-result health independently."""
+
+    status = str(row.get("status") or "UNKNOWN")
+    last = row.get("last_run")
+    last_mapping = last if isinstance(last, Mapping) else {}
+    return {
+        **row,
+        "execution": {
+            "status": status,
+            "alert": bool(row.get("alert")),
+            "last_run_age_seconds": last_mapping.get("age_seconds"),
+        },
+        "dependency": {
+            "status": "UNKNOWN_FROM_GITHUB_RUN_METADATA",
+            "evidence_available": False,
+        },
+        "business_result": {
+            "status": "UNKNOWN_FROM_GITHUB_RUN_METADATA",
+            "workflow_conclusion": last_mapping.get("conclusion"),
+        },
     }
 
 
@@ -166,7 +206,9 @@ def evaluate_automation_health(
     if schema not in SUPPORTED_REPORT_SCHEMAS:
         raise ResearchAutomationHealthError(f"unsupported report schema: {schema}")
     rows = [
-        evaluate_workflow(item, runs_by_workflow.get(item.workflow, ()), now=now)
+        _health_dimensions(
+            evaluate_workflow(item, runs_by_workflow.get(item.workflow, ()), now=now)
+        )
         for item in expectations
     ]
     alerts = [row for row in rows if row["alert"]]
@@ -240,29 +282,73 @@ def fetch_workflow_runs(
     repository: str,
     workflow: str,
     token: str,
-    per_page: int = 10,
+    branch: str = "main",
+    allowed_events: Sequence[str] = ("schedule",),
+    per_page: int = 100,
+    max_pages: int = 3,
 ) -> list[dict[str, Any]]:
+    """Fetch bounded workflow-run history with server-side branch/event filters."""
+
     if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
         raise ResearchAutomationHealthError("repository must use owner/name form")
     if not token:
         raise ResearchAutomationHealthError("GITHUB_TOKEN is required")
+    if not re.fullmatch(r"[A-Za-z0-9_./-]+", branch) or ".." in branch:
+        raise ResearchAutomationHealthError("branch is invalid")
+    if not allowed_events:
+        raise ResearchAutomationHealthError("allowed_events cannot be empty")
+    if per_page < 1 or per_page > 100:
+        raise ResearchAutomationHealthError("per_page must be between 1 and 100")
+    if max_pages < 1 or max_pages > 10:
+        raise ResearchAutomationHealthError("max_pages must be between 1 and 10")
+
     encoded = quote(workflow, safe="")
-    url = f"https://api.github.com/repos/{repository}/actions/workflows/{encoded}/runs?per_page={per_page}"
-    request = Request(
-        url,
-        headers={
-            "Accept": "application/vnd.github+json",
-            "Authorization": f"Bearer {token}",
-            "X-GitHub-Api-Version": "2022-11-28",
-            "User-Agent": "crypto-autopilot-health-v0.1",
-        },
-    )
-    with urlopen(request, timeout=20) as response:
-        payload = json.loads(response.read())
-    rows = payload.get("workflow_runs")
-    if not isinstance(rows, list):
-        raise ResearchAutomationHealthError("GitHub workflow-runs response is malformed")
-    return [dict(item) for item in rows if isinstance(item, Mapping)]
+    discovered: dict[object, dict[str, Any]] = {}
+    for event in allowed_events:
+        if not re.fullmatch(r"[A-Za-z0-9_.-]+", event):
+            raise ResearchAutomationHealthError("allowed event is invalid")
+        for page in range(1, max_pages + 1):
+            query = urlencode(
+                {
+                    "branch": branch,
+                    "event": event,
+                    "per_page": per_page,
+                    "page": page,
+                }
+            )
+            url = (
+                f"https://api.github.com/repos/{repository}/actions/workflows/"
+                f"{encoded}/runs?{query}"
+            )
+            request = Request(
+                url,
+                headers={
+                    "Accept": "application/vnd.github+json",
+                    "Authorization": f"Bearer {token}",
+                    "X-GitHub-Api-Version": "2022-11-28",
+                    "User-Agent": "crypto-autopilot-health-v0.2",
+                },
+            )
+            with urlopen(request, timeout=20) as response:
+                payload = json.loads(response.read())
+            rows = payload.get("workflow_runs")
+            if not isinstance(rows, list):
+                raise ResearchAutomationHealthError(
+                    "GitHub workflow-runs response is malformed"
+                )
+            for item in rows:
+                if not isinstance(item, Mapping):
+                    continue
+                row = dict(item)
+                key = row.get("id") or row.get("html_url") or (
+                    row.get("run_started_at"),
+                    row.get("created_at"),
+                    event,
+                )
+                discovered[key] = row
+            if len(rows) < per_page:
+                break
+    return sorted(discovered.values(), key=_run_time, reverse=True)
 
 
 def audit_workflow_inventory(workflow_dir: str | Path) -> dict[str, int]:
