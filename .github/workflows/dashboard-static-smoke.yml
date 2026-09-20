@@ -55,7 +55,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for path in / /assets/css/styles.css /assets/js/app.js /assets/images/cloud-garden-v4.jpg /data/dashboard.json /data/strategy.json; do
+          for path in / /assets/css/styles.css /assets/js/app.js /assets/images/cloud-garden-v4.jpg /data/dashboard.json /data/strategy.json /data/operations-schedule.json; do
             curl --fail --silent --show-error "http://127.0.0.1:4173${path}" >/dev/null
           done
 
