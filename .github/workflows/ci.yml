@@ -33,6 +33,8 @@ jobs:
         run: ruff check src tests scripts
       - name: Unit tests
         run: python -m unittest discover -s tests -v
+      - name: Pytest compatibility coverage
+        run: python -m pytest tests -q
       - name: R2 cost and budget gate
         run: python scripts/check_r2_budget.py
       - name: Observed Binance R2 budget gate
