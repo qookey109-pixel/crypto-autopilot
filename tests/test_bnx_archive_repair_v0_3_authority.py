@@ -157,15 +157,21 @@ class BnxFourHourRepairAuthorityTests(unittest.TestCase):
     def test_hashes_and_workflow_keep_new_authority_isolated(self):
         self.assertEqual(hashlib.sha256(CONFIG.read_bytes()).hexdigest(), repair_v0_3.CONFIG_SHA)
         self.assertEqual(hashlib.sha256(BUNDLE.read_bytes()).hexdigest(), bundle.CONFIG_SHA)
-        workflow = (ROOT / ".github/workflows/binance-usdm-detailed-history-v0-1.yml").read_text()
-        self.assertEqual(workflow.count('cron: "23 */2 9-30 9 *"'), 1)
+        frozen = (
+            ROOT
+            / "research/frozen/workflows/2026-09-12-binance-usdm-detailed-history-v0-1.yml"
+        ).read_text()
+        workflow = (
+            ROOT / ".github/workflows/binance-usdm-detailed-history-v0-1.yml"
+        ).read_text()
+        self.assertEqual(frozen.count('cron: "23 */2 9-30 9 *"'), 1)
+        self.assertNotIn('cron: "23 */2 9-30 9 *"', workflow)
         self.assertIn("- repair-bnx-bundle", workflow)
-        backfill, rest = workflow.split("  repair-bnx-1h:", 1)
-        old_repair, rest = rest.split("  repair-bnx-bundle:", 1)
+        one_hour, rest = workflow.split("  repair-bnx-1h:", 1)[1].split(
+            "  repair-bnx-bundle:", 1
+        )
         new_repair, diagnostic = rest.split("  diagnose-bnx:", 1)
-        self.assertIn("--repair-config config/bnx_archive_repair_v0_1.json", backfill)
-        self.assertNotIn("bnx_archive_repair_bundle_v0_3.json", backfill)
-        self.assertIn("--repair-config config/bnx_archive_repair_bundle_v0_2.json", old_repair)
+        self.assertIn("--repair-config config/bnx_archive_repair_bundle_v0_2.json", one_hour)
         self.assertIn("github.event_name == 'workflow_dispatch'", new_repair)
         self.assertIn("github.ref == 'refs/heads/main'", new_repair)
         self.assertIn("--repair-config config/bnx_archive_repair_bundle_v0_3.json", new_repair)
