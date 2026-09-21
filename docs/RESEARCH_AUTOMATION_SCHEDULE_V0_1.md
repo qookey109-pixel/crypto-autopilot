@@ -16,8 +16,7 @@ model or authorize trading.
 | Every two hours at `:57` | Research Automation Health V0.2 | complete GitHub cron inventory monitor; manual/PR runs do not count; no provider or R2 access |
 | Daily 01:13 UTC | Resource Hub Supply Chain V0.2 | public AI Resource Hub catalog change-watch only; source unchanged => NO_CHANGE; no third-party execution or auto PR |
 | Daily 04:43 UTC plus approved upstream completions | Dashboard GitHub Pages | non-authoritative website projection and content-hash deployment deduplication |
-| Every 2 hours at `:23`, 2026-09-09 through 2026-09-30 | Binance USD-M Crypto Core 100 V0.1.2 | Historical acquisition is now 10/10 COMPLETE; the bounded cron remains until a separate retirement PR removes it |
-| Sunday 04:37 UTC | Binance USD-M Crypto Core 100 Training V0.1.2 | Skips until all 10 detailed-history shards are complete; research evidence only |
+| Sunday 04:37 UTC | Binance USD-M Crypto Core 100 Training V0.1.2 | Complete dataset required; exact dataset + model-input experiment fingerprint match returns NO_CHANGE without retraining or R2 writes |
 | 2026-09-04 02:53 UTC, then Sep 6/13/20/27 at 03:53 UTC | Pionex Alternative Assets Observability V0.2 | Validates the 125-candidate equity/ETF/metal catalog, compares prior SHA-bound evidence and estimates capacity; metadata-only R2 evidence |
 
 The expired Binance V0.5 weekly/monthly and Pionex Paper cron triggers are no
@@ -136,3 +135,23 @@ store, pre-trained model or provider dataset was copied into this public
 repository.
 
 Current GitHub automatic-operations inventory is versioned in `config/github_automatic_research_operations_v0_3.json`. V0.2 remains unchanged because the History Cadence authority binds its exact bytes.
+
+
+## Core100 lifecycle cleanup
+
+On reviewed merge of the P1 lifecycle cleanup, the Core100 detailed-history
+schedule is retired because the governed dataset is already 10/10 COMPLETE.
+The current workflow keeps only diagnosis and previously bounded repair modes;
+generic auto/discover/backfill is removed. Historical cadence evidence remains
+immutable through the frozen 2026-09-12 workflow copy.
+
+Weekly Core100 Training remains scheduled. Before full Parquet/example loading,
+the V0.3 runner verifies the completed dataset lineage and immutable previous
+training manifest, computes the experiment fingerprint, and returns
+`NO_CHANGE` when both dataset and model-affecting inputs match the verified
+baseline run `34918219864`. `NO_CHANGE` performs no training and no R2
+write.
+
+Current automatic-operations inventory after this retirement is
+`config/github_automatic_research_operations_v0_4.json` with eight repository
+cron workflows.
