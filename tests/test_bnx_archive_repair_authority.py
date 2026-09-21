@@ -192,9 +192,17 @@ class BNXRepairTests(unittest.TestCase):
         self.assertEqual(store.writes, [])
 
     def test_workflow_keeps_exact_cron_and_existing_secret_boundary(self):
-        workflow = (ROOT / ".github/workflows/binance-usdm-detailed-history-v0-1.yml").read_text()
-        self.assertEqual(workflow.count('cron: "23 */2 9-30 9 *"'), 1)
-        self.assertIn("--repair-config config/bnx_archive_repair_v0_1.json", workflow)
+        frozen = (
+            ROOT
+            / "research/frozen/workflows/2026-09-12-binance-usdm-detailed-history-v0-1.yml"
+        ).read_text()
+        workflow = (
+            ROOT / ".github/workflows/binance-usdm-detailed-history-v0-1.yml"
+        ).read_text()
+        self.assertEqual(frozen.count('cron: "23 */2 9-30 9 *"'), 1)
+        self.assertIn("--repair-config config/bnx_archive_repair_v0_1.json", frozen)
+        self.assertNotIn('cron: "23 */2 9-30 9 *"', workflow)
+        self.assertIn("RETIRED / REPAIR ONLY", workflow)
         diagnostic = workflow.split("  diagnose-bnx:")[1]
         self.assertNotIn("--repair-config", diagnostic)
         self.assertNotIn("secrets.", diagnostic)
