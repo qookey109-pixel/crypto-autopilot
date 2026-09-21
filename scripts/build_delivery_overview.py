@@ -160,7 +160,7 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
     current_date = html.escape(str(current["updated_date"]))
 
     summary = f'''      <section class="panel readiness-summary" aria-labelledby="readiness-heading">
-        <h3 id="readiness-heading">9/18 目前作業狀態</h3>
+        <h3 id="readiness-heading">{current_date} 目前作業狀態</h3>
         <p><strong>Core100 資料與訓練已完成；Model Quality REJECT</strong>。真錢策略驗證、holdout、promotion 與 real trading 仍關閉；public-market Live Paper simulation 已獨立授權。</p>
         <div class="delivery-metrics" aria-label="目前已核實進度">
           <article><p>BTC 27 天固定樣本</p><strong>已完成 · {btc['executed_trade_count']} 筆成交</strong><p>歷史 engine validation only；不代表全市場策略有效。</p></article>
