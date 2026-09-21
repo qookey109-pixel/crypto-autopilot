@@ -63,7 +63,7 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     assert core100["trainingBaselineRunId"] == 34918219864
     assert core100["trainingNoChangeWritesR2"] is False
     assert actual["sourceStatus"]["zecV0_3"]["expectedCells"] == 256
-    assert actual["sourceStatus"]["zecV0_3"]["completedCells"] == 0
+    assert actual["sourceStatus"]["zecV0_3"]["completedCells"] == 256\n    assert actual["sourceStatus"]["zecV0_3"]["state"] == "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE"\n    assert actual["sourceStatus"]["zecV0_3"]["selectionStatus"] == "NO_ELIGIBLE_DEVELOPMENT_CANDIDATE"\n    assert actual["sourceStatus"]["zecV0_3"]["championFrozen"] is False\n    assert actual["sourceStatus"]["zecV0_3"]["diagnosticLeaderId"] == "zec-v0-3-45"\n    assert actual["sourceStatus"]["zecV0_3"]["freshConfirmationAccessAuthorized"] is False
     items = {row["id"]: row for row in actual["items"]}
     assert items["resource-hub-change-watch-v0-2"]["freshness_seconds"] == 108000
     assert items["research-signal-v0-2"]["freshness_seconds"] == 108000
