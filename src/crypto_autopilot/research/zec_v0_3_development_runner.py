@@ -23,6 +23,9 @@ from .zec_v0_3_development_contract import (
     validate_zec_v0_3_development_contract,
 )
 from .zec_v0_3_selection_policy import ZecV03SelectionPolicy
+from .zec_v0_3_development_execution_authority import (
+    ZecV03DevelopmentExecutionAuthority,
+)
 
 
 FOUR_HOURS_MS = 4 * 60 * 60 * 1000
@@ -728,14 +731,23 @@ def run_zec_v0_3_development_matrix(
     *,
     candles_15m: Sequence[Candle],
     contract: Mapping[str, Any],
+    execution_authority: ZecV03DevelopmentExecutionAuthority | None = None,
     funding_points: Sequence[FundingPoint] | None = None,
     initial_equity_usd: float = 10_000.0,
 ) -> tuple[tuple[ZecV03CandidateFoldResult, ...], ZecV03DevelopmentRanking]:
-    """Execute the frozen development matrix only when explicit local authority exists."""
+    """Execute the frozen development matrix only with separate reviewed authority.
+
+    The frozen design contract deliberately remains execution-authority=false.
+    A one-shot authority object may open development execution only after its
+    protected-main merge condition has independently been verified.
+    """
 
     evidence = validate_zec_v0_3_development_contract(contract)
-    authority = contract.get("authority")
-    if not isinstance(authority, Mapping) or authority.get("offline_development_runner_authorized") is not True:
+    if (
+        execution_authority is None
+        or execution_authority.effective is not True
+        or execution_authority.offline_development_execution_authorized is not True
+    ):
         raise ZecV03DevelopmentAuthorityError(
             "offline ZEC V0.3 development execution is not authorized"
         )
