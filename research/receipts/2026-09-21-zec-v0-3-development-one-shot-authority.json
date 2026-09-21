@@ -2,14 +2,15 @@
   "schema": "qookey-zec-v0-3-development-one-shot-authority-v0.1",
   "status": "PROPOSED_EFFECTIVE_ONLY_ON_EXPLICIT_PROTECTED_MAIN_PR_MERGE",
   "authority_id": "zec-v0-3-development-20260921-v0-1",
-  "authority_pr_number": 1,
+  "authority_pr_number": 415,
   "date": "2026-09-21",
   "purpose": "Authorize exactly one manual GitHub-hosted ZEC V0.3 development execution on the already-seen 2022-08 through 2026-07 public Binance Vision 15m history, without consuming fresh confirmation or opening any trading authority.",
   "user_authorization": {
     "explicit_protected_main_merge_required": true,
     "authority_granted_at_prepare_time": false,
     "execution_starts_automatically_on_merge": false,
-    "separate_manual_workflow_dispatch_required": true
+    "separate_manual_workflow_dispatch_required": true,
+    "authority_pr": "https://github.com/qookey109-pixel/crypto-autopilot/pull/415"
   },
   "prior_source_evidence": {
     "receipt": "research/receipts/2026-09-18-bitget-macd-zec-binance-vision-read-only-completion-v0-2.json",
