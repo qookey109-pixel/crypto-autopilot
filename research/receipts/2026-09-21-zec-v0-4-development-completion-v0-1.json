@@ -1,0 +1,143 @@
+{
+  "schema": "qookey-zec-v0-4-development-completion-v0.1",
+  "status": "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
+  "date": "2026-09-21",
+  "repository_main_at_execution": "dd12300b294f2a868389c49a877be97a41a3ebe8",
+  "authority": {
+    "authority_id": "zec-v0-4-development-20260921-v0-1",
+    "authority_pr_number": 418,
+    "authority_merge_sha": "dd12300b294f2a868389c49a877be97a41a3ebe8",
+    "consumed": true,
+    "run_id": 35618367238,
+    "run_attempt": 1
+  },
+  "workflow": {
+    "name": "ZEC V0.4 Development Execution V0.1",
+    "conclusion": "success",
+    "head_sha": "dd12300b294f2a868389c49a877be97a41a3ebe8"
+  },
+  "artifact": {
+    "id": 10647816808,
+    "name": "zec-v0-4-development-35618367238-1",
+    "size_bytes": 6227,
+    "digest": "sha256:ea9c7652d98fdf947216fc4f291b8823b99fa66e8b210d279b58be615da846de",
+    "report_sha256": "764a3667dcbc91a7142b2b2bf3fdd33c0051492ba1b892fb6283e05148c09959",
+    "retention_days": 30
+  },
+  "source": {
+    "provider": "binance_usdm",
+    "delivery": "binance_vision_public_monthly",
+    "symbol": "ZECUSDT",
+    "interval": "15m",
+    "archive_count": 48,
+    "provider_requests_performed": 96,
+    "row_count": 140256,
+    "raw_candles_persisted": false,
+    "funding_status": "UNAVAILABLE_NOT_FABRICATED"
+  },
+  "development": {
+    "candidate_count": 6,
+    "fold_count": 4,
+    "matrix_cells": 24,
+    "complete_matrix": true,
+    "minimum_realized_trades_per_fold_gate": 30,
+    "candidates_meeting_trade_count_gate": 6,
+    "minimum_worst_fold_return_pct_exclusive_gate": 0,
+    "candidates_with_positive_worst_fold_return": 0,
+    "selection_status": "NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
+    "champion_frozen": false,
+    "selected_candidate_id": null,
+    "diagnostic_leader": {
+      "candidate_id": "zec-v0-4-04",
+      "parameters": {
+        "macd": "12/30/7",
+        "activation_regime": "TREND_STRICT_BASELINE"
+      },
+      "worst_fold_return_pct": -8.12511401,
+      "median_fold_return_pct": -3.04319973,
+      "best_fold_return_pct": 6.28084212,
+      "minimum_trades_per_fold": 99,
+      "total_realized_trades": 627,
+      "worst_fold_drawdown_pct": 9.64917501,
+      "fold_returns_pct": [
+        -6.0073329,
+        -8.12511401,
+        -0.07906656,
+        6.28084212
+      ]
+    },
+    "candidate_summaries": [
+      {
+        "candidate_id": "zec-v0-4-01",
+        "macd": "12/26/9",
+        "activation_regime": "TREND_STRICT_BASELINE",
+        "worst_fold_return_pct": -9.14098812,
+        "median_fold_return_pct": -1.988247055,
+        "total_trades": 595
+      },
+      {
+        "candidate_id": "zec-v0-4-02",
+        "macd": "12/26/9",
+        "activation_regime": "TREND_STACKED",
+        "worst_fold_return_pct": -10.68657455,
+        "median_fold_return_pct": -1.32933364,
+        "total_trades": 477
+      },
+      {
+        "candidate_id": "zec-v0-4-03",
+        "macd": "12/26/9",
+        "activation_regime": "TREND_STACKED_MOMENTUM",
+        "worst_fold_return_pct": -8.94714216,
+        "median_fold_return_pct": -0.11074858,
+        "total_trades": 303
+      },
+      {
+        "candidate_id": "zec-v0-4-04",
+        "macd": "12/30/7",
+        "activation_regime": "TREND_STRICT_BASELINE",
+        "worst_fold_return_pct": -8.12511401,
+        "median_fold_return_pct": -3.04319973,
+        "total_trades": 627
+      },
+      {
+        "candidate_id": "zec-v0-4-05",
+        "macd": "12/30/7",
+        "activation_regime": "TREND_STACKED",
+        "worst_fold_return_pct": -10.19546108,
+        "median_fold_return_pct": -2.563869335,
+        "total_trades": 501
+      },
+      {
+        "candidate_id": "zec-v0-4-06",
+        "macd": "12/30/7",
+        "activation_regime": "TREND_STACKED_MOMENTUM",
+        "worst_fold_return_pct": -8.85062761,
+        "median_fold_return_pct": -0.67485695,
+        "total_trades": 320
+      }
+    ]
+  },
+  "interpretation": {
+    "workflow_success_means_execution_complete_not_strategy_pass": true,
+    "primary_rejection_reason": "NO_CANDIDATE_HAS_POSITIVE_WORST_FOLD_RETURN",
+    "trade_activity_was_not_the_blocking_gate": true,
+    "v0_4_regime_activation_did_not_establish_cross_fold_robustness": true,
+    "v0_3_selection_gate_should_be_loosened": false,
+    "fresh_confirmation_should_remain_closed": true,
+    "threshold_or_policy_change_supported": false
+  },
+  "safety_boundary": {
+    "fresh_confirmation_accessed": false,
+    "fresh_confirmation_access_authorized": false,
+    "formal_holdout_accessed": false,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "raw_candles_persisted": false,
+    "raw_trade_artifact_emitted": false,
+    "source_switch_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
