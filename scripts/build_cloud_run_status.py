@@ -186,6 +186,13 @@ def _parse_utc(value: object) -> datetime | None:
 def freshness_state(definition: dict, latest: dict, *, now: datetime) -> str:
     if definition["lifecycleState"] == "EXPIRED_BOUNDED_FROZEN_CRON_DECLARATION":
         return "EXPIRED_WINDOW"
+
+    active_until = _parse_utc(definition.get("activeUntilUtc"))
+    if active_until is not None and now > active_until:
+        return "EXPIRED_WINDOW"
+    if latest.get("state") == "QUERY_FAILED":
+        return "QUERY_FAILED"
+
     evidence = _parse_utc(latest.get("evidenceTimeUtc"))
     max_age = definition.get("maxAgeSeconds")
     active_from = _parse_utc(definition.get("activeFromUtc"))
@@ -194,8 +201,15 @@ def freshness_state(definition: dict, latest: dict, *, now: datetime) -> str:
             if now <= active_from + timedelta(seconds=max_age):
                 return "WAITING_FIRST_SCHEDULE"
         return "NO_AUTOMATIC_RUN"
+
     if latest.get("state") == "RUNNING":
-        return "RUNNING"
+        if not isinstance(max_age, int):
+            return "RUNNING"
+        age_seconds = (now - evidence).total_seconds()
+        if age_seconds < 0:
+            return "UNVERIFIED"
+        return "RUNNING" if age_seconds <= max_age else "STALLED"
+
     if not isinstance(max_age, int):
         return "NOT_APPLICABLE"
     age_seconds = (now - evidence).total_seconds()
@@ -218,7 +232,7 @@ def collect(fetch_json, *, now: datetime | None = None) -> dict:
             latest = project_run(payload.get("workflow_runs", []), workflow)
         except Exception:
             latest = {
-                "state": "UNVERIFIED",
+                "state": "QUERY_FAILED",
                 "runId": None,
                 "headSha": None,
                 "evidenceTimeUtc": None,
