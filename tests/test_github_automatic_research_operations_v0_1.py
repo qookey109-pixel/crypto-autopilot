@@ -55,6 +55,13 @@ def test_policy_matches_every_repository_cron_exactly() -> None:
     assert semantics["workflow_file_mutation_required"] is False
     assert semantics["outside_window_execution_effective"] is False
     assert semantics["replay_or_backfill_authorized"] is False
+    health_by_workflow = {row["workflow"]: row for row in health["workflows"]}
+    v012_health = health_by_workflow[
+        "provider-equivalence-v0-12-successor-metadata-capture.yml"
+    ]
+    assert v012_health["mode"] == "bounded"
+    assert v012_health["active_until_utc"] == "2026-09-12T04:00:00Z"
+    assert v012_health["allowed_events"] == ["schedule"]
 
 
 def test_manual_runs_are_not_normal_operations_or_health_evidence() -> None:
