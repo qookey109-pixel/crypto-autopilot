@@ -139,8 +139,9 @@ def test_workflow_expands_variables_and_never_silently_loses_dedupe_state() -> N
 
     assert "\\${" not in text
     assert "GITHUB_TOKEN: ${{ github.token }}" in text
-    assert '"${GITHUB_TOKEN}"' in text
-    assert '"${HUB_SHA}"' in text
+    assert 'Bearer ${GITHUB_TOKEN}' in text
+    assert 'hub_sha=${HUB_SHA}' in text
+    assert '/${HUB_SHA}/data/resources.json' in text
     assert '"${args[@]}"' in text
     assert "|| true" not in text
 
