@@ -136,6 +136,7 @@ Already established and verified:
 - Pionex V0.2 materialization completion is converged into current status/projections;
 - immutable Core100 REJECT / threshold-replay evidence is preserved on `main`;
 - Research Automation Health count derives from exact schedule inventory rather than a hard-coded `7`;
+- current Repository cron inventory is seven workflows after the expired V0.12 successor cron retirement; Dashboard/Health/Automatic Operations must match it exactly;
 - CI emits a non-blocking quality-visibility artifact on Python 3.13;
 - Dependabot provides monthly review-only visibility for `pip` and GitHub Actions.
 
