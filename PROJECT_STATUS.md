@@ -226,3 +226,32 @@ non-authoritative automation schedule projection.
 
 This batch does not open replacement holdout, source switching, automatic model
 promotion, formal trade plans, real-money orders or live real trading.
+
+
+## Automation V2 P1 — Core100 lifecycle cleanup (effective on reviewed merge)
+
+This branch prepares the next protected-main lifecycle cleanup without changing
+the completed research result:
+
+- Core100 History remains **10/10 COMPLETE** and
+  `history_reacquisition_required=false`.
+- The old `:23 every two hours` History cron is removed on merge.
+- Generic History `auto / discover / backfill` entrypoints are retired; only
+  the already-bounded diagnosis and BNX repair modes remain available.
+- The 2026-09-12 History cadence config, receipt and exact old workflow bytes
+  remain frozen historical evidence. The old receipt is not rewritten.
+- Automatic Operations V0.4 contains **8 repository cron workflows** after the
+  History schedule retirement.
+- Core100 weekly Training remains scheduled, but V0.3 of the runner computes an
+  experiment fingerprint from the governed dataset plus model-affecting Git
+  blobs. An exact match returns `NO_CHANGE`, performs no training and writes
+  nothing to R2.
+- The first dedupe baseline is the already-successful run `34918219864` on
+  dataset fingerprint
+  `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`.
+  The model-affecting inputs were verified byte-identical between that run head
+  and reviewed main before this change.
+
+This P1 change adds no provider scope, no new R2 scope, no holdout access, no
+source switch, no automatic model promotion, no formal trade plan, no
+real-money orders and no live real trading.
