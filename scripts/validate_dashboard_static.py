@@ -17,6 +17,7 @@ RESEARCH_EVIDENCE_SCHEMA = ROOT / "data" / "research-evidence.schema.json"
 ALTERNATIVE_ASSETS = ROOT / "data" / "alternative-assets.json"
 HISTORY_PROGRESS = ROOT / "data" / "history-progress.json"
 CLOUD_RUNS = ROOT / "data" / "cloud-runs.json"
+ZEC_COMPLETION_RECEIPT = Path("research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json")
 REQUIRED = (
     ROOT / "index.html",
     STYLES,
@@ -331,8 +332,8 @@ def main() -> int:
         raise RuntimeError("Core100 Training fingerprint dedupe state changed")
     if operations_summary.get("zecDevelopmentExpectedCells") != 256:
         raise RuntimeError("automation projection ZEC matrix size changed")
-    if operations_summary.get("zecDevelopmentCompletedCells") != 0:
-        raise RuntimeError("automation projection must not invent ZEC execution")
+    if operations_summary.get("zecDevelopmentCompletedCells") != 256:
+        raise RuntimeError("automation projection lost completed ZEC execution evidence")
     source_status = operations.get("sourceStatus") or {}
     resource_status = source_status.get("resourceHub") or {}
     registry_status = source_status.get("externalCapabilityRegistry") or {}
@@ -356,8 +357,34 @@ def main() -> int:
         raise RuntimeError("Core100 Training baseline run changed")
     if core100_status.get("trainingNoChangeWritesR2") is not False:
         raise RuntimeError("Core100 Training NO_CHANGE must not write R2")
-    if zec_status.get("state") != "WAITING_EXECUTION_AUTHORITY":
-        raise RuntimeError("ZEC projection must remain waiting for execution authority")
+    if zec_status.get("state") != "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE":
+        raise RuntimeError("ZEC projection completion state changed")
+    if zec_status.get("expectedCells") != 256 or zec_status.get("completedCells") != 256:
+        raise RuntimeError("ZEC projection must preserve the complete 256-cell matrix")
+    if zec_status.get("selectionStatus") != "NO_ELIGIBLE_DEVELOPMENT_CANDIDATE":
+        raise RuntimeError("ZEC projection selection result changed")
+    if zec_status.get("championFrozen") is not False:
+        raise RuntimeError("ZEC projection cannot claim a frozen champion")
+    if zec_status.get("diagnosticLeaderId") != "zec-v0-3-45":
+        raise RuntimeError("ZEC diagnostic leader evidence changed")
+    if zec_status.get("freshConfirmationAccessAuthorized") is not False:
+        raise RuntimeError("ZEC fresh confirmation must remain closed")
+
+    zec_completion = json.loads(ZEC_COMPLETION_RECEIPT.read_text(encoding="utf-8"))
+    if zec_completion.get("schema") != "qookey-zec-v0-3-development-completion-v0.1":
+        raise RuntimeError("ZEC completion receipt schema changed")
+    if zec_completion.get("status") != "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE":
+        raise RuntimeError("ZEC completion receipt state changed")
+    zec_completion_dev = zec_completion.get("development") or {}
+    if zec_completion_dev.get("matrix_cells") != 256:
+        raise RuntimeError("ZEC completion receipt matrix changed")
+    if zec_completion_dev.get("selection_status") != "NO_ELIGIBLE_DEVELOPMENT_CANDIDATE":
+        raise RuntimeError("ZEC completion receipt selection changed")
+    if zec_completion_dev.get("champion_frozen") is not False:
+        raise RuntimeError("ZEC completion receipt cannot freeze a champion")
+    zec_completion_safety = zec_completion.get("safety_boundary") or {}
+    if any(value is not False for value in zec_completion_safety.values()):
+        raise RuntimeError("ZEC completion receipt safety boundary changed")
     operations_items = operations.get("items") or []
     required_operation_ids = {
         "resource-hub-change-watch-v0-2",

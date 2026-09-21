@@ -267,14 +267,14 @@
       "workflow": null,
       "trigger": [],
       "expected_crons": [],
-      "local_schedule": "新 authority 合併後一次性",
+      "local_schedule": "one-shot authority consumed by run 35573236145",
       "dependency_ids": [],
       "active_from": null,
       "active_until": null,
       "freshness_seconds": null,
-      "status": "WAITING_EXECUTION_AUTHORITY",
-      "authority_link": "config/zec_strategy_v0_3_development_matrix_v0_1.json",
-      "detail": "64 candidates × 4 folds = 256 cells；real historical development execution 仍鎖定。"
+      "status": "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
+      "authority_link": "research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json",
+      "detail": "64 candidates × 4 folds = 256/256 complete；selection = NO_ELIGIBLE_DEVELOPMENT_CANDIDATE；fresh confirmation remains closed."
     }
   ],
   "authority": {

@@ -110,7 +110,7 @@ Tracking: `docs/TECH_DEBT_REGISTER_2026_09_16.md`.
 - Pionex Validation Materialization V0.2 is **COMPLETE / PASS** on run `35054729471`; this closes the materialization task only, not downstream research gates.
 - Core100 remains **Model Quality REJECT** and threshold replay still supports **no threshold change**; Strategy Validation, replacement holdout, Promotion and real trading remain closed.
 - ZEC MACD V0.2 historical evidence is preserved on current main as **execution PASS / strategy evidence REJECT**. No V0.1/V0.2 reexecution authority was revived.
-- ZEC Strategy V0.3 now has its preregistered design, Offline Development Runner V0.1, frozen 64-candidate / four-fold development contract, frozen Development Selection Policy V0.1, and reusable Statistical Edge Gate V0.1. Real historical development execution remains locked; fresh confirmation, holdout, promotion and trading remain unopened.
+- ZEC Strategy V0.3 completed its governed one-shot historical development execution: 64 candidates × 4 folds = 256/256 cells. Selection result is **NO_ELIGIBLE_DEVELOPMENT_CANDIDATE**; no champion was frozen. Fresh confirmation, holdout, promotion and trading remain unopened.
 - External Capability Registry candidates have downstream evaluation receipts and a convergence index. Candidate inventory status does not imply runtime approval.
 - Operator messaging now has a provider-neutral offline path: parser -> status resolver -> local CLI for `help`, `status` and `paper_status`; no Telegram/network/secret/trading authority is implied.
 - As of this 2026-09-19 status convergence, GitHub has **zero open pull requests** after preserving useful evidence/design work and closing superseded historical drafts.

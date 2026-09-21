@@ -320,7 +320,16 @@ jobs:
           assert operations['sourceStatus']['core100']['trainingState'] == 'FINGERPRINT_DEDUP_ACTIVE'
           assert operations['sourceStatus']['core100']['trainingNoChangeWritesR2'] is False
           assert operations['sourceStatus']['zecV0_3']['expectedCells'] == 256
-          assert operations['sourceStatus']['zecV0_3']['completedCells'] == 0
+          assert operations['sourceStatus']['zecV0_3']['completedCells'] == 256
+          assert operations['sourceStatus']['zecV0_3']['state'] == (
+              'COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE'
+          )
+          assert operations['sourceStatus']['zecV0_3']['selectionStatus'] == (
+              'NO_ELIGIBLE_DEVELOPMENT_CANDIDATE'
+          )
+          assert operations['sourceStatus']['zecV0_3']['championFrozen'] is False
+          assert operations['sourceStatus']['zecV0_3']['diagnosticLeaderId'] == 'zec-v0-3-45'
+          assert operations['sourceStatus']['zecV0_3']['freshConfirmationAccessAuthorized'] is False
           assert all(value is False for value in operations['safetyBoundary'].values())
           datetime.fromisoformat(operations['projectionGeneratedAtUtc'].replace('Z', '+00:00'))
           assert evidence['authority'] is False

@@ -1,0 +1,94 @@
+{
+  "schema": "qookey-zec-v0-3-development-completion-v0.1",
+  "status": "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
+  "date": "2026-09-21",
+  "repository_main_at_execution": "c33c81732deae569fb924f61f81868a128690a07",
+  "authority": {
+    "authority_id": "zec-v0-3-development-20260921-v0-1",
+    "authority_pr_number": 415,
+    "authority_merge_sha": "c33c81732deae569fb924f61f81868a128690a07",
+    "consumed": true,
+    "run_id": 35573236145,
+    "run_attempt": 1
+  },
+  "workflow": {
+    "name": "ZEC V0.3 Development Execution V0.1",
+    "conclusion": "success",
+    "head_sha": "c33c81732deae569fb924f61f81868a128690a07"
+  },
+  "artifact": {
+    "id": 10626687807,
+    "name": "zec-v0-3-development-35573236145-1",
+    "size_bytes": 22342,
+    "digest": "sha256:61bb133d9751aef381010d504250bb51c2e224f087344cb7f974396845c7cc90",
+    "report_sha256": "7428a8ced8cc401a98f061de7c77a54650dc53eb660443ec947f09e8e5fd2321",
+    "retention_days": 30
+  },
+  "source": {
+    "provider": "binance_usdm",
+    "delivery": "binance_vision_public_monthly",
+    "symbol": "ZECUSDT",
+    "interval": "15m",
+    "archive_count": 48,
+    "provider_requests_performed": 96,
+    "row_count": 140256,
+    "raw_candles_persisted": false,
+    "funding_status": "UNAVAILABLE_NOT_FABRICATED"
+  },
+  "development": {
+    "candidate_count": 64,
+    "fold_count": 4,
+    "matrix_cells": 256,
+    "complete_matrix": true,
+    "minimum_realized_trades_per_fold_gate": 30,
+    "candidates_meeting_trade_count_gate": 64,
+    "minimum_worst_fold_return_pct_exclusive_gate": 0,
+    "candidates_with_positive_worst_fold_return": 0,
+    "selection_status": "NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
+    "champion_frozen": false,
+    "selected_candidate_id": null,
+    "diagnostic_leader": {
+      "candidate_id": "zec-v0-3-45",
+      "parameters": {
+        "macd": "12/30/7",
+        "trend_regime": "TREND_STRICT",
+        "volatility_filter": "ATR_ROLLING_EXTREME_GUARD",
+        "stop_model": "VOL_STOP_2_5ATR_BB_HALF",
+        "account_risk_fraction": 0.01
+      },
+      "worst_fold_return_pct": -8.12511401,
+      "median_fold_return_pct": -3.04319973,
+      "best_fold_return_pct": 6.28084212,
+      "minimum_trades_per_fold": 99,
+      "total_realized_trades": 627,
+      "worst_fold_drawdown_pct": 9.64917501,
+      "fold_returns_pct": [
+        -6.0073329,
+        -8.12511401,
+        -0.07906656,
+        6.28084212
+      ]
+    }
+  },
+  "interpretation": {
+    "workflow_success_means_execution_complete_not_strategy_pass": true,
+    "primary_rejection_reason": "NO_CANDIDATE_HAS_POSITIVE_WORST_FOLD_RETURN",
+    "trade_activity_was_not_the_blocking_gate": true,
+    "fresh_confirmation_should_remain_closed": true,
+    "threshold_or_policy_change_supported": false
+  },
+  "safety_boundary": {
+    "fresh_confirmation_accessed": false,
+    "fresh_confirmation_access_authorized": false,
+    "formal_holdout_accessed": false,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "raw_candles_persisted": false,
+    "raw_trade_artifact_emitted": false,
+    "source_switch_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

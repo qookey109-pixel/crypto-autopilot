@@ -33,7 +33,7 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     }
     assert len(scheduled_workflows) == 7
     assert "provider-equivalence-v0-12-successor-metadata-capture.yml" not in scheduled_workflows
-    assert actual["summary"]["waitingAuthorityCount"] == 3
+    assert actual["summary"]["waitingAuthorityCount"] == 2
     assert actual["summary"]["plannedNotScheduledCount"] == 5
     assert actual["summary"]["core100HistoryStatus"] == "COMPLETE"
     assert actual["summary"]["core100HistoryRetirementPending"] is False
@@ -63,7 +63,16 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     assert core100["trainingBaselineRunId"] == 34918219864
     assert core100["trainingNoChangeWritesR2"] is False
     assert actual["sourceStatus"]["zecV0_3"]["expectedCells"] == 256
-    assert actual["sourceStatus"]["zecV0_3"]["completedCells"] == 0
+    assert actual["sourceStatus"]["zecV0_3"]["completedCells"] == 256
+    assert actual["sourceStatus"]["zecV0_3"]["state"] == (
+        "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE"
+    )
+    assert actual["sourceStatus"]["zecV0_3"]["selectionStatus"] == (
+        "NO_ELIGIBLE_DEVELOPMENT_CANDIDATE"
+    )
+    assert actual["sourceStatus"]["zecV0_3"]["championFrozen"] is False
+    assert actual["sourceStatus"]["zecV0_3"]["diagnosticLeaderId"] == "zec-v0-3-45"
+    assert actual["sourceStatus"]["zecV0_3"]["freshConfirmationAccessAuthorized"] is False
     items = {row["id"]: row for row in actual["items"]}
     assert items["resource-hub-change-watch-v0-2"]["freshness_seconds"] == 108000
     assert items["research-signal-v0-2"]["freshness_seconds"] == 108000
