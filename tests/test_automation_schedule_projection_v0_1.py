@@ -24,6 +24,13 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     assert actual["summary"]["repositoryScheduledWorkflowCount"] == 7
     assert actual["summary"]["monitoredScheduledWorkflowCount"] == 7
     assert actual["summary"]["scheduleInventoryConverged"] is True
+    scheduled_workflows = {
+        Path(row["workflow"]).name
+        for row in actual["items"]
+        if row.get("workflow") and row.get("expected_crons")
+    }
+    assert len(scheduled_workflows) == 7
+    assert "provider-equivalence-v0-12-successor-metadata-capture.yml" not in scheduled_workflows
     assert actual["summary"]["waitingAuthorityCount"] == 3
     assert actual["summary"]["plannedNotScheduledCount"] == 5
     assert actual["summary"]["core100HistoryStatus"] == "COMPLETE"
