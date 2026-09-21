@@ -206,3 +206,28 @@ this execution result.
 
 Completion receipt:
 `research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json`
+
+
+## ZEC Strategy V0.4 preregistration
+
+V0.3 remains complete with `NO_ELIGIBLE_DEVELOPMENT_CANDIDATE`; its frozen
+selection policy is not relaxed.
+
+V0.4 prepares a new **contract-only** regime-activation hypothesis:
+
+- development history remains the already-seen `2022-08-01 <= t < 2026-08-01`;
+- fresh confirmation `2026-08-01 <= t < 2026-09-16` remains unopened;
+- 2 MACD variants × 3 causal 4h activation regimes = **6 candidates**;
+- 4 chronological folds = **24 development cells**;
+- ATR extreme guard, 2.5ATR/Bollinger stop and 1% account risk are fixed rather
+  than swept;
+- V0.3 frozen selection policy is reused unchanged;
+- execution authority: **false**;
+- provider / R2 / holdout / source switch / promotion / trading authority:
+  **false**.
+
+Aggregate V0.3 diagnosis:
+`research/receipts/2026-09-21-zec-v0-3-development-diagnostic-v0-1.json`
+
+V0.4 contract:
+`config/zec_strategy_v0_4_development_matrix_v0_1.json`
