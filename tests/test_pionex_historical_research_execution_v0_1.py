@@ -60,7 +60,7 @@ def test_workflow_is_serialized_and_has_no_trading_or_schedule_path() -> None:
     assert "place_order" not in text.lower()
 
 
-def test_manual_pionex_workflow_remains_unscheduled_under_batch2_crons() -> None:
+def test_manual_pionex_workflow_remains_unscheduled_after_history_retirement() -> None:
     convergence = json.loads(
         (ROOT / "config/project_convergence_v0_1.json").read_text(encoding="utf-8")
     )
@@ -76,7 +76,7 @@ def test_manual_pionex_workflow_remains_unscheduled_under_batch2_crons() -> None
         for item in group
         if item.get("cron_utc")
     ]
-    assert len(scheduled) == 9
+    assert len(scheduled) == 8
 
 
 def test_runner_requires_headroom_before_pionex_history_and_writes_pointer_last() -> None:
