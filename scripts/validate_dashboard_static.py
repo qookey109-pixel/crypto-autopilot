@@ -276,6 +276,14 @@ def main() -> int:
     operations_summary = operations.get("summary") or {}
     if operations_summary.get("core100HistoryStatus") != "COMPLETE":
         raise RuntimeError("automation projection lost Core100 completion")
+    if operations_summary.get("scheduledJobCount") != 7:
+        raise RuntimeError("automation projection scheduled job count changed")
+    if operations_summary.get("core100HistoryRetirementPending") is not False:
+        raise RuntimeError("Core100 History retirement must no longer be pending")
+    if operations_summary.get("core100HistoryScheduleRetired") is not True:
+        raise RuntimeError("Core100 History retired schedule is not projected")
+    if operations_summary.get("core100TrainingDedupeState") != "ACTIVE_FINGERPRINT_NO_CHANGE":
+        raise RuntimeError("Core100 Training fingerprint dedupe state changed")
     if operations_summary.get("zecDevelopmentExpectedCells") != 256:
         raise RuntimeError("automation projection ZEC matrix size changed")
     if operations_summary.get("zecDevelopmentCompletedCells") != 0:
@@ -283,6 +291,7 @@ def main() -> int:
     source_status = operations.get("sourceStatus") or {}
     resource_status = source_status.get("resourceHub") or {}
     registry_status = source_status.get("externalCapabilityRegistry") or {}
+    core100_status = source_status.get("core100") or {}
     zec_status = source_status.get("zecV0_3") or {}
     if resource_status.get("state") != "SCHEDULED_READ_ONLY_CHANGE_WATCH":
         raise RuntimeError("Resource Hub projection state changed")
@@ -292,6 +301,16 @@ def main() -> int:
         raise RuntimeError("external capability registry count changed")
     if registry_status.get("runtimeExecutionAuthorized") is not False:
         raise RuntimeError("external capability runtime must remain closed")
+    if core100_status.get("historyState") != "COMPLETE_SCHEDULE_RETIRED":
+        raise RuntimeError("Core100 History retirement projection changed")
+    if core100_status.get("historyGenericBackfillRetired") is not True:
+        raise RuntimeError("Core100 generic backfill retirement projection changed")
+    if core100_status.get("trainingState") != "FINGERPRINT_DEDUP_ACTIVE":
+        raise RuntimeError("Core100 Training dedupe projection changed")
+    if core100_status.get("trainingBaselineRunId") != 34918219864:
+        raise RuntimeError("Core100 Training baseline run changed")
+    if core100_status.get("trainingNoChangeWritesR2") is not False:
+        raise RuntimeError("Core100 Training NO_CHANGE must not write R2")
     if zec_status.get("state") != "WAITING_EXECUTION_AUTHORITY":
         raise RuntimeError("ZEC projection must remain waiting for execution authority")
     operations_items = operations.get("items") or []
