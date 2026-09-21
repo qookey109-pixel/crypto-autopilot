@@ -197,3 +197,32 @@ The pre-PR-#322 long-form root documents remain exactly recoverable from histori
 - PROJECT_STATUS blob: `0815abd975c5c708fbb9578dff400733e1ff6275`
 
 Their old present-tense `8/10 / Training SKIPPED` statements are historical evidence and must not be treated as current operations.
+
+
+## Automation V2 Batch 2 — external research and website projection
+
+Automatic Operations V0.3 is the current Batch 2 schedule inventory. V0.2 remains byte-stable because the History Cadence authority binds it as frozen evidence.
+
+This batch adds a versioned, read-only external-source change watch and a
+non-authoritative automation schedule projection.
+
+- Resource Hub Supply Chain V0.2: daily `01:13 UTC` / `09:13 Asia/Taipei`;
+  unchanged source commits return `NO_CHANGE` without rebuilding candidates.
+- Changed Resource Hub candidates remain `REVIEW_REQUIRED`; automatic install,
+  runtime, adapter creation and pull-request creation remain closed.
+- Dashboard Pages adds a daily `04:43 UTC` / `12:43 Asia/Taipei` backstop and
+  business-content hash deduplication so rebuild timestamps alone do not cause
+  a deployment.
+- The website projects active, waiting-authority and planned schedules
+  separately through `web/data/operations-schedule.json` with
+  `authority=false`.
+- ZEC V0.3 remains `0/256` development cells and
+  `offline_development_runner_authorized=false`.
+- Hourly multi-asset Paper scheduling remains waiting for a separate authority.
+- Core100 History is complete 10/10, but its old September cron still requires a
+  separate retirement change.
+- Core100 Training remains scheduled; experiment-fingerprint `NO_CHANGE`
+  deduplication is still a P1 follow-up.
+
+This batch does not open replacement holdout, source switching, automatic model
+promotion, formal trade plans, real-money orders or live real trading.

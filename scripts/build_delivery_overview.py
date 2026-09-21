@@ -208,6 +208,16 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
             "視窗已於 9/12 12:00 結束",
             "HISTORICAL；保留 schedule registration lineage，不是目前 active execution path",
         ),
+        "resource-hub-supply-chain-v0-2.yml": (
+            "外部資源追蹤",
+            "每日 09:13",
+            "只讀 Resource Hub 公開 catalog；來源 commit 不變時 NO_CHANGE，不自動安裝、執行或開 PR",
+        ),
+        "dashboard-github-pages.yml": (
+            "網站投影補查",
+            "每日 12:43 + 核准上游完成事件",
+            "authority=false；業務內容 hash 相同時跳過重複部署",
+        ),
     }
     declared = read_json("config/project_convergence_v0_1.json", root)["scheduled_workflows"]
     inventory = {item["workflow"]: item["cron_utc"] for group in declared.values() for item in group}

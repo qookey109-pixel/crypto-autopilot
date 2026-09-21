@@ -13,6 +13,16 @@ const STATUS_LABELS = {
   PASS: "通過 · PASS",
   READY: "已就緒 · READY",
   AUTHORIZED: "已授權 · AUTHORIZED",
+  ACTIVE: "運作中 · ACTIVE",
+  ACTIVE_BACKSTOP: "運作中 · 補查",
+  SCHEDULED_READ_ONLY: "已排程 · 唯讀",
+  ACTIVE_CONTENT_HASH_DEDUP: "運作中 · 內容去重",
+  ACTIVE_UNTIL_ORIGINAL_EXPIRY: "運作中 · 原期限",
+  COMPLETE_CRON_RETIREMENT_PENDING: "已完成 · 待退役排程",
+  SCHEDULED_NEEDS_FINGERPRINT_DEDUPE: "已排程 · 待指紋去重",
+  WAITING_SCHEDULE_AUTHORITY: "等待排程授權",
+  WAITING_EXECUTION_AUTHORITY: "等待執行授權",
+  PLANNED_NOT_SCHEDULED: "規劃中 · 未排程",
   WAITING_FIRST_RUN: "等待首次執行 · WAITING_FIRST_RUN",
   BASELINE_CREATED: "基準已建立 · BASELINE_CREATED",
   PREPARED: "已準備 · PREPARED",
@@ -28,8 +38,8 @@ const STATUS_LABELS = {
 };
 
 function badgeClass(status) {
-  if (["PASS", "READY", "AUTHORIZED", "BASELINE_CREATED"].includes(status)) return "pass";
-  if (["PREPARED", "WAITING_AUTHORITY", "WAITING_FIRST_RUN", "PENDING", "IN_PROGRESS", "NOT_READY", "REVIEW_REQUIRED", "SCOPE_REDUCTION_REQUIRED"].includes(status)) return "pending";
+  if (["PASS", "READY", "AUTHORIZED", "BASELINE_CREATED", "ACTIVE", "ACTIVE_BACKSTOP", "SCHEDULED_READ_ONLY", "ACTIVE_CONTENT_HASH_DEDUP", "ACTIVE_UNTIL_ORIGINAL_EXPIRY"].includes(status)) return "pass";
+  if (["PREPARED", "WAITING_AUTHORITY", "WAITING_FIRST_RUN", "PENDING", "IN_PROGRESS", "NOT_READY", "REVIEW_REQUIRED", "SCOPE_REDUCTION_REQUIRED", "COMPLETE_CRON_RETIREMENT_PENDING", "SCHEDULED_NEEDS_FINGERPRINT_DEDUPE", "WAITING_SCHEDULE_AUTHORITY", "WAITING_EXECUTION_AUTHORITY", "PLANNED_NOT_SCHEDULED"].includes(status)) return "pending";
   if (["BLOCKED", "NOT_AUTHORIZED", "FAIL"].includes(status)) return "danger";
   return "neutral";
 }
@@ -39,7 +49,7 @@ function displayStatus(status) {
 }
 
 function statusDot(status) {
-  const className = ["PASS", "READY", "AUTHORIZED"].includes(status) ? "safe" : "";
+  const className = ["PASS", "READY", "AUTHORIZED", "ACTIVE", "ACTIVE_BACKSTOP", "SCHEDULED_READ_ONLY", "ACTIVE_CONTENT_HASH_DEDUP", "ACTIVE_UNTIL_ORIGINAL_EXPIRY"].includes(status) ? "safe" : "";
   return `<span class="status-dot ${className}"></span>`;
 }
 
@@ -236,6 +246,59 @@ function renderCalendar(calendar) {
       </li>
     `;
   }).join("");
+}
+
+
+function operationsScheduleIsSafe(projection) {
+  if (!projection || projection.schema !== "qookey-automation-schedule-projection-v0.1") return false;
+  if (projection.authority !== false || projection.timezone !== "Asia/Taipei") return false;
+  if (!Array.isArray(projection.items)) return false;
+  const boundary = projection.safetyBoundary || {};
+  return Object.keys(boundary).length > 0 && Object.values(boundary).every(value => value === false);
+}
+
+function renderOperationsSchedule(projection) {
+  const root = document.querySelector("#operations-schedule");
+  const generated = document.querySelector("#operations-schedule-generated-at");
+  const sourceSummary = document.querySelector("#external-source-summary");
+  const zecSummary = document.querySelector("#zec-matrix-summary");
+  if (!root) return;
+
+  if (!operationsScheduleIsSafe(projection)) {
+    root.innerHTML = '<li class="calendar-loading"><strong>自動化排程暫時無法核實</strong><small>請以 Repository authority 為準</small></li>';
+    if (generated) generated.textContent = "排程投影：尚未提供";
+    if (sourceSummary) sourceSummary.textContent = "外部來源狀態：尚未提供";
+    if (zecSummary) zecSummary.textContent = "ZEC V0.3：等待 authority";
+    return;
+  }
+
+  if (generated) {
+    generated.textContent = `排程投影：${formatTrustedTime(projection.projectionGeneratedAtUtc)}`;
+  }
+  const resource = projection.sourceStatus?.resourceHub || {};
+  const registry = projection.sourceStatus?.externalCapabilityRegistry || {};
+  const zec = projection.sourceStatus?.zecV0_3 || {};
+  const baseline = String(resource.baselineCommit || "");
+  if (sourceSummary) {
+    sourceSummary.textContent =
+      `外部來源：Resource Hub 每日唯讀追蹤 · baseline ${baseline ? baseline.slice(0, 8) : "—"} · Capability Registry ${number(registry.candidateCount, 0)} 個候選；來源不變不重評。`;
+  }
+  if (zecSummary) {
+    zecSummary.textContent =
+      `ZEC V0.3：${number(zec.completedCells, 0)}/${number(zec.expectedCells, 0)} cells · ${displayStatus(String(zec.state || "WAITING_EXECUTION_AUTHORITY"))}。`;
+  }
+
+  root.innerHTML = projection.items.map(item => `
+    <li class="calendar-card">
+      <div class="calendar-card-top">
+        <span>${escapeHtml(item.local_schedule || "未排程")}</span>
+        <span class="badge ${badgeClass(String(item.status || "NOT_READY"))}">${escapeHtml(displayStatus(String(item.status || "NOT_READY")))}</span>
+      </div>
+      <strong>${escapeHtml(item.title)}</strong>
+      <small>${escapeHtml(item.detail)}</small>
+      <em>${escapeHtml((item.trigger || []).join(" + ") || "等待新版 authority")}</em>
+    </li>
+  `).join("");
 }
 
 function renderEquityChart(report) {
@@ -644,6 +707,7 @@ async function loadData() {
     let researchEvidence = null;
     let strategy = null;
     let researchCalendar = null;
+    let operationsSchedule = null;
     let historyProgress = null;
     try {
       operational = await fetchJson("./data/operational-status.json");
@@ -677,6 +741,13 @@ async function loadData() {
       renderCalendar(null);
     }
     try {
+      operationsSchedule = await fetchJson("./data/operations-schedule.json");
+      renderOperationsSchedule(operationsSchedule);
+    } catch (error) {
+      console.warn("Automation schedule projection unavailable", error);
+      renderOperationsSchedule(null);
+    }
+    try {
       const progress = await fetchJson("./data/history-progress.json");
       if (!historyProgressIsSafe(progress)) throw new Error("History progress projection contract rejected");
       historyProgress = progress;
@@ -702,6 +773,7 @@ async function loadData() {
     renderHomeSummary(null, null, null, null, null);
     renderCloudRuns(null);
     renderCalendar(null);
+    renderOperationsSchedule(null);
     renderPaperTraining(null);
     renderResearchEvidence(null);
     renderAlternativeAssets(null);

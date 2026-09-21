@@ -10,7 +10,7 @@ from crypto_autopilot.research.automation_health import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-POLICY = ROOT / "config/github_automatic_research_operations_v0_2.json"
+POLICY = ROOT / "config/github_automatic_research_operations_v0_3.json"
 HEALTH = ROOT / "config/research_automation_health_v0_2.json"
 RECEIPT = (
     ROOT
@@ -31,7 +31,7 @@ def test_policy_matches_every_repository_cron_exactly() -> None:
     expectations = [expectation_from_config(row) for row in health["workflows"]]
     coverage = validate_schedule_coverage(expectations, ROOT / ".github/workflows")
     assert coverage["complete"] is True
-    assert coverage["scheduled_workflow_count"] == 7
+    assert coverage["scheduled_workflow_count"] == 9
     assert coverage["workflows"] == scheduled
 
 
@@ -66,5 +66,5 @@ def test_historical_authority_receipt_preserves_frozen_boundary() -> None:
         assert (ROOT / row["path"]).exists()
         assert len(row["sha256"]) == 64
         assert all(character in "0123456789abcdef" for character in row["sha256"])
-    assert _load(POLICY)["schema"] == "github-automatic-research-operations-v0.2"
+    assert _load(POLICY)["schema"] == "github-automatic-research-operations-v0.3"
     assert all(value is False for value in receipt["explicitly_not_authorized"].values())
