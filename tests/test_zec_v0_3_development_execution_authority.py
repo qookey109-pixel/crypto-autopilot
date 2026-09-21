@@ -28,7 +28,7 @@ class ZecV03DevelopmentExecutionAuthorityTests(unittest.TestCase):
         observed = {}
         for relative in self.bindings:
             payload = (ROOT / relative).read_bytes()
-            header = f"blob {len(payload)}\\0".encode("ascii")
+            header = f"blob {len(payload)}\0".encode("ascii")
             observed[relative] = hashlib.sha1(header + payload).hexdigest()  # noqa: S324
         self.assertEqual(observed, self.bindings)
 
