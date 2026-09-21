@@ -1,0 +1,83 @@
+{
+  "schema": "qookey-zec-v0-3-development-one-shot-authority-v0.1",
+  "status": "PROPOSED_EFFECTIVE_ONLY_ON_EXPLICIT_PROTECTED_MAIN_PR_MERGE",
+  "authority_id": "zec-v0-3-development-20260921-v0-1",
+  "authority_pr_number": 1,
+  "date": "2026-09-21",
+  "purpose": "Authorize exactly one manual GitHub-hosted ZEC V0.3 development execution on the already-seen 2022-08 through 2026-07 public Binance Vision 15m history, without consuming fresh confirmation or opening any trading authority.",
+  "user_authorization": {
+    "explicit_protected_main_merge_required": true,
+    "authority_granted_at_prepare_time": false,
+    "execution_starts_automatically_on_merge": false,
+    "separate_manual_workflow_dispatch_required": true
+  },
+  "prior_source_evidence": {
+    "receipt": "research/receipts/2026-09-18-bitget-macd-zec-binance-vision-read-only-completion-v0-2.json",
+    "run_id": 35298599786,
+    "source_archive_count": 48,
+    "source_row_count": 140256,
+    "raw_candles_persisted": false,
+    "interpretation": "Previously viewed history is development-only for V0.3 and cannot serve as fresh confirmation."
+  },
+  "source_scope": {
+    "provider": "binance_usdm",
+    "delivery": "binance_vision_public_monthly",
+    "dataset": "klines",
+    "frequency": "monthly",
+    "symbol": "ZECUSDT",
+    "interval": "15m",
+    "source_month_start": "2022-08",
+    "source_month_end": "2026-07",
+    "development_start_utc": "2022-08-01T00:00:00Z",
+    "development_end_exclusive_utc": "2026-08-01T00:00:00Z",
+    "archive_count": 48,
+    "row_count": 140256,
+    "maximum_provider_requests": 96,
+    "raw_candles_persisted": false,
+    "memory_only": true
+  },
+  "execution_scope": {
+    "trigger": "workflow_dispatch",
+    "one_shot": true,
+    "maximum_runs": 1,
+    "maximum_run_attempts": 1,
+    "candidate_count": 64,
+    "development_fold_count": 4,
+    "development_matrix_cells": 256,
+    "complete_matrix_required": true,
+    "selective_omission_allowed": false,
+    "primary_slippage_bps_per_side": 5,
+    "funding_fabrication_allowed": false,
+    "aggregate_report_artifact_authorized": true,
+    "raw_candle_artifact_authorized": false,
+    "raw_trade_artifact_authorized": false
+  },
+  "bound_git_blobs": {
+    "config/zec_strategy_v0_3_development_matrix_v0_1.json": "73487543d542223c4d1f462978ea096000383440",
+    "config/zec_strategy_v0_3_selection_policy_v0_1.json": "2ba1a5b618742d094fbbd0be8e8d8e783e24bbe6",
+    "research/receipts/2026-09-18-bitget-macd-zec-binance-vision-read-only-completion-v0-2.json": "f9a3fac869575937ba9ba1c9b6ae5f18a27304d6",
+    "src/crypto_autopilot/research/zec_v0_3_development_execution_authority.py": "db1b15e06268e4acaa2b331e6b3da9745d0951a1",
+    "src/crypto_autopilot/research/zec_v0_3_development_runner.py": "75e2c89866dc9fbb415d21518ec4d81d2014f13c",
+    "scripts/run_zec_v0_3_development_execution_v0_1.py": "f46d3ceb90b49c7f4bf5694fe5ff1f5a90ad71a5",
+    ".github/workflows/zec-v0-3-development-execution-v0-1.yml": "03cf16c925d3991f2df21802e90fff684f580623"
+  },
+  "conditional_authority": {
+    "effective_condition": "AUTHORITY_PR_MERGED_ON_PROTECTED_MAIN",
+    "public_binance_vision_read_authorized_after_effective_condition": true,
+    "offline_development_execution_authorized_after_effective_condition": true,
+    "aggregate_report_artifact_authorized_after_effective_condition": true,
+    "provider_private_api_authorized": false
+  },
+  "safety_boundary": {
+    "fresh_confirmation_access_authorized": false,
+    "fresh_data_read_authorized": false,
+    "r2_read_authorized": false,
+    "r2_write_authorized": false,
+    "formal_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
