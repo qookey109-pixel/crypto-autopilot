@@ -42,6 +42,24 @@ jobs:
           set -euo pipefail
           test "${GITHUB_REF}" = "refs/heads/main"
 
+      - name: Validate recovery run id
+        env:
+          RUN_ID_INPUT: ${{ inputs.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          run_id = os.environ["RUN_ID_INPUT"]
+          if re.fullmatch(r"live-paper-run-v0-1-[0-9a-f]{64}", run_id) is None:
+              raise SystemExit("run_id must match the canonical Live Paper run id format")
+          with Path(os.environ["GITHUB_ENV"]).open("a", encoding="utf-8") as handle:
+              handle.write(f"SAFE_RUN_ID={run_id}\n")
+          PY
+
       - name: Reconcile persistent Live Paper run
         id: recovery
         env:
@@ -49,15 +67,16 @@ jobs:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          REPAIR_MISSING_RESULT_SEALS: ${{ inputs.repair_missing_result_seals }}
         shell: bash
         run: |
           set -uo pipefail
           mkdir -p artifacts
           args=(
-            --run-id "${{ inputs.run_id }}"
+            --run-id "${SAFE_RUN_ID}"
             --store-backend r2
           )
-          if [[ "${{ inputs.repair_missing_result_seals }}" == "true" ]]; then
+          if [[ "${REPAIR_MISSING_RESULT_SEALS}" == "true" ]]; then
             args+=(--repair-missing-result-seals)
           fi
 
