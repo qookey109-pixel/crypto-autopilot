@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import hashlib
 import json
 from pathlib import Path
 import unittest
@@ -22,6 +23,14 @@ class ZecV03DevelopmentExecutionAuthorityTests(unittest.TestCase):
     def setUp(self) -> None:
         self.payload = json.loads(AUTHORITY.read_text(encoding="utf-8"))
         self.bindings = dict(self.payload["bound_git_blobs"])
+
+    def test_bound_git_blobs_match_reviewed_repository_bytes(self) -> None:
+        observed = {}
+        for relative in self.bindings:
+            payload = (ROOT / relative).read_bytes()
+            header = f"blob {len(payload)}\\0".encode("ascii")
+            observed[relative] = hashlib.sha1(header + payload).hexdigest()  # noqa: S324
+        self.assertEqual(observed, self.bindings)
 
     def test_proposal_is_ineffective_until_authority_pr_is_merged(self) -> None:
         authority = validate_zec_v0_3_development_execution_authority(
