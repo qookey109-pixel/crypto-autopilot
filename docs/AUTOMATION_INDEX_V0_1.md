@@ -3,7 +3,7 @@
 Current review: 2026-09-21. [Verified operations and handoff](OPERATIONS_HANDOFF_2026_09_13.md).
 Core100 History acquisition is complete and its former every-two-hours cadence is historical under `config/history_cadence_v0_1.json`.
 V0.12's window has ended; fixed BTC simulation V0.1 is PASS and retired.
-Seven workflow files now retain cron declarations. The expired V0.12 successor cron is retired; its historical window/config evidence remains preserved separately.
+Eight workflow files retain cron declarations. Seven are current-effective; the V0.12 successor declaration is frozen and expired, so its window gate blocks post-window execution.
 
 Core100 History is now **10/10 COMPLETE**. The completed training run
 `34918219864` passed operational execution, while the downstream Model Quality
@@ -30,6 +30,7 @@ backfills or regrades the incomplete V0.10 evidence.
 
 | State | Workflow | UTC cadence | Effective behavior |
 | --- | --- | --- | --- |
+| Expired frozen declaration | Provider Equivalence V0.12 metadata capture | `:17` and `:47`, historical 2026-09-04 through 2026-09-12 window | cron bytes preserved by Freeze Guard; window gate blocks post-window execution; no replay/backfill |
 | Continuous | Research Signal Layer V0.2 | daily 02:17 | bounded public structured-signal ingestion |
 | Continuous | Research Signal Quality V0.1 | daily 02:47 | allowlisted R2 lineage read only |
 | Continuous / alerting | Research Automation Health V0.2 | every 2 hours at :57 | GitHub Actions metadata read only; covers every current cron and ignores manual/PR runs when judging automatic health |
@@ -41,9 +42,9 @@ backfills or regrades the incomplete V0.10 evidence.
 ## Retired cron triggers
 
 Provider Equivalence V0.12 successor metadata capture reached the end of its
-bounded window on 2026-09-12. Its Repository cron is now removed. The original
-window config, authority lineage and 194-hour / 388-attempt schedule contract
-remain historical evidence; no replay or backfill is authorized.
+bounded window on 2026-09-12. Its cron declaration remains frozen as critical-path
+lineage, but the window gate makes later schedule events non-effective before any
+provider/R2 work. No replay or backfill is authorized.
 
 Core100 History V0.1.2 cron is retired by
 `config/core100_history_retirement_v0_1.json` after the governed dataset
@@ -103,7 +104,7 @@ workflow and every cron to have exactly one classification, so a new hidden
 schedule cannot be added accidentally.
 
 The current machine-readable normal-operation contract is
-`config/github_automatic_research_operations_v0_5.json`; V0.4 preserves the prior eight-workflow state before V0.12 expiry retirement, V0.2 remains frozen for the History Cadence authority binding, and V0.3 records the prior 9-workflow state. It does not let a
+`config/github_automatic_research_operations_v0_5.json`; it classifies eight cron declarations as seven current-effective plus one expired frozen V0.12 declaration. V0.4 preserves the prior unclassified eight-workflow state, V0.2 remains frozen for the History Cadence authority binding, and V0.3 records the prior 9-workflow state. It does not let a
 workflow grant itself provider, R2, holdout, promotion or trading authority.
 
 
