@@ -320,3 +320,18 @@ preregistered 24-cell V0.4 development study.
 - fresh confirmation remains unopened;
 - aggregate-only report is allowed; raw candles and raw trades are not persisted;
 - R2 / holdout / source switch / promotion / trade plan / real-money / live trading remain closed.
+
+
+## ZEC V0.4 development completion
+
+- One-shot development run `35618367238` completed successfully on main `dd12300b294f2a868389c49a877be97a41a3ebe8`.
+- Full preregistered matrix completed: **6 candidates × 4 folds = 24/24 cells**.
+- All 6 candidates satisfied the minimum trade-count gate.
+- **0/6** candidates had positive worst-fold return.
+- Selection result: **NO_ELIGIBLE_DEVELOPMENT_CANDIDATE**.
+- No champion was frozen.
+- Diagnostic leader `zec-v0-4-04` had worst-fold return `-8.12511401%`.
+- The V0.4 bull-regime activation hypothesis did not establish cross-fold robustness.
+- Fresh confirmation remains unopened.
+- V0.3/V0.4 selection thresholds are not loosened from this outcome.
+- R2 / holdout / source switch / promotion / trade plan / real-money / live trading remain closed.
