@@ -130,3 +130,14 @@ def test_workflows_use_constrained_installs_main_guard_and_shared_lock() -> None
     assert '--input "${{ inputs.input_path }}"' not in coordinator
     assert "research/inputs/live-paper" in coordinator
     assert 'INPUT_PATH: ${{ inputs.input_path }}' in coordinator
+
+    assert '--run-id "${{ inputs.run_id }}"' not in recovery
+    assert 'RUN_ID_INPUT: ${{ inputs.run_id }}' in recovery
+    assert '--run-id "${SAFE_RUN_ID}"' in recovery
+    assert "live-paper-run-v0-1-[0-9a-f]{64}" in recovery
+
+    assert "id: coordinator" in coordinator
+    assert "exit_code=$?" in coordinator
+    assert 'echo "report_safe=true" >> "$GITHUB_OUTPUT"' in coordinator
+    assert "always() && steps.coordinator.outputs.report_safe == 'true'" in coordinator
+    assert "Coordinator failed after producing a validated safe report." in coordinator

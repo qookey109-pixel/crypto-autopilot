@@ -129,7 +129,7 @@ class CloudRunStatusTests(unittest.TestCase):
         )
         self.assertEqual(len(calls), 8)
         self.assertTrue(all(
-            row["latestAutomaticRun"]["state"] == "UNVERIFIED"
+            row["latestAutomaticRun"]["state"] == "QUERY_FAILED"
             for row in result["items"]
         ))
         self.assertNotIn("SECRET_RESPONSE", str(result))
@@ -138,7 +138,47 @@ class CloudRunStatusTests(unittest.TestCase):
                 row for row in result["items"]
                 if row["workflow"] == "resource-hub-supply-chain-v0-2.yml"
             )["freshnessState"],
-            "WAITING_FIRST_SCHEDULE",
+            "QUERY_FAILED",
+        )
+
+    def test_active_until_marks_current_schedule_expired(self):
+        definition = {
+            "lifecycleState": "CURRENT_EFFECTIVE",
+            "maxAgeSeconds": 7200,
+            "activeFromUtc": "2026-09-20T00:00:00Z",
+            "activeUntilUtc": "2026-09-21T04:30:00Z",
+        }
+        latest = {
+            "state": "WORKFLOW_SUCCESS",
+            "evidenceTimeUtc": "2026-09-21T04:20:00Z",
+        }
+        self.assertEqual(
+            module.freshness_state(
+                definition,
+                latest,
+                now=datetime(2026, 9, 21, 5, 0, tzinfo=timezone.utc),
+            ),
+            "EXPIRED_WINDOW",
+        )
+
+    def test_running_schedule_becomes_stalled_after_max_age(self):
+        definition = {
+            "lifecycleState": "CURRENT_EFFECTIVE",
+            "maxAgeSeconds": 1800,
+            "activeFromUtc": "2026-09-20T00:00:00Z",
+            "activeUntilUtc": None,
+        }
+        latest = {
+            "state": "RUNNING",
+            "evidenceTimeUtc": "2026-09-21T04:00:00Z",
+        }
+        self.assertEqual(
+            module.freshness_state(
+                definition,
+                latest,
+                now=datetime(2026, 9, 21, 5, 0, tzinfo=timezone.utc),
+            ),
+            "STALLED",
         )
 
     def test_completed_btc_workflow_remains_retired_and_not_in_monitor_inventory(self):
