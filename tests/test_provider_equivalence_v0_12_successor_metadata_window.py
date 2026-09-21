@@ -189,12 +189,12 @@ def test_authority_is_atomic_free_only_and_downstream_closed() -> None:
         assert value is False, key
 
 
-def test_historical_schedule_contract_has_exact_194_slots_but_current_cron_is_retired() -> None:
+def test_atomic_schedule_transition_has_exact_194_slots_and_no_v010_cron() -> None:
     cfg = json.loads(CONFIG.read_text(encoding="utf-8"))
     v010 = V010_WORKFLOW.read_text(encoding="utf-8").splitlines()
     v012 = V012_WORKFLOW.read_text(encoding="utf-8").splitlines()
     assert not any(line == "  schedule:" for line in v010)
-    assert not any(line == "  schedule:" for line in v012)
+    assert any(line == "  schedule:" for line in v012)
 
     crons = cfg["atomic_schedule_transition"]["successor_cron_utc"]
     assert crons == [
@@ -203,8 +203,7 @@ def test_historical_schedule_contract_has_exact_194_slots_but_current_cron_is_re
         "17,47 0-3 12 9 *",
     ]
     expected_lines = {f'    - cron: "{cron}"' for cron in crons}
-    assert expected_lines.isdisjoint(set(v012))
-    assert "RETIRED" in V012_WORKFLOW.read_text(encoding="utf-8")
+    assert expected_lines.issubset(set(v012))
 
     start = datetime(2026, 9, 4, 2, tzinfo=timezone.utc)
     final_attempt = datetime(2026, 9, 12, 3, 47, tzinfo=timezone.utc)
