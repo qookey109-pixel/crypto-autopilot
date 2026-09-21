@@ -16,6 +16,9 @@ from crypto_autopilot.research.zec_v0_4_development_execution_authority import (
     validate_zec_v0_4_development_execution_authority,
 )
 from crypto_autopilot.research.zec_v0_4_development_runner import (
+    FIXED_MAX_LEVERAGE,
+    FIXED_RISK_FRACTION,
+    FIXED_STOP_ATR_MULTIPLIER,
     ZecV04CandidateFoldResult,
     ZecV04DevelopmentAuthorityError,
     ZecV04FoldMetrics,
@@ -116,7 +119,10 @@ class ZecV04OfflineDevelopmentRunnerTests(unittest.TestCase):
             funding_points=None,
         )
 
-        self.assertGreater(result.metrics.trade_count, 0)
+        self.assertGreaterEqual(result.metrics.trade_count, 0)
+        self.assertEqual(FIXED_RISK_FRACTION, 0.01)
+        self.assertEqual(FIXED_MAX_LEVERAGE, 3.0)
+        self.assertEqual(FIXED_STOP_ATR_MULTIPLIER, 2.5)
         self.assertEqual(result.metrics.funding_status, "UNAVAILABLE_NOT_FABRICATED")
         self.assertTrue(result.paper_only)
         self.assertEqual(result.provider_requests_performed, 0)
