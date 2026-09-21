@@ -255,6 +255,16 @@ function operationsScheduleIsSafe(projection) {
   if (!projection || projection.schema !== "qookey-automation-schedule-projection-v0.1") return false;
   if (projection.authority !== false || projection.timezone !== "Asia/Taipei") return false;
   if (!Array.isArray(projection.items)) return false;
+  const inventory = projection.sourceStatus?.scheduleInventory;
+  if (inventory) {
+    const counts = [
+      inventory.repositoryScheduledWorkflowCount,
+      inventory.projectedScheduledJobCount,
+      inventory.monitoredScheduledWorkflowCount
+    ].map(Number);
+    if (inventory.state !== "CONVERGED" || !counts.every(Number.isInteger)
+        || !counts.every(value => value === counts[0])) return false;
+  }
   const boundary = projection.safetyBoundary || {};
   return Object.keys(boundary).length > 0 && Object.values(boundary).every(value => value === false);
 }
@@ -274,8 +284,12 @@ function renderOperationsSchedule(projection) {
     return;
   }
 
+  const inventory = projection.sourceStatus?.scheduleInventory || null;
   if (generated) {
-    generated.textContent = `排程投影：${formatTrustedTime(projection.projectionGeneratedAtUtc)}`;
+    const countText = inventory
+      ? ` · Repo ${number(inventory.repositoryScheduledWorkflowCount, 0)} / Health ${number(inventory.monitoredScheduledWorkflowCount, 0)} / Website ${number(inventory.projectedScheduledJobCount, 0)}`
+      : "";
+    generated.textContent = `排程投影：${formatTrustedTime(projection.projectionGeneratedAtUtc)}${countText}`;
   }
   const resource = projection.sourceStatus?.resourceHub || {};
   const registry = projection.sourceStatus?.externalCapabilityRegistry || {};
