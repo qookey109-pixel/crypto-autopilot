@@ -1,6 +1,6 @@
 # Current Operations Status
 
-Updated: 2026-09-18
+Updated: 2026-09-21
 
 This is the concise current-operations entrypoint. Repository `main`, versioned configs/receipts, and immutable run evidence remain the formal authority. Dated prose in older status files is historical evidence, not a reason to regress an already completed lifecycle stage.
 
@@ -8,10 +8,10 @@ This is the concise current-operations entrypoint. Repository `main`, versioned 
 
 - Repository: `qookey109-pixel/crypto-autopilot`.
 - **Resolve `main` live at read time.** This file intentionally does not hard-code a claim that any SHA is the latest `main`.
-- Evidence-basis parent main for this status version: `a26902fd7a116af442a9b19249b895d0612bfc4f`.
+- Evidence-basis parent main for this status version: `3422efc91cfd973ab1991080186fb8300d26a2a5`.
 - Evidence-basis semantics: `REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION`.
 - The evidence-basis SHA is **not** a latest-main claim; it records the reviewed parent from which this status version was prepared.
-- PR #366 is the latest reviewed merge in that evidence basis; PR #365 records multi-cycle paper-loop integrity and PR #337 records the Pionex V0.2 materialization completion evidence.
+- PR #410 is the latest reviewed merge in that evidence basis; it established Resource Hub V0.2 change-watch and dashboard schedule/source projection.
 
 This avoids a self-reference bug where a file claiming its own future merge commit becomes stale immediately after it is merged.
 
@@ -23,6 +23,7 @@ This avoids a self-reference bug where a file claiming its own future merge comm
 
 - Core100 detailed-history acquisition is complete: `10/10` governed shards.
 - Historical reacquisition is **not required** solely because the model-quality gate rejected the trained model.
+- The automatic History cron and generic auto/discover/backfill entrypoints are retired; only existing bounded diagnosis/repair modes remain.
 - Do not restart the History program unless new evidence identifies an actual dataset-integrity failure.
 
 ### Training
@@ -40,6 +41,12 @@ Source training run: `34918219864`
 - run window: `2026-09-15T01:40:40Z` through `2026-09-15T04:38:22Z`
 
 Operational training success does **not** mean the model passed research quality gates.
+
+Weekly Training remains scheduled, but it now compares the governed dataset
+fingerprint plus model-affecting Git blobs before full training. An exact match
+returns `NO_CHANGE`, performs no retraining and writes nothing to R2. The
+verified baseline is run `34918219864` with experiment fingerprint
+`25b3178ce0d13052684d20b35a0e1f6949f0d97a5ac0c5b9e8f0a52d4d12f9c8`.
 
 ### Model-quality gate and threshold replay
 
