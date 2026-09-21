@@ -1,0 +1,1146 @@
+{
+  "authority_id": "zec-v0-4-development-20260921-v0-1",
+  "development": {
+    "candidate_count": 6,
+    "candidate_parameters": [
+      {
+        "activation_regime": "TREND_STRICT_BASELINE",
+        "candidate_id": "zec-v0-4-01",
+        "macd": "12/26/9"
+      },
+      {
+        "activation_regime": "TREND_STACKED",
+        "candidate_id": "zec-v0-4-02",
+        "macd": "12/26/9"
+      },
+      {
+        "activation_regime": "TREND_STACKED_MOMENTUM",
+        "candidate_id": "zec-v0-4-03",
+        "macd": "12/26/9"
+      },
+      {
+        "activation_regime": "TREND_STRICT_BASELINE",
+        "candidate_id": "zec-v0-4-04",
+        "macd": "12/30/7"
+      },
+      {
+        "activation_regime": "TREND_STACKED",
+        "candidate_id": "zec-v0-4-05",
+        "macd": "12/30/7"
+      },
+      {
+        "activation_regime": "TREND_STACKED_MOMENTUM",
+        "candidate_id": "zec-v0-4-06",
+        "macd": "12/30/7"
+      }
+    ],
+    "diagnostic_ranking": {
+      "champion_frozen": false,
+      "diagnostic_leader_id": "zec-v0-4-04",
+      "fresh_confirmation_accessed": false,
+      "leader_neighbor_ids": [
+        "zec-v0-4-01",
+        "zec-v0-4-05"
+      ],
+      "live_trading_authorized": false,
+      "ranked_candidate_ids": [
+        "zec-v0-4-04",
+        "zec-v0-4-06",
+        "zec-v0-4-03",
+        "zec-v0-4-01",
+        "zec-v0-4-05",
+        "zec-v0-4-02"
+      ],
+      "selection_status": "DIAGNOSTIC_RANKING_ONLY"
+    },
+    "fold_count": 4,
+    "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+    "matrix": [
+      {
+        "candidate_id": "zec-v0-4-01",
+        "end_exclusive_time_ms": 1690848000000,
+        "final_equity_usd": 9431.51606353,
+        "fold_id": "dev-2022-08_to_2023-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 72,
+          "max_drawdown_pct": 5.68483936,
+          "mean_net_pnl_usd": -5.86065914,
+          "profit_factor": 0.52766343,
+          "return_pct": -5.68483936,
+          "total_fees_usd": 202.00996919,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 168.34159142,
+          "trade_count": 97,
+          "win_count": 25
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1659312000000
+      },
+      {
+        "candidate_id": "zec-v0-4-01",
+        "end_exclusive_time_ms": 1722470400000,
+        "final_equity_usd": 9085.90118846,
+        "fold_id": "dev-2023-08_to_2024-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 133,
+          "max_drawdown_pct": 10.43031936,
+          "mean_net_pnl_usd": -5.37705183,
+          "profit_factor": 0.56611911,
+          "return_pct": -9.14098812,
+          "total_fees_usd": 352.57434461,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 293.81188692,
+          "trade_count": 170,
+          "win_count": 37
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1690848000000
+      },
+      {
+        "candidate_id": "zec-v0-4-01",
+        "end_exclusive_time_ms": 1754006400000,
+        "final_equity_usd": 10170.83452523,
+        "fold_id": "dev-2024-08_to_2025-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 107,
+          "max_drawdown_pct": 3.70615755,
+          "mean_net_pnl_usd": 1.13889683,
+          "profit_factor": 1.08916158,
+          "return_pct": 1.70834525,
+          "total_fees_usd": 207.70618875,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 173.08862853,
+          "trade_count": 150,
+          "win_count": 43
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1722470400000
+      },
+      {
+        "candidate_id": "zec-v0-4-01",
+        "end_exclusive_time_ms": 1785542400000,
+        "final_equity_usd": 10759.00443079,
+        "fold_id": "dev-2025-08_to_2026-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 124,
+          "max_drawdown_pct": 3.40516982,
+          "mean_net_pnl_usd": 4.26406984,
+          "profit_factor": 1.39976943,
+          "return_pct": 7.59004431,
+          "total_fees_usd": 228.06114055,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 190.05124477,
+          "trade_count": 178,
+          "win_count": 54
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1754006400000
+      },
+      {
+        "candidate_id": "zec-v0-4-02",
+        "end_exclusive_time_ms": 1690848000000,
+        "final_equity_usd": 9726.59434703,
+        "fold_id": "dev-2022-08_to_2023-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 42,
+          "max_drawdown_pct": 3.67286941,
+          "mean_net_pnl_usd": -4.71389057,
+          "profit_factor": 0.61159224,
+          "return_pct": -2.73405653,
+          "total_fees_usd": 122.14831606,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 101.79025103,
+          "trade_count": 58,
+          "win_count": 16
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1659312000000
+      },
+      {
+        "candidate_id": "zec-v0-4-02",
+        "end_exclusive_time_ms": 1722470400000,
+        "final_equity_usd": 8931.34254451,
+        "fold_id": "dev-2023-08_to_2024-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 112,
+          "max_drawdown_pct": 11.95397321,
+          "mean_net_pnl_usd": -7.57913089,
+          "profit_factor": 0.41878158,
+          "return_pct": -10.68657455,
+          "total_fees_usd": 282.43535868,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 235.3626612,
+          "trade_count": 141,
+          "win_count": 29
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1690848000000
+      },
+      {
+        "candidate_id": "zec-v0-4-02",
+        "end_exclusive_time_ms": 1754006400000,
+        "final_equity_usd": 10007.53892501,
+        "fold_id": "dev-2024-08_to_2025-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 92,
+          "max_drawdown_pct": 2.65964679,
+          "mean_net_pnl_usd": 0.05889785,
+          "profit_factor": 1.00470001,
+          "return_pct": 0.07538925,
+          "total_fees_usd": 168.51252654,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 140.42718455,
+          "trade_count": 128,
+          "win_count": 36
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1722470400000
+      },
+      {
+        "candidate_id": "zec-v0-4-02",
+        "end_exclusive_time_ms": 1785542400000,
+        "final_equity_usd": 11028.63169274,
+        "fold_id": "dev-2025-08_to_2026-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 103,
+          "max_drawdown_pct": 3.40516982,
+          "mean_net_pnl_usd": 6.85754462,
+          "profit_factor": 1.63425128,
+          "return_pct": 10.28631693,
+          "total_fees_usd": 196.08484902,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 163.40438791,
+          "trade_count": 150,
+          "win_count": 47
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1754006400000
+      },
+      {
+        "candidate_id": "zec-v0-4-03",
+        "end_exclusive_time_ms": 1690848000000,
+        "final_equity_usd": 9797.03574052,
+        "fold_id": "dev-2022-08_to_2023-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 28,
+          "max_drawdown_pct": 2.02964259,
+          "mean_net_pnl_usd": -5.48552053,
+          "profit_factor": 0.574706,
+          "return_pct": -2.02964259,
+          "total_fees_usd": 80.90486712,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 67.42070894,
+          "trade_count": 37,
+          "win_count": 9
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1659312000000
+      },
+      {
+        "candidate_id": "zec-v0-4-03",
+        "end_exclusive_time_ms": 1722470400000,
+        "final_equity_usd": 9105.28578436,
+        "fold_id": "dev-2023-08_to_2024-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 74,
+          "max_drawdown_pct": 9.03513711,
+          "mean_net_pnl_usd": -9.83202435,
+          "profit_factor": 0.31626555,
+          "return_pct": -8.94714216,
+          "total_fees_usd": 191.45401537,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 159.54487684,
+          "trade_count": 91,
+          "win_count": 17
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1690848000000
+      },
+      {
+        "candidate_id": "zec-v0-4-03",
+        "end_exclusive_time_ms": 1754006400000,
+        "final_equity_usd": 10180.81454294,
+        "fold_id": "dev-2024-08_to_2025-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 50,
+          "max_drawdown_pct": 2.04097161,
+          "mean_net_pnl_usd": 2.5466837,
+          "profit_factor": 1.20548862,
+          "return_pct": 1.80814543,
+          "total_fees_usd": 91.84187425,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 76.53498253,
+          "trade_count": 71,
+          "win_count": 21
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1722470400000
+      },
+      {
+        "candidate_id": "zec-v0-4-03",
+        "end_exclusive_time_ms": 1785542400000,
+        "final_equity_usd": 11605.15095195,
+        "fold_id": "dev-2025-08_to_2026-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 62,
+          "max_drawdown_pct": 0.97496406,
+          "mean_net_pnl_usd": 15.43414377,
+          "profit_factor": 2.83367868,
+          "return_pct": 16.05150952,
+          "total_fees_usd": 132.77944082,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 110.64999617,
+          "trade_count": 104,
+          "win_count": 42
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1754006400000
+      },
+      {
+        "candidate_id": "zec-v0-4-04",
+        "end_exclusive_time_ms": 1690848000000,
+        "final_equity_usd": 9399.26671017,
+        "fold_id": "dev-2022-08_to_2023-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 74,
+          "max_drawdown_pct": 6.0073329,
+          "mean_net_pnl_usd": -6.06801303,
+          "profit_factor": 0.50343506,
+          "return_pct": -6.0073329,
+          "total_fees_usd": 204.03322598,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 170.02763166,
+          "trade_count": 99,
+          "win_count": 25
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1659312000000
+      },
+      {
+        "candidate_id": "zec-v0-4-04",
+        "end_exclusive_time_ms": 1722470400000,
+        "final_equity_usd": 9187.48859862,
+        "fold_id": "dev-2023-08_to_2024-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 139,
+          "max_drawdown_pct": 9.64917501,
+          "mean_net_pnl_usd": -4.53916984,
+          "profit_factor": 0.62200932,
+          "return_pct": -8.12511401,
+          "total_fees_usd": 365.58755769,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 304.65626253,
+          "trade_count": 179,
+          "win_count": 40
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1690848000000
+      },
+      {
+        "candidate_id": "zec-v0-4-04",
+        "end_exclusive_time_ms": 1754006400000,
+        "final_equity_usd": 9992.09334383,
+        "fold_id": "dev-2024-08_to_2025-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 118,
+          "max_drawdown_pct": 4.5678222,
+          "mean_net_pnl_usd": -0.0497274,
+          "profit_factor": 0.99614075,
+          "return_pct": -0.07906656,
+          "total_fees_usd": 217.10070177,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 180.91734911,
+          "trade_count": 159,
+          "win_count": 41
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1722470400000
+      },
+      {
+        "candidate_id": "zec-v0-4-04",
+        "end_exclusive_time_ms": 1785542400000,
+        "final_equity_usd": 10628.08421213,
+        "fold_id": "dev-2025-08_to_2026-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 133,
+          "max_drawdown_pct": 3.19665776,
+          "mean_net_pnl_usd": 3.30570638,
+          "profit_factor": 1.3219248,
+          "return_pct": 6.28084212,
+          "total_fees_usd": 237.73111962,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 198.10953233,
+          "trade_count": 190,
+          "win_count": 57
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1754006400000
+      },
+      {
+        "candidate_id": "zec-v0-4-05",
+        "end_exclusive_time_ms": 1690848000000,
+        "final_equity_usd": 9647.96689028,
+        "fold_id": "dev-2022-08_to_2023-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 45,
+          "max_drawdown_pct": 3.92461199,
+          "mean_net_pnl_usd": -5.77103459,
+          "profit_factor": 0.52966944,
+          "return_pct": -3.5203311,
+          "total_fees_usd": 126.24106221,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 105.20085501,
+          "trade_count": 61,
+          "win_count": 16
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1659312000000
+      },
+      {
+        "candidate_id": "zec-v0-4-05",
+        "end_exclusive_time_ms": 1722470400000,
+        "final_equity_usd": 8980.45389152,
+        "fold_id": "dev-2023-08_to_2024-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 114,
+          "max_drawdown_pct": 11.68517826,
+          "mean_net_pnl_usd": -6.98319252,
+          "profit_factor": 0.44843006,
+          "return_pct": -10.19546108,
+          "total_fees_usd": 287.16851302,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 239.30697082,
+          "trade_count": 146,
+          "win_count": 32
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1690848000000
+      },
+      {
+        "candidate_id": "zec-v0-4-05",
+        "end_exclusive_time_ms": 1754006400000,
+        "final_equity_usd": 9839.25924252,
+        "fold_id": "dev-2024-08_to_2025-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 101,
+          "max_drawdown_pct": 3.67502438,
+          "mean_net_pnl_usd": -1.19067228,
+          "profit_factor": 0.90667953,
+          "return_pct": -1.60740757,
+          "total_fees_usd": 175.1835579,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 145.98633836,
+          "trade_count": 135,
+          "win_count": 34
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1722470400000
+      },
+      {
+        "candidate_id": "zec-v0-4-05",
+        "end_exclusive_time_ms": 1785542400000,
+        "final_equity_usd": 10893.89942147,
+        "fold_id": "dev-2025-08_to_2026-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 110,
+          "max_drawdown_pct": 3.19665776,
+          "mean_net_pnl_usd": 5.62200894,
+          "profit_factor": 1.54089006,
+          "return_pct": 8.93899421,
+          "total_fees_usd": 201.87674828,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 168.23093955,
+          "trade_count": 159,
+          "win_count": 49
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1754006400000
+      },
+      {
+        "candidate_id": "zec-v0-4-06",
+        "end_exclusive_time_ms": 1690848000000,
+        "final_equity_usd": 9761.82608627,
+        "fold_id": "dev-2022-08_to_2023-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 30,
+          "max_drawdown_pct": 2.38173914,
+          "mean_net_pnl_usd": -5.95434784,
+          "profit_factor": 0.53709015,
+          "return_pct": -2.38173914,
+          "total_fees_usd": 86.18907678,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 71.82421061,
+          "trade_count": 40,
+          "win_count": 10
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1659312000000
+      },
+      {
+        "candidate_id": "zec-v0-4-06",
+        "end_exclusive_time_ms": 1722470400000,
+        "final_equity_usd": 9114.93723938,
+        "fold_id": "dev-2023-08_to_2024-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 76,
+          "max_drawdown_pct": 9.03342051,
+          "mean_net_pnl_usd": -9.41556128,
+          "profit_factor": 0.33037032,
+          "return_pct": -8.85062761,
+          "total_fees_usd": 196.96578385,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 164.13802218,
+          "trade_count": 94,
+          "win_count": 18
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1690848000000
+      },
+      {
+        "candidate_id": "zec-v0-4-06",
+        "end_exclusive_time_ms": 1754006400000,
+        "final_equity_usd": 10103.20252372,
+        "fold_id": "dev-2024-08_to_2025-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 57,
+          "max_drawdown_pct": 2.26753591,
+          "mean_net_pnl_usd": 1.34029252,
+          "profit_factor": 1.11087834,
+          "return_pct": 1.03202524,
+          "total_fees_usd": 98.29987874,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 81.9166365,
+          "trade_count": 77,
+          "win_count": 20
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1722470400000
+      },
+      {
+        "candidate_id": "zec-v0-4-06",
+        "end_exclusive_time_ms": 1785542400000,
+        "final_equity_usd": 11468.91638113,
+        "fold_id": "dev-2025-08_to_2026-08",
+        "formal_holdout_accessed": false,
+        "initial_equity_usd": 10000.0,
+        "live_trading_authorized": false,
+        "metrics": {
+          "funding_status": "UNAVAILABLE_NOT_FABRICATED",
+          "loss_count": 66,
+          "max_drawdown_pct": 1.20305707,
+          "mean_net_pnl_usd": 13.47629707,
+          "profit_factor": 2.61765358,
+          "return_pct": 14.68916381,
+          "total_fees_usd": 135.01339113,
+          "total_funding_usd": 0.0,
+          "total_slippage_cost_usd": 112.51158834,
+          "trade_count": 109,
+          "win_count": 43
+        },
+        "paper_only": true,
+        "provider_requests_performed": 0,
+        "r2_reads_performed": false,
+        "r2_writes_performed": false,
+        "start_time_ms": 1754006400000
+      }
+    ],
+    "matrix_cells": 24,
+    "primary_slippage_bps_per_side": 5.0,
+    "selection": {
+      "champion_frozen": false,
+      "formal_holdout_accessed": false,
+      "fresh_confirmation_accessed": false,
+      "live_trading_authorized": false,
+      "policy_sha256": "6484f59ee6e71156c776bfe43cdf8c4716dae74f936a164e8702e175c731250d",
+      "ranked_eligible_candidate_ids": [],
+      "selected_candidate_id": null,
+      "selected_median_return_pct": null,
+      "selected_worst_return_pct": null,
+      "stable_neighbor_ids": [],
+      "status": "NO_ELIGIBLE_DEVELOPMENT_CANDIDATE"
+    }
+  },
+  "generated_at_utc": "2026-09-21T15:22:39.527334+00:00",
+  "runtime_authority": {
+    "authority_merge_sha": "dd12300b294f2a868389c49a877be97a41a3ebe8",
+    "authority_pr_number": 418,
+    "execution_head_sha": "dd12300b294f2a868389c49a877be97a41a3ebe8",
+    "github_run_attempt": 1,
+    "github_run_id": 35618367238
+  },
+  "safety_boundary": {
+    "formal_holdout_accessed": false,
+    "formal_trade_plan_authorized": false,
+    "fresh_confirmation_access_authorized": false,
+    "fresh_confirmation_accessed": false,
+    "live_trading_authorized": false,
+    "model_promotion_authorized": false,
+    "r2_reads_performed": false,
+    "r2_writes_performed": false,
+    "raw_candles_persisted": false,
+    "raw_trade_artifact_emitted": false,
+    "real_money_order_authorized": false,
+    "source_switch_authorized": false
+  },
+  "schema": "qookey-zec-v0-4-development-run-report-v0.1",
+  "source": {
+    "archive_count": 48,
+    "archive_receipts": [
+      {
+        "archive_sha256": "1b16d9b55d022fc8f128a75298a0deeafbfd3888ba93139d8dc5a45025037f26",
+        "audit_ok": true,
+        "first_time_ms": 1659312000000,
+        "last_time_ms": 1661989500000,
+        "period": "2022-08",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "8a227bc19340b6fa56e7ecdf75f3b6840699e6d665c7ee1c1808b23d1da8c8c4",
+        "audit_ok": true,
+        "first_time_ms": 1661990400000,
+        "last_time_ms": 1664581500000,
+        "period": "2022-09",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "2129338328f9672e36855d2081295fa1597efa3f1acae466f9e2cda061bdbb6f",
+        "audit_ok": true,
+        "first_time_ms": 1664582400000,
+        "last_time_ms": 1667259900000,
+        "period": "2022-10",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "b10150a5a9190a84617e7f6a29550b5f4b51bd444c59b113a987f683f2a6699d",
+        "audit_ok": true,
+        "first_time_ms": 1667260800000,
+        "last_time_ms": 1669851900000,
+        "period": "2022-11",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "b4f972e82236bc217002cdc4f5d7f44af0e1317b0dbc417bdc9c69f6ad763bd0",
+        "audit_ok": true,
+        "first_time_ms": 1669852800000,
+        "last_time_ms": 1672530300000,
+        "period": "2022-12",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "db6e56b206891edcda3193cb6eb4b80238ad27cae1604de030276b39c8a9d8ba",
+        "audit_ok": true,
+        "first_time_ms": 1672531200000,
+        "last_time_ms": 1675208700000,
+        "period": "2023-01",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "4a0d1e1feb332d749777b7a63edd3554f3e7d05472d306a633c275e60c6b168c",
+        "audit_ok": true,
+        "first_time_ms": 1675209600000,
+        "last_time_ms": 1677627900000,
+        "period": "2023-02",
+        "row_count": 2688
+      },
+      {
+        "archive_sha256": "2e5c3fc439070c4fc2ce5dc7fc27644b7b67ddefab01dc38a4c9c9b58929f937",
+        "audit_ok": true,
+        "first_time_ms": 1677628800000,
+        "last_time_ms": 1680306300000,
+        "period": "2023-03",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "707f2f1f75f7cb47d2b0333fdacc870ea0927d259646104d3d23a58330e42710",
+        "audit_ok": true,
+        "first_time_ms": 1680307200000,
+        "last_time_ms": 1682898300000,
+        "period": "2023-04",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "6ea2207491451ea29d64e800bc13c70d641dc9b038a12acddd4ed5255dc3a9e8",
+        "audit_ok": true,
+        "first_time_ms": 1682899200000,
+        "last_time_ms": 1685576700000,
+        "period": "2023-05",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "198664e4e360535559678fe42459094c7d491a9af1543f0fd5710573d13a7316",
+        "audit_ok": true,
+        "first_time_ms": 1685577600000,
+        "last_time_ms": 1688168700000,
+        "period": "2023-06",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "900c2b59499de1e7f915444634dadfe2b0677c048beebb9ab675b1121b653d08",
+        "audit_ok": true,
+        "first_time_ms": 1688169600000,
+        "last_time_ms": 1690847100000,
+        "period": "2023-07",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "fbcd36af312294dd3a864034074e00bc13e8bf6133faf975bb9325901d3ff6f2",
+        "audit_ok": true,
+        "first_time_ms": 1690848000000,
+        "last_time_ms": 1693525500000,
+        "period": "2023-08",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "bace04b9437704bc9043854c3d37ae5e432c5af6d525c44704615c92794ce5a4",
+        "audit_ok": true,
+        "first_time_ms": 1693526400000,
+        "last_time_ms": 1696117500000,
+        "period": "2023-09",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "6e82f23f861a5f1f568757eda960780eb1d44bc7f26fca2c3addfea990e4cebf",
+        "audit_ok": true,
+        "first_time_ms": 1696118400000,
+        "last_time_ms": 1698795900000,
+        "period": "2023-10",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "8c279885549d4bba9f3b80cfaf6df229547b0f787ea502e7b5c859052bc83fd8",
+        "audit_ok": true,
+        "first_time_ms": 1698796800000,
+        "last_time_ms": 1701387900000,
+        "period": "2023-11",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "64ec2c5acb7c6b459be6c8f7931b64240143bdfd3e0df7af9705e311197b0bfa",
+        "audit_ok": true,
+        "first_time_ms": 1701388800000,
+        "last_time_ms": 1704066300000,
+        "period": "2023-12",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "4a8adabd3ca0de4fe66a482ccdeed8d7f5b18ed5cbf868cd77a3000b3cfc9cf3",
+        "audit_ok": true,
+        "first_time_ms": 1704067200000,
+        "last_time_ms": 1706744700000,
+        "period": "2024-01",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "1ee52a5972759d8d93dfaa44f217f349d64839e72668206f4b322ca5accc69aa",
+        "audit_ok": true,
+        "first_time_ms": 1706745600000,
+        "last_time_ms": 1709250300000,
+        "period": "2024-02",
+        "row_count": 2784
+      },
+      {
+        "archive_sha256": "371bac254004fa783a458ddc6062845e4f4d15bc2ea20549e881727b10144a11",
+        "audit_ok": true,
+        "first_time_ms": 1709251200000,
+        "last_time_ms": 1711928700000,
+        "period": "2024-03",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "b47c062537da0d5e72d615571317ec63e398ca141b7c0ec390c13eb8e836c004",
+        "audit_ok": true,
+        "first_time_ms": 1711929600000,
+        "last_time_ms": 1714520700000,
+        "period": "2024-04",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "6b43d06eb8da0ee4a4385a26516bff6f9035ba66988b7454046931f2e3a052ee",
+        "audit_ok": true,
+        "first_time_ms": 1714521600000,
+        "last_time_ms": 1717199100000,
+        "period": "2024-05",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "2c9618187d157c1e87a12a788d24efa89fe9ee40ff2b8dc1fed8231076935edb",
+        "audit_ok": true,
+        "first_time_ms": 1717200000000,
+        "last_time_ms": 1719791100000,
+        "period": "2024-06",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "fbdfe660f3cbcacc74e1146b3c90dc8d11756918e1936f0c6ff6590dfc5b864a",
+        "audit_ok": true,
+        "first_time_ms": 1719792000000,
+        "last_time_ms": 1722469500000,
+        "period": "2024-07",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "1db9f8b9eb61c4eb99c8e69fcfafe5fe011af43a5184b6186224fb1d8a73c505",
+        "audit_ok": true,
+        "first_time_ms": 1722470400000,
+        "last_time_ms": 1725147900000,
+        "period": "2024-08",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "c6e6cfa49f5fee31b0b48e5e39ed373afb3e8332ba1ade6ae7d04fb31f59765e",
+        "audit_ok": true,
+        "first_time_ms": 1725148800000,
+        "last_time_ms": 1727739900000,
+        "period": "2024-09",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "2ddb584a8b43a16b93ee09ccc432759d30590deaf93af5af9c780662ceedd98f",
+        "audit_ok": true,
+        "first_time_ms": 1727740800000,
+        "last_time_ms": 1730418300000,
+        "period": "2024-10",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "cb9e881ff5539fca22e88d82444922242a788d73d5a648478cf944f992b217ce",
+        "audit_ok": true,
+        "first_time_ms": 1730419200000,
+        "last_time_ms": 1733010300000,
+        "period": "2024-11",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "5c1222d9ed3d99e2dc8b622d2a5899986a4ab98de586ae1575c0214b823c9bd1",
+        "audit_ok": true,
+        "first_time_ms": 1733011200000,
+        "last_time_ms": 1735688700000,
+        "period": "2024-12",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "09239a2bed7eaed00e1c63baa4ecc1fbfce08318e568d12a952b673feb0b79b3",
+        "audit_ok": true,
+        "first_time_ms": 1735689600000,
+        "last_time_ms": 1738367100000,
+        "period": "2025-01",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "c802b37c8f07fe9fcd3a7da9bd7f2b7885bfc3b29a46f9e2f864964f7e4a6db1",
+        "audit_ok": true,
+        "first_time_ms": 1738368000000,
+        "last_time_ms": 1740786300000,
+        "period": "2025-02",
+        "row_count": 2688
+      },
+      {
+        "archive_sha256": "a995bcc2e88df31769ffd95f6a2828e4c2a587c860b907b317ab2dc3fcf0b402",
+        "audit_ok": true,
+        "first_time_ms": 1740787200000,
+        "last_time_ms": 1743464700000,
+        "period": "2025-03",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "be222d5ba668142f752019d9718e011d20924a8bcb8a3855ba733db847b70cc1",
+        "audit_ok": true,
+        "first_time_ms": 1743465600000,
+        "last_time_ms": 1746056700000,
+        "period": "2025-04",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "4a29cbace7d4b9d770f59b9e2a370d05a93a216577478249d729f4c3c4149690",
+        "audit_ok": true,
+        "first_time_ms": 1746057600000,
+        "last_time_ms": 1748735100000,
+        "period": "2025-05",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "15bb3c87f69a3634df740b61ad27d0f00e482576429f753c44e702fd76426d48",
+        "audit_ok": true,
+        "first_time_ms": 1748736000000,
+        "last_time_ms": 1751327100000,
+        "period": "2025-06",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "16ad753956611bfa16e40d32767d71a12a2246fcba3ae1280c5822b7ea2268fe",
+        "audit_ok": true,
+        "first_time_ms": 1751328000000,
+        "last_time_ms": 1754005500000,
+        "period": "2025-07",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "d22bfea614af65db37a9ef5faf95dd27acb4a1870d60652a3555e9f054bd5563",
+        "audit_ok": true,
+        "first_time_ms": 1754006400000,
+        "last_time_ms": 1756683900000,
+        "period": "2025-08",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "8d7252d4900af5874c2f6210665670bbe12c112cb0d2c9b615b9aad874889e51",
+        "audit_ok": true,
+        "first_time_ms": 1756684800000,
+        "last_time_ms": 1759275900000,
+        "period": "2025-09",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "fe108bb3a10609861d1980b92f74b846b0a0980ba2e2779acaecb4384c00f7f9",
+        "audit_ok": true,
+        "first_time_ms": 1759276800000,
+        "last_time_ms": 1761954300000,
+        "period": "2025-10",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "a478a1933e521fc298efd274d074ee849de0017abc3df92de814d0a7f5fac4e8",
+        "audit_ok": true,
+        "first_time_ms": 1761955200000,
+        "last_time_ms": 1764546300000,
+        "period": "2025-11",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "baf2ddb4b4de7c9c9469779a324155458439c74082d70025026a98cd66413ada",
+        "audit_ok": true,
+        "first_time_ms": 1764547200000,
+        "last_time_ms": 1767224700000,
+        "period": "2025-12",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "1a21c22b3aa5b979e4509806b844b5063ac8e851d4d267aff7767352481c98c7",
+        "audit_ok": true,
+        "first_time_ms": 1767225600000,
+        "last_time_ms": 1769903100000,
+        "period": "2026-01",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "91c1bf46849786fd08891867aff18542463c63f0960e455ce8c8b9fcf5480248",
+        "audit_ok": true,
+        "first_time_ms": 1769904000000,
+        "last_time_ms": 1772322300000,
+        "period": "2026-02",
+        "row_count": 2688
+      },
+      {
+        "archive_sha256": "e4a4abefa530ee605396da78d0d2c3968e6dad744ca69def8cb4873e11fd0dcb",
+        "audit_ok": true,
+        "first_time_ms": 1772323200000,
+        "last_time_ms": 1775000700000,
+        "period": "2026-03",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "0c28ddbd4044ff428f774d6cd71ee7ae7b3fbf83de35fbf4e1ec3a16f21cf8db",
+        "audit_ok": true,
+        "first_time_ms": 1775001600000,
+        "last_time_ms": 1777592700000,
+        "period": "2026-04",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "b7655a7f56adf058c3557a2dbf9e685df10cc9ee044d8efb0c3acd4776d12c22",
+        "audit_ok": true,
+        "first_time_ms": 1777593600000,
+        "last_time_ms": 1780271100000,
+        "period": "2026-05",
+        "row_count": 2976
+      },
+      {
+        "archive_sha256": "bb73ea5b9da5fe427d38b279f008c7f0591c070561ad16bfad036450f949a596",
+        "audit_ok": true,
+        "first_time_ms": 1780272000000,
+        "last_time_ms": 1782863100000,
+        "period": "2026-06",
+        "row_count": 2880
+      },
+      {
+        "archive_sha256": "1e85b05a05e0b637dac10677a40ad1aab49e1d7543fbc91e38d0756f6d85f012",
+        "audit_ok": true,
+        "first_time_ms": 1782864000000,
+        "last_time_ms": 1785541500000,
+        "period": "2026-07",
+        "row_count": 2976
+      }
+    ],
+    "delivery": "binance_vision_public_monthly",
+    "first_time_ms": 1659312000000,
+    "interval": "15m",
+    "last_time_ms": 1785541500000,
+    "provider": "binance_usdm",
+    "provider_requests_performed": 96,
+    "raw_candles_persisted": false,
+    "row_count": 140256,
+    "symbol": "ZECUSDT"
+  },
+  "status": "PASS_EXECUTION_COMPLETE"
+}
