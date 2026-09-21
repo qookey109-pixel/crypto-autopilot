@@ -10,7 +10,6 @@ model or authorize trading.
 | Cadence | Current job | Evidence boundary |
 | --- | --- | --- |
 | Pull request / push | Repository CI and dashboard validation | No provider, production R2, holdout or trading access |
-| `:17` / `:47` inside 2026-09-04 02:00 through 2026-09-12 03:59:59.999 UTC | Provider Equivalence V0.12 successor metadata capture | Only current metadata schedule; V0.10 is retired, no replay/backfill or holdout candle access |
 | Daily 02:17 UTC | Research Signal Layer V0.2 | Public HTTPS source metadata and structured KOL challenger evidence to dedicated R2 namespace; no trading |
 | Daily 02:47 UTC | Research Signal Quality V0.1 | Exact latest/manifest/payload R2 reads with SHA/time/authority checks; no list or write |
 | Every two hours at `:57` | Research Automation Health V0.2 | complete GitHub cron inventory monitor; manual/PR runs do not count; no provider or R2 access |
@@ -18,6 +17,10 @@ model or authorize trading.
 | Daily 04:43 UTC plus approved upstream completions | Dashboard GitHub Pages | non-authoritative website projection and content-hash deployment deduplication |
 | Sunday 04:37 UTC | Binance USD-M Crypto Core 100 Training V0.1.2 | Complete dataset required; exact dataset + model-input experiment fingerprint match returns NO_CHANGE without retraining or R2 writes |
 | 2026-09-04 02:53 UTC, then Sep 6/13/20/27 at 03:53 UTC | Pionex Alternative Assets Observability V0.2 | Validates the 125-candidate equity/ETF/metal catalog, compares prior SHA-bound evidence and estimates capacity; metadata-only R2 evidence |
+
+The V0.12 successor metadata window ended on 2026-09-12 and its cron is now
+retired. Its original schedule strings remain only in the frozen authority/config
+lineage; no replay or backfill is authorized.
 
 The expired Binance V0.5 weekly/monthly and Pionex Paper cron triggers are no
 longer active. Their binding provider cutoff was
@@ -134,7 +137,7 @@ No GameAI reinforcement-learning runtime, OODA Frozen Core, local artifact
 store, pre-trained model or provider dataset was copied into this public
 repository.
 
-Current GitHub automatic-operations inventory is versioned in `config/github_automatic_research_operations_v0_3.json`. V0.2 remains unchanged because the History Cadence authority binds its exact bytes.
+Current GitHub automatic-operations inventory is versioned in `config/github_automatic_research_operations_v0_5.json`. V0.4 preserves the prior eight-workflow inventory before V0.12 expiry retirement; V0.2 remains unchanged because the History Cadence authority binds its exact bytes.
 
 
 ## Core100 lifecycle cleanup
@@ -152,6 +155,7 @@ training manifest, computes the experiment fingerprint, and returns
 baseline run `34918219864`. `NO_CHANGE` performs no training and no R2
 write.
 
-Current automatic-operations inventory after this retirement is
-`config/github_automatic_research_operations_v0_4.json` with eight repository
-cron workflows.
+Automatic Operations V0.4 records the intermediate eight-workflow state after
+Core100 History retirement. The current inventory is
+`config/github_automatic_research_operations_v0_5.json` with seven Repository
+cron workflows after the expired V0.12 successor cron was also retired.
