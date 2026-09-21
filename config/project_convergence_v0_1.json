@@ -80,8 +80,8 @@
     "core100_training_fingerprint_state": "ACTIVE_NO_CHANGE_WHEN_DATASET_AND_MODEL_INPUTS_MATCH",
     "zec_v0_3_development_execution": "research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json",
     "zec_v0_3_development_execution_state": "COMPLETE_256_OF_256_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE_FRESH_CONFIRMATION_CLOSED",
-    "zec_v0_4_development_execution": "research/receipts/2026-09-21-zec-v0-4-development-one-shot-authority.json",
-    "zec_v0_4_development_execution_state": "PROPOSED_ONE_SHOT_MANUAL_PUBLIC_BINANCE_VISION_DEVELOPMENT_ONLY_EFFECTIVE_ON_AUTHORITY_PR_MERGE"
+    "zec_v0_4_development_execution": "research/receipts/2026-09-21-zec-v0-4-development-completion-v0-1.json",
+    "zec_v0_4_development_execution_state": "COMPLETE_24_OF_24_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE_FRESH_CONFIRMATION_CLOSED"
   },
   "scheduled_workflows": {
     "current_window": [],
@@ -294,7 +294,9 @@
     "zec_v0_3_fresh_confirmation_opened": false,
     "zec_v0_4_development_one_shot_authority_added": true,
     "zec_v0_4_development_schedule_added": false,
-    "zec_v0_4_fresh_confirmation_opened": false
+    "zec_v0_4_fresh_confirmation_opened": false,
+    "zec_v0_4_development_one_shot_authority_consumed": true,
+    "zec_v0_4_development_champion_frozen": false
   },
   "retired_schedule_windows": [],
   "expired_frozen_schedule_windows": [
