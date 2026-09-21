@@ -15,32 +15,46 @@
   },
   "scheduled_workflows": [
     {
+      "workflow": "provider-equivalence-v0-12-successor-metadata-capture.yml",
+      "cron_utc": [
+        "17,47 2-23 4 9 *",
+        "17,47 * 5,6,7,8,9,10,11 9 *",
+        "17,47 0-3 12 9 *"
+      ],
+      "scope": "BOUNDED_V0_12_METADATA_ONLY",
+      "lifecycle_state": "EXPIRED_BOUNDED_FROZEN_CRON_DECLARATION"
+    },
+    {
       "workflow": "research-signal-layer-v0-2.yml",
       "cron_utc": [
         "17 2 * * *"
       ],
-      "scope": "STRUCTURED_PUBLIC_RESEARCH_SIGNAL_INGESTION"
+      "scope": "STRUCTURED_PUBLIC_RESEARCH_SIGNAL_INGESTION",
+      "lifecycle_state": "CURRENT_EFFECTIVE"
     },
     {
       "workflow": "research-signal-quality-v0-1.yml",
       "cron_utc": [
         "47 2 * * *"
       ],
-      "scope": "READ_ONLY_SIGNAL_LINEAGE_QUALITY"
+      "scope": "READ_ONLY_SIGNAL_LINEAGE_QUALITY",
+      "lifecycle_state": "CURRENT_EFFECTIVE"
     },
     {
       "workflow": "research-automation-health-v0-2.yml",
       "cron_utc": [
         "57 */2 * * *"
       ],
-      "scope": "GITHUB_ACTIONS_METADATA_READ_ONLY"
+      "scope": "GITHUB_ACTIONS_METADATA_READ_ONLY",
+      "lifecycle_state": "CURRENT_EFFECTIVE"
     },
     {
       "workflow": "binance-usdm-detailed-training-v0-1.yml",
       "cron_utc": [
         "37 4 * * 0"
       ],
-      "scope": "CONDITIONAL_RESEARCH_TRAINING_AFTER_COMPLETE_DATASET"
+      "scope": "CONDITIONAL_RESEARCH_TRAINING_AFTER_COMPLETE_DATASET",
+      "lifecycle_state": "CURRENT_EFFECTIVE"
     },
     {
       "workflow": "pionex-alternative-assets-observability-v0-2.yml",
@@ -48,21 +62,24 @@
         "53 2 4 9 *",
         "53 3 6,13,20,27 9 *"
       ],
-      "scope": "BOUNDED_PIONEX_METADATA_OBSERVABILITY_ONLY"
+      "scope": "BOUNDED_PIONEX_METADATA_OBSERVABILITY_ONLY",
+      "lifecycle_state": "CURRENT_EFFECTIVE"
     },
     {
       "workflow": "resource-hub-supply-chain-v0-2.yml",
       "cron_utc": [
         "13 1 * * *"
       ],
-      "scope": "READ_ONLY_PUBLIC_RESOURCE_HUB_CHANGE_WATCH"
+      "scope": "READ_ONLY_PUBLIC_RESOURCE_HUB_CHANGE_WATCH",
+      "lifecycle_state": "CURRENT_EFFECTIVE"
     },
     {
       "workflow": "dashboard-github-pages.yml",
       "cron_utc": [
         "43 4 * * *"
       ],
-      "scope": "NON_AUTHORITATIVE_DASHBOARD_BACKSTOP_CONTENT_HASH_DEDUP"
+      "scope": "NON_AUTHORITATIVE_DASHBOARD_BACKSTOP_CONTENT_HASH_DEDUP",
+      "lifecycle_state": "CURRENT_EFFECTIVE"
     }
   ],
   "waiting_not_automatically_unblocked": [
@@ -92,17 +109,17 @@
     "live_trading": false
   },
   "predecessor": "config/github_automatic_research_operations_v0_4.json",
-  "change_reason": "Retire the expired V0.12 successor metadata cron after its bounded window ended, preserve historical authority/evidence without replay or backfill, and converge the live Repository schedule inventory to seven cron workflows.",
+  "change_reason": "Classify the frozen V0.12 successor cron declaration as expired/non-effective after its bounded window, while preserving the exact critical-path workflow bytes. Repository and Health still inventory eight cron declarations; seven are current-effective.",
   "historical_schedule_appendix": "config/history_cadence_v0_1.json",
   "history_retirement": "config/core100_history_retirement_v0_1.json",
-  "expired_schedule_retirements": [
-    {
-      "workflow": "provider-equivalence-v0-12-successor-metadata-capture.yml",
-      "active_from_utc": "2026-09-04T02:00:00Z",
-      "active_until_utc": "2026-09-12T04:00:00Z",
-      "schedule_retired": true,
-      "replay_or_backfill_authorized": false,
-      "historical_authority_preserved": true
-    }
-  ]
+  "schedule_semantics": {
+    "repository_cron_declaration_count": 8,
+    "monitored_cron_declaration_count": 8,
+    "current_effective_schedule_count": 7,
+    "expired_frozen_cron_declaration_count": 1,
+    "expired_frozen_workflow": "provider-equivalence-v0-12-successor-metadata-capture.yml",
+    "workflow_file_mutation_required": false,
+    "outside_window_execution_effective": false,
+    "replay_or_backfill_authorized": false
+  }
 }
