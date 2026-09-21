@@ -55,17 +55,25 @@ selection must not silently fall through to the next-ranked candidate.
 
 ## Execution authority
 
-The repository contract currently keeps:
+The frozen repository contract continues to keep:
 
 `offline_development_runner_authorized = false`
 
-Accordingly, `run_zec_v0_3_development_matrix(...)` fails closed before real
-development execution. Unit tests may exercise the pure engine with synthetic
-candles, but that is not historical ZEC evidence.
+That field is intentionally **not** mutated to execute V0.3. The runner now
+accepts a separate typed one-shot authority object, and still fails closed when
+that authority is absent or ineffective.
 
-A later explicit authority change may open **local, already-seen development
-execution only**. It still must keep the fresh confirmation interval
-`2026-08-01T00:00:00Z <= t < 2026-09-16T00:00:00Z` unopened.
+The reviewed execution package is documented in
+`docs/ZEC_STRATEGY_V0_3_DEVELOPMENT_EXECUTION_AUTHORITY_V0_1.md`.
+
+Its authority receipt is effective only after the exact authority PR is merged
+to protected `main`. The workflow is manual-only and consumes the authority on
+its first dispatch. It may re-read only the already-seen 2022-08 through
+2026-07 public Binance Vision ZECUSDT 15m development history in disposable
+runner memory.
+
+The fresh confirmation interval
+`2026-08-01T00:00:00Z <= t < 2026-09-16T00:00:00Z` remains unopened.
 
 ## Non-authority
 

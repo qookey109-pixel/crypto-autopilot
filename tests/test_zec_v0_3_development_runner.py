@@ -22,11 +22,18 @@ from crypto_autopilot.research.zec_v0_3_development_runner import (
 from crypto_autopilot.research.zec_v0_3_selection_policy import (
     validate_zec_v0_3_selection_policy,
 )
+from crypto_autopilot.research.zec_v0_3_development_execution_authority import (
+    validate_zec_v0_3_development_execution_authority,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "config" / "zec_strategy_v0_3_development_matrix_v0_1.json"
 SELECTION_POLICY = ROOT / "config" / "zec_strategy_v0_3_selection_policy_v0_1.json"
+EXECUTION_AUTHORITY = (
+    ROOT
+    / "research/receipts/2026-09-21-zec-v0-3-development-one-shot-authority.json"
+)
 FIFTEEN_MINUTES_MS = 15 * 60 * 1000
 FOUR_HOURS_MS = 4 * 60 * 60 * 1000
 
@@ -350,6 +357,23 @@ class ZecV03OfflineDevelopmentRunnerTests(unittest.TestCase):
             run_zec_v0_3_development_matrix(
                 candles_15m=(),
                 contract=self.contract,
+            )
+
+    def test_separate_merged_authority_passes_authority_gate_without_mutating_contract(self) -> None:
+        payload = json.loads(EXECUTION_AUTHORITY.read_text(encoding="utf-8"))
+        authority = validate_zec_v0_3_development_execution_authority(
+            payload,
+            authority_pr_merged=True,
+            observed_blob_shas=dict(payload["bound_git_blobs"]),
+        )
+        self.assertFalse(
+            self.contract["authority"]["offline_development_runner_authorized"]
+        )
+        with self.assertRaisesRegex(ValueError, "development source candles are required"):
+            run_zec_v0_3_development_matrix(
+                candles_15m=(),
+                contract=self.contract,
+                execution_authority=authority,
             )
 
 
