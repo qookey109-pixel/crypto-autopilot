@@ -22,7 +22,7 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         current = self.current
 
         self.assertEqual(payload["schema"], "qookey-current-operations-v0.3")
-        self.assertEqual(payload["updated_date"], "2026-09-18")
+        self.assertEqual(payload["updated_date"], "2026-09-21")
         self.assertEqual(payload["repository_authority"], "RESOLVE_MAIN_LIVE_AT_READ_TIME")
         self.assertEqual(payload["mode"], "PAPER_AND_LIVE_PAPER_ONLY")
 
@@ -32,10 +32,10 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
         )
         self.assertFalse(basis["is_latest_main_claim"])
-        self.assertEqual(basis["source_merge_pr"], 366)
+        self.assertEqual(basis["source_merge_pr"], 410)
         self.assertEqual(
             basis["parent_main_sha"],
-            "a26902fd7a116af442a9b19249b895d0612bfc4f",
+            "3422efc91cfd973ab1991080186fb8300d26a2a5",
         )
         self.assertIn(basis["parent_main_sha"], current)
         self.assertIn("Resolve `main` live at read time", current)
