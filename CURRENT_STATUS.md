@@ -262,3 +262,40 @@ promotion, formal trade plans, real-money orders and live trading remain closed.
 
 Authority receipt:
 `research/receipts/2026-09-21-zec-v0-4-development-one-shot-authority.json`
+
+
+## ZEC Strategy V0.4 development result
+
+The governed V0.4 one-shot development run is complete.
+
+- workflow run: `35618367238`
+- run attempt: `1`
+- execution head: `dd12300b294f2a868389c49a877be97a41a3ebe8`
+- workflow conclusion: **SUCCESS**
+- artifact: `10647816808`
+- artifact digest: `sha256:ea9c7652d98fdf947216fc4f291b8823b99fa66e8b210d279b58be615da846de`
+- report SHA-256: `764a3667dcbc91a7142b2b2bf3fdd33c0051492ba1b892fb6283e05148c09959`
+- development matrix: **24 / 24 COMPLETE**
+- selection result: **NO_ELIGIBLE_DEVELOPMENT_CANDIDATE**
+- champion frozen: **false**
+- all 6 candidates met the minimum 30 realized trades per fold
+- candidates with positive worst-fold return: **0 / 6**
+
+Diagnostic leader only:
+- `zec-v0-4-04`
+- MACD `12/30/7`
+- activation regime `TREND_STRICT_BASELINE`
+- worst-fold return `-8.12511401%`
+- median-fold return `-3.04319973%`
+- fold returns `-6.00733290%`, `-8.12511401%`, `-0.07906656%`, `+6.28084212%`
+
+The stricter stacked / momentum activation variants improved some later-period
+results but did not establish positive worst-fold return. V0.4 therefore does
+not open fresh confirmation and does not justify relaxing the frozen selection
+policy.
+
+Fresh confirmation, R2, formal holdout, source switch, promotion, formal trade
+plans, real-money orders and live trading remain closed.
+
+Completion receipt:
+`research/receipts/2026-09-21-zec-v0-4-development-completion-v0-1.json`
