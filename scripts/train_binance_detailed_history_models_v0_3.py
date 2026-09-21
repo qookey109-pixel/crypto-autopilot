@@ -59,7 +59,15 @@ def _fingerprint_payload(
 
 
 def _payload_sha256(payload: Mapping[str, Any]) -> str:
-    return runner.sha256_bytes(runner.canonical_json_bytes(dict(payload)))
+    # Experiment identity is a compact canonical hash contract. Keep it separate
+    # from the pretty-printed canonical JSON used for persisted evidence files.
+    canonical = json.dumps(
+        dict(payload),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
 
 
 def validate_fingerprint_config(
