@@ -218,7 +218,6 @@ td strong { color: var(--ink); }
   .learning-timeline { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 @media (max-width: 760px) {
-  .cloud-run-list { grid-template-columns: 1fr; }
   body { background-attachment: scroll; }
   .header-inner { width: calc(100% - 28px); min-height: 72px; gap: 10px; }
   .brand-copy small { display: none; }
@@ -329,3 +328,4 @@ td strong { color: var(--ink); }
 .cloud-run-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 9px; font-size: 12px; }
 .cloud-run-links a { color: var(--mint); font-weight: 700; text-decoration: none; }
 .cloud-run-links a:hover { text-decoration: underline; }
+@media (max-width: 760px) { .cloud-run-list { grid-template-columns: 1fr; } }
