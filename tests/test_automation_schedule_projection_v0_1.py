@@ -21,8 +21,10 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     assert actual["authority"] is False
     assert actual["summary"]["scheduledJobCount"] == 7
     assert actual["summary"]["projectedScheduledJobCount"] == 7
-    assert actual["summary"]["repositoryScheduledWorkflowCount"] == 7
-    assert actual["summary"]["monitoredScheduledWorkflowCount"] == 7
+    assert actual["summary"]["repositoryScheduledWorkflowCount"] == 8
+    assert actual["summary"]["monitoredScheduledWorkflowCount"] == 8
+    assert actual["summary"]["currentEffectiveScheduledWorkflowCount"] == 7
+    assert actual["summary"]["expiredFrozenCronDeclarationCount"] == 1
     assert actual["summary"]["scheduleInventoryConverged"] is True
     scheduled_workflows = {
         Path(row["workflow"]).name
@@ -38,10 +40,15 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     assert actual["summary"]["core100HistoryScheduleRetired"] is True
     assert actual["summary"]["core100TrainingDedupeState"] == "ACTIVE_FINGERPRINT_NO_CHANGE"
     assert actual["sourceStatus"]["scheduleInventory"] == {
-        "state": "CONVERGED",
-        "repositoryScheduledWorkflowCount": 7,
+        "state": "CONVERGED_WITH_EXPIRED_FROZEN_DECLARATION",
+        "repositoryScheduledWorkflowCount": 8,
         "projectedScheduledJobCount": 7,
-        "monitoredScheduledWorkflowCount": 7,
+        "monitoredScheduledWorkflowCount": 8,
+        "currentEffectiveScheduledWorkflowCount": 7,
+        "expiredFrozenCronDeclarationCount": 1,
+        "expiredFrozenWorkflows": [
+            "provider-equivalence-v0-12-successor-metadata-capture.yml"
+        ],
         "freshnessAndEffectivePeriodSource": "config/research_automation_health_v0_2.json",
         "automaticOperationsInventory": "config/github_automatic_research_operations_v0_5.json",
     }
