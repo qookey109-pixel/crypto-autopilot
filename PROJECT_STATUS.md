@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-09-19
+Updated: 2026-09-21
 
 Repository `main` is the formal current authority and must be resolved live at read time. This file is the project-stage, governance-compatibility, and retired-workflow index. Exact versioned configs, receipts, immutable run evidence, and merged code remain the detailed authority for each scope.
 
@@ -9,7 +9,7 @@ Repository `main` is the formal current authority and must be resolved live at r
 - Repository: `qookey109-pixel/crypto-autopilot`.
 - Current Operations companion: `research/status/current-operations-v0-3.json`.
 - Current Operations V0.3 stores an **evidence-basis parent SHA**, not a self-referential latest-main claim.
-- Evidence-basis parent for this status version: `a26902fd7a116af442a9b19249b895d0612bfc4f`, the reviewed main commit after PR #366 merged and passed post-merge CI / Freeze Guard.
+- Evidence-basis parent for this status version: `3422efc91cfd973ab1991080186fb8300d26a2a5`, the reviewed main commit after PR #410 merged and passed post-merge CI / Freeze Guard / CodeQL / Pages.
 - Current mode: **PAPER / LIVE-PAPER ONLY**. Public live market data and simulated live-paper execution/persistence are separate from real trading authority.
 - FREE-ONLY cloud/runtime budget: **0 USD/month**.
 
