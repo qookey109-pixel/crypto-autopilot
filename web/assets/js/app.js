@@ -257,13 +257,18 @@ function operationsScheduleIsSafe(projection) {
   if (!Array.isArray(projection.items)) return false;
   const inventory = projection.sourceStatus?.scheduleInventory;
   if (inventory) {
-    const counts = [
-      inventory.repositoryScheduledWorkflowCount,
-      inventory.projectedScheduledJobCount,
-      inventory.monitoredScheduledWorkflowCount
-    ].map(Number);
-    if (inventory.state !== "CONVERGED" || !counts.every(Number.isInteger)
-        || !counts.every(value => value === counts[0])) return false;
+    const repositoryCount = Number(inventory.repositoryScheduledWorkflowCount);
+    const monitoredCount = Number(inventory.monitoredScheduledWorkflowCount);
+    const projectedCount = Number(inventory.projectedScheduledJobCount);
+    const effectiveCount = Number(inventory.currentEffectiveScheduledWorkflowCount);
+    const expiredCount = Number(inventory.expiredFrozenCronDeclarationCount);
+    const counts = [repositoryCount, monitoredCount, projectedCount, effectiveCount, expiredCount];
+    if (inventory.state !== "CONVERGED_WITH_EXPIRED_FROZEN_DECLARATION"
+        || !counts.every(Number.isInteger)
+        || repositoryCount !== monitoredCount
+        || projectedCount !== effectiveCount
+        || repositoryCount !== effectiveCount + expiredCount
+        || expiredCount !== 1) return false;
   }
   const boundary = projection.safetyBoundary || {};
   return Object.keys(boundary).length > 0 && Object.values(boundary).every(value => value === false);
@@ -287,7 +292,7 @@ function renderOperationsSchedule(projection) {
   const inventory = projection.sourceStatus?.scheduleInventory || null;
   if (generated) {
     const countText = inventory
-      ? ` · Repo ${number(inventory.repositoryScheduledWorkflowCount, 0)} / Health ${number(inventory.monitoredScheduledWorkflowCount, 0)} / Website ${number(inventory.projectedScheduledJobCount, 0)}`
+      ? ` · Repo 宣告 ${number(inventory.repositoryScheduledWorkflowCount, 0)} / Health ${number(inventory.monitoredScheduledWorkflowCount, 0)} / 目前有效 ${number(inventory.currentEffectiveScheduledWorkflowCount, 0)} / Website ${number(inventory.projectedScheduledJobCount, 0)}`
       : "";
     generated.textContent = `排程投影：${formatTrustedTime(projection.projectionGeneratedAtUtc)}${countText}`;
   }
