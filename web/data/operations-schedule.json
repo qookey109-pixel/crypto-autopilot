@@ -14,9 +14,11 @@
     "core100HistoryScheduleRetired": true,
     "core100TrainingDedupeState": "ACTIVE_FINGERPRINT_NO_CHANGE",
     "projectedScheduledJobCount": 7,
-    "repositoryScheduledWorkflowCount": 7,
-    "monitoredScheduledWorkflowCount": 7,
-    "scheduleInventoryConverged": true
+    "repositoryScheduledWorkflowCount": 8,
+    "monitoredScheduledWorkflowCount": 8,
+    "scheduleInventoryConverged": true,
+    "currentEffectiveScheduledWorkflowCount": 7,
+    "expiredFrozenCronDeclarationCount": 1
   },
   "sourceStatus": {
     "resourceHub": {
@@ -49,10 +51,15 @@
       "trainingNoChangeWritesR2": false
     },
     "scheduleInventory": {
-      "state": "CONVERGED",
-      "repositoryScheduledWorkflowCount": 7,
+      "state": "CONVERGED_WITH_EXPIRED_FROZEN_DECLARATION",
+      "repositoryScheduledWorkflowCount": 8,
       "projectedScheduledJobCount": 7,
-      "monitoredScheduledWorkflowCount": 7,
+      "monitoredScheduledWorkflowCount": 8,
+      "currentEffectiveScheduledWorkflowCount": 7,
+      "expiredFrozenCronDeclarationCount": 1,
+      "expiredFrozenWorkflows": [
+        "provider-equivalence-v0-12-successor-metadata-capture.yml"
+      ],
       "freshnessAndEffectivePeriodSource": "config/research_automation_health_v0_2.json",
       "automaticOperationsInventory": "config/github_automatic_research_operations_v0_5.json"
     }
