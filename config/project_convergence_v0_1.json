@@ -78,8 +78,8 @@
     "core100_history_state": "COMPLETE_10_OF_10_SCHEDULE_RETIRED_MANUAL_REPAIR_DIAGNOSIS_ONLY",
     "core100_training_fingerprint": "config/core100_training_fingerprint_v0_1.json",
     "core100_training_fingerprint_state": "ACTIVE_NO_CHANGE_WHEN_DATASET_AND_MODEL_INPUTS_MATCH",
-    "zec_v0_3_development_execution": "research/receipts/2026-09-21-zec-v0-3-development-one-shot-authority.json",
-    "zec_v0_3_development_execution_state": "PROPOSED_ONE_SHOT_MANUAL_PUBLIC_BINANCE_VISION_DEVELOPMENT_ONLY_EFFECTIVE_ON_PR_415_MERGE"
+    "zec_v0_3_development_execution": "research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json",
+    "zec_v0_3_development_execution_state": "COMPLETE_256_OF_256_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE_FRESH_CONFIRMATION_CLOSED"
   },
   "scheduled_workflows": {
     "current_window": [],
@@ -285,7 +285,10 @@
     "v0_12_schedule_retired_after_window_expiry": false,
     "v0_12_frozen_cron_declaration_preserved_after_window_expiry": true,
     "zec_v0_3_development_one_shot_authority_added": true,
-    "zec_v0_3_development_schedule_added": false
+    "zec_v0_3_development_schedule_added": false,
+    "zec_v0_3_development_one_shot_authority_consumed": true,
+    "zec_v0_3_development_champion_frozen": false,
+    "zec_v0_3_fresh_confirmation_opened": false
   },
   "retired_schedule_windows": [],
   "expired_frozen_schedule_windows": [
