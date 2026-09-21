@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   watch-candidates:
-    if: \${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -59,14 +59,14 @@ jobs:
       - name: Resolve exact Resource Hub source commit
         id: hub
         env:
-          GITHUB_TOKEN: \${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p resource-hub-input resource-hub-output previous-state
           curl --fail --silent --show-error --location \
             --header 'Accept: application/vnd.github+json' \
-            --header "Authorization: Bearer \${GITHUB_TOKEN}" \
+            --header "Authorization: Bearer ${GITHUB_TOKEN}" \
             https://api.github.com/repos/qookey109-pixel/ai-resource-hub/commits/main \
             > resource-hub-input/commit.json
           HUB_SHA="$(python - <<'PY'
@@ -81,11 +81,12 @@ jobs:
           print(sha)
           PY
           )"
-          echo "hub_sha=\${HUB_SHA}" >> "\${GITHUB_OUTPUT}"
+          echo "hub_sha=${HUB_SHA}" >> "${GITHUB_OUTPUT}"
 
       - name: Restore latest successful source state
+        id: previous-state
         env:
-          GH_TOKEN: \${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
@@ -98,41 +99,83 @@ jobs:
               --json databaseId \
               --jq '.[0].databaseId // empty'
           )"
-          if [[ -n "\${previous_run_id}" ]]; then
-            gh run download "\${previous_run_id}" \
-              --name resource-hub-source-state-v0-2 \
-              --dir previous-state || true
+
+          if [[ -z "${previous_run_id}" ]]; then
+            echo "restore_status=FIRST_RUN_BASELINE" >> "${GITHUB_OUTPUT}"
+            echo "No prior successful Resource Hub run exists; use the reviewed policy baseline."
+            exit 0
           fi
+
+          echo "previous_run_id=${previous_run_id}" >> "${GITHUB_OUTPUT}"
+
+          if ! artifacts_json="$(
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${previous_run_id}/artifacts"
+          )"; then
+            echo "::error::PREVIOUS_STATE_LOOKUP_FAILED: unable to inspect prior-run artifacts; refusing silent baseline fallback."
+            exit 1
+          fi
+
+          active_count="$(
+            jq '[.artifacts[] | select(.name == "resource-hub-source-state-v0-2" and .expired == false)] | length' \
+              <<<"${artifacts_json}"
+          )"
+          expired_count="$(
+            jq '[.artifacts[] | select(.name == "resource-hub-source-state-v0-2" and .expired == true)] | length' \
+              <<<"${artifacts_json}"
+          )"
+
+          if [[ "${active_count}" -eq 0 ]]; then
+            if [[ "${expired_count}" -gt 0 ]]; then
+              echo "::error::PREVIOUS_STATE_EXPIRED: the last successful checkpoint exists only as an expired artifact; dedupe state is unavailable."
+            else
+              echo "::error::PREVIOUS_STATE_MISSING: a prior successful run exists but its checkpoint artifact is missing."
+            fi
+            exit 1
+          fi
+
+          if ! gh run download "${previous_run_id}" \
+            --name resource-hub-source-state-v0-2 \
+            --dir previous-state; then
+            echo "::error::PREVIOUS_STATE_RESTORE_FAILED: checkpoint download failed; possible permission or network error."
+            exit 1
+          fi
+
+          if [[ ! -f previous-state/state.json ]]; then
+            echo "::error::PREVIOUS_STATE_INVALID: checkpoint download completed without previous-state/state.json."
+            exit 1
+          fi
+
+          echo "restore_status=RESTORED" >> "${GITHUB_OUTPUT}"
 
       - name: Fetch catalog at exact source commit
         env:
-          HUB_SHA: \${{ steps.hub.outputs.hub_sha }}
-          GITHUB_TOKEN: \${{ github.token }}
+          HUB_SHA: ${{ steps.hub.outputs.hub_sha }}
+          GITHUB_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           curl --fail --silent --show-error --location \
-            --header "Authorization: Bearer \${GITHUB_TOKEN}" \
-            "https://raw.githubusercontent.com/qookey109-pixel/ai-resource-hub/\${HUB_SHA}/data/resources.json" \
+            --header "Authorization: Bearer ${GITHUB_TOKEN}" \
+            "https://raw.githubusercontent.com/qookey109-pixel/ai-resource-hub/${HUB_SHA}/data/resources.json" \
             > resource-hub-input/resources.json
 
       - name: Compare source and evaluate only when changed
         env:
-          HUB_SHA: \${{ steps.hub.outputs.hub_sha }}
+          HUB_SHA: ${{ steps.hub.outputs.hub_sha }}
         shell: bash
         run: |
           set -euo pipefail
           args=(
             --catalog resource-hub-input/resources.json
             --policy config/resource_hub_supply_chain_v0_2.json
-            --source-commit "\${HUB_SHA}"
+            --source-commit "${HUB_SHA}"
             --state-output resource-hub-output/state.json
             --candidates-output resource-hub-output/candidates.json
           )
           if [[ -f previous-state/state.json ]]; then
             args+=(--previous-state previous-state/state.json)
           fi
-          PYTHONPATH=src python scripts/resource_hub_change_watch_v0_2.py "\${args[@]}"
+          PYTHONPATH=src python scripts/resource_hub_change_watch_v0_2.py "${args[@]}"
 
       - name: Assert no automatic integration authority
         run: |
@@ -166,14 +209,14 @@ jobs:
         with:
           name: resource-hub-source-state-v0-2
           path: resource-hub-output/state.json
-          retention-days: 7
+          retention-days: 30
           if-no-files-found: error
 
       - name: Upload changed candidate registry
-        if: \${{ hashFiles('resource-hub-output/candidates.json') != '' }}
+        if: ${{ hashFiles('resource-hub-output/candidates.json') != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: resource-hub-changed-candidates-v0-2-\${{ github.run_id }}
+          name: resource-hub-changed-candidates-v0-2-${{ github.run_id }}
           path: resource-hub-output/candidates.json
           retention-days: 7
           if-no-files-found: error
