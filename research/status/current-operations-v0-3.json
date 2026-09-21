@@ -1,13 +1,13 @@
 {
   "schema": "qookey-current-operations-v0.3",
-  "updated_date": "2026-09-18",
+  "updated_date": "2026-09-21",
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
-    "parent_main_sha": "a26902fd7a116af442a9b19249b895d0612bfc4f",
+    "parent_main_sha": "3422efc91cfd973ab1991080186fb8300d26a2a5",
     "semantics": "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
     "is_latest_main_claim": false,
-    "source_merge_pr": 366
+    "source_merge_pr": 410
   },
   "mode": "PAPER_AND_LIVE_PAPER_ONLY",
   "core100": {
@@ -50,6 +50,15 @@
       "configured_threshold": 0.55,
       "configured_threshold_changed": false,
       "diagnostic_only": true
+    },
+    "history_schedule_state": "RETIRED_COMPLETE_MANUAL_REPAIR_ONLY",
+    "history_generic_backfill_retired": true,
+    "training_schedule_state": "ACTIVE_FINGERPRINT_DEDUP",
+    "training_baseline_experiment_fingerprint": "25b3178ce0d13052684d20b35a0e1f6949f0d97a5ac0c5b9e8f0a52d4d12f9c8",
+    "training_no_change_semantics": {
+      "same_dataset_and_model_inputs": "NO_CHANGE",
+      "training_performed": false,
+      "r2_writes_performed": false
     }
   },
   "pionex_validation": {
@@ -107,7 +116,10 @@
     "automation_health_count_policy": "DERIVED_FROM_EXACT_REPOSITORY_SCHEDULE_INVENTORY",
     "dashboard_projection_policy": "HISTORICAL_AUTHORITY_OVERLAY_THEN_CURRENT_OPERATIONS_OVERLAY",
     "homepage_projection_policy": "CURRENT_OPERATIONS_MUST_OVERRIDE_DATED_SIMULATION_READINESS_FOR_PRESENT_TENSE_STATE",
-    "self_referential_latest_main_sha_allowed": false
+    "self_referential_latest_main_sha_allowed": false,
+    "automatic_operations": "config/github_automatic_research_operations_v0_4.json",
+    "core100_history_retirement": "config/core100_history_retirement_v0_1.json",
+    "core100_training_fingerprint": "config/core100_training_fingerprint_v0_1.json"
   },
   "next_decision": "PIONEX_V0_2_MATERIALIZATION_COMPLETE_KEEP_DOWNSTREAM_GATES_CLOSED_PENDING_SEPARATE_REVIEW",
   "notes": [
@@ -120,7 +132,9 @@
     "Open PR navigation was refreshed on 2026-09-17 in open-pr-triage-v0-4 after PR #340 evidence preservation.",
     "This file grants no provider, holdout, promotion, trading, source-switch, or private-account authority beyond already merged versioned authority.",
     "Live Paper Simulation V0.1 separates public live market data and simulated paper execution from real live trading; private exchange APIs and real-money orders remain closed.",
-    "Paper Run Store V0.1 authorizes content-addressed Local JSON / R2 persistence for paper evidence only; stored objects do not become execution authority."
+    "Paper Run Store V0.1 authorizes content-addressed Local JSON / R2 persistence for paper evidence only; stored objects do not become execution authority.",
+    "Core100 History automatic acquisition is retired after 10/10 completion; current workflow retains only existing bounded diagnosis/repair modes.",
+    "Core100 weekly Training now deduplicates by governed dataset plus model-affecting Git blobs; an exact match returns NO_CHANGE without retraining or R2 writes."
   ],
   "live_paper": {
     "status": "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY",
