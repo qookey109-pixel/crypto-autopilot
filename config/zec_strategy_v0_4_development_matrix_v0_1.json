@@ -1,0 +1,150 @@
+{
+  "schema": "qookey-zec-strategy-v0-4-development-matrix-v0.1",
+  "status": "PREPARED_OFFLINE_DEVELOPMENT_CONTRACT_ONLY",
+  "symbol": "ZECUSDT",
+  "direction": "LONG_ONLY_RESEARCH",
+  "source_timeframe": "15m",
+  "signal_timeframe": "30m",
+  "context_timeframe": "4h",
+  "lineage": {
+    "v0_3_completion": "research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json",
+    "v0_3_diagnostic": "research/receipts/2026-09-21-zec-v0-3-development-diagnostic-v0-1.json",
+    "interpretation": "V0.4 is a new development iteration on already-seen history. V0.3 produced no eligible champion, so V0.4 does not inherit a champion or promotion state."
+  },
+  "development_window": {
+    "start_utc": "2022-08-01T00:00:00Z",
+    "end_exclusive_utc": "2026-08-01T00:00:00Z",
+    "data_role": "DEVELOPMENT_ONLY_ALREADY_SEEN",
+    "folds": [
+      {
+        "fold_id": "dev-2022-08_to_2023-08",
+        "start_utc": "2022-08-01T00:00:00Z",
+        "end_exclusive_utc": "2023-08-01T00:00:00Z"
+      },
+      {
+        "fold_id": "dev-2023-08_to_2024-08",
+        "start_utc": "2023-08-01T00:00:00Z",
+        "end_exclusive_utc": "2024-08-01T00:00:00Z"
+      },
+      {
+        "fold_id": "dev-2024-08_to_2025-08",
+        "start_utc": "2024-08-01T00:00:00Z",
+        "end_exclusive_utc": "2025-08-01T00:00:00Z"
+      },
+      {
+        "fold_id": "dev-2025-08_to_2026-08",
+        "start_utc": "2025-08-01T00:00:00Z",
+        "end_exclusive_utc": "2026-08-01T00:00:00Z"
+      }
+    ]
+  },
+  "fresh_confirmation_window": {
+    "fold_id": "fresh-confirmation-2026-08-01_to_2026-09-16",
+    "start_utc": "2026-08-01T00:00:00Z",
+    "end_exclusive_utc": "2026-09-16T00:00:00Z",
+    "accessed": false,
+    "access_authorized": false
+  },
+  "base_signal": {
+    "trigger": "BULLISH_MACD_CROSSOVER_ON_CLOSED_30M_BAR",
+    "execution": "NEXT_30M_OPEN",
+    "macd_axis": [
+      "12/26/9",
+      "12/30/7"
+    ]
+  },
+  "activation_regime_axis": [
+    "TREND_STRICT_BASELINE",
+    "TREND_STACKED",
+    "TREND_STACKED_MOMENTUM"
+  ],
+  "activation_regime_definitions": {
+    "TREND_STRICT_BASELINE": {
+      "required_4h_conditions": [
+        "close_gt_ema200",
+        "ema20_gt_ema50",
+        "ema20_slope_atr_gt_0"
+      ]
+    },
+    "TREND_STACKED": {
+      "required_4h_conditions": [
+        "close_gt_ema200",
+        "ema20_gt_ema50",
+        "ema50_gt_ema200",
+        "ema20_slope_atr_gt_0"
+      ]
+    },
+    "TREND_STACKED_MOMENTUM": {
+      "required_4h_conditions": [
+        "close_gt_ema200",
+        "ema20_gt_ema50",
+        "ema50_gt_ema200",
+        "ema20_slope_atr_gt_0",
+        "rsi14_gt_50",
+        "macd_histogram_gt_0"
+      ]
+    }
+  },
+  "fixed_rules": {
+    "volatility_filter": "ATR_ROLLING_EXTREME_GUARD",
+    "volatility_filter_definition": "Reject entry when causal 4h ATR14/close is above the causal rolling 90th percentile of the prior 180 closed 4h bars; current bar excluded.",
+    "stop_model": "VOL_STOP_2_5ATR_BB_HALF",
+    "account_risk_fraction": 0.01,
+    "maximum_leverage": 3,
+    "averaging_down": false,
+    "martingale": false,
+    "pyramiding": false,
+    "funding_fabrication_allowed": false
+  },
+  "candidate_axes": {
+    "macd": [
+      "12/26/9",
+      "12/30/7"
+    ],
+    "activation_regime": [
+      "TREND_STRICT_BASELINE",
+      "TREND_STACKED",
+      "TREND_STACKED_MOMENTUM"
+    ]
+  },
+  "expected_candidate_count": 6,
+  "expected_development_matrix_cells": 24,
+  "selection_policy": {
+    "path": "config/zec_strategy_v0_3_selection_policy_v0_1.json",
+    "canonical_sha256": "6484f59ee6e71156c776bfe43cdf8c4716dae74f936a164e8702e175c731250d",
+    "reuse_without_threshold_change": true
+  },
+  "development_protocol": {
+    "complete_candidate_fold_matrix_required": true,
+    "selective_omission_allowed": false,
+    "robust_first_selection_required": true,
+    "stable_neighbor_evidence_required": true,
+    "exactly_one_champion_before_fresh_confirmation": true,
+    "fresh_confirmation_can_reselect_candidate": false,
+    "candidate_selection_from_fresh_confirmation_allowed": false,
+    "account_risk_sweep_allowed": false,
+    "v0_3_selection_threshold_relaxation_allowed": false
+  },
+  "rationale": {
+    "primary_v0_3_failure_mode": "TIME_REGIME_DEPENDENCE_NOT_ACTIVITY_SHORTAGE",
+    "why_fix_risk": "V0.3 trade counts were exactly invariant across the four risk values within each signal/fold group; risk changed sizing and drawdown magnitude rather than entry edge.",
+    "why_keep_two_macd_variants": "V0.3 aggregate evidence did not establish a decisive robust MACD winner.",
+    "why_fix_strict_volatility_stop": "TREND_STRICT, ATR_ROLLING_EXTREME_GUARD and VOL_STOP_2_5ATR_BB_HALF were directionally better aggregate development choices and are fixed here to reduce degrees of freedom, not treated as validated winners.",
+    "why_regime_axis": "V0.3 one-percent-risk signal configurations were uniformly negative in the first two annual folds and uniformly positive in the last annual fold, motivating a small causal activation-gate hypothesis."
+  },
+  "authority": {
+    "offline_contract_validation_authorized": true,
+    "offline_development_runner_authorized": false,
+    "new_data_access_authorized": false,
+    "provider_network_access_authorized": false,
+    "fresh_data_read_authorized": false,
+    "r2_read_authorized": false,
+    "r2_write_authorized": false,
+    "formal_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
