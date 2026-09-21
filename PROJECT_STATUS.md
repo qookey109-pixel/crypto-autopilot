@@ -303,3 +303,20 @@ real-money orders and no live real trading.
 - ATR extreme guard and 2.5ATR/Bollinger stop are fixed to reduce degrees of freedom.
 - Fresh confirmation remains unopened.
 - This phase is **contract validation only**: no runner, workflow dispatch, provider read, R2 access, holdout access, source switch, promotion or trading authority is added.
+
+
+## ZEC V0.4 one-shot development authority
+
+PR #418 prepares a **manual one-shot** execution authority for the already
+preregistered 24-cell V0.4 development study.
+
+- authority id: `zec-v0-4-development-20260921-v0-1`
+- authority is ineffective until explicit protected-main merge of PR #418;
+- merge does not auto-dispatch;
+- one later manual `workflow_dispatch` is the only execution path;
+- one run / one attempt maximum; retry or rerun requires a new versioned authority;
+- source is bounded to 48 public Binance Vision ZECUSDT 15m monthly archives plus 48 checksums;
+- development remains `2022-08-01 <= t < 2026-08-01`;
+- fresh confirmation remains unopened;
+- aggregate-only report is allowed; raw candles and raw trades are not persisted;
+- R2 / holdout / source switch / promotion / trade plan / real-money / live trading remain closed.
