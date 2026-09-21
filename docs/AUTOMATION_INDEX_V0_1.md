@@ -1,7 +1,7 @@
 # Automation Index V0.1
 
 Current review: 2026-09-21. [Verified operations and handoff](OPERATIONS_HANDOFF_2026_09_13.md).
-History is every two hours under `config/history_cadence_v0_1.json`.
+Core100 History acquisition is complete and its former every-two-hours cadence is historical under `config/history_cadence_v0_1.json`.
 V0.12's window has ended; fixed BTC simulation V0.1 is PASS and retired.
 Seven workflow files now retain cron declarations. The expired V0.12 successor cron is retired; its historical window/config evidence remains preserved separately.
 
