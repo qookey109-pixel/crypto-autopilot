@@ -1,0 +1,225 @@
+{
+  "schema": "qookey-zec-v0-3-development-diagnostic-v0.1",
+  "status": "AGGREGATE_DIAGNOSTIC_ONLY",
+  "date": "2026-09-21",
+  "source_execution": {
+    "run_id": 35573236145,
+    "run_attempt": 1,
+    "head_sha": "c33c81732deae569fb924f61f81868a128690a07",
+    "artifact_id": 10626687807,
+    "artifact_digest": "sha256:61bb133d9751aef381010d504250bb51c2e224f087344cb7f974396845c7cc90",
+    "report_sha256": "7428a8ced8cc401a98f061de7c77a54650dc53eb660443ec947f09e8e5fd2321"
+  },
+  "scope": {
+    "raw_candles_included": false,
+    "raw_trades_included": false,
+    "fresh_confirmation_accessed": false,
+    "aggregate_only": true
+  },
+  "matrix": {
+    "candidates": 64,
+    "folds": 4,
+    "cells": 256,
+    "completed_cells": 256,
+    "candidates_meeting_minimum_30_trades_per_fold": 64,
+    "candidates_with_positive_worst_fold_return": 0,
+    "selection_status": "NO_ELIGIBLE_DEVELOPMENT_CANDIDATE"
+  },
+  "diagnostic_leader": {
+    "candidate_id": "zec-v0-3-45",
+    "macd": "12/30/7",
+    "trend_regime": "TREND_STRICT",
+    "volatility_filter": "ATR_ROLLING_EXTREME_GUARD",
+    "stop_model": "VOL_STOP_2_5ATR_BB_HALF",
+    "account_risk_fraction": 0.01,
+    "worst_fold_return_pct": -8.12511401,
+    "median_fold_return_pct": -3.04319973,
+    "best_fold_return_pct": 6.28084212,
+    "minimum_trades_per_fold": 99,
+    "total_realized_trades": 627,
+    "worst_fold_drawdown_pct": 9.64917501,
+    "fold_returns_pct": [
+      -6.0073329,
+      -8.12511401,
+      -0.07906656,
+      6.28084212
+    ],
+    "champion": false
+  },
+  "one_percent_risk_slice": {
+    "rationale": "Use the lowest frozen V0.3 risk budget to compare signal structure without letting higher sizing dominate drawdown and loss magnitude.",
+    "signal_configuration_count": 16,
+    "fold_summary": [
+      {
+        "fold_id": "dev-2022-08_to_2023-08",
+        "positive_signal_config_count": 0,
+        "mean_return_pct": -7.30327641,
+        "median_return_pct": -7.33312763,
+        "best_return_pct": -5.68483936,
+        "worst_return_pct": -8.82718169,
+        "mean_profit_factor": 0.55899656,
+        "median_profit_factor": 0.57305385,
+        "mean_trade_count": 123.5
+      },
+      {
+        "fold_id": "dev-2023-08_to_2024-08",
+        "positive_signal_config_count": 0,
+        "mean_return_pct": -11.94681221,
+        "median_return_pct": -12.0079475,
+        "best_return_pct": -8.12511401,
+        "worst_return_pct": -16.23595307,
+        "mean_profit_factor": 0.60081318,
+        "median_profit_factor": 0.59931263,
+        "mean_trade_count": 230.625
+      },
+      {
+        "fold_id": "dev-2024-08_to_2025-08",
+        "positive_signal_config_count": 3,
+        "mean_return_pct": -2.98660537,
+        "median_return_pct": -2.78631048,
+        "best_return_pct": 2.62983652,
+        "worst_return_pct": -9.18891581,
+        "mean_profit_factor": 0.91793463,
+        "median_profit_factor": 0.89422993,
+        "mean_trade_count": 218
+      },
+      {
+        "fold_id": "dev-2025-08_to_2026-08",
+        "positive_signal_config_count": 16,
+        "mean_return_pct": 8.17378501,
+        "median_return_pct": 8.76714894,
+        "best_return_pct": 11.45304736,
+        "worst_return_pct": 4.84593122,
+        "mean_profit_factor": 1.28950827,
+        "median_profit_factor": 1.26909504,
+        "mean_trade_count": 258.875
+      }
+    ],
+    "axis_summary": {
+      "macd": {
+        "12/26/9": {
+          "mean_return_pct": -3.14300095,
+          "median_return_pct": -5.89059026,
+          "mean_profit_factor": 0.85340411,
+          "mean_trade_count": 201.3125,
+          "mean_max_drawdown_pct": 7.70003336
+        },
+        "12/30/7": {
+          "mean_return_pct": -3.88845354,
+          "median_return_pct": -6.80635544,
+          "mean_profit_factor": 0.83022221,
+          "mean_trade_count": 214.1875,
+          "mean_max_drawdown_pct": 7.94819308
+        }
+      },
+      "trend_regime": {
+        "TREND_BASIC": {
+          "mean_return_pct": -4.65965846,
+          "median_return_pct": -6.90126711,
+          "mean_profit_factor": 0.82420759,
+          "mean_trade_count": 249.375,
+          "mean_max_drawdown_pct": 8.75916509
+        },
+        "TREND_STRICT": {
+          "mean_return_pct": -2.37179604,
+          "median_return_pct": -4.75030195,
+          "mean_profit_factor": 0.85941873,
+          "mean_trade_count": 166.125,
+          "mean_max_drawdown_pct": 6.88906134
+        }
+      },
+      "volatility_filter": {
+        "ATR_FILTER_OFF": {
+          "mean_return_pct": -3.98597777,
+          "median_return_pct": -7.63183496,
+          "mean_profit_factor": 0.82937929,
+          "mean_trade_count": 226.375,
+          "mean_max_drawdown_pct": 8.44166656
+        },
+        "ATR_ROLLING_EXTREME_GUARD": {
+          "mean_return_pct": -3.04547672,
+          "median_return_pct": -5.45208121,
+          "mean_profit_factor": 0.85424703,
+          "mean_trade_count": 189.125,
+          "mean_max_drawdown_pct": 7.20655987
+        }
+      },
+      "stop_model": {
+        "VOL_STOP_2ATR_BB_HALF": {
+          "mean_return_pct": -3.83501556,
+          "median_return_pct": -6.4894215,
+          "mean_profit_factor": 0.8430317,
+          "mean_trade_count": 207.75,
+          "mean_max_drawdown_pct": 8.44313259
+        },
+        "VOL_STOP_2_5ATR_BB_HALF": {
+          "mean_return_pct": -3.19643893,
+          "median_return_pct": -5.84608613,
+          "mean_profit_factor": 0.84059462,
+          "mean_trade_count": 207.75,
+          "mean_max_drawdown_pct": 7.20509384
+        }
+      }
+    }
+  },
+  "risk_axis_diagnostic": {
+    "exact_trade_count_invariant_across_risk_values_per_signal_fold": true,
+    "signal_fold_groups_checked": 64,
+    "interpretation": "The V0.3 risk axis changed sizing and drawdown magnitude but did not alter entry frequency; it is therefore not retained as a V0.4 edge-discovery axis.",
+    "summaries": [
+      {
+        "account_risk_fraction": 0.01,
+        "mean_return_pct": -3.515727,
+        "median_return_pct": -6.203693,
+        "mean_trade_count": 207.75,
+        "mean_max_drawdown_pct": 7.824113
+      },
+      {
+        "account_risk_fraction": 0.025,
+        "mean_return_pct": -8.001528,
+        "median_return_pct": -15.268808,
+        "mean_trade_count": 207.75,
+        "mean_max_drawdown_pct": 18.396719
+      },
+      {
+        "account_risk_fraction": 0.05,
+        "mean_return_pct": -13.690272,
+        "median_return_pct": -28.969779,
+        "mean_trade_count": 207.75,
+        "mean_max_drawdown_pct": 33.343975
+      },
+      {
+        "account_risk_fraction": 0.1,
+        "mean_return_pct": -20.288245,
+        "median_return_pct": -51.560361,
+        "mean_trade_count": 207.75,
+        "mean_max_drawdown_pct": 55.29384
+      }
+    ]
+  },
+  "interpretation": {
+    "primary_failure_mode": "TIME_REGIME_DEPENDENCE_NOT_ACTIVITY_SHORTAGE",
+    "evidence": [
+      "All 16 one-percent-risk signal configurations were negative in 2022-08_to_2023-08.",
+      "All 16 one-percent-risk signal configurations were negative in 2023-08_to_2024-08.",
+      "All 16 one-percent-risk signal configurations were positive in 2025-08_to_2026-08.",
+      "TREND_STRICT, ATR_ROLLING_EXTREME_GUARD and VOL_STOP_2_5ATR_BB_HALF had directionally better aggregate return/drawdown behavior, but none established cross-fold profitability."
+    ],
+    "v0_3_selection_gate_should_be_loosened": false,
+    "v0_3_diagnostic_leader_should_be_promoted": false,
+    "v0_4_research_question": "Can a small, causal 4h bull-regime activation layer suppress the loss-making historical regimes without relying on a broader parameter sweep?"
+  },
+  "authority": {
+    "new_data_access_authorized": false,
+    "provider_network_access_authorized": false,
+    "r2_read_authorized": false,
+    "r2_write_authorized": false,
+    "fresh_confirmation_access_authorized": false,
+    "formal_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
