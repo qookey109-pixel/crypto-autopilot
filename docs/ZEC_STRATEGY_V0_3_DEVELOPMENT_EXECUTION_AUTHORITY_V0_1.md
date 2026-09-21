@@ -1,6 +1,7 @@
 # ZEC Strategy V0.3 — One-Shot Development Execution Authority V0.1
 
 Status date: 2026-09-21
+Authority PR: #415
 
 ## Purpose
 
