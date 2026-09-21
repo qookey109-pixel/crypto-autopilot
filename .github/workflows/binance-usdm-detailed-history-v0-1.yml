@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "auto discovers once, then materializes the next incomplete shard"
+        description: "History is complete; manual diagnosis or bounded repair only"
         type: choice
         required: true
         default: diagnose-bnx
@@ -12,10 +12,6 @@ on:
           - diagnose-bnx
           - repair-bnx-1h
           - repair-bnx-bundle
-      shard_index:
-        description: "Optional governed shard index for a manual backfill run"
-        type: string
-        required: false
 
 permissions:
   contents: read
