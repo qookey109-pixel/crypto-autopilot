@@ -265,7 +265,7 @@ jobs:
           assert '資料健康度' in html
           assert '績效中心' in html
           assert '風險與閘門' in html
-          assert '9/18 目前作業狀態' in html
+          assert f"{current['updatedDate']} 目前作業狀態" in html
           assert '10/10 · COMPLETE' in html
           assert 'COMPLETED · PASS' in html
           assert 'COMPLETE · PASS' in html
