@@ -1,0 +1,18 @@
+{
+  "schema": "qookey-core100-history-retirement-prepared-v0.1",
+  "status": "PREPARED_REQUIRES_PROTECTED_MAIN_MERGE",
+  "prepared_at_utc": "2026-09-21T03:00:00Z",
+  "config": "config/core100_history_retirement_v0_1.json",
+  "merge_authority_granted_by_this_receipt": false,
+  "production_execution_performed": false,
+  "provider_requests_performed": 0,
+  "r2_reads_performed": false,
+  "r2_writes_performed": false,
+  "historical_authority_mutated": false,
+  "frozen_workflow_copy_sha256": "b8fadbabac8c193f9e50a3ef42de15eae784589807e62e316574e83197e64861",
+  "intended_effect_on_reviewed_merge": [
+    "remove Core100 History cron",
+    "retire generic auto/discover/backfill entrypoints",
+    "retain existing narrow diagnosis/repair entrypoints only"
+  ]
+}
