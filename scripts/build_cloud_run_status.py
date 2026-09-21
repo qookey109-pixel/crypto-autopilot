@@ -8,7 +8,7 @@ business-result claim.
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import json
 import os
 from pathlib import Path
@@ -191,7 +191,7 @@ def freshness_state(definition: dict, latest: dict, *, now: datetime) -> str:
     active_from = _parse_utc(definition.get("activeFromUtc"))
     if evidence is None:
         if isinstance(max_age, int) and active_from is not None:
-            if now <= active_from + __import__("datetime").timedelta(seconds=max_age):
+            if now <= active_from + timedelta(seconds=max_age):
                 return "WAITING_FIRST_SCHEDULE"
         return "NO_AUTOMATIC_RUN"
     if latest.get("state") == "RUNNING":
