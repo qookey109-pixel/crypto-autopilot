@@ -291,3 +291,15 @@ real-money orders and no live real trading.
   provider data, R2 objects, holdout, private APIs, or trading surfaces.
 - The checked-in fixture contains no invented run IDs, SHAs, or evidence times;
   the GitHub Pages build refreshes those fields from live GitHub metadata.
+
+
+## Automation V3 P5 — ZEC V0.4 regime-activation preregistration
+
+- V0.3 remains **256/256 COMPLETE / NO_ELIGIBLE_DEVELOPMENT_CANDIDATE**.
+- V0.4 does not loosen the V0.3 selection gate and does not promote the V0.3 diagnostic leader.
+- The new hypothesis tests whether a small causal 4h bull-regime activation layer can reduce the strong time-regime dependence seen in V0.3.
+- Candidate matrix is reduced to **2 MACD × 3 activation regimes = 6 candidates**, across the same four annual development folds = **24 cells**.
+- Account-risk sweep is removed; risk is fixed at 1% for edge discovery.
+- ATR extreme guard and 2.5ATR/Bollinger stop are fixed to reduce degrees of freedom.
+- Fresh confirmation remains unopened.
+- This phase is **contract validation only**: no runner, workflow dispatch, provider read, R2 access, holdout access, source switch, promotion or trading authority is added.
