@@ -10,7 +10,7 @@ from crypto_autopilot.research.automation_health import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-POLICY = ROOT / "config/github_automatic_research_operations_v0_4.json"
+POLICY = ROOT / "config/github_automatic_research_operations_v0_5.json"
 HEALTH = ROOT / "config/research_automation_health_v0_2.json"
 RECEIPT = (
     ROOT
@@ -31,8 +31,10 @@ def test_policy_matches_every_repository_cron_exactly() -> None:
     expectations = [expectation_from_config(row) for row in health["workflows"]]
     coverage = validate_schedule_coverage(expectations, ROOT / ".github/workflows")
     assert coverage["complete"] is True
-    assert coverage["scheduled_workflow_count"] == 8
+    assert coverage["scheduled_workflow_count"] == 7
     assert coverage["workflows"] == scheduled
+    assert "provider-equivalence-v0-12-successor-metadata-capture.yml" not in scheduled
+    assert len(scheduled) == 7
 
 
 def test_manual_runs_are_not_normal_operations_or_health_evidence() -> None:
@@ -66,5 +68,5 @@ def test_historical_authority_receipt_preserves_frozen_boundary() -> None:
         assert (ROOT / row["path"]).exists()
         assert len(row["sha256"]) == 64
         assert all(character in "0123456789abcdef" for character in row["sha256"])
-    assert _load(POLICY)["schema"] == "github-automatic-research-operations-v0.4"
+    assert _load(POLICY)["schema"] == "github-automatic-research-operations-v0.5"
     assert all(value is False for value in receipt["explicitly_not_authorized"].values())
