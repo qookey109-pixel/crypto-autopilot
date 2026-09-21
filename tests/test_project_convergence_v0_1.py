@@ -97,12 +97,27 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
         self.assertFalse(boundaries["replacement_holdout_access_authorized"])
         self.assertFalse(boundaries["paper_successor_automatic_activation_authorized"])
         self.assertFalse(boundaries["live_trading_authorized"])
+        self.assertTrue(boundaries["core100_history_schedule_retired"])
+        self.assertTrue(boundaries["core100_history_generic_backfill_retired"])
+        self.assertTrue(boundaries["core100_training_fingerprint_dedupe_added"])
 
     def test_current_data_and_paper_index_is_bounded(self) -> None:
         current = self.index["current_data_and_paper"]
         self.assertEqual(
             current["crypto_core_100"],
             "config/binance_usdm_detailed_history_v0_1_2.json",
+        )
+        self.assertEqual(
+            current["automatic_operations"],
+            "config/github_automatic_research_operations_v0_4.json",
+        )
+        self.assertEqual(
+            current["core100_history_state"],
+            "COMPLETE_10_OF_10_SCHEDULE_RETIRED_MANUAL_REPAIR_DIAGNOSIS_ONLY",
+        )
+        self.assertEqual(
+            current["core100_training_fingerprint_state"],
+            "ACTIVE_NO_CHANGE_WHEN_DATASET_AND_MODEL_INPUTS_MATCH",
         )
         self.assertEqual(
             current["pionex_alternative_assets_state"],
@@ -119,6 +134,9 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
         for key in (
             "crypto_core_100",
             "crypto_core_100_authority",
+            "automatic_operations",
+            "core100_history_retirement",
+            "core100_training_fingerprint",
             "pionex_alternative_assets_registry",
             "pionex_alternative_assets_catalog",
             "pionex_alternative_assets_authority",

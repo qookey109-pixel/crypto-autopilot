@@ -17,6 +17,8 @@ RESOURCE_HUB = Path("config/resource_hub_supply_chain_v0_2.json")
 CAPABILITY_REGISTRY = Path("config/external_capability_registry_v0_1.json")
 CURRENT_OPERATIONS = Path("research/status/current-operations-v0-3.json")
 ZEC_MATRIX = Path("config/zec_strategy_v0_3_development_matrix_v0_1.json")
+CORE100_RETIREMENT = Path("config/core100_history_retirement_v0_1.json")
+CORE100_TRAINING_FINGERPRINT = Path("config/core100_training_fingerprint_v0_1.json")
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -99,6 +101,52 @@ def build_projection(
     if core100.get("history_reacquisition_required") is not False:
         raise RuntimeError("automation projection cannot require completed history reacquisition")
 
+    retirement = _load(CORE100_RETIREMENT)
+    if (
+        retirement.get("schema") != "qookey-core100-history-retirement-v0.1"
+        or retirement.get("status") != "EFFECTIVE_ON_PROTECTED_MAIN_MERGE"
+    ):
+        raise RuntimeError("Core100 History retirement authority missing")
+    retired_execution = retirement.get("retired_execution")
+    retirement_authority = retirement.get("authority")
+    if not isinstance(retired_execution, Mapping) or not isinstance(
+        retirement_authority, Mapping
+    ):
+        raise RuntimeError("Core100 History retirement contract incomplete")
+    if (
+        retired_execution.get("schedule_trigger_retired") is not True
+        or retired_execution.get("generic_auto_discover_backfill_retired") is not True
+        or retired_execution.get("automatic_resume") is not False
+    ):
+        raise RuntimeError("Core100 History retirement contract drifted")
+    if any(value is not False for value in retirement_authority.values()):
+        raise RuntimeError("Core100 History retirement gained authority")
+
+    training_fingerprint = _load(CORE100_TRAINING_FINGERPRINT)
+    if (
+        training_fingerprint.get("schema")
+        != "qookey-core100-training-fingerprint-v0.1"
+        or training_fingerprint.get("status") != "EFFECTIVE_ON_PROTECTED_MAIN_MERGE"
+    ):
+        raise RuntimeError("Core100 Training fingerprint policy missing")
+    reuse = training_fingerprint.get("reuse_policy")
+    fingerprint_authority = training_fingerprint.get("authority")
+    baseline_training = training_fingerprint.get("baseline")
+    if (
+        not isinstance(reuse, Mapping)
+        or not isinstance(fingerprint_authority, Mapping)
+        or not isinstance(baseline_training, Mapping)
+    ):
+        raise RuntimeError("Core100 Training fingerprint contract incomplete")
+    if (
+        reuse.get("same_dataset_and_experiment_returns") != "NO_CHANGE"
+        or reuse.get("no_training_on_no_change") is not True
+        or reuse.get("no_r2_write_on_no_change") is not True
+    ):
+        raise RuntimeError("Core100 Training fingerprint reuse policy drifted")
+    if any(value is not False for value in fingerprint_authority.values()):
+        raise RuntimeError("Core100 Training fingerprint gained authority")
+
     resource = _load(RESOURCE_HUB)
     if resource.get("schema") != "qookey-resource-hub-supply-chain-policy-v0.2":
         raise RuntimeError("Resource Hub v0.2 policy missing")
@@ -166,7 +214,9 @@ def build_projection(
             "waitingAuthorityCount": waiting_count,
             "plannedNotScheduledCount": planned_count,
             "core100HistoryStatus": "COMPLETE",
-            "core100HistoryRetirementPending": True,
+            "core100HistoryRetirementPending": False,
+            "core100HistoryScheduleRetired": True,
+            "core100TrainingDedupeState": "ACTIVE_FINGERPRINT_NO_CHANGE",
             "zecDevelopmentExpectedCells": expected_cells,
             "zecDevelopmentCompletedCells": 0,
         },
@@ -184,6 +234,16 @@ def build_projection(
                 "runtimeExecutionAuthorized": False,
                 "automaticInstallAuthorized": False,
             },
+            "core100": {
+                "historyState": "COMPLETE_SCHEDULE_RETIRED",
+                "historyGenericBackfillRetired": True,
+                "trainingState": "FINGERPRINT_DEDUP_ACTIVE",
+                "trainingBaselineRunId": baseline_training.get("source_workflow_run_id"),
+                "trainingBaselineExperimentFingerprint": baseline_training.get(
+                    "experiment_fingerprint"
+                ),
+                "trainingNoChangeWritesR2": False,
+            },
             "zecV0_3": {
                 "state": "WAITING_EXECUTION_AUTHORITY",
                 "candidateCount": candidates,
@@ -199,6 +259,8 @@ def build_projection(
             str(RESOURCE_HUB),
             str(CAPABILITY_REGISTRY),
             str(CURRENT_OPERATIONS),
+            str(CORE100_RETIREMENT),
+            str(CORE100_TRAINING_FINGERPRINT),
             str(ZEC_MATRIX),
         ],
         "safetyBoundary": {

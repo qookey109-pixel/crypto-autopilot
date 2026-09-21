@@ -19,15 +19,23 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     )
     assert actual == expected
     assert actual["authority"] is False
-    assert actual["summary"]["scheduledJobCount"] == 8
+    assert actual["summary"]["scheduledJobCount"] == 7
     assert actual["summary"]["waitingAuthorityCount"] == 3
     assert actual["summary"]["plannedNotScheduledCount"] == 5
     assert actual["summary"]["core100HistoryStatus"] == "COMPLETE"
-    assert actual["summary"]["core100HistoryRetirementPending"] is True
+    assert actual["summary"]["core100HistoryRetirementPending"] is False
+    assert actual["summary"]["core100HistoryScheduleRetired"] is True
+    assert actual["summary"]["core100TrainingDedupeState"] == "ACTIVE_FINGERPRINT_NO_CHANGE"
     assert actual["sourceStatus"]["resourceHub"]["state"] == (
         "SCHEDULED_READ_ONLY_CHANGE_WATCH"
     )
     assert actual["sourceStatus"]["externalCapabilityRegistry"]["candidateCount"] == 10
+    core100 = actual["sourceStatus"]["core100"]
+    assert core100["historyState"] == "COMPLETE_SCHEDULE_RETIRED"
+    assert core100["historyGenericBackfillRetired"] is True
+    assert core100["trainingState"] == "FINGERPRINT_DEDUP_ACTIVE"
+    assert core100["trainingBaselineRunId"] == 34918219864
+    assert core100["trainingNoChangeWritesR2"] is False
     assert actual["sourceStatus"]["zecV0_3"]["expectedCells"] == 256
     assert actual["sourceStatus"]["zecV0_3"]["completedCells"] == 0
     assert all(value is False for value in actual["safetyBoundary"].values())

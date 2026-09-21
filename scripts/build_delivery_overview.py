@@ -179,17 +179,11 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
         </details>
       </section>'''
 
-    cadence = read_json("config/history_cadence_v0_1.json", root)
     labels = {
-        "binance-usdm-detailed-history-v0-1.yml": (
-            "Core100 歷史補齊",
-            "每日偶數小時 :23；bounded schedule 至 10/1 08:00 前",
-            "目前 10/10 COMPLETE；排程不得把 model-quality REJECT 解讀成重新取得歷史資料的理由",
-        ),
         "binance-usdm-detailed-training-v0-1.yml": (
             "Core100 研究訓練",
             "每週日 12:37",
-            "目前 training 已完成；model-quality = REJECT；例行觸發不授權 promotion",
+            "先比對 experiment fingerprint；相同即 NO_CHANGE，不重訓、不寫 R2；promotion 仍未授權",
         ),
         "research-signal-layer-v0-2.yml": ("研究訊號", "每日 10:17", "結構化研究訊號收集"),
         "research-signal-quality-v0-1.yml": ("訊號品質", "每日 10:47", "檢查來源與資料鏈"),
@@ -233,8 +227,6 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
         )
         if actual != inventory[name]:
             raise ValueError(f"Schedule index disagrees with workflow: {name}")
-        if name.startswith("binance-usdm-detailed-history") and actual != [cadence["cron"]]:
-            raise ValueError("History cadence authority mismatch")
         rows.append(f'<tr><th scope="row">{label}</th><td>{timing}</td><td>{detail}</td></tr>')
 
     schedule = '''      <section class="panel" aria-label="目前雲端排程">

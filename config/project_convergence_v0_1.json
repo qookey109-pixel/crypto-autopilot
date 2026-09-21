@@ -31,8 +31,8 @@
     "external_market_context_state": "SIX_PINNED_SOURCES_PREFETCHED_EVIDENCE_NORMALIZATION_ONLY_NO_NETWORK_NO_ROUTER_CHANGE"
   },
   "current_data_and_paper": {
-    "automatic_operations": "config/github_automatic_research_operations_v0_3.json",
-    "automatic_operations_state": "GITHUB_SCHEDULE_V0_3_INCLUDES_RESOURCE_HUB_READ_ONLY_WATCH_AND_DASHBOARD_BACKSTOP",
+    "automatic_operations": "config/github_automatic_research_operations_v0_4.json",
+    "automatic_operations_state": "GITHUB_SCHEDULE_V0_4_CORE100_HISTORY_RETIRED_TRAINING_FINGERPRINT_DEDUP_ACTIVE",
     "current_metadata_successor": "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
     "current_metadata_successor_state": "V0_12_AUTHORIZED_ON_MAIN_MERGE_V0_10_SCHEDULE_RETIRED",
     "crypto_core_100": "config/binance_usdm_detailed_history_v0_1_2.json",
@@ -73,7 +73,11 @@
     "live_paper_run_recovery": "config/live_paper_run_recovery_v0_1.json",
     "live_paper_run_recovery_state": "MANUAL_AUDIT_AND_RESULT_SEAL_REPAIR_ONLY_NO_PROVIDER_NO_SCHEDULE",
     "paper_run_conditional_write": "config/paper_run_conditional_write_v0_1.json",
-    "paper_run_conditional_write_state": "STORAGE_PRIMITIVE_ONLY_ATOMIC_CREATE_IF_ABSENT_NOT_WIRED_TO_COORDINATOR"
+    "paper_run_conditional_write_state": "STORAGE_PRIMITIVE_ONLY_ATOMIC_CREATE_IF_ABSENT_NOT_WIRED_TO_COORDINATOR",
+    "core100_history_retirement": "config/core100_history_retirement_v0_1.json",
+    "core100_history_state": "COMPLETE_10_OF_10_SCHEDULE_RETIRED_MANUAL_REPAIR_DIAGNOSIS_ONLY",
+    "core100_training_fingerprint": "config/core100_training_fingerprint_v0_1.json",
+    "core100_training_fingerprint_state": "ACTIVE_NO_CHANGE_WHEN_DATASET_AND_MODEL_INPUTS_MATCH"
   },
   "scheduled_workflows": {
     "current_window": [
@@ -123,14 +127,6 @@
       }
     ],
     "authorized_post_window": [
-      {
-        "workflow": "binance-usdm-detailed-history-v0-1.yml",
-        "cron_utc": [
-          "23 */2 9-30 9 *"
-        ],
-        "active_from_utc": "2026-09-04T02:00:00Z",
-        "active_until_utc": "2026-10-01T00:00:00Z"
-      },
       {
         "workflow": "binance-usdm-detailed-training-v0-1.yml",
         "cron_utc": [
@@ -277,6 +273,9 @@
     "paper_run_conditional_write_schedule_added": false,
     "external_market_context_registry_added": true,
     "external_market_context_network_capture_added": false,
-    "external_market_context_router_behavior_changed": false
+    "external_market_context_router_behavior_changed": false,
+    "core100_history_schedule_retired": true,
+    "core100_history_generic_backfill_retired": true,
+    "core100_training_fingerprint_dedupe_added": true
   }
 }

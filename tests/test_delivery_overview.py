@@ -35,9 +35,10 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertNotIn("訓練尚未完成", summary)
         self.assertNotIn("PR #292", summary)
 
-        self.assertIn("每日偶數小時 :23", schedule)
-        self.assertIn("目前 10/10 COMPLETE", schedule)
-        self.assertIn("training 已完成", schedule)
+        self.assertNotIn("每日偶數小時 :23", schedule)
+        self.assertIn("Core100 研究訓練", schedule)
+        self.assertIn("每週日 12:37", schedule)
+        self.assertIn("NO_CHANGE", schedule)
         self.assertIn("V0.12 metadata", schedule)
         self.assertIn("HISTORICAL", schedule)
         self.assertIn("Pionex Validation Dataset V0.2", schedule)

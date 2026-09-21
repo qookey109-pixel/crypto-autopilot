@@ -75,7 +75,7 @@ class OperatorStatusResolverV01Tests(unittest.TestCase):
             result["repository_authority"],
             "RESOLVE_MAIN_LIVE_AT_READ_TIME",
         )
-        self.assertEqual(result["snapshot_updated_date"], "2026-09-18")
+        self.assertEqual(result["snapshot_updated_date"], "2026-09-21")
 
     def test_unrecognized_or_execution_authorized_command_fails_closed(self) -> None:
         with self.assertRaises(ValueError):

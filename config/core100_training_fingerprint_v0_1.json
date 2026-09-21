@@ -1,0 +1,87 @@
+{
+  "schema": "qookey-core100-training-fingerprint-v0.1",
+  "status": "EFFECTIVE_ON_PROTECTED_MAIN_MERGE",
+  "purpose": "Skip repeated Core100 training when both the governed dataset and all model-affecting implementation inputs are unchanged.",
+  "python_runtime": "3.13",
+  "model_affecting_paths": [
+    "config/binance_usdm_detailed_history_v0_1_2.json",
+    "requirements/ci-constraints.txt",
+    "pyproject.toml",
+    "scripts/train_binance_detailed_history_models.py",
+    "scripts/train_binance_detailed_history_models_v0_2.py",
+    "src/crypto_autopilot/training/detailed.py",
+    "src/crypto_autopilot/training/history_quality.py",
+    "src/crypto_autopilot/storage/parquet.py",
+    "src/crypto_autopilot/history/detailed.py",
+    "src/crypto_autopilot/models.py"
+  ],
+  "baseline": {
+    "source_workflow_run_id": 34918219864,
+    "source_workflow_run_attempt": 1,
+    "source_head_sha": "dc10ce590c8731fbef21115e0e3d3423cbcc7cf1",
+    "latest_pointer_run_id": "github-34918219864-1",
+    "dataset_fingerprint": "91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876",
+    "experiment_fingerprint": "25b3178ce0d13052684d20b35a0e1f6949f0d97a5ac0c5b9e8f0a52d4d12f9c8",
+    "model_affecting_git_blobs": [
+      {
+        "path": "config/binance_usdm_detailed_history_v0_1_2.json",
+        "git_blob_sha": "d45a88922980dfe4838dce3f281c1102bfede9a0"
+      },
+      {
+        "path": "requirements/ci-constraints.txt",
+        "git_blob_sha": "323fbf34e2e3348f2e4acc062181f862af7019d4"
+      },
+      {
+        "path": "pyproject.toml",
+        "git_blob_sha": "0ef7f465ab0adc32b6b5bc57c9811f15b51e80bc"
+      },
+      {
+        "path": "scripts/train_binance_detailed_history_models.py",
+        "git_blob_sha": "4e44fc0b5bb6711753e68e468120c81ee0b5eeaa"
+      },
+      {
+        "path": "scripts/train_binance_detailed_history_models_v0_2.py",
+        "git_blob_sha": "e739d29579223797f5439d6feebeec81287c73a8"
+      },
+      {
+        "path": "src/crypto_autopilot/training/detailed.py",
+        "git_blob_sha": "f24c7345b422fca9dbe92ef5bb2b9ab272fe7236"
+      },
+      {
+        "path": "src/crypto_autopilot/training/history_quality.py",
+        "git_blob_sha": "1c66f3291fcf03ad132e2cfd68f2ffc4f9ceab1a"
+      },
+      {
+        "path": "src/crypto_autopilot/storage/parquet.py",
+        "git_blob_sha": "5095a36bf8f879b93766519118a44d3ead3a3999"
+      },
+      {
+        "path": "src/crypto_autopilot/history/detailed.py",
+        "git_blob_sha": "88bb0d15b2ff42485defb7b8e61c79e46f0785b0"
+      },
+      {
+        "path": "src/crypto_autopilot/models.py",
+        "git_blob_sha": "ec7c817cf6b42694a1938adb63eccd95f6def4a0"
+      }
+    ],
+    "verification": "Every listed Git blob was byte-identical between run head dc10ce590c8731fbef21115e0e3d3423cbcc7cf1 and reviewed main 3422efc91cfd973ab1991080186fb8300d26a2a5."
+  },
+  "reuse_policy": {
+    "same_dataset_and_experiment_returns": "NO_CHANGE",
+    "no_training_on_no_change": true,
+    "no_r2_write_on_no_change": true,
+    "legacy_v0_1_latest_pointer_may_reuse_only_exact_baseline_run": true,
+    "dataset_change_requires_training": true,
+    "model_affecting_blob_change_requires_training": true
+  },
+  "authority": {
+    "new_provider_access_authorized": false,
+    "new_r2_scope_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

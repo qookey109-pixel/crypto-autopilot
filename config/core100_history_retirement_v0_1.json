@@ -1,0 +1,52 @@
+{
+  "schema": "qookey-core100-history-retirement-v0.1",
+  "status": "EFFECTIVE_ON_PROTECTED_MAIN_MERGE",
+  "reason": "Core100 detailed-history acquisition is COMPLETE 10/10 and historical reacquisition is not required solely because Model Quality is REJECT.",
+  "completed_evidence": {
+    "source": "research/status/current-operations-v0-3.json",
+    "history_status": "COMPLETE",
+    "complete_shards": 10,
+    "total_shards": 10,
+    "history_reacquisition_required": false,
+    "dataset_fingerprint": "91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876"
+  },
+  "retired_execution": {
+    "workflow": ".github/workflows/binance-usdm-detailed-history-v0-1.yml",
+    "retired_cron_utc": "23 */2 9-30 9 *",
+    "generic_auto_discover_backfill_retired": true,
+    "schedule_trigger_retired": true,
+    "automatic_resume": false
+  },
+  "historical_authority": {
+    "config": "config/history_cadence_v0_1.json",
+    "receipt": "research/receipts/2026-09-12-history-cadence-v0-2-authority.json",
+    "frozen_workflow_copy": "research/frozen/workflows/2026-09-12-binance-usdm-detailed-history-v0-1.yml",
+    "frozen_workflow_sha256": "b8fadbabac8c193f9e50a3ef42de15eae784589807e62e316574e83197e64861",
+    "original_config_and_receipt_immutable": true
+  },
+  "retained_manual_modes": {
+    "diagnose-bnx": {
+      "provider_scope": "PUBLIC_ARCHIVE_DIAGNOSTIC_ONLY",
+      "r2_access": false
+    },
+    "repair-bnx-1h": {
+      "authority": "research/receipts/2026-09-12-bnx-archive-repair-bundle-v0-2-authority.json",
+      "original_window_still_applies": true
+    },
+    "repair-bnx-bundle": {
+      "authority": "research/receipts/2026-09-12-bnx-archive-repair-bundle-v0-3-authority.json",
+      "original_window_still_applies": true
+    }
+  },
+  "authority": {
+    "new_provider_access_authorized": false,
+    "new_r2_access_authorized": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "strategy_change_authorized": false,
+    "model_promotion_authorized": false,
+    "trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}

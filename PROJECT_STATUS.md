@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-09-19
+Updated: 2026-09-21
 
 Repository `main` is the formal current authority and must be resolved live at read time. This file is the project-stage, governance-compatibility, and retired-workflow index. Exact versioned configs, receipts, immutable run evidence, and merged code remain the detailed authority for each scope.
 
@@ -9,7 +9,7 @@ Repository `main` is the formal current authority and must be resolved live at r
 - Repository: `qookey109-pixel/crypto-autopilot`.
 - Current Operations companion: `research/status/current-operations-v0-3.json`.
 - Current Operations V0.3 stores an **evidence-basis parent SHA**, not a self-referential latest-main claim.
-- Evidence-basis parent for this status version: `a26902fd7a116af442a9b19249b895d0612bfc4f`, the reviewed main commit after PR #366 merged and passed post-merge CI / Freeze Guard.
+- Evidence-basis parent for this status version: `3422efc91cfd973ab1991080186fb8300d26a2a5`, the reviewed main commit after PR #410 merged and passed post-merge CI / Freeze Guard / CodeQL / Pages.
 - Current mode: **PAPER / LIVE-PAPER ONLY**. Public live market data and simulated live-paper execution/persistence are separate from real trading authority.
 - FREE-ONLY cloud/runtime budget: **0 USD/month**.
 
@@ -226,3 +226,32 @@ non-authoritative automation schedule projection.
 
 This batch does not open replacement holdout, source switching, automatic model
 promotion, formal trade plans, real-money orders or live real trading.
+
+
+## Automation V2 P1 — Core100 lifecycle cleanup (effective on reviewed merge)
+
+This branch prepares the next protected-main lifecycle cleanup without changing
+the completed research result:
+
+- Core100 History remains **10/10 COMPLETE** and
+  `history_reacquisition_required=false`.
+- The old `:23 every two hours` History cron is removed on merge.
+- Generic History `auto / discover / backfill` entrypoints are retired; only
+  the already-bounded diagnosis and BNX repair modes remain available.
+- The 2026-09-12 History cadence config, receipt and exact old workflow bytes
+  remain frozen historical evidence. The old receipt is not rewritten.
+- Automatic Operations V0.4 contains **8 repository cron workflows** after the
+  History schedule retirement.
+- Core100 weekly Training remains scheduled, but V0.3 of the runner computes an
+  experiment fingerprint from the governed dataset plus model-affecting Git
+  blobs. An exact match returns `NO_CHANGE`, performs no training and writes
+  nothing to R2.
+- The first dedupe baseline is the already-successful run `34918219864` on
+  dataset fingerprint
+  `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`.
+  The model-affecting inputs were verified byte-identical between that run head
+  and reviewed main before this change.
+
+This P1 change adds no provider scope, no new R2 scope, no holdout access, no
+source switch, no automatic model promotion, no formal trade plan, no
+real-money orders and no live real trading.

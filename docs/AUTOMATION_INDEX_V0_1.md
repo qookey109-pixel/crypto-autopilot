@@ -3,7 +3,7 @@
 Current review: 2026-09-19. [Verified operations and handoff](OPERATIONS_HANDOFF_2026_09_13.md).
 History is every two hours under `config/history_cadence_v0_1.json`.
 V0.12's window has ended; fixed BTC simulation V0.1 is PASS and retired.
-Nine workflow files now retain cron declarations; bounded/expired entries remain classified separately from current execution.
+After this reviewed merge, eight workflow files retain cron declarations; bounded/expired entries remain classified separately from current execution.
 
 Core100 History is now **10/10 COMPLETE**. The completed training run
 `34918219864` passed operational execution, while the downstream Model Quality
@@ -36,11 +36,18 @@ backfills or regrades the incomplete V0.10 evidence.
 | Continuous / alerting | Research Automation Health V0.2 | every 2 hours at :57 | GitHub Actions metadata read only; covers every current cron and ignores manual/PR runs when judging automatic health |
 | Continuous / read-only | Resource Hub Supply Chain V0.2 | daily 01:13 | public catalog commit change-watch only; unchanged source returns NO_CHANGE; no auto install/runtime/PR |
 | Website backstop | Dashboard GitHub Pages | daily 04:43 plus approved upstream completion events | authority=false projection; business-content hash suppresses duplicate deploys |
-| Post-window | Binance USD-M Crypto Core 100 V0.1.2 | every 2 hours at :23 during 2026-09-09 through 09-30 | starts only after V0.10; 10 R2-only shards; fixed pre-holdout source range |
-| Conditional post-window | Binance USD-M Crypto Core 100 Training V0.1.2 | Sunday 04:37 | skips until all 100-market detailed-history shards exist |
+| Conditional post-window | Binance USD-M Crypto Core 100 Training V0.1.2 | Sunday 04:37 | dataset + model-input fingerprint is checked first; exact match returns NO_CHANGE with no retraining or R2 write |
 | Post-window | Pionex Alternative Assets Observability V0.2 | 2026-09-04 02:53, then 09-06/13/20/27 at 03:53 | Pionex `PERP + TRADING` metadata only; validates the 125-candidate catalog, compares it with the prior SHA-bound catalog, estimates four-year capacity and writes R2 evidence plus a safe aggregate artifact |
 
 ## Retired cron triggers
+
+Core100 History V0.1.2 cron is retired by
+`config/core100_history_retirement_v0_1.json` after the governed dataset
+reached 10/10 COMPLETE. Generic auto/discover/backfill execution is retired;
+only the pre-existing bounded diagnosis and repair modes remain. The original
+2026-09-12 cadence config/receipt and exact workflow bytes are preserved as
+historical evidence.
+
 
 The following three workflows reached their binding provider-read cutoff at
 `2026-08-27T00:00:00Z`. Their cron triggers are removed by
@@ -92,7 +99,7 @@ workflow and every cron to have exactly one classification, so a new hidden
 schedule cannot be added accidentally.
 
 The current machine-readable normal-operation contract is
-`config/github_automatic_research_operations_v0_3.json`; V0.2 remains frozen for the History Cadence authority binding. It does not let a
+`config/github_automatic_research_operations_v0_4.json`; V0.2 remains frozen for the History Cadence authority binding and V0.3 records the prior 9-workflow state. It does not let a
 workflow grant itself provider, R2, holdout, promotion or trading authority.
 
 

@@ -4,13 +4,15 @@
   "timezone": "Asia/Taipei",
   "projectionGeneratedAtUtc": null,
   "summary": {
-    "scheduledJobCount": 8,
+    "scheduledJobCount": 7,
     "waitingAuthorityCount": 3,
     "plannedNotScheduledCount": 5,
     "core100HistoryStatus": "COMPLETE",
-    "core100HistoryRetirementPending": true,
+    "core100HistoryRetirementPending": false,
     "zecDevelopmentExpectedCells": 256,
-    "zecDevelopmentCompletedCells": 0
+    "zecDevelopmentCompletedCells": 0,
+    "core100HistoryScheduleRetired": true,
+    "core100TrainingDedupeState": "ACTIVE_FINGERPRINT_NO_CHANGE"
   },
   "sourceStatus": {
     "resourceHub": {
@@ -33,6 +35,14 @@
       "expectedCells": 256,
       "completedCells": 0,
       "freshConfirmationAccessAuthorized": false
+    },
+    "core100": {
+      "historyState": "COMPLETE_SCHEDULE_RETIRED",
+      "historyGenericBackfillRetired": true,
+      "trainingState": "FINGERPRINT_DEDUP_ACTIVE",
+      "trainingBaselineRunId": 34918219864,
+      "trainingBaselineExperimentFingerprint": "25b3178ce0d13052684d20b35a0e1f6949f0d97a5ac0c5b9e8f0a52d4d12f9c8",
+      "trainingNoChangeWritesR2": false
     }
   },
   "items": [
@@ -182,20 +192,17 @@
       "title": "Core100 History",
       "workflow": ".github/workflows/binance-usdm-detailed-history-v0-1.yml",
       "trigger": [
-        "schedule",
         "workflow_dispatch"
       ],
-      "expected_crons": [
-        "23 */2 9-30 9 *"
-      ],
-      "local_schedule": "九月偶數小時 :23",
+      "expected_crons": [],
+      "local_schedule": "已退役；僅手動 diagnosis / repair",
       "dependency_ids": [],
       "active_from": "2026-09-09T00:00:00Z",
       "active_until": "2026-10-01T00:00:00Z",
       "freshness_seconds": null,
-      "status": "COMPLETE_CRON_RETIREMENT_PENDING",
-      "authority_link": "config/binance_usdm_detailed_history_v0_1_2.json",
-      "detail": "10/10 已完成；正式移除抓取 cron 仍需獨立 retirement PR，網站不得把 cron 存在誤認為資料未完成。"
+      "status": "RETIRED_COMPLETE_MANUAL_REPAIR_ONLY",
+      "authority_link": "config/core100_history_retirement_v0_1.json",
+      "detail": "10/10 COMPLETE；自動 schedule 與一般 auto/discover/backfill 已退役，只保留既有 diagnosis / bounded repair。"
     },
     {
       "id": "core100-training-v0-1-2",
@@ -216,9 +223,9 @@
       "active_from": null,
       "active_until": null,
       "freshness_seconds": 691200,
-      "status": "SCHEDULED_NEEDS_FINGERPRINT_DEDUPE",
-      "authority_link": "config/binance_usdm_detailed_history_v0_1_2.json",
-      "detail": "資料已完成；訓練前比較實驗指紋的 NO_CHANGE 去重仍是後續 P1。"
+      "status": "ACTIVE_FINGERPRINT_DEDUP",
+      "authority_link": "config/core100_training_fingerprint_v0_1.json",
+      "detail": "每週觸發先比對 dataset + model-input experiment fingerprint；完全相同時回 NO_CHANGE，不重訓、不寫 R2。"
     },
     {
       "id": "pionex-alternative-observability-v0-2",
@@ -339,6 +346,8 @@
     "config/resource_hub_supply_chain_v0_2.json",
     "config/external_capability_registry_v0_1.json",
     "research/status/current-operations-v0-3.json",
+    "config/core100_history_retirement_v0_1.json",
+    "config/core100_training_fingerprint_v0_1.json",
     "config/zec_strategy_v0_3_development_matrix_v0_1.json"
   ],
   "safetyBoundary": {
