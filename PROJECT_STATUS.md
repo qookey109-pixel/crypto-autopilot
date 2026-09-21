@@ -201,7 +201,7 @@ Their old present-tense `8/10 / Training SKIPPED` statements are historical evid
 
 ## Automation V2 Batch 2 — external research and website projection
 
-Automatic Operations V0.5 is the current schedule inventory. V0.4 preserves the prior eight-workflow state, and V0.2 remains byte-stable because the History Cadence authority binds it as frozen evidence.
+Automatic Operations V0.5 is the current schedule classification. Repository/Health retain eight cron declarations, while seven are current-effective; the eighth is the expired frozen V0.12 declaration. V0.4 preserves the prior unclassified eight-workflow state, and V0.2 remains byte-stable because the History Cadence authority binds it as frozen evidence.
 
 This batch adds a versioned, read-only external-source change watch and a
 non-authoritative automation schedule projection.
@@ -257,16 +257,18 @@ real-money orders and no live real trading.
 
 ## Automation V3 P2 — schedule and freshness convergence
 
-- The expired Provider Equivalence V0.12 successor metadata cron is removed after
-  its bounded 2026-09-04 through 2026-09-12 window. Historical authority,
-  schedule strings and capture evidence remain preserved; replay/backfill stays closed.
-- Automatic Operations V0.5 now describes the seven actual Repository cron workflows.
-- Research Automation Health V0.2 is the single source for scheduled-workflow
-  freshness thresholds and effective periods.
-- The website projection derives those values rather than maintaining a second
-  copy, and CI requires Repository cron inventory, Automatic Operations,
-  Health monitoring, and website scheduled inventory to match exactly.
-- The Dashboard exposes Repo / Health / Website schedule counts while remaining
-  `authority=false`.
+- Provider Equivalence V0.12 is a frozen critical path, so its cron declaration is
+  preserved byte-for-byte even though the bounded 2026-09-04 through 2026-09-12
+  window has expired. Its window gate makes post-window execution ineffective;
+  replay/backfill stays closed.
+- Automatic Operations V0.5 classifies eight Repository cron declarations:
+  seven current-effective plus one expired frozen V0.12 declaration.
+- Research Automation Health V0.2 remains the exact eight-declaration monitor and
+  is the single source for freshness thresholds / effective periods used by the
+  seven current-effective Dashboard jobs.
+- CI requires Repository cron declarations, Automatic Operations, Health monitoring,
+  and the seven-job website effective subset to obey the exact 8 / 8 / 7 + 1 relation.
+- The Dashboard exposes Repo declaration / Health / current-effective / Website
+  counts while remaining `authority=false`.
 - This convergence adds no provider, R2, holdout, source-switch, promotion,
   trade-plan, real-money-order, or live-real-trading authority.
