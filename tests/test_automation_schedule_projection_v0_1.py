@@ -20,12 +20,38 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     assert actual == expected
     assert actual["authority"] is False
     assert actual["summary"]["scheduledJobCount"] == 7
+    assert actual["summary"]["projectedScheduledJobCount"] == 7
+    assert actual["summary"]["repositoryScheduledWorkflowCount"] == 8
+    assert actual["summary"]["monitoredScheduledWorkflowCount"] == 8
+    assert actual["summary"]["currentEffectiveScheduledWorkflowCount"] == 7
+    assert actual["summary"]["expiredFrozenCronDeclarationCount"] == 1
+    assert actual["summary"]["scheduleInventoryConverged"] is True
+    scheduled_workflows = {
+        Path(row["workflow"]).name
+        for row in actual["items"]
+        if row.get("workflow") and row.get("expected_crons")
+    }
+    assert len(scheduled_workflows) == 7
+    assert "provider-equivalence-v0-12-successor-metadata-capture.yml" not in scheduled_workflows
     assert actual["summary"]["waitingAuthorityCount"] == 3
     assert actual["summary"]["plannedNotScheduledCount"] == 5
     assert actual["summary"]["core100HistoryStatus"] == "COMPLETE"
     assert actual["summary"]["core100HistoryRetirementPending"] is False
     assert actual["summary"]["core100HistoryScheduleRetired"] is True
     assert actual["summary"]["core100TrainingDedupeState"] == "ACTIVE_FINGERPRINT_NO_CHANGE"
+    assert actual["sourceStatus"]["scheduleInventory"] == {
+        "state": "CONVERGED_WITH_EXPIRED_FROZEN_DECLARATION",
+        "repositoryScheduledWorkflowCount": 8,
+        "projectedScheduledJobCount": 7,
+        "monitoredScheduledWorkflowCount": 8,
+        "currentEffectiveScheduledWorkflowCount": 7,
+        "expiredFrozenCronDeclarationCount": 1,
+        "expiredFrozenWorkflows": [
+            "provider-equivalence-v0-12-successor-metadata-capture.yml"
+        ],
+        "freshnessAndEffectivePeriodSource": "config/research_automation_health_v0_2.json",
+        "automaticOperationsInventory": "config/github_automatic_research_operations_v0_5.json",
+    }
     assert actual["sourceStatus"]["resourceHub"]["state"] == (
         "SCHEDULED_READ_ONLY_CHANGE_WATCH"
     )
@@ -38,6 +64,19 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     assert core100["trainingNoChangeWritesR2"] is False
     assert actual["sourceStatus"]["zecV0_3"]["expectedCells"] == 256
     assert actual["sourceStatus"]["zecV0_3"]["completedCells"] == 0
+    items = {row["id"]: row for row in actual["items"]}
+    assert items["resource-hub-change-watch-v0-2"]["freshness_seconds"] == 108000
+    assert items["research-signal-v0-2"]["freshness_seconds"] == 108000
+    assert items["research-signal-quality-v0-1"]["freshness_seconds"] == 108000
+    assert items["automation-health-v0-2"]["freshness_seconds"] == 14400
+    assert items["dashboard-pages-projection"]["freshness_seconds"] == 108000
+    assert items["core100-training-v0-1-2"]["freshness_seconds"] == 691200
+    assert items["pionex-alternative-observability-v0-2"]["freshness_seconds"] == 691200
+    assert all(
+        row["freshness_source"] == "config/research_automation_health_v0_2.json"
+        for row in items.values()
+        if row.get("expected_crons")
+    )
     assert all(value is False for value in actual["safetyBoundary"].values())
 
 

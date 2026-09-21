@@ -10,7 +10,7 @@ from crypto_autopilot.research.automation_health import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-POLICY = ROOT / "config/github_automatic_research_operations_v0_4.json"
+POLICY = ROOT / "config/github_automatic_research_operations_v0_5.json"
 HEALTH = ROOT / "config/research_automation_health_v0_2.json"
 RECEIPT = (
     ROOT
@@ -33,6 +33,35 @@ def test_policy_matches_every_repository_cron_exactly() -> None:
     assert coverage["complete"] is True
     assert coverage["scheduled_workflow_count"] == 8
     assert coverage["workflows"] == scheduled
+    assert "provider-equivalence-v0-12-successor-metadata-capture.yml" in scheduled
+    assert len(scheduled) == 8
+    effective = {
+        row["workflow"]
+        for row in policy["scheduled_workflows"]
+        if row["lifecycle_state"] == "CURRENT_EFFECTIVE"
+    }
+    expired = {
+        row["workflow"]
+        for row in policy["scheduled_workflows"]
+        if row["lifecycle_state"] == "EXPIRED_BOUNDED_FROZEN_CRON_DECLARATION"
+    }
+    assert len(effective) == 7
+    assert expired == {"provider-equivalence-v0-12-successor-metadata-capture.yml"}
+    semantics = policy["schedule_semantics"]
+    assert semantics["repository_cron_declaration_count"] == 8
+    assert semantics["monitored_cron_declaration_count"] == 8
+    assert semantics["current_effective_schedule_count"] == 7
+    assert semantics["expired_frozen_cron_declaration_count"] == 1
+    assert semantics["workflow_file_mutation_required"] is False
+    assert semantics["outside_window_execution_effective"] is False
+    assert semantics["replay_or_backfill_authorized"] is False
+    health_by_workflow = {row["workflow"]: row for row in health["workflows"]}
+    v012_health = health_by_workflow[
+        "provider-equivalence-v0-12-successor-metadata-capture.yml"
+    ]
+    assert v012_health["mode"] == "bounded"
+    assert v012_health["active_until_utc"] == "2026-09-12T04:00:00Z"
+    assert v012_health["allowed_events"] == ["schedule"]
 
 
 def test_manual_runs_are_not_normal_operations_or_health_evidence() -> None:
@@ -66,5 +95,5 @@ def test_historical_authority_receipt_preserves_frozen_boundary() -> None:
         assert (ROOT / row["path"]).exists()
         assert len(row["sha256"]) == 64
         assert all(character in "0123456789abcdef" for character in row["sha256"])
-    assert _load(POLICY)["schema"] == "github-automatic-research-operations-v0.4"
+    assert _load(POLICY)["schema"] == "github-automatic-research-operations-v0.5"
     assert all(value is False for value in receipt["explicitly_not_authorized"].values())

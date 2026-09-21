@@ -117,9 +117,10 @@
     "dashboard_projection_policy": "HISTORICAL_AUTHORITY_OVERLAY_THEN_CURRENT_OPERATIONS_OVERLAY",
     "homepage_projection_policy": "CURRENT_OPERATIONS_MUST_OVERRIDE_DATED_SIMULATION_READINESS_FOR_PRESENT_TENSE_STATE",
     "self_referential_latest_main_sha_allowed": false,
-    "automatic_operations": "config/github_automatic_research_operations_v0_4.json",
+    "automatic_operations": "config/github_automatic_research_operations_v0_5.json",
     "core100_history_retirement": "config/core100_history_retirement_v0_1.json",
-    "core100_training_fingerprint": "config/core100_training_fingerprint_v0_1.json"
+    "core100_training_fingerprint": "config/core100_training_fingerprint_v0_1.json",
+    "schedule_inventory_state": "EIGHT_REPOSITORY_CRON_DECLARATIONS_EIGHT_MONITORED_SEVEN_CURRENT_EFFECTIVE_ONE_EXPIRED_FROZEN"
   },
   "next_decision": "PIONEX_V0_2_MATERIALIZATION_COMPLETE_KEEP_DOWNSTREAM_GATES_CLOSED_PENDING_SEPARATE_REVIEW",
   "notes": [
@@ -134,7 +135,8 @@
     "Live Paper Simulation V0.1 separates public live market data and simulated paper execution from real live trading; private exchange APIs and real-money orders remain closed.",
     "Paper Run Store V0.1 authorizes content-addressed Local JSON / R2 persistence for paper evidence only; stored objects do not become execution authority.",
     "Core100 History automatic acquisition is retired after 10/10 completion; current workflow retains only existing bounded diagnosis/repair modes.",
-    "Core100 weekly Training now deduplicates by governed dataset plus model-affecting Git blobs; an exact match returns NO_CHANGE without retraining or R2 writes."
+    "Core100 weekly Training now deduplicates by governed dataset plus model-affecting Git blobs; an exact match returns NO_CHANGE without retraining or R2 writes.",
+    "Provider Equivalence V0.12 successor metadata window expired on 2026-09-12. Its frozen critical-path cron declaration remains byte-preserved and monitored, but the exact window gate makes post-window execution ineffective; no replay or backfill is authorized."
   ],
   "live_paper": {
     "status": "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY",

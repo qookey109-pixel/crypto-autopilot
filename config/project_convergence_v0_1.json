@@ -31,10 +31,10 @@
     "external_market_context_state": "SIX_PINNED_SOURCES_PREFETCHED_EVIDENCE_NORMALIZATION_ONLY_NO_NETWORK_NO_ROUTER_CHANGE"
   },
   "current_data_and_paper": {
-    "automatic_operations": "config/github_automatic_research_operations_v0_4.json",
-    "automatic_operations_state": "GITHUB_SCHEDULE_V0_4_CORE100_HISTORY_RETIRED_TRAINING_FINGERPRINT_DEDUP_ACTIVE",
+    "automatic_operations": "config/github_automatic_research_operations_v0_5.json",
+    "automatic_operations_state": "GITHUB_SCHEDULE_V0_5_EIGHT_CRON_DECLARATIONS_SEVEN_CURRENT_EFFECTIVE_V0_12_FROZEN_EXPIRED",
     "current_metadata_successor": "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
-    "current_metadata_successor_state": "V0_12_AUTHORIZED_ON_MAIN_MERGE_V0_10_SCHEDULE_RETIRED",
+    "current_metadata_successor_state": "V0_12_WINDOW_EXPIRED_FROZEN_CRON_DECLARATION_WINDOW_GATE_BLOCKS_EXECUTION_NO_REPLAY_BACKFILL",
     "crypto_core_100": "config/binance_usdm_detailed_history_v0_1_2.json",
     "crypto_core_100_authority": "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json",
     "pionex_alternative_assets_registry": "config/pionex_alternative_assets_v0_1.json",
@@ -80,18 +80,7 @@
     "core100_training_fingerprint_state": "ACTIVE_NO_CHANGE_WHEN_DATASET_AND_MODEL_INPUTS_MATCH"
   },
   "scheduled_workflows": {
-    "current_window": [
-      {
-        "workflow": "provider-equivalence-v0-12-successor-metadata-capture.yml",
-        "cron_utc": [
-          "17,47 2-23 4 9 *",
-          "17,47 * 5,6,7,8,9,10,11 9 *",
-          "17,47 0-3 12 9 *"
-        ],
-        "active_from_utc": "2026-09-04T02:00:00Z",
-        "active_until_utc": "2026-09-12T04:00:00Z"
-      }
-    ],
+    "current_window": [],
     "continuous_research": [
       {
         "workflow": "research-signal-layer-v0-2.yml",
@@ -144,6 +133,19 @@
         "active_until_utc": "2026-10-01T00:00:00Z",
         "scope": "Pionex PERP symbol metadata validation, prior-catalog diff and capacity estimate only; no candle/funding/trade/order-book reads"
       }
+    ],
+    "expired_frozen_cron_declarations": [
+      {
+        "workflow": "provider-equivalence-v0-12-successor-metadata-capture.yml",
+        "cron_utc": [
+          "17,47 2-23 4 9 *",
+          "17,47 * 5,6,7,8,9,10,11 9 *",
+          "17,47 0-3 12 9 *"
+        ],
+        "active_from_utc": "2026-09-04T02:00:00Z",
+        "active_until_utc": "2026-09-12T04:00:00Z",
+        "state": "EXPIRED_BOUNDED_FROZEN_CRON_DECLARATION_WINDOW_GATE_BLOCKS_EXECUTION"
+      }
     ]
   },
   "post_cutoff_manual_regressions": [
@@ -178,7 +180,6 @@
       "pionex-research-universe-v0-1.yml",
       "pionex-validation-materialization-v0-1.yml",
       "pionex-validation-materialization-v0-2.yml",
-      "provider-equivalence-v0-12-successor-metadata-capture.yml",
       "qookey-crypto-toolkit-v0-2-cloud.yml",
       "research-automation-health-v0-2.yml",
       "research-signal-layer-v0-2.yml",
@@ -235,7 +236,8 @@
       "validate-v0-6-render-transport-authority-transition.yml",
       "validate-v0-7-render-metadata-capture-protocol.yml",
       "validate-v0-8-shared-secret-preflight.yml",
-      "validate-v0-9-render-relay-smoke.yml"
+      "validate-v0-9-render-relay-smoke.yml",
+      "provider-equivalence-v0-12-successor-metadata-capture.yml"
     ],
     "current_quality_or_security_visibility": [
       "security-visibility-codeql.yml"
@@ -276,6 +278,19 @@
     "external_market_context_router_behavior_changed": false,
     "core100_history_schedule_retired": true,
     "core100_history_generic_backfill_retired": true,
-    "core100_training_fingerprint_dedupe_added": true
-  }
+    "core100_training_fingerprint_dedupe_added": true,
+    "v0_12_schedule_retired_after_window_expiry": false,
+    "v0_12_frozen_cron_declaration_preserved_after_window_expiry": true
+  },
+  "retired_schedule_windows": [],
+  "expired_frozen_schedule_windows": [
+    {
+      "workflow": "provider-equivalence-v0-12-successor-metadata-capture.yml",
+      "cron_declaration_preserved": true,
+      "active_from_utc": "2026-09-04T02:00:00Z",
+      "active_until_utc": "2026-09-12T04:00:00Z",
+      "execution_after_window": false,
+      "replay_or_backfill_authorized": false
+    }
+  ]
 }

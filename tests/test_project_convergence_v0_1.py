@@ -109,7 +109,7 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
         )
         self.assertEqual(
             current["automatic_operations"],
-            "config/github_automatic_research_operations_v0_4.json",
+            "config/github_automatic_research_operations_v0_5.json",
         )
         self.assertEqual(
             current["core100_history_state"],

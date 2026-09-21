@@ -201,7 +201,7 @@ Their old present-tense `8/10 / Training SKIPPED` statements are historical evid
 
 ## Automation V2 Batch 2 — external research and website projection
 
-Automatic Operations V0.3 is the current Batch 2 schedule inventory. V0.2 remains byte-stable because the History Cadence authority binds it as frozen evidence.
+Automatic Operations V0.5 is the current schedule classification. Repository/Health retain eight cron declarations, while seven are current-effective; the eighth is the expired frozen V0.12 declaration. V0.4 preserves the prior unclassified eight-workflow state, and V0.2 remains byte-stable because the History Cadence authority binds it as frozen evidence.
 
 This batch adds a versioned, read-only external-source change watch and a
 non-authoritative automation schedule projection.
@@ -219,10 +219,8 @@ non-authoritative automation schedule projection.
 - ZEC V0.3 remains `0/256` development cells and
   `offline_development_runner_authorized=false`.
 - Hourly multi-asset Paper scheduling remains waiting for a separate authority.
-- Core100 History is complete 10/10, but its old September cron still requires a
-  separate retirement change.
-- Core100 Training remains scheduled; experiment-fingerprint `NO_CHANGE`
-  deduplication is still a P1 follow-up.
+- Core100 History is complete 10/10 and its acquisition cron is retired; only bounded manual diagnosis/repair remains.
+- Core100 Training remains scheduled with experiment-fingerprint `NO_CHANGE` deduplication active.
 
 This batch does not open replacement holdout, source switching, automatic model
 promotion, formal trade plans, real-money orders or live real trading.
@@ -255,3 +253,22 @@ the completed research result:
 This P1 change adds no provider scope, no new R2 scope, no holdout access, no
 source switch, no automatic model promotion, no formal trade plan, no
 real-money orders and no live real trading.
+
+
+## Automation V3 P2 — schedule and freshness convergence
+
+- Provider Equivalence V0.12 is a frozen critical path, so its cron declaration is
+  preserved byte-for-byte even though the bounded 2026-09-04 through 2026-09-12
+  window has expired. Its window gate makes post-window execution ineffective;
+  replay/backfill stays closed.
+- Automatic Operations V0.5 classifies eight Repository cron declarations:
+  seven current-effective plus one expired frozen V0.12 declaration.
+- Research Automation Health V0.2 remains the exact eight-declaration monitor and
+  is the single source for freshness thresholds / effective periods used by the
+  seven current-effective Dashboard jobs.
+- CI requires Repository cron declarations, Automatic Operations, Health monitoring,
+  and the seven-job website effective subset to obey the exact 8 / 8 / 7 + 1 relation.
+- The Dashboard exposes Repo declaration / Health / current-effective / Website
+  counts while remaining `authority=false`.
+- This convergence adds no provider, R2, holdout, source-switch, promotion,
+  trade-plan, real-money-order, or live-real-trading authority.
