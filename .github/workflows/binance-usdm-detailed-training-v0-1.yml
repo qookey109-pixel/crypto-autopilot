@@ -74,9 +74,10 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          python scripts/train_binance_detailed_history_models_v0_2.py \
+          python scripts/train_binance_detailed_history_models_v0_3.py \
             --config config/binance_usdm_detailed_history_v0_1_2.json \
             --authority research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json \
+            --fingerprint-config config/core100_training_fingerprint_v0_1.json \
             --run-id "github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
             --output detailed-training-output/report.json
 
@@ -87,14 +88,21 @@ jobs:
           from pathlib import Path
 
           report = json.loads(Path("detailed-training-output/report.json").read_text())
-          if report.get("status") == "PASS":
-              authority = report["authority"]
+          assert report.get("status") in {"PASS", "NO_CHANGE"}
+          authority = report["authority"]
+          if report["status"] == "PASS":
               assert authority["pionex_native_relabel_authorized"] is False
               assert authority["source_switch_authorized"] is False
               assert authority["automatic_model_promotion_authorized"] is False
               assert authority["formal_trade_plan_authorized"] is False
               assert authority["real_money_order_authorized"] is False
               assert authority["live_trading_authorized"] is False
+          else:
+              assert report["training_performed"] is False
+              assert report["provider_requests_performed"] == 0
+              assert report["r2_reads_performed"] is True
+              assert report["r2_writes_performed"] is False
+              assert all(value is False for value in authority.values())
           PY
 
       - name: Upload secret-free training evidence
