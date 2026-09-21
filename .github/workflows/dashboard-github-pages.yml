@@ -48,6 +48,11 @@ on:
       - "config/github_automatic_research_operations_v0_1.json"
       - "config/research_automation_health_v0_2.json"
       - "config/automation_schedule_projection_v0_1.json"
+      - "config/core100_history_retirement_v0_1.json"
+      - "config/core100_training_fingerprint_v0_1.json"
+      - "config/github_automatic_research_operations_v0_4.json"
+      - ".github/workflows/binance-usdm-detailed-history-v0-1.yml"
+      - ".github/workflows/binance-usdm-detailed-training-v0-1.yml"
       - "config/resource_hub_supply_chain_v0_2.json"
       - "config/external_capability_registry_v0_1.json"
       - "config/zec_strategy_v0_3_development_matrix_v0_1.json"
@@ -96,6 +101,11 @@ on:
       - "config/github_automatic_research_operations_v0_1.json"
       - "config/research_automation_health_v0_2.json"
       - "config/automation_schedule_projection_v0_1.json"
+      - "config/core100_history_retirement_v0_1.json"
+      - "config/core100_training_fingerprint_v0_1.json"
+      - "config/github_automatic_research_operations_v0_4.json"
+      - ".github/workflows/binance-usdm-detailed-history-v0-1.yml"
+      - ".github/workflows/binance-usdm-detailed-training-v0-1.yml"
       - "config/resource_hub_supply_chain_v0_2.json"
       - "config/external_capability_registry_v0_1.json"
       - "config/zec_strategy_v0_3_development_matrix_v0_1.json"
@@ -300,6 +310,13 @@ jobs:
               'SCHEDULED_READ_ONLY_CHANGE_WATCH'
           )
           assert operations['sourceStatus']['externalCapabilityRegistry']['candidateCount'] == 10
+          assert operations['summary']['scheduledJobCount'] == 7
+          assert operations['summary']['core100HistoryRetirementPending'] is False
+          assert operations['summary']['core100HistoryScheduleRetired'] is True
+          assert operations['summary']['core100TrainingDedupeState'] == 'ACTIVE_FINGERPRINT_NO_CHANGE'
+          assert operations['sourceStatus']['core100']['historyState'] == 'COMPLETE_SCHEDULE_RETIRED'
+          assert operations['sourceStatus']['core100']['trainingState'] == 'FINGERPRINT_DEDUP_ACTIVE'
+          assert operations['sourceStatus']['core100']['trainingNoChangeWritesR2'] is False
           assert operations['sourceStatus']['zecV0_3']['expectedCells'] == 256
           assert operations['sourceStatus']['zecV0_3']['completedCells'] == 0
           assert all(value is False for value in operations['safetyBoundary'].values())
