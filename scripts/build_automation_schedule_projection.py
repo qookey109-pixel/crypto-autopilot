@@ -18,6 +18,7 @@ RESOURCE_HUB = Path("config/resource_hub_supply_chain_v0_2.json")
 CAPABILITY_REGISTRY = Path("config/external_capability_registry_v0_1.json")
 CURRENT_OPERATIONS = Path("research/status/current-operations-v0-3.json")
 ZEC_MATRIX = Path("config/zec_strategy_v0_3_development_matrix_v0_1.json")
+ZEC_COMPLETION = Path("research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json")
 CORE100_RETIREMENT = Path("config/core100_history_retirement_v0_1.json")
 CORE100_TRAINING_FINGERPRINT = Path("config/core100_training_fingerprint_v0_1.json")
 HEALTH_POLICY = Path("config/research_automation_health_v0_2.json")
@@ -296,6 +297,39 @@ def build_projection(
         raise RuntimeError("ZEC V0.3 64 x 4 matrix contract changed")
     expected_cells = candidates * len(folds)
 
+    zec_completion = _load(ZEC_COMPLETION)
+    if zec_completion.get("schema") != "qookey-zec-v0-3-development-completion-v0.1":
+        raise RuntimeError("ZEC V0.3 completion evidence schema changed")
+    if zec_completion.get("status") != "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE":
+        raise RuntimeError("ZEC V0.3 completion evidence state changed")
+    zec_dev = zec_completion.get("development")
+    zec_safety = zec_completion.get("safety_boundary")
+    if not isinstance(zec_dev, Mapping) or not isinstance(zec_safety, Mapping):
+        raise RuntimeError("ZEC V0.3 completion evidence incomplete")
+    completed_cells = int(zec_dev.get("matrix_cells") or 0)
+    if completed_cells != expected_cells:
+        raise RuntimeError("ZEC V0.3 completion matrix is incomplete")
+    if zec_dev.get("selection_status") != "NO_ELIGIBLE_DEVELOPMENT_CANDIDATE":
+        raise RuntimeError("ZEC V0.3 selection result changed")
+    if zec_dev.get("champion_frozen") is not False:
+        raise RuntimeError("ZEC V0.3 completion unexpectedly froze a champion")
+    for key in (
+        "fresh_confirmation_accessed",
+        "fresh_confirmation_access_authorized",
+        "formal_holdout_accessed",
+        "r2_reads_performed",
+        "r2_writes_performed",
+        "raw_candles_persisted",
+        "raw_trade_artifact_emitted",
+        "source_switch_authorized",
+        "model_promotion_authorized",
+        "formal_trade_plan_authorized",
+        "real_money_order_authorized",
+        "live_trading_authorized",
+    ):
+        if zec_safety.get(key) is not False:
+            raise RuntimeError(f"ZEC V0.3 completion safety boundary changed: {key}")
+
     statuses = [str(row.get("status") or "") for row in projected_rows]
     scheduled_count = len(projected_crons)
     repository_scheduled_count = len(repository_crons)
@@ -332,7 +366,7 @@ def build_projection(
             "core100HistoryScheduleRetired": True,
             "core100TrainingDedupeState": "ACTIVE_FINGERPRINT_NO_CHANGE",
             "zecDevelopmentExpectedCells": expected_cells,
-            "zecDevelopmentCompletedCells": 0,
+            "zecDevelopmentCompletedCells": completed_cells,
         },
         "sourceStatus": {
             "scheduleInventory": {
@@ -370,11 +404,18 @@ def build_projection(
                 "trainingNoChangeWritesR2": False,
             },
             "zecV0_3": {
-                "state": "WAITING_EXECUTION_AUTHORITY",
+                "state": "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
                 "candidateCount": candidates,
                 "foldCount": len(folds),
                 "expectedCells": expected_cells,
-                "completedCells": 0,
+                "completedCells": completed_cells,
+                "selectionStatus": zec_dev.get("selection_status"),
+                "championFrozen": False,
+                "diagnosticLeaderId": (
+                    (zec_dev.get("diagnostic_leader") or {}).get("candidate_id")
+                    if isinstance(zec_dev.get("diagnostic_leader"), Mapping)
+                    else None
+                ),
                 "freshConfirmationAccessAuthorized": False,
             },
         },
@@ -389,6 +430,7 @@ def build_projection(
             str(HEALTH_POLICY),
             str(AUTOMATIC_OPERATIONS),
             str(ZEC_MATRIX),
+            str(ZEC_COMPLETION),
         ],
         "safetyBoundary": {
             "automaticActivationAuthorized": False,
