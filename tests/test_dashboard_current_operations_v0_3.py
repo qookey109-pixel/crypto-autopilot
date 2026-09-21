@@ -160,7 +160,7 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
             build_delivery_overview(site, ROOT)
 
             html = (site / "index.html").read_text(encoding="utf-8")
-            self.assertIn("9/18 目前作業狀態", html)
+            self.assertIn(f"{self.current['updated_date']} 目前作業狀態", html)
             self.assertIn("10/10 · COMPLETE", html)
             self.assertIn("COMPLETED · PASS", html)
             self.assertIn("Model Quality REJECT", html)
