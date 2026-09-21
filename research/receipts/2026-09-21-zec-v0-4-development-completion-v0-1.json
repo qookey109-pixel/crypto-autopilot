@@ -22,7 +22,11 @@
     "size_bytes": 6227,
     "digest": "sha256:ea9c7652d98fdf947216fc4f291b8823b99fa66e8b210d279b58be615da846de",
     "report_sha256": "764a3667dcbc91a7142b2b2bf3fdd33c0051492ba1b892fb6283e05148c09959",
-    "retention_days": 30
+    "retention_days": 30,
+    "expires_at_utc": "2026-10-21T15:22:39Z",
+    "permanent_report_path": "research/receipts/2026-09-21-zec-v0-4-development-run-35618367238-report.json",
+    "permanent_report_git_blob_sha": "91ca243447f5ff795e9c108187a231728bb181c6",
+    "permanent_report_byte_identical": true
   },
   "source": {
     "provider": "binance_usdm",
