@@ -5,7 +5,6 @@ import itertools
 import json
 from dataclasses import dataclass
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Mapping
 
 from .zec_v0_3_selection_policy import validate_zec_v0_3_selection_policy
