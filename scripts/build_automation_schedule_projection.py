@@ -94,6 +94,8 @@ def build_projection(
     if not isinstance(automatic_rows, list) or not automatic_rows:
         raise RuntimeError("automatic operations schedule inventory missing")
     automatic_crons: dict[str, list[str]] = {}
+    effective_automatic_crons: dict[str, list[str]] = {}
+    expired_frozen_workflows: set[str] = set()
     for item in automatic_rows:
         if (
             not isinstance(item, dict)
@@ -101,7 +103,31 @@ def build_projection(
             or not isinstance(item.get("cron_utc"), list)
         ):
             raise RuntimeError("automatic operations schedule row invalid")
-        automatic_crons[str(item["workflow"])] = list(item["cron_utc"])
+        workflow_name = str(item["workflow"])
+        lifecycle_state = str(item.get("lifecycle_state") or "")
+        automatic_crons[workflow_name] = list(item["cron_utc"])
+        if lifecycle_state == "CURRENT_EFFECTIVE":
+            effective_automatic_crons[workflow_name] = list(item["cron_utc"])
+        elif lifecycle_state == "EXPIRED_BOUNDED_FROZEN_CRON_DECLARATION":
+            expired_frozen_workflows.add(workflow_name)
+        else:
+            raise RuntimeError(
+                f"automatic operations lifecycle state invalid for {workflow_name}: {lifecycle_state}"
+            )
+
+    semantics = automatic.get("schedule_semantics")
+    if not isinstance(semantics, Mapping):
+        raise RuntimeError("automatic operations schedule semantics missing")
+    if (
+        int(semantics.get("repository_cron_declaration_count") or -1) != 8
+        or int(semantics.get("monitored_cron_declaration_count") or -1) != 8
+        or int(semantics.get("current_effective_schedule_count") or -1) != 7
+        or int(semantics.get("expired_frozen_cron_declaration_count") or -1) != 1
+        or semantics.get("workflow_file_mutation_required") is not False
+        or semantics.get("outside_window_execution_effective") is not False
+        or semantics.get("replay_or_backfill_authorized") is not False
+    ):
+        raise RuntimeError("automatic operations schedule semantics drifted")
 
     repository_crons = scheduled_workflow_crons(Path(".github/workflows"))
     if repository_crons != automatic_crons:
@@ -154,10 +180,17 @@ def build_projection(
         for row in projected_rows
         if isinstance(row.get("workflow"), str) and bool(row.get("expected_crons"))
     }
-    if projected_crons != repository_crons:
+    if projected_crons != effective_automatic_crons:
         raise RuntimeError(
-            f"website schedule projection drift: projected={projected_crons} repository={repository_crons}"
+            "website schedule projection must equal the current-effective automatic subset: "
+            f"projected={projected_crons} effective={effective_automatic_crons}"
         )
+    if len(expired_frozen_workflows) != 1:
+        raise RuntimeError("expected exactly one expired frozen cron declaration")
+    if expired_frozen_workflows != {
+        "provider-equivalence-v0-12-successor-metadata-capture.yml"
+    }:
+        raise RuntimeError("unexpected expired frozen cron declaration")
 
     current = _load(CURRENT_OPERATIONS)
     core100 = current.get("core100")
@@ -267,6 +300,8 @@ def build_projection(
     scheduled_count = len(projected_crons)
     repository_scheduled_count = len(repository_crons)
     monitored_scheduled_count = len(health_by_workflow)
+    effective_scheduled_count = len(effective_automatic_crons)
+    expired_frozen_count = len(expired_frozen_workflows)
     waiting_count = sum("WAITING" in status for status in statuses)
     planned_count = sum(status == "PLANNED_NOT_SCHEDULED" for status in statuses)
 
@@ -281,10 +316,14 @@ def build_projection(
             "projectedScheduledJobCount": scheduled_count,
             "repositoryScheduledWorkflowCount": repository_scheduled_count,
             "monitoredScheduledWorkflowCount": monitored_scheduled_count,
+            "currentEffectiveScheduledWorkflowCount": effective_scheduled_count,
+            "expiredFrozenCronDeclarationCount": expired_frozen_count,
             "scheduleInventoryConverged": (
-                scheduled_count
-                == repository_scheduled_count
-                == monitored_scheduled_count
+                repository_scheduled_count == monitored_scheduled_count == 8
+                and scheduled_count == effective_scheduled_count == 7
+                and expired_frozen_count == 1
+                and repository_scheduled_count
+                == effective_scheduled_count + expired_frozen_count
             ),
             "waitingAuthorityCount": waiting_count,
             "plannedNotScheduledCount": planned_count,
@@ -297,10 +336,13 @@ def build_projection(
         },
         "sourceStatus": {
             "scheduleInventory": {
-                "state": "CONVERGED",
+                "state": "CONVERGED_WITH_EXPIRED_FROZEN_DECLARATION",
                 "repositoryScheduledWorkflowCount": repository_scheduled_count,
                 "projectedScheduledJobCount": scheduled_count,
                 "monitoredScheduledWorkflowCount": monitored_scheduled_count,
+                "currentEffectiveScheduledWorkflowCount": effective_scheduled_count,
+                "expiredFrozenCronDeclarationCount": expired_frozen_count,
+                "expiredFrozenWorkflows": sorted(expired_frozen_workflows),
                 "freshnessAndEffectivePeriodSource": str(HEALTH_POLICY),
                 "automaticOperationsInventory": str(AUTOMATIC_OPERATIONS),
             },
