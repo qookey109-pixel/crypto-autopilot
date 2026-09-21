@@ -74,7 +74,7 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
         self.assertFalse(projection["is_latest_main_claim"])
         self.assertEqual(
             projection["evidence_basis_parent_main_sha"],
-            "a26902fd7a116af442a9b19249b895d0612bfc4f",
+            "3422efc91cfd973ab1991080186fb8300d26a2a5",
         )
 
     def test_overlay_projects_current_lifecycle_and_closes_expired_v012(self) -> None:
