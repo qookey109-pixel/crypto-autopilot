@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 from typing import Mapping
 
+from crypto_autopilot.research.automation_health import scheduled_workflow_crons
 from crypto_autopilot.toolkit.external_capability_registry_v0_1 import (
     validate_external_capability_registry,
 )
@@ -19,6 +20,8 @@ CURRENT_OPERATIONS = Path("research/status/current-operations-v0-3.json")
 ZEC_MATRIX = Path("config/zec_strategy_v0_3_development_matrix_v0_1.json")
 CORE100_RETIREMENT = Path("config/core100_history_retirement_v0_1.json")
 CORE100_TRAINING_FINGERPRINT = Path("config/core100_training_fingerprint_v0_1.json")
+HEALTH_POLICY = Path("config/research_automation_health_v0_2.json")
+AUTOMATIC_OPERATIONS = Path("config/github_automatic_research_operations_v0_5.json")
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -66,6 +69,50 @@ def build_projection(
         if key != "projection_only" and value is not False:
             raise RuntimeError(f"automation schedule projection gained authority: {key}")
 
+    if policy.get("freshness_and_effective_period_source") != str(HEALTH_POLICY):
+        raise RuntimeError("automation projection freshness source drifted")
+
+    health = _load(HEALTH_POLICY)
+    if health.get("schema") != "research-automation-health-v0.2":
+        raise RuntimeError("automation health policy schema changed")
+    health_rows = health.get("workflows")
+    if not isinstance(health_rows, list) or not health_rows:
+        raise RuntimeError("automation health workflow inventory missing")
+    health_by_workflow: dict[str, dict[str, object]] = {}
+    for item in health_rows:
+        if not isinstance(item, dict) or not isinstance(item.get("workflow"), str):
+            raise RuntimeError("automation health workflow row invalid")
+        workflow_name = str(item["workflow"])
+        if workflow_name in health_by_workflow:
+            raise RuntimeError(f"duplicate automation health workflow: {workflow_name}")
+        health_by_workflow[workflow_name] = item
+
+    automatic = _load(AUTOMATIC_OPERATIONS)
+    if automatic.get("schema") != "github-automatic-research-operations-v0.5":
+        raise RuntimeError("automatic operations V0.5 inventory missing")
+    automatic_rows = automatic.get("scheduled_workflows")
+    if not isinstance(automatic_rows, list) or not automatic_rows:
+        raise RuntimeError("automatic operations schedule inventory missing")
+    automatic_crons: dict[str, list[str]] = {}
+    for item in automatic_rows:
+        if (
+            not isinstance(item, dict)
+            or not isinstance(item.get("workflow"), str)
+            or not isinstance(item.get("cron_utc"), list)
+        ):
+            raise RuntimeError("automatic operations schedule row invalid")
+        automatic_crons[str(item["workflow"])] = list(item["cron_utc"])
+
+    repository_crons = scheduled_workflow_crons(Path(".github/workflows"))
+    if repository_crons != automatic_crons:
+        raise RuntimeError(
+            f"repository cron inventory drift: automatic={automatic_crons} repository={repository_crons}"
+        )
+    if set(health_by_workflow) != set(repository_crons):
+        raise RuntimeError(
+            "automation health inventory must exactly match current Repository cron workflows"
+        )
+
     rows = policy.get("jobs")
     if not isinstance(rows, list) or not rows:
         raise RuntimeError("automation schedule jobs are required")
@@ -88,7 +135,29 @@ def build_projection(
                 )
         elif expected:
             raise RuntimeError(f"planned job cannot declare live cron: {row.get('id')}")
-        projected_rows.append(dict(row))
+        projected = dict(row)
+        if workflow is not None and expected:
+            workflow_name = Path(workflow).name
+            health_row = health_by_workflow.get(workflow_name)
+            if health_row is None:
+                raise RuntimeError(
+                    f"scheduled projection missing health authority for {row.get('id')}"
+                )
+            projected["active_from"] = health_row.get("active_from_utc")
+            projected["active_until"] = health_row.get("active_until_utc")
+            projected["freshness_seconds"] = health_row.get("max_age_seconds")
+            projected["freshness_source"] = str(HEALTH_POLICY)
+        projected_rows.append(projected)
+
+    projected_crons = {
+        Path(str(row["workflow"])).name: list(row["expected_crons"])
+        for row in projected_rows
+        if isinstance(row.get("workflow"), str) and bool(row.get("expected_crons"))
+    }
+    if projected_crons != repository_crons:
+        raise RuntimeError(
+            f"website schedule projection drift: projected={projected_crons} repository={repository_crons}"
+        )
 
     current = _load(CURRENT_OPERATIONS)
     core100 = current.get("core100")
@@ -195,11 +264,9 @@ def build_projection(
     expected_cells = candidates * len(folds)
 
     statuses = [str(row.get("status") or "") for row in projected_rows]
-    scheduled_count = sum(
-        1
-        for row in projected_rows
-        if isinstance(row.get("workflow"), str) and bool(row.get("expected_crons"))
-    )
+    scheduled_count = len(projected_crons)
+    repository_scheduled_count = len(repository_crons)
+    monitored_scheduled_count = len(health_by_workflow)
     waiting_count = sum("WAITING" in status for status in statuses)
     planned_count = sum(status == "PLANNED_NOT_SCHEDULED" for status in statuses)
 
@@ -211,6 +278,14 @@ def build_projection(
         "projectionGeneratedAtUtc": generated,
         "summary": {
             "scheduledJobCount": scheduled_count,
+            "projectedScheduledJobCount": scheduled_count,
+            "repositoryScheduledWorkflowCount": repository_scheduled_count,
+            "monitoredScheduledWorkflowCount": monitored_scheduled_count,
+            "scheduleInventoryConverged": (
+                scheduled_count
+                == repository_scheduled_count
+                == monitored_scheduled_count
+            ),
             "waitingAuthorityCount": waiting_count,
             "plannedNotScheduledCount": planned_count,
             "core100HistoryStatus": "COMPLETE",
@@ -221,6 +296,14 @@ def build_projection(
             "zecDevelopmentCompletedCells": 0,
         },
         "sourceStatus": {
+            "scheduleInventory": {
+                "state": "CONVERGED",
+                "repositoryScheduledWorkflowCount": repository_scheduled_count,
+                "projectedScheduledJobCount": scheduled_count,
+                "monitoredScheduledWorkflowCount": monitored_scheduled_count,
+                "freshnessAndEffectivePeriodSource": str(HEALTH_POLICY),
+                "automaticOperationsInventory": str(AUTOMATIC_OPERATIONS),
+            },
             "resourceHub": {
                 "state": "SCHEDULED_READ_ONLY_CHANGE_WATCH",
                 "baselineCommit": baseline.get("source_commit"),
@@ -261,6 +344,8 @@ def build_projection(
             str(CURRENT_OPERATIONS),
             str(CORE100_RETIREMENT),
             str(CORE100_TRAINING_FINGERPRINT),
+            str(HEALTH_POLICY),
+            str(AUTOMATIC_OPERATIONS),
             str(ZEC_MATRIX),
         ],
         "safetyBoundary": {
