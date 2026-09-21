@@ -272,3 +272,22 @@ real-money orders and no live real trading.
   counts while remaining `authority=false`.
 - This convergence adds no provider, R2, holdout, source-switch, promotion,
   trade-plan, real-money-order, or live-real-trading authority.
+
+
+## Automation V3 P3 — dashboard operations monitoring
+
+- Cloud execution projection is upgraded to `qookey-cloud-run-status-v0.2`.
+- The monitor derives its eight cron declarations from Automatic Operations V0.5
+  and Research Automation Health V0.2 instead of a six-workflow hard-coded list.
+- It preserves the current lifecycle split: seven `CURRENT_EFFECTIVE` schedules
+  plus the frozen expired V0.12 cron declaration.
+- Each row exposes operation ID, authority state/path, latest automatic schedule
+  run ID, exact head SHA, evidence time, execution state, freshness state, and
+  GitHub evidence links.
+- Workflow success is never converted into a research/trading/business PASS.
+  Business result stays `UNKNOWN_FROM_GITHUB_RUN_METADATA` unless a separate
+  governed artifact/receipt surface is added later.
+- The collector reads GitHub Actions metadata only: no workflow logs, artifacts,
+  provider data, R2 objects, holdout, private APIs, or trading surfaces.
+- The checked-in fixture contains no invented run IDs, SHAs, or evidence times;
+  the GitHub Pages build refreshes those fields from live GitHub metadata.
