@@ -77,7 +77,9 @@
     "core100_history_retirement": "config/core100_history_retirement_v0_1.json",
     "core100_history_state": "COMPLETE_10_OF_10_SCHEDULE_RETIRED_MANUAL_REPAIR_DIAGNOSIS_ONLY",
     "core100_training_fingerprint": "config/core100_training_fingerprint_v0_1.json",
-    "core100_training_fingerprint_state": "ACTIVE_NO_CHANGE_WHEN_DATASET_AND_MODEL_INPUTS_MATCH"
+    "core100_training_fingerprint_state": "ACTIVE_NO_CHANGE_WHEN_DATASET_AND_MODEL_INPUTS_MATCH",
+    "zec_v0_3_development_execution": "research/receipts/2026-09-21-zec-v0-3-development-one-shot-authority.json",
+    "zec_v0_3_development_execution_state": "PROPOSED_ONE_SHOT_MANUAL_PUBLIC_BINANCE_VISION_DEVELOPMENT_ONLY_EFFECTIVE_ON_PR_415_MERGE"
   },
   "scheduled_workflows": {
     "current_window": [],
@@ -188,7 +190,8 @@
       "resource-hub-supply-chain-v0-2.yml",
       "v0-10-critical-path-freeze-guard.yml",
       "validate-v0-10-capture-window-operations.yml",
-      "validate-v0-11-metadata-stability-evaluator.yml"
+      "validate-v0-11-metadata-stability-evaluator.yml",
+      "zec-v0-3-development-execution-v0-1.yml"
     ],
     "post_cutoff_manual_fail_closed": [
       "binance-spot-r2-monthly-governance-v0-5.yml",
@@ -280,7 +283,9 @@
     "core100_history_generic_backfill_retired": true,
     "core100_training_fingerprint_dedupe_added": true,
     "v0_12_schedule_retired_after_window_expiry": false,
-    "v0_12_frozen_cron_declaration_preserved_after_window_expiry": true
+    "v0_12_frozen_cron_declaration_preserved_after_window_expiry": true,
+    "zec_v0_3_development_one_shot_authority_added": true,
+    "zec_v0_3_development_schedule_added": false
   },
   "retired_schedule_windows": [],
   "expired_frozen_schedule_windows": [
