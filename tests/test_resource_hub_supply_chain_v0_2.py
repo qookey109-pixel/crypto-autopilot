@@ -14,6 +14,7 @@ POLICY = json.loads(
     Path("config/resource_hub_supply_chain_v0_2.json").read_text(encoding="utf-8")
 )
 BASELINE = POLICY["baseline"]["source_commit"]
+WORKFLOW = Path(".github/workflows/resource-hub-supply-chain-v0-2.yml")
 
 
 def _catalog() -> dict[str, object]:
@@ -131,3 +132,28 @@ def test_v0_2_fails_closed_if_runtime_or_auto_pr_is_enabled() -> None:
                 source_commit=BASELINE,
                 previous_state=_previous(),
             )
+
+
+def test_workflow_expands_variables_and_never_silently_loses_dedupe_state() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+
+    assert "\\${" not in text
+    assert "GITHUB_TOKEN: ${{ github.token }}" in text
+    assert 'Bearer ${GITHUB_TOKEN}' in text
+    assert 'hub_sha=${HUB_SHA}' in text
+    assert '/${HUB_SHA}/data/resources.json' in text
+    assert '"${args[@]}"' in text
+    assert "|| true" not in text
+
+    assert "FIRST_RUN_BASELINE" in text
+    assert "PREVIOUS_STATE_LOOKUP_FAILED" in text
+    assert "PREVIOUS_STATE_EXPIRED" in text
+    assert "PREVIOUS_STATE_MISSING" in text
+    assert "PREVIOUS_STATE_RESTORE_FAILED" in text
+    assert "PREVIOUS_STATE_INVALID" in text
+
+    assert (
+        "name: resource-hub-source-state-v0-2\n"
+        "          path: resource-hub-output/state.json\n"
+        "          retention-days: 30"
+    ) in text
