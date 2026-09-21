@@ -65,6 +65,7 @@ jobs:
           PY
 
       - name: Run exactly one persistent Live Paper step
+        id: coordinator
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
@@ -72,12 +73,17 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         shell: bash
         run: |
-          set -euo pipefail
+          set -uo pipefail
           mkdir -p artifacts
+          set +e
           PYTHONPATH=src python scripts/run_live_paper_coordinator_v0_1.py \
             --input "${SAFE_INPUT_PATH}" \
             --store-backend r2 \
             > artifacts/live-paper-run-coordinator-report.json
+          exit_code=$?
+          set -e
+          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+
           python - <<'PY'
           import json
           from pathlib import Path
@@ -90,7 +96,18 @@ jobs:
           assert report["state"] in {
               "LIVE_PAPER_RUN_STEP_COMMITTED",
               "COMMITTED_STEP_REPLAYED",
+              "REJECT",
           }
+          if report["state"] == "REJECT":
+              assert isinstance(report.get("reason"), str) and report["reason"]
+              assert report.get("provider_requests_status") in {
+                  "KNOWN",
+                  "UNKNOWN_OR_PARTIAL",
+              }
+              assert report.get("persistent_writes_status") in {
+                  "KNOWN",
+                  "UNKNOWN_OR_PARTIAL",
+              }
           authority = report["authority"]
           assert authority["public_live_market_data_authorized"] is True
           assert authority["live_paper_simulation_authorized"] is True
@@ -103,11 +120,24 @@ jobs:
           assert authority["real_money_order_authorized"] is False
           assert authority["live_real_trading_authorized"] is False
           PY
+          echo "report_safe=true" >> "$GITHUB_OUTPUT"
 
       - name: Upload coordinator report as secondary evidence
+        if: ${{ always() && steps.coordinator.outputs.report_safe == 'true' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: live-paper-run-coordinator-v0-1-${{ github.run_id }}
           path: artifacts/live-paper-run-coordinator-report.json
           if-no-files-found: error
           retention-days: 30
+
+      - name: Enforce coordinator outcome
+        if: ${{ always() && steps.coordinator.outputs.report_safe == 'true' }}
+        shell: bash
+        run: |
+          code="${{ steps.coordinator.outputs.exit_code }}"
+          if [[ "$code" == "0" ]]; then
+            exit 0
+          fi
+          echo "Coordinator failed after producing a validated safe report." >&2
+          exit "$code"
