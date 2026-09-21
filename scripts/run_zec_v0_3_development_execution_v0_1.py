@@ -8,7 +8,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import time
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -60,23 +59,25 @@ def _git_blob_sha(path: Path) -> str:
     return hashlib.sha1(header + payload).hexdigest()  # noqa: S324 - Git object identity
 
 
-def _request_bytes(url: str, *, retries: int = 4, timeout_seconds: float = 45.0) -> bytes:
-    last_error: Exception | None = None
-    for attempt in range(retries):
-        try:
-            request = Request(
-                url,
-                headers={"User-Agent": "qookey-zec-v0-3-development/0.1"},
-            )
-            with urlopen(request, timeout=timeout_seconds) as response:  # noqa: S310 - URL comes from validated Binance Vision key
-                return response.read()
-        except (HTTPError, URLError, TimeoutError) as exc:
-            last_error = exc
-            if isinstance(exc, HTTPError) and exc.code == 404:
-                raise RuntimeError("required frozen Binance Vision archive is missing") from exc
-            if attempt + 1 < retries:
-                time.sleep(2.0 * (attempt + 1))
-    raise RuntimeError("failed to read required frozen Binance Vision archive") from last_error
+def _request_bytes(url: str, *, timeout_seconds: float = 45.0) -> bytes:
+    """Perform exactly one bounded public-source request.
+
+    The reviewed authority caps the full 48-month study at 96 requests
+    (archive + checksum). Retries would silently expand that authority, so any
+    network failure fails closed and requires a new versioned authority.
+    """
+
+    request = Request(
+        url,
+        headers={"User-Agent": "qookey-zec-v0-3-development/0.1"},
+    )
+    try:
+        with urlopen(request, timeout=timeout_seconds) as response:  # noqa: S310 - URL comes from validated Binance Vision key
+            return response.read()
+    except (HTTPError, URLError, TimeoutError) as exc:
+        if isinstance(exc, HTTPError) and exc.code == 404:
+            raise RuntimeError("required frozen Binance Vision archive is missing") from exc
+        raise RuntimeError("failed to read required frozen Binance Vision archive") from exc
 
 
 def _github_json(url: str) -> dict[str, Any]:
