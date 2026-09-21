@@ -12,7 +12,11 @@
     "zecDevelopmentExpectedCells": 256,
     "zecDevelopmentCompletedCells": 0,
     "core100HistoryScheduleRetired": true,
-    "core100TrainingDedupeState": "ACTIVE_FINGERPRINT_NO_CHANGE"
+    "core100TrainingDedupeState": "ACTIVE_FINGERPRINT_NO_CHANGE",
+    "projectedScheduledJobCount": 7,
+    "repositoryScheduledWorkflowCount": 7,
+    "monitoredScheduledWorkflowCount": 7,
+    "scheduleInventoryConverged": true
   },
   "sourceStatus": {
     "resourceHub": {
@@ -43,6 +47,14 @@
       "trainingBaselineRunId": 34918219864,
       "trainingBaselineExperimentFingerprint": "25b3178ce0d13052684d20b35a0e1f6949f0d97a5ac0c5b9e8f0a52d4d12f9c8",
       "trainingNoChangeWritesR2": false
+    },
+    "scheduleInventory": {
+      "state": "CONVERGED",
+      "repositoryScheduledWorkflowCount": 7,
+      "projectedScheduledJobCount": 7,
+      "monitoredScheduledWorkflowCount": 7,
+      "freshnessAndEffectivePeriodSource": "config/research_automation_health_v0_2.json",
+      "automaticOperationsInventory": "config/github_automatic_research_operations_v0_5.json"
     }
   },
   "items": [
@@ -59,12 +71,13 @@
       ],
       "local_schedule": "每日 09:13",
       "dependency_ids": [],
-      "active_from": null,
-      "active_until": null,
-      "freshness_seconds": 97200,
       "status": "SCHEDULED_READ_ONLY",
       "authority_link": "config/resource_hub_supply_chain_v0_2.json",
-      "detail": "只讀 AI Resource Hub 公開 catalog；source commit 不變時不重建候選，變更時仍只產生 REVIEW_REQUIRED artifact。"
+      "detail": "只讀 AI Resource Hub 公開 catalog；source commit 不變時不重建候選，變更時仍只產生 REVIEW_REQUIRED artifact。",
+      "active_from": "2026-09-21T00:00:00Z",
+      "active_until": null,
+      "freshness_seconds": 108000,
+      "freshness_source": "config/research_automation_health_v0_2.json"
     },
     {
       "id": "research-signal-v0-2",
@@ -79,12 +92,13 @@
       ],
       "local_schedule": "每日 10:17",
       "dependency_ids": [],
-      "active_from": null,
-      "active_until": null,
-      "freshness_seconds": 97200,
       "status": "ACTIVE",
       "authority_link": "config/research_signal_layer_v0_2.json",
-      "detail": "沿用既有核准資料範圍，研究輸出不取得模型晉升或交易 authority。"
+      "detail": "沿用既有核准資料範圍，研究輸出不取得模型晉升或交易 authority。",
+      "active_from": "2026-08-24T03:47:45Z",
+      "active_until": null,
+      "freshness_seconds": 108000,
+      "freshness_source": "config/research_automation_health_v0_2.json"
     },
     {
       "id": "research-signal-quality-v0-1",
@@ -101,12 +115,13 @@
       "dependency_ids": [
         "research-signal-v0-2"
       ],
-      "active_from": null,
-      "active_until": null,
-      "freshness_seconds": 97200,
       "status": "ACTIVE_BACKSTOP",
       "authority_link": "config/research_signal_quality_v0_1.json",
-      "detail": "目前仍由 10:47 cron 補查；事件式跟隨上游完成尚未在本批啟用。"
+      "detail": "目前仍由 10:47 cron 補查；事件式跟隨上游完成尚未在本批啟用。",
+      "active_from": "2026-08-24T00:00:00Z",
+      "active_until": null,
+      "freshness_seconds": 108000,
+      "freshness_source": "config/research_automation_health_v0_2.json"
     },
     {
       "id": "context-forward-capture-v0-1",
@@ -157,12 +172,13 @@
       ],
       "local_schedule": "每兩小時 :57",
       "dependency_ids": [],
-      "active_from": null,
-      "active_until": null,
-      "freshness_seconds": 10800,
       "status": "ACTIVE",
       "authority_link": "config/research_automation_health_v0_2.json",
-      "detail": "只以合法自動事件判斷執行 freshness；依賴與業務結果分開顯示。"
+      "detail": "只以合法自動事件判斷執行 freshness；依賴與業務結果分開顯示。",
+      "active_from": "2026-09-01T00:00:00Z",
+      "active_until": null,
+      "freshness_seconds": 14400,
+      "freshness_source": "config/research_automation_health_v0_2.json"
     },
     {
       "id": "dashboard-pages-projection",
@@ -180,12 +196,13 @@
       ],
       "local_schedule": "上游完成後 + 每日 12:43 補查",
       "dependency_ids": [],
-      "active_from": null,
-      "active_until": null,
-      "freshness_seconds": 90000,
       "status": "ACTIVE_CONTENT_HASH_DEDUP",
       "authority_link": ".github/workflows/dashboard-github-pages.yml",
-      "detail": "網站仍是 authority=false 投影；業務內容 hash 相同時不重複部署。"
+      "detail": "網站仍是 authority=false 投影；業務內容 hash 相同時不重複部署。",
+      "active_from": "2026-09-21T00:00:00Z",
+      "active_until": null,
+      "freshness_seconds": 108000,
+      "freshness_source": "config/research_automation_health_v0_2.json"
     },
     {
       "id": "core100-history-v0-1-2",
@@ -220,12 +237,13 @@
       "dependency_ids": [
         "core100-history-v0-1-2"
       ],
-      "active_from": null,
-      "active_until": null,
-      "freshness_seconds": 691200,
       "status": "ACTIVE_FINGERPRINT_DEDUP",
       "authority_link": "config/core100_training_fingerprint_v0_1.json",
-      "detail": "每週觸發先比對 dataset + model-input experiment fingerprint；完全相同時回 NO_CHANGE，不重訓、不寫 R2。"
+      "detail": "每週觸發先比對 dataset + model-input experiment fingerprint；完全相同時回 NO_CHANGE，不重訓、不寫 R2。",
+      "active_from": "2026-09-04T02:00:00Z",
+      "active_until": null,
+      "freshness_seconds": 691200,
+      "freshness_source": "config/research_automation_health_v0_2.json"
     },
     {
       "id": "pionex-alternative-observability-v0-2",
@@ -241,12 +259,13 @@
       ],
       "local_schedule": "原核准九月觀測窗",
       "dependency_ids": [],
-      "active_from": "2026-09-04T02:00:00Z",
-      "active_until": "2026-10-01T00:00:00Z",
-      "freshness_seconds": null,
       "status": "ACTIVE_UNTIL_ORIGINAL_EXPIRY",
       "authority_link": "config/pionex_alternative_assets_observability_v0_2.json",
-      "detail": "維持原有效期間；期限後續接需另行審核。"
+      "detail": "維持原有效期間；期限後續接需另行審核。",
+      "active_from": "2026-09-04T02:00:00Z",
+      "active_until": "2026-10-01T00:00:00Z",
+      "freshness_seconds": 691200,
+      "freshness_source": "config/research_automation_health_v0_2.json"
     },
     {
       "id": "external-tool-evaluation-weekly",
@@ -348,6 +367,8 @@
     "research/status/current-operations-v0-3.json",
     "config/core100_history_retirement_v0_1.json",
     "config/core100_training_fingerprint_v0_1.json",
+    "config/research_automation_health_v0_2.json",
+    "config/github_automatic_research_operations_v0_5.json",
     "config/zec_strategy_v0_3_development_matrix_v0_1.json"
   ],
   "safetyBoundary": {
