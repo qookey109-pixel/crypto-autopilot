@@ -33,7 +33,7 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     }
     assert len(scheduled_workflows) == 7
     assert "provider-equivalence-v0-12-successor-metadata-capture.yml" not in scheduled_workflows
-    assert actual["summary"]["waitingAuthorityCount"] == 3
+    assert actual["summary"]["waitingAuthorityCount"] == 2
     assert actual["summary"]["plannedNotScheduledCount"] == 5
     assert actual["summary"]["core100HistoryStatus"] == "COMPLETE"
     assert actual["summary"]["core100HistoryRetirementPending"] is False
