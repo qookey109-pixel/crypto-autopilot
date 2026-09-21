@@ -1,0 +1,91 @@
+{
+  "schema": "qookey-zec-v0-4-development-one-shot-authority-v0.1",
+  "status": "PROPOSED_EFFECTIVE_ONLY_ON_EXPLICIT_PROTECTED_MAIN_PR_MERGE",
+  "authority_id": "zec-v0-4-development-20260921-v0-1",
+  "authority_pr_number": 418,
+  "date": "2026-09-21",
+  "purpose": "Authorize exactly one manual GitHub-hosted ZEC V0.4 development execution on the already-seen 2022-08 through 2026-07 public Binance Vision 15m history, without consuming fresh confirmation or opening any trading authority.",
+  "user_authorization": {
+    "explicit_protected_main_merge_required": true,
+    "authority_granted_at_prepare_time": false,
+    "execution_starts_automatically_on_merge": false,
+    "separate_manual_workflow_dispatch_required": true,
+    "authority_pr": "https://github.com/qookey109-pixel/crypto-autopilot/pull/418"
+  },
+  "lineage": {
+    "v0_3_completion": "research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json",
+    "v0_3_diagnostic": "research/receipts/2026-09-21-zec-v0-3-development-diagnostic-v0-1.json",
+    "v0_4_contract": "config/zec_strategy_v0_4_development_matrix_v0_1.json",
+    "selection_policy": "config/zec_strategy_v0_3_selection_policy_v0_1.json",
+    "interpretation": "V0.4 is a new 24-cell development-only iteration. V0.3 froze no champion; this authority does not promote or inherit any V0.3 candidate."
+  },
+  "prior_source_evidence": {
+    "receipt": "research/receipts/2026-09-18-bitget-macd-zec-binance-vision-read-only-completion-v0-2.json",
+    "run_id": 35298599786,
+    "source_archive_count": 48,
+    "source_row_count": 140256,
+    "raw_candles_persisted": false,
+    "interpretation": "Previously viewed history remains development-only and cannot serve as fresh confirmation."
+  },
+  "source_scope": {
+    "provider": "binance_usdm",
+    "delivery": "binance_vision_public_monthly",
+    "dataset": "klines",
+    "frequency": "monthly",
+    "symbol": "ZECUSDT",
+    "interval": "15m",
+    "source_month_start": "2022-08",
+    "source_month_end": "2026-07",
+    "development_start_utc": "2022-08-01T00:00:00Z",
+    "development_end_exclusive_utc": "2026-08-01T00:00:00Z",
+    "archive_count": 48,
+    "row_count": 140256,
+    "maximum_provider_requests": 96,
+    "raw_candles_persisted": false,
+    "memory_only": true
+  },
+  "execution_scope": {
+    "trigger": "workflow_dispatch",
+    "one_shot": true,
+    "maximum_runs": 1,
+    "maximum_run_attempts": 1,
+    "candidate_count": 6,
+    "development_fold_count": 4,
+    "development_matrix_cells": 24,
+    "complete_matrix_required": true,
+    "selective_omission_allowed": false,
+    "primary_slippage_bps_per_side": 5,
+    "funding_fabrication_allowed": false,
+    "aggregate_report_artifact_authorized": true,
+    "raw_candle_artifact_authorized": false,
+    "raw_trade_artifact_authorized": false
+  },
+  "bound_git_blobs": {
+    "config/zec_strategy_v0_4_development_matrix_v0_1.json": "c5acd49e7987b7bb89b7c1fc83c0fd03c548b418",
+    "config/zec_strategy_v0_3_selection_policy_v0_1.json": "2ba1a5b618742d094fbbd0be8e8d8e783e24bbe6",
+    "research/receipts/2026-09-18-bitget-macd-zec-binance-vision-read-only-completion-v0-2.json": "f9a3fac869575937ba9ba1c9b6ae5f18a27304d6",
+    "src/crypto_autopilot/research/zec_v0_4_development_execution_authority.py": "ca9988ef679547a04f1508ee8d8b0778e3ce8dca",
+    "src/crypto_autopilot/research/zec_v0_4_development_runner.py": "bdc4defc09247647a65e34e2fa8e7f6a7ef7666f",
+    "scripts/run_zec_v0_4_development_execution_v0_1.py": "4733d0913a0fa86a6142013625fb6e7acad4174e",
+    ".github/workflows/zec-v0-4-development-execution-v0-1.yml": "024ed1dc1a54ebc829186cb8ae2f016f983a4fd5"
+  },
+  "conditional_authority": {
+    "effective_condition": "AUTHORITY_PR_MERGED_ON_PROTECTED_MAIN",
+    "public_binance_vision_read_authorized_after_effective_condition": true,
+    "offline_development_execution_authorized_after_effective_condition": true,
+    "aggregate_report_artifact_authorized_after_effective_condition": true,
+    "provider_private_api_authorized": false
+  },
+  "safety_boundary": {
+    "fresh_confirmation_access_authorized": false,
+    "fresh_data_read_authorized": false,
+    "r2_read_authorized": false,
+    "r2_write_authorized": false,
+    "formal_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
