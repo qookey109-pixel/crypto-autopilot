@@ -1,0 +1,92 @@
+name: ZEC V0.3 Development Execution V0.1
+run-name: ZEC V0.3 Development · ${{ inputs.authority_id }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      authority_id:
+        description: "Exact reviewed one-shot authority id"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+concurrency:
+  group: zec-v0-3-development-execution-v0-1
+  cancel-in-progress: false
+
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained runtime
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Run one-shot ZEC V0.3 development matrix
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/run_zec_v0_3_development_execution_v0_1.py \
+            --authority-id "${{ inputs.authority_id }}" \
+            --output zec-v0-3-development-output/report.json
+
+      - name: Assert aggregate-only fail-closed boundary
+        if: always() && hashFiles('zec-v0-3-development-output/report.json') != ''
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(
+              Path("zec-v0-3-development-output/report.json").read_text(encoding="utf-8")
+          )
+          assert report["schema"] == "qookey-zec-v0-3-development-run-report-v0.1"
+          assert report["status"] in {"PASS_EXECUTION_COMPLETE", "FAIL_CLOSED"}
+          safety = report["safety_boundary"]
+          assert safety["fresh_confirmation_accessed"] is False
+          assert safety["formal_holdout_accessed"] is False
+          assert safety["source_switch_authorized"] is False
+          assert safety["model_promotion_authorized"] is False
+          assert safety["real_money_order_authorized"] is False
+          assert safety["live_trading_authorized"] is False
+          if report["status"] == "PASS_EXECUTION_COMPLETE":
+              assert report["source"]["provider"] == "binance_usdm"
+              assert report["source"]["delivery"] == "binance_vision_public_monthly"
+              assert report["source"]["archive_count"] == 48
+              assert report["source"]["provider_requests_performed"] == 96
+              assert report["source"]["row_count"] == 140256
+              assert report["source"]["raw_candles_persisted"] is False
+              assert report["development"]["candidate_count"] == 64
+              assert report["development"]["fold_count"] == 4
+              assert report["development"]["matrix_cells"] == 256
+              assert len(report["development"]["matrix"]) == 256
+              assert "trades" not in report["development"]
+              assert report["safety_boundary"]["r2_reads_performed"] is False
+              assert report["safety_boundary"]["r2_writes_performed"] is False
+              assert report["safety_boundary"]["raw_trade_artifact_emitted"] is False
+          PY
+
+      - name: Upload aggregate development report
+        if: always() && hashFiles('zec-v0-3-development-output/report.json') != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: zec-v0-3-development-${{ github.run_id }}-${{ github.run_attempt }}
+          path: zec-v0-3-development-output/report.json
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Remove disposable runner output
+        if: always()
+        run: rm -rf zec-v0-3-development-output
