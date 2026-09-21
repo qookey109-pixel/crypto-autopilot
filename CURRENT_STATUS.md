@@ -174,3 +174,35 @@ Do not use those older statements to restart History, classify current Training 
 Machine-readable companion: `research/status/current-operations-v0-3.json`.
 
 - Dashboard cloud monitoring V0.2 is prepared as metadata-only execution evidence; workflow success is not a business-result claim.
+
+
+## ZEC Strategy V0.3 development result
+
+The one-shot governed development run is complete.
+
+- workflow run: `35573236145`
+- run attempt: `1`
+- execution head: `c33c81732deae569fb924f61f81868a128690a07`
+- workflow conclusion: **SUCCESS**
+- artifact: `10626687807`
+- artifact digest: `sha256:61bb133d9751aef381010d504250bb51c2e224f087344cb7f974396845c7cc90`
+- report SHA-256: `7428a8ced8cc401a98f061de7c77a54650dc53eb660443ec947f09e8e5fd2321`
+- development matrix: **256 / 256 COMPLETE**
+- selection result: **NO_ELIGIBLE_DEVELOPMENT_CANDIDATE**
+- champion frozen: **false**
+- all 64 candidates met the minimum 30 realized trades per fold
+- candidates with positive worst-fold return: **0 / 64**
+
+The diagnostic leader is `zec-v0-3-45`, but it is **not** a selected champion.
+Its worst-fold return is `-8.12511401%`; the four development-fold returns are
+`-6.00733290%`, `-8.12511401%`, `-0.07906656%`, and `+6.28084212%`.
+
+Therefore the blocking gate is cross-fold robustness, not trade count.
+The frozen selection threshold is not loosened or retuned from this outcome.
+
+Fresh confirmation remains unopened. No holdout, R2, source switch, promotion,
+formal trade plan, real-money order, or live trading authority is opened by
+this execution result.
+
+Completion receipt:
+`research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json`
