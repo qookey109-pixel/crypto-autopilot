@@ -1,9 +1,9 @@
 # Automation Index V0.1
 
-Current review: 2026-09-19. [Verified operations and handoff](OPERATIONS_HANDOFF_2026_09_13.md).
+Current review: 2026-09-21. [Verified operations and handoff](OPERATIONS_HANDOFF_2026_09_13.md).
 History is every two hours under `config/history_cadence_v0_1.json`.
 V0.12's window has ended; fixed BTC simulation V0.1 is PASS and retired.
-After this reviewed merge, eight workflow files retain cron declarations; bounded/expired entries remain classified separately from current execution.
+Seven workflow files now retain cron declarations. The expired V0.12 successor cron is retired; its historical window/config evidence remains preserved separately.
 
 Core100 History is now **10/10 COMPLETE**. The completed training run
 `34918219864` passed operational execution, while the downstream Model Quality
@@ -30,7 +30,6 @@ backfills or regrades the incomplete V0.10 evidence.
 
 | State | Workflow | UTC cadence | Effective behavior |
 | --- | --- | --- | --- |
-| Expired bounded successor | Provider Equivalence V0.12 metadata capture | `:17` and `:47`, only 2026-09-04 02:00 through 2026-09-12 03:59:59.999 | only current metadata schedule after exact protected-main merge; normalized Pionex schema must validate before R2 construction |
 | Continuous | Research Signal Layer V0.2 | daily 02:17 | bounded public structured-signal ingestion |
 | Continuous | Research Signal Quality V0.1 | daily 02:47 | allowlisted R2 lineage read only |
 | Continuous / alerting | Research Automation Health V0.2 | every 2 hours at :57 | GitHub Actions metadata read only; covers every current cron and ignores manual/PR runs when judging automatic health |
@@ -40,6 +39,11 @@ backfills or regrades the incomplete V0.10 evidence.
 | Post-window | Pionex Alternative Assets Observability V0.2 | 2026-09-04 02:53, then 09-06/13/20/27 at 03:53 | Pionex `PERP + TRADING` metadata only; validates the 125-candidate catalog, compares it with the prior SHA-bound catalog, estimates four-year capacity and writes R2 evidence plus a safe aggregate artifact |
 
 ## Retired cron triggers
+
+Provider Equivalence V0.12 successor metadata capture reached the end of its
+bounded window on 2026-09-12. Its Repository cron is now removed. The original
+window config, authority lineage and 194-hour / 388-attempt schedule contract
+remain historical evidence; no replay or backfill is authorized.
 
 Core100 History V0.1.2 cron is retired by
 `config/core100_history_retirement_v0_1.json` after the governed dataset
@@ -99,7 +103,7 @@ workflow and every cron to have exactly one classification, so a new hidden
 schedule cannot be added accidentally.
 
 The current machine-readable normal-operation contract is
-`config/github_automatic_research_operations_v0_4.json`; V0.2 remains frozen for the History Cadence authority binding and V0.3 records the prior 9-workflow state. It does not let a
+`config/github_automatic_research_operations_v0_5.json`; V0.4 preserves the prior eight-workflow state before V0.12 expiry retirement, V0.2 remains frozen for the History Cadence authority binding, and V0.3 records the prior 9-workflow state. It does not let a
 workflow grant itself provider, R2, holdout, promotion or trading authority.
 
 
