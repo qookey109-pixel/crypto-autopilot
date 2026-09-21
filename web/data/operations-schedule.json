@@ -5,12 +5,12 @@
   "projectionGeneratedAtUtc": null,
   "summary": {
     "scheduledJobCount": 7,
-    "waitingAuthorityCount": 3,
+    "waitingAuthorityCount": 2,
     "plannedNotScheduledCount": 5,
     "core100HistoryStatus": "COMPLETE",
     "core100HistoryRetirementPending": false,
     "zecDevelopmentExpectedCells": 256,
-    "zecDevelopmentCompletedCells": 0,
+    "zecDevelopmentCompletedCells": 256,
     "core100HistoryScheduleRetired": true,
     "core100TrainingDedupeState": "ACTIVE_FINGERPRINT_NO_CHANGE",
     "projectedScheduledJobCount": 7,
@@ -35,11 +35,14 @@
       "automaticInstallAuthorized": false
     },
     "zecV0_3": {
-      "state": "WAITING_EXECUTION_AUTHORITY",
+      "state": "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
       "candidateCount": 64,
       "foldCount": 4,
       "expectedCells": 256,
-      "completedCells": 0,
+      "completedCells": 256,
+      "selectionStatus": "NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
+      "championFrozen": false,
+      "diagnosticLeaderId": "zec-v0-3-45",
       "freshConfirmationAccessAuthorized": false
     },
     "core100": {
@@ -357,14 +360,14 @@
       "workflow": null,
       "trigger": [],
       "expected_crons": [],
-      "local_schedule": "新 authority 合併後一次性",
+      "local_schedule": "one-shot authority consumed by run 35573236145",
       "dependency_ids": [],
       "active_from": null,
       "active_until": null,
       "freshness_seconds": null,
-      "status": "WAITING_EXECUTION_AUTHORITY",
-      "authority_link": "config/zec_strategy_v0_3_development_matrix_v0_1.json",
-      "detail": "64 candidates × 4 folds = 256 cells；real historical development execution 仍鎖定。"
+      "status": "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
+      "authority_link": "research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json",
+      "detail": "64 candidates × 4 folds = 256/256 complete；selection = NO_ELIGIBLE_DEVELOPMENT_CANDIDATE；fresh confirmation remains closed."
     }
   ],
   "sourceAuthorities": [
@@ -376,7 +379,8 @@
     "config/core100_training_fingerprint_v0_1.json",
     "config/research_automation_health_v0_2.json",
     "config/github_automatic_research_operations_v0_5.json",
-    "config/zec_strategy_v0_3_development_matrix_v0_1.json"
+    "config/zec_strategy_v0_3_development_matrix_v0_1.json",
+    "research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json"
   ],
   "safetyBoundary": {
     "automaticActivationAuthorized": false,
