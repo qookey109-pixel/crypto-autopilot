@@ -155,8 +155,30 @@ def load_training_latest(store, config: Mapping[str, Any]) -> tuple[str, dict[st
         or latest.get("provider") != "binance_usdm"
         or not latest.get("run_id")
         or not latest.get("dataset_fingerprint")
+        or not latest.get("manifest_key")
+        or not latest.get("manifest_sha256")
     ):
         raise DetailedHistoryAuthorityError("Core100 training latest pointer mismatch")
+
+    manifest_payload = store.get_bytes_verified(
+        str(latest["manifest_key"]),
+        expected_sha256=str(latest["manifest_sha256"]),
+    )
+    manifest = json.loads(manifest_payload)
+    if (
+        not isinstance(manifest, dict)
+        or manifest.get("schema")
+        not in {
+            "binance-usdm-intraday-research-training-manifest-v0.1",
+            "binance-usdm-intraday-research-training-manifest-v0.2",
+        }
+        or manifest.get("status") != "PASS"
+        or manifest.get("provider") != "binance_usdm"
+        or manifest.get("run_id") != latest.get("run_id")
+        or manifest.get("dataset_fingerprint") != latest.get("dataset_fingerprint")
+        or manifest.get("experiment_fingerprint") != latest.get("experiment_fingerprint")
+    ):
+        raise DetailedHistoryAuthorityError("Core100 training latest manifest mismatch")
     return key, latest
 
 
