@@ -231,3 +231,34 @@ Aggregate V0.3 diagnosis:
 
 V0.4 contract:
 `config/zec_strategy_v0_4_development_matrix_v0_1.json`
+
+
+## ZEC Strategy V0.4 one-shot development authority
+
+PR #418 prepares the reviewed execution surface for the preregistered V0.4
+development matrix.
+
+- authority id: `zec-v0-4-development-20260921-v0-1`
+- authority state before merge: **INEFFECTIVE**
+- effective condition: explicit protected-main merge of PR #418
+- merge auto-starts execution: **false**
+- subsequent dispatch mode: **manual workflow_dispatch only**
+- maximum runs: **1**
+- maximum run attempts: **1**
+- development matrix: **6 candidates × 4 folds = 24 cells**
+- public source: Binance USD-M / Binance Vision monthly ZECUSDT 15m
+- source months: `2022-08` through `2026-07`
+- maximum source requests: **96** (48 archives + 48 checksums)
+- raw candles persisted: **false**
+- raw trade artifact: **false**
+- aggregate report artifact: **allowed only after authority becomes effective**
+
+The merge itself does not execute the study. A first manual dispatch consumes
+the one-shot authority; a failed or cancelled first attempt is not rerunnable
+under the same authority.
+
+Fresh confirmation remains unopened. R2, formal holdout, source switch,
+promotion, formal trade plans, real-money orders and live trading remain closed.
+
+Authority receipt:
+`research/receipts/2026-09-21-zec-v0-4-development-one-shot-authority.json`
