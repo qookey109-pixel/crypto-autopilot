@@ -59,7 +59,7 @@
     "research/receipts/2026-09-18-bitget-macd-zec-binance-vision-read-only-completion-v0-2.json": "f9a3fac869575937ba9ba1c9b6ae5f18a27304d6",
     "src/crypto_autopilot/research/zec_v0_3_development_execution_authority.py": "db1b15e06268e4acaa2b331e6b3da9745d0951a1",
     "src/crypto_autopilot/research/zec_v0_3_development_runner.py": "75e2c89866dc9fbb415d21518ec4d81d2014f13c",
-    "scripts/run_zec_v0_3_development_execution_v0_1.py": "f46d3ceb90b49c7f4bf5694fe5ff1f5a90ad71a5",
+    "scripts/run_zec_v0_3_development_execution_v0_1.py": "040876805051b5ad30d23800174162d4024d7b89",
     ".github/workflows/zec-v0-3-development-execution-v0-1.yml": "03cf16c925d3991f2df21802e90fff684f580623"
   },
   "conditional_authority": {
