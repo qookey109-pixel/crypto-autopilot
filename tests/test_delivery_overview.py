@@ -213,18 +213,18 @@ class DeliveryOverviewTests(unittest.TestCase):
 
             generated = (site / "index.html").read_text(encoding="utf-8")
             template = (ROOT / "web/index.html").read_text(encoding="utf-8")
+            current = json.loads(
+                (site / "data/current-operations.json").read_text(encoding="utf-8")
+            )
             self.assertIn("<!-- DELIVERY_OVERVIEW_START -->", template)
             self.assertIn("<!-- DELIVERY_SCHEDULE_START -->", template)
-            self.assertIn("9/18 目前作業狀態", generated)
+            self.assertIn(f"{current['updatedDate']} 目前作業狀態", generated)
             self.assertIn("10/10 · COMPLETE", generated)
             self.assertIn("COMPLETE · PASS", generated)
             self.assertNotIn("PENDING MANUAL DISPATCH", generated)
             self.assertNotIn("8/10 分片", generated)
             self.assertNotEqual(generated, template)
 
-            current = json.loads(
-                (site / "data/current-operations.json").read_text(encoding="utf-8")
-            )
             self.assertEqual(current["trainingRunId"], 34918219864)
             self.assertEqual(current["modelQualityStatus"], "REJECT")
             self.assertEqual(current["pionexValidationStatus"], "COMPLETE_PASS")

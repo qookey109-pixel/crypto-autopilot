@@ -247,7 +247,7 @@ jobs:
           python -m http.server 4173 -d artifacts/dashboard-site > /tmp/dashboard-zh-http.log 2>&1 &
           SERVER_PID=$!
           trap 'kill ${SERVER_PID} || true' EXIT
-          for attempt in $(seq 1 20); do
+          for _ in $(seq 1 20); do
             if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then
               break
             fi
@@ -265,7 +265,7 @@ jobs:
           assert '資料健康度' in html
           assert '績效中心' in html
           assert '風險與閘門' in html
-          assert '9/18 目前作業狀態' in html
+          assert f"{current['updatedDate']} 目前作業狀態" in html
           assert '10/10 · COMPLETE' in html
           assert 'COMPLETED · PASS' in html
           assert 'COMPLETE · PASS' in html

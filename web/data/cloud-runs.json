@@ -1,7 +1,226 @@
 {
-  "schema": "qookey-cloud-run-status-v0.1",
+  "schema": "qookey-cloud-run-status-v0.2",
   "authority": false,
+  "mode": "GITHUB_ACTIONS_METADATA_ONLY",
   "observedAtUtc": null,
-  "simulationReady": false,
-  "runs": {}
+  "summary": {
+    "repositoryCronDeclarationCount": 8,
+    "monitoredCronDeclarationCount": 8,
+    "currentEffectiveScheduleCount": 7,
+    "expiredFrozenCronDeclarationCount": 1
+  },
+  "items": [
+    {
+      "operationId": "provider-equivalence-v0-12-successor-metadata-capture",
+      "title": "V0.12 successor metadata capture",
+      "workflow": "provider-equivalence-v0-12-successor-metadata-capture.yml",
+      "lifecycleState": "EXPIRED_BOUNDED_FROZEN_CRON_DECLARATION",
+      "authorityState": "HISTORICAL_WINDOW_ENDED",
+      "authorityPath": "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
+      "authorityUrl": "https://github.com/qookey109-pixel/crypto-autopilot/blob/main/config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
+      "maxAgeSeconds": 7200,
+      "activeFromUtc": "2026-09-04T02:00:00Z",
+      "activeUntilUtc": "2026-09-12T04:00:00Z",
+      "latestAutomaticRun": {
+        "state": "UNVERIFIED",
+        "runId": null,
+        "headSha": null,
+        "evidenceTimeUtc": null,
+        "workflowConclusion": null,
+        "sourceUrl": null
+      },
+      "freshnessState": "EXPIRED_WINDOW",
+      "businessResult": {
+        "status": "UNKNOWN_FROM_GITHUB_RUN_METADATA",
+        "reason": "WORKFLOW_CONCLUSION_IS_NOT_BUSINESS_RESULT"
+      }
+    },
+    {
+      "operationId": "research-signal-v0-2",
+      "title": "Research Signal",
+      "workflow": "research-signal-layer-v0-2.yml",
+      "lifecycleState": "CURRENT_EFFECTIVE",
+      "authorityState": "ACTIVE",
+      "authorityPath": "config/research_signal_layer_v0_2.json",
+      "authorityUrl": "https://github.com/qookey109-pixel/crypto-autopilot/blob/main/config/research_signal_layer_v0_2.json",
+      "maxAgeSeconds": 108000,
+      "activeFromUtc": "2026-08-24T03:47:45Z",
+      "activeUntilUtc": null,
+      "latestAutomaticRun": {
+        "state": "UNVERIFIED",
+        "runId": null,
+        "headSha": null,
+        "evidenceTimeUtc": null,
+        "workflowConclusion": null,
+        "sourceUrl": null
+      },
+      "freshnessState": "UNVERIFIED",
+      "businessResult": {
+        "status": "UNKNOWN_FROM_GITHUB_RUN_METADATA",
+        "reason": "WORKFLOW_CONCLUSION_IS_NOT_BUSINESS_RESULT"
+      }
+    },
+    {
+      "operationId": "research-signal-quality-v0-1",
+      "title": "Signal Quality",
+      "workflow": "research-signal-quality-v0-1.yml",
+      "lifecycleState": "CURRENT_EFFECTIVE",
+      "authorityState": "ACTIVE_BACKSTOP",
+      "authorityPath": "config/research_signal_quality_v0_1.json",
+      "authorityUrl": "https://github.com/qookey109-pixel/crypto-autopilot/blob/main/config/research_signal_quality_v0_1.json",
+      "maxAgeSeconds": 108000,
+      "activeFromUtc": "2026-08-24T00:00:00Z",
+      "activeUntilUtc": null,
+      "latestAutomaticRun": {
+        "state": "UNVERIFIED",
+        "runId": null,
+        "headSha": null,
+        "evidenceTimeUtc": null,
+        "workflowConclusion": null,
+        "sourceUrl": null
+      },
+      "freshnessState": "UNVERIFIED",
+      "businessResult": {
+        "status": "UNKNOWN_FROM_GITHUB_RUN_METADATA",
+        "reason": "WORKFLOW_CONCLUSION_IS_NOT_BUSINESS_RESULT"
+      }
+    },
+    {
+      "operationId": "automation-health-v0-2",
+      "title": "健康與排程檢查",
+      "workflow": "research-automation-health-v0-2.yml",
+      "lifecycleState": "CURRENT_EFFECTIVE",
+      "authorityState": "ACTIVE",
+      "authorityPath": "config/research_automation_health_v0_2.json",
+      "authorityUrl": "https://github.com/qookey109-pixel/crypto-autopilot/blob/main/config/research_automation_health_v0_2.json",
+      "maxAgeSeconds": 14400,
+      "activeFromUtc": "2026-09-01T00:00:00Z",
+      "activeUntilUtc": null,
+      "latestAutomaticRun": {
+        "state": "UNVERIFIED",
+        "runId": null,
+        "headSha": null,
+        "evidenceTimeUtc": null,
+        "workflowConclusion": null,
+        "sourceUrl": null
+      },
+      "freshnessState": "UNVERIFIED",
+      "businessResult": {
+        "status": "UNKNOWN_FROM_GITHUB_RUN_METADATA",
+        "reason": "WORKFLOW_CONCLUSION_IS_NOT_BUSINESS_RESULT"
+      }
+    },
+    {
+      "operationId": "core100-training-v0-1-2",
+      "title": "Core100 Training",
+      "workflow": "binance-usdm-detailed-training-v0-1.yml",
+      "lifecycleState": "CURRENT_EFFECTIVE",
+      "authorityState": "ACTIVE_FINGERPRINT_DEDUP",
+      "authorityPath": "config/core100_training_fingerprint_v0_1.json",
+      "authorityUrl": "https://github.com/qookey109-pixel/crypto-autopilot/blob/main/config/core100_training_fingerprint_v0_1.json",
+      "maxAgeSeconds": 691200,
+      "activeFromUtc": "2026-09-04T02:00:00Z",
+      "activeUntilUtc": null,
+      "latestAutomaticRun": {
+        "state": "UNVERIFIED",
+        "runId": null,
+        "headSha": null,
+        "evidenceTimeUtc": null,
+        "workflowConclusion": null,
+        "sourceUrl": null
+      },
+      "freshnessState": "UNVERIFIED",
+      "businessResult": {
+        "status": "UNKNOWN_FROM_GITHUB_RUN_METADATA",
+        "reason": "WORKFLOW_CONCLUSION_IS_NOT_BUSINESS_RESULT"
+      }
+    },
+    {
+      "operationId": "pionex-alternative-observability-v0-2",
+      "title": "Pionex 商品觀測",
+      "workflow": "pionex-alternative-assets-observability-v0-2.yml",
+      "lifecycleState": "CURRENT_EFFECTIVE",
+      "authorityState": "ACTIVE_UNTIL_ORIGINAL_EXPIRY",
+      "authorityPath": "config/pionex_alternative_assets_observability_v0_2.json",
+      "authorityUrl": "https://github.com/qookey109-pixel/crypto-autopilot/blob/main/config/pionex_alternative_assets_observability_v0_2.json",
+      "maxAgeSeconds": 691200,
+      "activeFromUtc": "2026-09-04T02:00:00Z",
+      "activeUntilUtc": "2026-10-01T00:00:00Z",
+      "latestAutomaticRun": {
+        "state": "UNVERIFIED",
+        "runId": null,
+        "headSha": null,
+        "evidenceTimeUtc": null,
+        "workflowConclusion": null,
+        "sourceUrl": null
+      },
+      "freshnessState": "UNVERIFIED",
+      "businessResult": {
+        "status": "UNKNOWN_FROM_GITHUB_RUN_METADATA",
+        "reason": "WORKFLOW_CONCLUSION_IS_NOT_BUSINESS_RESULT"
+      }
+    },
+    {
+      "operationId": "resource-hub-change-watch-v0-2",
+      "title": "外部資源追蹤",
+      "workflow": "resource-hub-supply-chain-v0-2.yml",
+      "lifecycleState": "CURRENT_EFFECTIVE",
+      "authorityState": "SCHEDULED_READ_ONLY",
+      "authorityPath": "config/resource_hub_supply_chain_v0_2.json",
+      "authorityUrl": "https://github.com/qookey109-pixel/crypto-autopilot/blob/main/config/resource_hub_supply_chain_v0_2.json",
+      "maxAgeSeconds": 108000,
+      "activeFromUtc": "2026-09-21T00:00:00Z",
+      "activeUntilUtc": null,
+      "latestAutomaticRun": {
+        "state": "UNVERIFIED",
+        "runId": null,
+        "headSha": null,
+        "evidenceTimeUtc": null,
+        "workflowConclusion": null,
+        "sourceUrl": null
+      },
+      "freshnessState": "UNVERIFIED",
+      "businessResult": {
+        "status": "UNKNOWN_FROM_GITHUB_RUN_METADATA",
+        "reason": "WORKFLOW_CONCLUSION_IS_NOT_BUSINESS_RESULT"
+      }
+    },
+    {
+      "operationId": "dashboard-pages-projection",
+      "title": "網站投影與補查",
+      "workflow": "dashboard-github-pages.yml",
+      "lifecycleState": "CURRENT_EFFECTIVE",
+      "authorityState": "ACTIVE_CONTENT_HASH_DEDUP",
+      "authorityPath": ".github/workflows/dashboard-github-pages.yml",
+      "authorityUrl": "https://github.com/qookey109-pixel/crypto-autopilot/blob/main/.github/workflows/dashboard-github-pages.yml",
+      "maxAgeSeconds": 108000,
+      "activeFromUtc": "2026-09-21T00:00:00Z",
+      "activeUntilUtc": null,
+      "latestAutomaticRun": {
+        "state": "UNVERIFIED",
+        "runId": null,
+        "headSha": null,
+        "evidenceTimeUtc": null,
+        "workflowConclusion": null,
+        "sourceUrl": null
+      },
+      "freshnessState": "UNVERIFIED",
+      "businessResult": {
+        "status": "UNKNOWN_FROM_GITHUB_RUN_METADATA",
+        "reason": "WORKFLOW_CONCLUSION_IS_NOT_BUSINESS_RESULT"
+      }
+    }
+  ],
+  "safetyBoundary": {
+    "providerReadsPerformed": false,
+    "r2ReadsPerformed": false,
+    "r2WritesPerformed": false,
+    "artifactReadsPerformed": false,
+    "logReadsPerformed": false,
+    "holdoutAccessed": false,
+    "sourceSwitchAuthorized": false,
+    "tradePlanAuthorized": false,
+    "realMoneyOrderAuthorized": false,
+    "liveTradingAuthorized": false
+  }
 }

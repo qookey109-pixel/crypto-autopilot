@@ -160,7 +160,7 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
     current_date = html.escape(str(current["updated_date"]))
 
     summary = f'''      <section class="panel readiness-summary" aria-labelledby="readiness-heading">
-        <h3 id="readiness-heading">9/18 目前作業狀態</h3>
+        <h3 id="readiness-heading">{current_date} 目前作業狀態</h3>
         <p><strong>Core100 資料與訓練已完成；Model Quality REJECT</strong>。真錢策略驗證、holdout、promotion 與 real trading 仍關閉；public-market Live Paper simulation 已獨立授權。</p>
         <div class="delivery-metrics" aria-label="目前已核實進度">
           <article><p>BTC 27 天固定樣本</p><strong>已完成 · {btc['executed_trade_count']} 筆成交</strong><p>歷史 engine validation only；不代表全市場策略有效。</p></article>
@@ -170,7 +170,7 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
         </div>
         <p>模型品質閘門：<strong>REJECT</strong>。Threshold replay run {replay_run} 已完成；0.50–0.55 沒有 supported threshold change，configured threshold 保持不變。</p>
         <p>Pionex V0.2 materialization 已完成，但這不代表完整 197-market multiyear history，也沒有執行 Core100 Pionex training；Strategy Validation、holdout、promotion、source switch 與 real trading 仍關閉。Live Paper 僅使用公開市場資料與模擬帳戶。</p>
-        <p>Current Operations 更新日期：{current_date}。下列 Actions 狀態只代表工作流程結果。</p>
+        <p>Current Operations 更新日期：{current_date}。下列自動排程監控顯示 latest schedule run / SHA / evidence time；workflow success 只代表執行層，business result 必須有正式 artifact / receipt 才能判定。</p>
         <p id="cloud-run-updated">雲端執行狀態尚未載入。</p>
         <ul id="cloud-run-list" class="cloud-run-list" aria-live="polite"></ul>
         <details><summary>查看資料證據與後續步驟</summary>

@@ -374,7 +374,7 @@ jobs:
           assert current_web['evidenceBasisIsLatestMainClaim'] is False
 
           html = Path('_site/index.html').read_text(encoding='utf-8')
-          assert '9/18 目前作業狀態' in html
+          assert f"{current_web['updatedDate']} 目前作業狀態" in html
           assert '10/10 · COMPLETE' in html
           assert 'COMPLETED · PASS' in html
           assert 'COMPLETE · PASS' in html

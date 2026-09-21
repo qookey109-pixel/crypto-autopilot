@@ -172,3 +172,5 @@ Older September 13 present-tense summaries that report Core100 as `8/10` or Trai
 Do not use those older statements to restart History, classify current Training as incomplete, or regress the completed Pionex V0.2 materialization stage.
 
 Machine-readable companion: `research/status/current-operations-v0-3.json`.
+
+- Dashboard cloud monitoring V0.2 is prepared as metadata-only execution evidence; workflow success is not a business-result claim.

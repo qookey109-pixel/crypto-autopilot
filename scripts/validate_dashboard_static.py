@@ -16,6 +16,7 @@ RESEARCH_EVIDENCE = ROOT / "data" / "research-evidence.json"
 RESEARCH_EVIDENCE_SCHEMA = ROOT / "data" / "research-evidence.schema.json"
 ALTERNATIVE_ASSETS = ROOT / "data" / "alternative-assets.json"
 HISTORY_PROGRESS = ROOT / "data" / "history-progress.json"
+CLOUD_RUNS = ROOT / "data" / "cloud-runs.json"
 REQUIRED = (
     ROOT / "index.html",
     STYLES,
@@ -31,6 +32,7 @@ REQUIRED = (
     RESEARCH_EVIDENCE_SCHEMA,
     ALTERNATIVE_ASSETS,
     HISTORY_PROGRESS,
+    CLOUD_RUNS,
     ROOT / "_headers",
 )
 
@@ -127,6 +129,49 @@ def main() -> int:
         raise RuntimeError("dashboard fixture must declare locale=zh-Hant-TW")
     if data.get("generatedAtUtc") is not None:
         raise RuntimeError("checked-in dashboard fixture must not invent a generation time")
+
+    cloud_runs = json.loads(CLOUD_RUNS.read_text(encoding="utf-8"))
+    if cloud_runs.get("schema") != "qookey-cloud-run-status-v0.2":
+        raise RuntimeError("cloud monitoring fixture schema changed")
+    if cloud_runs.get("authority") is not False:
+        raise RuntimeError("cloud monitoring fixture must remain non-authoritative")
+    if cloud_runs.get("mode") != "GITHUB_ACTIONS_METADATA_ONLY":
+        raise RuntimeError("cloud monitoring fixture must remain metadata-only")
+    if cloud_runs.get("observedAtUtc") is not None:
+        raise RuntimeError("checked-in cloud monitoring fixture must not invent observation time")
+    cloud_summary = cloud_runs.get("summary") or {}
+    if cloud_summary.get("repositoryCronDeclarationCount") != 8:
+        raise RuntimeError("cloud monitoring Repository cron declaration count changed")
+    if cloud_summary.get("monitoredCronDeclarationCount") != 8:
+        raise RuntimeError("cloud monitoring Health declaration count changed")
+    if cloud_summary.get("currentEffectiveScheduleCount") != 7:
+        raise RuntimeError("cloud monitoring current-effective schedule count changed")
+    if cloud_summary.get("expiredFrozenCronDeclarationCount") != 1:
+        raise RuntimeError("cloud monitoring expired frozen declaration count changed")
+    cloud_items = cloud_runs.get("items") or []
+    if len(cloud_items) != 8:
+        raise RuntimeError("cloud monitoring fixture must contain all eight cron declarations")
+    if sum(
+        item.get("lifecycleState") == "CURRENT_EFFECTIVE"
+        for item in cloud_items
+    ) != 7:
+        raise RuntimeError("cloud monitoring current-effective lifecycle split changed")
+    if sum(
+        item.get("lifecycleState") == "EXPIRED_BOUNDED_FROZEN_CRON_DECLARATION"
+        for item in cloud_items
+    ) != 1:
+        raise RuntimeError("cloud monitoring frozen-expired lifecycle split changed")
+    for item in cloud_items:
+        if (item.get("businessResult") or {}).get("status") != (
+            "UNKNOWN_FROM_GITHUB_RUN_METADATA"
+        ):
+            raise RuntimeError("cloud monitoring must not infer business results from run metadata")
+        latest = item.get("latestAutomaticRun") or {}
+        if latest.get("runId") is not None or latest.get("headSha") is not None:
+            raise RuntimeError("checked-in cloud monitoring fixture must not invent run evidence")
+    cloud_boundary = cloud_runs.get("safetyBoundary") or {}
+    if not cloud_boundary or any(value is not False for value in cloud_boundary.values()):
+        raise RuntimeError("cloud monitoring safety boundary changed")
 
     alternative_assets = json.loads(ALTERNATIVE_ASSETS.read_text(encoding="utf-8"))
     if alternative_assets.get("schema") != (
@@ -506,6 +551,7 @@ def main() -> int:
         ".site-header { position: sticky",
         ".table-wrap:focus-visible",
         ".strategy-score-progress",
+        ".cloud-run-card",
     ):
         if token not in styles:
             raise RuntimeError(f"dashboard responsive/accessibility style missing: {token}")
@@ -526,6 +572,9 @@ def main() -> int:
         "./data/research-evidence.json",
         "./data/alternative-assets.json",
         "./data/history-progress.json",
+        "./data/cloud-runs.json",
+        "qookey-cloud-run-status-v0.2",
+        "UNKNOWN_FROM_GITHUB_RUN_METADATA",
         "mergeOperationalStatus",
         "renderPaperTraining",
         "renderEquityChart",

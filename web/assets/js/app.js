@@ -691,19 +691,146 @@ function renderCloudRuns(report) {
   const time = document.getElementById("cloud-run-updated");
   if (!list || !time) return;
   list.replaceChildren();
+
   const observed = Date.parse(report?.observedAtUtc);
-  if (report?.schema !== "qookey-cloud-run-status-v0.1" || report.authority !== false
-      || report.simulationReady !== false || !Number.isFinite(observed)
-      || observed > Date.now() + 300000) {
+  const future = Number.isFinite(observed) && observed > Date.now() + 300000;
+  const legacy = report?.schema === "qookey-cloud-run-status-v0.1"
+    && report.authority === false
+    && report.simulationReady === false;
+  const boundary = report?.safetyBoundary || {};
+  const modern = report?.schema === "qookey-cloud-run-status-v0.2"
+    && report.authority === false
+    && report.mode === "GITHUB_ACTIONS_METADATA_ONLY"
+    && Array.isArray(report.items)
+    && Object.keys(boundary).length > 0
+    && Object.values(boundary).every(value => value === false);
+
+  if ((!legacy && !modern) || !Number.isFinite(observed) || future) {
     time.textContent = "雲端狀態暫不可核實，請查看 GitHub 執行紀錄。";
     return;
   }
-  const stale = Date.now() - observed > 6 * 60 * 60 * 1000;
+
+  const stale = Date.now() - observed > 30 * 60 * 60 * 1000;
+  if (modern) {
+    const summary = report.summary || {};
+    const declared = Number(summary.repositoryCronDeclarationCount);
+    const monitored = Number(summary.monitoredCronDeclarationCount);
+    const effective = Number(summary.currentEffectiveScheduleCount);
+    const expired = Number(summary.expiredFrozenCronDeclarationCount);
+    if (![declared, monitored, effective, expired].every(Number.isInteger)
+        || declared !== monitored || declared !== effective + expired
+        || report.items.length !== declared) {
+      time.textContent = "雲端狀態暫不可核實：排程 inventory 不一致。";
+      return;
+    }
+    time.textContent =
+      `${stale ? "較舊快照" : "最後核對"}：${formatTrustedTime(report.observedAtUtc)} · Repo ${declared} / Health ${monitored} / 有效 ${effective} / Expired ${expired}。`;
+
+    const states = {
+      WORKFLOW_SUCCESS: "流程成功",
+      WORKFLOW_FAILED: "流程失敗",
+      RUNNING: "執行或排隊中",
+      CANCELLED: "已取消",
+      TIMED_OUT: "逾時",
+      SKIPPED: "已略過",
+      UNVERIFIED: "待核實"
+    };
+    const freshness = {
+      FRESH: "新鮮",
+      STALE: "已過 freshness",
+      RUNNING: "執行中",
+      WAITING_FIRST_SCHEDULE: "等待首次自然排程",
+      NO_AUTOMATIC_RUN: "尚無自動 run",
+      EXPIRED_WINDOW: "時窗已結束",
+      NOT_APPLICABLE: "不適用",
+      UNVERIFIED: "待核實"
+    };
+
+    for (const row of report.items) {
+      const latest = row?.latestAutomaticRun || {};
+      const item = document.createElement("li");
+      item.className = "cloud-run-card";
+
+      const title = document.createElement("strong");
+      title.textContent = String(row?.title || row?.workflow || "未命名 workflow");
+      item.append(title);
+
+      const authority = document.createElement("small");
+      authority.textContent =
+        `Job ${String(row?.operationId || "—")} · Authority ${String(row?.authorityState || "—")} · ${String(row?.lifecycleState || "—")}`;
+      item.append(authority);
+
+      const run = document.createElement("small");
+      const runId = Number.isInteger(latest.runId) ? `#${latest.runId}` : "—";
+      const sha = typeof latest.headSha === "string" && /^[0-9a-f]{40}$/.test(latest.headSha)
+        ? latest.headSha.slice(0, 8) : "—";
+      run.textContent =
+        `Latest automatic run ${runId} · SHA ${sha} · ${states[latest.state] || "待核實"} · ${freshness[row?.freshnessState] || "待核實"}`;
+      item.append(run);
+
+      const evidence = document.createElement("small");
+      evidence.textContent =
+        `Evidence ${latest.evidenceTimeUtc ? formatTrustedTime(latest.evidenceTimeUtc) : "尚未提供"}`;
+      item.append(evidence);
+
+      const business = document.createElement("small");
+      business.className = "cloud-run-business";
+      business.textContent = row?.businessResult?.status === "UNKNOWN_FROM_GITHUB_RUN_METADATA"
+        ? "Business result：GitHub run metadata 無法判定；需另讀正式 artifact / receipt。"
+        : "Business result：待核實。";
+      item.append(business);
+
+      const links = document.createElement("span");
+      links.className = "cloud-run-links";
+      const safeRunUrl = typeof latest.sourceUrl === "string"
+        && /^https:\/\/github\.com\/qookey109-pixel\/crypto-autopilot\/actions\/runs\/[0-9]+$/.test(latest.sourceUrl);
+      if (safeRunUrl) {
+        const runLink = document.createElement("a");
+        runLink.textContent = "Run ↗";
+        runLink.href = latest.sourceUrl;
+        runLink.target = "_blank";
+        runLink.rel = "noopener noreferrer";
+        links.append(runLink);
+      }
+      const safeAuthorityUrl = typeof row?.authorityUrl === "string"
+        && /^https:\/\/github\.com\/qookey109-pixel\/crypto-autopilot\/blob\/main\/[A-Za-z0-9._\/-]+$/.test(row.authorityUrl);
+      if (safeAuthorityUrl) {
+        const authorityLink = document.createElement("a");
+        authorityLink.textContent = "Authority ↗";
+        authorityLink.href = row.authorityUrl;
+        authorityLink.target = "_blank";
+        authorityLink.rel = "noopener noreferrer";
+        links.append(authorityLink);
+      }
+      item.append(links);
+      list.append(item);
+    }
+    if (!report.items.length) {
+      const empty = document.createElement("li");
+      empty.textContent = "目前沒有可核實的自動排程執行資料。";
+      list.append(empty);
+    }
+    return;
+  }
+
+  // V0.1 compatibility for previously deployed snapshots.
   time.textContent = `${stale ? "較舊快照" : "最後核對"}：${formatTrustedTime(report.observedAtUtc)}。作業完成後由雲端更新。`;
-  const labels = { history: "Binance 歷史補齊", reach: "Pionex 歷史探測",
-    universe: "Pionex 候選池", funding: "Pionex Funding", health: "排程健康", simulation: "BTC 模擬測試" };
-  const states = { WORKFLOW_SUCCESS: "流程成功", WORKFLOW_FAILED: "需修復",
-    RUNNING: "執行或排隊中", CANCELLED: "已取消", TIMED_OUT: "逾時", UNVERIFIED: "待核實" };
+  const labels = {
+    history: "Binance 歷史補齊",
+    reach: "Pionex 歷史探測",
+    universe: "Pionex 候選池",
+    funding: "Pionex Funding",
+    health: "排程健康",
+    simulation: "BTC 模擬測試"
+  };
+  const states = {
+    WORKFLOW_SUCCESS: "流程成功",
+    WORKFLOW_FAILED: "需修復",
+    RUNNING: "執行或排隊中",
+    CANCELLED: "已取消",
+    TIMED_OUT: "逾時",
+    UNVERIFIED: "待核實"
+  };
   for (const [key, label] of Object.entries(labels)) {
     const row = report.runs?.[key] || {};
     const item = document.createElement("li");
@@ -711,7 +838,11 @@ function renderCloudRuns(report) {
     const safeUrl = typeof row.sourceUrl === "string"
       && /^https:\/\/github\.com\/qookey109-pixel\/crypto-autopilot\/actions\/runs\/[0-9]+$/.test(row.sourceUrl);
     link.textContent = `${label} · ${states[row.state] || "待核實"}`;
-    if (safeUrl) { link.href = row.sourceUrl; link.target = "_blank"; link.rel = "noopener noreferrer"; }
+    if (safeUrl) {
+      link.href = row.sourceUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+    }
     item.append(link);
     list.append(item);
   }
