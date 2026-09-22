@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Final
+from typing import Final, cast
 
 SOURCE_CAPABILITY_ID: Final[str] = "agentfeed"
 UPSTREAM_REPOSITORY: Final[str] = "seekdaseek/agentfeed"
@@ -236,7 +236,7 @@ def build_liquidation_quality_context(
 
     normalized.sort(
         key=lambda row: (
-            int(row["event_timestamp_ms"]),
+            int(cast(int, row["event_timestamp_ms"])),
             str(row["exchange"]),
             str(row["side_semantics"]),
         )
@@ -303,9 +303,9 @@ def liquidation_quality_context_policy_from_config(
     if source.get("upstream_commit_sha") != UPSTREAM_COMMIT_SHA:
         raise ValueError("liquidation quality upstream commit pin mismatch")
 
-    if set(payload.get("allowed_input_classes") or []) != ALLOWED_INPUT_CLASSES:
+    if set(cast(Sequence[object], payload.get("allowed_input_classes") or [])) != ALLOWED_INPUT_CLASSES:
         raise ValueError("liquidation quality input-class registry mismatch")
-    if set(payload.get("side_semantics") or []) != SIDE_SEMANTICS:
+    if set(cast(Sequence[object], payload.get("side_semantics") or [])) != SIDE_SEMANTICS:
         raise ValueError("liquidation side-semantics registry mismatch")
     if payload.get("venue_coverage_profiles") != VENUE_COVERAGE_PROFILES:
         raise ValueError("liquidation venue coverage profile mismatch")
