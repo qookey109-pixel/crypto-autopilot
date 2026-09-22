@@ -25,7 +25,6 @@ EXPECTED = {
     "pluggy": "1.6.0",
     "pygments": "2.21.0",
     "ruff": "0.16.0",
-    "mypy": "2.3.1",
 }
 
 CRITICAL = (
@@ -93,7 +92,7 @@ class CIDependencyConstraintsTests(unittest.TestCase):
         ci = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
         self.assertIn("Install informational type visibility tool", ci)
         self.assertIn(
-            "python -m pip install -c requirements/ci-constraints.txt mypy",
+            'python -m pip install "mypy==2.3.1"',
             ci,
         )
         self.assertIn("Build informational type visibility report", ci)
