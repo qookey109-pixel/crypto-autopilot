@@ -4,7 +4,7 @@ import calendar
 import math
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Iterable
+from typing import Iterable, Mapping, cast
 
 
 class BinanceExpansionPlanError(RuntimeError):
@@ -71,13 +71,13 @@ def validate_config(config: dict[str, object]) -> None:
         raise BinanceExpansionPlanError("planning protocol must be frozen before planning")
     if config.get("provider") != "binance_usdm" or config.get("delivery") != "binance_vision":
         raise BinanceExpansionPlanError("provider/delivery mismatch")
-    if int(config.get("candidate_count") or 0) != 15:
+    if int(cast(int, config.get("candidate_count") or 0)) != 15:
         raise BinanceExpansionPlanError("V0.1 planning requires the frozen 15-market candidate universe")
     if config.get("planning_scope") != "trade_klines_only":
         raise BinanceExpansionPlanError("V0.1 planning scope must remain trade_klines_only")
-    if tuple(config.get("project_intervals") or ()) != ("15M", "60M", "4H"):
+    if tuple(cast(Iterable[object], config.get("project_intervals") or ())) != ("15M", "60M", "4H"):
         raise BinanceExpansionPlanError("project intervals changed")
-    if tuple(config.get("source_intervals") or ()) != ("15m", "1h", "4h"):
+    if tuple(cast(Iterable[object], config.get("source_intervals") or ())) != ("15m", "1h", "4h"):
         raise BinanceExpansionPlanError("source intervals changed")
     if config.get("current_incomplete_year_policy") != "DEFER":
         raise BinanceExpansionPlanError("current incomplete year must remain deferred")
@@ -100,22 +100,22 @@ def load_coverage_windows(payload: dict[str, object]) -> tuple[CoverageWindow, .
         raise BinanceExpansionPlanError("coverage authority must be BINANCE_MAX_COVERAGE_DISCOVERY_PASS")
     if payload.get("provider") != "binance_usdm" or payload.get("delivery") != "binance_vision":
         raise BinanceExpansionPlanError("coverage authority provider/delivery mismatch")
-    if int(payload.get("candidate_count") or 0) != 15:
+    if int(cast(int, payload.get("candidate_count") or 0)) != 15:
         raise BinanceExpansionPlanError("coverage authority must contain 15 candidates")
-    boundary = payload.get("authority_boundary") or {}
+    boundary = cast(Mapping[str, object], payload.get("authority_boundary") or {})
     if boundary.get("authorizes_source_switch") is not False:
         raise BinanceExpansionPlanError("coverage authority must not authorize source switching")
     if boundary.get("authorizes_large_scale_backfill") is not False:
         raise BinanceExpansionPlanError("coverage authority must not authorize large-scale backfill")
 
-    rows = payload.get("strategy_price_common_windows") or []
+    rows = cast(Iterable[Mapping[str, object]], payload.get("strategy_price_common_windows") or [])
     windows: list[CoverageWindow] = []
     for row in rows:
         windows.append(
             CoverageWindow(
                 symbol=str(row["symbol"]),
-                earliest_ms=int(row["earliest_candle_time_ms"]),
-                latest_ms=int(row["latest_candle_time_ms"]),
+                earliest_ms=int(cast(int, row["earliest_candle_time_ms"])),
+                latest_ms=int(cast(int, row["latest_candle_time_ms"])),
             )
         )
     if len(windows) != 15 or len({item.symbol for item in windows}) != 15:
@@ -126,13 +126,13 @@ def load_coverage_windows(payload: dict[str, object]) -> tuple[CoverageWindow, .
 def load_capacity_basis(payload: dict[str, object]) -> tuple[int, float, float, float]:
     if payload.get("status") != "PASS" or payload.get("stage") != "BINANCE_OBSERVED_R2_BUDGET_GATE_PASS":
         raise BinanceExpansionPlanError("capacity authority must be BINANCE_OBSERVED_R2_BUDGET_GATE_PASS")
-    basis = payload.get("basis") or {}
-    projection = payload.get("storage_projection") or {}
-    rows_per_full_market_year = int(basis.get("rows_per_full_market_year") or 0)
-    bytes_per_row = float(basis.get("observed_bytes_per_row") or 0.0)
-    canonical = float(projection.get("canonical_only_gb_month") or 0.0)
-    canonical_plus_staging = float(projection.get("canonical_plus_retained_staging_gb_month") or 0.0)
-    stress = float(projection.get("three_x_capacity_stress_gb_month") or 0.0)
+    basis = cast(Mapping[str, object], payload.get("basis") or {})
+    projection = cast(Mapping[str, object], payload.get("storage_projection") or {})
+    rows_per_full_market_year = int(cast(int, basis.get("rows_per_full_market_year") or 0))
+    bytes_per_row = float(cast(float, basis.get("observed_bytes_per_row") or 0.0))
+    canonical = float(cast(float, projection.get("canonical_only_gb_month") or 0.0))
+    canonical_plus_staging = float(cast(float, projection.get("canonical_plus_retained_staging_gb_month") or 0.0))
+    stress = float(cast(float, projection.get("three_x_capacity_stress_gb_month") or 0.0))
     if rows_per_full_market_year <= 0 or bytes_per_row <= 0 or canonical <= 0:
         raise BinanceExpansionPlanError("invalid observed capacity basis")
     staging_multiplier = canonical_plus_staging / canonical
@@ -145,22 +145,22 @@ def load_capacity_basis(payload: dict[str, object]) -> tuple[int, float, float, 
 def validate_existing_2025(payload: dict[str, object]) -> None:
     if payload.get("status") != "PASS" or payload.get("stage") != "BINANCE_2025_R2_PILOT_PASS":
         raise BinanceExpansionPlanError("existing 2025 materialization authority must PASS")
-    if int(payload.get("year") or 0) != 2025:
+    if int(cast(int, payload.get("year") or 0)) != 2025:
         raise BinanceExpansionPlanError("existing materialization authority must be 2025")
     if payload.get("provider") not in {None, "binance_usdm"}:
         raise BinanceExpansionPlanError("existing materialization provider mismatch")
-    scope = payload.get("scope") or {}
-    if int(scope.get("candidate_count") or 0) != 15:
+    scope = cast(Mapping[str, object], payload.get("scope") or {})
+    if int(cast(int, scope.get("candidate_count") or 0)) != 15:
         raise BinanceExpansionPlanError("existing 2025 authority candidate count mismatch")
-    if int(scope.get("canonical_object_count") or 0) != 206:
+    if int(cast(int, scope.get("canonical_object_count") or 0)) != 206:
         raise BinanceExpansionPlanError("existing 2025 authority object count mismatch")
-    validation = payload.get("validation") or {}
+    validation = cast(Mapping[str, object], payload.get("validation") or {})
     if validation.get("pionex_namespace_touched") is not False:
         raise BinanceExpansionPlanError("existing Binance materialization touched Pionex namespace")
 
 
 def _last_complete_month(payload: dict[str, object]) -> tuple[int, int]:
-    protocol = payload.get("protocol") or {}
+    protocol = cast(Mapping[str, object], payload.get("protocol") or {})
     text = str(protocol.get("last_complete_month_scanned") or "")
     try:
         year_text, month_text = text.split("-", 1)
