@@ -37,7 +37,7 @@ def validate_funding_coverage_config(config: dict[str, object]) -> None:
     if int(cast(int, config.get("coverage_edge_cadence_jitter_tolerance_ms") or -1)) != COVERAGE_EDGE_CADENCE_JITTER_TOLERANCE_MS:
         raise BinanceFundingCoverageError("Funding coverage edge tolerance changed after diagnostic freeze")
     diagnostic = cast(Mapping[str, object], config.get("coverage_edge_diagnostic") or {})
-    if int(diagnostic.get("observed_max_abs_residual_ms") or -1) != 45:
+    if int(cast(int, diagnostic.get("observed_max_abs_residual_ms") or -1)) != 45:
         raise BinanceFundingCoverageError("Funding coverage edge diagnostic maximum must remain frozen at 45ms")
     if diagnostic.get("tolerance_refrozen_before_coverage_pass_authority") is not True:
         raise BinanceFundingCoverageError("Funding coverage tolerance must be refrozen before PASS authority")
@@ -171,7 +171,7 @@ def attach_funding_boundaries(
         raise BinanceFundingCoverageError("Funding audited boundaries are reversed")
     intervals = sorted(
         {
-            int(value)
+            int(cast(int, value))
             for receipt in (first_receipt, last_receipt)
             for value in cast(Iterable[object], receipt.get("interval_hours") or [])
         }
