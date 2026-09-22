@@ -147,6 +147,10 @@ def main() -> int:
         raise RuntimeError("cloud monitoring Health declaration count changed")
     if cloud_summary.get("currentEffectiveScheduleCount") != 7:
         raise RuntimeError("cloud monitoring current-effective schedule count changed")
+    if cloud_summary.get("expiredScheduleCount") != 1:
+        raise RuntimeError("cloud monitoring expired schedule count changed")
+    if cloud_summary.get("pendingScheduleCount") != 0:
+        raise RuntimeError("cloud monitoring pending schedule count changed")
     if cloud_summary.get("expiredFrozenCronDeclarationCount") != 1:
         raise RuntimeError("cloud monitoring expired frozen declaration count changed")
     cloud_items = cloud_runs.get("items") or []
