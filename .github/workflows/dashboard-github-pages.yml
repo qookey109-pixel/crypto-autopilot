@@ -8,12 +8,13 @@ on:
       - "Pionex Historical Reach Discovery V0.3"
       - "Pionex Research Universe 150+ V0.1"
       - "Pionex Funding History V0.1"
-      - "Binance USD-M Crypto Core 100 History V0.1.2"
+      - "Binance USD-M Crypto Core 100 Training V0.1.2"
+      - "Pionex Alternative Assets Observability V0.2"
       - "Research Automation Health V0.2"
       - "Research Signal Layer V0.2"
       - "Research Signal Quality V0.1"
       - "Resource Hub Supply Chain V0.2"
-      - "BTC Fixed Sample Simulation V0.1"
+      - "Live Paper Run Coordinator V0.1"
     types: [completed]
   push:
     branches: [main]
@@ -155,7 +156,7 @@ jobs:
        (github.event.workflow_run.event == 'schedule' ||
         github.event.workflow_run.event == 'workflow_dispatch' ||
         (github.event.workflow_run.event == 'workflow_run' &&
-         github.event.workflow_run.name == 'BTC Fixed Sample Simulation V0.1')))
+         github.event.workflow_run.name == 'Research Signal Quality V0.1')))
     permissions:
       contents: read
       actions: read
