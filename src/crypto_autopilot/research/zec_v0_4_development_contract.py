@@ -219,7 +219,9 @@ def validate_zec_v0_4_development_contract(
         if fold_start != cursor or fold_end <= fold_start:
             raise ValueError("V0.4 development folds must be contiguous and ordered")
         cursor = fold_end
-        actual_folds.append(\n            cast(tuple[str, str, str], (fold_id, fold_start_raw, fold_end_raw))\n        )
+        actual_folds.append(
+            cast(tuple[str, str, str], (fold_id, fold_start_raw, fold_end_raw))
+        )
     if cursor != development_end or actual_folds != FROZEN_FOLDS:
         raise ValueError("V0.4 development folds drifted from the frozen design")
 
