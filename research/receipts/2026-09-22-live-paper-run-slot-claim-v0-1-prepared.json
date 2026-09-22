@@ -1,0 +1,77 @@
+{
+  "schema": "qookey-live-paper-run-slot-claim-v0-1-prepared",
+  "status": "PREPARED_AWAITING_EXPLICIT_PROTECTED_MAIN_MERGE_AUTHORIZATION",
+  "date": "2026-09-22",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "source_main_sha": "b84ba7bd1bdc80e65a53f47a15dd9961c5152e97",
+  "purpose": "Bind the deterministic run-slot claim integration that prevents concurrent or conflicting Live Paper coordinator requests from entering the provider path from the same prior run position.",
+  "bound_files": [
+    {
+      "path": "config/live_paper_run_claim_v0_1.json",
+      "git_blob_sha": "44b9d6d8c95a57b514f8df9f6b38d465be44ac99"
+    },
+    {
+      "path": "config/live_paper_run_coordinator_v0_2.json",
+      "git_blob_sha": "3b2ac6d9f04096efbcde398308c5623f20185e6d"
+    },
+    {
+      "path": "config/live_paper_run_recovery_v0_1.json",
+      "git_blob_sha": "e79eafa371df12053dfe26bc4a076bcae29178aa"
+    },
+    {
+      "path": "src/crypto_autopilot/paper/run_claim_v0_1.py",
+      "git_blob_sha": "9f250befb6e498499e83877be80b99e908224dee"
+    },
+    {
+      "path": "src/crypto_autopilot/paper/run_coordinator_v0_1.py",
+      "git_blob_sha": "01d02846058ddee8781ceca391e7fc0255bc4d21"
+    },
+    {
+      "path": "src/crypto_autopilot/paper/run_recovery_v0_1.py",
+      "git_blob_sha": "9025f09d75325ce53817f0af6049b76e6a7152d4"
+    },
+    {
+      "path": "scripts/run_live_paper_coordinator_v0_1.py",
+      "git_blob_sha": "c4f0e923d8d5276a64eac297646d36db8bbe2ba8"
+    },
+    {
+      "path": ".github/workflows/live-paper-run-coordinator-v0-1.yml",
+      "git_blob_sha": "bfaaade4dd9898fa70a83f1e627011efc998c4b2"
+    }
+  ],
+  "prepared_scope": {
+    "deterministic_slot_identity": [
+      "run_id",
+      "sequence",
+      "previous_step_id",
+      "previous_state_id"
+    ],
+    "request_evidence": [
+      "request_id",
+      "tick_time_ms",
+      "candidate_specs_sha256"
+    ],
+    "claim_write_before_provider_call": true,
+    "claim_expiry": false,
+    "automatic_claim_takeover": false,
+    "automatic_retry_after_claim_conflict": false,
+    "recovery_unresolved_claim_requires_review": true,
+    "complete_step_missing_result_seal_repair_remains_provider_free": true,
+    "existing_manual_workflow_reused": true,
+    "automatic_schedule_added": false
+  },
+  "authority": {
+    "existing_public_live_market_data_scope_only": true,
+    "existing_paper_state_persistence_scope_only": true,
+    "new_provider_scope_authorized": false,
+    "new_r2_namespace_authorized": false,
+    "automatic_schedule_authorized": false,
+    "automatic_candidate_generation_authorized": false,
+    "scorecard_auto_selection_authorized": false,
+    "private_exchange_api_authorized": false,
+    "holdout_access_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false,
+    "merge_authority_granted": false
+  }
+}

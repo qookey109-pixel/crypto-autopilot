@@ -11,6 +11,10 @@ from crypto_autopilot.paper.live_v0_1 import (
     PionexLivePaperFeed,
     live_paper_policy_from_config,
 )
+from crypto_autopilot.paper.run_claim_v0_1 import (
+    LivePaperRunClaimConflictError,
+    live_paper_run_claim_policy_from_config,
+)
 from crypto_autopilot.paper.run_coordinator_v0_1 import (
     coordinate_live_paper_run_step,
     live_paper_run_coordinator_input_from_dict,
@@ -18,6 +22,7 @@ from crypto_autopilot.paper.run_coordinator_v0_1 import (
 )
 from crypto_autopilot.paper.run_store_v0_1 import (
     LocalPaperRunStore,
+    PaperRunObjectAlreadyExistsError,
     R2PaperRunStore,
     paper_run_store_policy_from_config,
 )
@@ -94,6 +99,21 @@ class _TrackedStore:
             self.journal.store_objects_created_known += 1
         return receipt
 
+    def put_json_if_absent(self, kind: str, object_id: str, payload):
+        self.journal.store_write_attempts += 1
+        try:
+            receipt = self.store.put_json_if_absent(kind, object_id, payload)
+        except PaperRunObjectAlreadyExistsError:
+            raise
+        except Exception:
+            self.journal.store_status = "UNKNOWN_OR_PARTIAL"
+            raise
+        if bool(getattr(receipt, "replayed", False)):
+            self.journal.store_objects_replayed_known += 1
+        else:
+            self.journal.store_objects_created_known += 1
+        return receipt
+
 
 def _load_json(path: Path) -> dict[str, object]:
     payload = json.loads(path.read_text(encoding="utf-8"))
@@ -145,13 +165,19 @@ def _failure_report(
     stage: str,
     error: Exception,
     journal: _OperationJournal,
+    claim_required: bool,
 ) -> dict[str, object]:
     provider_known = journal.provider_status == "KNOWN"
     store_known = journal.store_status == "KNOWN"
+    reason = (
+        "run_slot_claim_conflict"
+        if isinstance(error, LivePaperRunClaimConflictError)
+        else f"{stage.lower()}_failed"
+    )
     return {
         "schema": "qookey-live-paper-run-coordinator-report-v0.1",
         "state": "REJECT",
-        "reason": f"{stage.lower()}_failed",
+        "reason": reason,
         "error_stage": stage,
         "error_type": type(error).__name__,
         "provider_requests_performed": (
@@ -168,6 +194,8 @@ def _failure_report(
             "live_paper_simulation_authorized": True,
             "paper_state_persistence_authorized": True,
             "append_only_run_ledger": True,
+            "paper_run_slot_claim_authorized": claim_required,
+            "claim_conflict_auto_retry_authorized": False,
             "automatic_schedule_authorized": False,
             "automatic_candidate_generation_authorized": False,
             "scorecard_auto_selection_authorized": False,
@@ -196,7 +224,12 @@ def main() -> int:
     parser.add_argument(
         "--coordinator-config",
         type=Path,
-        default=Path("config/live_paper_run_coordinator_v0_1.json"),
+        default=Path("config/live_paper_run_coordinator_v0_2.json"),
+    )
+    parser.add_argument(
+        "--claim-config",
+        type=Path,
+        default=Path("config/live_paper_run_claim_v0_1.json"),
     )
     parser.add_argument(
         "--live-config",
@@ -211,10 +244,17 @@ def main() -> int:
     args = parser.parse_args()
 
     journal = _OperationJournal()
+    claim_required = False
     stage = "LOAD_POLICY"
     try:
         coordinator_policy = live_paper_run_coordinator_policy_from_config(
             _load_json(args.coordinator_config)
+        )
+        claim_required = coordinator_policy.run_slot_claim_required
+        claim_policy = (
+            live_paper_run_claim_policy_from_config(_load_json(args.claim_config))
+            if claim_required
+            else None
         )
         live_policy = live_paper_policy_from_config(_load_json(args.live_config))
 
@@ -255,12 +295,18 @@ def main() -> int:
             previous_step=previous_step,
             policy=coordinator_policy,
             live_policy=live_policy,
+            claim_policy=claim_policy,
         )
         report = dict(report)
         report["operation_accounting"] = journal.evidence()
         code = 0
     except (OSError, json.JSONDecodeError, ValueError, RuntimeError) as error:
-        report = _failure_report(stage=stage, error=error, journal=journal)
+        report = _failure_report(
+            stage=stage,
+            error=error,
+            journal=journal,
+            claim_required=claim_required,
+        )
         code = 2
 
     print(json.dumps(report, sort_keys=True, separators=(",", ":")))

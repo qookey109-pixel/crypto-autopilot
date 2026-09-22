@@ -100,6 +100,11 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
         self.assertTrue(boundaries["core100_history_schedule_retired"])
         self.assertTrue(boundaries["core100_history_generic_backfill_retired"])
         self.assertTrue(boundaries["core100_training_fingerprint_dedupe_added"])
+        self.assertTrue(
+            boundaries["paper_run_conditional_write_coordinator_integration_added"]
+        )
+        self.assertTrue(boundaries["live_paper_run_slot_claim_added"])
+        self.assertFalse(boundaries["live_paper_run_coordinator_schedule_added"])
 
     def test_current_data_and_paper_index_is_bounded(self) -> None:
         current = self.index["current_data_and_paper"]
@@ -131,6 +136,18 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
             current["paper_successor_state"],
             "PREPARED_WAITING_FOR_HOLDOUT_AUTHORITY",
         )
+        self.assertEqual(
+            current["live_paper_run_coordinator"],
+            "config/live_paper_run_coordinator_v0_2.json",
+        )
+        self.assertEqual(
+            current["live_paper_run_claim"],
+            "config/live_paper_run_claim_v0_1.json",
+        )
+        self.assertEqual(
+            current["live_paper_run_claim_state"],
+            "DETERMINISTIC_SLOT_CREATE_IF_ABSENT_NO_EXPIRY_NO_TAKEOVER_NO_AUTO_RETRY",
+        )
         for key in (
             "crypto_core_100",
             "crypto_core_100_authority",
@@ -142,6 +159,8 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
             "pionex_alternative_assets_authority",
             "pionex_historical_research_execution",
             "paper_successor",
+            "live_paper_run_coordinator",
+            "live_paper_run_claim",
         ):
             self.assertTrue((ROOT / current[key]).is_file(), current[key])
 

@@ -30,7 +30,11 @@
     "tick_rewrite_for_repair": false,
     "step_rewrite_for_repair": false,
     "fork_auto_resolution": false,
-    "orphan_tick_auto_adoption": false
+    "orphan_tick_auto_adoption": false,
+    "run_slot_claims_audited_if_present": true,
+    "unresolved_claim_requires_review": true,
+    "claim_takeover_authorized": false,
+    "automatic_retry_after_claim_conflict_authorized": false
   },
   "authority": {
     "audit_authorized": true,
@@ -42,6 +46,9 @@
     "holdout_access_authorized": false,
     "real_money_order_authorized": false,
     "live_real_trading_authorized": false,
-    "merge_authority_granted": false
+    "merge_authority_granted": false,
+    "run_slot_claim_audit_authorized": true,
+    "claim_takeover_authorized": false,
+    "automatic_retry_after_claim_conflict_authorized": false
   }
 }

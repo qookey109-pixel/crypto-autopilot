@@ -147,6 +147,21 @@ when the report requires review.
 
 It has no schedule trigger and performs no provider call.
 
+## Run Slot Claim awareness
+
+When Run Slot Claim V0.1 evidence is present, Recovery also scans
+`live-run-claim/<slot_id>` objects.
+
+- a claim with no complete verified matching step is `REVIEW_REQUIRED`;
+- a claim cannot expire or be taken over;
+- Recovery never retries the provider because of a claim;
+- a claim that matches a complete verified step does not block the existing
+  missing-result-seal repair;
+- the repair still writes only `live-run-result/<request_id>`.
+
+Historical runs without claim objects remain valid under the original V0.1
+recovery rules.
+
 ## Authority
 
 Authorized:

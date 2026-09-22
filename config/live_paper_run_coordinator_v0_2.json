@@ -1,0 +1,53 @@
+{
+  "schema": "qookey-live-paper-run-coordinator-v0.2",
+  "status_date": "2026-09-22",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "product_stage": "LIVE_PAPER_RUN_COORDINATOR",
+  "policy": {
+    "require_persistent_store": true,
+    "persist_run_header": true,
+    "persist_states": true,
+    "persist_tick_reports": true,
+    "persist_run_steps": true,
+    "committed_request_replay_authorized": true,
+    "run_slot_claim_required": true,
+    "claim_conflict_auto_retry_authorized": false,
+    "automatic_schedule_authorized": false,
+    "automatic_candidate_generation_authorized": false,
+    "scorecard_auto_selection_authorized": false,
+    "private_exchange_api_authorized": false,
+    "holdout_access_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false
+  },
+  "behavior": {
+    "append_only_run_ledger": true,
+    "mutable_latest_pointer": false,
+    "continuation_requires_previous_committed_step": true,
+    "persisted_previous_state_reverified": true,
+    "tick_report_reverified": true,
+    "same_committed_request_replays_without_provider_call": true,
+    "run_header_and_previous_state_persist_before_claim": true,
+    "run_slot_claim_acquired_before_provider_call": true,
+    "claim_conflict_fails_closed_before_provider_call": true,
+    "claim_expiry_or_takeover": false,
+    "candidate_specs_remain_explicit_upstream_input": true,
+    "research_scorecard_auto_selection": false,
+    "workflow_schedule_created": false
+  },
+  "authority": {
+    "public_live_market_data_authorized": true,
+    "live_paper_simulation_authorized": true,
+    "paper_state_persistence_authorized": true,
+    "paper_run_slot_claim_authorized": true,
+    "automatic_schedule_authorized": false,
+    "automatic_candidate_generation_authorized": false,
+    "scorecard_auto_selection_authorized": false,
+    "private_exchange_api_authorized": false,
+    "holdout_access_authorized": false,
+    "real_money_order_authorized": false,
+    "live_real_trading_authorized": false,
+    "merge_authority_granted": false
+  },
+  "predecessor": "config/live_paper_run_coordinator_v0_1.json"
+}
