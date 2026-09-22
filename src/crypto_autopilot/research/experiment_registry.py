@@ -130,7 +130,12 @@ class ExperimentRecord:
     @classmethod
     def from_evidence(cls, payload: Mapping[str, Any]) -> "ExperimentRecord":
         comparison = dict(payload["comparison"])
-        comparison["interval_set"] = tuple(comparison.get("interval_set", comparison.get("intervalSet", ())))
+        comparison["interval_set"] = tuple(
+            cast(
+                Iterable[Any],
+                comparison.get("interval_set", comparison.get("intervalSet", ())),
+            )
+        )
         if "symbol_universe_sha256" not in comparison:
             comparison["symbol_universe_sha256"] = comparison.pop("symbolUniverseSha256")
         if "feature_config_sha256" not in comparison:
