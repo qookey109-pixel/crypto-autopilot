@@ -89,6 +89,28 @@ class DashboardPlaywrightWorkflowTests(unittest.TestCase):
             text,
         )
 
+        for workflow_name in (
+            "Binance USD-M Crypto Core 100 Training V0.1.2",
+            "Pionex Alternative Assets Observability V0.2",
+            "Research Signal Quality V0.1",
+            "Live Paper Run Coordinator V0.1",
+        ):
+            self.assertIn(f'- "{workflow_name}"', text)
+
+        self.assertNotIn(
+            '- "Binance USD-M Crypto Core 100 History V0.1.2"',
+            text,
+        )
+        self.assertNotIn('- "BTC Fixed Sample Simulation V0.1"', text)
+        self.assertIn(
+            "github.event.workflow_run.name == 'Research Signal Quality V0.1'",
+            text,
+        )
+        self.assertNotIn(
+            "github.event.workflow_run.name == 'BTC Fixed Sample Simulation V0.1'",
+            text,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
