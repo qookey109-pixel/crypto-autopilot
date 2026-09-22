@@ -267,14 +267,18 @@ def evaluate_contextual_breakout_edge(
             expiry_rate,
         ) = _rates(by_slice[(direction, regime_state)])
         baseline_decisive, baseline_rate = baseline_acceptance[direction]
-        eligible = (
+        if (
             regime_state != "INSUFFICIENT"
             and decisive >= minimum_decisive_events
             and baseline_decisive >= minimum_decisive_events
             and acceptance_rate is not None
             and baseline_rate is not None
-        )
-        uplift = acceptance_rate - baseline_rate if eligible else None
+        ):
+            eligible = True
+            uplift = acceptance_rate - baseline_rate
+        else:
+            eligible = False
+            uplift = None
         slices.append(
             ContextualEdgeSlice(
                 direction=direction,
