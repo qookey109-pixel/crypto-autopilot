@@ -64,7 +64,10 @@ def coverage_shape(coverage_authority: dict[str, object]) -> tuple[int, int, int
     if int(cast(int, scan.get("monthly_available_checks") or 0)) != 1010:
         raise BinanceFundingBudgetError("Funding available symbol-month count changed")
 
-    boundaries = cast(\n        Mapping[str, Mapping[str, object]],\n        coverage_authority.get("symbol_boundaries") or {},\n    )
+    boundaries = cast(
+        Mapping[str, Mapping[str, object]],
+        coverage_authority.get("symbol_boundaries") or {},
+    )
     if len(boundaries) != 15:
         raise BinanceFundingBudgetError("Funding coverage must contain 15 symbol boundaries")
 
