@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
-from typing import Iterable
+from typing import Iterable, cast
 
 from crypto_autopilot.binance.vision import BinanceVisionArchiveKey
 
@@ -174,8 +174,8 @@ def attach_audited_boundaries(
         for receipt in (last_receipt, latest_daily_receipt)
         if receipt is not None and receipt.get("last_time_ms") is not None
     ]
-    earliest = min(int(receipt["first_time_ms"]) for receipt in first_candidates)
-    latest = max(int(receipt["last_time_ms"]) for receipt in last_candidates)
+    earliest = min(int(cast(int, receipt["first_time_ms"])) for receipt in first_candidates)
+    latest = max(int(cast(int, receipt["last_time_ms"])) for receipt in last_candidates)
     result.update(
         {
             "earliest_candle_time_ms": earliest,
@@ -209,8 +209,8 @@ def summarize_symbol_boundaries(
     trade_earliest = [summary.get("earliest_candle_time_ms") for summary in trade]
     trade_latest = [summary.get("latest_candle_time_ms") for summary in trade]
     if all(value is not None for value in trade_earliest + trade_latest):
-        trade_common_earliest = max(int(value) for value in trade_earliest)
-        trade_common_latest = min(int(value) for value in trade_latest)
+        trade_common_earliest = max(int(cast(int, value)) for value in trade_earliest)
+        trade_common_latest = min(int(cast(int, value)) for value in trade_latest)
         trade_common_available = trade_common_earliest <= trade_common_latest
     else:
         trade_common_earliest = None
@@ -223,8 +223,8 @@ def summarize_symbol_boundaries(
     all_earliest = trade_earliest + [mark_earliest]
     all_latest = trade_latest + [mark_latest]
     if all(value is not None for value in all_earliest + all_latest):
-        strategy_common_earliest = max(int(value) for value in all_earliest)
-        strategy_common_latest = min(int(value) for value in all_latest)
+        strategy_common_earliest = max(int(cast(int, value)) for value in all_earliest)
+        strategy_common_latest = min(int(cast(int, value)) for value in all_latest)
         strategy_common_available = strategy_common_earliest <= strategy_common_latest
     else:
         strategy_common_earliest = None
