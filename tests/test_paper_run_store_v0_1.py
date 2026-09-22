@@ -8,6 +8,7 @@ from types import SimpleNamespace
 
 from crypto_autopilot.paper.run_store_v0_1 import (
     LocalPaperRunStore,
+    PaperRunObjectAlreadyExistsError,
     PaperRunStorePolicy,
     R2PaperRunStore,
     paper_run_store_policy_from_config,
@@ -62,6 +63,60 @@ class PaperRunStoreV01Tests(unittest.TestCase):
     def test_local_store_requires_explicit_absolute_root(self) -> None:
         with self.assertRaises(ValueError):
             LocalPaperRunStore("relative/path")
+
+    def test_r2_conditional_create_uses_if_none_match_and_maps_412_conflict(self) -> None:
+        class ConditionalClient:
+            def __init__(self, *, conflict: bool = False) -> None:
+                self.conflict = conflict
+                self.calls: list[dict[str, object]] = []
+
+            def put_object(self, **kwargs: object) -> None:
+                self.calls.append(kwargs)
+                if self.conflict:
+                    error = RuntimeError("fixture conflict")
+                    error.response = {  # type: ignore[attr-defined]
+                        "Error": {"Code": "PreconditionFailed"},
+                        "ResponseMetadata": {"HTTPStatusCode": 412},
+                    }
+                    raise error
+
+        first_client = ConditionalClient()
+        first_store = SimpleNamespace(
+            client=first_client,
+            bucket="fixture-bucket",
+        )
+        store = R2PaperRunStore(first_store)  # type: ignore[arg-type]
+        receipt = store.put_json_if_absent(
+            "live-run-claim",
+            "slot-1",
+            {"schema": "fixture-v0.1", "value": 1},
+        )
+        self.assertFalse(receipt.replayed)
+        self.assertEqual(len(first_client.calls), 1)
+        call = first_client.calls[0]
+        self.assertEqual(call["Bucket"], "fixture-bucket")
+        self.assertEqual(call["IfNoneMatch"], "*")
+        self.assertEqual(call["ContentType"], "application/json")
+        self.assertEqual(
+            call["Metadata"]["paper-run-kind"],  # type: ignore[index]
+            "live-run-claim",
+        )
+        self.assertEqual(
+            call["Metadata"]["paper-run-id"],  # type: ignore[index]
+            "slot-1",
+        )
+
+        conflict_client = ConditionalClient(conflict=True)
+        conflict_store = R2PaperRunStore(
+            SimpleNamespace(client=conflict_client, bucket="fixture-bucket")
+        )  # type: ignore[arg-type]
+        with self.assertRaises(PaperRunObjectAlreadyExistsError):
+            conflict_store.put_json_if_absent(
+                "live-run-claim",
+                "slot-1",
+                {"schema": "fixture-v0.1", "value": 1},
+            )
+        self.assertEqual(conflict_client.calls[0]["IfNoneMatch"], "*")
 
     def test_r2_store_reuses_existing_r2_adapter_and_rejects_collision(self) -> None:
         fake = FakeR2()
