@@ -15,9 +15,10 @@ const EXPECTED_VIEWS = [
 test("dashboard loads governed data and all primary views", async ({ page, baseURL }) => {
   const pageErrors = [];
   const badResponses = [];
+  const normalizedBaseURL = new URL(baseURL).href;
   page.on("pageerror", error => pageErrors.push(error.message));
   page.on("response", response => {
-    if (response.status() >= 400 && response.url().includes("/crypto-autopilot/")) {
+    if (response.status() >= 400 && response.url().startsWith(normalizedBaseURL)) {
       badResponses.push(`${response.status()} ${response.url()}`);
     }
   });
