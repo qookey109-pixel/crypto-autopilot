@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Mapping, cast
 
 from .binance_funding import funding_partition_receipt_key, funding_r2_key
 
@@ -67,11 +68,11 @@ def validate_plan_config(config: dict[str, object]) -> None:
         raise BinanceFundingMaterializationPlanError("Funding materialization provider/delivery mismatch")
     if config.get("dataset") != "fundingRate":
         raise BinanceFundingMaterializationPlanError("Funding materialization dataset changed")
-    if int(config.get("candidate_count") or 0) != 15:
+    if int(cast(int, config.get("candidate_count") or 0)) != 15:
         raise BinanceFundingMaterializationPlanError("Funding materialization requires the frozen 15-symbol scope")
-    if int(config.get("expected_available_symbol_months") or 0) != 1010:
+    if int(cast(int, config.get("expected_available_symbol_months") or 0)) != 1010:
         raise BinanceFundingMaterializationPlanError("Funding symbol-month scope changed")
-    if int(config.get("expected_annual_canonical_objects") or 0) != 95:
+    if int(cast(int, config.get("expected_annual_canonical_objects") or 0)) != 95:
         raise BinanceFundingMaterializationPlanError("Funding annual object scope changed")
     if config.get("canonical_partition") != "annual_per_symbol":
         raise BinanceFundingMaterializationPlanError("Funding partition policy changed")
@@ -89,7 +90,7 @@ def validate_plan_config(config: dict[str, object]) -> None:
         raise BinanceFundingMaterializationPlanError("Funding raw timestamp policy changed")
     if config.get("source_declared_interval_policy") != "PRESERVE_EXACT_SOURCE_FUNDING_INTERVAL_HOURS":
         raise BinanceFundingMaterializationPlanError("Funding interval policy changed")
-    if int(config.get("materialization_cadence_jitter_tolerance_ms") or -1) != 50:
+    if int(cast(int, config.get("materialization_cadence_jitter_tolerance_ms") or -1)) != 50:
         raise BinanceFundingMaterializationPlanError("Funding materialization cadence tolerance changed")
     if config.get("annual_cross_month_cadence_audit_required") is not True:
         raise BinanceFundingMaterializationPlanError("Funding annual cross-month audit must remain required")
@@ -97,7 +98,7 @@ def validate_plan_config(config: dict[str, object]) -> None:
         raise BinanceFundingMaterializationPlanError("Funding Parquet compression changed")
     if config.get("preflight_source_archives_stored_in_r2") is not False:
         raise BinanceFundingMaterializationPlanError("Funding source archives must not be retained in R2 by V0.1")
-    if int(config.get("planned_global_metadata_objects") or 0) != 4:
+    if int(cast(int, config.get("planned_global_metadata_objects") or 0)) != 4:
         raise BinanceFundingMaterializationPlanError("Funding global metadata object count changed")
     if config.get("writer_must_require_explicit_authority_receipt") is not True:
         raise BinanceFundingMaterializationPlanError("Funding writer must require explicit authority receipt")
@@ -130,18 +131,21 @@ def validate_authorities(
     if source_proof.get("status") != "PASS" or source_proof.get("stage") != "BINANCE_FUNDING_SOURCE_PROOF_PASS":
         raise BinanceFundingMaterializationPlanError("Funding source proof authority must PASS")
     for authority in (coverage, budget, source_proof):
-        boundary = authority.get("authority_boundary") or {}
+        boundary = cast(Mapping[str, object], authority.get("authority_boundary") or {})
         if boundary.get("authorizes_live_trading") is not False:
             raise BinanceFundingMaterializationPlanError("upstream Funding authority unexpectedly authorizes live trading")
 
 
 def build_materialization_scope(coverage: dict[str, object]) -> FundingMaterializationScope:
-    scan = coverage.get("scan") or {}
-    if int(scan.get("monthly_available_checks") or 0) != 1010:
+    scan = cast(Mapping[str, object], coverage.get("scan") or {})
+    if int(cast(int, scan.get("monthly_available_checks") or 0)) != 1010:
         raise BinanceFundingMaterializationPlanError("Funding coverage aggregate changed")
     if scan.get("symbols_with_internal_monthly_presence_gap") != []:
         raise BinanceFundingMaterializationPlanError("Funding coverage has internal monthly gaps")
-    boundaries = coverage.get("symbol_boundaries") or {}
+    boundaries = cast(
+        Mapping[str, Mapping[str, object]],
+        coverage.get("symbol_boundaries") or {},
+    )
     if len(boundaries) != 15:
         raise BinanceFundingMaterializationPlanError("Funding coverage must contain 15 symbol boundaries")
 
@@ -155,7 +159,7 @@ def build_materialization_scope(coverage: dict[str, object]) -> FundingMateriali
             str(boundary.get("first_available_period") or ""),
             str(boundary.get("last_available_period") or ""),
         )
-        if len(months) != int(boundary.get("available_months") or 0):
+        if len(months) != int(cast(int, boundary.get("available_months") or 0)):
             raise BinanceFundingMaterializationPlanError(f"Funding available-month count changed for {symbol}")
         total_months += len(months)
         by_year: dict[int, list[int]] = {}
