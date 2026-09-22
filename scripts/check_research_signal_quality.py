@@ -5,6 +5,7 @@ import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 from crypto_autopilot.research.signal_quality import (
     ResearchSignalQualityError,
@@ -29,10 +30,26 @@ def _write_report(path: str, report: dict[str, object]) -> None:
     )
 
 
+def _load_previous(path: str | None) -> dict[str, Any] | None:
+    if not path:
+        return None
+    source = Path(path)
+    if not source.exists():
+        return None
+    value = json.loads(source.read_text(encoding="utf-8"))
+    if not isinstance(value, dict) or value.get("schema") != "research-signal-quality-v0.1":
+        raise ResearchSignalQualityError("previous quality evidence has an unexpected schema")
+    return value
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Check public research signal quality")
     parser.add_argument("--config", default="config/research_signal_quality_v0_1.json")
     parser.add_argument("--output", required=True)
+    parser.add_argument("--previous-report")
+    parser.add_argument("--expected-run-id")
+    parser.add_argument("--source-workflow-run-id")
+    parser.add_argument("--source-head-sha")
     args = parser.parse_args()
 
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
@@ -43,6 +60,12 @@ def main() -> int:
         raise RuntimeError("research signal quality must not list R2")
     if storage.get("r2_write_authorized") is not False:
         raise RuntimeError("research signal quality must not write R2")
+
+    previous = None
+    try:
+        previous = _load_previous(args.previous_report)
+    except (ResearchSignalQualityError, ValueError, json.JSONDecodeError) as exc:
+        print(f"::warning::previous quality evidence ignored: {exc}")
 
     try:
         store = R2Store(
@@ -56,12 +79,15 @@ def main() -> int:
             namespace=str(storage["namespace"]),
             now=datetime.now(timezone.utc),
             max_age_seconds=int(config["quality"]["max_age_seconds"]),
+            expected_run_id=args.expected_run_id,
+            previous_report=previous,
         )
     except (ResearchSignalQualityError, ValueError) as exc:
         report = {
             "schema": "research-signal-quality-v0.1",
             "status": "ALERT",
             "quality": "INVALID_OR_MISSING",
+            "decision": "EVALUATION_FAILED",
             "error": str(exc),
             "authority": {
                 "r2_exact_object_read_only": True,
@@ -75,10 +101,21 @@ def main() -> int:
                 "live_trading": False,
             },
         }
+
+    report["execution_provenance"] = {
+        "quality_workflow_run_id": os.environ.get("GITHUB_RUN_ID"),
+        "quality_workflow_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+        "quality_head_sha": os.environ.get("GITHUB_SHA"),
+        "trigger_event": os.environ.get("GITHUB_EVENT_NAME"),
+        "source_workflow_run_id": args.source_workflow_run_id,
+        "source_head_sha": args.source_head_sha,
+        "expected_signal_run_id": args.expected_run_id,
+    }
     _write_report(args.output, report)
     summary = (
         "# Research Signal Quality V0.1\n\n"
-        f"Status: **{report['status']}** · quality: **{report['quality']}**\n"
+        f"Status: **{report['status']}** · quality: **{report['quality']}**"
+        f" · decision: **{report.get('decision', 'UNKNOWN')}**\n"
     )
     step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if step_summary:
