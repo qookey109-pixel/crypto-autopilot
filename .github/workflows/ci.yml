@@ -87,6 +87,10 @@ jobs:
         if: ${{ always() && matrix.python-version == '3.13' }}
         continue-on-error: true
         run: python -m pip install -c requirements/ci-constraints.txt mypy
+      - name: Build informational type visibility report
+        if: ${{ always() && matrix.python-version == '3.13' }}
+        continue-on-error: true
+        run: python scripts/type_visibility.py --output type-visibility.json
       - name: Build informational quality visibility report
         if: ${{ always() && matrix.python-version == '3.13' }}
         continue-on-error: true
@@ -97,6 +101,8 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4
         with:
           name: quality-visibility-${{ github.run_id }}-${{ github.run_attempt }}
-          path: quality-visibility.json
+          path: |
+            quality-visibility.json
+            type-visibility.json
           retention-days: 30
           if-no-files-found: warn
