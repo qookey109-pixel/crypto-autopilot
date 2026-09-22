@@ -293,8 +293,8 @@ def validate_experiment_registry_entry(entry: dict[str, Any]) -> None:
     assert_sha256(str(entry.get("dataset_sha256", "")), "dataset_sha256")
     assert_sha256(str(entry.get("config_sha256", "")), "config_sha256")
     for key in ("challenger_only", "promotion_eligible", "deployment_authorized", "trading_authorized"):
-        expected = True if key == "challenger_only" else False
-        if entry.get(key) is not expected:
+        expected_flag = True if key == "challenger_only" else False
+        if entry.get(key) is not expected_flag:
             raise ValueError(f"experiment registry safety field {key} is unsafe")
     expected = build_experiment_registry_entry(
         comparison_key=str(entry.get("comparison_key", "")),
