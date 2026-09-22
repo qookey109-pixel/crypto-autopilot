@@ -95,6 +95,20 @@ class CIDependencyConstraintsTests(unittest.TestCase):
         self.assertIn("  pull_request:\n", trigger_section)
         self.assertNotIn("  push:\n  pull_request:\n", trigger_section)
 
+    def test_ci_avoids_duplicate_full_unittest_suite_on_python_313(self) -> None:
+        ci = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
+        self.assertIn(
+            "Unit test runner compatibility (Python 3.12 only)",
+            ci,
+        )
+        self.assertIn(
+            "if: ${{ matrix.python-version == '3.12' }}",
+            ci,
+        )
+        self.assertEqual(ci.count("python -m unittest discover -s tests -v"), 1)
+        self.assertEqual(ci.count("python -m pytest tests -q"), 1)
+        self.assertIn("Full test suite (pytest)", ci)
+
     def test_ci_covers_supported_and_v0_10_runtime_python_versions(self) -> None:
         ci = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
         self.assertIn('python-version: ["3.12", "3.13"]', ci)
