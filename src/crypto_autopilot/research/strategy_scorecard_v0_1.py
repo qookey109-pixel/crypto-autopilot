@@ -5,7 +5,7 @@ import json
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
-from typing import Any
+from typing import Any, cast
 
 from crypto_autopilot.strategy_library import get_strategy_family
 
@@ -270,30 +270,30 @@ def _score_one(
     policy: StrategyResearchScorecardPolicy,
 ) -> dict[str, object]:
     parsed = _validate_family_report(report)
-    state = str(parsed["state"])
-    receipt_count = int(parsed["receipt_count"])
-    failed_count = int(parsed["failed_count"])
+    state = cast(str, parsed["state"])
+    receipt_count = cast(int, parsed["receipt_count"])
+    failed_count = cast(int, parsed["failed_count"])
 
     dimensions = {
         "receipt_coverage": _breadth_score(
             receipt_count,
-            int(parsed["minimum_receipts"]),
+            cast(int, parsed["minimum_receipts"]),
             policy.breadth_saturation_multiple,
         ),
         "asset_breadth": _breadth_score(
-            int(parsed["asset_count"]),
-            int(parsed["minimum_assets"]),
+            cast(int, parsed["asset_count"]),
+            cast(int, parsed["minimum_assets"]),
             policy.breadth_saturation_multiple,
         ),
         "regime_breadth": _breadth_score(
-            int(parsed["regime_count"]),
-            int(parsed["minimum_regimes"]),
+            cast(int, parsed["regime_count"]),
+            cast(int, parsed["minimum_regimes"]),
             policy.breadth_saturation_multiple,
         ),
         "direction_breadth": min(
             1.0,
-            int(parsed["direction_count"])
-            / max(1, int(parsed["supported_direction_count"])),
+            cast(int, parsed["direction_count"])
+            / max(1, cast(int, parsed["supported_direction_count"])),
         ),
         "edge_consistency": (
             0.0
@@ -347,7 +347,10 @@ def build_strategy_research_scorecard(
 
     rankable = sorted(
         (row for row in scored if row["rankable_for_research"]),
-        key=lambda row: (-float(row["research_score"]), str(row["family"])),
+        key=lambda row: (
+            -cast(float, row["research_score"]),
+            cast(str, row["family"]),
+        ),
     )
     rank_by_family = {
         str(row["family"]): index + 1 for index, row in enumerate(rankable)
@@ -538,7 +541,25 @@ def scorecard_policy_from_mapping(
         if not isinstance(value, bool):
             raise ValueError(f"{key} must be a JSON boolean")
         flags[key] = value
-    return StrategyResearchScorecardPolicy(**numeric, **flags)
+    return StrategyResearchScorecardPolicy(
+        receipt_coverage_weight=numeric["receipt_coverage_weight"],
+        asset_breadth_weight=numeric["asset_breadth_weight"],
+        regime_breadth_weight=numeric["regime_breadth_weight"],
+        direction_breadth_weight=numeric["direction_breadth_weight"],
+        edge_consistency_weight=numeric["edge_consistency_weight"],
+        ready_state_multiplier=numeric["ready_state_multiplier"],
+        insufficient_state_multiplier=numeric["insufficient_state_multiplier"],
+        breadth_saturation_multiple=numeric["breadth_saturation_multiple"],
+        research_ranking_authorized=flags["research_ranking_authorized"],
+        winner_selection_authorized=flags["winner_selection_authorized"],
+        automatic_strategy_selection_authorized=flags[
+            "automatic_strategy_selection_authorized"
+        ],
+        position_sizing_authorized=flags["position_sizing_authorized"],
+        paper_execution_authorized=flags["paper_execution_authorized"],
+        real_money_order_authorized=flags["real_money_order_authorized"],
+        live_real_trading_authorized=flags["live_real_trading_authorized"],
+    )
 
 
 def scorecard_policy_from_config(
