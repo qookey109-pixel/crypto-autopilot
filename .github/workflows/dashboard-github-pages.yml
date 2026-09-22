@@ -448,6 +448,9 @@ jobs:
             if curl --fail --silent "http://127.0.0.1:4173/" >/dev/null; then
               exit 0
             fi
+            if [[ "${attempt}" -eq 20 ]]; then
+              break
+            fi
             sleep 0.25
           done
           cat /tmp/qookey-dashboard-playwright.log || true
@@ -542,6 +545,9 @@ jobs:
           for attempt in $(seq 1 30); do
             if curl --fail --silent --show-error "${PLAYWRIGHT_BASE_URL}" >/dev/null; then
               exit 0
+            fi
+            if [[ "${attempt}" -eq 30 ]]; then
+              break
             fi
             sleep 2
           done
