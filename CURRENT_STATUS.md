@@ -137,14 +137,15 @@ Already established and verified:
 - immutable Core100 REJECT / threshold-replay evidence is preserved on `main`;
 - Research Automation Health count derives from exact schedule inventory rather than a hard-coded `7`;
 - Repository retains eight cron declarations and Health monitors all eight; seven are current-effective, while the frozen V0.12 declaration is expired and window-gated. Dashboard projects only the seven effective jobs;
-- CI emits a non-blocking quality-visibility artifact on Python 3.13;
+- CI emits non-blocking quality and semantic type visibility artifacts on Python 3.13;
+- CodeQL provides non-blocking repository-controlled security visibility;
 - Dependabot provides monthly review-only visibility for `pip` and GitHub Actions.
 
 Current cleanup priority:
 
 1. keep the open-PR triage aligned with current `main` and do not merge stale architecture-generation branches directly;
 2. review dependency PRs independently, with extra compatibility scrutiny for major-version jumps;
-3. add non-blocking type/security visibility before considering any new required quality gate;
+3. review the measured quality/type/security baselines before considering any new required quality gate;
 4. review only still-unique code hardening from PR #302 and still-useful data-role governance from PR #315 against current `main`;
 5. rebuild #306/#307 from current main only if those capabilities remain priorities;
 6. only after that consider responsibility-splitting large modules such as `training/quality.py`.
