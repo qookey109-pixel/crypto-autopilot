@@ -56,17 +56,15 @@ class OpenPrTriageV06Tests(unittest.TestCase):
         self.assertEqual(payload["local_checkout_visibility"], "UNVERIFIED_FROM_GITHUB")
         self.assertFalse(payload["local_cleanup_authorized"])
 
-    def test_human_navigation_matches_v06(self) -> None:
-        human = (ROOT / "docs" / "OPEN_PR_TRIAGE_2026_09_22.md").read_text(
-            encoding="utf-8"
+    def test_v06_remains_historical_snapshot(self) -> None:
+        payload = self.payload
+        self.assertEqual(payload["active_open_pr_count"], 7)
+        self.assertEqual(
+            payload["active_open_pr_numbers"],
+            [441, 326, 327, 328, 329, 330, 331],
         )
-        self.assertIn("seven pull requests", human)
-        self.assertIn("#441", human)
-        self.assertIn("#326", human)
-        self.assertIn("#331", human)
-        self.assertIn("open-pr-triage-v0-6.json", human)
-        self.assertIn("UNVERIFIED_FROM_GITHUB", human)
-        self.assertIn("No item in this triage is self-authorized", human)
+        self.assertEqual(payload["evidence_basis"]["source_merged_pr"], 442)
+        self.assertFalse(payload["evidence_basis"]["is_latest_main_claim"])
 
 
 if __name__ == "__main__":
