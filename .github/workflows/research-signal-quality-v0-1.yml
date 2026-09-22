@@ -3,6 +3,10 @@ name: Research Signal Quality V0.1
 on:
   schedule:
     - cron: "47 2 * * *"
+  workflow_run:
+    workflows: ["Research Signal Layer V0.2"]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -10,16 +14,64 @@ permissions:
 
 concurrency:
   group: research-signal-quality-v0-1
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   quality:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository &&
+       (github.event.workflow_run.event == 'schedule' ||
+        github.event.workflow_run.event == 'workflow_dispatch'))
+    permissions:
+      contents: read
+      actions: read
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+          fetch-depth: 0
+
+      - name: Bind successful upstream run to current main
+        if: ${{ github.event_name == 'workflow_run' }}
+        env:
+          SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+          SOURCE_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          SOURCE_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          SOURCE_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          SOURCE_REPOSITORY: ${{ github.event.workflow_run.head_repository.full_name }}
+          SOURCE_EVENT: ${{ github.event.workflow_run.event }}
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
+
+          run_id = os.environ["SOURCE_RUN_ID"]
+          run_attempt = os.environ["SOURCE_RUN_ATTEMPT"]
+          source_head = os.environ["SOURCE_HEAD_SHA"]
+          source_repo = os.environ["SOURCE_REPOSITORY"]
+          source_event = os.environ["SOURCE_EVENT"]
+          assert run_id.isdigit()
+          assert run_attempt.isdigit()
+          assert re.fullmatch(r"[0-9a-f]{40}", source_head)
+          assert os.environ["SOURCE_HEAD_BRANCH"] == "main"
+          assert source_repo == os.environ["GITHUB_REPOSITORY"]
+          assert source_event in {"schedule", "workflow_dispatch"}
+          subprocess.run(
+              ["git", "merge-base", "--is-ancestor", source_head, os.environ["GITHUB_SHA"]],
+              check=True,
+          )
+          with Path(os.environ["GITHUB_ENV"]).open("a", encoding="utf-8") as handle:
+              handle.write(f"EXPECTED_SIGNAL_RUN_ID=github-{run_id}-{run_attempt}\n")
+              handle.write(f"SOURCE_WORKFLOW_RUN_ID={run_id}\n")
+              handle.write(f"SOURCE_HEAD_SHA={source_head}\n")
+          PY
 
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -28,23 +80,48 @@ jobs:
       - name: Install constrained runtime
         run: python -m pip install -c requirements/ci-constraints.txt .
 
+      - name: Recover previous successful quality evidence
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/fetch_previous_research_signal_quality.py \
+            --repository "${GITHUB_REPOSITORY}" \
+            --current-run-id "${GITHUB_RUN_ID}" \
+            --output previous-quality/quality.json
+
       - name: Verify latest research signal evidence
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        shell: bash
         run: |
-          python scripts/check_research_signal_quality.py \
-            --config config/research_signal_quality_v0_1.json \
+          set -euo pipefail
+          args=(
+            --config config/research_signal_quality_v0_1.json
             --output research-signal-quality-output/quality.json
+          )
+          if [[ -f previous-quality/quality.json ]]; then
+            args+=(--previous-report previous-quality/quality.json)
+          fi
+          if [[ -n "${EXPECTED_SIGNAL_RUN_ID:-}" ]]; then
+            args+=(
+              --expected-run-id "${EXPECTED_SIGNAL_RUN_ID}"
+              --source-workflow-run-id "${SOURCE_WORKFLOW_RUN_ID}"
+              --source-head-sha "${SOURCE_HEAD_SHA}"
+            )
+          fi
+          python scripts/check_research_signal_quality.py "${args[@]}"
 
       - name: Assert read-only research authority
         if: always()
         run: |
           python - <<'PY'
           import json
+          import os
           from pathlib import Path
+
           report = json.loads(Path("research-signal-quality-output/quality.json").read_text())
           authority = report["authority"]
           assert authority["r2_list"] is False
@@ -55,6 +132,15 @@ jobs:
           assert authority["direct_trade_trigger"] is False
           assert authority["real_money_order"] is False
           assert authority["live_trading"] is False
+          assert report["decision"] in {"EVALUATED", "NO_CHANGE"}
+          if report["decision"] == "NO_CHANGE":
+              assert report["lineage"] == "REUSED_VERIFIED_RUN"
+              assert len(report["objects_read"]) == 1
+          if os.environ.get("EXPECTED_SIGNAL_RUN_ID"):
+              assert report["source_binding"] in {
+                  "MATCHED_TRIGGERING_RUN",
+                  "SUPERSEDED_BY_NEWER_RUN",
+              }
           PY
 
       - name: Upload secret-free quality evidence
@@ -65,4 +151,3 @@ jobs:
           path: research-signal-quality-output/quality.json
           retention-days: 90
           if-no-files-found: error
-
