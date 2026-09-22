@@ -3,6 +3,7 @@ from __future__ import annotations
 import calendar
 import math
 from dataclasses import dataclass
+from typing import Mapping, cast
 
 
 class BinanceFundingBudgetError(RuntimeError):
@@ -55,15 +56,15 @@ def _month_range(first: str, last: str) -> tuple[tuple[int, int], ...]:
 def coverage_shape(coverage_authority: dict[str, object]) -> tuple[int, int, int]:
     if coverage_authority.get("status") != "PASS" or coverage_authority.get("stage") != "BINANCE_FUNDING_COVERAGE_DISCOVERY_PASS":
         raise BinanceFundingBudgetError("Funding coverage authority must PASS")
-    scan = coverage_authority.get("scan") or {}
-    if int(scan.get("symbols_with_observed_funding_coverage") or 0) != 15:
+    scan = cast(Mapping[str, object], coverage_authority.get("scan") or {})
+    if int(cast(int, scan.get("symbols_with_observed_funding_coverage") or 0)) != 15:
         raise BinanceFundingBudgetError("Funding coverage authority must contain all 15 observed symbols")
     if scan.get("symbols_with_internal_monthly_presence_gap") != []:
         raise BinanceFundingBudgetError("Funding coverage contains internal monthly presence gaps")
-    if int(scan.get("monthly_available_checks") or 0) != 1010:
+    if int(cast(int, scan.get("monthly_available_checks") or 0)) != 1010:
         raise BinanceFundingBudgetError("Funding available symbol-month count changed")
 
-    boundaries = coverage_authority.get("symbol_boundaries") or {}
+    boundaries = cast(\n        Mapping[str, Mapping[str, object]],\n        coverage_authority.get("symbol_boundaries") or {},\n    )
     if len(boundaries) != 15:
         raise BinanceFundingBudgetError("Funding coverage must contain 15 symbol boundaries")
 
@@ -74,7 +75,7 @@ def coverage_shape(coverage_authority: dict[str, object]) -> tuple[int, int, int
         first = str(boundary.get("first_available_period") or "")
         last = str(boundary.get("last_available_period") or "")
         months = _month_range(first, last)
-        if len(months) != int(boundary.get("available_months") or 0):
+        if len(months) != int(cast(int, boundary.get("available_months") or 0)):
             raise BinanceFundingBudgetError(f"Funding available month mismatch for {symbol}")
         if boundary.get("internal_missing_months") != []:
             raise BinanceFundingBudgetError(f"Funding internal gaps present for {symbol}")
@@ -82,7 +83,7 @@ def coverage_shape(coverage_authority: dict[str, object]) -> tuple[int, int, int
         total_days += sum(calendar.monthrange(year, month)[1] for year, month in months)
         annual_objects += len({year for year, _ in months})
 
-    if total_months != int(scan["monthly_available_checks"]):
+    if total_months != int(cast(int, scan["monthly_available_checks"])):
         raise BinanceFundingBudgetError("Funding boundary months do not match scan aggregate")
     return total_months, total_days, annual_objects
 
@@ -96,13 +97,13 @@ def validate_budget_config(config: dict[str, object]) -> None:
         raise BinanceFundingBudgetError("Funding bytes-per-row policy changed")
     if config.get("row_projection_policy") != "ASSUME_ONE_HOUR_FUNDING_FOR_EVERY_CALENDAR_HOUR_IN_EVERY_AVAILABLE_MONTH":
         raise BinanceFundingBudgetError("Funding row projection policy changed")
-    if int(config.get("minimum_funding_interval_hours_for_budget") or 0) != 1:
+    if int(cast(int, config.get("minimum_funding_interval_hours_for_budget") or 0)) != 1:
         raise BinanceFundingBudgetError("Funding budget minimum interval must remain one hour")
-    if float(config.get("retained_staging_multiplier") or 0.0) != 2.0:
+    if float(cast(float, config.get("retained_staging_multiplier") or 0.0)) != 2.0:
         raise BinanceFundingBudgetError("Funding staging multiplier changed")
-    if float(config.get("capacity_stress_multiplier") or 0.0) != 3.0:
+    if float(cast(float, config.get("capacity_stress_multiplier") or 0.0)) != 3.0:
         raise BinanceFundingBudgetError("Funding capacity stress multiplier changed")
-    if int(config.get("operation_stress_multiplier") or 0) != 3:
+    if int(cast(int, config.get("operation_stress_multiplier") or 0)) != 3:
         raise BinanceFundingBudgetError("Funding operation stress multiplier changed")
     for field in (
         "source_switch_authorized",
