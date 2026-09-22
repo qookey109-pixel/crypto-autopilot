@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-09-21
+Updated: 2026-09-22
 
 Repository `main` is the formal current authority and must be resolved live at read time. This file is the project-stage, governance-compatibility, and retired-workflow index. Exact versioned configs, receipts, immutable run evidence, and merged code remain the detailed authority for each scope.
 
@@ -9,7 +9,7 @@ Repository `main` is the formal current authority and must be resolved live at r
 - Repository: `qookey109-pixel/crypto-autopilot`.
 - Current Operations companion: `research/status/current-operations-v0-3.json`.
 - Current Operations V0.3 stores an **evidence-basis parent SHA**, not a self-referential latest-main claim.
-- Evidence-basis parent for this status version: `3422efc91cfd973ab1991080186fb8300d26a2a5`, the reviewed main commit after PR #410 merged and passed post-merge CI / Freeze Guard / CodeQL / Pages.
+- Evidence-basis parent for this status version: `b1d75cc54812fc6a355ab5c4535c105c53c26ceb`, the reviewed main commit after PR #423 merged and passed post-merge CI / Freeze Guard / CodeQL / Pages.
 - Current mode: **PAPER / LIVE-PAPER ONLY**. Public live market data and simulated live-paper execution/persistence are separate from real trading authority.
 - FREE-ONLY cloud/runtime budget: **0 USD/month**.
 
@@ -337,20 +337,25 @@ preregistered 24-cell V0.4 development study.
 - R2 / holdout / source switch / promotion / trade plan / real-money / live trading remain closed.
 
 
-## Live Paper Run Slot Claim V0.1
+## Reliability convergence through PR #423
 
-Prepared on 2026-09-22 for explicit protected-main merge review.
+The current protected-main reliability layer now includes three merged changes:
 
-- Coordinator successor: `config/live_paper_run_coordinator_v0_2.json`.
-- Claim authority: `config/live_paper_run_claim_v0_1.json`.
-- One deterministic slot binds `run_id + sequence + previous_step_id + previous_state_id`.
-- The slot claim is atomically created before a new public Live Paper provider call.
-- Different tick/candidate requests from the same prior run position compete for the same slot.
-- A claim conflict performs no automatic provider retry, expiry or takeover.
-- Recovery treats a claim without a complete verified matching step as `REVIEW_REQUIRED`.
-- A complete verified step with only a missing result seal remains eligible for the existing provider-free seal repair.
-- Existing fully committed identical requests still replay with zero new provider requests.
-- No cron schedule is added; the coordinator workflow remains explicit `workflow_dispatch` only.
+- PR #421: Research Signal Quality runs after successful Research Signal Layer completion on same-repository `main`, retains the 10:47 Asia/Taipei fallback, and uses exact immutable-run dedupe without opening R2 list/write authority.
+- PR #422: Dashboard GitHub Pages validates the built site with pinned Playwright Chromium on desktop and mobile; production browser validation is gated on an actual Pages deployment.
+- PR #423: Live Paper Coordinator V0.2 requires a deterministic atomic run-slot claim before any new provider call.
+
+Live Paper run-slot details:
+
+- Coordinator contract: `config/live_paper_run_coordinator_v0_2.json`.
+- Claim contract: `config/live_paper_run_claim_v0_1.json`.
+- Slot identity: `run_id + sequence + previous_step_id + previous_state_id`.
+- R2 conditional create uses S3-compatible `IfNoneMatch="*"`; a 412/precondition conflict fails closed.
+- Claim conflicts have no automatic retry, expiry or takeover.
+- Recovery treats unresolved claims without a complete verified step as `REVIEW_REQUIRED`.
+- Complete verified steps missing only the result seal remain repairable without provider access.
+- Fully committed identical requests replay with zero new provider calls.
+- Coordinator execution remains manual `workflow_dispatch` only; no schedule was added.
 - Private exchange APIs, holdout access, real-money orders and real live trading remain closed.
 
-This prepared change becomes current authority only if its pull request is explicitly merged into protected `main`.
+PR #423 post-merge CI, CodeQL, Dashboard GitHub Pages and V0.10 Critical Path Freeze Guard all completed successfully.
