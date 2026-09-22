@@ -19,6 +19,10 @@ from crypto_autopilot.paper.live_v0_1 import (
     initialize_live_paper_state,
     live_paper_tick_report_id_from_mapping,
 )
+from crypto_autopilot.paper.run_claim_v0_1 import (
+    LivePaperRunClaimConflictError,
+    live_paper_run_claim_policy_from_config,
+)
 from crypto_autopilot.paper.run_coordinator_v0_1 import (
     LivePaperRunCoordinatorPolicy,
     coordinate_live_paper_run_step,
@@ -33,6 +37,8 @@ from crypto_autopilot.risk import plan_position_size
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "config" / "live_paper_run_coordinator_v0_1.json"
+CONFIG_V2 = ROOT / "config" / "live_paper_run_coordinator_v0_2.json"
+CLAIM_CONFIG = ROOT / "config" / "live_paper_run_claim_v0_1.json"
 
 
 def family_report(family: str) -> dict[str, object]:
@@ -414,7 +420,92 @@ class LivePaperRunCoordinatorV01Tests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 live_paper_tick_report_id_from_mapping(tick)
 
+    def test_v0_2_claim_gate_persists_one_slot_claim(self) -> None:
+        state, spec, feed = self._first_fixture()
+        coordinator_policy = live_paper_run_coordinator_policy_from_config(
+            json.loads(CONFIG_V2.read_text(encoding="utf-8"))
+        )
+        claim_policy = live_paper_run_claim_policy_from_config(
+            json.loads(CLAIM_CONFIG.read_text(encoding="utf-8"))
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            store = LocalPaperRunStore(Path(tmp).resolve())
+            report = coordinate_live_paper_run_step(
+                run_name="primary-live-paper",
+                tick_time_ms=5_000,
+                candidate_specs=(spec,),
+                feed=feed,
+                store=store,
+                initial_state=state,
+                policy=coordinator_policy,
+                claim_policy=claim_policy,
+            )
+
+            self.assertTrue(report["authority"]["paper_run_slot_claim_authorized"])
+            self.assertFalse(
+                report["authority"]["claim_conflict_auto_retry_authorized"]
+            )
+            slot_id = report["claim_slot_id"]
+            self.assertIsInstance(slot_id, str)
+            self.assertEqual(store.list_json_ids("live-run-claim"), (slot_id,))
+            claim = store.get_json("live-run-claim", slot_id)
+            self.assertIsNotNone(claim)
+            assert claim is not None
+            self.assertEqual(claim["request_id"], report["request_id"])
+            self.assertEqual(claim["sequence"], 1)
+            self.assertEqual(report["persistent_objects_created"], 7)
+
+    def test_unresolved_claim_blocks_same_request_before_provider_retry(self) -> None:
+        state, spec, _ = self._first_fixture()
+        coordinator_policy = live_paper_run_coordinator_policy_from_config(
+            json.loads(CONFIG_V2.read_text(encoding="utf-8"))
+        )
+        claim_policy = live_paper_run_claim_policy_from_config(
+            json.loads(CLAIM_CONFIG.read_text(encoding="utf-8"))
+        )
+
+        class FailingAfterClaimFeed:
+            def __init__(self) -> None:
+                self.calls = 0
+
+            def fetch_frame(self, *_args: object, **_kwargs: object):
+                self.calls += 1
+                raise RuntimeError("fixture provider failure after claim")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = LocalPaperRunStore(Path(tmp).resolve())
+            first_feed = FailingAfterClaimFeed()
+            with self.assertRaisesRegex(RuntimeError, "after claim"):
+                coordinate_live_paper_run_step(
+                    run_name="primary-live-paper",
+                    tick_time_ms=5_000,
+                    candidate_specs=(spec,),
+                    feed=first_feed,
+                    store=store,
+                    initial_state=state,
+                    policy=coordinator_policy,
+                    claim_policy=claim_policy,
+                )
+            self.assertEqual(first_feed.calls, 1)
+            self.assertEqual(len(store.list_json_ids("live-run-claim")), 1)
+
+            retry_feed = SequenceFeed({})
+            with self.assertRaises(LivePaperRunClaimConflictError):
+                coordinate_live_paper_run_step(
+                    run_name="primary-live-paper",
+                    tick_time_ms=5_000,
+                    candidate_specs=(spec,),
+                    feed=retry_feed,
+                    store=store,
+                    initial_state=state,
+                    policy=coordinator_policy,
+                    claim_policy=claim_policy,
+                )
+            self.assertEqual(retry_feed.calls, [])
+
     def test_policy_cannot_enable_schedule_auto_selection_or_real_trading(self) -> None:
+        with self.assertRaises(ValueError):
+            LivePaperRunCoordinatorPolicy(claim_conflict_auto_retry_authorized=True)
         with self.assertRaises(ValueError):
             LivePaperRunCoordinatorPolicy(automatic_schedule_authorized=True)
         with self.assertRaises(ValueError):
@@ -436,6 +527,11 @@ class LivePaperRunCoordinatorV01Tests(unittest.TestCase):
             live_paper_run_coordinator_policy_from_config(config),
             LivePaperRunCoordinatorPolicy(),
         )
+        v2 = live_paper_run_coordinator_policy_from_config(
+            json.loads(CONFIG_V2.read_text(encoding="utf-8"))
+        )
+        self.assertTrue(v2.run_slot_claim_required)
+        self.assertFalse(v2.claim_conflict_auto_retry_authorized)
 
         state, spec, _ = self._first_fixture()
         payload = {
