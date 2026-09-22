@@ -5,6 +5,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from crypto_autopilot.paper.run_claim_v0_1 import LivePaperRunClaimConflictError
+from crypto_autopilot.paper.run_store_v0_1 import PaperRunObjectAlreadyExistsError
 from scripts.run_live_paper_coordinator_v0_1 import (
     _OperationJournal,
     _TrackedFeed,
@@ -39,6 +41,17 @@ class _SuccessStore:
 
     def put_json_if_absent(self, kind: str, object_id: str, payload):
         return SimpleNamespace(replayed=False)
+
+
+class _ConflictStore:
+    def put_json(self, kind: str, object_id: str, payload):
+        return SimpleNamespace(replayed=True)
+
+    def get_json(self, kind: str, object_id: str):
+        return {"schema": "fixture"}
+
+    def put_json_if_absent(self, kind: str, object_id: str, payload):
+        raise PaperRunObjectAlreadyExistsError("known precondition conflict")
 
 
 class _FailingStore:
@@ -98,6 +111,41 @@ def test_tracked_store_records_known_create_and_unknown_failed_write() -> None:
     assert failing_journal.store_write_attempts == 1
     assert failing_journal.store_objects_created_known == 0
     assert failing_journal.store_status == "UNKNOWN_OR_PARTIAL"
+
+
+def test_tracked_conditional_conflict_remains_known_no_create() -> None:
+    journal = _OperationJournal()
+    with pytest.raises(PaperRunObjectAlreadyExistsError):
+        _TrackedStore(_ConflictStore(), journal).put_json_if_absent(
+            "live-run-claim",
+            "slot-1",
+            {"schema": "fixture"},
+        )
+    assert journal.store_write_attempts == 1
+    assert journal.store_objects_created_known == 0
+    assert journal.store_objects_replayed_known == 0
+    assert journal.store_status == "KNOWN"
+
+
+def test_claim_conflict_failure_report_is_explicit_and_zero_provider() -> None:
+    journal = _OperationJournal(
+        provider_requests_known=0,
+        provider_status="KNOWN",
+        store_write_attempts=3,
+        store_objects_replayed_known=2,
+        store_status="KNOWN",
+    )
+    report = _failure_report(
+        stage="COORDINATE_RUN_STEP",
+        error=LivePaperRunClaimConflictError("slot already claimed"),
+        journal=journal,
+        claim_required=True,
+    )
+    assert report["reason"] == "run_slot_claim_conflict"
+    assert report["provider_requests_performed"] == 0
+    assert report["persistent_objects_created"] == 0
+    assert report["persistent_writes_status"] == "KNOWN"
+    assert "slot already claimed" not in str(report)
 
 
 def test_failure_report_never_claims_zero_when_side_effects_are_uncertain() -> None:
