@@ -32,10 +32,10 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
         )
         self.assertFalse(basis["is_latest_main_claim"])
-        self.assertEqual(basis["source_merge_pr"], 423)
+        self.assertEqual(basis["source_merge_pr"], 426)
         self.assertEqual(
             basis["parent_main_sha"],
-            "b1d75cc54812fc6a355ab5c4535c105c53c26ceb",
+            "09dfb0d79b88dc56f3cb582c91d8091617437ce2",
         )
         self.assertIn(basis["parent_main_sha"], current)
         self.assertIn("Resolve `main` live at read time", current)
@@ -188,6 +188,19 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             "This prepared change becomes current authority only if its pull request is explicitly merged",
             self.current,
         )
+
+    def test_open_pr_triage_pointer_is_current(self) -> None:
+        control = self.payload["control_plane"]
+        self.assertEqual(
+            control["open_pr_triage"],
+            "research/status/open-pr-triage-v0-5.json",
+        )
+        self.assertEqual(control["open_pr_count"], 6)
+        self.assertEqual(
+            control["open_pr_numbers"],
+            [326, 327, 328, 329, 330, 331],
+        )
+        self.assertIn("SIX_DEPENDABOT_OPEN", control["open_pr_triage_state"])
 
     def test_control_plane_contract_requires_current_overlay(self) -> None:
         control = self.payload["control_plane"]

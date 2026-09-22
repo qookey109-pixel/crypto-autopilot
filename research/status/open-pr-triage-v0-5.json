@@ -1,0 +1,127 @@
+{
+  "schema": "qookey-open-pr-triage-v0.5",
+  "snapshot_date": "2026-09-22",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
+  "evidence_basis": {
+    "parent_main_sha": "09dfb0d79b88dc56f3cb582c91d8091617437ce2",
+    "is_latest_main_claim": false,
+    "source_merged_pr": 426
+  },
+  "merge_authority_granted": false,
+  "execution_authority_granted": false,
+  "close_authority_granted": false,
+  "active_open_pr_count": 6,
+  "active_open_pr_numbers": [
+    326,
+    327,
+    328,
+    329,
+    330,
+    331
+  ],
+  "recommended_review_order": [
+    329,
+    326,
+    327,
+    328,
+    330,
+    331
+  ],
+  "pull_requests": {
+    "326": {
+      "classification": "DEPENDENCY_REVIEW_PATCH_SDK",
+      "dependency": "boto3",
+      "change": "1.43.75 -> 1.43.93",
+      "head_sha": "a523d0da28258cb8dc8fb600b1ab646a8701d745",
+      "base_main_sha": "f081490e10d38130f6a7a09cdbd06e4f6b4bc4a1",
+      "current_scope": [
+        "requirements/ci-constraints.txt"
+      ],
+      "current_main_review": "REVIEW_BOTO3_BOTOCORE_COUPLING_THEN_REFRESH_FROM_CURRENT_MAIN",
+      "risk": "LOWER_PATCH_SDK_WITH_PIN_COUPLING"
+    },
+    "327": {
+      "classification": "DEPENDENCY_REVIEW_MAJOR_ACTION",
+      "dependency": "actions/cache",
+      "change": "5.1.0 -> 6.1.0",
+      "head_sha": "3ef53e5c47fa77deadb88443b3b1b10ea0f006c5",
+      "base_main_sha": "f081490e10d38130f6a7a09cdbd06e4f6b4bc4a1",
+      "current_scope": [
+        ".github/workflows/pionex-public-paper-training-v0-1.yml"
+      ],
+      "current_main_review": "REBUILD_EXACT_CHANGE_FROM_CURRENT_MAIN_AND_VERIFY_CACHE_SEMANTICS",
+      "risk": "MAJOR_ACTION"
+    },
+    "328": {
+      "classification": "DEPENDENCY_REVIEW_MAJOR_ACTION",
+      "dependency": "actions/download-artifact",
+      "change": "7.0.0 -> 8.0.1",
+      "head_sha": "cc8576b25e04812ac66875c4ec2ddc2a0372da72",
+      "base_main_sha": "f081490e10d38130f6a7a09cdbd06e4f6b4bc4a1",
+      "current_scope": [
+        ".github/workflows/pionex-asset-classification-execution-v0-1.yml"
+      ],
+      "current_main_review": "REBUILD_EXACT_CHANGE_FROM_CURRENT_MAIN_AND_VERIFY_ARTIFACT_ID_BEHAVIOR",
+      "risk": "MAJOR_ACTION"
+    },
+    "329": {
+      "classification": "DEPENDENCY_REVIEW_PATCH_TOOLING",
+      "dependency": "ruff",
+      "change": "0.16.0 -> 0.16.7",
+      "head_sha": "7671aaf94242ad4a89adcaba7c230d07a17e7dc3",
+      "base_main_sha": "f081490e10d38130f6a7a09cdbd06e4f6b4bc4a1",
+      "current_scope": [
+        "requirements/ci-constraints.txt"
+      ],
+      "current_main_review": "REFRESH_FROM_CURRENT_MAIN_AND_RUN_FULL_CI_BEFORE_MERGE",
+      "risk": "LOWER_PATCH_TOOLING"
+    },
+    "330": {
+      "classification": "DEPENDENCY_REVIEW_MAJOR_CRITICAL_ACTION",
+      "dependency": "actions/checkout",
+      "change": "6 -> 7",
+      "head_sha": "63f8827136ad3446c181a92603b3e66e29821e43",
+      "base_main_sha": "b84ba7bd1bdc80e65a53f47a15dd9961c5152e97",
+      "current_scope": "MANY_WORKFLOWS_INCLUDING_CURRENT_CRITICAL_PATHS",
+      "current_main_review": "DO_NOT_MERGE_OLD_BRANCH_REVIEW_GLOBAL_PIN_POLICY_AND_FREEZE_BOUNDARIES_FIRST",
+      "risk": "HIGH_GLOBAL_ACTION_AND_FREEZE_SCOPE"
+    },
+    "331": {
+      "classification": "DEPENDENCY_REVIEW_MAJOR_RUNTIME",
+      "dependency": "pyarrow",
+      "change": "21.0.0 -> 25.0.1",
+      "head_sha": "767b39c410c98969e74ee11560a5562cfa783ca5",
+      "base_main_sha": "f081490e10d38130f6a7a09cdbd06e4f6b4bc4a1",
+      "current_scope": [
+        "pyproject.toml",
+        "requirements/ci-constraints.txt"
+      ],
+      "current_main_review": "BLOCKED_PENDING_PUBLIC_COMPATIBILITY_AND_FROZEN_CONSTRAINT_REVIEW",
+      "risk": "HIGH_MAJOR_RUNTIME_AND_PUBLIC_CONTRACT_CHANGE",
+      "conflicts_with_current_main": [
+        "pyproject.toml currently declares pyarrow>=18,<22",
+        "requirements/ci-constraints.txt currently pins pyarrow==21.0.0"
+      ]
+    }
+  },
+  "closed_historical_references": {
+    "166": "CLOSED_NOT_MERGED_DRAFT_SALVAGE_REFERENCE",
+    "167": "CLOSED_NOT_MERGED_DRAFT_SALVAGE_REFERENCE",
+    "168": "CLOSED_NOT_MERGED_DRAFT_SALVAGE_REFERENCE",
+    "199": "CLOSED_NOT_MERGED_DRAFT_SALVAGE_REFERENCE",
+    "249": "CLOSED_NOT_MERGED_DRAFT_SALVAGE_REFERENCE",
+    "302": "CLOSED_NOT_MERGED_EVIDENCE_ALREADY_PRESERVED_BY_340",
+    "306": "CLOSED_NOT_MERGED_REBUILD_ONLY_IF_REVIVED",
+    "307": "CLOSED_NOT_MERGED_REBUILD_ONLY_IF_REVIVED",
+    "315": "CLOSED_NOT_MERGED_GOVERNANCE_SALVAGE_REFERENCE_ONLY",
+    "336": "CLOSED_NOT_MERGED_SUPERSEDED_BY_337_339"
+  },
+  "notes": [
+    "The active open backlog is six Dependabot pull requests only.",
+    "Older architecture-generation and draft-salvage pull requests listed in V0.4 are now closed and remain historical references only.",
+    "Historical CI on old dependency branches is not current-main merge evidence.",
+    "Each dependency update requires independent current-main compatibility review and separate merge authorization.",
+    "This snapshot grants no merge, close, provider, R2, holdout, promotion, source-switch, order, or live-trading authority."
+  ]
+}

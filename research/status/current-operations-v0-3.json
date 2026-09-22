@@ -4,10 +4,10 @@
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
-    "parent_main_sha": "b1d75cc54812fc6a355ab5c4535c105c53c26ceb",
+    "parent_main_sha": "09dfb0d79b88dc56f3cb582c91d8091617437ce2",
     "semantics": "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
     "is_latest_main_claim": false,
-    "source_merge_pr": 423
+    "source_merge_pr": 426
   },
   "mode": "PAPER_AND_LIVE_PAPER_ONLY",
   "core100": {
@@ -109,10 +109,10 @@
   },
   "control_plane": {
     "current_truth_entrypoint": "CURRENT_STATUS.md",
-    "root_docs_projection": "CURRENT_OPERATIONS_CONVERGED_THROUGH_PR_423_LIVE_PAPER_SLOT_CLAIM",
+    "root_docs_projection": "CURRENT_OPERATIONS_CONVERGED_THROUGH_PR_426_TYPE_VISIBILITY_AND_PR_TRIAGE_V0_5",
     "security_projection": "CONVERGED_BY_PR_322",
-    "open_pr_triage": "research/status/open-pr-triage-v0-4.json",
-    "open_pr_triage_state": "REFRESHED_2026_09_17_NAVIGATION_ONLY_REQUIRES_LIVE_MAIN_REVIEW",
+    "open_pr_triage": "research/status/open-pr-triage-v0-5.json",
+    "open_pr_triage_state": "REFRESHED_2026_09_22_SIX_DEPENDABOT_OPEN_OLD_ARCHITECTURE_PRS_CLOSED",
     "automation_health_count_policy": "DERIVED_FROM_EXACT_REPOSITORY_SCHEDULE_INVENTORY",
     "dashboard_projection_policy": "HISTORICAL_AUTHORITY_OVERLAY_THEN_CURRENT_OPERATIONS_OVERLAY",
     "homepage_projection_policy": "CURRENT_OPERATIONS_MUST_OVERRIDE_DATED_SIMULATION_READINESS_FOR_PRESENT_TENSE_STATE",
@@ -123,9 +123,18 @@
     "schedule_inventory_state": "EIGHT_REPOSITORY_CRON_DECLARATIONS_EIGHT_MONITORED_SEVEN_CURRENT_EFFECTIVE_ONE_EXPIRED_FROZEN",
     "research_signal_quality_state": "UPSTREAM_COMPLETION_CHAINED_WITH_EXACT_IMMUTABLE_RUN_DEDUP_AND_DAILY_FALLBACK",
     "dashboard_browser_validation_state": "PLAYWRIGHT_CHROMIUM_DESKTOP_MOBILE_PR_BUILD_PLUS_POST_DEPLOY_PRODUCTION_CHECK",
-    "live_paper_slot_claim_state": "ACTIVE_MANUAL_COORDINATOR_FAIL_CLOSED_ATOMIC_CREATE_IF_ABSENT"
+    "live_paper_slot_claim_state": "ACTIVE_MANUAL_COORDINATOR_FAIL_CLOSED_ATOMIC_CREATE_IF_ABSENT",
+    "open_pr_count": 6,
+    "open_pr_numbers": [
+      326,
+      327,
+      328,
+      329,
+      330,
+      331
+    ]
   },
-  "next_decision": "KEEP_ZEC_FRESH_CONFIRMATION_CLOSED_CONTINUE_RELIABILITY_AND_OBSERVABILITY_WITHOUT_NEW_EXECUTION_AUTHORITY",
+  "next_decision": "REVIEW_DEPENDENCY_PRS_FROM_CURRENT_MAIN_AND_REVIEW_TYPE_BASELINE_WITHOUT_NEW_EXECUTION_AUTHORITY",
   "notes": [
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
     "Older September 13 present-tense summaries reporting Core100 8/10 and Training SKIPPED are historical and superseded for current operations.",
@@ -133,7 +142,6 @@
     "Pionex Validation Materialization V0.2 run 35054729471 completed PASS for the frozen 197-market / 682-partition validation scope.",
     "The V0.2 PASS explicitly does not claim complete 197-market multiyear history and did not perform Core100 Pionex training.",
     "PR #337 records the merged completion evidence; Model Quality remains REJECT and downstream research/trading gates remain closed.",
-    "Open PR navigation was refreshed on 2026-09-17 in open-pr-triage-v0-4 after PR #340 evidence preservation.",
     "This file grants no provider, holdout, promotion, trading, source-switch, or private-account authority beyond already merged versioned authority.",
     "Live Paper Simulation V0.1 separates public live market data and simulated paper execution from real live trading; private exchange APIs and real-money orders remain closed.",
     "Paper Run Store V0.1 authorizes content-addressed Local JSON / R2 persistence for paper evidence only; stored objects do not become execution authority.",
@@ -144,7 +152,9 @@
     "ZEC V0.4 one-shot development run 35618367238 completed all 24 cells; all six candidates met the trade-count gate, none had positive worst-fold return, no champion was frozen, and fresh confirmation remains closed.",
     "PR #421 merged Research Signal Quality upstream-completion chaining and exact immutable-run dedupe while preserving R2 exact-object read-only authority and the 10:47 Asia/Taipei fallback.",
     "PR #422 merged pinned Playwright Chromium validation for desktop and mobile against PR-built dashboard output, with production browser validation gated on a real GitHub Pages deploy.",
-    "PR #423 merged deterministic Live Paper run-slot claims using atomic create-if-absent before provider access; unresolved claims fail closed to review and the coordinator remains manual workflow_dispatch only."
+    "PR #423 merged deterministic Live Paper run-slot claims using atomic create-if-absent before provider access; unresolved claims fail closed to review and the coordinator remains manual workflow_dispatch only.",
+    "Open PR navigation was refreshed on 2026-09-22 in open-pr-triage-v0-5: only Dependabot PRs #326-#331 remain open; older architecture-generation and salvage PRs are closed historical references.",
+    "PR #426 merged non-blocking mypy semantic type visibility on Python 3.13; the first baseline reported 261 type errors without failing CI or changing execution authority."
   ],
   "live_paper": {
     "status": "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY",

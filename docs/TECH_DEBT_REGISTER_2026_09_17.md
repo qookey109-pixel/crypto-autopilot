@@ -1,6 +1,6 @@
 # Technical Debt Register — 2026-09-17 (refreshed 2026-09-22)
 
-Repository `main` is authority and must be resolved live at read time. Evidence basis for this refresh: `dc5a381e7aa2a860dc83032478b0346f12df59d0` after PR #425 merged. This SHA is historical review context, not a latest-main claim.
+Repository `main` is authority and must be resolved live at read time. Evidence basis for this refresh: `09dfb0d79b88dc56f3cb582c91d8091617437ce2` after PR #426 merged. This SHA is historical review context, not a latest-main claim.
 
 This register tracks cleanup work only. It grants no execution, provider, R2, holdout, promotion, source-switch, deployment, trading, or merge authority.
 
@@ -49,22 +49,21 @@ Historical V0.12 wording remains historical; current runtime and safety boundari
 
 ### TD-005 — Open PR backlog crosses architecture generations
 
-Status: **ACTIVE / REFRESHED 2026-09-17**
+Status: **ACTIVE / REFRESHED 2026-09-22**
 
 Current classification is recorded in:
 
-- `docs/OPEN_PR_TRIAGE_2026_09_17.md`;
-- `research/status/open-pr-triage-v0-4.json`.
+- `docs/OPEN_PR_TRIAGE_2026_09_22.md`;
+- `research/status/open-pr-triage-v0-5.json`.
 
-Important changes since the 2026-09-16 snapshot:
+Current live backlog:
 
-- PR #323 merged;
-- PR #305 is closed without merge;
-- PR #339 merged current Pionex V0.2 status convergence;
-- PR #340 merged immutable Core100 REJECT / threshold-replay evidence preservation;
-- PR #336 is now superseded by merged #337/#339 work and is not a merge candidate from its old base;
-- PR #302 evidence is preserved on `main`, but its code hardening still requires file-level current-main review before any reuse;
-- six Dependabot PRs (#326–#331) now form a distinct review-only dependency lane.
+- six Dependabot PRs only: #326–#331;
+- #302, #306, #307, #315, #336 and the older salvage drafts are closed historical references;
+- old architecture branches are no longer represented as active merge lanes;
+- each dependency PR still requires current-main compatibility review and its own merge authorization.
+
+The V0.5 review order separates patch-level tooling/SDK updates from major GitHub Action/runtime changes and records the current-main contract conflicts for #330/#331.
 
 No PR is closed or merged merely by this classification.
 
@@ -98,18 +97,19 @@ Do not make these blocking until baseline noise is measured and reviewed.
 
 ### TD-008 — Dependency/security maintenance visibility
 
-Status: **PARTIAL / SECURITY VISIBILITY COMPLETE**
+Status: **PARTIAL / SECURITY AND DEPENDENCY TRIAGE CURRENT**
 
 Already implemented:
 
 - `.github/dependabot.yml` tracks both `pip` and GitHub Actions monthly;
 - update PRs are review-only; no auto-merge authority is introduced;
 - repository-controlled CodeQL runs as non-blocking security visibility and has passed on current main;
-- historical dependency PR classifications remain review guidance only and do not grant merge authority.
+- Open PR Triage V0.5 records a current dependency review order and separates patch-level updates from major action/runtime changes;
+- dependency classifications remain review guidance only and do not grant merge authority.
 
 Still missing:
 
-- a refreshed dependency review order if new Dependabot PRs appear, with breaking-major risk separated from routine patch/minor updates.
+- actual current-main rebuild/compatibility decisions for the six open dependency PRs.
 
 ## P3 — code structure
 
@@ -124,9 +124,9 @@ Status: **DEFERRED**
 1. Keep this refreshed PR triage aligned with live `main`; do not merge stale architecture-generation branches directly.
 2. Review dependency PRs as a separate lane; breaking-major upgrades require explicit compatibility review and their own merge authorization.
 3. Review quality/type/security baseline evidence before considering any new required gate.
-4. Review only the still-unique code hardening from PR #302 and the still-useful data-role governance from PR #315 against current `main`.
-5. Rebuild #306/#307 from current `main` only if those capabilities remain priorities.
-6. Leave #166/#167/#168/#199/#249 as Draft salvage backlog unless deliberately revived.
+4. Treat #302/#315/#306/#307 and #166/#167/#168/#199/#249 as closed historical salvage only; rebuild selected ideas from current `main` only if deliberately revived.
+5. Review the 261-error mypy baseline by category before considering any type gate.
+6. Leave large-module responsibility splitting deferred until characterization coverage justifies it.
 
 ## Explicit non-goals
 

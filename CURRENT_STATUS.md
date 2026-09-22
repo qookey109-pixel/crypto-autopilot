@@ -8,10 +8,10 @@ This is the concise current-operations entrypoint. Repository `main`, versioned 
 
 - Repository: `qookey109-pixel/crypto-autopilot`.
 - **Resolve `main` live at read time.** This file intentionally does not hard-code a claim that any SHA is the latest `main`.
-- Evidence-basis parent main for this status version: `b1d75cc54812fc6a355ab5c4535c105c53c26ceb`.
+- Evidence-basis parent main for this status version: `09dfb0d79b88dc56f3cb582c91d8091617437ce2`.
 - Evidence-basis semantics: `REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION`.
 - The evidence-basis SHA is **not** a latest-main claim; it records the reviewed parent from which this status version was prepared.
-- PR #423 is the latest reviewed merge in that evidence basis; it established fail-closed Live Paper run-slot claims on top of the already-merged Signal Quality chaining and Playwright browser validation.
+- PR #426 is the latest reviewed merge in that evidence basis; it added non-blocking semantic type visibility on top of the already-merged reliability and browser-validation layers.
 
 This avoids a self-reference bug where a file claiming its own future merge commit becomes stale immediately after it is merged.
 
@@ -146,12 +146,12 @@ Current cleanup priority:
 1. keep the open-PR triage aligned with current `main` and do not merge stale architecture-generation branches directly;
 2. review dependency PRs independently, with extra compatibility scrutiny for major-version jumps;
 3. review the measured quality/type/security baselines before considering any new required quality gate;
-4. review only still-unique code hardening from PR #302 and still-useful data-role governance from PR #315 against current `main`;
-5. rebuild #306/#307 from current main only if those capabilities remain priorities;
+4. treat #302/#315/#306/#307 as closed historical salvage only; rebuild selected ideas from current `main` only if deliberately revived;
+5. review the 261-error mypy baseline by category before considering any blocking type gate;
 6. only after that consider responsibility-splitting large modules such as `training/quality.py`.
 
 Detailed cleanup tracking lives in `docs/TECH_DEBT_REGISTER_2026_09_17.md`.
-Current open-PR navigation lives in `docs/OPEN_PR_TRIAGE_2026_09_17.md` with machine-readable companion `research/status/open-pr-triage-v0-4.json`.
+Current open-PR navigation lives in `docs/OPEN_PR_TRIAGE_2026_09_22.md` with machine-readable companion `research/status/open-pr-triage-v0-5.json`. The active backlog is six Dependabot PRs (#326–#331); older architecture-generation and salvage PRs are closed historical references.
 
 ## Safety and governance still binding
 
