@@ -4,7 +4,11 @@
   "purpose": "Verify the latest public research signal lineage and report whether it contains forecasts, metadata only or no usable data",
   "schedule": {
     "cron_utc": "47 2 * * *",
-    "manual_dispatch": true
+    "manual_dispatch": true,
+    "upstream_workflow_run": "Research Signal Layer V0.2",
+    "upstream_completion_trigger": true,
+    "upstream_branch": "main",
+    "upstream_conclusion": "success"
   },
   "storage": {
     "namespace": "research/signal-layer/v0-2",
@@ -16,7 +20,21 @@
   "quality": {
     "max_age_seconds": 129600,
     "forecast_ready_required": false,
-    "metadata_only_is_valid_evidence": true
+    "metadata_only_is_valid_evidence": true,
+    "dedupe_identity": [
+      "run_id",
+      "manifest_sha256",
+      "generated_at_utc"
+    ],
+    "same_verified_immutable_run_returns": "NO_CHANGE",
+    "no_change_max_exact_objects_read": 1
+  },
+  "github_evidence": {
+    "actions_read_only": true,
+    "previous_quality_artifact_read": true,
+    "previous_quality_artifact_retention_days": 90,
+    "source_run_binding_required_on_workflow_run": true,
+    "source_head_must_be_main_ancestor": true
   },
   "authority": {
     "provider_access": false,

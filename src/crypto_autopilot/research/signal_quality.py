@@ -21,6 +21,20 @@ class ReadOnlyObjectStore(Protocol):
     def get_bytes_verified(self, key: str, *, expected_sha256: str) -> bytes: ...
 
 
+def _authority() -> dict[str, bool]:
+    return {
+        "r2_exact_object_read_only": True,
+        "r2_list": False,
+        "r2_write": False,
+        "provider_access": False,
+        "holdout_access": False,
+        "automatic_model_promotion": False,
+        "direct_trade_trigger": False,
+        "real_money_order": False,
+        "live_trading": False,
+    }
+
+
 def _object(payload: bytes, *, label: str) -> dict[str, Any]:
     try:
         decoded = json.loads(payload)
@@ -49,14 +63,54 @@ def _validated_sha256(value: Any, *, label: str) -> str:
     return digest
 
 
+def _generated_time(value: Any) -> datetime:
+    generated_at = str(value or "")
+    try:
+        generated = datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ResearchSignalQualityError("payload generation timestamp is invalid") from exc
+    if generated.tzinfo is None:
+        raise ResearchSignalQualityError("payload generation timestamp needs an offset")
+    return generated.astimezone(timezone.utc)
+
+
+def _github_run_number(run_id: str) -> int | None:
+    match = re.fullmatch(r"github-(\d+)-(\d+)", run_id)
+    return int(match.group(1)) if match else None
+
+
+def _previous_report_matches(
+    previous_report: Mapping[str, Any] | None,
+    *,
+    run_id: str,
+    manifest_sha256: str,
+    generated_at_utc: str,
+) -> bool:
+    if not isinstance(previous_report, Mapping):
+        return False
+    if previous_report.get("schema") != "research-signal-quality-v0.1":
+        return False
+    if previous_report.get("lineage") not in {"PASS", "REUSED_VERIFIED_RUN"}:
+        return False
+    if previous_report.get("run_id") != run_id:
+        return False
+    if previous_report.get("manifest_sha256") != manifest_sha256:
+        return False
+    if previous_report.get("generated_at_utc") != generated_at_utc:
+        return False
+    return previous_report.get("quality") in {"FORECAST_READY", "METADATA_ONLY", "NO_DATA"}
+
+
 def evaluate_research_signal_quality(
     store: ReadOnlyObjectStore,
     *,
     namespace: str,
     now: datetime,
     max_age_seconds: int = 129_600,
+    expected_run_id: str | None = None,
+    previous_report: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Read and verify exactly latest -> manifest -> payload without listing R2."""
+    """Verify latest research evidence, reusing an already verified immutable run when exact."""
 
     namespace = namespace.strip("/")
     if not namespace:
@@ -72,6 +126,26 @@ def evaluate_research_signal_quality(
     if latest.get("schema") != "research-signal-layer-latest-v0.2":
         raise ResearchSignalQualityError("unexpected latest pointer schema")
 
+    run_id = str(latest.get("run_id") or "")
+    if not run_id:
+        raise ResearchSignalQualityError("latest research signal run ID is missing")
+    source_binding = "FALLBACK_LATEST"
+    if expected_run_id:
+        if run_id == expected_run_id:
+            source_binding = "MATCHED_TRIGGERING_RUN"
+        else:
+            observed_number = _github_run_number(run_id)
+            expected_number = _github_run_number(expected_run_id)
+            if (
+                observed_number is None
+                or expected_number is None
+                or observed_number <= expected_number
+            ):
+                raise ResearchSignalQualityError(
+                    "latest pointer does not match or supersede triggering upstream run"
+                )
+            source_binding = "SUPERSEDED_BY_NEWER_RUN"
+
     manifest_key = _validated_key(
         latest.get("manifest_key"),
         prefix=prefix,
@@ -81,6 +155,43 @@ def evaluate_research_signal_quality(
     manifest_sha256 = _validated_sha256(
         latest.get("manifest_sha256"), label="manifest SHA-256"
     )
+    generated_at = str(latest.get("generated_at_utc") or "")
+    generated = _generated_time(generated_at)
+    now = now.astimezone(timezone.utc)
+    age_seconds = int((now - generated).total_seconds())
+    if age_seconds < -300:
+        raise ResearchSignalQualityError("signal payload is dated in the future")
+
+    if _previous_report_matches(
+        previous_report,
+        run_id=run_id,
+        manifest_sha256=manifest_sha256,
+        generated_at_utc=generated_at,
+    ):
+        assert previous_report is not None
+        return {
+            "schema": "research-signal-quality-v0.1",
+            "status": "ALERT" if age_seconds > max_age_seconds else "PASS",
+            "quality": previous_report["quality"],
+            "decision": "NO_CHANGE",
+            "source_binding": source_binding,
+            "expected_run_id": expected_run_id,
+            "evaluated_at_utc": now.isoformat().replace("+00:00", "Z"),
+            "run_id": run_id,
+            "lineage": "REUSED_VERIFIED_RUN",
+            "generated_at_utc": generated_at,
+            "age_seconds": max(0, age_seconds),
+            "max_age_seconds": max_age_seconds,
+            "manifest_sha256": manifest_sha256,
+            "payload_sha256": previous_report.get("payload_sha256"),
+            "objects_read": [latest_key],
+            "source_count": int(previous_report.get("source_count", 0)),
+            "parsed_source_count": int(previous_report.get("parsed_source_count", 0)),
+            "failed_source_count": int(previous_report.get("failed_source_count", 0)),
+            "forecast_count": int(previous_report.get("forecast_count", 0)),
+            "authority": _authority(),
+        }
+
     manifest_bytes = store.get_bytes_verified(
         manifest_key, expected_sha256=manifest_sha256
     )
@@ -90,8 +201,7 @@ def evaluate_research_signal_quality(
     if manifest.get("schema") != "research-signal-layer-manifest-v0.2":
         raise ResearchSignalQualityError("unexpected manifest schema")
 
-    run_id = str(latest.get("run_id") or "")
-    if not run_id or manifest.get("run_id") != run_id:
+    if manifest.get("run_id") != run_id:
         raise ResearchSignalQualityError("latest and manifest run IDs disagree")
     payload_key = _validated_key(
         manifest.get("payload_key"),
@@ -126,20 +236,8 @@ def evaluate_research_signal_quality(
     forecasts = payload.get("kol_forecasts")
     if not isinstance(snapshots, list) or not isinstance(forecasts, list):
         raise ResearchSignalQualityError("signal payload collections are malformed")
-    generated_at = str(payload.get("generated_at_utc") or "")
-    if latest.get("generated_at_utc") != generated_at:
+    if payload.get("generated_at_utc") != generated_at:
         raise ResearchSignalQualityError("latest and payload generation timestamps disagree")
-    try:
-        generated = datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
-    except ValueError as exc:
-        raise ResearchSignalQualityError("payload generation timestamp is invalid") from exc
-    if generated.tzinfo is None:
-        raise ResearchSignalQualityError("payload generation timestamp needs an offset")
-    now = now.astimezone(timezone.utc)
-    generated = generated.astimezone(timezone.utc)
-    age_seconds = int((now - generated).total_seconds())
-    if age_seconds < -300:
-        raise ResearchSignalQualityError("signal payload is dated in the future")
     now_ms = int(now.timestamp() * 1000)
     for row in forecasts:
         if not isinstance(row, Mapping):
@@ -180,26 +278,21 @@ def evaluate_research_signal_quality(
         "schema": "research-signal-quality-v0.1",
         "status": "ALERT" if age_seconds > max_age_seconds else "PASS",
         "quality": quality,
+        "decision": "EVALUATED",
+        "source_binding": source_binding,
+        "expected_run_id": expected_run_id,
         "evaluated_at_utc": now.isoformat().replace("+00:00", "Z"),
         "run_id": run_id,
         "lineage": "PASS",
         "generated_at_utc": generated_at,
         "age_seconds": max(0, age_seconds),
         "max_age_seconds": max_age_seconds,
+        "manifest_sha256": manifest_sha256,
+        "payload_sha256": payload_sha256,
         "objects_read": [latest_key, manifest_key, payload_key],
         "source_count": len(snapshots),
         "parsed_source_count": parsed,
         "failed_source_count": failed,
         "forecast_count": len(forecasts),
-        "authority": {
-            "r2_exact_object_read_only": True,
-            "r2_list": False,
-            "r2_write": False,
-            "provider_access": False,
-            "holdout_access": False,
-            "automatic_model_promotion": False,
-            "direct_trade_trigger": False,
-            "real_money_order": False,
-            "live_trading": False,
-        },
+        "authority": _authority(),
     }
