@@ -166,7 +166,7 @@ def size_long_trade_tool(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def run_paper_backtest(payload: dict[str, Any]) -> dict[str, Any]:
-    candles_by_symbol = {
+    candles_by_symbol: dict[str, list[Candle] | tuple[Candle, ...]] = {
         str(symbol): tuple(_candle_from_mapping(item) for item in candles)
         for symbol, candles in payload["candles_by_symbol"].items()
     }
