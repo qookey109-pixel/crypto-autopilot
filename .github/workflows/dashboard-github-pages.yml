@@ -436,7 +436,7 @@ jobs:
       - name: Install pinned Playwright for PR browser validation
         if: github.event_name == 'pull_request'
         run: |
-          npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+          npm ci --ignore-scripts --no-audit --no-fund
           npx playwright install --with-deps chromium
 
       - name: Start built dashboard server for PR browser validation
@@ -536,7 +536,7 @@ jobs:
 
       - name: Install pinned Playwright production validator
         run: |
-          npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+          npm ci --ignore-scripts --no-audit --no-fund
           npx playwright install --with-deps chromium
 
       - name: Wait for deployed GitHub Pages site
