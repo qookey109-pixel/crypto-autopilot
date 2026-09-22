@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Final
+from typing import Any, Final, cast
 
 INPUT_SCHEMA: Final[str] = "qookey-liquidation-quality-context-snapshot-v0.1"
 ALLOWED_VENUES: Final[frozenset[str]] = frozenset({"bybit", "binance", "okx"})
@@ -185,7 +185,7 @@ def venue_local_liquidation_summary_policy_from_config(
         raise ValueError("unsupported venue-local liquidation summary config")
     if payload.get("input_schema") != INPUT_SCHEMA:
         raise ValueError("venue-local liquidation input schema mismatch")
-    if set(payload.get("allowed_venues") or []) != ALLOWED_VENUES:
+    if set(cast(Any, payload.get("allowed_venues") or [])) != ALLOWED_VENUES:
         raise ValueError("venue-local liquidation venue registry mismatch")
 
     policy = payload.get("policy")
