@@ -10,7 +10,7 @@ from dataclasses import asdict, dataclass
 import hashlib
 import json
 import math
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Iterable, Mapping, Sequence, TypedDict
 
 from ..models import BookTicker, MarketTicker
 from ..providers.pionex_alternative_assets import (
@@ -21,6 +21,19 @@ from ..providers.pionex_alternative_assets import (
 
 class UniverseRejected(RuntimeError):
     pass
+
+
+class _EligibleMarket(TypedDict):
+    symbol: str
+    base_asset: str
+    asset_class: str
+    tags: list[str]
+    close: float
+    quote_amount: float
+    trade_count: int
+    bid_price: float
+    ask_price: float
+    spread_bps: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -268,7 +281,7 @@ def build_universe(
     if not live:
         raise UniverseRejected("live Pionex perpetual catalog is empty")
 
-    eligible: list[dict[str, object]] = []
+    eligible: list[_EligibleMarket] = []
     excluded: list[dict[str, str]] = []
     for symbol in live:
         base = base_asset_from_pionex_symbol(symbol)
@@ -292,16 +305,21 @@ def build_universe(
         if base in meme_roots:
             tags.append("meme_candidate")
         eligible.append(
-            {
-                "symbol": symbol,
-                "base_asset": base,
-                "asset_class": asset_class,
-                "tags": tags,
-                **metrics,
-            }
+            _EligibleMarket(
+                symbol=symbol,
+                base_asset=base,
+                asset_class=asset_class,
+                tags=tags,
+                close=float(metrics["close"]),
+                quote_amount=float(metrics["quote_amount"]),
+                trade_count=int(metrics["trade_count"]),
+                bid_price=float(metrics["bid_price"]),
+                ask_price=float(metrics["ask_price"]),
+                spread_bps=float(metrics["spread_bps"]),
+            )
         )
 
-    def rank_key(item: Mapping[str, object]) -> tuple[float, float, int, str]:
+    def rank_key(item: _EligibleMarket) -> tuple[float, float, int, str]:
         return (
             -float(item["quote_amount"]),
             float(item["spread_bps"]),
