@@ -9,7 +9,7 @@ Repository `main` is the formal current authority and must be resolved live at r
 - Repository: `qookey109-pixel/crypto-autopilot`.
 - Current Operations companion: `research/status/current-operations-v0-3.json`.
 - Current Operations V0.3 stores an **evidence-basis parent SHA**, not a self-referential latest-main claim.
-- Evidence-basis parent for this status version: `b1d75cc54812fc6a355ab5c4535c105c53c26ceb`, the reviewed main commit after PR #423 merged and passed post-merge CI / Freeze Guard / CodeQL / Pages.
+- Evidence-basis parent for this status version: `09dfb0d79b88dc56f3cb582c91d8091617437ce2`, the reviewed main commit after PR #426 merged and passed post-merge CI / Freeze Guard / CodeQL / Pages.
 - Current mode: **PAPER / LIVE-PAPER ONLY**. Public live market data and simulated live-paper execution/persistence are separate from real trading authority.
 - FREE-ONLY cloud/runtime budget: **0 USD/month**.
 
@@ -101,9 +101,9 @@ PR #322 merged the first control-plane convergence batch:
 
 The control plane must keep present-tense Current Operations later than historical authority/readiness projections, so dated September 13 `8/10 / Training skipped / PR #292` text and older V0.1 Pionex pending-dispatch text cannot return during deployment.
 
-P2 quality/dependency/security visibility is now established through the non-blocking Quality Visibility V0.2 report, existing review-only Dependabot proposals, and non-blocking CodeQL SARIF artifacts. No semantic type checker or new required security gate has been introduced. Large-module refactoring remains deferred under TD-009.
+P2 quality/dependency/security visibility is now established through non-blocking Quality Visibility V0.2, non-blocking mypy semantic type visibility, review-only Dependabot proposals, and non-blocking CodeQL SARIF artifacts. The first mypy baseline reported 261 type errors and remains informational only; no type/security threshold is a required gate. Large-module refactoring remains deferred under TD-009.
 
-Tracking: `docs/TECH_DEBT_REGISTER_2026_09_16.md`.
+Tracking: `docs/TECH_DEBT_REGISTER_2026_09_17.md`. Current PR navigation: `docs/OPEN_PR_TRIAGE_2026_09_22.md` / `research/status/open-pr-triage-v0-5.json`.
 
 ## Open work that matters now
 
@@ -113,7 +113,7 @@ Tracking: `docs/TECH_DEBT_REGISTER_2026_09_16.md`.
 - ZEC Strategy V0.3 completed its governed one-shot historical development execution: 64 candidates × 4 folds = 256/256 cells. Selection result is **NO_ELIGIBLE_DEVELOPMENT_CANDIDATE**; no champion was frozen. Fresh confirmation, holdout, promotion and trading remain unopened.
 - External Capability Registry candidates have downstream evaluation receipts and a convergence index. Candidate inventory status does not imply runtime approval.
 - Operator messaging now has a provider-neutral offline path: parser -> status resolver -> local CLI for `help`, `status` and `paper_status`; no Telegram/network/secret/trading authority is implied.
-- As of this 2026-09-19 status convergence, GitHub has **zero open pull requests** after preserving useful evidence/design work and closing superseded historical drafts.
+- As of the 2026-09-22 triage refresh, the active open backlog is **six Dependabot pull requests (#326–#331)**. Older architecture-generation and draft-salvage PRs are closed historical references and are not current merge candidates.
 
 Historical CI success on an old branch is not sufficient merge evidence after main advances. Any newly opened PR must be evaluated against live `main`.
 
@@ -187,7 +187,8 @@ The dashboard and retired-workflow validators intentionally preserve these histo
 4. `README.md`
 5. `AGENTS.md`
 6. current versioned config/receipt/run evidence
-7. `docs/TECH_DEBT_REGISTER_2026_09_16.md`
+7. `docs/TECH_DEBT_REGISTER_2026_09_17.md`
+8. `docs/OPEN_PR_TRIAGE_2026_09_22.md`
 
 ## Preserved pre-convergence snapshot
 
