@@ -8,7 +8,7 @@ import os
 import tempfile
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping, cast
 
 from crypto_autopilot.lineage import assert_no_secret_fields, assert_sha256, canonical_json, sha256_json
 
@@ -130,7 +130,12 @@ class ExperimentRecord:
     @classmethod
     def from_evidence(cls, payload: Mapping[str, Any]) -> "ExperimentRecord":
         comparison = dict(payload["comparison"])
-        comparison["interval_set"] = tuple(comparison.get("interval_set", comparison.get("intervalSet", ())))
+        comparison["interval_set"] = tuple(
+            cast(
+                Iterable[Any],
+                comparison.get("interval_set", comparison.get("intervalSet", ())),
+            )
+        )
         if "symbol_universe_sha256" not in comparison:
             comparison["symbol_universe_sha256"] = comparison.pop("symbolUniverseSha256")
         if "feature_config_sha256" not in comparison:
@@ -148,7 +153,10 @@ class ExperimentRecord:
             outcome=str(payload["outcome"]),
             cost=ExperimentCost(**dict(payload.get("cost") or {})),
             metrics=dict(payload.get("metrics") or {}),
-            artifact_refs=tuple(str(item) for item in payload.get("artifactRefs", ())),
+            artifact_refs=tuple(
+                str(item)
+                for item in cast(Iterable[Any], payload.get("artifactRefs", ()))
+            ),
         )
 
 
@@ -290,8 +298,8 @@ def validate_experiment_registry_entry(entry: dict[str, Any]) -> None:
     assert_sha256(str(entry.get("dataset_sha256", "")), "dataset_sha256")
     assert_sha256(str(entry.get("config_sha256", "")), "config_sha256")
     for key in ("challenger_only", "promotion_eligible", "deployment_authorized", "trading_authorized"):
-        expected = True if key == "challenger_only" else False
-        if entry.get(key) is not expected:
+        expected_flag = True if key == "challenger_only" else False
+        if entry.get(key) is not expected_flag:
             raise ValueError(f"experiment registry safety field {key} is unsafe")
     expected = build_experiment_registry_entry(
         comparison_key=str(entry.get("comparison_key", "")),
