@@ -4,10 +4,10 @@
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
-    "parent_main_sha": "09dfb0d79b88dc56f3cb582c91d8091617437ce2",
+    "parent_main_sha": "9ffe30c8f0ab28bc3b2a95ae19de6938ed613dae",
     "semantics": "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
     "is_latest_main_claim": false,
-    "source_merge_pr": 426
+    "source_merge_pr": 427
   },
   "mode": "PAPER_AND_LIVE_PAPER_ONLY",
   "core100": {
@@ -132,9 +132,11 @@
       329,
       330,
       331
-    ]
+    ],
+    "type_debt_baseline": "research/status/type-debt-baseline-v0-1.json",
+    "type_debt_baseline_state": "NONBLOCKING_MYPY_261_ERRORS_49_FILES_DYNAMIC_OBJECT_NARROWING_FIRST"
   },
-  "next_decision": "REVIEW_DEPENDENCY_PRS_FROM_CURRENT_MAIN_AND_REVIEW_TYPE_BASELINE_WITHOUT_NEW_EXECUTION_AUTHORITY",
+  "next_decision": "REDUCE_NON_EXECUTION_TYPE_DEBT_AND_REVIEW_DEPENDENCY_PRS_WITHOUT_NEW_EXECUTION_AUTHORITY",
   "notes": [
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
     "Older September 13 present-tense summaries reporting Core100 8/10 and Training SKIPPED are historical and superseded for current operations.",
@@ -154,7 +156,8 @@
     "PR #422 merged pinned Playwright Chromium validation for desktop and mobile against PR-built dashboard output, with production browser validation gated on a real GitHub Pages deploy.",
     "PR #423 merged deterministic Live Paper run-slot claims using atomic create-if-absent before provider access; unresolved claims fail closed to review and the coordinator remains manual workflow_dispatch only.",
     "Open PR navigation was refreshed on 2026-09-22 in open-pr-triage-v0-5: only Dependabot PRs #326-#331 remain open; older architecture-generation and salvage PRs are closed historical references.",
-    "PR #426 merged non-blocking mypy semantic type visibility on Python 3.13; the first baseline reported 261 type errors without failing CI or changing execution authority."
+    "PR #426 merged non-blocking mypy semantic type visibility on Python 3.13; the first baseline reported 261 type errors without failing CI or changing execution authority.",
+    "Type Debt Baseline V0.1 records the post-PR-427 CI baseline: mypy 2.3.1 on Python 3.13 reports 261 errors across 49 files; 82.38% are arg-type/call-overload/attr-defined and remain non-blocking."
   ],
   "live_paper": {
     "status": "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY",
