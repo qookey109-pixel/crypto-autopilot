@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = ROOT / "package.json"
+LOCKFILE = ROOT / "package-lock.json"
 CONFIG = ROOT / "playwright.config.cjs"
 SPEC = ROOT / "tests/browser/dashboard.spec.cjs"
 WORKFLOW = ROOT / ".github/workflows/dashboard-github-pages.yml"
@@ -17,6 +18,16 @@ class DashboardPlaywrightWorkflowTests(unittest.TestCase):
         package = json.loads(PACKAGE.read_text(encoding="utf-8"))
         self.assertTrue(package["private"])
         self.assertEqual(package["devDependencies"]["@playwright/test"], "1.63.0")
+
+        lock = json.loads(LOCKFILE.read_text(encoding="utf-8"))
+        self.assertEqual(lock["lockfileVersion"], 3)
+        self.assertEqual(
+            lock["packages"][""]["devDependencies"]["@playwright/test"],
+            "1.63.0",
+        )
+        self.assertEqual(lock["packages"]["node_modules/@playwright/test"]["version"], "1.63.0")
+        self.assertEqual(lock["packages"]["node_modules/playwright"]["version"], "1.63.0")
+        self.assertEqual(lock["packages"]["node_modules/playwright-core"]["version"], "1.63.0")
 
         config = CONFIG.read_text(encoding="utf-8")
         self.assertIn("workers: 1", config)
@@ -56,7 +67,8 @@ class DashboardPlaywrightWorkflowTests(unittest.TestCase):
     def test_pages_workflow_runs_pr_build_and_post_deploy_browser_checks(self) -> None:
         text = WORKFLOW.read_text(encoding="utf-8")
         self.assertIn("actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38", text)
-        self.assertIn("npm install --ignore-scripts --no-audit --no-fund --package-lock=false", text)
+        self.assertEqual(text.count("npm ci --ignore-scripts --no-audit --no-fund"), 2)
+        self.assertNotIn("npm install --ignore-scripts --no-audit --no-fund --package-lock=false", text)
         self.assertIn("npx playwright install --with-deps chromium", text)
         self.assertIn("python -m http.server 4173 -d _site", text)
         self.assertIn("PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173/", text)
