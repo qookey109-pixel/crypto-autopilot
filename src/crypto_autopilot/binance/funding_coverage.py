@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Iterable
+from typing import Iterable, Mapping, cast
 
 
 COVERAGE_EDGE_CADENCE_JITTER_TOLERANCE_MS = 50
@@ -18,9 +18,9 @@ def validate_funding_coverage_config(config: dict[str, object]) -> None:
         raise BinanceFundingCoverageError("Funding coverage provider/delivery mismatch")
     if config.get("dataset") != "fundingRate" or config.get("archive_frequency") != "monthly":
         raise BinanceFundingCoverageError("Funding coverage must remain monthly fundingRate")
-    if int(config.get("candidate_count") or 0) != 15:
+    if int(cast(int, config.get("candidate_count") or 0)) != 15:
         raise BinanceFundingCoverageError("Funding coverage V0.1 requires the frozen 15-market universe")
-    if int(config.get("project_history_cap_years") or 0) != 8:
+    if int(cast(int, config.get("project_history_cap_years") or 0)) != 8:
         raise BinanceFundingCoverageError("Funding coverage history cap changed")
     if config.get("scan_floor_policy") != "PROJECT_HISTORY_CAP_ONLY":
         raise BinanceFundingCoverageError("Funding coverage may not assume a provider onset month")
@@ -32,11 +32,11 @@ def validate_funding_coverage_config(config: dict[str, object]) -> None:
         raise BinanceFundingCoverageError("Funding edge audit policy changed")
     if config.get("interior_policy") != "CHECKSUM_PRESENCE_ONLY":
         raise BinanceFundingCoverageError("Funding interior policy changed")
-    if int(config.get("source_proof_default_cadence_jitter_tolerance_ms") or -1) != 10:
+    if int(cast(int, config.get("source_proof_default_cadence_jitter_tolerance_ms") or -1)) != 10:
         raise BinanceFundingCoverageError("Funding source-proof default tolerance must remain 10ms")
-    if int(config.get("coverage_edge_cadence_jitter_tolerance_ms") or -1) != COVERAGE_EDGE_CADENCE_JITTER_TOLERANCE_MS:
+    if int(cast(int, config.get("coverage_edge_cadence_jitter_tolerance_ms") or -1)) != COVERAGE_EDGE_CADENCE_JITTER_TOLERANCE_MS:
         raise BinanceFundingCoverageError("Funding coverage edge tolerance changed after diagnostic freeze")
-    diagnostic = config.get("coverage_edge_diagnostic") or {}
+    diagnostic = cast(Mapping[str, object], config.get("coverage_edge_diagnostic") or {})
     if int(diagnostic.get("observed_max_abs_residual_ms") or -1) != 45:
         raise BinanceFundingCoverageError("Funding coverage edge diagnostic maximum must remain frozen at 45ms")
     if diagnostic.get("tolerance_refrozen_before_coverage_pass_authority") is not True:
@@ -70,7 +70,7 @@ def validate_source_proof_authority(payload: dict[str, object]) -> None:
         raise BinanceFundingCoverageError("Funding source proof provider/delivery mismatch")
     if payload.get("dataset") != "fundingRate" or payload.get("frequency") != "monthly":
         raise BinanceFundingCoverageError("Funding source proof dataset/frequency mismatch")
-    boundary = payload.get("authority_boundary") or {}
+    boundary = cast(Mapping[str, object], payload.get("authority_boundary") or {})
     for field in (
         "authorizes_funding_r2_writes",
         "authorizes_source_switch",
@@ -165,15 +165,15 @@ def attach_funding_boundaries(
         raise BinanceFundingCoverageError("available Funding span requires both first and last edge receipts")
     if first_receipt.get("audit_ok") is not True or last_receipt.get("audit_ok") is not True:
         raise BinanceFundingCoverageError("Funding edge receipts must pass content audit")
-    first_ms = int(first_receipt["first_time_ms"])
-    last_ms = int(last_receipt["last_time_ms"])
+    first_ms = int(cast(int, first_receipt["first_time_ms"]))
+    last_ms = int(cast(int, last_receipt["last_time_ms"]))
     if first_ms > last_ms:
         raise BinanceFundingCoverageError("Funding audited boundaries are reversed")
     intervals = sorted(
         {
             int(value)
             for receipt in (first_receipt, last_receipt)
-            for value in (receipt.get("interval_hours") or [])
+            for value in cast(Iterable[object], receipt.get("interval_hours") or [])
         }
     )
     result.update(
