@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import Iterable
+from typing import Iterable, cast
 
 from crypto_autopilot.models import Candle
 
@@ -132,10 +132,10 @@ def analyze_direction_mismatches(
     if matches + mismatches != comparisons:
         raise RuntimeError("direction forensic accounting mismatch")
 
-    max_abs_values = [float(row["max_abs_return_bps"]) for row in mismatch_rows]
-    min_abs_values = [float(row["min_abs_return_bps"]) for row in mismatch_rows]
-    left_abs_values = [abs(float(row["pionex_return_bps"])) for row in mismatch_rows]
-    right_abs_values = [abs(float(row["binance_return_bps"])) for row in mismatch_rows]
+    max_abs_values = [float(cast(float, row["max_abs_return_bps"])) for row in mismatch_rows]
+    min_abs_values = [float(cast(float, row["min_abs_return_bps"])) for row in mismatch_rows]
+    left_abs_values = [abs(float(cast(float, row["pionex_return_bps"]))) for row in mismatch_rows]
+    right_abs_values = [abs(float(cast(float, row["binance_return_bps"]))) for row in mismatch_rows]
 
     bin_counts: dict[str, int] = {}
     for row in mismatch_rows:
@@ -144,8 +144,8 @@ def analyze_direction_mismatches(
 
     cumulative_counts = {
         f"both_abs_returns_le_{threshold:g}_bps": sum(
-            _le_descriptive_boundary(abs(float(row["pionex_return_bps"])), threshold)
-            and _le_descriptive_boundary(abs(float(row["binance_return_bps"])), threshold)
+            _le_descriptive_boundary(abs(float(cast(float, row["pionex_return_bps"]))), threshold)
+            and _le_descriptive_boundary(abs(float(cast(float, row["binance_return_bps"]))), threshold)
             for row in mismatch_rows
         )
         for threshold in FORENSIC_ABS_RETURN_BPS_BINS
