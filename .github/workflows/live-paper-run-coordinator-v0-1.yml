@@ -79,6 +79,10 @@ jobs:
           PYTHONPATH=src python scripts/run_live_paper_coordinator_v0_1.py \
             --input "${SAFE_INPUT_PATH}" \
             --store-backend r2 \
+            --coordinator-config config/live_paper_run_coordinator_v0_2.json \
+            --claim-config config/live_paper_run_claim_v0_1.json \
+            --live-config config/live_paper_simulation_v0_1.json \
+            --store-config config/paper_run_store_v0_1.json \
             > artifacts/live-paper-run-coordinator-report.json
           exit_code=$?
           set -e
@@ -112,6 +116,8 @@ jobs:
           assert authority["public_live_market_data_authorized"] is True
           assert authority["live_paper_simulation_authorized"] is True
           assert authority["paper_state_persistence_authorized"] is True
+          assert authority["paper_run_slot_claim_authorized"] is True
+          assert authority["claim_conflict_auto_retry_authorized"] is False
           assert authority["automatic_schedule_authorized"] is False
           assert authority["automatic_candidate_generation_authorized"] is False
           assert authority["scorecard_auto_selection_authorized"] is False
@@ -119,6 +125,10 @@ jobs:
           assert authority["holdout_access_authorized"] is False
           assert authority["real_money_order_authorized"] is False
           assert authority["live_real_trading_authorized"] is False
+          if report["state"] == "LIVE_PAPER_RUN_STEP_COMMITTED":
+              slot_id = report.get("claim_slot_id")
+              assert isinstance(slot_id, str)
+              assert slot_id.startswith("live-paper-run-slot-v0-1-")
           PY
           echo "report_safe=true" >> "$GITHUB_OUTPUT"
 
