@@ -37,6 +37,9 @@ class _SuccessStore:
     def get_json(self, kind: str, object_id: str):
         return None
 
+    def put_json_if_absent(self, kind: str, object_id: str, payload):
+        return SimpleNamespace(replayed=False)
+
 
 class _FailingStore:
     def put_json(self, kind: str, object_id: str, payload):
@@ -44,6 +47,9 @@ class _FailingStore:
 
     def get_json(self, kind: str, object_id: str):
         return None
+
+    def put_json_if_absent(self, kind: str, object_id: str, payload):
+        raise OSError("storage leaked detail must not reach report")
 
 
 def test_tracked_feed_counts_known_provider_requests() -> None:
@@ -104,6 +110,7 @@ def test_failure_report_never_claims_zero_when_side_effects_are_uncertain() -> N
         stage="COORDINATE_RUN_STEP",
         error=RuntimeError("secret-ish raw provider response"),
         journal=journal,
+        claim_required=True,
     )
     assert report["provider_requests_performed"] is None
     assert report["persistent_objects_created"] is None
@@ -111,6 +118,8 @@ def test_failure_report_never_claims_zero_when_side_effects_are_uncertain() -> N
     assert report["persistent_writes_status"] == "UNKNOWN_OR_PARTIAL"
     assert report["reason"] == "coordinate_run_step_failed"
     assert report["error_type"] == "RuntimeError"
+    assert report["authority"]["paper_run_slot_claim_authorized"] is True
+    assert report["authority"]["claim_conflict_auto_retry_authorized"] is False
     assert "secret-ish" not in str(report)
 
 
@@ -140,4 +149,7 @@ def test_workflows_use_constrained_installs_main_guard_and_shared_lock() -> None
     assert "exit_code=$?" in coordinator
     assert 'echo "report_safe=true" >> "$GITHUB_OUTPUT"' in coordinator
     assert "always() && steps.coordinator.outputs.report_safe == 'true'" in coordinator
+    assert "--coordinator-config config/live_paper_run_coordinator_v0_2.json" in coordinator
+    assert "--claim-config config/live_paper_run_claim_v0_1.json" in coordinator
+    assert 'authority["paper_run_slot_claim_authorized"] is True' in coordinator
     assert "Coordinator failed after producing a validated safe report." in coordinator
