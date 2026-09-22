@@ -1,0 +1,111 @@
+{
+  "schema": "qookey-open-pr-triage-v0.6",
+  "snapshot_date": "2026-09-22",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
+  "evidence_basis": {
+    "parent_main_sha": "89b7335204d09232b25b407e593294fbdb5913f2",
+    "is_latest_main_claim": false,
+    "source_merged_pr": 442
+  },
+  "merge_authority_granted": false,
+  "execution_authority_granted": false,
+  "close_authority_granted": false,
+  "active_open_pr_count": 7,
+  "active_open_pr_numbers": [
+    441,
+    326,
+    327,
+    328,
+    329,
+    330,
+    331
+  ],
+  "non_dependabot_open_prs": {
+    "441": {
+      "classification": "NARROW_TYPING_CLEANUP_REVALIDATE_CURRENT_MAIN",
+      "title": "Narrow liquidation sensitivity runner typing",
+      "head_sha": "509baa911054ea2c1ebb695152b2d3a1f201110e",
+      "comparison_to_evidence_basis_main": {
+        "ahead_by": 1,
+        "behind_by": 2,
+        "status": "DIVERGED"
+      },
+      "current_scope": [
+        "src/crypto_autopilot/research/liquidation_sensitivity_scenario_runner_v0_1.py"
+      ],
+      "changed_lines": 5,
+      "prior_checks": "CI_AND_CODEQL_SUCCESS_ON_ORIGINAL_HEAD",
+      "current_main_review": "REFRESH_OR_REVALIDATE_AGAINST_CURRENT_MAIN_BEFORE_MERGE",
+      "risk": "LOW_NARROW_TYPING_ONLY"
+    }
+  },
+  "dependency_review_order": [
+    329,
+    326,
+    327,
+    328,
+    330,
+    331
+  ],
+  "dependency_pull_requests": {
+    "326": {
+      "classification": "DEPENDENCY_REVIEW_PATCH_SDK",
+      "dependency": "boto3",
+      "change": "1.43.75 -> 1.43.93",
+      "current_main_review": "REVIEW_BOTO3_BOTOCORE_COUPLING_THEN_REFRESH_FROM_CURRENT_MAIN"
+    },
+    "327": {
+      "classification": "DEPENDENCY_REVIEW_MAJOR_ACTION",
+      "dependency": "actions/cache",
+      "change": "5.1.0 -> 6.1.0",
+      "current_main_review": "REBUILD_EXACT_CHANGE_FROM_CURRENT_MAIN_AND_VERIFY_CACHE_SEMANTICS"
+    },
+    "328": {
+      "classification": "DEPENDENCY_REVIEW_MAJOR_ACTION",
+      "dependency": "actions/download-artifact",
+      "change": "7.0.0 -> 8.0.1",
+      "current_main_review": "REBUILD_EXACT_CHANGE_FROM_CURRENT_MAIN_AND_VERIFY_ARTIFACT_ID_BEHAVIOR"
+    },
+    "329": {
+      "classification": "DEPENDENCY_REVIEW_PATCH_TOOLING",
+      "dependency": "ruff",
+      "change": "0.16.0 -> 0.16.7",
+      "current_main_review": "REFRESH_FROM_CURRENT_MAIN_AND_RUN_FULL_CI_BEFORE_MERGE"
+    },
+    "330": {
+      "classification": "DEPENDENCY_REVIEW_MAJOR_CRITICAL_ACTION",
+      "dependency": "actions/checkout",
+      "change": "6 -> 7",
+      "current_main_review": "DO_NOT_MERGE_OLD_BRANCH_REVIEW_GLOBAL_PIN_POLICY_AND_FREEZE_BOUNDARIES_FIRST"
+    },
+    "331": {
+      "classification": "DEPENDENCY_REVIEW_MAJOR_RUNTIME",
+      "dependency": "pyarrow",
+      "change": "21.0.0 -> 25.0.1",
+      "current_main_review": "BLOCKED_PENDING_PUBLIC_COMPATIBILITY_AND_FROZEN_CONSTRAINT_REVIEW"
+    }
+  },
+  "remote_branch_inventory": {
+    "codex/research-context-v0-1": {
+      "ahead_by": 0,
+      "behind_by": 1433,
+      "unique_remote_commits": 0,
+      "classification": "REMOTE_FULLY_SUPERSEDED_BY_MAIN"
+    },
+    "codex/dashboard-schedule-audit-20260922": {
+      "ahead_by": 0,
+      "behind_by": 1,
+      "unique_remote_commits": 0,
+      "classification": "MERGED_VIA_PR_442"
+    }
+  },
+  "local_checkout_visibility": "UNVERIFIED_FROM_GITHUB",
+  "local_cleanup_authorized": false,
+  "notes": [
+    "GitHub branch comparison cannot observe uncommitted files in a developer checkout.",
+    "Preserve local work until compared against exact current main.",
+    "Each dependency update requires independent current-main compatibility review and separate merge authorization.",
+    "This snapshot grants no merge, close, provider, R2, holdout, promotion, source-switch, order, or live-trading authority."
+  ]
+}
