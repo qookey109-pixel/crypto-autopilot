@@ -86,7 +86,7 @@ Already implemented:
 - CI on Python 3.13 emits non-blocking quality visibility;
 - `scripts/quality_visibility.py` reports Python inventory, syntax issues, TODO/FIXME/HACK markers, annotation coverage, broad Ruff diagnostics, largest/decision-heavy definitions, and heuristic private dead-code candidates;
 - `scripts/type_visibility.py` emits a separate non-blocking mypy semantic baseline for `src/crypto_autopilot`;
-- mypy is pinned in the CI reproducibility constraints and diagnostics are uploaded as `type-visibility.json`;
+- mypy `2.3.1` is pinned directly in the informational CI step so the frozen V0.10 dependency snapshot remains unchanged; diagnostics are uploaded as `type-visibility.json`;
 - no lint/type threshold is enforced by these informational reports.
 
 Still missing:
