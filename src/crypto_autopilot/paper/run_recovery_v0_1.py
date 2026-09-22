@@ -10,6 +10,10 @@ from crypto_autopilot.paper.live_v0_1 import (
     live_paper_tick_report_id_from_mapping,
     verify_live_paper_state,
 )
+from crypto_autopilot.paper.run_claim_v0_1 import (
+    live_paper_run_slot_id,
+    verify_live_paper_run_claim,
+)
 from crypto_autopilot.paper.run_coordinator_v0_1 import (
     build_live_paper_run_result,
     verify_live_paper_run_header,
@@ -123,6 +127,9 @@ def _required_store_object(
 def _authority() -> dict[str, object]:
     return {
         "audit_and_result_seal_repair_only": True,
+        "run_slot_claim_audit_authorized": True,
+        "claim_takeover_authorized": False,
+        "automatic_retry_after_claim_conflict_authorized": False,
         "provider_access_authorized": False,
         "live_market_data_access_authorized": False,
         "account_state_mutation_authorized": False,
@@ -248,6 +255,32 @@ def _scan_target_results(
     return by_request, issues
 
 
+def _scan_target_claims(
+    *,
+    store: PaperRunRecoveryStore,
+    run_id: str,
+) -> tuple[dict[str, dict[str, object]], list[str]]:
+    by_slot: dict[str, dict[str, object]] = {}
+    issues: list[str] = []
+    for object_id in store.list_json_ids("live-run-claim"):
+        payload = store.get_json("live-run-claim", object_id)
+        if payload is None or payload.get("run_id") != run_id:
+            continue
+        try:
+            slot_id = verify_live_paper_run_claim(payload)
+        except ValueError as error:
+            issues.append(f"invalid_claim:{object_id}:{error}")
+            continue
+        if slot_id != object_id or payload.get("slot_id") != object_id:
+            issues.append(f"claim_object_id_mismatch:{object_id}")
+            continue
+        if object_id in by_slot:
+            issues.append(f"duplicate_claim_slot:{object_id}")
+            continue
+        by_slot[object_id] = dict(payload)
+    return by_slot, issues
+
+
 def _orphan_ticks_after_terminal_state(
     *,
     store: PaperRunRecoveryStore,
@@ -305,9 +338,19 @@ def reconcile_live_paper_run(
 
     steps, step_scan_issues = _scan_target_steps(store=store, run_id=run_id)
     results, result_scan_issues = _scan_target_results(store=store, run_id=run_id)
-    issues = [*step_scan_issues, *result_scan_issues]
+    claims, claim_scan_issues = _scan_target_claims(store=store, run_id=run_id)
+    issues = [*step_scan_issues, *result_scan_issues, *claim_scan_issues]
 
     if not steps:
+        unresolved_claim_slots = sorted(claims)
+        if unresolved_claim_slots:
+            issues.extend(
+                "unresolved_claim_without_step:"
+                + slot_id
+                + ":"
+                + str(claims[slot_id].get("request_id"))
+                for slot_id in unresolved_claim_slots
+            )
         orphan_results = sorted(results)
         if orphan_results:
             issues.extend(
@@ -334,6 +377,8 @@ def reconcile_live_paper_run(
             "state": state,
             "run_id": run_id,
             "step_count": 0,
+            "claim_count": len(claims),
+            "unresolved_claim_slot_ids": unresolved_claim_slots,
             "terminal_step_id": None,
             "terminal_state_id": initial_state_id,
             "repairable_request_ids": [],
@@ -428,6 +473,42 @@ def reconcile_live_paper_run(
         if isinstance(referenced_step, str) and referenced_step not in complete_step_ids:
             issues.append(f"result_references_incomplete_step:{request_id}")
 
+    unresolved_claim_slots: list[str] = []
+    complete_steps_by_request = {
+        str(step["request_id"]): step
+        for step in steps.values()
+        if (
+            isinstance(step.get("request_id"), str)
+            and step.get("request_id")
+            and str(step.get("step_id")) in complete_step_ids
+        )
+    }
+    for slot_id, claim in claims.items():
+        request_id = claim.get("request_id")
+        if not isinstance(request_id, str) or not request_id:
+            issues.append(f"claim_missing_request_id:{slot_id}")
+            unresolved_claim_slots.append(slot_id)
+            continue
+        step = complete_steps_by_request.get(request_id)
+        if step is None:
+            issues.append(f"unresolved_claim_without_complete_step:{slot_id}:{request_id}")
+            unresolved_claim_slots.append(slot_id)
+            continue
+        expected_slot = live_paper_run_slot_id(
+            run_id=run_id,
+            sequence=int(step["sequence"]),
+            previous_step_id=step.get("previous_step_id"),
+            previous_state_id=str(step["previous_state_id"]),
+        )
+        if expected_slot != slot_id:
+            issues.append(f"claim_step_slot_mismatch:{slot_id}:{request_id}")
+            unresolved_claim_slots.append(slot_id)
+            continue
+        result = results.get(request_id)
+        if result is not None and result.get("_verified_step_id") != step.get("step_id"):
+            issues.append(f"claim_result_step_mismatch:{slot_id}:{request_id}")
+            unresolved_claim_slots.append(slot_id)
+
     orphan_ticks = _orphan_ticks_after_terminal_state(
         store=store,
         known_tick_ids=known_tick_ids,
@@ -501,6 +582,8 @@ def reconcile_live_paper_run(
         "state": state,
         "run_id": run_id,
         "step_count": len(steps),
+        "claim_count": len(claims),
+        "unresolved_claim_slot_ids": sorted(set(unresolved_claim_slots)),
         "terminal_step_id": terminal_step_id,
         "terminal_state_id": terminal_state_id,
         "repairable_request_ids": sorted(repairable),
