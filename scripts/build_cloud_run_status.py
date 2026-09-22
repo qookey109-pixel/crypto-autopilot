@@ -218,6 +218,20 @@ def freshness_state(definition: dict, latest: dict, *, now: datetime) -> str:
     return "FRESH" if age_seconds <= max_age else "STALE"
 
 
+def schedule_window_state(definition: dict, *, now: datetime) -> str:
+    if definition["lifecycleState"] == "EXPIRED_BOUNDED_FROZEN_CRON_DECLARATION":
+        return "EXPIRED"
+
+    active_from = _parse_utc(definition.get("activeFromUtc"))
+    if active_from is not None and now < active_from:
+        return "PENDING"
+
+    active_until = _parse_utc(definition.get("activeUntilUtc"))
+    if active_until is not None and now > active_until:
+        return "EXPIRED"
+    return "EFFECTIVE"
+
+
 def collect(fetch_json, *, now: datetime | None = None) -> dict:
     observed = now or datetime.now(timezone.utc)
     definitions = load_monitor_definitions()
@@ -248,8 +262,14 @@ def collect(fetch_json, *, now: datetime | None = None) -> dict:
         }
         items.append(item)
 
-    current = sum(row["lifecycleState"] == "CURRENT_EFFECTIVE" for row in items)
-    expired = len(items) - current
+    window_states = [schedule_window_state(row, now=observed) for row in items]
+    current = sum(state == "EFFECTIVE" for state in window_states)
+    expired = sum(state == "EXPIRED" for state in window_states)
+    pending = sum(state == "PENDING" for state in window_states)
+    frozen_expired = sum(
+        row["lifecycleState"] == "EXPIRED_BOUNDED_FROZEN_CRON_DECLARATION"
+        for row in items
+    )
     return {
         "schema": "qookey-cloud-run-status-v0.2",
         "authority": False,
@@ -259,7 +279,9 @@ def collect(fetch_json, *, now: datetime | None = None) -> dict:
             "repositoryCronDeclarationCount": len(items),
             "monitoredCronDeclarationCount": len(items),
             "currentEffectiveScheduleCount": current,
-            "expiredFrozenCronDeclarationCount": expired,
+            "expiredScheduleCount": expired,
+            "pendingScheduleCount": pending,
+            "expiredFrozenCronDeclarationCount": frozen_expired,
         },
         "items": items,
         "safetyBoundary": {
