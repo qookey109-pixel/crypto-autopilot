@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 import math
-from typing import Protocol, Sequence
+from typing import Mapping, Protocol, Sequence, cast
 
 from ..historical import INTERVAL_ALIGNMENT_OFFSET_MS, INTERVAL_MS, audit_candles
 from ..models import Candle
@@ -179,15 +179,17 @@ def discover_interval(
     progress: dict[str, int],
 ) -> IntervalReach:
     _require_fixed_scope(config)
-    if interval not in config["intervals"]:
+    intervals = cast(Sequence[str], config["intervals"])
+    classifications = cast(Mapping[str, object], config["classification"])
+    if interval not in intervals:
         raise ReachRejected("interval not authorized")
     step = INTERVAL_MS[interval]
     cutoff = stamp(str(config["cutoff_exclusive_utc"]))
     cursor = _last_aligned_candle_before(cutoff, interval)
-    page_limit = int(config["page_limit"])
-    max_records = int(config["documented_max_records_per_interval"])
-    max_pages = int(config["max_pages_per_interval"])
-    maximum_requests = int(config["maximum_requests"])
+    page_limit = int(cast(int, config["page_limit"]))
+    max_records = int(cast(int, config["documented_max_records_per_interval"]))
+    max_pages = int(cast(int, config["max_pages_per_interval"]))
+    maximum_requests = int(cast(int, config["maximum_requests"]))
     seen: set[int] = set()
     data_pages = 0
     interval_requests = 0
@@ -216,7 +218,7 @@ def discover_interval(
         if not page:
             if not seen:
                 raise ReachRejected("provider returned no data at discovery cutoff")
-            classification = str(config["classification"]["provider_earliest_reached"])
+            classification = str(classifications["provider_earliest_reached"])
             break
 
         _validate_page(page, interval=interval, cursor=cursor, limit=limit, seen=seen)
@@ -233,7 +235,7 @@ def discover_interval(
                 probe = client.get_klines(
                     str(config["symbol"]),
                     interval,
-                    limit=int(config["boundary_probe_limit"]),
+                    limit=int(cast(int, config["boundary_probe_limit"])),
                     end_time_ms=probe_cursor,
                 )
             except Exception as exc:
@@ -248,15 +250,15 @@ def discover_interval(
                     probe,
                     interval=interval,
                     cursor=probe_cursor,
-                    limit=int(config["boundary_probe_limit"]),
+                    limit=int(cast(int, config["boundary_probe_limit"])),
                     seen=seen,
                 )
                 raise ReachRejected("short page did not prove provider earliest boundary")
-            classification = str(config["classification"]["provider_earliest_reached"])
+            classification = str(classifications["provider_earliest_reached"])
             break
 
         if len(seen) == max_records:
-            classification = str(config["classification"]["documented_record_cap_reached"])
+            classification = str(classifications["documented_record_cap_reached"])
             break
 
         cursor = page[0].time_ms - step
@@ -265,7 +267,7 @@ def discover_interval(
         raise ReachRejected("no valid candles observed")
     if classification is None:
         if len(seen) == max_records:
-            classification = str(config["classification"]["documented_record_cap_reached"])
+            classification = str(classifications["documented_record_cap_reached"])
         else:
             raise ReachRejected("discovery ended without a valid boundary classification")
 
@@ -314,7 +316,9 @@ def discover_all(
     progress = {"requests": 0}
     observations = []
     failures = []
-    for interval in config["intervals"]:
+    intervals = cast(Sequence[str], config["intervals"])
+    classifications = cast(Mapping[str, object], config["classification"])
+    for interval in intervals:
         try:
             observations.append(discover_interval(config, client, interval, progress))
         except ReachRejected as exc:
@@ -338,7 +342,7 @@ def discover_all(
         "holdout_accessed": False,
         "api_key_used": False,
         "full_history_complete": all(
-            item.classification == config["classification"]["provider_earliest_reached"]
+            item.classification == classifications["provider_earliest_reached"]
             for item in observations
         ),
         "materialization_authorized": False,
