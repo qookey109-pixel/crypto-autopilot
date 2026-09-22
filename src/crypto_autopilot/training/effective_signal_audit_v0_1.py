@@ -4,7 +4,7 @@ import math
 import statistics
 from collections import Counter, defaultdict
 from datetime import datetime
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Sequence, cast
 
 from crypto_autopilot.training.detailed import FEATURE_NAMES, IntradayExample
 
@@ -169,7 +169,7 @@ def symbol_drift(
         )
     rows.sort(
         key=lambda row: (
-            -float(row["absolute_positive_rate_delta"]),
+            -float(cast(float, row["absolute_positive_rate_delta"])),
             str(row["symbol"]),
         )
     )
@@ -281,7 +281,7 @@ def feature_separation(
         )
     rows.sort(
         key=lambda row: (
-            -float(row["absolute_standardized_mean_difference"]),
+            -float(cast(float, row["absolute_standardized_mean_difference"])),
             str(row["feature"]),
         )
     )
@@ -319,7 +319,7 @@ def feature_drift(
         )
     rows.sort(
         key=lambda row: (
-            -float(row["absolute_standardized_mean_drift"]),
+            -float(cast(float, row["absolute_standardized_mean_drift"])),
             str(row["feature"]),
         )
     )
@@ -381,7 +381,7 @@ def feature_redundancy(
                 )
     rows.sort(
         key=lambda row: (
-            -float(row["absolute_correlation"]),
+            -float(cast(float, row["absolute_correlation"])),
             str(row["left_feature"]),
             str(row["right_feature"]),
         )
@@ -434,12 +434,12 @@ def _recommendations(folds: Sequence[Mapping[str, Any]]) -> list[str]:
         if separation:
             max_late_separation = max(
                 max_late_separation,
-                max(float(row["absolute_standardized_mean_difference"]) for row in separation),
+                max(float(cast(float, row["absolute_standardized_mean_difference"])) for row in separation),
             )
         if drift:
             max_late_drift = max(
                 max_late_drift,
-                max(float(row["absolute_standardized_mean_drift"]) for row in drift),
+                max(float(cast(float, row["absolute_standardized_mean_drift"])) for row in drift),
             )
     if max_late_drift >= 0.5:
         recommendations.append("REGIME_OR_FEATURE_DRIFT_REVIEW")
