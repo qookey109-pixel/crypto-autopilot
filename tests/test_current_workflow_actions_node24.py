@@ -9,6 +9,7 @@ WORKFLOWS = ROOT / ".github" / "workflows"
 
 CHECKOUT_V6_SHA = "d23441a48e516b6c34aea4fa41551a30e30af803"
 SETUP_PYTHON_V6_SHA = "ece7cb06caefa5fff74198d8649806c4678c61a1"
+SETUP_NODE_V6_SHA = "249970729cb0ef3589644e2896645e5dc5ba9c38"
 UPLOAD_ARTIFACT_V7_SHA = "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
 UPLOAD_PAGES_ARTIFACT_V5_SHA = "fc324d3547104276b827a68afc52ff2a11cc49c9"
 CONFIGURE_PAGES_V6_SHA = "45bfe0192ca1faeb007ade9deae92b16b8254a0d"
@@ -18,6 +19,7 @@ CACHE_V5_SHA = "caa296126883cff596d87d8935842f9db880ef25"
 APPROVED_CRITICAL_ACTIONS = {
     "actions/checkout": CHECKOUT_V6_SHA,
     "actions/setup-python": SETUP_PYTHON_V6_SHA,
+    "actions/setup-node": SETUP_NODE_V6_SHA,
     "actions/upload-artifact": UPLOAD_ARTIFACT_V7_SHA,
     "actions/upload-pages-artifact": UPLOAD_PAGES_ARTIFACT_V5_SHA,
     "actions/configure-pages": CONFIGURE_PAGES_V6_SHA,
