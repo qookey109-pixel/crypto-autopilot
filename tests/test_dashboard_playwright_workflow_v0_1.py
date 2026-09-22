@@ -14,6 +14,14 @@ WORKFLOW = ROOT / ".github/workflows/dashboard-github-pages.yml"
 
 
 class DashboardPlaywrightWorkflowTests(unittest.TestCase):
+    def test_lockfile_only_changes_trigger_pr_and_main_browser_validation(self) -> None:
+        text = WORKFLOW.read_text(encoding="utf-8")
+        push = text.split("  push:\n", 1)[1].split("  pull_request:\n", 1)[0]
+        pull_request = text.split("  pull_request:\n", 1)[1].split("\npermissions:", 1)[0]
+        for event, paths in (("push", push), ("pull_request", pull_request)):
+            with self.subTest(event=event):
+                self.assertIn('      - "package-lock.json"', paths)
+
     def test_playwright_dependency_and_runtime_are_pinned(self) -> None:
         package = json.loads(PACKAGE.read_text(encoding="utf-8"))
         self.assertTrue(package["private"])

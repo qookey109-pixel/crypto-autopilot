@@ -188,7 +188,7 @@ def freshness_state(definition: dict, latest: dict, *, now: datetime) -> str:
         return "EXPIRED_WINDOW"
 
     active_until = _parse_utc(definition.get("activeUntilUtc"))
-    if active_until is not None and now > active_until:
+    if active_until is not None and now >= active_until:
         return "EXPIRED_WINDOW"
     if latest.get("state") == "QUERY_FAILED":
         return "QUERY_FAILED"
@@ -227,7 +227,7 @@ def schedule_window_state(definition: dict, *, now: datetime) -> str:
         return "PENDING"
 
     active_until = _parse_utc(definition.get("activeUntilUtc"))
-    if active_until is not None and now > active_until:
+    if active_until is not None and now >= active_until:
         return "EXPIRED"
     return "EFFECTIVE"
 
