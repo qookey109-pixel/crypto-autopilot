@@ -1,0 +1,61 @@
+{
+  "schema": "qookey-research-signal-quality-v0-2-prepared",
+  "status": "PREPARED_AWAITING_EXPLICIT_MERGE_AUTHORIZATION",
+  "date": "2026-09-22",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "source_main_sha": "b6e2f8f4eb9fa7a57ea3e9813ae8d90cb4931841",
+  "pull_request": 421,
+  "purpose": "Bind read-only upstream completion chaining and exact immutable-run quality evidence reuse without expanding market-data, R2-write, model or trading authority.",
+  "bound_files": [
+    {
+      "path": "config/research_signal_quality_v0_1.json",
+      "sha256": "a73cef4fe5c45dc5393eadccda0df735ccf0fe0127ef3f1a69d595c77d4293ca"
+    },
+    {
+      "path": ".github/workflows/research-signal-quality-v0-1.yml",
+      "sha256": "8a76481f95d0ff89f52c0bdfb12533c19a4ae305c1c733f1c63e3bf34cbbf8f7"
+    }
+  ],
+  "prepared_scope": {
+    "existing_daily_fallback_cron_utc": "47 2 * * *",
+    "upstream_workflow": "Research Signal Layer V0.2",
+    "upstream_completion_event": true,
+    "upstream_success_required": true,
+    "upstream_main_required": true,
+    "upstream_same_repository_required": true,
+    "github_actions_metadata_and_artifact_read_only": true,
+    "research_signal_exact_r2_object_read_max": 3,
+    "same_verified_immutable_run_exact_r2_object_read_max": 1,
+    "research_signal_r2_namespace": "research/signal-layer/v0-2",
+    "research_signal_r2_list_authorized": false,
+    "research_signal_r2_write_authorized": false
+  },
+  "dedupe_contract": {
+    "identity": [
+      "run_id",
+      "manifest_sha256",
+      "generated_at_utc"
+    ],
+    "previous_lineage_required": [
+      "PASS",
+      "REUSED_VERIFIED_RUN"
+    ],
+    "same_identity_decision": "NO_CHANGE",
+    "freshness_rechecked_on_no_change": true,
+    "identity_mismatch_requires_full_lineage_evaluation": true
+  },
+  "merge_authority_granted_by_this_receipt": false,
+  "explicitly_not_authorized": {
+    "new_provider_access_authorized": false,
+    "new_r2_scope_authorized": false,
+    "r2_write_authorized": false,
+    "holdout_access_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "training_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
