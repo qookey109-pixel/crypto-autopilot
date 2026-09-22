@@ -11,7 +11,7 @@ This is the concise current-operations entrypoint. Repository `main`, versioned 
 - Evidence-basis parent main for this status version: `9ffe30c8f0ab28bc3b2a95ae19de6938ed613dae`.
 - Evidence-basis semantics: `REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION`.
 - The evidence-basis SHA is **not** a latest-main claim; it records the reviewed parent from which this status version was prepared.
-- The current open-PR navigation has been refreshed to V0.6 from reviewed main after PR #442; the evidence-basis SHA remains historical review context rather than a latest-main claim.
+- The current open-PR navigation has been refreshed to V0.7 from reviewed main after PR #448; the navigation snapshot records zero open pull requests while the evidence-basis SHA remains historical review context rather than a future latest-main claim.
 
 This avoids a self-reference bug where a file claiming its own future merge commit becomes stale immediately after it is merged.
 
@@ -151,7 +151,7 @@ Current cleanup priority:
 6. only after that consider responsibility-splitting large modules such as `training/quality.py`.
 
 Detailed cleanup tracking lives in `docs/TECH_DEBT_REGISTER_2026_09_17.md`. Type-debt baseline tracking lives in `docs/TYPE_DEBT_BASELINE_2026_09_22.md` with machine-readable companion `research/status/type-debt-baseline-v0-1.json`.
-Current open-PR navigation lives in `docs/OPEN_PR_TRIAGE_2026_09_22.md` with machine-readable companion `research/status/open-pr-triage-v0-6.json`. The active backlog is seven PRs: narrow typing cleanup #441 plus six Dependabot proposals (#326–#331); older architecture-generation and salvage PRs are closed historical references.
+Current open-PR navigation lives in `docs/OPEN_PR_TRIAGE_2026_09_22.md` with machine-readable companion `research/status/open-pr-triage-v0-7.json`. The reviewed open backlog is zero after the #326–#331 dependency review and current-main rebuilds #445/#447/#448; older architecture-generation and salvage PRs remain historical references.
 
 ## Safety and governance still binding
 
