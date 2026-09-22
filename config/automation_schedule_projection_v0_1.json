@@ -43,18 +43,19 @@
       "workflow": ".github/workflows/research-signal-quality-v0-1.yml",
       "trigger": [
         "schedule",
+        "workflow_run",
         "workflow_dispatch"
       ],
       "expected_crons": [
         "47 2 * * *"
       ],
-      "local_schedule": "每日 10:47 補查",
+      "local_schedule": "上游成功後 + 每日 10:47 補查",
       "dependency_ids": [
         "research-signal-v0-2"
       ],
-      "status": "ACTIVE_BACKSTOP",
+      "status": "ACTIVE_CHAINED_WITH_BACKSTOP",
       "authority_link": "config/research_signal_quality_v0_1.json",
-      "detail": "目前仍由 10:47 cron 補查；事件式跟隨上游完成尚未在本批啟用。"
+      "detail": "Research Signal Layer V0.2 成功且同 Repository main lineage 時由 workflow_run 跟隨；每日 10:47 保留補查。沿用精確證據去重，無變更時可回 NO_CHANGE。"
     },
     {
       "id": "context-forward-capture-v0-1",
@@ -89,8 +90,8 @@
       "active_until": null,
       "freshness_seconds": null,
       "status": "WAITING_AUTHORITY",
-      "authority_link": "config/live_paper_run_coordinator_v0_1.json",
-      "detail": "目前只有手動 Live Paper coordinator；每小時候選掃描與 NO_TRADE 排程仍等待新版 authority。"
+      "authority_link": "config/live_paper_run_coordinator_v0_2.json",
+      "detail": "現有 workflow 檔名仍為 live-paper-run-coordinator-v0-1.yml，但已由 Coordinator V0.2 契約治理並要求原子 run-slot claim；仍僅 workflow_dispatch。每小時候選掃描與 NO_TRADE 排程等待新版 authority。"
     },
     {
       "id": "automation-health-v0-2",
@@ -275,6 +276,21 @@
       "status": "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
       "authority_link": "research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json",
       "detail": "64 candidates × 4 folds = 256/256 complete；selection = NO_ELIGIBLE_DEVELOPMENT_CANDIDATE；fresh confirmation remains closed."
+    },
+    {
+      "id": "zec-v0-4-development",
+      "title": "ZEC V0.4 Development",
+      "workflow": null,
+      "trigger": [],
+      "expected_crons": [],
+      "local_schedule": "one-shot authority consumed by run 35618367238",
+      "dependency_ids": [],
+      "active_from": null,
+      "active_until": null,
+      "freshness_seconds": null,
+      "status": "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
+      "authority_link": "research/receipts/2026-09-21-zec-v0-4-development-run-35618367238-report.json",
+      "detail": "6 candidates × 4 folds = 24/24 complete；selection = NO_ELIGIBLE_DEVELOPMENT_CANDIDATE；永久完整報告已保存於 Repository，fresh confirmation remains closed."
     }
   ],
   "authority": {
