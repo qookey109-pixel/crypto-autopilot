@@ -22,7 +22,7 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         current = self.current
 
         self.assertEqual(payload["schema"], "qookey-current-operations-v0.3")
-        self.assertEqual(payload["updated_date"], "2026-09-21")
+        self.assertEqual(payload["updated_date"], "2026-09-22")
         self.assertEqual(payload["repository_authority"], "RESOLVE_MAIN_LIVE_AT_READ_TIME")
         self.assertEqual(payload["mode"], "PAPER_AND_LIVE_PAPER_ONLY")
 
@@ -32,10 +32,10 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
         )
         self.assertFalse(basis["is_latest_main_claim"])
-        self.assertEqual(basis["source_merge_pr"], 410)
+        self.assertEqual(basis["source_merge_pr"], 423)
         self.assertEqual(
             basis["parent_main_sha"],
-            "3422efc91cfd973ab1991080186fb8300d26a2a5",
+            "b1d75cc54812fc6a355ab5c4535c105c53c26ceb",
         )
         self.assertIn(basis["parent_main_sha"], current)
         self.assertIn("Resolve `main` live at read time", current)
@@ -142,6 +142,52 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         self.assertFalse(live_paper["replacement_holdout_access"])
         self.assertFalse(live_paper["real_money_orders"])
         self.assertFalse(live_paper["live_real_trading"])
+
+    def test_reliability_convergence_is_current_and_authority_stays_bounded(self) -> None:
+        control = self.payload["control_plane"]
+        live_paper = self.payload["live_paper"]
+
+        self.assertEqual(
+            control["research_signal_quality_state"],
+            "UPSTREAM_COMPLETION_CHAINED_WITH_EXACT_IMMUTABLE_RUN_DEDUP_AND_DAILY_FALLBACK",
+        )
+        self.assertEqual(
+            control["dashboard_browser_validation_state"],
+            "PLAYWRIGHT_CHROMIUM_DESKTOP_MOBILE_PR_BUILD_PLUS_POST_DEPLOY_PRODUCTION_CHECK",
+        )
+        self.assertEqual(
+            control["live_paper_slot_claim_state"],
+            "ACTIVE_MANUAL_COORDINATOR_FAIL_CLOSED_ATOMIC_CREATE_IF_ABSENT",
+        )
+        self.assertEqual(
+            live_paper["coordinator_contract"],
+            "config/live_paper_run_coordinator_v0_2.json",
+        )
+        self.assertEqual(
+            live_paper["run_slot_claim_contract"],
+            "config/live_paper_run_claim_v0_1.json",
+        )
+        self.assertEqual(
+            live_paper["coordinator_dispatch_mode"],
+            "MANUAL_WORKFLOW_DISPATCH_ONLY",
+        )
+        self.assertTrue(live_paper["run_slot_claim_required"])
+        self.assertTrue(live_paper["atomic_create_if_absent_required"])
+        self.assertFalse(live_paper["claim_expiry_authorized"])
+        self.assertFalse(live_paper["claim_takeover_authorized"])
+        self.assertFalse(live_paper["claim_conflict_auto_retry_authorized"])
+        self.assertFalse(live_paper["private_exchange_api"])
+        self.assertFalse(live_paper["replacement_holdout_access"])
+        self.assertFalse(live_paper["real_money_orders"])
+        self.assertFalse(live_paper["live_real_trading"])
+        self.assertIn("PR #421", self.current)
+        self.assertIn("PR #422", self.current)
+        self.assertIn("PR #423", self.current)
+        self.assertIn('IfNoneMatch="*"', self.current)
+        self.assertNotIn(
+            "This prepared change becomes current authority only if its pull request is explicitly merged",
+            self.current,
+        )
 
     def test_control_plane_contract_requires_current_overlay(self) -> None:
         control = self.payload["control_plane"]

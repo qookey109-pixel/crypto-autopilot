@@ -1,13 +1,13 @@
 {
   "schema": "qookey-current-operations-v0.3",
-  "updated_date": "2026-09-21",
+  "updated_date": "2026-09-22",
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
-    "parent_main_sha": "3422efc91cfd973ab1991080186fb8300d26a2a5",
+    "parent_main_sha": "b1d75cc54812fc6a355ab5c4535c105c53c26ceb",
     "semantics": "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
     "is_latest_main_claim": false,
-    "source_merge_pr": 410
+    "source_merge_pr": 423
   },
   "mode": "PAPER_AND_LIVE_PAPER_ONLY",
   "core100": {
@@ -109,7 +109,7 @@
   },
   "control_plane": {
     "current_truth_entrypoint": "CURRENT_STATUS.md",
-    "root_docs_projection": "CURRENT_OPERATIONS_CONVERGED_THROUGH_PIONEX_V0_2_MATERIALIZATION_PASS",
+    "root_docs_projection": "CURRENT_OPERATIONS_CONVERGED_THROUGH_PR_423_LIVE_PAPER_SLOT_CLAIM",
     "security_projection": "CONVERGED_BY_PR_322",
     "open_pr_triage": "research/status/open-pr-triage-v0-4.json",
     "open_pr_triage_state": "REFRESHED_2026_09_17_NAVIGATION_ONLY_REQUIRES_LIVE_MAIN_REVIEW",
@@ -120,9 +120,12 @@
     "automatic_operations": "config/github_automatic_research_operations_v0_5.json",
     "core100_history_retirement": "config/core100_history_retirement_v0_1.json",
     "core100_training_fingerprint": "config/core100_training_fingerprint_v0_1.json",
-    "schedule_inventory_state": "EIGHT_REPOSITORY_CRON_DECLARATIONS_EIGHT_MONITORED_SEVEN_CURRENT_EFFECTIVE_ONE_EXPIRED_FROZEN"
+    "schedule_inventory_state": "EIGHT_REPOSITORY_CRON_DECLARATIONS_EIGHT_MONITORED_SEVEN_CURRENT_EFFECTIVE_ONE_EXPIRED_FROZEN",
+    "research_signal_quality_state": "UPSTREAM_COMPLETION_CHAINED_WITH_EXACT_IMMUTABLE_RUN_DEDUP_AND_DAILY_FALLBACK",
+    "dashboard_browser_validation_state": "PLAYWRIGHT_CHROMIUM_DESKTOP_MOBILE_PR_BUILD_PLUS_POST_DEPLOY_PRODUCTION_CHECK",
+    "live_paper_slot_claim_state": "ACTIVE_MANUAL_COORDINATOR_FAIL_CLOSED_ATOMIC_CREATE_IF_ABSENT"
   },
-  "next_decision": "ZEC_V0_4_DEVELOPMENT_COMPLETE_NO_ELIGIBLE_KEEP_FRESH_CONFIRMATION_CLOSED_REQUIRE_NEW_REVIEWED_RESEARCH_DESIGN_FOR_ANY_NEXT_ITERATION",
+  "next_decision": "KEEP_ZEC_FRESH_CONFIRMATION_CLOSED_CONTINUE_RELIABILITY_AND_OBSERVABILITY_WITHOUT_NEW_EXECUTION_AUTHORITY",
   "notes": [
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
     "Older September 13 present-tense summaries reporting Core100 8/10 and Training SKIPPED are historical and superseded for current operations.",
@@ -138,7 +141,10 @@
     "Core100 weekly Training now deduplicates by governed dataset plus model-affecting Git blobs; an exact match returns NO_CHANGE without retraining or R2 writes.",
     "Provider Equivalence V0.12 successor metadata window expired on 2026-09-12. Its frozen critical-path cron declaration remains byte-preserved and monitored, but the exact window gate makes post-window execution ineffective; no replay or backfill is authorized.",
     "ZEC V0.3 one-shot development run 35573236145 completed all 256 cells; no candidate had positive worst-fold return, so no champion was frozen and fresh confirmation remains closed.",
-    "ZEC V0.4 one-shot development run 35618367238 completed all 24 cells; all six candidates met the trade-count gate, none had positive worst-fold return, no champion was frozen, and fresh confirmation remains closed."
+    "ZEC V0.4 one-shot development run 35618367238 completed all 24 cells; all six candidates met the trade-count gate, none had positive worst-fold return, no champion was frozen, and fresh confirmation remains closed.",
+    "PR #421 merged Research Signal Quality upstream-completion chaining and exact immutable-run dedupe while preserving R2 exact-object read-only authority and the 10:47 Asia/Taipei fallback.",
+    "PR #422 merged pinned Playwright Chromium validation for desktop and mobile against PR-built dashboard output, with production browser validation gated on a real GitHub Pages deploy.",
+    "PR #423 merged deterministic Live Paper run-slot claims using atomic create-if-absent before provider access; unresolved claims fail closed to review and the coordinator remains manual workflow_dispatch only."
   ],
   "live_paper": {
     "status": "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY",
@@ -150,7 +156,16 @@
     "private_exchange_api": false,
     "replacement_holdout_access": false,
     "real_money_orders": false,
-    "live_real_trading": false
+    "live_real_trading": false,
+    "coordinator_contract": "config/live_paper_run_coordinator_v0_2.json",
+    "recovery_contract": "config/live_paper_run_recovery_v0_1.json",
+    "run_slot_claim_contract": "config/live_paper_run_claim_v0_1.json",
+    "coordinator_dispatch_mode": "MANUAL_WORKFLOW_DISPATCH_ONLY",
+    "run_slot_claim_required": true,
+    "atomic_create_if_absent_required": true,
+    "claim_expiry_authorized": false,
+    "claim_takeover_authorized": false,
+    "claim_conflict_auto_retry_authorized": false
   },
   "zec_v0_3": {
     "development_status": "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",

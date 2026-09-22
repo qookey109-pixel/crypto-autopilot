@@ -1,6 +1,6 @@
 # Current Operations Status
 
-Updated: 2026-09-21
+Updated: 2026-09-22
 
 This is the concise current-operations entrypoint. Repository `main`, versioned configs/receipts, and immutable run evidence remain the formal authority. Dated prose in older status files is historical evidence, not a reason to regress an already completed lifecycle stage.
 
@@ -8,10 +8,10 @@ This is the concise current-operations entrypoint. Repository `main`, versioned 
 
 - Repository: `qookey109-pixel/crypto-autopilot`.
 - **Resolve `main` live at read time.** This file intentionally does not hard-code a claim that any SHA is the latest `main`.
-- Evidence-basis parent main for this status version: `3422efc91cfd973ab1991080186fb8300d26a2a5`.
+- Evidence-basis parent main for this status version: `b1d75cc54812fc6a355ab5c4535c105c53c26ceb`.
 - Evidence-basis semantics: `REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION`.
 - The evidence-basis SHA is **not** a latest-main claim; it records the reviewed parent from which this status version was prepared.
-- PR #410 is the latest reviewed merge in that evidence basis; it established Resource Hub V0.2 change-watch and dashboard schedule/source projection.
+- PR #423 is the latest reviewed merge in that evidence basis; it established fail-closed Live Paper run-slot claims on top of the already-merged Signal Quality chaining and Playwright browser validation.
 
 This avoids a self-reference bug where a file claiming its own future merge commit becomes stale immediately after it is merged.
 
@@ -301,20 +301,44 @@ Completion receipt:
 `research/receipts/2026-09-21-zec-v0-4-development-completion-v0-1.json`
 
 
-## Live Paper Run Slot Claim V0.1
+## Automation reliability convergence — PR #421 / #422 / #423
 
-Prepared on 2026-09-22 for explicit protected-main merge review.
+The second reliability batch is now merged and verified on protected `main`.
 
-- Coordinator successor: `config/live_paper_run_coordinator_v0_2.json`.
-- Claim authority: `config/live_paper_run_claim_v0_1.json`.
+### Research Signal Quality
+
+PR #421 merged upstream-completion chaining for `Research Signal Layer V0.2` while preserving the existing daily 10:47 Asia/Taipei fallback.
+
+- workflow-run execution requires successful same-repository `main` lineage;
+- previous successful secret-free Quality evidence may be reused only when `run_id + manifest_sha256 + generated_at_utc` match exactly;
+- an exact verified match returns `NO_CHANGE`, rechecks freshness and reads only `latest.json`;
+- any identity mismatch falls back to the full three-object lineage verification;
+- R2 list/write authority remains false.
+
+### Dashboard browser QA
+
+PR #422 merged pinned Playwright Chromium validation.
+
+- Chromium only, one worker;
+- desktop and mobile profiles;
+- PR validation runs against the built `_site`;
+- production browser validation runs only after a real GitHub Pages deploy;
+- screenshots and traces are retained only on failure for 7 days;
+- the latest merged PR path passed desktop/mobile browser validation before merge.
+
+### Live Paper Run Slot Claim V0.1
+
+PR #423 is merged and current.
+
+- Coordinator contract: `config/live_paper_run_coordinator_v0_2.json`.
+- Claim contract: `config/live_paper_run_claim_v0_1.json`.
 - One deterministic slot binds `run_id + sequence + previous_step_id + previous_state_id`.
-- The slot claim is atomically created before a new public Live Paper provider call.
-- Different tick/candidate requests from the same prior run position compete for the same slot.
-- A claim conflict performs no automatic provider retry, expiry or takeover.
-- Recovery treats a claim without a complete verified matching step as `REVIEW_REQUIRED`.
-- A complete verified step with only a missing result seal remains eligible for the existing provider-free seal repair.
-- Existing fully committed identical requests still replay with zero new provider requests.
-- No cron schedule is added; the coordinator workflow remains explicit `workflow_dispatch` only.
+- The slot is created atomically with R2/S3-compatible `IfNoneMatch="*"` before a new provider call.
+- A claim conflict performs no automatic retry, expiry or takeover.
+- Recovery returns `REVIEW_REQUIRED` for unresolved claims without a complete verified matching step.
+- A complete verified step with only a missing result seal remains eligible for provider-free seal repair.
+- Existing fully committed identical requests replay with zero new provider requests.
+- The coordinator remains explicit `workflow_dispatch` only; no cron schedule was added.
 - Private exchange APIs, holdout access, real-money orders and real live trading remain closed.
 
-This prepared change becomes current authority only if its pull request is explicitly merged into protected `main`.
+Post-merge verification for PR #423 completed successfully: CI, CodeQL, Dashboard GitHub Pages and V0.10 Critical Path Freeze Guard all passed.
