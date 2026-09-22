@@ -1,11 +1,20 @@
 from __future__ import annotations
 
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Sequence, TypedDict
 
 from crypto_autopilot.training.detailed import IntradayExample, _signal_diagnostics
 
 
 DEFAULT_THRESHOLDS = (0.50, 0.51, 0.52, 0.53, 0.54, 0.55)
+
+
+class _FoldResult(TypedDict):
+    fold: str
+    signal_count: int
+    selection_rate: float
+    average_net_return: float
+    maximum_drawdown: float
+    maximum_symbol_concentration: float
 
 
 def _quantile(values: Sequence[float], fraction: float) -> float:
@@ -141,7 +150,7 @@ def summarize_thresholds_across_folds(
     rows = []
     supported = []
     for threshold in candidates:
-        fold_results = []
+        fold_results: list[_FoldResult] = []
         for fold in folds:
             threshold_row = next(
                 (
