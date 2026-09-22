@@ -7,7 +7,9 @@
     "repositoryCronDeclarationCount": 8,
     "monitoredCronDeclarationCount": 8,
     "currentEffectiveScheduleCount": 7,
-    "expiredFrozenCronDeclarationCount": 1
+    "expiredFrozenCronDeclarationCount": 1,
+    "expiredScheduleCount": 1,
+    "pendingScheduleCount": 0
   },
   "items": [
     {
