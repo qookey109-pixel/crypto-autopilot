@@ -12,7 +12,7 @@ import math
 import platform
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Sequence
+from typing import Any, Sequence, TypedDict
 
 from crypto_autopilot.features.advanced import AdvancedTechnicalSnapshot, build_advanced_technical_series
 from crypto_autopilot.research.experiment_registry import build_experiment_registry_entry
@@ -80,6 +80,15 @@ FEATURE_GROUPS: dict[str, tuple[str, ...]] = {
         "ichimoku_base26_distance_fraction",
     ),
 }
+
+
+class _ShadowExampleBase(TypedDict):
+    symbol: str
+    asset_class: str
+    time_ms: int
+    label: int
+    forward_return: float
+    regimes: tuple[tuple[str, str], ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -213,7 +222,7 @@ def build_shadow_examples(
                     orderflow[index],
                 )
                 regimes = _regimes(values)
-                base = dict(
+                base: _ShadowExampleBase = dict(
                     symbol=symbol,
                     asset_class=asset_class,
                     time_ms=int(current["open_time_ms"]),
