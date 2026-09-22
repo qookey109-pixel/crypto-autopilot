@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Sequence, cast
 
 
 class OrderFlowDataError(ValueError):
@@ -56,7 +56,7 @@ def _optional_finite(row: Mapping[str, Any] | object, name: str) -> float | None
     value = _value(row, name)
     if value is None:
         return None
-    numeric = float(value)
+    numeric = float(cast(int | float | str, value))
     if not math.isfinite(numeric) or numeric < 0:
         raise OrderFlowDataError(f"{name} must be finite and non-negative")
     return numeric
