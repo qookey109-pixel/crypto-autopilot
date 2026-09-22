@@ -90,7 +90,7 @@ Already implemented:
 
 Still missing:
 
-- review of measured baseline noise before any signal is considered for promotion to a required gate;
+- measured mypy baseline is now recorded as 261 errors across 49 files; first remediation lane is non-execution dynamic-object narrowing with characterization tests;
 - dedicated semantic dead-code tooling beyond the current conservative heuristic.
 
 Do not make these blocking until baseline noise is measured and reviewed.
@@ -123,7 +123,7 @@ Status: **DEFERRED**
 
 1. Keep this refreshed PR triage aligned with live `main`; do not merge stale architecture-generation branches directly.
 2. Review dependency PRs as a separate lane; breaking-major upgrades require explicit compatibility review and their own merge authorization.
-3. Review quality/type/security baseline evidence before considering any new required gate.
+3. Reduce the measured type baseline from `docs/TYPE_DEBT_BASELINE_2026_09_22.md`, starting with non-execution dynamic-object narrowing; keep the gate informational.
 4. Treat #302/#315/#306/#307 and #166/#167/#168/#199/#249 as closed historical salvage only; rebuild selected ideas from current `main` only if deliberately revived.
 5. Review the 261-error mypy baseline by category before considering any type gate.
 6. Leave large-module responsibility splitting deferred until characterization coverage justifies it.

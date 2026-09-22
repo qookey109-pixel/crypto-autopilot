@@ -32,10 +32,10 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
         )
         self.assertFalse(basis["is_latest_main_claim"])
-        self.assertEqual(basis["source_merge_pr"], 426)
+        self.assertEqual(basis["source_merge_pr"], 427)
         self.assertEqual(
             basis["parent_main_sha"],
-            "09dfb0d79b88dc56f3cb582c91d8091617437ce2",
+            "9ffe30c8f0ab28bc3b2a95ae19de6938ed613dae",
         )
         self.assertIn(basis["parent_main_sha"], current)
         self.assertIn("Resolve `main` live at read time", current)
@@ -201,6 +201,15 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             [326, 327, 328, 329, 330, 331],
         )
         self.assertIn("SIX_DEPENDABOT_OPEN", control["open_pr_triage_state"])
+
+    def test_type_debt_baseline_pointer_is_nonblocking(self) -> None:
+        control = self.payload["control_plane"]
+        self.assertEqual(
+            control["type_debt_baseline"],
+            "research/status/type-debt-baseline-v0-1.json",
+        )
+        self.assertIn("261_ERRORS_49_FILES", control["type_debt_baseline_state"])
+        self.assertIn("NONBLOCKING", control["type_debt_baseline_state"])
 
     def test_control_plane_contract_requires_current_overlay(self) -> None:
         control = self.payload["control_plane"]
