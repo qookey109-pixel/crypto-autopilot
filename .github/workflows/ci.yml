@@ -74,9 +74,10 @@ jobs:
         run: python -m pip install -c requirements/ci-constraints.txt pytest
       - name: Ruff core correctness
         run: ruff check src tests scripts
-      - name: Unit tests
+      - name: Unit test runner compatibility (Python 3.12 only)
+        if: ${{ matrix.python-version == '3.12' }}
         run: python -m unittest discover -s tests -v
-      - name: Pytest compatibility coverage
+      - name: Full test suite (pytest)
         run: python -m pytest tests -q
       - name: R2 cost and budget gate
         run: python scripts/check_r2_budget.py
