@@ -118,6 +118,33 @@ class BinanceExpansionPlanTests(unittest.TestCase):
         self.assertNotIn("SUIUSDT", by_symbol)
         self.assertNotIn("HYPEUSDT", by_symbol)
 
+    def test_nested_schema_values_remain_exact(self) -> None:
+        coverage = coverage_payload()
+        windows = load_coverage_windows(coverage)
+        self.assertEqual(len(windows), 15)
+        btc = next(item for item in windows if item.symbol == "BTCUSDT")
+        self.assertEqual(btc.earliest_ms, ms(EARLIEST["BTCUSDT"]))
+        self.assertEqual(btc.latest_ms, ms(LATEST))
+
+        capacity = {
+            "status": "PASS",
+            "stage": "BINANCE_OBSERVED_R2_BUDGET_GATE_PASS",
+            "basis": {
+                "rows_per_full_market_year": 45990,
+                "observed_bytes_per_row": 27.98556232135459,
+            },
+            "storage_projection": {
+                "canonical_only_gb_month": 2.5741120223,
+                "canonical_plus_retained_staging_gb_month": 5.1482240446,
+                "three_x_capacity_stress_gb_month": 7.722336067,
+            },
+        }
+        rows, bytes_per_row, staging, stress = load_capacity_basis(capacity)
+        self.assertEqual(rows, 45990)
+        self.assertEqual(bytes_per_row, 27.98556232135459)
+        self.assertAlmostEqual(staging, 2.0)
+        self.assertAlmostEqual(stress, 3.0)
+
     def test_capacity_and_existing_authorities_fail_closed(self) -> None:
         capacity = {
             "status": "PASS",
