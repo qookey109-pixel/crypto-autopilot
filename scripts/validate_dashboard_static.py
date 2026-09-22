@@ -407,6 +407,7 @@ def main() -> int:
         "weekly-handoff",
         "monthly-terms-review",
         "zec-v0-3-development",
+        "zec-v0-4-development",
     }
     if {item.get("id") for item in operations_items} != required_operation_ids:
         raise RuntimeError("dashboard automation schedule items changed without review")
