@@ -145,12 +145,12 @@ Current cleanup priority:
 
 1. keep the open-PR triage aligned with current `main` and do not merge stale architecture-generation branches directly;
 2. review dependency PRs independently, with extra compatibility scrutiny for major-version jumps;
-3. review the measured quality/type/security baselines before considering any new required quality gate;
+3. follow `docs/TYPE_DEBT_BASELINE_2026_09_22.md`: reduce non-execution dynamic-object type debt first, without blanket `Any` / `type: ignore`, before considering any required type gate;
 4. treat #302/#315/#306/#307 as closed historical salvage only; rebuild selected ideas from current `main` only if deliberately revived;
 5. review the 261-error mypy baseline by category before considering any blocking type gate;
 6. only after that consider responsibility-splitting large modules such as `training/quality.py`.
 
-Detailed cleanup tracking lives in `docs/TECH_DEBT_REGISTER_2026_09_17.md`.
+Detailed cleanup tracking lives in `docs/TECH_DEBT_REGISTER_2026_09_17.md`. Type-debt baseline tracking lives in `docs/TYPE_DEBT_BASELINE_2026_09_22.md` with machine-readable companion `research/status/type-debt-baseline-v0-1.json`.
 Current open-PR navigation lives in `docs/OPEN_PR_TRIAGE_2026_09_22.md` with machine-readable companion `research/status/open-pr-triage-v0-5.json`. The active backlog is six Dependabot PRs (#326–#331); older architecture-generation and salvage PRs are closed historical references.
 
 ## Safety and governance still binding
