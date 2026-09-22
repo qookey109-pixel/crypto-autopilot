@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Final
+from typing import Any, Final, cast
 
 INPUT_SCHEMA: Final[str] = (
     "qookey-venue-local-liquidation-summary-snapshot-v0.1"
@@ -198,7 +198,7 @@ def liquidation_cross_venue_gate_policy_from_config(
         raise ValueError("unsupported liquidation cross-venue gate config")
     if payload.get("input_schema") != INPUT_SCHEMA:
         raise ValueError("liquidation cross-venue input schema mismatch")
-    if set(payload.get("decisions") or []) != {
+    if set(cast(Any, payload.get("decisions") or [])) != {
         VENUE_LOCAL_ONLY,
         CROSS_VENUE_BLOCKED,
     }:
