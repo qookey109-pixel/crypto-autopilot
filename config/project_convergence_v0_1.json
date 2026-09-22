@@ -68,12 +68,12 @@
     "paper_successor_state": "PREPARED_WAITING_FOR_HOLDOUT_AUTHORITY",
     "paper_run_package_artifact_export": "config/paper_run_package_artifact_export_v0_1.json",
     "paper_run_package_artifact_export_state": "MANUAL_SECONDARY_AUDIT_EXPORT_ONLY_NO_SCHEDULE_NO_EXECUTION_AUTHORITY",
-    "live_paper_run_coordinator": "config/live_paper_run_coordinator_v0_1.json",
-    "live_paper_run_coordinator_state": "MANUAL_APPEND_ONLY_R2_OR_LOCAL_COORDINATION_NO_SCHEDULE_NO_REAL_ORDERS",
+    "live_paper_run_coordinator": "config/live_paper_run_coordinator_v0_2.json",
+    "live_paper_run_coordinator_state": "MANUAL_APPEND_ONLY_COORDINATION_WITH_ATOMIC_RUN_SLOT_CLAIM_NO_SCHEDULE_NO_REAL_ORDERS",
     "live_paper_run_recovery": "config/live_paper_run_recovery_v0_1.json",
     "live_paper_run_recovery_state": "MANUAL_AUDIT_AND_RESULT_SEAL_REPAIR_ONLY_NO_PROVIDER_NO_SCHEDULE",
     "paper_run_conditional_write": "config/paper_run_conditional_write_v0_1.json",
-    "paper_run_conditional_write_state": "STORAGE_PRIMITIVE_ONLY_ATOMIC_CREATE_IF_ABSENT_NOT_WIRED_TO_COORDINATOR",
+    "paper_run_conditional_write_state": "ATOMIC_CREATE_IF_ABSENT_WIRED_TO_COORDINATOR_V0_2_NO_SCHEDULE",
     "core100_history_retirement": "config/core100_history_retirement_v0_1.json",
     "core100_history_state": "COMPLETE_10_OF_10_SCHEDULE_RETIRED_MANUAL_REPAIR_DIAGNOSIS_ONLY",
     "core100_training_fingerprint": "config/core100_training_fingerprint_v0_1.json",
@@ -81,7 +81,9 @@
     "zec_v0_3_development_execution": "research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json",
     "zec_v0_3_development_execution_state": "COMPLETE_256_OF_256_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE_FRESH_CONFIRMATION_CLOSED",
     "zec_v0_4_development_execution": "research/receipts/2026-09-21-zec-v0-4-development-completion-v0-1.json",
-    "zec_v0_4_development_execution_state": "COMPLETE_24_OF_24_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE_FRESH_CONFIRMATION_CLOSED"
+    "zec_v0_4_development_execution_state": "COMPLETE_24_OF_24_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE_FRESH_CONFIRMATION_CLOSED",
+    "live_paper_run_claim": "config/live_paper_run_claim_v0_1.json",
+    "live_paper_run_claim_state": "DETERMINISTIC_SLOT_CREATE_IF_ABSENT_NO_EXPIRY_NO_TAKEOVER_NO_AUTO_RETRY"
   },
   "scheduled_workflows": {
     "current_window": [],
@@ -277,7 +279,7 @@
     "live_paper_run_recovery_authority_added": true,
     "live_paper_run_recovery_schedule_added": false,
     "paper_run_conditional_write_primitive_added": true,
-    "paper_run_conditional_write_coordinator_integration_added": false,
+    "paper_run_conditional_write_coordinator_integration_added": true,
     "paper_run_conditional_write_schedule_added": false,
     "external_market_context_registry_added": true,
     "external_market_context_network_capture_added": false,
@@ -296,7 +298,8 @@
     "zec_v0_4_development_schedule_added": false,
     "zec_v0_4_fresh_confirmation_opened": false,
     "zec_v0_4_development_one_shot_authority_consumed": true,
-    "zec_v0_4_development_champion_frozen": false
+    "zec_v0_4_development_champion_frozen": false,
+    "live_paper_run_slot_claim_added": true
   },
   "retired_schedule_windows": [],
   "expired_frozen_schedule_windows": [
