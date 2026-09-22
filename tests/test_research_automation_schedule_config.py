@@ -59,19 +59,40 @@ class ResearchAutomationScheduleConfigTests(unittest.TestCase):
         )
         self.assertNotIn('coverage["scheduled_workflow_count"] == 7', workflow)
 
-    def test_authority_receipt_binds_exact_config_and_workflow_bytes(self) -> None:
-        receipt = _json(
+    def test_authority_receipts_preserve_history_and_bind_prepared_revision(self) -> None:
+        historical = _json(
             "research/receipts/2026-08-24-research-automation-health-v0-1-authority.json"
         )
-        for row in receipt["bound_files"]:
-            if row["path"] == ".github/workflows/research-automation-health-v0-1.yml":
-                self.assertEqual(
-                    row["sha256"],
-                    "64da84b0966b74de3939605873dc0e4edd2147a7eb276ad6e5afe2d23bd72b68",
-                )
+        historical_hashes = {
+            ".github/workflows/research-automation-health-v0-1.yml":
+                "64da84b0966b74de3939605873dc0e4edd2147a7eb276ad6e5afe2d23bd72b68",
+            "config/research_signal_quality_v0_1.json":
+                "b99938e41d6fb95a37e9296155f5f669b6b5e939d5e8fd8d04bb8a5675228457",
+            ".github/workflows/research-signal-quality-v0-1.yml":
+                "12378d8345f930486a77e598d5547c8eea297e61f21a3cbfb4762ff1284ac49b",
+        }
+        for row in historical["bound_files"]:
+            path = row["path"]
+            if path in historical_hashes:
+                self.assertEqual(row["sha256"], historical_hashes[path])
                 continue
+            payload = (ROOT / path).read_bytes()
+            self.assertEqual(hashlib.sha256(payload).hexdigest(), row["sha256"])
+
+        prepared = _json(
+            "research/receipts/2026-09-22-research-signal-quality-v0-2-prepared.json"
+        )
+        self.assertEqual(
+            prepared["status"],
+            "PREPARED_AWAITING_EXPLICIT_MERGE_AUTHORIZATION",
+        )
+        self.assertFalse(prepared["merge_authority_granted_by_this_receipt"])
+        for row in prepared["bound_files"]:
             payload = (ROOT / row["path"]).read_bytes()
             self.assertEqual(hashlib.sha256(payload).hexdigest(), row["sha256"])
+        self.assertTrue(
+            all(value is False for value in prepared["explicitly_not_authorized"].values())
+        )
 
     def test_post_window_schedule_is_prepared_without_execution_authority(self) -> None:
         config = _json("config/post_window_research_successor_schedule_v0_1.json")
