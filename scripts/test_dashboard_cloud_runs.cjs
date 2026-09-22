@@ -34,6 +34,8 @@ const modern = {
     repositoryCronDeclarationCount: 2,
     monitoredCronDeclarationCount: 2,
     currentEffectiveScheduleCount: 1,
+    expiredScheduleCount: 1,
+    pendingScheduleCount: 0,
     expiredFrozenCronDeclarationCount: 1,
   },
   safetyBoundary: {
@@ -88,7 +90,7 @@ const modern = {
 
 context.renderCloudRuns(modern);
 assert.equal(list.children.length, 2);
-assert.match(time.textContent, /Repo 2 \/ Health 2 \/ 有效 1 \/ Expired 1/);
+assert.match(time.textContent, /宣告 2 \/ 監控 2 \/ 有效 1 \/ 到期 1/);
 assert.match(list.children[0].children[1].textContent, /Job resource-hub-change-watch-v0-2/);
 assert.match(list.children[0].children[2].textContent, /Latest automatic run #123 · SHA aaaaaaaa · 流程成功 · 新鮮/);
 assert.match(list.children[0].children[3].textContent, /2026-09-21T04:00:00Z/);
@@ -98,6 +100,17 @@ assert.equal(list.children[0].children[5].children[0].rel, 'noopener noreferrer'
 assert.equal(list.children[0].children[5].children[1].rel, 'noopener noreferrer');
 assert.equal(list.children[1].children[5].children.length, 0);
 assert.doesNotMatch(list.children[0].children[2].textContent, /COMPLETE|資料完成/);
+
+context.renderCloudRuns({
+  ...modern,
+  summary: {
+    ...modern.summary,
+    currentEffectiveScheduleCount: 0,
+    expiredScheduleCount: 2,
+  },
+});
+assert.equal(list.children.length, 2);
+assert.match(time.textContent, /宣告 2 \/ 監控 2 \/ 有效 0 \/ 到期 2/);
 
 context.renderCloudRuns({
   ...modern,
