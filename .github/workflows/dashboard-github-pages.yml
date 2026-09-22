@@ -19,6 +19,10 @@ on:
     branches: [main]
     paths:
       - "web/**"
+      - "package.json"
+      - "playwright.config.cjs"
+      - "tests/browser/**"
+      - "tests/test_dashboard_playwright_workflow_v0_1.py"
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/build_research_calendar_projection.py"
       - "scripts/build_automation_schedule_projection.py"
@@ -75,6 +79,10 @@ on:
   pull_request:
     paths:
       - "web/**"
+      - "package.json"
+      - "playwright.config.cjs"
+      - "tests/browser/**"
+      - "tests/test_dashboard_playwright_workflow_v0_1.py"
       - "scripts/build_dashboard_authority_snapshot.py"
       - "scripts/build_research_calendar_projection.py"
       - "scripts/build_automation_schedule_projection.py"
@@ -417,6 +425,57 @@ jobs:
           fi
           echo "deploy_required=${deploy_required}" >> "${GITHUB_OUTPUT}"
 
+      - name: Set up Node for PR browser validation
+        if: github.event_name == 'pull_request'
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+
+      - name: Install pinned Playwright for PR browser validation
+        if: github.event_name == 'pull_request'
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+          npx playwright install --with-deps chromium
+
+      - name: Start built dashboard server for PR browser validation
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 4173 -d _site > /tmp/qookey-dashboard-playwright.log 2>&1 &
+          echo $! > /tmp/qookey-dashboard-playwright.pid
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent "http://127.0.0.1:4173/" >/dev/null; then
+              exit 0
+            fi
+            sleep 0.25
+          done
+          cat /tmp/qookey-dashboard-playwright.log || true
+          exit 1
+
+      - name: Browser validate built dashboard on desktop and mobile
+        if: github.event_name == 'pull_request'
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173/
+        run: npx playwright test --workers=1
+
+      - name: Stop PR browser validation server
+        if: always() && github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          if test -f /tmp/qookey-dashboard-playwright.pid; then
+            kill "$(cat /tmp/qookey-dashboard-playwright.pid)" || true
+          fi
+
+      - name: Upload PR Playwright failure evidence
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dashboard-playwright-pr-${{ github.run_id }}
+          path: playwright-results
+          retention-days: 7
+          if-no-files-found: ignore
+
       - name: Upload PR build evidence
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -435,6 +494,8 @@ jobs:
   deploy:
     if: github.event_name != 'pull_request' && needs.build.outputs.deploy_required == 'true'
     needs: build
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -450,3 +511,53 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
+
+  browser-production:
+    if: needs.deploy.result == 'success'
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+
+      - name: Install pinned Playwright production validator
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+          npx playwright install --with-deps chromium
+
+      - name: Wait for deployed GitHub Pages site
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error "${PLAYWRIGHT_BASE_URL}" >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "deployed Pages URL did not become readable"
+          exit 1
+
+      - name: Browser validate deployed dashboard on desktop and mobile
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: npx playwright test --workers=1
+
+      - name: Upload production Playwright failure evidence
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dashboard-playwright-production-${{ github.run_id }}
+          path: playwright-results
+          retention-days: 7
+          if-no-files-found: ignore
