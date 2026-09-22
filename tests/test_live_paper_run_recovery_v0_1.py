@@ -17,6 +17,7 @@ from crypto_autopilot.paper.live_v0_1 import (
     LivePaperMarketFrame,
     initialize_live_paper_state,
 )
+from crypto_autopilot.paper.run_claim_v0_1 import build_live_paper_run_claim
 from crypto_autopilot.paper.run_coordinator_v0_1 import (
     coordinate_live_paper_run_step,
 )
@@ -349,6 +350,74 @@ class LivePaperRunRecoveryV01Tests(unittest.TestCase):
                 "RUN_EMPTY_RETRY_FROM_INITIAL_STATE_SAFE",
             )
             self.assertEqual(recovery["step_count"], 0)
+
+    def test_unresolved_next_slot_claim_requires_review_without_provider_replay(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store, _, _, committed = self._committed_run(Path(tmp).resolve())
+            step = committed["run_step"]
+            claim = build_live_paper_run_claim(
+                run_id=committed["run_id"],
+                sequence=2,
+                previous_step_id=step["step_id"],
+                previous_state_id=step["next_state_id"],
+                request_id="unresolved-request-v0-1",
+                tick_time_ms=6_000,
+                candidate_specs_sha256="c" * 64,
+            )
+            slot_id = claim["slot_id"]
+            store.put_json_if_absent("live-run-claim", slot_id, claim)
+
+            recovery = reconcile_live_paper_run(
+                run_id=committed["run_id"],
+                store=store,
+                repair_missing_result_seals=True,
+            )
+            self.assertEqual(recovery["state"], "REVIEW_REQUIRED")
+            self.assertEqual(recovery["claim_count"], 1)
+            self.assertEqual(recovery["unresolved_claim_slot_ids"], [slot_id])
+            self.assertEqual(recovery["provider_requests_performed"], 0)
+            self.assertEqual(recovery["result_seal_writes_performed"], 0)
+            self.assertFalse(recovery["authority"]["claim_takeover_authorized"])
+            self.assertFalse(
+                recovery["authority"][
+                    "automatic_retry_after_claim_conflict_authorized"
+                ]
+            )
+
+    def test_claim_for_complete_step_does_not_block_result_seal_repair(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            store, _, _, committed = self._committed_run(root)
+            step = committed["run_step"]
+            claim = build_live_paper_run_claim(
+                run_id=committed["run_id"],
+                sequence=step["sequence"],
+                previous_step_id=step["previous_step_id"],
+                previous_state_id=step["previous_state_id"],
+                request_id=step["request_id"],
+                tick_time_ms=step["tick_time_ms"],
+                candidate_specs_sha256=step["candidate_specs_sha256"],
+            )
+            slot_id = claim["slot_id"]
+            store.put_json_if_absent("live-run-claim", slot_id, claim)
+            _delete_object(root, "live-run-result", step["request_id"])
+
+            audit = reconcile_live_paper_run(
+                run_id=committed["run_id"],
+                store=store,
+            )
+            self.assertEqual(audit["state"], "MISSING_RESULT_SEALS_REPAIRABLE")
+            self.assertEqual(audit["unresolved_claim_slot_ids"], [])
+            self.assertEqual(audit["repairable_request_ids"], [step["request_id"]])
+
+            repaired = reconcile_live_paper_run(
+                run_id=committed["run_id"],
+                store=store,
+                repair_missing_result_seals=True,
+            )
+            self.assertEqual(repaired["state"], "MISSING_RESULT_SEALS_REPAIRED")
+            self.assertEqual(repaired["unresolved_claim_slot_ids"], [])
+            self.assertEqual(repaired["result_seal_writes_performed"], 1)
 
     def test_policy_cannot_enable_provider_state_rewrite_or_real_trading(self) -> None:
         with self.assertRaises(ValueError):
