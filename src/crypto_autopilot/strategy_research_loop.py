@@ -7,7 +7,7 @@ import math
 import random
 import statistics
 from dataclasses import dataclass
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Iterable, Mapping, Sequence, cast
 
 from .backtest import BacktestResult
 from .strategy_edge_validation import StrategyEdgeInput, input_fingerprint
@@ -37,7 +37,7 @@ def _finite(value: object, label: str) -> float:
     if isinstance(value, bool):
         raise StrategyResearchLoopError(f"{label} must be finite numeric data")
     try:
-        number = float(value)
+        number = float(cast(Any, value))
     except (TypeError, ValueError) as error:
         raise StrategyResearchLoopError(f"{label} must be finite numeric data") from error
     if not math.isfinite(number):
@@ -214,7 +214,14 @@ def build_candidate_registry(payload: Mapping[str, Any]) -> CandidateRegistry:
                         candidate_id=candidate_id,
                         family=family_id,
                         horizon=normalized_horizon,
-                        parameters=tuple(sorted(parameters.items())),
+                        parameters=tuple(
+                            sorted(
+                                cast(
+                                    Iterable[tuple[str, int | float | str]],
+                                    parameters.items(),
+                                )
+                            )
+                        ),
                         hypothesis_sha256=digest,
                     )
                 )
