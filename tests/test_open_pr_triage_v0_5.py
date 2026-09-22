@@ -69,15 +69,12 @@ class OpenPrTriageV05Tests(unittest.TestCase):
                 self.assertIn(number, closed)
                 self.assertTrue(closed[number].startswith("CLOSED_NOT_MERGED"))
 
-    def test_human_snapshot_matches_v05(self) -> None:
-        human = (ROOT / "docs" / "OPEN_PR_TRIAGE_2026_09_22.md").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("six Dependabot pull requests only", human)
-        self.assertIn("#326", human)
-        self.assertIn("#331", human)
-        self.assertIn("pyarrow>=18,<22", human)
-        self.assertIn("No item in this triage is self-authorized", human)
+    def test_v05_remains_historical_snapshot(self) -> None:
+        payload = self.payload
+        self.assertEqual(payload["active_open_pr_count"], 6)
+        self.assertEqual(payload["active_open_pr_numbers"], [326, 327, 328, 329, 330, 331])
+        self.assertEqual(payload["evidence_basis"]["source_merged_pr"], 426)
+        self.assertFalse(payload["evidence_basis"]["is_latest_main_claim"])
 
 
 if __name__ == "__main__":
