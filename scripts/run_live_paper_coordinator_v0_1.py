@@ -12,6 +12,7 @@ from crypto_autopilot.paper.live_v0_1 import (
     live_paper_policy_from_config,
 )
 from crypto_autopilot.paper.run_claim_v0_1 import (
+    LivePaperRunClaimConflictError,
     live_paper_run_claim_policy_from_config,
 )
 from crypto_autopilot.paper.run_coordinator_v0_1 import (
@@ -21,6 +22,7 @@ from crypto_autopilot.paper.run_coordinator_v0_1 import (
 )
 from crypto_autopilot.paper.run_store_v0_1 import (
     LocalPaperRunStore,
+    PaperRunObjectAlreadyExistsError,
     R2PaperRunStore,
     paper_run_store_policy_from_config,
 )
@@ -101,6 +103,8 @@ class _TrackedStore:
         self.journal.store_write_attempts += 1
         try:
             receipt = self.store.put_json_if_absent(kind, object_id, payload)
+        except PaperRunObjectAlreadyExistsError:
+            raise
         except Exception:
             self.journal.store_status = "UNKNOWN_OR_PARTIAL"
             raise
@@ -165,10 +169,15 @@ def _failure_report(
 ) -> dict[str, object]:
     provider_known = journal.provider_status == "KNOWN"
     store_known = journal.store_status == "KNOWN"
+    reason = (
+        "run_slot_claim_conflict"
+        if isinstance(error, LivePaperRunClaimConflictError)
+        else f"{stage.lower()}_failed"
+    )
     return {
         "schema": "qookey-live-paper-run-coordinator-report-v0.1",
         "state": "REJECT",
-        "reason": f"{stage.lower()}_failed",
+        "reason": reason,
         "error_stage": stage,
         "error_type": type(error).__name__,
         "provider_requests_performed": (
