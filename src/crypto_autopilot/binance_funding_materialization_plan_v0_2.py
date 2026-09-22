@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from typing import Mapping, cast
 
 from .binance_funding_materialization_plan import (
     BinanceFundingMaterializationPlanError,
@@ -24,19 +25,19 @@ def validate_v0_2_config(config: dict[str, object]) -> None:
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 provider/delivery changed")
     if config.get("dataset") != "fundingRate":
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 dataset changed")
-    if int(config.get("candidate_count") or 0) != 15:
+    if int(cast(int, config.get("candidate_count") or 0)) != 15:
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 candidate count changed")
-    if int(config.get("coverage_available_symbol_months") or 0) != 1010:
+    if int(cast(int, config.get("coverage_available_symbol_months") or 0)) != 1010:
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 coverage count changed")
-    if int(config.get("expected_materialized_symbol_months") or 0) != 1003:
+    if int(cast(int, config.get("expected_materialized_symbol_months") or 0)) != 1003:
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 materialized month target changed")
-    if int(config.get("expected_annual_canonical_objects") or 0) != 94:
+    if int(cast(int, config.get("expected_annual_canonical_objects") or 0)) != 94:
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 annual object target changed")
-    if int(config.get("expected_annual_partition_receipts") or 0) != 94:
+    if int(cast(int, config.get("expected_annual_partition_receipts") or 0)) != 94:
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 receipt target changed")
-    if int(config.get("planned_global_metadata_objects") or 0) != 4:
+    if int(cast(int, config.get("planned_global_metadata_objects") or 0)) != 4:
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 metadata object count changed")
-    if int(config.get("expected_total_r2_object_identities") or 0) != 192:
+    if int(cast(int, config.get("expected_total_r2_object_identities") or 0)) != 192:
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 R2 identity target changed")
     if config.get("canonical_partition") != "annual_per_symbol":
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 canonical partition changed")
@@ -54,7 +55,7 @@ def validate_v0_2_config(config: dict[str, object]) -> None:
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 expected scope SHA changed")
     if config.get("expected_source_checksum_set_sha256") != "881c14d3b3c780b8a0d56ca2f7fd57d2abff310fcd7cb4b13dc01f506b9b64f3":
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 expected checksum-set SHA changed")
-    if int(config.get("materialization_cadence_jitter_tolerance_ms") or -1) != 50:
+    if int(cast(int, config.get("materialization_cadence_jitter_tolerance_ms") or -1)) != 50:
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 cadence tolerance changed")
     if config.get("source_archive_revision_policy") != "FAIL_CLOSED_REQUIRE_EXPLICIT_REVIEW":
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.2 revision policy changed")
@@ -97,10 +98,10 @@ def validate_v0_2_authorities(
         raise BinanceFundingMaterializationPlanV02Error("Funding continuity review stage changed")
     if continuity_review.get("review_outcome") != "SCOPE_REDUCTION_REQUIRED":
         raise BinanceFundingMaterializationPlanV02Error("Funding continuity review outcome changed")
-    effect = continuity_review.get("v0_1_materialization_effect") or {}
+    effect = cast(Mapping[str, object], continuity_review.get("v0_1_materialization_effect") or {})
     if effect.get("v0_1_write_execution_must_remain_blocked") is not True:
         raise BinanceFundingMaterializationPlanV02Error("Funding V0.1 must remain blocked")
-    scope_change = continuity_review.get("required_scope_change") or {}
+    scope_change = cast(Mapping[str, object], continuity_review.get("required_scope_change") or {})
     if scope_change.get("deferred_symbol") != "HYPEUSDT" or scope_change.get("deferred_year") != 2026:
         raise BinanceFundingMaterializationPlanV02Error("Funding continuity scope-reduction target changed")
     if scope_change.get("deferred_source_months") != [1, 2, 3, 4, 5, 6, 7]:
