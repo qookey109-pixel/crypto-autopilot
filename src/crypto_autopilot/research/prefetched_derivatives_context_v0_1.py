@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Final
+from typing import Any, Final, cast
 
 SOURCE_CAPABILITY_ID: Final[str] = "crypto_market_data_mcp"
 UPSTREAM_REPOSITORY: Final[str] = "eliasfire617/crypto-market-data-mcp"
@@ -261,7 +261,7 @@ def build_prefetched_derivatives_context(
         rows.sort(
             key=lambda row: (
                 str(row["exchange"]),
-                int(row["observed_at_ms"]),
+                cast(int, row["observed_at_ms"]),
             )
         )
 
@@ -319,9 +319,9 @@ def prefetched_derivatives_context_policy_from_config(
         raise ValueError("derivatives context upstream repository mismatch")
     if source.get("upstream_commit_sha") != UPSTREAM_COMMIT_SHA:
         raise ValueError("derivatives context upstream commit pin mismatch")
-    if set(allowed_inputs or []) != ALLOWED_INPUT_CLASSES:
+    if set(cast(Any, allowed_inputs or [])) != ALLOWED_INPUT_CLASSES:
         raise ValueError("derivatives context input-class registry mismatch")
-    if set(metric_kinds or []) != METRIC_KINDS:
+    if set(cast(Any, metric_kinds or [])) != METRIC_KINDS:
         raise ValueError("derivatives context metric registry mismatch")
     if not isinstance(long_short, Mapping):
         raise ValueError("long_short_ratio config is required")
