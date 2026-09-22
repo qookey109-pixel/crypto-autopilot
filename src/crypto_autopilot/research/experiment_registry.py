@@ -8,7 +8,7 @@ import os
 import tempfile
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping, cast
 
 from crypto_autopilot.lineage import assert_no_secret_fields, assert_sha256, canonical_json, sha256_json
 
@@ -148,7 +148,10 @@ class ExperimentRecord:
             outcome=str(payload["outcome"]),
             cost=ExperimentCost(**dict(payload.get("cost") or {})),
             metrics=dict(payload.get("metrics") or {}),
-            artifact_refs=tuple(str(item) for item in payload.get("artifactRefs", ())),
+            artifact_refs=tuple(
+                str(item)
+                for item in cast(Iterable[Any], payload.get("artifactRefs", ()))
+            ),
         )
 
 
