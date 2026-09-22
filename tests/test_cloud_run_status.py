@@ -1,4 +1,5 @@
 import importlib.util
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 import unittest
@@ -97,6 +98,8 @@ class CloudRunStatusTests(unittest.TestCase):
         self.assertEqual(result["summary"]["repositoryCronDeclarationCount"], 8)
         self.assertEqual(result["summary"]["monitoredCronDeclarationCount"], 8)
         self.assertEqual(result["summary"]["currentEffectiveScheduleCount"], 7)
+        self.assertEqual(result["summary"]["expiredScheduleCount"], 1)
+        self.assertEqual(result["summary"]["pendingScheduleCount"], 0)
         self.assertEqual(result["summary"]["expiredFrozenCronDeclarationCount"], 1)
         self.assertEqual(len(result["items"]), 8)
         current = next(
@@ -115,6 +118,64 @@ class CloudRunStatusTests(unittest.TestCase):
         )
         self.assertEqual(expired["freshnessState"], "EXPIRED_WINDOW")
         self.assertTrue(all(value is False for value in result["safetyBoundary"].values()))
+
+    def test_effective_count_tracks_bounded_schedule_before_at_and_after_expiry(self):
+        def fetch(_url):
+            return {"workflow_runs": []}
+
+        cases = [
+            (datetime(2026, 9, 30, 23, 59, 59, tzinfo=timezone.utc), 7, 1),
+            (datetime(2026, 10, 1, 0, 0, 0, tzinfo=timezone.utc), 7, 1),
+            (datetime(2026, 10, 1, 0, 0, 0, 1, tzinfo=timezone.utc), 6, 2),
+        ]
+        for observed, effective, expired in cases:
+            with self.subTest(observed=observed.isoformat()):
+                result = module.collect(fetch, now=observed)
+                self.assertEqual(result["summary"]["repositoryCronDeclarationCount"], 8)
+                self.assertEqual(result["summary"]["monitoredCronDeclarationCount"], 8)
+                self.assertEqual(
+                    result["summary"]["currentEffectiveScheduleCount"],
+                    effective,
+                )
+                self.assertEqual(result["summary"]["expiredScheduleCount"], expired)
+                self.assertEqual(result["summary"]["pendingScheduleCount"], 0)
+                self.assertEqual(
+                    result["summary"]["expiredFrozenCronDeclarationCount"],
+                    1,
+                )
+
+    def test_schedule_projection_tracks_current_chaining_coordinator_and_zec_v04(self):
+        projection = json.loads(module.SCHEDULE_PROJECTION.read_text(encoding="utf-8"))
+        jobs = {row["id"]: row for row in projection["jobs"]}
+
+        quality = jobs["research-signal-quality-v0-1"]
+        self.assertEqual(
+            quality["trigger"],
+            ["schedule", "workflow_run", "workflow_dispatch"],
+        )
+        self.assertIn("上游成功後", quality["local_schedule"])
+        self.assertIn("精確證據去重", quality["detail"])
+
+        paper = jobs["live-paper-hourly-v0-2"]
+        self.assertEqual(
+            paper["workflow"],
+            ".github/workflows/live-paper-run-coordinator-v0-1.yml",
+        )
+        self.assertEqual(
+            paper["authority_link"],
+            "config/live_paper_run_coordinator_v0_2.json",
+        )
+        self.assertIn("Coordinator V0.2", paper["detail"])
+
+        zec = jobs["zec-v0-4-development"]
+        self.assertEqual(
+            zec["status"],
+            "COMPLETE_NO_ELIGIBLE_DEVELOPMENT_CANDIDATE",
+        )
+        self.assertEqual(
+            zec["authority_link"],
+            "research/receipts/2026-09-21-zec-v0-4-development-run-35618367238-report.json",
+        )
 
     def test_network_failure_is_secret_free_and_does_not_preserve_success(self):
         calls = []

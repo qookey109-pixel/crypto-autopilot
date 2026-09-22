@@ -147,6 +147,10 @@ def main() -> int:
         raise RuntimeError("cloud monitoring Health declaration count changed")
     if cloud_summary.get("currentEffectiveScheduleCount") != 7:
         raise RuntimeError("cloud monitoring current-effective schedule count changed")
+    if cloud_summary.get("expiredScheduleCount") != 1:
+        raise RuntimeError("cloud monitoring expired schedule count changed")
+    if cloud_summary.get("pendingScheduleCount") != 0:
+        raise RuntimeError("cloud monitoring pending schedule count changed")
     if cloud_summary.get("expiredFrozenCronDeclarationCount") != 1:
         raise RuntimeError("cloud monitoring expired frozen declaration count changed")
     cloud_items = cloud_runs.get("items") or []
@@ -403,6 +407,7 @@ def main() -> int:
         "weekly-handoff",
         "monthly-terms-review",
         "zec-v0-3-development",
+        "zec-v0-4-development",
     }
     if {item.get("id") for item in operations_items} != required_operation_ids:
         raise RuntimeError("dashboard automation schedule items changed without review")
