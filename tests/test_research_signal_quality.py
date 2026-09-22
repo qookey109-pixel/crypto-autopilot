@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from crypto_autopilot.research.signal_quality import (
     ResearchSignalQualityError,
@@ -93,7 +93,10 @@ class ResearchSignalQualityTests(unittest.TestCase):
         report = evaluate_research_signal_quality(store, namespace=NAMESPACE, now=NOW)
         self.assertEqual(report["status"], "PASS")
         self.assertEqual(report["quality"], "METADATA_ONLY")
+        self.assertEqual(report["decision"], "EVALUATED")
         self.assertEqual(report["forecast_count"], 0)
+        self.assertRegex(report["manifest_sha256"], r"^[0-9a-f]{64}$")
+        self.assertRegex(report["payload_sha256"], r"^[0-9a-f]{64}$")
         self.assertFalse(report["authority"]["r2_list"])
         self.assertFalse(report["authority"]["r2_write"])
         self.assertFalse(report["authority"]["direct_trade_trigger"])
@@ -117,6 +120,80 @@ class ResearchSignalQualityTests(unittest.TestCase):
         )
         self.assertEqual(report["quality"], "FORECAST_READY")
         self.assertEqual(report["forecast_count"], 1)
+
+    def test_exact_verified_run_returns_no_change_after_one_pointer_read(self) -> None:
+        first_store = _fixture()
+        first = evaluate_research_signal_quality(first_store, namespace=NAMESPACE, now=NOW)
+        second_store = _fixture()
+        second = evaluate_research_signal_quality(
+            second_store,
+            namespace=NAMESPACE,
+            now=NOW + timedelta(minutes=10),
+            previous_report=first,
+        )
+        self.assertEqual(second["status"], "PASS")
+        self.assertEqual(second["decision"], "NO_CHANGE")
+        self.assertEqual(second["lineage"], "REUSED_VERIFIED_RUN")
+        self.assertEqual(second["quality"], first["quality"])
+        self.assertEqual(second["objects_read"], [f"{NAMESPACE}/latest.json"])
+        self.assertEqual(len(second_store.reads), 1)
+
+    def test_no_change_reuse_still_enforces_freshness(self) -> None:
+        first = evaluate_research_signal_quality(_fixture(), namespace=NAMESPACE, now=NOW)
+        second_store = _fixture()
+        second = evaluate_research_signal_quality(
+            second_store,
+            namespace=NAMESPACE,
+            now=NOW + timedelta(days=3),
+            previous_report=first,
+            max_age_seconds=129_600,
+        )
+        self.assertEqual(second["decision"], "NO_CHANGE")
+        self.assertEqual(second["status"], "ALERT")
+        self.assertEqual(len(second_store.reads), 1)
+
+    def test_changed_previous_identity_forces_full_reverification(self) -> None:
+        first = evaluate_research_signal_quality(_fixture(), namespace=NAMESPACE, now=NOW)
+        previous = dict(first)
+        previous["manifest_sha256"] = "0" * 64
+        store = _fixture()
+        report = evaluate_research_signal_quality(
+            store,
+            namespace=NAMESPACE,
+            now=NOW,
+            previous_report=previous,
+        )
+        self.assertEqual(report["decision"], "EVALUATED")
+        self.assertEqual(report["lineage"], "PASS")
+        self.assertEqual(len(store.reads), 3)
+
+    def test_triggering_upstream_run_is_bound_or_safely_superseded(self) -> None:
+        matched = evaluate_research_signal_quality(
+            _fixture(),
+            namespace=NAMESPACE,
+            now=NOW,
+            expected_run_id=RUN_ID,
+        )
+        self.assertEqual(matched["source_binding"], "MATCHED_TRIGGERING_RUN")
+
+        superseded = evaluate_research_signal_quality(
+            _fixture(),
+            namespace=NAMESPACE,
+            now=NOW,
+            expected_run_id="github-122-1",
+        )
+        self.assertEqual(superseded["source_binding"], "SUPERSEDED_BY_NEWER_RUN")
+
+        with self.assertRaisesRegex(
+            ResearchSignalQualityError,
+            "does not match or supersede",
+        ):
+            evaluate_research_signal_quality(
+                _fixture(),
+                namespace=NAMESPACE,
+                now=NOW,
+                expected_run_id="github-124-1",
+            )
 
     def test_manifest_sha_mismatch_fails_closed(self) -> None:
         store = _fixture()
