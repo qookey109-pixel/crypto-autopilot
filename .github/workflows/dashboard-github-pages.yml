@@ -147,6 +147,7 @@ jobs:
   build:
     outputs:
       deploy_required: ${{ steps.content-hash.outputs.deploy_required }}
+      content_hash: ${{ steps.content-hash.outputs.content_hash }}
     if: >-
       github.event_name != 'workflow_run' ||
       (github.event.workflow_run.head_branch == 'main' &&
@@ -412,18 +413,19 @@ jobs:
             --output _site/data/content-hash.txt \
             --manifest _site/data/content-manifest.json
           deploy_required=true
+          local_hash="$(tr -d '\r\n' < _site/data/content-hash.txt)"
           if [[ "${{ github.event_name }}" != "pull_request" ]]; then
             remote_hash="$(
               curl --fail --silent --show-error \
                 "https://qookey109-pixel.github.io/crypto-autopilot/data/content-hash.txt" \
                 2>/dev/null || true
             )"
-            local_hash="$(tr -d '\r\n' < _site/data/content-hash.txt)"
             if [[ -n "${remote_hash}" && "${remote_hash}" == "${local_hash}" ]]; then
               deploy_required=false
             fi
           fi
           echo "deploy_required=${deploy_required}" >> "${GITHUB_OUTPUT}"
+          echo "content_hash=${local_hash}" >> "${GITHUB_OUTPUT}"
 
       - name: Set up Node for PR browser validation
         if: github.event_name == 'pull_request'
@@ -460,6 +462,7 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173/
+          PLAYWRIGHT_EXPECTED_CONTENT_HASH: ${{ steps.content-hash.outputs.content_hash }}
         run: npx playwright test --workers=1
 
       - name: Stop PR browser validation server
@@ -517,7 +520,7 @@ jobs:
 
   browser-production:
     if: needs.deploy.result == 'success'
-    needs: deploy
+    needs: [build, deploy]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -557,6 +560,7 @@ jobs:
       - name: Browser validate deployed dashboard on desktop and mobile
         env:
           PLAYWRIGHT_BASE_URL: ${{ needs.deploy.outputs.page_url }}
+          PLAYWRIGHT_EXPECTED_CONTENT_HASH: ${{ needs.build.outputs.content_hash }}
         run: npx playwright test --workers=1
 
       - name: Upload production Playwright failure evidence
