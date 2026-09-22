@@ -29,7 +29,7 @@ class LineageProtocolError(ValueError):
 def canonical_json(value: Any) -> str:
     """Return deterministic JSON and reject non-finite numeric values."""
 
-    if is_dataclass(value):
+    if is_dataclass(value) and not isinstance(value, type):
         value = asdict(value)
     try:
         return json.dumps(
@@ -183,7 +183,7 @@ def build_lineage_manifest(
 
 
 def _json_default(value: Any) -> Any:
-    if is_dataclass(value):
+    if is_dataclass(value) and not isinstance(value, type):
         return asdict(value)
     if isinstance(value, set):
         return sorted(value)
