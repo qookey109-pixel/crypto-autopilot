@@ -88,6 +88,25 @@ class CIDependencyConstraintsTests(unittest.TestCase):
         self.assertIn("ruff check src tests scripts", ci)
         self.assertLess(ci.index("ruff check src tests scripts"), ci.index("python -m unittest discover"))
 
+    def test_type_visibility_is_nonblocking_and_python_313_only(self) -> None:
+        ci = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
+        self.assertIn("Install informational type visibility tool", ci)
+        self.assertIn(
+            'python -m pip install "mypy==2.3.1"',
+            ci,
+        )
+        self.assertIn("Build informational type visibility report", ci)
+        self.assertIn(
+            "python scripts/type_visibility.py --output type-visibility.json",
+            ci,
+        )
+        self.assertIn("quality-visibility.json\n            type-visibility.json", ci)
+        self.assertGreaterEqual(
+            ci.count("matrix.python-version == '3.13'"),
+            4,
+        )
+        self.assertIn("continue-on-error: true", ci)
+
     def test_ci_runs_on_pull_requests_and_main_pushes_only(self) -> None:
         ci = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
         trigger_section = ci.split("permissions:", 1)[0]

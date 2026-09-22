@@ -1,6 +1,6 @@
-# Technical Debt Register — 2026-09-17
+# Technical Debt Register — 2026-09-17 (refreshed 2026-09-22)
 
-Repository `main` is authority and must be resolved live at read time. Evidence basis for this refresh: `59be8326cb822cd2e618f537c8bbf24b2621af37` after PR #340 merged. This SHA is historical review context, not a latest-main claim.
+Repository `main` is authority and must be resolved live at read time. Evidence basis for this refresh: `dc5a381e7aa2a860dc83032478b0346f12df59d0` after PR #425 merged. This SHA is historical review context, not a latest-main claim.
 
 This register tracks cleanup work only. It grants no execution, provider, R2, holdout, promotion, source-switch, deployment, trading, or merge authority.
 
@@ -78,37 +78,38 @@ Research Automation Health derives the expected schedule count from repository i
 
 ### TD-007 — Quality visibility is narrower than project size
 
-Status: **PARTIAL / ACTIVE**
+Status: **PARTIAL / BASELINE VISIBILITY EXPANDED**
 
 Already implemented:
 
 - blocking Ruff remains limited to core correctness classes;
-- CI on Python 3.13 emits a non-blocking `quality-visibility.json` artifact;
-- `scripts/quality_visibility.py` reports Python file/line inventory, syntax issues, TODO/FIXME/HACK markers, largest definitions, and a decision-point complexity proxy.
+- CI on Python 3.13 emits non-blocking quality visibility;
+- `scripts/quality_visibility.py` reports Python inventory, syntax issues, TODO/FIXME/HACK markers, annotation coverage, broad Ruff diagnostics, largest/decision-heavy definitions, and heuristic private dead-code candidates;
+- `scripts/type_visibility.py` emits a separate non-blocking mypy semantic baseline for `src/crypto_autopilot`;
+- mypy `2.3.1` is pinned directly in the informational CI step so the frozen V0.10 dependency snapshot remains unchanged; diagnostics are uploaded as `type-visibility.json`;
+- no lint/type threshold is enforced by these informational reports.
 
 Still missing:
 
-- non-blocking type-check visibility;
-- broader lint visibility beyond the current blocking subset;
-- dedicated dead-code visibility;
-- a reviewed path for converting any informational signal into a future required gate.
+- review of measured baseline noise before any signal is considered for promotion to a required gate;
+- dedicated semantic dead-code tooling beyond the current conservative heuristic.
 
 Do not make these blocking until baseline noise is measured and reviewed.
 
 ### TD-008 — Dependency/security maintenance visibility
 
-Status: **PARTIAL / ACTIVE**
+Status: **PARTIAL / SECURITY VISIBILITY COMPLETE**
 
 Already implemented:
 
 - `.github/dependabot.yml` tracks both `pip` and GitHub Actions monthly;
 - update PRs are review-only; no auto-merge authority is introduced;
-- the current open dependency lane is #326, #327, #328, #329, #330, and #331.
+- repository-controlled CodeQL runs as non-blocking security visibility and has passed on current main;
+- historical dependency PR classifications remain review guidance only and do not grant merge authority.
 
 Still missing:
 
-- non-blocking static security analysis such as CodeQL or an equivalent repository-controlled report;
-- a documented review order for dependency PRs with breaking-change risk separated from routine patch/minor updates.
+- a refreshed dependency review order if new Dependabot PRs appear, with breaking-major risk separated from routine patch/minor updates.
 
 ## P3 — code structure
 
@@ -122,7 +123,7 @@ Status: **DEFERRED**
 
 1. Keep this refreshed PR triage aligned with live `main`; do not merge stale architecture-generation branches directly.
 2. Review dependency PRs as a separate lane; breaking-major upgrades require explicit compatibility review and their own merge authorization.
-3. Add non-blocking type/security visibility before considering new required gates.
+3. Review quality/type/security baseline evidence before considering any new required gate.
 4. Review only the still-unique code hardening from PR #302 and the still-useful data-role governance from PR #315 against current `main`.
 5. Rebuild #306/#307 from current `main` only if those capabilities remain priorities.
 6. Leave #166/#167/#168/#199/#249 as Draft salvage backlog unless deliberately revived.
