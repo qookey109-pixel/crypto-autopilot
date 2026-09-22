@@ -716,15 +716,23 @@ function renderCloudRuns(report) {
     const declared = Number(summary.repositoryCronDeclarationCount);
     const monitored = Number(summary.monitoredCronDeclarationCount);
     const effective = Number(summary.currentEffectiveScheduleCount);
-    const expired = Number(summary.expiredFrozenCronDeclarationCount);
-    if (![declared, monitored, effective, expired].every(Number.isInteger)
-        || declared !== monitored || declared !== effective + expired
+    const expired = Number(
+      summary.expiredScheduleCount ?? summary.expiredFrozenCronDeclarationCount
+    );
+    const pending = Number(summary.pendingScheduleCount ?? 0);
+    const frozenExpired = Number(summary.expiredFrozenCronDeclarationCount);
+    if (![declared, monitored, effective, expired, pending, frozenExpired]
+          .every(Number.isInteger)
+        || declared !== monitored
+        || declared !== effective + expired + pending
+        || frozenExpired > expired
         || report.items.length !== declared) {
       time.textContent = "雲端狀態暫不可核實：排程 inventory 不一致。";
       return;
     }
+    const pendingText = pending > 0 ? ` / 待開始 ${pending}` : "";
     time.textContent =
-      `${stale ? "較舊快照" : "最後核對"}：${formatTrustedTime(report.observedAtUtc)} · Repo ${declared} / Health ${monitored} / 有效 ${effective} / Expired ${expired}。`;
+      `${stale ? "較舊快照" : "最後核對"}：${formatTrustedTime(report.observedAtUtc)} · 宣告 ${declared} / 監控 ${monitored} / 有效 ${effective} / 到期 ${expired}${pendingText}。`;
 
     const states = {
       WORKFLOW_SUCCESS: "流程成功",
