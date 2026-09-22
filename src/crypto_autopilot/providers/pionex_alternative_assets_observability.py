@@ -389,7 +389,7 @@ def build_safe_projection(
         "mode": "METADATA_ONLY_READ_ONLY",
         "status": "WAITING_FIRST_RUN" if actual is None else actual["state"],
         "projection_generated_at_utc": (
-            None if actual is None else str(catalog["retrieved_at_utc"])
+            None if actual is None else str(actual["observed_at_utc"])
         ),
         "candidate_registry": {
             "total": sum(candidate_counts.values()),
