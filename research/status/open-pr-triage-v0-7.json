@@ -1,0 +1,72 @@
+{
+  "schema": "qookey-open-pr-triage-v0.7",
+  "snapshot_date": "2026-09-22",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
+  "evidence_basis": {
+    "parent_main_sha": "28099bafdc3addee363933dab4a99a32ea76fc2c",
+    "is_latest_main_claim": false,
+    "source_merged_pr": 448
+  },
+  "merge_authority_granted": false,
+  "execution_authority_granted": false,
+  "close_authority_granted": false,
+  "active_open_pr_count": 0,
+  "active_open_pr_numbers": [],
+  "reviewed_pull_requests": {
+    "326": {
+      "outcome": "CLOSED_NOT_MERGED",
+      "reason": "BOTO3_BOTOCORE_PIN_COUPLING_AND_FROZEN_CI_CONSTRAINTS"
+    },
+    "327": {
+      "outcome": "CLOSED_DUPLICATE",
+      "replacement_pr": 447,
+      "reason": "CURRENT_MAIN_ACTIONS_CACHE_V6_1_0_REBUILD_MERGED"
+    },
+    "328": {
+      "outcome": "CLOSED_DUPLICATE",
+      "replacement_pr": 448,
+      "reason": "CURRENT_MAIN_DOWNLOAD_ARTIFACT_V8_0_1_REBUILD_MERGED"
+    },
+    "329": {
+      "outcome": "CLOSED_NOT_MERGED",
+      "rebuild_pr": 446,
+      "freeze_guard_run": 35747058798,
+      "reason": "FROZEN_CI_CONSTRAINTS_REJECTED_BY_FREEZE_GUARD"
+    },
+    "330": {
+      "outcome": "CLOSED_NOT_MERGED",
+      "changed_workflow_count": 77,
+      "reason": "GLOBAL_MAJOR_ACTION_CROSSES_FROZEN_AND_AUTHORITY_SENSITIVE_PATHS"
+    },
+    "331": {
+      "outcome": "CLOSED_NOT_MERGED",
+      "reason": "MAJOR_RUNTIME_PUBLIC_CONTRACT_AND_FROZEN_CONSTRAINT_CHANGE"
+    },
+    "441": {
+      "outcome": "CLOSED_DUPLICATE",
+      "replacement_pr": 445,
+      "reason": "CURRENT_MAIN_TYPING_REBUILD_MERGED"
+    }
+  },
+  "current_type_visibility": {
+    "error_count": 216,
+    "blocking_gate": false,
+    "measured_from_pr": 445,
+    "next_candidate": "src/crypto_autopilot/binance_expansion_plan.py",
+    "next_candidate_error_count": 17,
+    "zero_error_candidates": [
+      "src/crypto_autopilot/toolkit/descriptive_context_v0_1.py",
+      "src/crypto_autopilot/research/pionex_universe_v0_1.py",
+      "src/crypto_autopilot/research/strategy_scorecard_v0_1.py"
+    ]
+  },
+  "local_checkout_visibility": "UNVERIFIED_FROM_GITHUB",
+  "local_cleanup_authorized": false,
+  "notes": [
+    "No pull requests were open at the reviewed snapshot.",
+    "Historical dependency branches are not current merge evidence.",
+    "Freeze Guard blockers must not be bypassed.",
+    "This snapshot grants no provider, R2, holdout, promotion, source-switch, order, or live-trading authority."
+  ]
+}
