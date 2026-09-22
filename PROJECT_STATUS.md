@@ -103,7 +103,7 @@ The control plane must keep present-tense Current Operations later than historic
 
 P2 quality/dependency/security visibility is now established through non-blocking Quality Visibility V0.2, non-blocking mypy semantic type visibility, review-only Dependabot proposals, and non-blocking CodeQL SARIF artifacts. The first mypy baseline reported 261 type errors and remains informational only; no type/security threshold is a required gate. Large-module refactoring remains deferred under TD-009.
 
-Tracking: `docs/TECH_DEBT_REGISTER_2026_09_17.md`. Current PR navigation: `docs/OPEN_PR_TRIAGE_2026_09_22.md` / `research/status/open-pr-triage-v0-6.json`.
+Tracking: `docs/TECH_DEBT_REGISTER_2026_09_17.md`. Current PR navigation: `docs/OPEN_PR_TRIAGE_2026_09_22.md` / `research/status/open-pr-triage-v0-7.json`.
 
 ## Open work that matters now
 
@@ -113,7 +113,7 @@ Tracking: `docs/TECH_DEBT_REGISTER_2026_09_17.md`. Current PR navigation: `docs/
 - ZEC Strategy V0.3 completed its governed one-shot historical development execution: 64 candidates × 4 folds = 256/256 cells. Selection result is **NO_ELIGIBLE_DEVELOPMENT_CANDIDATE**; no champion was frozen. Fresh confirmation, holdout, promotion and trading remain unopened.
 - External Capability Registry candidates have downstream evaluation receipts and a convergence index. Candidate inventory status does not imply runtime approval.
 - Operator messaging now has a provider-neutral offline path: parser -> status resolver -> local CLI for `help`, `status` and `paper_status`; no Telegram/network/secret/trading authority is implied.
-- As of the 2026-09-22 triage refresh, the active open backlog is **seven pull requests**: narrow typing cleanup #441 plus six Dependabot proposals (#326–#331). Older architecture-generation and draft-salvage PRs are closed historical references and are not current merge candidates.
+- As of the latest 2026-09-22 triage refresh, the reviewed open pull-request backlog is **zero**. The #326–#331 dependency batch has been reviewed: #447/#448 merged the compatible current-main action updates, while incompatible/freeze-crossing proposals were closed without merge. Older architecture-generation and draft-salvage PRs remain historical references.
 
 Historical CI success on an old branch is not sufficient merge evidence after main advances. Any newly opened PR must be evaluated against live `main`.
 
