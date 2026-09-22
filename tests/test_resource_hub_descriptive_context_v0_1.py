@@ -173,6 +173,28 @@ class ResourceHubDescriptiveContextV01Tests(unittest.TestCase):
                 as_of=AS_OF,
             )
 
+    def test_non_object_policy_sections_fail_closed(self) -> None:
+        for section in (
+            "freshness",
+            "provenance",
+            "content",
+            "interpretation",
+            "authority",
+        ):
+            invalid = deepcopy(self.policy)
+            invalid[section] = None
+            with self.subTest(section=section):
+                with self.assertRaisesRegex(
+                    DescriptiveContextError,
+                    rf"{section} policy must be an object",
+                ):
+                    build_descriptive_context_envelope(
+                        _payload(),
+                        invalid,
+                        input_class="synthetic_fixture",
+                        as_of=AS_OF,
+                    )
+
     def test_any_authority_or_interpretation_expansion_fails_closed(self) -> None:
         unsafe_authority = deepcopy(self.policy)
         unsafe_authority["authority"]["worldmonitor_network_call_authorized"] = True

@@ -116,6 +116,12 @@ def _positive_int(mapping: Mapping[str, Any], key: str) -> int:
     return value
 
 
+def _require_mapping(value: object, label: str) -> Mapping[str, Any]:
+    if not isinstance(value, Mapping):
+        raise DescriptiveContextError(f"{label} policy must be an object")
+    return value
+
+
 def _validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
     if policy.get("schema") != "resource-hub-descriptive-context-policy-v0.1":
         raise DescriptiveContextError("unexpected descriptive-context policy schema")
@@ -132,20 +138,11 @@ def _validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(allowed_severity, list) or set(allowed_severity) != _ALLOWED_SEVERITY_LABELS:
         raise DescriptiveContextError("allowed severity labels must remain the frozen descriptive set")
 
-    freshness = policy.get("freshness")
-    provenance_policy = policy.get("provenance")
-    content_policy = policy.get("content")
-    interpretation = policy.get("interpretation")
-    authority = policy.get("authority")
-    for value, label in (
-        (freshness, "freshness"),
-        (provenance_policy, "provenance"),
-        (content_policy, "content"),
-        (interpretation, "interpretation"),
-        (authority, "authority"),
-    ):
-        if not isinstance(value, Mapping):
-            raise DescriptiveContextError(f"{label} policy must be an object")
+    freshness = _require_mapping(policy.get("freshness"), "freshness")
+    provenance_policy = _require_mapping(policy.get("provenance"), "provenance")
+    content_policy = _require_mapping(policy.get("content"), "content")
+    interpretation = _require_mapping(policy.get("interpretation"), "interpretation")
+    authority = _require_mapping(policy.get("authority"), "authority")
 
     if set(interpretation) != _INTERPRETATION_KEYS:
         raise DescriptiveContextError("interpretation policy keys must remain frozen")
