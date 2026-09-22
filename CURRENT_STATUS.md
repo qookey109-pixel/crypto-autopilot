@@ -299,3 +299,22 @@ plans, real-money orders and live trading remain closed.
 
 Completion receipt:
 `research/receipts/2026-09-21-zec-v0-4-development-completion-v0-1.json`
+
+
+## Live Paper Run Slot Claim V0.1
+
+Prepared on 2026-09-22 for explicit protected-main merge review.
+
+- Coordinator successor: `config/live_paper_run_coordinator_v0_2.json`.
+- Claim authority: `config/live_paper_run_claim_v0_1.json`.
+- One deterministic slot binds `run_id + sequence + previous_step_id + previous_state_id`.
+- The slot claim is atomically created before a new public Live Paper provider call.
+- Different tick/candidate requests from the same prior run position compete for the same slot.
+- A claim conflict performs no automatic provider retry, expiry or takeover.
+- Recovery treats a claim without a complete verified matching step as `REVIEW_REQUIRED`.
+- A complete verified step with only a missing result seal remains eligible for the existing provider-free seal repair.
+- Existing fully committed identical requests still replay with zero new provider requests.
+- No cron schedule is added; the coordinator workflow remains explicit `workflow_dispatch` only.
+- Private exchange APIs, holdout access, real-money orders and real live trading remain closed.
+
+This prepared change becomes current authority only if its pull request is explicitly merged into protected `main`.
