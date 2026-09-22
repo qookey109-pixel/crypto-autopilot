@@ -139,10 +139,11 @@ class BinanceExpansionPlanTests(unittest.TestCase):
                 "three_x_capacity_stress_gb_month": 7.722336067,
             },
         }
-        self.assertEqual(
-            load_capacity_basis(capacity),
-            (45990, 27.98556232135459, 2.0, 3.0),
-        )
+        rows, bytes_per_row, staging, stress = load_capacity_basis(capacity)
+        self.assertEqual(rows, 45990)
+        self.assertEqual(bytes_per_row, 27.98556232135459)
+        self.assertAlmostEqual(staging, 2.0)
+        self.assertAlmostEqual(stress, 3.0)
 
     def test_capacity_and_existing_authorities_fail_closed(self) -> None:
         capacity = {
