@@ -13,6 +13,10 @@ from crypto_autopilot.paper.live_v0_1 import (
     run_live_paper_tick,
     verify_live_paper_state,
 )
+from crypto_autopilot.paper.run_claim_v0_1 import (
+    LivePaperRunClaimPolicy,
+    acquire_live_paper_run_claim,
+)
 from crypto_autopilot.paper.run_store_v0_1 import run_store_receipt_evidence
 
 
@@ -30,6 +34,13 @@ class PaperRunStoreLike(Protocol):
         object_id: str,
     ) -> dict[str, object] | None: ...
 
+    def put_json_if_absent(
+        self,
+        kind: str,
+        object_id: str,
+        payload: Mapping[str, object],
+    ) -> object: ...
+
 
 @dataclass(frozen=True, slots=True)
 class LivePaperRunCoordinatorPolicy:
@@ -41,6 +52,8 @@ class LivePaperRunCoordinatorPolicy:
     persist_tick_reports: bool = True
     persist_run_steps: bool = True
     committed_request_replay_authorized: bool = True
+    run_slot_claim_required: bool = False
+    claim_conflict_auto_retry_authorized: bool = False
     automatic_schedule_authorized: bool = False
     automatic_candidate_generation_authorized: bool = False
     scorecard_auto_selection_authorized: bool = False
@@ -57,6 +70,8 @@ class LivePaperRunCoordinatorPolicy:
             self.persist_tick_reports,
             self.persist_run_steps,
             self.committed_request_replay_authorized,
+            self.run_slot_claim_required,
+            self.claim_conflict_auto_retry_authorized,
             self.automatic_schedule_authorized,
             self.automatic_candidate_generation_authorized,
             self.scorecard_auto_selection_authorized,
@@ -69,11 +84,15 @@ class LivePaperRunCoordinatorPolicy:
             raise ValueError("Live Paper Run Coordinator policy flags must be booleans")
         if not all(flags[:6]):
             raise ValueError(
-                "Live Paper Run Coordinator V0.1 requires persistent append-only evidence"
+                "Live Paper Run Coordinator requires persistent append-only evidence"
             )
-        if any(flags[6:]):
+        if self.claim_conflict_auto_retry_authorized:
             raise ValueError(
-                "Live Paper Run Coordinator V0.1 cannot authorize scheduling, "
+                "Live Paper Run Coordinator cannot auto-retry a run-slot claim conflict"
+            )
+        if any(flags[8:]):
+            raise ValueError(
+                "Live Paper Run Coordinator cannot authorize scheduling, "
                 "automatic candidate selection or real trading"
             )
 
@@ -477,6 +496,7 @@ def coordinate_live_paper_run_step(
     previous_step: Mapping[str, object] | None = None,
     policy: LivePaperRunCoordinatorPolicy = LivePaperRunCoordinatorPolicy(),
     live_policy: LivePaperPolicy = LivePaperPolicy(),
+    claim_policy: LivePaperRunClaimPolicy | None = None,
 ) -> dict[str, object]:
     """Commit one append-only Live Paper run step.
 
@@ -580,14 +600,37 @@ def coordinate_live_paper_run_step(
             "persistent_objects_created": 0,
             "run_step": stored_step,
             "storage_receipts": [],
-            "authority": _coordinator_authority(),
+            "authority": _coordinator_authority(
+                claim_required=policy.run_slot_claim_required
+            ),
         }
+
+    if policy.run_slot_claim_required and claim_policy is None:
+        raise ValueError("Coordinator V0.2 requires Live Paper Run Claim policy")
+    if not policy.run_slot_claim_required and claim_policy is not None:
+        raise ValueError("run-slot claim policy supplied while coordinator claim gate is disabled")
 
     receipts: list[object] = []
     receipts.append(_receipt(store, "live-run", run_id, header))
     receipts.append(
         _receipt(store, "live-state", previous_state_id, current_state)
     )
+
+    claim_slot_id: str | None = None
+    if claim_policy is not None:
+        claim, claim_receipt = acquire_live_paper_run_claim(
+            store=store,
+            run_id=run_id,
+            sequence=sequence,
+            previous_step_id=previous_step_id,
+            previous_state_id=previous_state_id,
+            request_id=request_id,
+            tick_time_ms=tick_time_ms,
+            candidate_specs_sha256=_sha256(canonical_candidates),
+            policy=claim_policy,
+        )
+        claim_slot_id = str(claim["slot_id"])
+        receipts.append(claim_receipt)
 
     tick_report = run_live_paper_tick(
         state=current_state,
@@ -636,7 +679,9 @@ def coordinate_live_paper_run_step(
         "candidate_specs": canonical_candidates,
         "tick_report_sha256": tick_report_sha256,
         "tick_report": _canonicalize(tick_report),
-        "authority": _coordinator_authority(),
+        "authority": _coordinator_authority(
+            claim_required=policy.run_slot_claim_required
+        ),
         "limitations": [
             "V0.1 commits one tick per explicit coordinator invocation.",
             "V0.1 has no mutable latest pointer and requires the prior committed step id for continuation.",
@@ -676,18 +721,23 @@ def coordinate_live_paper_run_step(
             0,
         ),
         "persistent_objects_created": created,
+        "claim_slot_id": claim_slot_id,
         "run_step": step,
         "storage_receipts": receipt_evidence,
-        "authority": _coordinator_authority(),
+        "authority": _coordinator_authority(
+            claim_required=policy.run_slot_claim_required
+        ),
     }
 
 
-def _coordinator_authority() -> dict[str, object]:
+def _coordinator_authority(*, claim_required: bool = False) -> dict[str, object]:
     return {
         "public_live_market_data_authorized": True,
         "live_paper_simulation_authorized": True,
         "paper_state_persistence_authorized": True,
         "append_only_run_ledger": True,
+        "paper_run_slot_claim_authorized": claim_required,
+        "claim_conflict_auto_retry_authorized": False,
         "automatic_schedule_authorized": False,
         "automatic_candidate_generation_authorized": False,
         "scorecard_auto_selection_authorized": False,
@@ -701,7 +751,11 @@ def _coordinator_authority() -> dict[str, object]:
 def live_paper_run_coordinator_policy_from_config(
     payload: Mapping[str, object],
 ) -> LivePaperRunCoordinatorPolicy:
-    if payload.get("schema") != "qookey-live-paper-run-coordinator-v0.1":
+    schema = payload.get("schema")
+    if schema not in {
+        "qookey-live-paper-run-coordinator-v0.1",
+        "qookey-live-paper-run-coordinator-v0.2",
+    }:
         raise ValueError("unsupported live paper run coordinator config")
     policy = payload.get("policy")
     if not isinstance(policy, Mapping):
@@ -713,6 +767,8 @@ def live_paper_run_coordinator_policy_from_config(
         "persist_tick_reports",
         "persist_run_steps",
         "committed_request_replay_authorized",
+        "run_slot_claim_required",
+        "claim_conflict_auto_retry_authorized",
         "automatic_schedule_authorized",
         "automatic_candidate_generation_authorized",
         "scorecard_auto_selection_authorized",
@@ -723,6 +779,12 @@ def live_paper_run_coordinator_policy_from_config(
     )
     values: dict[str, bool] = {}
     for key in keys:
+        if schema == "qookey-live-paper-run-coordinator-v0.1" and key in {
+            "run_slot_claim_required",
+            "claim_conflict_auto_retry_authorized",
+        }:
+            values[key] = False
+            continue
         value = policy.get(key)
         if not isinstance(value, bool):
             raise ValueError(f"policy.{key} must be a JSON boolean")
