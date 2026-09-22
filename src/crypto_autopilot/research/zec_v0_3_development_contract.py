@@ -5,7 +5,7 @@ import itertools
 import json
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Mapping
+from typing import Any, Mapping, cast
 
 
 SCHEMA = "qookey-zec-strategy-v0-3-development-matrix-v0.1"
@@ -95,10 +95,10 @@ def build_zec_v0_3_candidate_grid(config: Mapping[str, Any]) -> tuple[ZecV03Cand
         candidates.append(
             ZecV03Candidate(
                 candidate_id=f"zec-v0-3-{index:02d}",
-                macd=macd,
-                trend_regime=trend,
-                volatility_filter=volatility,
-                stop_model=stop,
+                macd=cast(str, macd),
+                trend_regime=cast(str, trend),
+                volatility_filter=cast(str, volatility),
+                stop_model=cast(str, stop),
                 account_risk_fraction=float(risk),
             )
         )
@@ -178,7 +178,7 @@ def validate_zec_v0_3_development_contract(
         if fold_start != cursor or fold_end <= fold_start:
             raise ValueError("development folds must be contiguous, ordered and non-empty")
         cursor = fold_end
-        actual_folds.append((fold_id, fold_start_raw, fold_end_raw))
+        actual_folds.append((cast(str, fold_id), cast(str, fold_start_raw), cast(str, fold_end_raw)))
     if cursor != development_end or actual_folds != FROZEN_FOLDS:
         raise ValueError("development folds drifted from the frozen design")
 
