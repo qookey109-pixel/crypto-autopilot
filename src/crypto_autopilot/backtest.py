@@ -268,9 +268,9 @@ def run_long_backtest(
 
     prepared: dict[str, tuple[Candle, ...]] = {}
     for symbol, values in candles_by_symbol.items():
-        candles = tuple(values)
-        _validate_candles(candles, symbol)
-        prepared[symbol] = candles
+        symbol_candles = tuple(values)
+        _validate_candles(symbol_candles, symbol)
+        prepared[symbol] = symbol_candles
 
     funding_by_symbol: dict[str, list[FundingPoint]] = {}
     for point in sorted(
