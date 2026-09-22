@@ -1,0 +1,144 @@
+{
+  "schema": "qookey-type-debt-baseline-v0.1",
+  "snapshot_date": "2026-09-22",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
+  "evidence_basis": {
+    "parent_main_sha": "9ffe30c8f0ab28bc3b2a95ae19de6938ed613dae",
+    "is_latest_main_claim": false,
+    "source_merged_pr": 427,
+    "ci_run_id": 35685558516,
+    "artifact_id": 10676955738,
+    "artifact_name": "quality-visibility-35685558516-1"
+  },
+  "tool": {
+    "name": "mypy",
+    "version": "2.3.1",
+    "python_version_target": "3.13",
+    "scan_targets": [
+      "src/crypto_autopilot"
+    ]
+  },
+  "result": {
+    "baseline_clean": false,
+    "returncode": 1,
+    "diagnostic_count": 465,
+    "error_count": 261,
+    "note_count": 204,
+    "files_with_errors": 49
+  },
+  "error_codes": {
+    "arg-type": 111,
+    "call-overload": 63,
+    "attr-defined": 41,
+    "operator": 20,
+    "index": 13,
+    "assignment": 5,
+    "union-attr": 5,
+    "misc": 1,
+    "no-redef": 1,
+    "return-value": 1
+  },
+  "concentration": {
+    "top_three_codes": [
+      "arg-type",
+      "call-overload",
+      "attr-defined"
+    ],
+    "top_three_error_count": 215,
+    "top_three_fraction": 0.8237547893,
+    "interpretation": "MOST_ERRORS_ARE_DYNAMIC_OBJECT_NARROWING_OR_CONVERSION_BOUNDARY_ISSUES"
+  },
+  "top_files": [
+    [
+      "src/crypto_autopilot/binance_expansion_plan.py",
+      17
+    ],
+    [
+      "src/crypto_autopilot/portfolio/admission_v0_1.py",
+      16
+    ],
+    [
+      "src/crypto_autopilot/paper/live_v0_1.py",
+      14
+    ],
+    [
+      "src/crypto_autopilot/binance_funding_materialization_plan_v0_2.py",
+      13
+    ],
+    [
+      "src/crypto_autopilot/history/pionex_reach_v0_3.py",
+      13
+    ],
+    [
+      "src/crypto_autopilot/toolkit/descriptive_context_v0_1.py",
+      13
+    ],
+    [
+      "src/crypto_autopilot/binance/funding_coverage.py",
+      12
+    ],
+    [
+      "src/crypto_autopilot/features/advanced.py",
+      12
+    ],
+    [
+      "src/crypto_autopilot/research/pionex_universe_v0_1.py",
+      12
+    ],
+    [
+      "src/crypto_autopilot/binance_funding_materialization_plan.py",
+      11
+    ],
+    [
+      "src/crypto_autopilot/research/strategy_scorecard_v0_1.py",
+      11
+    ],
+    [
+      "src/crypto_autopilot/binance_funding_budget.py",
+      10
+    ],
+    [
+      "src/crypto_autopilot/training/detailed.py",
+      10
+    ]
+  ],
+  "quality_context": {
+    "fully_annotated_callable_fraction": 0.871807,
+    "parameter_annotation_fraction": 0.900574,
+    "return_annotation_fraction": 0.877059,
+    "broad_ruff_diagnostic_count": 1029,
+    "heuristic_private_dead_code_candidate_count": 0
+  },
+  "remediation_policy": {
+    "blocking_gate": false,
+    "threshold_enforced": false,
+    "blanket_any_authorized": false,
+    "blanket_type_ignore_authorized": false,
+    "behavior_change_authorized": false,
+    "first_lane": "NON_EXECUTION_DYNAMIC_OBJECT_NARROWING_WITH_CHARACTERIZATION_TESTS",
+    "deferred_sensitive_paths": [
+      "src/crypto_autopilot/paper/live_v0_1.py",
+      "src/crypto_autopilot/paper/run_coordinator_v0_1.py",
+      "src/crypto_autopilot/paper/run_recovery_v0_1.py"
+    ],
+    "first_review_candidates": [
+      "src/crypto_autopilot/toolkit/descriptive_context_v0_1.py",
+      "src/crypto_autopilot/research/pionex_universe_v0_1.py",
+      "src/crypto_autopilot/research/strategy_scorecard_v0_1.py",
+      "src/crypto_autopilot/binance_expansion_plan.py",
+      "src/crypto_autopilot/binance_funding_budget.py"
+    ]
+  },
+  "authority": {
+    "merge": false,
+    "provider": false,
+    "r2": false,
+    "holdout": false,
+    "training": false,
+    "promotion": false,
+    "source_switch": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
