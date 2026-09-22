@@ -21,6 +21,7 @@ on:
     paths:
       - "web/**"
       - "package.json"
+      - "package-lock.json"
       - "playwright.config.cjs"
       - "tests/browser/**"
       - "tests/test_dashboard_playwright_workflow_v0_1.py"
@@ -81,6 +82,7 @@ on:
     paths:
       - "web/**"
       - "package.json"
+      - "package-lock.json"
       - "playwright.config.cjs"
       - "tests/browser/**"
       - "tests/test_dashboard_playwright_workflow_v0_1.py"

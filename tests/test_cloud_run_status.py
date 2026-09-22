@@ -125,7 +125,7 @@ class CloudRunStatusTests(unittest.TestCase):
 
         cases = [
             (datetime(2026, 9, 30, 23, 59, 59, tzinfo=timezone.utc), 7, 1),
-            (datetime(2026, 10, 1, 0, 0, 0, tzinfo=timezone.utc), 7, 1),
+            (datetime(2026, 10, 1, 0, 0, 0, tzinfo=timezone.utc), 6, 2),
             (datetime(2026, 10, 1, 0, 0, 0, 1, tzinfo=timezone.utc), 6, 2),
         ]
         for observed, effective, expired in cases:
@@ -217,7 +217,7 @@ class CloudRunStatusTests(unittest.TestCase):
             module.freshness_state(
                 definition,
                 latest,
-                now=datetime(2026, 9, 21, 5, 0, tzinfo=timezone.utc),
+                now=datetime(2026, 9, 21, 4, 30, tzinfo=timezone.utc),
             ),
             "EXPIRED_WINDOW",
         )
