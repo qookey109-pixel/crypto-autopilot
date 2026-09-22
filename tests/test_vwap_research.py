@@ -85,7 +85,7 @@ class VwapResearchTests(unittest.TestCase):
         feb_1 = by_time[_ts(2026, 2, 1)]
         self.assertEqual(feb_1.day.bar_count, 1)
         self.assertEqual(feb_1.month.bar_count, 1)
-      self.assertGreater(feb_1.week.bar_count, 1)
+        self.assertGreater(feb_1.week.bar_count, 1)
 
         feb_2 = by_time[_ts(2026, 2, 2)]
         self.assertEqual(feb_2.day.bar_count, 1)
