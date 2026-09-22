@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import cast
 
 from crypto_autopilot.research.liquidation_coverage_sensitivity_v0_1 import (
     assess_liquidation_coverage_sensitivity,
@@ -119,7 +120,9 @@ def run_liquidation_sensitivity_scenarios(
         results.append({
             "scenario": name,
             "drop_event_indices": indices,
-            "degradation_scenario_id": degraded["synthetic_degradation"]["scenario_id"],
+            "degradation_scenario_id": cast(
+                Mapping[str, object], degraded["synthetic_degradation"]
+            )["scenario_id"],
             "sensitivity": sensitivity,
         })
     return {
