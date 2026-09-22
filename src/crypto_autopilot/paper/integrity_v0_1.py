@@ -4,7 +4,8 @@ import hashlib
 import json
 import math
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass\nfrom typing import cast
+from dataclasses import dataclass
+from typing import cast
 
 from crypto_autopilot.paper.account_advance_v0_1 import (
     paper_account_advance_report_id_from_mapping,
