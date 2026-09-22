@@ -25,6 +25,7 @@ EXPECTED = {
     "pluggy": "1.6.0",
     "pygments": "2.21.0",
     "ruff": "0.16.0",
+    "mypy": "2.3.1",
 }
 
 CRITICAL = (
