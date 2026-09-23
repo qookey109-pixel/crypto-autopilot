@@ -9,6 +9,7 @@ from urllib.error import HTTPError
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github/workflows/dashboard-github-pages.yml"
+CI_WORKFLOW = ROOT / ".github/workflows/ci.yml"
 SCRIPT = ROOT / "scripts/check_dashboard_deploy_freshness.py"
 SPEC = importlib.util.spec_from_file_location("dashboard_deploy_freshness", SCRIPT)
 assert SPEC and SPEC.loader
@@ -39,6 +40,12 @@ class DashboardPagesQueueGuardTests(unittest.TestCase):
         self.assertIn("if: needs.deploy.outputs.deployed == 'true'", text)
         self.assertIn("--expected-sha", text)
         self.assertIn("--content-hash", text)
+
+    def test_static_gate_accounts_for_documented_queue_syntax(self) -> None:
+        text = CI_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn('grep -Fxq \'  queue: max\' "${workflow}"', text)
+        self.assertIn('grep -Ec \'^[[:space:]]*queue:\' "${workflow}"', text)
+        self.assertIn('-ignore \'^unexpected key "queue" for "concurrency" section\'', text)
 
     def test_queued_old_main_never_deploys(self) -> None:
         self.assertEqual(
