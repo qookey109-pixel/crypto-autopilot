@@ -45,7 +45,7 @@ Detailed evidence:
 | Priority | Work | Completion evidence / boundary |
 | --- | --- | --- |
 | 1 | Pages / Health reliability checkpoint | TD-010 complete: Pages `35843351924` succeeded naturally, followed by Health `35870216734` with `PASS` and zero alerts. Continue normal monitoring; do not create substitute dispatch evidence. |
-| 2 | Reconcile the old local checkout with current main | Inventory each changed/untracked file; preserve recovery files; review differing bytes before migration. |
+| 2 | Reconcile the old local checkout with current main | The 78-path inventory and original recovery files remain in the old checkout. Signal ingest and quality hardening are isolated in [PR #491](https://github.com/qookey109-pixel/crypto-autopilot/pull/491) and [PR #492](https://github.com/qookey109-pixel/crypto-autopilot/pull/492); continue reviewing remaining local candidates against current main without overwriting or deleting originals. |
 | 3 | Review Core100 fingerprint dependency coverage | Synthetic dependency checks and a new contract/baseline migration proposal; no new training or R2 execution authority. |
 | 4 | PR delivery checkpoint | PR #477 and PR #479 are merged; the live open-PR query at this checkpoint returned zero. Recheck GitHub before acting on any future PR. |
 | 5 | Tidy historical Actions registrations | The [operating map](docs/GITHUB_ACTIONS_OPERATING_MAP.md) separates current workflow files, removed-file registrations and dynamic Dependabot. Preserve historical run evidence. |

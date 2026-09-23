@@ -1,6 +1,6 @@
 # 專案接續與排程手冊
 
-更新：2026-09-23。適用任何能讀取 Repository 與 GitHub metadata 的模型。
+更新：2026-09-24。適用任何能讀取 Repository 與 GitHub metadata 的模型。
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
@@ -27,7 +27,7 @@
 | TD-012 | `handoffs/2026-09-23-core100-fingerprint-v0-2-proposal.md` | dependency closure 與 synthetic 診斷提案；正式版本／baseline migration 未啟用 |
 | 最新交接 | `handoffs/2026-09-23-project-checkpoint/README.md` | main／PR／驗證快照、原工作區狀態與新聊天接續文字；仍需 live 查核 |
 
-Salvage 先核對 main 是否已涵蓋：Signal ingest／quality 的本地驗證增量、engineering planning、Agent Arena、synthetic daily preview 各自成小範圍工作。本地舊 Health V0.1 cron 與缺少 #478 的 Pages workflow 不可回灌；舊路徑 source 移植須保留 main 已有 dedupe／source binding。
+Signal ingest hardening 已以 [PR #491](https://github.com/qookey109-pixel/crypto-autopilot/pull/491) 移植到 current-main 路徑；本次 Quality V0.1 authority validation 經 [PR #492](https://github.com/qookey109-pixel/crypto-autopilot/pull/492) 收斂。不要把舊模組整檔覆蓋 current main，也不要移植舊的 Quality evaluator；保留 main 已有 dedupe、source-run binding、freshness 與單指標 `NO_CHANGE` 讀取契約。engineering planning、Agent Arena 與 synthetic daily preview 仍是獨立候選，須各自重新查重。本地舊 Health V0.1 cron 與缺少 #478 的 Pages workflow不可回灌。
 
 ## 2. 每次接續的固定流程
 
