@@ -14,6 +14,7 @@
 | Agent 規則 | [AGENTS.md](../AGENTS.md) |
 | 排程、事件、歷史 workflow | [Actions operating map](GITHUB_ACTIONS_OPERATING_MAP.md) |
 | 整理工作的狀態與驗收 | [既有技術債登記表](TECH_DEBT_REGISTER_2026_09_17.md#current-cleanup-order) |
+| 原工作區 78 項逐檔處置 | [Local workspace reconciliation receipt](LOCAL_WORKSPACE_RECONCILIATION_2026_09_24.md) |
 
 本手冊沒有第二份待辦資料庫。GitHub intake 使用單一 [Work Item 表單](../.github/ISSUE_TEMPLATE/work-item.yml)，其 contract 與規則見 [Engineering Workflow](ENGINEERING_WORKFLOW_V0_1.md)；issue、label、PR 與本手冊都不授予 execution authority。舊 AGENTS、草稿 PR 與本地提案不能替代 current main。
 
@@ -23,7 +24,7 @@
 
 | 工作 | 本地成果位置 | 已完成／仍待處理 |
 | --- | --- | --- |
-| TD-011 | `handoffs/2026-09-23-project-checkpoint/local-files.json`、`local-files.md`、`reconciliation-plan.md` | 原 78 項映射與 recovery 留在 dirty checkout。C1 planning overlay（PR #493）、C4 signal ingest、C5 quality validation 已整合；C2/C3 已比對 current main 並 deferred，未搬移其程式 |
+| TD-011 | `docs/LOCAL_WORKSPACE_RECONCILIATION_2026_09_24.md`; original checkpoint remains in `handoffs/2026-09-23-project-checkpoint/` in the dirty checkout | All 78 outcomes and current-main blob/mode classifications are documented; all 78 status pairs still match the checkpoint, with 13 newer untracked handoff files. There are 15 untracked exact duplicates proposed as one cleanup batch; two tracked exact matches are excluded. C1/C4/C5 are integrated by PRs #493/#491/#492; C2/C3 are deferred. The original working tree remains dirty. Any local deletion requires explicit approval and final repeated status/hash checks. |
 | TD-012 | 原本地提案仍保留於 handoffs/2026-09-23-core100-fingerprint-v0-2-proposal.md；main 準備文件見 [V0.2 review](CORE100_TRAINING_FINGERPRINT_V0_2.md)、[config](../config/core100_training_fingerprint_v0_2.json)、[receipt](../research/receipts/2026-09-24-core100-training-fingerprint-v0-2-prepared.json) | 31-path closure 分為 14 個 result-identity 與 17 個 runtime-guard 檔；features/advanced.py 變更會被 V0.1 漏掉，舊 baseline 為 REVIEW_REQUIRED。V0.1 runner 仍有效且未修改；任何 cutover 需另有版本化 authority |
 | 最新交接 | `handoffs/2026-09-23-project-checkpoint/README.md` | main／PR／驗證快照、原工作區狀態與新聊天接續文字；仍需 live 查核 |
 
@@ -48,7 +49,7 @@ Signal ingest parsing hardening 和 Quality V0.1 authority validation 分別由 
 
 ### 雲端模型健檢：建議每 6 小時
 
-使用可在雲端執行、可讀 GitHub Repository／Actions metadata 的排程服務。[自足的雲端提示詞](CLOUD_SCHEDULED_CHECK_PROMPT.md)可直接用於建立任務；排程是否建立和執行須以該服務的任務與 run history 查核，本手冊不宣稱某個個人排程已啟用。提示詞不依賴本機電腦、`/tmp`、聊天記憶或特定模型。雲端只能讀 GitHub 可取得的已合併檔案與可用的 PR；上述 78 項本地清冊和 fingerprint 本地提案尚未上傳，須標示 `LOCAL_ONLY_UNAVAILABLE`，不能聲稱已檢視其內容或執行 salvage。
+使用可在雲端執行、可讀 GitHub Repository／Actions metadata 的排程服務。[自足的雲端提示詞](CLOUD_SCHEDULED_CHECK_PROMPT.md)可直接用於建立任務；排程是否建立和執行須以該服務的任務與 run history 查核，本手冊不宣稱某個個人排程已啟用。提示詞不依賴本機電腦、`/tmp`、聊天記憶或特定模型。雲端可讀 current main 的 78 項逐檔 reconciliation receipt 與 fingerprint V0.2 preparation 文件；原始 dirty checkout 的即時檔案狀態仍是 local-only。無 checkout 時，將實際本地檔案檢視標為 `LOCAL_ONLY_UNAVAILABLE`，不能聲稱已比對當前 bytes 或執行 cleanup。
 
 每輪順序：
 
@@ -64,7 +65,7 @@ Signal ingest parsing hardening 和 Quality V0.1 authority validation 分別由 
 | 時點（台北） | 工作與完成條件 |
 | --- | --- |
 | 雲端排程啟用後每 6 小時 | 唯讀健檢；Pages 自然 run `35843351924` 已成功，且其後自然 Health run `35870216734` 已 `PASS`、`alerts=0`。TD-010 已完成，後續只做正常健康監控並在新故障／恢復時更新 |
-| 下一個可執行的整理回合 | TD-012 的唯讀 fingerprint 查核及 PREPARED_NOT_ACTIVE 提案已完成；回到 TD-011 對原 78 項清冊做剩餘項目分類，保留 dirty checkout 原件。若要啟用 V0.2，先另行建立並審查版本化 cutover authority；此提案不授權改 runner、訓練或接觸 R2 |
+| 下一個可執行的整理回合 | 等待使用者對 [15 個 untracked exact-duplicate paths](LOCAL_WORKSPACE_RECONCILIATION_2026_09_24.md) 的明確移除決定；同意後執行前重查 main、status、hash。未獲核准前不碰原 checkout。其餘 76 個狀態項保留待後續逐項審核；D、C2/C3 與 13 個後續 handoff 檔保留。PR #494 已合併，但 V0.2 仍 PREPARED_NOT_ACTIVE；啟用前另需版本化 cutover authority，不得改 runner、訓練或接觸 R2 |
 | 2026-09-27 11:53 之後 | 核對 Pionex bounded observability 最後名義 slot 的自然 schedule；保留 missing／delayed／failure |
 | 2026-09-27 12:37 之後 | 核對 Weekly Training 自然 schedule；只從 metadata 確認 workflow 結論，無 report 就不判定 NO_CHANGE／模型 PASS |
 | 自 2026-09-23 起取得至少 7 天觀測後 | 整理 delay／missing／cancelled／重複／duration；列 coverage、樣本量、未知值，再提 cadence 建議 |

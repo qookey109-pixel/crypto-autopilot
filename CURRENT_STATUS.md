@@ -6,7 +6,7 @@ Updated: 2026-09-24. This is the single human entrypoint for the current project
 
 ## Read and act from the right source
 
-1. **Resolve `main` live at read time.** This checkpoint was refreshed at 2026-09-24 03:09 Asia/Taipei after PR #493 merged at main `766fc2a9b75a9c728901a72393734d68d5799a7d`; this is a dated observation, not a latest-main claim.
+1. **Resolve `main` live at read time.** This checkpoint was refreshed at 2026-09-23 19:34 UTC / 2026-09-24 03:34 Asia/Taipei after PR #494 merged at main `c06b46b61f6a26c7a8130cfd82b7c3408e29ed67`; this is a dated observation, not a latest-main claim.
 2. Use the exact versioned config, receipt and immutable run evidence for any execution decision. This document adds no authority.
 3. Use [PROJECT_STATUS.md](PROJECT_STATUS.md) for governance and retired-stage lineage, [README.md](README.md) for the product map, and [AGENTS.md](AGENTS.md) for agent rules.
 4. Use live [pull requests](https://github.com/qookey109-pixel/crypto-autopilot/pulls) and [Actions](https://github.com/qookey109-pixel/crypto-autopilot/actions) for moving operational state.
@@ -47,9 +47,9 @@ Detailed evidence:
 | Priority | Work | Completion evidence / boundary |
 | --- | --- | --- |
 | 1 | Pages / Health reliability checkpoint | TD-010 complete: Pages `35843351924` succeeded naturally, followed by Health `35870216734` with `PASS` and zero alerts. Continue normal monitoring; do not create substitute dispatch evidence. |
-| 2 | Reconcile the old local checkout with current main | The 78-path inventory and recovery files remain in the original dirty checkout. The unified Work Item intake is integrated by PR #493; C4/C5 signal hardening are integrated by PRs #491/#492. C2 Agent Arena and C3 synthetic daily preview were rechecked and deferred because neither has a current approved use case on main. Preserve the originals. |
-| 3 | Core100 fingerprint V0.2 | Prepared as PREPARED_NOT_ACTIVE: 31-file import closure split into 14 result-identity and 17 runtime-guard paths; synthetic proof confirms V0.1 misses features/advanced.py. Legacy migration is REVIEW_REQUIRED; do not change the active runner, train, or access R2 without a separate versioned authority. |
-| 4 | PR delivery checkpoint | PRs #477, #478, #479, #491, #492 and #493 are merged. Recheck GitHub for exact live open PRs, heads, bases and checks before any future delivery action. |
+| 2 | Close the 78-path local reconciliation | [Receipt](docs/LOCAL_WORKSPACE_RECONCILIATION_2026_09_24.md): all 78 paths hashed against main `c06b46b` (15 exact at path, 2 identical relocated, 34 different, 27 absent); 15 untracked exact duplicates are proposed for approval-only removal. Thirteen later handoff files remain separately preserved. C1/C4/C5 integrated; C2/C3 deferred. Original checkout remains untouched. |
+| 3 | Core100 fingerprint V0.2 | PR #494 merged to main `c06b46b`; V0.2 remains PREPARED_NOT_ACTIVE: 31-file import closure split into 14 result-identity and 17 runtime-guard paths; synthetic proof confirms V0.1 misses features/advanced.py. Legacy migration is REVIEW_REQUIRED; do not change the active runner, train, or access R2 without a separate versioned authority. |
+| 4 | PR delivery checkpoint | PR #494 merged at `c06b46b`; post-merge tests (3.12/3.13), CodeQL, build and Freeze Guard passed. Pages build passed; deploy and browser-production were skipped by path filters. Delivery branch was deleted. Recheck live PR heads, bases and checks before future delivery actions. |
 | 5 | Tidy historical Actions registrations | The [operating map](docs/GITHUB_ACTIONS_OPERATING_MAP.md) separates current workflow files, removed-file registrations and dynamic Dependabot. Preserve historical run evidence. |
 
 The [technical-debt register](docs/TECH_DEBT_REGISTER_2026_09_17.md) remains the cleanup register. This checklist is its current navigation, not a second issue tracker. Use the single [Work Item intake](.github/ISSUE_TEMPLATE/work-item.yml) for planning; issue state grants no authority. Large-module refactoring, new strategy families and new schedules stay deferred until their stated gates are met. The 261-error type baseline is historical; fetch current CI visibility before quoting a current count or choosing another typing slice.
