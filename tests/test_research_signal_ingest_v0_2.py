@@ -3,12 +3,16 @@ from __future__ import annotations
 import json
 import unittest
 from io import BytesIO
+from pathlib import Path
 
 from crypto_autopilot.research.signal_ingest_v0_2 import (
+    ResearchSignalIngestError,
     build_signal_payload,
     collect_sources,
+    fetch_public_source,
     parse_source_payload,
 )
+from crypto_autopilot.research.signal_layer import ResearchSignalLayerError
 
 
 class _Response:
@@ -28,7 +32,151 @@ class _Response:
         return None
 
 
+def _forecast_row() -> dict[str, object]:
+    return {
+        "forecast_id": "f-1",
+        "symbol": "BTCUSDT",
+        "direction": "long",
+        "confidence": 0.75,
+        "published_at_ms": 1_000,
+        "target_time_ms": 2_000,
+    }
+
+
+def _parse_forecast(row: dict[str, object], **kwargs: object):
+    return parse_source_payload(
+        source_id="synthetic",
+        source_url="https://example.test/forecast",
+        body=json.dumps({"title": "Evidence", "forecasts": [row]}).encode(),
+        content_type="application/json",
+        retrieved_at_ms=1_500,
+        **kwargs,
+    )
+
+
 class ResearchSignalIngestTests(unittest.TestCase):
+    def test_metadata_mode_keeps_metadata_but_never_parses_forecasts(self) -> None:
+        for row in (_forecast_row(), {"invalid": "forecast"}):
+            with self.subTest(row=row):
+                snapshot, forecasts = _parse_forecast(row, parse_mode="metadata_only")
+                self.assertEqual(snapshot.title, "Evidence")
+                self.assertEqual(snapshot.status, "PARSED")
+                self.assertEqual(snapshot.forecast_count, 0)
+                self.assertEqual(len(snapshot.body_sha256), 64)
+                self.assertEqual(forecasts, ())
+
+    def test_configured_parse_modes_are_propagated_through_collection(self) -> None:
+        config_path = Path(__file__).resolve().parents[1] / "config/research_signal_layer_v0_2.json"
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+        calls: list[str] = []
+
+        def opener(request, **_kwargs):
+            calls.append(request.full_url)
+            row = {**_forecast_row(), "forecast_id": f"f-{len(calls)}"}
+            return _Response(json.dumps({"forecasts": [row]}).encode(), "application/json")
+
+        snapshots, forecasts = collect_sources(
+            config["sources"],
+            timeout_seconds=1,
+            max_bytes=1000,
+            opener=opener,
+            retrieved_at_ms=1_500,
+        )
+
+        self.assertEqual(calls, [source["url"] for source in config["sources"]])
+        self.assertEqual([item.forecast_count for item in snapshots], [1, 1, 0])
+        self.assertEqual(
+            [item.source for item in forecasts],
+            ["capafy_category_11", "capafy_btc_cycle_radar"],
+        )
+
+    def test_missing_or_invalid_parse_mode_blocks_before_any_request(self) -> None:
+        def opener(*_args: object, **_kwargs: object) -> _Response:
+            self.fail("invalid source configuration must not call the opener")
+
+        valid = {
+            "source_id": "valid",
+            "url": "https://example.test/a",
+            "parse_mode": "structured_json_only",
+        }
+        for mode in (None, "", "guess_prose", [], True):
+            with self.subTest(mode=mode):
+                invalid: dict[str, object] = {
+                    "source_id": "invalid",
+                    "url": "https://example.test/b",
+                }
+                if mode is not None:
+                    invalid["parse_mode"] = mode
+                with self.assertRaisesRegex(ResearchSignalIngestError, "parse_mode"):
+                    collect_sources(
+                        [valid, invalid],
+                        timeout_seconds=1,
+                        max_bytes=1000,
+                        opener=opener,
+                    )
+                with self.assertRaisesRegex(ResearchSignalIngestError, "parse_mode"):
+                    fetch_public_source(
+                        source_id="invalid",
+                        source_url="https://example.test/b",
+                        timeout_seconds=1,
+                        max_bytes=1000,
+                        opener=opener,
+                        parse_mode=mode,
+                    )
+
+    def test_publication_time_is_required_without_coercion(self) -> None:
+        missing = _forecast_row()
+        del missing["published_at_ms"]
+        rows = [missing] + [
+            {**_forecast_row(), "published_at_ms": value}
+            for value in (None, True, False, 1000.5, "1000", [], {})
+        ]
+        for row in rows:
+            with self.subTest(row=row):
+                with self.assertRaisesRegex(ResearchSignalIngestError, "explicit integer"):
+                    _parse_forecast(row)
+
+    def test_publication_time_must_obey_existing_temporal_contract(self) -> None:
+        for published in (-1, 1_501, 2_000):
+            with self.subTest(published=published):
+                with self.assertRaises(ResearchSignalLayerError):
+                    _parse_forecast({**_forecast_row(), "published_at_ms": published})
+        for published in (0, 1_000, 1_500):
+            with self.subTest(published=published):
+                _, forecasts = _parse_forecast(
+                    {**_forecast_row(), "published_at_ms": published}
+                )
+                self.assertEqual(forecasts[0].published_at_ms, published)
+
+    def test_invalid_forecast_discards_its_source_and_collection_continues(self) -> None:
+        def opener(request, **_kwargs):
+            rows = [_forecast_row()]
+            if request.full_url.endswith("/bad"):
+                bad = {**_forecast_row(), "forecast_id": "bad"}
+                del bad["published_at_ms"]
+                rows.append(bad)
+            return _Response(json.dumps({"forecasts": rows}).encode(), "application/json")
+
+        snapshots, forecasts = collect_sources(
+            [
+                {
+                    "source_id": name,
+                    "url": f"https://example.test/{name}",
+                    "parse_mode": "structured_json_only",
+                }
+                for name in ("bad", "good")
+            ],
+            timeout_seconds=1,
+            max_bytes=1000,
+            opener=opener,
+            retrieved_at_ms=1_500,
+        )
+
+        self.assertEqual([item.status for item in snapshots], ["FETCH_FAILED", "PARSED"])
+        self.assertEqual([item.forecast_count for item in snapshots], [0, 1])
+        self.assertIn("published_at_ms", snapshots[0].error)
+        self.assertEqual([item.source for item in forecasts], ["good"])
+
     def test_structured_forecast_is_accepted(self) -> None:
         body = json.dumps(
             {
@@ -74,7 +222,12 @@ class ResearchSignalIngestTests(unittest.TestCase):
         snapshots, forecasts = collect_sources(
             [
                 {"source_id": "disabled", "url": "https://example.test/no", "enabled": False},
-                {"source_id": "ok", "url": "https://example.test/ok", "enabled": True},
+                {
+                    "source_id": "ok",
+                    "url": "https://example.test/ok",
+                    "enabled": True,
+                    "parse_mode": "structured_json_only",
+                },
             ],
             timeout_seconds=1,
             max_bytes=1000,

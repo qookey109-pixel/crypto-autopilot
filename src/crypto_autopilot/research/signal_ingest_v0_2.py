@@ -21,7 +21,11 @@ from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
 from crypto_autopilot.training.online_r2 import current_bucket_bytes
-from crypto_autopilot.research.signal_layer import KOLForecast, deduplicate_kol_forecasts
+from crypto_autopilot.research.signal_layer import (
+    KOLForecast,
+    deduplicate_kol_forecasts,
+    validate_kol_forecast,
+)
 from crypto_autopilot.storage.r2 import R2Store
 
 
@@ -60,6 +64,14 @@ def _sha256(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def _validated_parse_mode(value: Any) -> str:
+    if value not in ("structured_json_only", "metadata_only"):
+        raise ResearchSignalIngestError(
+            "source parse_mode must be structured_json_only or metadata_only"
+        )
+    return value
+
+
 def _meta_value(text: str, *, key: str) -> str | None:
     pattern = re.compile(
         rf'<meta[^>]+(?:property|name)=["\']{re.escape(key)}["\'][^>]+content=["\']([^"\']*)["\']',
@@ -96,7 +108,11 @@ def _forecast_from_payload(
     for item in raw_forecasts:
         if not isinstance(item, Mapping):
             raise ResearchSignalIngestError(f"{source_id} forecast entry is not an object")
-        published = int(item.get("published_at_ms", retrieved_at_ms))
+        published = item.get("published_at_ms")
+        if type(published) is not int:
+            raise ResearchSignalIngestError(
+                "forecast published_at_ms must be an explicit integer"
+            )
         target = int(item["target_time_ms"])
         result.append(
             KOLForecast(
@@ -112,6 +128,7 @@ def _forecast_from_payload(
                 content_sha256=content_sha256,
             )
         )
+        validate_kol_forecast(result[-1])
     return tuple(result)
 
 
@@ -123,9 +140,11 @@ def parse_source_payload(
     content_type: str | None,
     retrieved_at_ms: int,
     http_status: int = 200,
+    parse_mode: str = "structured_json_only",
 ) -> tuple[SourceSnapshot, tuple[KOLForecast, ...]]:
     """Parse one public response without inferring forecasts from prose."""
 
+    mode = _validated_parse_mode(parse_mode)
     url = _safe_url(source_url)
     digest = _sha256(body)
     title = description = None
@@ -137,13 +156,15 @@ def parse_source_payload(
         text = body.decode("utf-8", errors="replace")
         title = _meta_value(text, key="og:title") or _meta_value(text, key="twitter:title")
         description = _meta_value(text, key="description")
-    forecasts = _forecast_from_payload(
-        source_id,
-        url,
-        payload or {},
-        retrieved_at_ms=retrieved_at_ms,
-        content_sha256=digest,
-    )
+    forecasts: tuple[KOLForecast, ...] = ()
+    if mode == "structured_json_only":
+        forecasts = _forecast_from_payload(
+            source_id,
+            url,
+            payload or {},
+            retrieved_at_ms=retrieved_at_ms,
+            content_sha256=digest,
+        )
     snapshot = SourceSnapshot(
         source_id=source_id,
         source_url=url,
@@ -168,9 +189,11 @@ def fetch_public_source(
     max_bytes: int,
     opener: Callable[..., Any] = urlopen,
     retrieved_at_ms: int | None = None,
+    parse_mode: str = "structured_json_only",
 ) -> tuple[SourceSnapshot, tuple[KOLForecast, ...]]:
     """Fetch one source with strict size/time bounds and fail-closed errors."""
 
+    mode = _validated_parse_mode(parse_mode)
     url = _safe_url(source_url)
     retrieved = _now_ms() if retrieved_at_ms is None else retrieved_at_ms
     request = Request(
@@ -194,6 +217,7 @@ def fetch_public_source(
                 content_type=content_type,
                 retrieved_at_ms=retrieved,
                 http_status=status,
+                parse_mode=mode,
             )
     except Exception as exc:  # network/provider failures become evidence, not fallback
         snapshot = SourceSnapshot(
@@ -223,6 +247,8 @@ def collect_sources(
 ) -> tuple[tuple[SourceSnapshot, ...], tuple[KOLForecast, ...]]:
     snapshots: list[SourceSnapshot] = []
     forecasts: list[KOLForecast] = []
+    enabled_sources: list[tuple[str, str, str]] = []
+    # Validate the complete selected configuration before the first request.
     for source in sources:
         if source.get("enabled", True) is not True:
             continue
@@ -230,6 +256,9 @@ def collect_sources(
         source_url = str(source.get("url", "")).strip()
         if not source_id or not source_url:
             raise ResearchSignalIngestError("enabled source requires source_id and url")
+        mode = _validated_parse_mode(source.get("parse_mode"))
+        enabled_sources.append((source_id, _safe_url(source_url), mode))
+    for source_id, source_url, mode in enabled_sources:
         snapshot, items = fetch_public_source(
             source_id=source_id,
             source_url=source_url,
@@ -237,6 +266,7 @@ def collect_sources(
             max_bytes=max_bytes,
             opener=opener,
             retrieved_at_ms=retrieved_at_ms,
+            parse_mode=mode,
         )
         snapshots.append(snapshot)
         forecasts.extend(items)
