@@ -5,6 +5,7 @@ import json
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
+from typing import Any, cast
 
 from crypto_autopilot.paper.execution_v0_1 import (
     PaperExecutionDecision,
@@ -849,7 +850,7 @@ def lifecycle_input_from_dict(
     if isinstance(payload.get("target_price"), bool):
         raise ValueError("target_price cannot be boolean")
     try:
-        target_price = float(payload["target_price"])
+        target_price = float(cast(Any, payload["target_price"]))
     except (KeyError, TypeError, ValueError) as error:
         raise ValueError(f"invalid target_price: {error}") from error
 
