@@ -15,6 +15,51 @@ class ResearchSignalQualityError(ValueError):
     """Raised when research-signal evidence is absent or malformed."""
 
 
+_REQUIRED_FALSE_AUTHORITY = (
+    "automatic_model_promotion",
+    "direct_trade_trigger",
+    "real_money_order",
+    "live_trading",
+)
+_OPTIONAL_FALSE_AUTHORITY = (
+    "holdout_access",
+    "trade_plan",
+    "provider_relabeling",
+    "v0_10_production_critical_path_change_authorized",
+    "v0_11_production_receipt_read_authorized",
+    "replacement_holdout_access_authorized",
+    "provider_source_switch_authorized",
+    "historical_universe_membership_authorized",
+    "formal_backtest_admission_authorized",
+    "automatic_model_promotion_authorized",
+    "formal_trade_plan_authorized",
+    "private_api_authorized",
+    "real_money_order_authorized",
+    "live_trading_authorized",
+)
+_PRODUCER_AUTHORITY = ("external_source_fetch", "production_r2_write")
+_ALLOWED_AUTHORITY = frozenset(
+    _REQUIRED_FALSE_AUTHORITY + _OPTIONAL_FALSE_AUTHORITY + _PRODUCER_AUTHORITY
+)
+
+
+def _validate_payload_authority(value: Any) -> None:
+    if not isinstance(value, Mapping):
+        raise ResearchSignalQualityError("signal payload authority is missing")
+    if any(key not in _ALLOWED_AUTHORITY for key in value):
+        # Do not echo arbitrary untrusted field names or values into reports.
+        raise ResearchSignalQualityError("signal payload contains unknown authority fields")
+    for key in _REQUIRED_FALSE_AUTHORITY:
+        if value.get(key) is not False:
+            raise ResearchSignalQualityError(f"signal payload unexpectedly authorizes {key}")
+    for key in _OPTIONAL_FALSE_AUTHORITY:
+        if key in value and value[key] is not False:
+            raise ResearchSignalQualityError(f"signal payload unexpectedly authorizes {key}")
+    for key in _PRODUCER_AUTHORITY:
+        if key in value and type(value[key]) is not bool:
+            raise ResearchSignalQualityError("signal payload producer authority flag must be boolean")
+
+
 class ReadOnlyObjectStore(Protocol):
     def get_bytes_if_exists(self, key: str) -> bytes | None: ...
 
@@ -220,17 +265,7 @@ def evaluate_research_signal_quality(
         raise ResearchSignalQualityError("unexpected signal payload schema")
     if payload.get("mode") != "RESEARCH_ONLY" or payload.get("run_id") != run_id:
         raise ResearchSignalQualityError("signal payload authority or run ID is invalid")
-    observed_authority = payload.get("authority")
-    if not isinstance(observed_authority, Mapping):
-        raise ResearchSignalQualityError("signal payload authority is missing")
-    for forbidden in (
-        "automatic_model_promotion",
-        "direct_trade_trigger",
-        "real_money_order",
-        "live_trading",
-    ):
-        if observed_authority.get(forbidden) is not False:
-            raise ResearchSignalQualityError(f"signal payload unexpectedly authorizes {forbidden}")
+    _validate_payload_authority(payload.get("authority"))
 
     snapshots = payload.get("source_snapshots")
     forecasts = payload.get("kol_forecasts")
