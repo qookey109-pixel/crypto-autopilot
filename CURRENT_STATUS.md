@@ -6,7 +6,7 @@ Updated: 2026-09-24. This is the single human entrypoint for the current project
 
 ## Read and act from the right source
 
-1. **Resolve `main` live at read time.** This checkpoint was refreshed at 2026-09-24 02:27 Asia/Taipei after PR #492 merged at main `35c39d50957beccc634fd6346ef1554c20b32f35`; this is a dated observation, not a latest-main claim.
+1. **Resolve `main` live at read time.** This checkpoint was refreshed at 2026-09-24 03:09 Asia/Taipei after PR #493 merged at main `766fc2a9b75a9c728901a72393734d68d5799a7d`; this is a dated observation, not a latest-main claim.
 2. Use the exact versioned config, receipt and immutable run evidence for any execution decision. This document adds no authority.
 3. Use [PROJECT_STATUS.md](PROJECT_STATUS.md) for governance and retired-stage lineage, [README.md](README.md) for the product map, and [AGENTS.md](AGENTS.md) for agent rules.
 4. Use live [pull requests](https://github.com/qookey109-pixel/crypto-autopilot/pulls) and [Actions](https://github.com/qookey109-pixel/crypto-autopilot/actions) for moving operational state.
@@ -32,6 +32,8 @@ The machine-readable [Current Operations V0.3](research/status/current-operation
 Core100 dataset fingerprint: `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`.
 Weekly Training remains scheduled with dataset/model-blob fingerprint deduplication. An exact match returns `NO_CHANGE`, with no retraining or R2 write. The verified baseline experiment fingerprint is `25b3178ce0d13052684d20b35a0e1f6949f0d97a5ac0c5b9e8f0a52d4d12f9c8`.
 
+Fingerprint V0.2 preparation found that V0.1 omits `features/advanced.py`. If the live dataset and latest pointer still match the old baseline, the active V0.1 runner can return `NO_CHANGE` even though that feature source changed. Production R2 was not read during this audit, so the condition is not confirmed against the current dataset. V0.2 remains `PREPARED_NOT_ACTIVE`; its runner and workflow were not changed. See the [fingerprint V0.2 review](docs/CORE100_TRAINING_FINGERPRINT_V0_2.md).
+
 Detailed evidence:
 
 - [Core100 lifecycle and threshold results](PROJECT_STATUS.md#current-lifecycle)
@@ -45,9 +47,9 @@ Detailed evidence:
 | Priority | Work | Completion evidence / boundary |
 | --- | --- | --- |
 | 1 | Pages / Health reliability checkpoint | TD-010 complete: Pages `35843351924` succeeded naturally, followed by Health `35870216734` with `PASS` and zero alerts. Continue normal monitoring; do not create substitute dispatch evidence. |
-| 2 | Reconcile the old local checkout with current main | The 78-path inventory and recovery files remain in the original dirty checkout. The unified Work Item intake and C4/C5 signal hardening are integrated; C2 Agent Arena and C3 synthetic daily preview were rechecked and deferred because neither has a current approved use case on main. Preserve the originals. |
-| 3 | Review Core100 fingerprint dependency coverage | The local proposal lists 18 Python paths; an AST walk of the exact current-main blobs finds 20, including `backtest.py` and `risk.py`. Classify their effect, verify dynamic/runtime inputs, then complete synthetic identity and baseline-migration checks. Prepare only `PREPARED_NOT_ACTIVE`; do not change the active runner, train, or access R2. |
-| 4 | PR delivery checkpoint | PRs #477, #479, #491 and #492 are merged. Recheck GitHub for exact live open PRs, heads, bases and checks before any future delivery action. |
+| 2 | Reconcile the old local checkout with current main | The 78-path inventory and recovery files remain in the original dirty checkout. The unified Work Item intake is integrated by PR #493; C4/C5 signal hardening are integrated by PRs #491/#492. C2 Agent Arena and C3 synthetic daily preview were rechecked and deferred because neither has a current approved use case on main. Preserve the originals. |
+| 3 | Core100 fingerprint V0.2 | Prepared as PREPARED_NOT_ACTIVE: 31-file import closure split into 14 result-identity and 17 runtime-guard paths; synthetic proof confirms V0.1 misses features/advanced.py. Legacy migration is REVIEW_REQUIRED; do not change the active runner, train, or access R2 without a separate versioned authority. |
+| 4 | PR delivery checkpoint | PRs #477, #478, #479, #491, #492 and #493 are merged. Recheck GitHub for exact live open PRs, heads, bases and checks before any future delivery action. |
 | 5 | Tidy historical Actions registrations | The [operating map](docs/GITHUB_ACTIONS_OPERATING_MAP.md) separates current workflow files, removed-file registrations and dynamic Dependabot. Preserve historical run evidence. |
 
 The [technical-debt register](docs/TECH_DEBT_REGISTER_2026_09_17.md) remains the cleanup register. This checklist is its current navigation, not a second issue tracker. Use the single [Work Item intake](.github/ISSUE_TEMPLATE/work-item.yml) for planning; issue state grants no authority. Large-module refactoring, new strategy families and new schedules stay deferred until their stated gates are met. The 261-error type baseline is historical; fetch current CI visibility before quoting a current count or choosing another typing slice.
