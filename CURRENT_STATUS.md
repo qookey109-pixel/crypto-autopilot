@@ -27,7 +27,7 @@ The machine-readable [Current Operations V0.3](research/status/current-operation
 | ZEC V0.3 | Run `35573236145`: 256/256 cells complete; NO_ELIGIBLE_DEVELOPMENT_CANDIDATE | No champion; fresh confirmation remains unopened. |
 | ZEC V0.4 | Run `35618367238`: 24/24 cells complete; NO_ELIGIBLE_DEVELOPMENT_CANDIDATE | One-shot development is finished; do not dispatch it again from its earlier preregistration text. |
 | Live Paper | Explicit public-market-data simulation, persistence and slot claim contracts exist | Manual governed operation only; no automatic schedule/candidate selection or private exchange orders. |
-| Pages reliability | PR #478 merged; natural schedule run `35843351924` succeeded on main `87ad32fd8f29a0c34bbf61ad11694fe4ef29df51` | build / deploy / browser-production all succeeded; the next natural Health run after this Pages success is still pending. |
+| Pages / Health reliability | Natural Pages schedule `35843351924` succeeded on main `87ad32fd8f29a0c34bbf61ad11694fe4ef29df51`; later natural Health schedule `35870216734` succeeded on main `5b4aa2a4903ad2b630f3bbd4b4117adcffe867bf` | Pages build / deploy / browser-production succeeded; Health reported `Overall: PASS`, `alerts: 0`, with the dashboard backstop HEALTHY. TD-010 acceptance is satisfied. |
 
 Core100 dataset fingerprint: `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`.
 Weekly Training remains scheduled with dataset/model-blob fingerprint deduplication. An exact match returns `NO_CHANGE`, with no retraining or R2 write. The verified baseline experiment fingerprint is `25b3178ce0d13052684d20b35a0e1f6949f0d97a5ac0c5b9e8f0a52d4d12f9c8`.
@@ -44,7 +44,7 @@ Detailed evidence:
 
 | Priority | Work | Completion evidence / boundary |
 | --- | --- | --- |
-| 1 | Verify the first natural Health result after successful Pages run `35843351924` | Pages natural schedule is now verified; record the first later Health `schedule` run ID, head SHA and conclusion. Do not dispatch a replacement. |
+| 1 | Pages / Health reliability checkpoint | TD-010 complete: Pages `35843351924` succeeded naturally, followed by Health `35870216734` with `PASS` and zero alerts. Continue normal monitoring; do not create substitute dispatch evidence. |
 | 2 | Reconcile the old local checkout with current main | Inventory each changed/untracked file; preserve recovery files; review differing bytes before migration. |
 | 3 | Review Core100 fingerprint dependency coverage | Synthetic dependency checks and a new contract/baseline migration proposal; no new training or R2 execution authority. |
 | 4 | PR delivery checkpoint | PR #477 and PR #479 are merged; the live open-PR query at this checkpoint returned zero. Recheck GitHub before acting on any future PR. |
@@ -61,7 +61,7 @@ At the 2026-09-23 12:49 UTC observation:
 - post-merge [CI `35813605260`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/35813605260), [CodeQL `35813605270`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/35813605270) and [Freeze Guard `35813605239`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/35813605239) succeeded;
 - [Pages push `35813605262`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/35813605262) built successfully, with deploy and browser-production skipped;
 - natural Pages schedule [`35843351924`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/35843351924) ran on main `87ad32fd8f29a0c34bbf61ad11694fe4ef29df51`; build, deploy and browser-production all concluded `success`, completing at 09:31:59 UTC;
-- Health schedule [`35834552996`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/35834552996) failed at 07:59:11 UTC, before the successful Pages schedule; its single alert was the previously cancelled Dashboard backstop. As of 12:49 UTC, no later natural `schedule` run existed after Pages `35843351924`, so post-fix Health recovery remains unverified;
+- Health schedule [`35834552996`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/35834552996) failed at 07:59:11 UTC, before the successful Pages schedule; its single alert was the previously cancelled Dashboard backstop. The later natural Health schedule [`35870216734`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/35870216734) completed successfully at 13:53:43 UTC on main `5b4aa2a4903ad2b630f3bbd4b4117adcffe867bf`; its report was `Overall: PASS`, `alerts: 0`, and the dashboard backstop was HEALTHY;
 - Resource Hub schedule `35824364991` was created at 05:54:26 UTC versus its nominal 01:13 UTC slot. This is delay evidence, not a confirmed diagnosis of GitHub's scheduler.
 
 These are dated observations, not promises of current health. PR #478 preserves queued production runs and rejects stale/unchanged deployments; the queue holds at most 100 pending runs.

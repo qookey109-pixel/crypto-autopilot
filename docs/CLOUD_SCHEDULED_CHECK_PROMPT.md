@@ -7,7 +7,7 @@
 
 從 current main workflow 檔辨認所有 cron；依 current main 的 config/research_automation_health_v0_2.json 或已合併 successor，檢查 active window、allowed_events、allowed_conclusions、max_age_seconds。每個相關 run 記 workflow path/ID、event、run ID/attempt、head SHA、nominal slot 與不確定性、created/start/completed（可取得時）、status/conclusion、policy 版本與證據 URL。查詢須注意 pagination、event filter 和可見時間範圍；若工具只能看 PR-triggered runs，不能推論自然 schedule。API 403、rate limit、資料缺頁或工具不支援，標 UNKNOWN/BLOCKED_PERMISSION，報告缺少的證據。
 
-特別追蹤 #478 合併後的自然 Pages schedule，再查其後的 Health schedule。Pages build、deploy、browser-production 各記結論；push/PR/workflow_run 的成功、skipped job、較早的 Health run 不能代替自然排程成功。區分名義 cron 時間、GitHub 建立 run 的時間、queue delay 與 policy freshness；無法唯一配對 slot 就說明歧義。只在有新自然證據時更新原問題；已通知的相同失敗與單純 pending/running 保持安靜。
+TD-010 的自然恢復基線已完成：Pages schedule `35843351924` 的 build/deploy/browser-production 全部成功，其後 Health schedule `35870216734` 為 `PASS`、`alerts=0`。後續維持普通健康監控，不再把這組既有成功證據當成未完成項；新的 failure/recovery 仍須依自然 schedule、event、head SHA 與 policy freshness 判定，push/PR/workflow_run 或 skipped job 不能替代自然排程證據。
 
 每輪查當下 open PR，不固定假設任何既有 PR 仍 open。PR #479 已合併到 main；後續只能把 current main 當 authority，新的 PR 必須重新讀 exact head/base/draft/merged/checks。查 9/27 11:53 台北後 Pionex bounded observability 的最後自然 slot、9/27 12:37 後 Core100 weekly Training 自然 slot；10/1 08:00 台北後確認 Pionex window 到期。至少累積七天實際 metadata coverage、樣本與缺失後，才提頻率建議；日期經過本身不代表七天證據完整。Training workflow success 不代表模型 PASS/NO_CHANGE，沒有可讀報告時列 UNKNOWN。provider/R2 用量同理。
 
