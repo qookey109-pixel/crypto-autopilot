@@ -29,6 +29,7 @@ on:
       - "scripts/build_research_calendar_projection.py"
       - "scripts/build_automation_schedule_projection.py"
       - "scripts/build_dashboard_content_hash.py"
+      - "scripts/check_dashboard_deploy_freshness.py"
       - "scripts/build_alternative_assets_projection.py"
       - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
@@ -90,6 +91,7 @@ on:
       - "scripts/build_research_calendar_projection.py"
       - "scripts/build_automation_schedule_projection.py"
       - "scripts/build_dashboard_content_hash.py"
+      - "scripts/check_dashboard_deploy_freshness.py"
       - "scripts/build_alternative_assets_projection.py"
       - "scripts/build_strategy_projection.py"
       - "scripts/apply_dashboard_latest_authority.py"
@@ -144,7 +146,10 @@ permissions:
 
 concurrency:
   group: github-pages-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'production' }}
-  cancel-in-progress: true
+  # Keep the daily schedule and event-driven runs, including pending runs, in order.
+  # The shared production group also serializes build, deployment, and browser checks.
+  queue: max
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -505,24 +510,45 @@ jobs:
     needs: build
     outputs:
       page_url: ${{ steps.deployment.outputs.page_url }}
+      deployed: ${{ steps.deployment.outcome == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
+      contents: read
       pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Reject stale main or unchanged content before deployment
+        id: freshness
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ github.sha }}
+          CONTENT_HASH: ${{ needs.build.outputs.content_hash }}
+        run: >-
+          python scripts/check_dashboard_deploy_freshness.py
+          --repository "${GITHUB_REPOSITORY}"
+          --expected-sha "${EXPECTED_SHA}"
+          --content-hash "${CONTENT_HASH}"
+          --github-output "${GITHUB_OUTPUT}"
+
       - name: Configure GitHub Pages
+        if: steps.freshness.outputs.deploy_required == 'true'
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
 
       - name: Deploy to GitHub Pages
+        if: steps.freshness.outputs.deploy_required == 'true'
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
 
   browser-production:
-    if: needs.deploy.result == 'success'
+    if: needs.deploy.outputs.deployed == 'true'
     needs: [build, deploy]
     runs-on: ubuntu-latest
     timeout-minutes: 10
