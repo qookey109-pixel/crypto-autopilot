@@ -837,6 +837,7 @@ def validate_model_contract(
                 class_model.get("feature_standard_deviations"),
                 class_model.get("weights"),
             )
+            standard_deviations = arrays[1]
             if (
                 class_model.get("feature_names") != expected_features
                 or any(
@@ -850,7 +851,10 @@ def validate_model_contract(
                     )
                     for values in arrays
                 )
-                or any(float(value) <= 0 for value in arrays[1])
+                or (
+                    isinstance(standard_deviations, list)
+                    and any(float(value) <= 0 for value in standard_deviations)
+                )
                 or isinstance(class_model.get("bias"), bool)
                 or not isinstance(class_model.get("bias"), (int, float))
                 or not math.isfinite(float(class_model["bias"]))
