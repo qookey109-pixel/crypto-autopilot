@@ -5,6 +5,7 @@ import json
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from typing import cast
 
 from crypto_autopilot.paper.account_advance_v0_1 import (
     paper_account_advance_report_id_from_mapping,
@@ -506,8 +507,8 @@ def audit_paper_loop_integrity(
         "start_equity_usd": summaries[0]["start_equity_usd"],
         "terminal_equity_usd": summaries[-1]["end_equity_usd"],
         "net_equity_change_usd": round(
-            float(summaries[-1]["end_equity_usd"])
-            - float(summaries[0]["start_equity_usd"]),
+            cast(float, summaries[-1]["end_equity_usd"])
+            - cast(float, summaries[0]["start_equity_usd"]),
             8,
         ),
         "unique_forward_intent_count": len(forward_intent_ids),
