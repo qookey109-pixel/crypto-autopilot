@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from bisect import bisect_right
 from dataclasses import asdict, dataclass
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Sequence, cast
 
 from crypto_autopilot.features.advanced import AdvancedTechnicalSnapshot, build_advanced_technical_series
 from crypto_autopilot.backtest import BacktestConfig, FundingPoint, LongTradePlan, run_long_backtest
@@ -154,7 +154,7 @@ def run_paper_training_replay(
 ) -> dict[str, Any]:
     symbols = tuple(sorted(candles_by_symbol_interval))
     candidates: list[CandidateSignal] = []
-    candles_for_backtest: dict[str, tuple[Candle, ...]] = {}
+    candles_for_backtest: dict[str, list[Candle] | tuple[Candle, ...]] = {}
     replay_bars = int(config["replay"]["fifteen_minute_bars"])
 
     dataset_evidence: dict[str, Any] = {}
@@ -163,7 +163,9 @@ def run_paper_training_replay(
         if any(interval not in by_interval for interval in REQUIRED_INTERVALS):
             continue
         technical_by_interval = {
-            interval: build_technical_series(by_interval[interval], interval)
+            interval: build_technical_series(
+                cast(list[Candle] | tuple[Candle, ...], by_interval[interval]), interval
+            )
             for interval in REQUIRED_INTERVALS
         }
         advanced_15m = build_advanced_technical_series(
