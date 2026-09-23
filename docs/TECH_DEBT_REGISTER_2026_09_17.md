@@ -53,7 +53,7 @@ Status: **DEPENDENCY BATCH CLOSED / LIVE TRIAGE REQUIRED**
 
 The September 22 [V0.7 review](OPEN_PR_TRIAGE_2026_09_22.md) records the completed #326–#331 dependency review: compatible replacements #447/#448 merged; incompatible/freeze-crossing proposals closed. The earlier six-open-PR list is historical.
 
-At the September 23 checkpoint on main `87ad32fd8f29a0c34bbf61ad11694fe4ef29df51`, #477 was open and #478 was merged. Use live GitHub state plus exact current head/base/checks for new review. Closed architecture branches #302/#306/#307/#315/#336 remain historical salvage only. Follow the work order in `CURRENT_STATUS.md`.
+At the September 23 refresh, #478 was already merged and #477 then merged as main `19968403407d932fab58aca9ec354e2ffd82b825`. Use live GitHub state plus exact current head/base/checks for new review. Closed architecture branches #302/#306/#307/#315/#336 remain historical salvage only. Follow the work order in `CURRENT_STATUS.md`.
 
 ## P2 — workflow and quality maintenance
 
@@ -116,7 +116,7 @@ Follow the dated checkpoint in `CURRENT_STATUS.md` and the [continuation runbook
 | TD-010 / P0 — Pages and Health | PARTIAL — PAGES VERIFIED / HEALTH WAITING | Read the first natural Health schedule created after Pages run `35843351924` | Pages `35843351924` build/deploy/browser all SUCCESS on main `87ad32f...`; require a later natural Health result, with no dispatch or substitute event |
 | TD-011 / P1 — Local reconciliation | DISPOSITION_REVIEWED, integration pending | Read local inventory and reconciliation plan indexed in the runbook; recheck main before each salvage slice | 78 paths mapped, original hashes unchanged; review candidate tests at current source paths; no removal/reset/overwrite from inventory alone |
 | TD-012 / P1 — Training fingerprint | LOCAL_PROPOSAL, not activated | Review full model-affecting dependency closure, baseline migration and synthetic regression | Feature/dataset change changes identity; unchanged retains NO_CHANGE; no production training/R2 or frozen receipt edits |
-| TD-013 / P1 — Delivery and PR review | LIVE_REVIEW_REQUIRED | Recheck exact head/base, existing work and checks; checkpoint docs are draft #479 | Keep draft versus merged distinct; #477 and #479 need separate explicit merge decisions; never reopen completed work from old counts |
+| TD-013 / P1 — Delivery and PR review | PARTIAL — #477 MERGED / #479 DRAFT | Keep #479 separate and recheck its exact head/base/checks before any merge decision | #477 merged as `1996840...`; #479 still requires its own explicit merge decision; never reopen completed work from old counts |
 | TD-014 / P2 — Removed registrations | BLOCKED_PERMISSION, 0/25 disabled | After Actions:write becomes available, revalidate exact removed-file list in [Actions map](GITHUB_ACTIONS_OPERATING_MAP.md) | User authorized these 25 only; read back state, preserve runs, exclude current/frozen-source workflows and Dependabot; no repeated 403 attempts |
 
 After these items, continue TD-007 non-execution type narrowing from fresh CI visibility; keep type/security informational. TD-009 responsibility splitting stays deferred until characterization coverage justifies it.
