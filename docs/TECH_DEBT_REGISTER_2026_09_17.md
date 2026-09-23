@@ -113,7 +113,7 @@ Follow the dated checkpoint in `CURRENT_STATUS.md` and the [continuation runbook
 
 | ID / priority | Checkpoint status | Next action | Completion evidence / boundary |
 | --- | --- | --- | --- |
-| TD-010 / P0 — Pages and Health | WAITING_EVIDENCE after merged #478 | Read next natural Pages schedule and subsequent Health metadata | Exact run/event/SHA; separate build/deploy/browser; no dispatch or substitute event |
+| TD-010 / P0 — Pages and Health | PARTIAL — PAGES VERIFIED / HEALTH WAITING | Read the first natural Health schedule created after Pages run `35843351924` | Pages `35843351924` build/deploy/browser all SUCCESS on main `87ad32f...`; require a later natural Health result, with no dispatch or substitute event |
 | TD-011 / P1 — Local reconciliation | DISPOSITION_REVIEWED, integration pending | Read local inventory and reconciliation plan indexed in the runbook; recheck main before each salvage slice | 78 paths mapped, original hashes unchanged; review candidate tests at current source paths; no removal/reset/overwrite from inventory alone |
 | TD-012 / P1 — Training fingerprint | LOCAL_PROPOSAL, not activated | Review full model-affecting dependency closure, baseline migration and synthetic regression | Feature/dataset change changes identity; unchanged retains NO_CHANGE; no production training/R2 or frozen receipt edits |
 | TD-013 / P1 — Delivery and PR review | LIVE_REVIEW_REQUIRED | Recheck exact head/base, existing work and checks; checkpoint docs are draft #479 | Keep draft versus merged distinct; #477 and #479 need separate explicit merge decisions; never reopen completed work from old counts |

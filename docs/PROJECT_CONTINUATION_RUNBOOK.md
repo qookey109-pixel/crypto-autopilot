@@ -63,7 +63,7 @@ Salvage 先核對 main 是否已涵蓋：Signal ingest／quality 的本地驗證
 
 | 時點（台北） | 工作與完成條件 |
 | --- | --- |
-| 雲端排程啟用後每 6 小時 | 唯讀健檢；Pages／Health 尚未恢復就保留待驗證，按 policy 評估告警 |
+| 雲端排程啟用後每 6 小時 | 唯讀健檢；Pages 已由自然 run `35843351924` 驗證成功，直到出現其後的自然 Health run 前，Health recovery 保留待驗證並按 policy 評估告警 |
 | 下一個可執行的整理回合 | 依 TD-010～TD-014 先核對既有 PR，再做本地差異處置與 fingerprint 提案；外部等待不阻塞獨立項目 |
 | 2026-09-27 11:53 之後 | 核對 Pionex bounded observability 最後名義 slot 的自然 schedule；保留 missing／delayed／failure |
 | 2026-09-27 12:37 之後 | 核對 Weekly Training 自然 schedule；只從 metadata 確認 workflow 結論，無 report 就不判定 NO_CHANGE／模型 PASS |
