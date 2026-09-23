@@ -1,0 +1,404 @@
+{
+  "schema": "qookey-core100-training-fingerprint-preparation-receipt-v0.1",
+  "status": "PREPARED_NOT_ACTIVE",
+  "prepared_at_utc": "2026-09-23T19:02:04Z",
+  "prepared_at_taipei": "2026-09-24T03:02:04+08:00",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "source_main_sha": "766fc2a9b75a9c728901a72393734d68d5799a7d",
+  "contract_path": "config/core100_training_fingerprint_v0_2.json",
+  "source_blob_inventory": [
+    {
+      "path": "scripts/train_binance_detailed_history_models.py",
+      "git_blob_sha": "4e44fc0b5bb6711753e68e468120c81ee0b5eeaa"
+    },
+    {
+      "path": "scripts/train_binance_detailed_history_models_v0_2.py",
+      "git_blob_sha": "e739d29579223797f5439d6feebeec81287c73a8"
+    },
+    {
+      "path": "scripts/train_binance_detailed_history_models_v0_3.py",
+      "git_blob_sha": "baf7f59ed042d895660e3a3ac612cb73bb2416b6"
+    },
+    {
+      "path": "src/crypto_autopilot/__init__.py",
+      "git_blob_sha": "e0879c3743d56611357d339f698c40f585bf6bd7"
+    },
+    {
+      "path": "src/crypto_autopilot/backtest.py",
+      "git_blob_sha": "03133d1a43e8282c7e1dd21ec30aef06b9199075"
+    },
+    {
+      "path": "src/crypto_autopilot/binance/__init__.py",
+      "git_blob_sha": "3da7520f22cff663d488be7044fa757954b3cd3c"
+    },
+    {
+      "path": "src/crypto_autopilot/binance/lifecycle_gap_policy.py",
+      "git_blob_sha": "a5634950c4e38cc13c6cb060e97311171e4f02c8"
+    },
+    {
+      "path": "src/crypto_autopilot/binance/vision.py",
+      "git_blob_sha": "1233fc52250ac1c89ef71fc03554fc1f40ae2800"
+    },
+    {
+      "path": "src/crypto_autopilot/binance_historical.py",
+      "git_blob_sha": "e1ed228cdbff3596f1e81a23875ba92a659ddd1a"
+    },
+    {
+      "path": "src/crypto_autopilot/exchanges/__init__.py",
+      "git_blob_sha": "c9f8a6bd351d20c855174dc6861556703850bb1e"
+    },
+    {
+      "path": "src/crypto_autopilot/exchanges/base.py",
+      "git_blob_sha": "816d64b72e10189575ed4398129abe7ffd336428"
+    },
+    {
+      "path": "src/crypto_autopilot/exchanges/binance_usdm_public.py",
+      "git_blob_sha": "2bc8e2a034c50f4a1fdf2355e6fb8570050ee4d2"
+    },
+    {
+      "path": "src/crypto_autopilot/exchanges/paper.py",
+      "git_blob_sha": "f0adcf906eb5288756569ab452a9434f7d8b0933"
+    },
+    {
+      "path": "src/crypto_autopilot/exchanges/pionex_public.py",
+      "git_blob_sha": "8508fa8b44b6fcf8992f4841c73550eeff9664be"
+    },
+    {
+      "path": "src/crypto_autopilot/features/__init__.py",
+      "git_blob_sha": "f5f1a572fe49a39c5d0053b123ceefeec4756278"
+    },
+    {
+      "path": "src/crypto_autopilot/features/advanced.py",
+      "git_blob_sha": "52695764c837a6cc90cd02f43d6c601ef94e5707"
+    },
+    {
+      "path": "src/crypto_autopilot/features/market.py",
+      "git_blob_sha": "fa5ecfcdf2a256429152b5465681579f56036829"
+    },
+    {
+      "path": "src/crypto_autopilot/historical.py",
+      "git_blob_sha": "8f90abe4e4f6c6f58d8dc42a1dd66fba405c5c05"
+    },
+    {
+      "path": "src/crypto_autopilot/history/__init__.py",
+      "git_blob_sha": "ae32dd6c8b202116ca295c95efc3f8550f2bccff"
+    },
+    {
+      "path": "src/crypto_autopilot/history/detailed.py",
+      "git_blob_sha": "88bb0d15b2ff42485defb7b8e61c79e46f0785b0"
+    },
+    {
+      "path": "src/crypto_autopilot/models.py",
+      "git_blob_sha": "ec7c817cf6b42694a1938adb63eccd95f6def4a0"
+    },
+    {
+      "path": "src/crypto_autopilot/risk.py",
+      "git_blob_sha": "28d7d7fc33395461847719c6eecc94be4ff3bed7"
+    },
+    {
+      "path": "src/crypto_autopilot/storage/__init__.py",
+      "git_blob_sha": "e3cc3da3be3f529263edc8065b1f38657141e8a2"
+    },
+    {
+      "path": "src/crypto_autopilot/storage/ephemeral.py",
+      "git_blob_sha": "374ca665d8d5e80efc5f21d35236f099e3203059"
+    },
+    {
+      "path": "src/crypto_autopilot/storage/parquet.py",
+      "git_blob_sha": "5095a36bf8f879b93766519118a44d3ead3a3999"
+    },
+    {
+      "path": "src/crypto_autopilot/storage/r2.py",
+      "git_blob_sha": "98002298662cd82561e9c2cd6ae38ea0561f2ce6"
+    },
+    {
+      "path": "src/crypto_autopilot/technical.py",
+      "git_blob_sha": "9f41198c044d32044023e8133ebe33dcd226c008"
+    },
+    {
+      "path": "src/crypto_autopilot/training/__init__.py",
+      "git_blob_sha": "890a206dd7abf4cbd6b9f32cbd66f4c38a307acd"
+    },
+    {
+      "path": "src/crypto_autopilot/training/detailed.py",
+      "git_blob_sha": "f24c7345b422fca9dbe92ef5bb2b9ab272fe7236"
+    },
+    {
+      "path": "src/crypto_autopilot/training/history_quality.py",
+      "git_blob_sha": "1c66f3291fcf03ad132e2cfd68f2ffc4f9ceab1a"
+    },
+    {
+      "path": "src/crypto_autopilot/training/online_r2.py",
+      "git_blob_sha": "e2286a80aba6b3df33ddf0a52fab5ae9e23d36d9"
+    }
+  ],
+  "identity_support_blob_comparison": [
+    {
+      "path": "config/binance_usdm_detailed_history_v0_1_2.json",
+      "legacy_git_blob_sha": "d45a88922980dfe4838dce3f281c1102bfede9a0",
+      "current_git_blob_sha": "d45a88922980dfe4838dce3f281c1102bfede9a0",
+      "comparison": "MATCH"
+    },
+    {
+      "path": "requirements/ci-constraints.txt",
+      "legacy_git_blob_sha": "323fbf34e2e3348f2e4acc062181f862af7019d4",
+      "current_git_blob_sha": "323fbf34e2e3348f2e4acc062181f862af7019d4",
+      "comparison": "MATCH"
+    },
+    {
+      "path": "pyproject.toml",
+      "legacy_git_blob_sha": "0ef7f465ab0adc32b6b5bc57c9811f15b51e80bc",
+      "current_git_blob_sha": "0ef7f465ab0adc32b6b5bc57c9811f15b51e80bc",
+      "comparison": "MATCH"
+    }
+  ],
+  "execution_provenance_blobs": [
+    {
+      "path": ".github/workflows/binance-usdm-detailed-training-v0-1.yml",
+      "legacy_git_blob_sha": "11e241105dddd2dfc657afd6287bf8fff2982687",
+      "current_git_blob_sha": "668a0aba30e585261ec8a84416ec13e74447fb67",
+      "comparison": "DIFF"
+    },
+    {
+      "path": "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json",
+      "legacy_git_blob_sha": "f0a34709b8e514d3a27662db7b76d6272d5b73e6",
+      "current_git_blob_sha": "f0a34709b8e514d3a27662db7b76d6272d5b73e6",
+      "comparison": "MATCH"
+    }
+  ],
+  "legacy_source_comparison": {
+    "legacy_source_head_sha": "dc10ce590c8731fbef21115e0e3d3423cbcc7cf1",
+    "candidate_python_path_count": 31,
+    "match_count": 25,
+    "different_count": 5,
+    "missing_at_legacy_head_count": 1,
+    "rows": [
+      {
+        "path": "scripts/train_binance_detailed_history_models.py",
+        "legacy_git_blob_sha": "4e44fc0b5bb6711753e68e468120c81ee0b5eeaa",
+        "current_git_blob_sha": "4e44fc0b5bb6711753e68e468120c81ee0b5eeaa",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "scripts/train_binance_detailed_history_models_v0_2.py",
+        "legacy_git_blob_sha": "e739d29579223797f5439d6feebeec81287c73a8",
+        "current_git_blob_sha": "e739d29579223797f5439d6feebeec81287c73a8",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "scripts/train_binance_detailed_history_models_v0_3.py",
+        "legacy_git_blob_sha": null,
+        "current_git_blob_sha": "baf7f59ed042d895660e3a3ac612cb73bb2416b6",
+        "comparison": "MISSING_HISTORICAL"
+      },
+      {
+        "path": "src/crypto_autopilot/__init__.py",
+        "legacy_git_blob_sha": "e0879c3743d56611357d339f698c40f585bf6bd7",
+        "current_git_blob_sha": "e0879c3743d56611357d339f698c40f585bf6bd7",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/backtest.py",
+        "legacy_git_blob_sha": "eefa75276398b5df820e6ccd2bbb9b7d02200920",
+        "current_git_blob_sha": "03133d1a43e8282c7e1dd21ec30aef06b9199075",
+        "comparison": "DIFF"
+      },
+      {
+        "path": "src/crypto_autopilot/binance/__init__.py",
+        "legacy_git_blob_sha": "3da7520f22cff663d488be7044fa757954b3cd3c",
+        "current_git_blob_sha": "3da7520f22cff663d488be7044fa757954b3cd3c",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/binance/lifecycle_gap_policy.py",
+        "legacy_git_blob_sha": "a5634950c4e38cc13c6cb060e97311171e4f02c8",
+        "current_git_blob_sha": "a5634950c4e38cc13c6cb060e97311171e4f02c8",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/binance/vision.py",
+        "legacy_git_blob_sha": "1233fc52250ac1c89ef71fc03554fc1f40ae2800",
+        "current_git_blob_sha": "1233fc52250ac1c89ef71fc03554fc1f40ae2800",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/binance_historical.py",
+        "legacy_git_blob_sha": "e1ed228cdbff3596f1e81a23875ba92a659ddd1a",
+        "current_git_blob_sha": "e1ed228cdbff3596f1e81a23875ba92a659ddd1a",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/exchanges/__init__.py",
+        "legacy_git_blob_sha": "c9f8a6bd351d20c855174dc6861556703850bb1e",
+        "current_git_blob_sha": "c9f8a6bd351d20c855174dc6861556703850bb1e",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/exchanges/base.py",
+        "legacy_git_blob_sha": "816d64b72e10189575ed4398129abe7ffd336428",
+        "current_git_blob_sha": "816d64b72e10189575ed4398129abe7ffd336428",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/exchanges/binance_usdm_public.py",
+        "legacy_git_blob_sha": "2bc8e2a034c50f4a1fdf2355e6fb8570050ee4d2",
+        "current_git_blob_sha": "2bc8e2a034c50f4a1fdf2355e6fb8570050ee4d2",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/exchanges/paper.py",
+        "legacy_git_blob_sha": "c1a3d697c7e080b5ce53562401e5e082465c5de1",
+        "current_git_blob_sha": "f0adcf906eb5288756569ab452a9434f7d8b0933",
+        "comparison": "DIFF"
+      },
+      {
+        "path": "src/crypto_autopilot/exchanges/pionex_public.py",
+        "legacy_git_blob_sha": "8508fa8b44b6fcf8992f4841c73550eeff9664be",
+        "current_git_blob_sha": "8508fa8b44b6fcf8992f4841c73550eeff9664be",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/features/__init__.py",
+        "legacy_git_blob_sha": "f5f1a572fe49a39c5d0053b123ceefeec4756278",
+        "current_git_blob_sha": "f5f1a572fe49a39c5d0053b123ceefeec4756278",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/features/advanced.py",
+        "legacy_git_blob_sha": "1814901b0849ed62e8b5ca2ba4beeae14c65ebb8",
+        "current_git_blob_sha": "52695764c837a6cc90cd02f43d6c601ef94e5707",
+        "comparison": "DIFF"
+      },
+      {
+        "path": "src/crypto_autopilot/features/market.py",
+        "legacy_git_blob_sha": "fa5ecfcdf2a256429152b5465681579f56036829",
+        "current_git_blob_sha": "fa5ecfcdf2a256429152b5465681579f56036829",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/historical.py",
+        "legacy_git_blob_sha": "8f90abe4e4f6c6f58d8dc42a1dd66fba405c5c05",
+        "current_git_blob_sha": "8f90abe4e4f6c6f58d8dc42a1dd66fba405c5c05",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/history/__init__.py",
+        "legacy_git_blob_sha": "ae32dd6c8b202116ca295c95efc3f8550f2bccff",
+        "current_git_blob_sha": "ae32dd6c8b202116ca295c95efc3f8550f2bccff",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/history/detailed.py",
+        "legacy_git_blob_sha": "88bb0d15b2ff42485defb7b8e61c79e46f0785b0",
+        "current_git_blob_sha": "88bb0d15b2ff42485defb7b8e61c79e46f0785b0",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/models.py",
+        "legacy_git_blob_sha": "ec7c817cf6b42694a1938adb63eccd95f6def4a0",
+        "current_git_blob_sha": "ec7c817cf6b42694a1938adb63eccd95f6def4a0",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/risk.py",
+        "legacy_git_blob_sha": "baf5c877ff710e99499e94ccfe44b81b1272634a",
+        "current_git_blob_sha": "28d7d7fc33395461847719c6eecc94be4ff3bed7",
+        "comparison": "DIFF"
+      },
+      {
+        "path": "src/crypto_autopilot/storage/__init__.py",
+        "legacy_git_blob_sha": "e3cc3da3be3f529263edc8065b1f38657141e8a2",
+        "current_git_blob_sha": "e3cc3da3be3f529263edc8065b1f38657141e8a2",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/storage/ephemeral.py",
+        "legacy_git_blob_sha": "374ca665d8d5e80efc5f21d35236f099e3203059",
+        "current_git_blob_sha": "374ca665d8d5e80efc5f21d35236f099e3203059",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/storage/parquet.py",
+        "legacy_git_blob_sha": "5095a36bf8f879b93766519118a44d3ead3a3999",
+        "current_git_blob_sha": "5095a36bf8f879b93766519118a44d3ead3a3999",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/storage/r2.py",
+        "legacy_git_blob_sha": "98002298662cd82561e9c2cd6ae38ea0561f2ce6",
+        "current_git_blob_sha": "98002298662cd82561e9c2cd6ae38ea0561f2ce6",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/technical.py",
+        "legacy_git_blob_sha": "9f41198c044d32044023e8133ebe33dcd226c008",
+        "current_git_blob_sha": "9f41198c044d32044023e8133ebe33dcd226c008",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/training/__init__.py",
+        "legacy_git_blob_sha": "890a206dd7abf4cbd6b9f32cbd66f4c38a307acd",
+        "current_git_blob_sha": "890a206dd7abf4cbd6b9f32cbd66f4c38a307acd",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/training/detailed.py",
+        "legacy_git_blob_sha": "f24c7345b422fca9dbe92ef5bb2b9ab272fe7236",
+        "current_git_blob_sha": "f24c7345b422fca9dbe92ef5bb2b9ab272fe7236",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/training/history_quality.py",
+        "legacy_git_blob_sha": "1c66f3291fcf03ad132e2cfd68f2ffc4f9ceab1a",
+        "current_git_blob_sha": "1c66f3291fcf03ad132e2cfd68f2ffc4f9ceab1a",
+        "comparison": "MATCH"
+      },
+      {
+        "path": "src/crypto_autopilot/training/online_r2.py",
+        "legacy_git_blob_sha": "1220a9ede7c4516f134b7fc5325cc88e41ee6374",
+        "current_git_blob_sha": "e2286a80aba6b3df33ddf0a52fab5ae9e23d36d9",
+        "comparison": "DIFF"
+      }
+    ]
+  },
+  "synthetic_regression": {
+    "used_production_dataset": false,
+    "constructed_r2_client": false,
+    "provider_requests": 0,
+    "r2_reads": 0,
+    "r2_writes": 0,
+    "current_v0_1_baseline_identity_reproduced": true,
+    "all_10_current_v0_1_baseline_blobs_match_frozen_baseline": true,
+    "changing_advanced_or_technical_synthetic_blob_changes_v0_1_identity": false,
+    "changed_feature_blob_lookup_count_in_v0_1_identity": 0,
+    "changing_a_tracked_v0_1_training_blob_changes_identity": true,
+    "changing_dataset_fingerprint_changes_identity": true,
+    "conclusion": "V0.1 can misclassify the legacy baseline as unchanged after an omitted feature-source change, conditional on the live dataset/latest pointer still matching the baseline."
+  },
+  "runtime_review": {
+    "workflow_requests_python": "3.13",
+    "legacy_config_records_exact_patch": false,
+    "legacy_installed_distribution_manifest_recorded": false,
+    "runtime_manifest_required_by_prepared_v0_2": true
+  },
+  "authority_effect": {
+    "active_cutover": false,
+    "training": false,
+    "provider_access": false,
+    "r2_access": false,
+    "holdout_access": false,
+    "promotion": false,
+    "source_switch": false,
+    "orders": false,
+    "live_trading": false
+  },
+  "side_effects": {
+    "training_performed": false,
+    "provider_requests_performed": 0,
+    "r2_reads_performed": 0,
+    "r2_writes_performed": 0,
+    "holdout_accessed": false,
+    "active_runner_changed": false,
+    "workflow_changed": false
+  }
+}

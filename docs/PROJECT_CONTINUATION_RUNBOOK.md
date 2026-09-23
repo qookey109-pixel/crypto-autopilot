@@ -23,11 +23,11 @@
 
 | 工作 | 本地成果位置 | 已完成／仍待處理 |
 | --- | --- | --- |
-| TD-011 | `handoffs/2026-09-23-project-checkpoint/local-files.json`、`local-files.md`、`reconciliation-plan.md` | 原 78 項映射與 recovery 留在 dirty checkout。C1 planning overlay、C4 signal ingest、C5 quality validation 已整合；C2/C3 已比對 current main 並 deferred，未搬移其程式 |
-| TD-012 | `handoffs/2026-09-23-core100-fingerprint-v0-2-proposal.md` | 未啟用提案。原清單列 18 個 Python 路徑；對 exact current-main blobs 的 AST walk 找到 20 個，還需分類 `backtest.py`、`risk.py`，核對動態／runtime inputs，並完成 synthetic regression 與 baseline migration 審查 |
+| TD-011 | `handoffs/2026-09-23-project-checkpoint/local-files.json`、`local-files.md`、`reconciliation-plan.md` | 原 78 項映射與 recovery 留在 dirty checkout。C1 planning overlay（PR #493）、C4 signal ingest、C5 quality validation 已整合；C2/C3 已比對 current main 並 deferred，未搬移其程式 |
+| TD-012 | 原本地提案仍保留於 handoffs/2026-09-23-core100-fingerprint-v0-2-proposal.md；main 準備文件見 [V0.2 review](CORE100_TRAINING_FINGERPRINT_V0_2.md)、[config](../config/core100_training_fingerprint_v0_2.json)、[receipt](../research/receipts/2026-09-24-core100-training-fingerprint-v0-2-prepared.json) | 31-path closure 分為 14 個 result-identity 與 17 個 runtime-guard 檔；features/advanced.py 變更會被 V0.1 漏掉，舊 baseline 為 REVIEW_REQUIRED。V0.1 runner 仍有效且未修改；任何 cutover 需另有版本化 authority |
 | 最新交接 | `handoffs/2026-09-23-project-checkpoint/README.md` | main／PR／驗證快照、原工作區狀態與新聊天接續文字；仍需 live 查核 |
 
-Signal ingest parsing hardening 和 Quality V0.1 authority validation 分別由 [PR #491](https://github.com/qookey109-pixel/crypto-autopilot/pull/491) 與 [PR #492](https://github.com/qookey109-pixel/crypto-autopilot/pull/492) 合併；兩者合併後 CI、CodeQL、Freeze Guard、Pages deploy 與 browser-production 均成功。不要把舊模組整檔覆蓋 current main，也不要移植舊的 Quality evaluator；main 的 dedupe、source-run binding、freshness 與單指標 `NO_CHANGE` 讀取契約已保留。C1 unified planning overlay 已由單一 Work Item form、contract、模板與 AGENTS/README 導覽收斂。C2 Agent Arena 仍無具體比較集合／使用路徑，且 registry 已能保存不可變證據、scorecard 已提供 research-priority ranking；C3 的舊 synthetic preview 使用舊 Paper report schema，而 main 已有 Daily Opportunity Engine 和 Strategy Router，兩項都先保留本地、不移植。舊 Health V0.1 cron 與缺少 #478 的 Pages workflow不可回灌。
+Signal ingest parsing hardening 和 Quality V0.1 authority validation 分別由 [PR #491](https://github.com/qookey109-pixel/crypto-autopilot/pull/491) 與 [PR #492](https://github.com/qookey109-pixel/crypto-autopilot/pull/492) 合併，合併後 CI、CodeQL、Freeze Guard、Pages deploy 與 browser-production 均成功。不要把舊模組整檔覆蓋 current main，也不要移植舊的 Quality evaluator；main 的 dedupe、source-run binding、freshness 與單指標 `NO_CHANGE` 讀取契約已保留。C1 unified planning overlay 的單一 Work Item form、contract、模板與 AGENTS/README 導覽由 [PR #493](https://github.com/qookey109-pixel/crypto-autopilot/pull/493) 整合。C2 Agent Arena 仍無具體比較集合／使用路徑，且 registry 已能保存不可變證據、scorecard 已提供 research-priority ranking；C3 的舊 synthetic preview 使用舊 Paper report schema，而 main 已有 Daily Opportunity Engine 和 Strategy Router，兩項都先保留本地、不移植。舊 Health V0.1 cron 與缺少 #478 的 Pages workflow不可回灌。
 
 ## 2. 每次接續的固定流程
 
@@ -64,7 +64,7 @@ Signal ingest parsing hardening 和 Quality V0.1 authority validation 分別由 
 | 時點（台北） | 工作與完成條件 |
 | --- | --- |
 | 雲端排程啟用後每 6 小時 | 唯讀健檢；Pages 自然 run `35843351924` 已成功，且其後自然 Health run `35870216734` 已 `PASS`、`alerts=0`。TD-010 已完成，後續只做正常健康監控並在新故障／恢復時更新 |
-| 下一個可執行的整理回合 | 依 TD-012 審查 current-main fingerprint dependency closure、V0.1 baseline migration 與 synthetic regression；只準備新版本提案，不改 active runner、不訓練、不接觸 R2 |
+| 下一個可執行的整理回合 | TD-012 的唯讀 fingerprint 查核及 PREPARED_NOT_ACTIVE 提案已完成；回到 TD-011 對原 78 項清冊做剩餘項目分類，保留 dirty checkout 原件。若要啟用 V0.2，先另行建立並審查版本化 cutover authority；此提案不授權改 runner、訓練或接觸 R2 |
 | 2026-09-27 11:53 之後 | 核對 Pionex bounded observability 最後名義 slot 的自然 schedule；保留 missing／delayed／failure |
 | 2026-09-27 12:37 之後 | 核對 Weekly Training 自然 schedule；只從 metadata 確認 workflow 結論，無 report 就不判定 NO_CHANGE／模型 PASS |
 | 自 2026-09-23 起取得至少 7 天觀測後 | 整理 delay／missing／cancelled／重複／duration；列 coverage、樣本量、未知值，再提 cadence 建議 |

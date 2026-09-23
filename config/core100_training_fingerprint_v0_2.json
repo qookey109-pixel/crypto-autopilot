@@ -1,0 +1,247 @@
+{
+  "schema": "qookey-core100-training-fingerprint-v0.2",
+  "status": "PREPARED_NOT_ACTIVE",
+  "prepared_from_main_sha": "766fc2a9b75a9c728901a72393734d68d5799a7d",
+  "preparation_receipt": "research/receipts/2026-09-24-core100-training-fingerprint-v0-2-prepared.json",
+  "purpose": "Proposed reproducibility contract for Core100 training. It does not modify or activate the current runner.",
+  "source_inventory": {
+    "entry_scripts": [
+      "scripts/train_binance_detailed_history_models.py",
+      "scripts/train_binance_detailed_history_models_v0_2.py",
+      "scripts/train_binance_detailed_history_models_v0_3.py"
+    ],
+    "static_import_closure_paths": [
+      "scripts/train_binance_detailed_history_models.py",
+      "scripts/train_binance_detailed_history_models_v0_2.py",
+      "scripts/train_binance_detailed_history_models_v0_3.py",
+      "src/crypto_autopilot/__init__.py",
+      "src/crypto_autopilot/backtest.py",
+      "src/crypto_autopilot/binance/__init__.py",
+      "src/crypto_autopilot/binance/lifecycle_gap_policy.py",
+      "src/crypto_autopilot/binance/vision.py",
+      "src/crypto_autopilot/binance_historical.py",
+      "src/crypto_autopilot/exchanges/__init__.py",
+      "src/crypto_autopilot/exchanges/base.py",
+      "src/crypto_autopilot/exchanges/binance_usdm_public.py",
+      "src/crypto_autopilot/exchanges/paper.py",
+      "src/crypto_autopilot/exchanges/pionex_public.py",
+      "src/crypto_autopilot/features/__init__.py",
+      "src/crypto_autopilot/features/advanced.py",
+      "src/crypto_autopilot/features/market.py",
+      "src/crypto_autopilot/historical.py",
+      "src/crypto_autopilot/history/__init__.py",
+      "src/crypto_autopilot/history/detailed.py",
+      "src/crypto_autopilot/models.py",
+      "src/crypto_autopilot/risk.py",
+      "src/crypto_autopilot/storage/__init__.py",
+      "src/crypto_autopilot/storage/ephemeral.py",
+      "src/crypto_autopilot/storage/parquet.py",
+      "src/crypto_autopilot/storage/r2.py",
+      "src/crypto_autopilot/technical.py",
+      "src/crypto_autopilot/training/__init__.py",
+      "src/crypto_autopilot/training/detailed.py",
+      "src/crypto_autopilot/training/history_quality.py",
+      "src/crypto_autopilot/training/online_r2.py"
+    ],
+    "static_import_closure_count": 31,
+    "training_result_identity_code_paths": [
+      "scripts/train_binance_detailed_history_models.py",
+      "scripts/train_binance_detailed_history_models_v0_2.py",
+      "src/crypto_autopilot/binance/lifecycle_gap_policy.py",
+      "src/crypto_autopilot/binance/vision.py",
+      "src/crypto_autopilot/binance_historical.py",
+      "src/crypto_autopilot/exchanges/binance_usdm_public.py",
+      "src/crypto_autopilot/features/advanced.py",
+      "src/crypto_autopilot/historical.py",
+      "src/crypto_autopilot/history/detailed.py",
+      "src/crypto_autopilot/models.py",
+      "src/crypto_autopilot/storage/parquet.py",
+      "src/crypto_autopilot/technical.py",
+      "src/crypto_autopilot/training/detailed.py",
+      "src/crypto_autopilot/training/history_quality.py"
+    ],
+    "runtime_import_guard_paths": [
+      "scripts/train_binance_detailed_history_models_v0_3.py",
+      "src/crypto_autopilot/__init__.py",
+      "src/crypto_autopilot/backtest.py",
+      "src/crypto_autopilot/binance/__init__.py",
+      "src/crypto_autopilot/exchanges/__init__.py",
+      "src/crypto_autopilot/exchanges/base.py",
+      "src/crypto_autopilot/exchanges/paper.py",
+      "src/crypto_autopilot/exchanges/pionex_public.py",
+      "src/crypto_autopilot/features/__init__.py",
+      "src/crypto_autopilot/features/market.py",
+      "src/crypto_autopilot/history/__init__.py",
+      "src/crypto_autopilot/risk.py",
+      "src/crypto_autopilot/storage/__init__.py",
+      "src/crypto_autopilot/storage/ephemeral.py",
+      "src/crypto_autopilot/storage/r2.py",
+      "src/crypto_autopilot/training/__init__.py",
+      "src/crypto_autopilot/training/online_r2.py"
+    ],
+    "identity_support_paths": [
+      "config/binance_usdm_detailed_history_v0_1_2.json",
+      "requirements/ci-constraints.txt",
+      "pyproject.toml"
+    ],
+    "dynamic_imports": [
+      {
+        "caller": "scripts/train_binance_detailed_history_models_v0_2.py",
+        "target": "scripts/train_binance_detailed_history_models.py",
+        "target_variable": "RUNNER",
+        "mechanism": "importlib.util.spec_from_file_location"
+      },
+      {
+        "caller": "scripts/train_binance_detailed_history_models_v0_3.py",
+        "target": "scripts/train_binance_detailed_history_models_v0_2.py",
+        "target_variable": "V02",
+        "mechanism": "importlib.util.spec_from_file_location"
+      }
+    ],
+    "closure_method": "AST walk over absolute and relative local imports, package __init__.py execution, and the two explicitly listed file-loader edges.",
+    "unknown_dynamic_import_policy": "REVIEW_REQUIRED; do not silently expand the import inventory or execute training.",
+    "classification": {
+      "result_identity": "The original runner, V0.2 partition-quality/example builder, feature/model functions, data admission logic, Parquet decoding and training config can change accepted rows or model output.",
+      "runtime_import_guard": "Imports that are loaded but have no observed Core100 result call site are tracked separately. A change requires REVIEW_REQUIRED and does not automatically trigger retraining.",
+      "backtest_and_risk": "Loaded through binance_historical.FundingPoint and the backtest-to-risk import. The Core100 path uses the interval mapping and does not call backtest or position-sizing behavior; these remain guard paths.",
+      "package_initializers": "exchanges/__init__.py imports base, Binance, paper and Pionex modules; package initializers execute before submodules. Unused imported modules remain guard paths.",
+      "dedupe_runner": "The V0.3 wrapper decides reuse versus training and formats the run report; it does not calculate Core100 features or fit the model. Changes require REVIEW_REQUIRED and do not automatically retrain."
+    }
+  },
+  "identity_contract": {
+    "schema": "qookey-core100-training-experiment-fingerprint-v0.2",
+    "dataset_fingerprint": "Preserve catalog SHA plus ordered shard-receipt binding; each shard receipt binds the governed partition SHA values.",
+    "canonicalization": {
+      "encoding": "UTF-8",
+      "json_sort_keys": true,
+      "json_separators": [
+        ",",
+        ":"
+      ],
+      "hash": "SHA-256"
+    },
+    "code_paths": [
+      "scripts/train_binance_detailed_history_models.py",
+      "scripts/train_binance_detailed_history_models_v0_2.py",
+      "src/crypto_autopilot/binance/lifecycle_gap_policy.py",
+      "src/crypto_autopilot/binance/vision.py",
+      "src/crypto_autopilot/binance_historical.py",
+      "src/crypto_autopilot/exchanges/binance_usdm_public.py",
+      "src/crypto_autopilot/features/advanced.py",
+      "src/crypto_autopilot/historical.py",
+      "src/crypto_autopilot/history/detailed.py",
+      "src/crypto_autopilot/models.py",
+      "src/crypto_autopilot/storage/parquet.py",
+      "src/crypto_autopilot/technical.py",
+      "src/crypto_autopilot/training/detailed.py",
+      "src/crypto_autopilot/training/history_quality.py"
+    ],
+    "support_paths": [
+      "config/binance_usdm_detailed_history_v0_1_2.json",
+      "requirements/ci-constraints.txt",
+      "pyproject.toml"
+    ],
+    "runtime_manifest_required": true,
+    "runtime_manifest_fields": [
+      "sys.implementation.name",
+      "sys.version",
+      "sys.implementation.cache_tag",
+      "sysconfig.get_platform()",
+      "platform.system()",
+      "platform.release()",
+      "platform.machine()",
+      "platform.libc_ver()",
+      "sorted installed distribution name==version rows from an isolated project environment",
+      "GitHub Actions runner image metadata when available",
+      "pip and build-backend/install-tool versions",
+      "installed project package version"
+    ],
+    "dependency_install_isolation_required": true,
+    "exact_python_patch_required": true,
+    "same_dataset_result_identity_runtime_and_guard": "NO_CHANGE",
+    "exact_match_training_performed": false,
+    "exact_match_r2_write_performed": false,
+    "runtime_guard_change": "REVIEW_REQUIRED; no automatic training or R2 write",
+    "unknown_runtime_or_distribution_inventory": "REVIEW_REQUIRED; no automatic training or R2 write",
+    "runtime_guard_paths": [
+      "scripts/train_binance_detailed_history_models_v0_3.py",
+      "src/crypto_autopilot/__init__.py",
+      "src/crypto_autopilot/backtest.py",
+      "src/crypto_autopilot/binance/__init__.py",
+      "src/crypto_autopilot/exchanges/__init__.py",
+      "src/crypto_autopilot/exchanges/base.py",
+      "src/crypto_autopilot/exchanges/paper.py",
+      "src/crypto_autopilot/exchanges/pionex_public.py",
+      "src/crypto_autopilot/features/__init__.py",
+      "src/crypto_autopilot/features/market.py",
+      "src/crypto_autopilot/history/__init__.py",
+      "src/crypto_autopilot/risk.py",
+      "src/crypto_autopilot/storage/__init__.py",
+      "src/crypto_autopilot/storage/ephemeral.py",
+      "src/crypto_autopilot/storage/r2.py",
+      "src/crypto_autopilot/training/__init__.py",
+      "src/crypto_autopilot/training/online_r2.py"
+    ],
+    "runtime_guard_payload": "SHA-256 over canonical UTF-8 JSON containing path/blob rows sorted lexicographically by path.",
+    "dependency_inventory_contract": "Normalize distribution names and serialize sorted name==version rows from the isolated runtime, including pip, the project package and build-backend/install tooling versions."
+  },
+  "execution_context": {
+    "workflow_path": ".github/workflows/binance-usdm-detailed-training-v0-1.yml",
+    "workflow_blob_sha_at_preparation": "668a0aba30e585261ec8a84416ec13e74447fb67",
+    "current_training_authority_receipt_path": "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json",
+    "authority_receipt_blob_sha_at_preparation": "f0a34709b8e514d3a27662db7b76d6272d5b73e6",
+    "workflow_python_request": "3.13",
+    "workflow_and_authority_receipt_are_provenance_not_result_identity_inputs": true,
+    "workflow_or_authority_receipt_change_result": "REVIEW_REQUIRED before evaluating reuse or training."
+  },
+  "baseline_migration": {
+    "legacy_v0_1_latest_pointer": "REVIEW_REQUIRED",
+    "legacy_reuse_authorized": false,
+    "legacy_training_run_id": "github-34918219864-1",
+    "legacy_source_head_sha": "dc10ce590c8731fbef21115e0e3d3423cbcc7cf1",
+    "current_main_sha": "766fc2a9b75a9c728901a72393734d68d5799a7d",
+    "result_identity_source_comparison": {
+      "match": 13,
+      "different": 1,
+      "missing_at_legacy_head": 0,
+      "different_paths": [
+        "src/crypto_autopilot/features/advanced.py"
+      ]
+    },
+    "wrapper_at_legacy_head": "scripts/train_binance_detailed_history_models_v0_3.py was absent at the legacy source head.",
+    "legacy_exact_python_patch_and_distribution_inventory_available": false,
+    "legacy_v0_1_model_paths_match_current_baseline": true,
+    "conditional_v0_1_failure_mode": "If the live dataset fingerprint and legacy latest pointer still equal the frozen baseline, current V0.1 logic can return NO_CHANGE even though features/advanced.py differs from the trained source.",
+    "receipt": "research/receipts/2026-09-24-core100-training-fingerprint-v0-2-prepared.json",
+    "policy": "Do not migrate or reuse V0.1 latest automatically. Do not train automatically from a migration mismatch. Resolve only under a separately reviewed activation authority."
+  },
+  "reuse_policy": {
+    "exact_v0_2_identity_and_runtime_and_guard": "NO_CHANGE",
+    "v0_1_pointer_or_missing_v0_2_provenance": "REVIEW_REQUIRED",
+    "runtime_guard_change": "REVIEW_REQUIRED",
+    "training_after_identity_change": "Requires a separately reviewed activation authority; this preparation does not activate training."
+  },
+  "authority": {
+    "preparation_artifact_authorizes_execution": false,
+    "active_fingerprint_cutover_authorized": false,
+    "training_execution_authorized_by_this_artifact": false,
+    "provider_requests_authorized_by_this_artifact": false,
+    "r2_reads_authorized_by_this_artifact": false,
+    "r2_writes_authorized_by_this_artifact": false,
+    "holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  },
+  "preparation_effects": {
+    "active_runner_changed": false,
+    "workflow_changed": false,
+    "training_performed": false,
+    "provider_requests_performed": 0,
+    "r2_reads_performed": 0,
+    "r2_writes_performed": 0,
+    "holdout_accessed": false
+  }
+}

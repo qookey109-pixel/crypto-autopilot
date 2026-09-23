@@ -257,6 +257,15 @@ source switch, no automatic model promotion, no formal trade plan, no
 real-money orders and no live real trading.
 
 
+## Core100 Training Fingerprint V0.2 preparation (PREPARED_NOT_ACTIVE)
+
+A read-only source audit found that the active V0.1 fingerprint tracks 10 blobs but omits `features/advanced.py`. All 10 tracked current blobs still match the frozen baseline; a synthetic change to the omitted feature path leaves the V0.1 experiment identity unchanged. Therefore, if the live dataset and latest pointer remain at the legacy baseline, V0.1 may report `NO_CHANGE` for a model trained with older feature code. The current production dataset/latest pointer was not read in this audit.
+
+The preparation contract records the 31-file Python import closure as 14 result-identity paths and 17 runtime-import guard paths. GitHub history shows 13 of the 14 candidate result paths match the legacy source; `features/advanced.py` differs. The V0.3 wrapper is absent at the legacy source head, and the legacy runtime lacks an exact Python patch/dependency inventory. Baseline migration is `REVIEW_REQUIRED`.
+
+The prepared [V0.2 contract](config/core100_training_fingerprint_v0_2.json), [review](docs/CORE100_TRAINING_FINGERPRINT_V0_2.md) and [receipt](research/receipts/2026-09-24-core100-training-fingerprint-v0-2-prepared.json) do not modify the V0.1 runner/workflow and authorize no training, provider or R2 access, holdout, source switch, promotion or trading. Any cutover requires a separately reviewed versioned authority.
+
+
 ## Automation V3 P2 — schedule and freshness convergence
 
 - Provider Equivalence V0.12 is a frozen critical path, so its cron declaration is
