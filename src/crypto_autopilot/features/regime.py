@@ -130,13 +130,15 @@ def build_alt_breadth_series(
     output: list[AltBreadthSnapshot] = []
     for index, bar_time_ms in enumerate(reference_times):
         above_ema20_ratio = None
-        if all(technical_by_symbol[symbol][index].ema20 is not None for symbol in ordered_symbols):
-            above_count = sum(
-                technical_by_symbol[symbol][index].close
-                > technical_by_symbol[symbol][index].ema20  # type: ignore[operator]
-                for symbol in ordered_symbols
-            )
-            above_ema20_ratio = above_count / len(ordered_symbols)
+        above_ema20: list[bool] = []
+        for symbol in ordered_symbols:
+            technical_snapshot = technical_by_symbol[symbol][index]
+            ema20 = technical_snapshot.ema20
+            if ema20 is None:
+                break
+            above_ema20.append(technical_snapshot.close > ema20)
+        if len(above_ema20) == len(ordered_symbols):
+            above_ema20_ratio = sum(above_ema20) / len(ordered_symbols)
 
         positive_momentum_ratio = None
         if index >= momentum_lookback_bars:
