@@ -152,12 +152,15 @@ def _hull_ma(values: Sequence[float], period: int) -> tuple[float | None, ...]:
     root_period = max(1, int(math.sqrt(period)))
     half = _wma(values, half_period)
     full = _wma(values, period)
-    difference: list[float | None] = [
-        None
-        if half[index] is None or full[index] is None
-        else 2.0 * float(half[index]) - float(full[index])
-        for index in range(len(values))
-    ]
+    difference: list[float | None] = []
+    for index in range(len(values)):
+        half_value = half[index]
+        full_value = full[index]
+        difference.append(
+            None
+            if half_value is None or full_value is None
+            else 2.0 * half_value - full_value
+        )
     return _wma(difference, root_period)
 
 
@@ -201,10 +204,16 @@ def _awesome_oscillator(candles: Sequence[Candle]) -> tuple[float | None, ...]:
     median = tuple((item.high + item.low) / 2.0 for item in candles)
     fast = _sma(median, 5)
     slow = _sma(median, 34)
-    return tuple(
-        None if fast[index] is None or slow[index] is None else float(fast[index]) - float(slow[index])
-        for index in range(len(candles))
-    )
+    output: list[float | None] = []
+    for index in range(len(candles)):
+        fast_value = fast[index]
+        slow_value = slow[index]
+        output.append(
+            None
+            if fast_value is None or slow_value is None
+            else fast_value - slow_value
+        )
+    return tuple(output)
 
 
 def _ultimate_oscillator(candles: Sequence[Candle]) -> tuple[float | None, ...]:
@@ -282,12 +291,21 @@ def _adx(candles: Sequence[Candle], period: int = 14) -> tuple[
     minus_di: list[float | None] = [None] * len(candles)
     dx: list[float | None] = [None] * len(candles)
     for index in range(len(candles)):
-        if atr[index] is None or atr[index] == 0:
+        atr_value = atr[index]
+        if atr_value is None or atr_value == 0:
             continue
-        plus_di[index] = 100.0 * float(plus_smoothed[index] or 0.0) / atr[index]
-        minus_di[index] = 100.0 * float(minus_smoothed[index] or 0.0) / atr[index]
-        denominator = plus_di[index] + minus_di[index]
-        dx[index] = 0.0 if denominator == 0 else 100.0 * abs(plus_di[index] - minus_di[index]) / denominator
+        plus_smoothed_value = plus_smoothed[index]
+        minus_smoothed_value = minus_smoothed[index]
+        plus_di_value = 100.0 * (plus_smoothed_value or 0.0) / atr_value
+        minus_di_value = 100.0 * (minus_smoothed_value or 0.0) / atr_value
+        plus_di[index] = plus_di_value
+        minus_di[index] = minus_di_value
+        denominator = plus_di_value + minus_di_value
+        dx[index] = (
+            0.0
+            if denominator == 0
+            else 100.0 * abs(plus_di_value - minus_di_value) / denominator
+        )
 
     valid_dx = [value for value in dx if value is not None]
     smoothed_dx = _wilder(valid_dx, period)
@@ -301,13 +319,13 @@ def _adx(candles: Sequence[Candle], period: int = 14) -> tuple[
 
 def _percentile_rank(values: Sequence[float | None], index: int, period: int) -> float | None:
     start = index - period + 1
-    if start < 0 or values[index] is None:
+    current = values[index]
+    if start < 0 or current is None:
         return None
     window = values[start : index + 1]
     if any(value is None for value in window):
         return None
-    current = float(values[index])  # type: ignore[arg-type]
-    numeric = [float(value) for value in window if value is not None]
+    numeric = [value for value in window if value is not None]
     return sum(value <= current for value in numeric) / len(numeric)
 
 
@@ -340,12 +358,15 @@ def build_advanced_technical_series(
     ultimate_oscillator = _ultimate_oscillator(source)
     closes = tuple(item.close for item in source)
     hull_ma9 = _hull_ma(closes, 9)
-    hull_ma9_distance: tuple[float | None, ...] = tuple(
-        None
-        if hull_ma9[index] in (None, 0.0)
-        else (source[index].close - float(hull_ma9[index])) / float(hull_ma9[index])
-        for index in range(len(source))
-    )
+    hull_ma9_distance_values: list[float | None] = []
+    for index in range(len(source)):
+        hull_value = hull_ma9[index]
+        hull_ma9_distance_values.append(
+            None
+            if hull_value is None or hull_value == 0.0
+            else (source[index].close - hull_value) / hull_value
+        )
+    hull_ma9_distance = tuple(hull_ma9_distance_values)
     ichimoku_base26_distance = _ichimoku_base_distance(source, 26)
     log_returns: list[float | None] = [None]
     for index in range(1, len(source)):
@@ -427,9 +448,10 @@ def build_advanced_technical_series(
                 )
 
         volatility_adjusted_momentum = None
-        if index >= 20 and realized[index] not in (None, 0.0):
+        realized_value = realized[index]
+        if index >= 20 and realized_value is not None and realized_value != 0.0:
             volatility_adjusted_momentum = (
-                math.log(candle.close / source[index - 20].close) / float(realized[index])
+                math.log(candle.close / source[index - 20].close) / realized_value
             )
 
         output.append(
