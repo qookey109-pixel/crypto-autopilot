@@ -31,12 +31,12 @@ Salvage 先核對 main 是否已涵蓋：Signal ingest／quality 的本地驗證
 
 ## 2. 每次接續的固定流程
 
-1. 記錄 UTC／Asia/Taipei 查核時間、Repository、工作區、分支、HEAD 與 dirty 狀態。先解析 GitHub `main` exact SHA；失敗則標記 `UNKNOWN`，停止依賴最新 authority 的工作。
+1. 記錄 UTC／Asia/Taipei 查核時間、Repository，先解析 GitHub `main` exact SHA。有 checkout 才記錄工作區、分支、HEAD 與 dirty 狀態；雲端沒有 checkout 就明記 `NO_LOCAL_CHECKOUT`，不得假設本地檔案可讀。main 解析失敗則標記 `UNKNOWN`，停止依賴最新 authority 的工作。
 2. 依上表讀入口及本次涉及的版本化檔案。文件內 evidence-basis SHA 是歷史查核基準，不是最新 main。
 3. 取得 live open PR，再讀相關 PR exact head/base、draft／merged、checks。已有相同工作就接續；已完成工作不重做。
 4. 判定模式：**排程健檢**只讀 Repository／Actions metadata；**使用者指派的整理工作**依明確範圍編輯、驗證與交付。排程或待辦本身不授予寫入／merge／dispatch 權限。
-5. 選一個可執行的整理項目。遇外部等待或權限缺口，留下證據並繼續不相依項目；不反覆重試已知 403、不增加平行工作流。
-6. 修改前查該檔是否被 frozen receipt／hash 綁定。原工作區有 dirty／recovery 時，在隔離 current-main checkout 改動；未提交內容不得自動帶入。
+5. 排程健檢只指出一個下一步，不自行實作。使用者指派的整理工作才選一個可執行項目；遇外部等待或權限缺口，留下證據並繼續不相依項目；不反覆重試已知 403、不增加平行工作流。
+6. 執行有檔案權限的整理工作時，修改前查該檔是否被 frozen receipt／hash 綁定。原工作區有 dirty／recovery 時，在隔離 current-main checkout 改動；未提交內容不得自動帶入。純雲端健檢不需要 checkout。
 7. 以項目驗收證據結束。文件檢查連結、矛盾及相關既有檢查；行為改動加必要回歸測試。保留實際命令、結果、未驗證事項。
 8. 交接記錄「完成、等待、下一動作」。PR 建立、CI 通過、合併、部署、自然 schedule 通過必須分開。
 
@@ -46,9 +46,9 @@ Salvage 先核對 main 是否已涵蓋：Signal ingest／quality 的本地驗證
 
 名義時間及 expiry 以 [Actions map](GITHUB_ACTIONS_OPERATING_MAP.md#scheduled-operations) 導航，再核對當下 workflow／config。不要由 Codex 再 dispatch，也不要建立平行 cron。
 
-### Codex：既有 crypto 每 6 小時接續健檢
+### 雲端模型健檢：建議每 6 小時
 
-這是 2026-09-23 的 app 設定記錄；實際啟用狀態須在 app 查核。它與 GitHub runtime 分開。提示詞必須自足，不依賴 `/tmp`、聊天記憶或特定模型。
+使用可在雲端執行、可讀 GitHub Repository／Actions metadata 的排程服務。排程是否建立和執行須以該服務的任務與 run history 查核；本手冊不宣稱某個個人排程已啟用。提示詞必須自足，不依賴本機電腦、`/tmp`、聊天記憶或特定模型。雲端只能讀 GitHub 可取得的已合併檔案與可用的 PR；上述 78 項本地清冊和 fingerprint 本地提案尚未上傳，須標示 `LOCAL_ONLY_UNAVAILABLE`，不能聲稱已檢視其內容或執行 salvage。
 
 每輪順序：
 
@@ -63,7 +63,7 @@ Salvage 先核對 main 是否已涵蓋：Signal ingest／quality 的本地驗證
 
 | 時點（台北） | 工作與完成條件 |
 | --- | --- |
-| 每 6 小時 | 唯讀健檢；Pages／Health 尚未恢復就保留待驗證，按 policy 評估告警 |
+| 雲端排程啟用後每 6 小時 | 唯讀健檢；Pages／Health 尚未恢復就保留待驗證，按 policy 評估告警 |
 | 下一個可執行的整理回合 | 依 TD-010～TD-014 先核對既有 PR，再做本地差異處置與 fingerprint 提案；外部等待不阻塞獨立項目 |
 | 2026-09-27 11:53 之後 | 核對 Pionex bounded observability 最後名義 slot 的自然 schedule；保留 missing／delayed／failure |
 | 2026-09-27 12:37 之後 | 核對 Weekly Training 自然 schedule；只從 metadata 確認 workflow 結論，無 report 就不判定 NO_CHANGE／模型 PASS |
@@ -115,7 +115,7 @@ evidence_urls / changed_since_previous / next_action / blocker:
 等待／未知（原因、缺少哪項證據）：
 PR / merge / deployment / natural schedule：各自狀態
 下一個可開始的工作（檔案、步驟、驗收、停止條件）：
-原工作區與 recovery：位置、是否有異動
+原工作區與 recovery：有權限才記位置／異動；雲端無存取時填 NO_LOCAL_CHECKOUT
 ```
 
 新模型先跑第 2 節，再依 [CURRENT_STATUS.md](../CURRENT_STATUS.md) 接續。舊 Handoff 保留歷史，新查核追加時間與來源。
