@@ -7,6 +7,7 @@ import tempfile
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import cast
 
 from crypto_autopilot.storage.r2 import R2Store
 
@@ -428,4 +429,4 @@ def paper_run_store_policy_from_config(
     for key, value in fields.items():
         if not isinstance(value, bool):
             raise ValueError(f"{key} must be a JSON boolean")
-    return PaperRunStorePolicy(**fields)
+    return PaperRunStorePolicy(**cast(dict[str, bool], fields))
