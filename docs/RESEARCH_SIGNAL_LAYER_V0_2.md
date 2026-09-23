@@ -13,6 +13,16 @@ uses private APIs, bypasses anti-bot controls, or treats prose as a forecast.
 Only a source response containing an explicit JSON `forecasts` array can create
 a `KOLForecast`; ordinary HTML is retained as metadata-only evidence.
 
+Each enabled source must declare `parse_mode` as either
+`structured_json_only` or `metadata_only`. The collector validates the full
+enabled-source configuration before its first request. `metadata_only` records
+response metadata and the content hash but never parses forecast entries.
+`structured_json_only` requires each forecast's `published_at_ms` to be an
+explicit integer and applies the existing V0.1 temporal and value checks.
+If any forecast entry in a response is invalid, that source is marked
+`FETCH_FAILED` and none of its forecasts are retained; collection may continue
+with the other configured sources.
+
 Every run performs a fresh whole-bucket R2 inventory before fetching sources and
 again before writing. The 8 GB FREE-ONLY hard stop and immutable run namespace
 are mandatory. A blocked gate performs no provider fetch and no write. The
