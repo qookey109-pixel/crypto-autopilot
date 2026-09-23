@@ -6,7 +6,7 @@ Updated: 2026-09-23. This is the single human entrypoint for the current project
 
 ## Read and act from the right source
 
-1. **Resolve `main` live at read time.** The checkpoint below was refreshed after PR #477 merged at main `19968403407d932fab58aca9ec354e2ffd82b825`; it is a dated observation.
+1. **Resolve `main` live at read time.** The checkpoint below was refreshed after PR #479 merged at main `8ca0962933b18d4607b2f4ad9a3b7588a4f4db25`; it is a dated observation.
 2. Use the exact versioned config, receipt and immutable run evidence for any execution decision. This document adds no authority.
 3. Use [PROJECT_STATUS.md](PROJECT_STATUS.md) for governance and retired-stage lineage, [README.md](README.md) for the product map, and [AGENTS.md](AGENTS.md) for agent rules.
 4. Use live [pull requests](https://github.com/qookey109-pixel/crypto-autopilot/pulls) and [Actions](https://github.com/qookey109-pixel/crypto-autopilot/actions) for moving operational state.
@@ -47,7 +47,7 @@ Detailed evidence:
 | 1 | Verify the first natural Health result after successful Pages run `35843351924` | Pages natural schedule is now verified; record the first later Health `schedule` run ID, head SHA and conclusion. Do not dispatch a replacement. |
 | 2 | Reconcile the old local checkout with current main | Inventory each changed/untracked file; preserve recovery files; review differing bytes before migration. |
 | 3 | Review Core100 fingerprint dependency coverage | Synthetic dependency checks and a new contract/baseline migration proposal; no new training or R2 execution authority. |
-| 4 | Resolve remaining PR delivery | PR #477 merged as `19968403407d932fab58aca9ec354e2ffd82b825`; #479 remains a separate draft checkpoint PR and requires its own merge decision. |
+| 4 | PR delivery checkpoint | PR #477 and PR #479 are merged; the live open-PR query at this checkpoint returned zero. Recheck GitHub before acting on any future PR. |
 | 5 | Tidy historical Actions registrations | The [operating map](docs/GITHUB_ACTIONS_OPERATING_MAP.md) separates current workflow files, removed-file registrations and dynamic Dependabot. Preserve historical run evidence. |
 
 The [technical-debt register](docs/TECH_DEBT_REGISTER_2026_09_17.md) remains the cleanup register. This checklist is its current navigation, not a second issue tracker. Large-module refactoring, new strategy families and new schedules stay deferred until the operational checkpoint is resolved. The 261-error type baseline is historical; fetch current CI visibility before quoting a current count or choosing another typing slice.

@@ -9,7 +9,7 @@
 
 特別追蹤 #478 合併後的自然 Pages schedule，再查其後的 Health schedule。Pages build、deploy、browser-production 各記結論；push/PR/workflow_run 的成功、skipped job、較早的 Health run 不能代替自然排程成功。區分名義 cron 時間、GitHub 建立 run 的時間、queue delay 與 policy freshness；無法唯一配對 slot 就說明歧義。只在有新自然證據時更新原問題；已通知的相同失敗與單純 pending/running 保持安靜。
 
-每輪查當下 open PR，不固定假設 #477/#479 仍 open。#479 為專案整理草稿，未合併前不作 main authority。查 9/27 11:53 台北後 Pionex bounded observability 的最後自然 slot、9/27 12:37 後 Core100 weekly Training 自然 slot；10/1 08:00 台北後確認 Pionex window 到期。至少累積七天實際 metadata coverage、樣本與缺失後，才提頻率建議；日期經過本身不代表七天證據完整。Training workflow success 不代表模型 PASS/NO_CHANGE，沒有可讀報告時列 UNKNOWN。provider/R2 用量同理。
+每輪查當下 open PR，不固定假設任何既有 PR 仍 open。PR #479 已合併到 main；後續只能把 current main 當 authority，新的 PR 必須重新讀 exact head/base/draft/merged/checks。查 9/27 11:53 台北後 Pionex bounded observability 的最後自然 slot、9/27 12:37 後 Core100 weekly Training 自然 slot；10/1 08:00 台北後確認 Pionex window 到期。至少累積七天實際 metadata coverage、樣本與缺失後，才提頻率建議；日期經過本身不代表七天證據完整。Training workflow success 不代表模型 PASS/NO_CHANGE，沒有可讀報告時列 UNKNOWN。provider/R2 用量同理。
 
 這是純雲端任務，沒有本機 checkout：本地 78 項 reconciliation、Core100 fingerprint V0.2 本地提案和 recovery 檔不可讀，標 LOCAL_ONLY_UNAVAILABLE；不要聲稱已核對或自行重新建構這些成果。可指出 TD-010～TD-014 下一項及精確阻礙，但不自動做本地整合。25 個 removed-file Actions registration 的停用已有使用者授權，但既有連線缺 Actions:write、0/25 成功；本唯讀任務不反覆重試、也不要求 token。
 
