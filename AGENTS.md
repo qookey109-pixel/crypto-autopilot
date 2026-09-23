@@ -110,3 +110,27 @@ For a scheduled check or model handoff, follow `docs/PROJECT_CONTINUATION_RUNBOO
 - Treat backtest results as evidence, not proof of future profitability.
 - Prefer deterministic fixtures and fail-closed behavior for tests and automation.
 - If an external dependency, free allowance, provider endpoint, secret, or runner is unavailable, fail closed rather than silently switching provider, endpoint, proxy, credentials, or paid tier.
+
+## Planning and issue workflow
+
+- The GitHub issue workflow is a planning overlay only. Its contract is
+  `config/engineering_workflow_v0_1.json`; operating guidance is in
+  `docs/ENGINEERING_WORKFLOW_V0_1.md`.
+- An issue, pull request, checklist, milestone, label, comment, specification,
+  ticket or decision map is never authority. `ready-for-agent` means a bounded
+  code, test or documentation slice is implementation-ready only.
+- Provider access, R2 list/read/write, holdout access, source switching, model
+  promotion, strategy/risk changes, trade plans and order paths require the
+  exact current Repository authority or a new versioned config and receipt
+  merged to `main` before execution.
+- A ticket marked `authority-required` may prepare a proposed authority,
+  synthetic tests and documentation; it may not execute the gated operation.
+- Do not let issue state mutate frozen evidence, bypass a bounded window,
+  disclose secrets or create a second execution path.
+- Use one unified Work Item intake for bugs, specifications, implementation
+  tickets and decision maps. Large uncertain work starts with a planning-only
+  decision map; tickets describe verifiable vertical slices and explicit
+  blockers.
+- `main` is the only long-lived branch. A short-lived delivery branch may be
+  used when Repository protection requires a pull request and is removed after
+  merge; audit an existing branch before cleanup.
