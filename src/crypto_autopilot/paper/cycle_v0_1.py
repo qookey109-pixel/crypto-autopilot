@@ -4,6 +4,7 @@ import hashlib
 import json
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
+from typing import cast
 
 from crypto_autopilot.paper.account_v0_1 import (
     PaperAccountPolicy,
@@ -267,7 +268,7 @@ def prepare_paper_cycle(
                 decisions=(),
             ),
             "state": "PORTFOLIO_REVIEW_REQUIRED",
-            "reasons": list(portfolio_report["reasons"]),
+            "reasons": list(cast(Sequence[str], portfolio_report["reasons"])),
             "portfolio_admission": portfolio_report,
             "prepared_intents": [],
             "existing_exposures": [asdict(item) for item in existing],
@@ -364,7 +365,7 @@ def _cycle_id(
                 "intent_id": None if decision.intent is None else decision.intent.intent_id,
             }
         )
-    decision_rows.sort(key=lambda item: item["proposal_id"])
+    decision_rows.sort(key=lambda item: str(item["proposal_id"]))
     payload: dict[str, object] = {
         "schema": "qookey-paper-cycle-id-v0.1",
         "account_snapshot_id": snapshot.snapshot_id,
@@ -372,7 +373,7 @@ def _cycle_id(
         "portfolio_report_sha256": (
             None
             if portfolio_report is None
-            else _sha256(_canonicalize(portfolio_report))
+            else _sha256(cast(Mapping[str, object], _canonicalize(portfolio_report)))
         ),
         "decisions": decision_rows,
     }
@@ -455,7 +456,7 @@ def paper_cycle_report_id_from_mapping(
         "portfolio_report_sha256": (
             None
             if portfolio_report is None
-            else _sha256(_canonicalize(portfolio_report))
+            else _sha256(cast(Mapping[str, object], _canonicalize(portfolio_report)))
         ),
         "decisions": decision_rows,
     }
