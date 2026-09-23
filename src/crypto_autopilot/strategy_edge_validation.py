@@ -442,12 +442,15 @@ def circular_shift_signal_permutation(
     samples: int,
     seed: int,
 ) -> dict[str, Any]:
-    if len(market_returns) != len(positions):
+    position_values = tuple(positions)
+    if len(market_returns) != len(position_values):
         raise EdgeValidationError("market returns and positions must align")
     if len(market_returns) < 3:
         raise EdgeValidationError("signal permutation requires at least three observations")
-    observed = float(sum(position * value for position, value in zip(positions, market_returns)))
-    possible_shifts = list(range(1, len(positions)))
+    observed = float(
+        sum(position * value for position, value in zip(position_values, market_returns))
+    )
+    possible_shifts = list(range(1, len(position_values)))
     rng = random.Random(seed)
     if len(possible_shifts) <= samples:
         shifts = possible_shifts
@@ -455,7 +458,7 @@ def circular_shift_signal_permutation(
         shifts = rng.sample(possible_shifts, samples)
     greater_or_equal = 0
     for shift in shifts:
-        shifted = positions[-shift:] + positions[:-shift]
+        shifted = position_values[-shift:] + position_values[:-shift]
         statistic = sum(position * value for position, value in zip(shifted, market_returns))
         greater_or_equal += statistic >= observed
     p_value = (greater_or_equal + 1) / (len(shifts) + 1)
