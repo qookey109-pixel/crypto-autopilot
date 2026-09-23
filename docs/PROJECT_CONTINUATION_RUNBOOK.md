@@ -48,7 +48,7 @@ Salvage 先核對 main 是否已涵蓋：Signal ingest／quality 的本地驗證
 
 ### 雲端模型健檢：建議每 6 小時
 
-使用可在雲端執行、可讀 GitHub Repository／Actions metadata 的排程服務。排程是否建立和執行須以該服務的任務與 run history 查核；本手冊不宣稱某個個人排程已啟用。提示詞必須自足，不依賴本機電腦、`/tmp`、聊天記憶或特定模型。雲端只能讀 GitHub 可取得的已合併檔案與可用的 PR；上述 78 項本地清冊和 fingerprint 本地提案尚未上傳，須標示 `LOCAL_ONLY_UNAVAILABLE`，不能聲稱已檢視其內容或執行 salvage。
+使用可在雲端執行、可讀 GitHub Repository／Actions metadata 的排程服務。[自足的雲端提示詞](CLOUD_SCHEDULED_CHECK_PROMPT.md)可直接用於建立任務；排程是否建立和執行須以該服務的任務與 run history 查核，本手冊不宣稱某個個人排程已啟用。提示詞不依賴本機電腦、`/tmp`、聊天記憶或特定模型。雲端只能讀 GitHub 可取得的已合併檔案與可用的 PR；上述 78 項本地清冊和 fingerprint 本地提案尚未上傳，須標示 `LOCAL_ONLY_UNAVAILABLE`，不能聲稱已檢視其內容或執行 salvage。
 
 每輪順序：
 
