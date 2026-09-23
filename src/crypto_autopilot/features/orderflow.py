@@ -110,8 +110,9 @@ def build_spot_orderflow_series(
     output: list[OrderFlowSnapshot] = []
     for index in range(len(rows)):
         delta_fraction = None
-        if deltas[index] is not None and quote_volume[index] > 0:
-            delta_fraction = float(deltas[index]) / quote_volume[index]
+        delta_value = deltas[index]
+        if delta_value is not None and quote_volume[index] > 0:
+            delta_fraction = delta_value / quote_volume[index]
         zscore = None
         rolling_cvd = None
         rolling_cvd_fraction = None
