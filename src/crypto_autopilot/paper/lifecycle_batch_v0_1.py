@@ -5,6 +5,7 @@ import json
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from typing import cast
 
 from crypto_autopilot.paper.lifecycle_v0_1 import (
     PaperLifecyclePolicy,
@@ -353,7 +354,7 @@ def simulate_paper_lifecycle_batch(
         )
 
     report_hashes = [
-        _sha256(row["paper_lifecycle_report"])
+        _sha256(cast(Mapping[str, object], row["paper_lifecycle_report"]))
         for row in results
     ]
     batch_payload: dict[str, object] = {
