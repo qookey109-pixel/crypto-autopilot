@@ -29,6 +29,16 @@ are mandatory. A blocked gate performs no provider fetch and no write. The
 latest pointer is the only mutable object; run payloads and manifests are
 immutable and SHA-bound.
 
+The separate read-only Quality V0.1 check verifies the exact
+`latest -> manifest -> payload` lineage with at most three object reads. An
+exact verified-run reuse reads only the latest pointer and still rechecks
+freshness and upstream-run binding. Full evaluation requires the four
+model/order prohibition flags to be explicitly `false`; known optional
+prohibition flags may appear only as `false`; producer capability flags, when
+present, must be booleans; unknown authority fields fail closed. These input
+declarations do not grant the evaluator provider, R2-list, R2-write, holdout,
+promotion or trading authority.
+
 This stage does not append candles to the historical Binance dataset, promote
 models, open the holdout, create trade plans, trigger paper trades, or place
 orders. Latest closed market simulation remains the existing Pionex paper
