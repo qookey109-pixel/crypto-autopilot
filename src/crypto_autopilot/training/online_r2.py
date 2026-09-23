@@ -100,7 +100,7 @@ def build_online_objects(
         True,
         "manifest",
     )
-    latest = {
+    latest: dict[str, Any] = {
         "schema": f"binance-spot-r2-automated-training-latest-{schema_version}",
         "provider": "binance_spot",
         "run_id": run_id,
