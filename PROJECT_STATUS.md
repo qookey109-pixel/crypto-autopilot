@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-09-22
+Updated: 2026-09-23
 
 Repository `main` is the formal current authority and must be resolved live at read time. This file is the project-stage, governance-compatibility, and retired-workflow index. Exact versioned configs, receipts, immutable run evidence, and merged code remain the detailed authority for each scope.
 
@@ -111,9 +111,10 @@ Tracking: `docs/TECH_DEBT_REGISTER_2026_09_17.md`. Current PR navigation: `docs/
 - Core100 remains **Model Quality REJECT** and threshold replay still supports **no threshold change**; Strategy Validation, replacement holdout, Promotion and real trading remain closed.
 - ZEC MACD V0.2 historical evidence is preserved on current main as **execution PASS / strategy evidence REJECT**. No V0.1/V0.2 reexecution authority was revived.
 - ZEC Strategy V0.3 completed its governed one-shot historical development execution: 64 candidates × 4 folds = 256/256 cells. Selection result is **NO_ELIGIBLE_DEVELOPMENT_CANDIDATE**; no champion was frozen. Fresh confirmation, holdout, promotion and trading remain unopened.
+- ZEC V0.4 is also complete: 24/24 development cells, **NO_ELIGIBLE_DEVELOPMENT_CANDIDATE**, no champion and no fresh confirmation. See `research/receipts/2026-09-21-zec-v0-4-development-completion-v0-1.json`.
 - External Capability Registry candidates have downstream evaluation receipts and a convergence index. Candidate inventory status does not imply runtime approval.
 - Operator messaging now has a provider-neutral offline path: parser -> status resolver -> local CLI for `help`, `status` and `paper_status`; no Telegram/network/secret/trading authority is implied.
-- As of the latest 2026-09-22 triage refresh, the reviewed open pull-request backlog is **zero**. The #326–#331 dependency batch has been reviewed: #447/#448 merged the compatible current-main action updates, while incompatible/freeze-crossing proposals were closed without merge. Older architecture-generation and draft-salvage PRs remain historical references.
+- The 2026-09-22 triage snapshot recorded a reviewed open pull-request backlog of zero; it is historical. PR #478 merged the Pages queue guard, and PR #477 subsequently merged as `19968403407d932fab58aca9ec354e2ffd82b825`. Resolve live GitHub PRs before acting; #479 remains a separate draft checkpoint PR. The #326–#331 dependency batch has been reviewed: #447/#448 merged the compatible current-main action updates, while incompatible/freeze-crossing proposals were closed without merge. Older architecture-generation and draft-salvage PRs remain historical references.
 
 Historical CI success on an old branch is not sufficient merge evidence after main advances. Any newly opened PR must be evaluated against live `main`.
 

@@ -14,6 +14,8 @@ Read these first, in order:
 
 Repository `main` is the formal current authority. Resolve `main` live at read time. If chat history, an issue comment, a dashboard fixture, or an older receipt conflicts with current merged authority, preserve the historical evidence but follow the latest valid versioned authority for new work.
 
+For a scheduled check or model handoff, follow `docs/PROJECT_CONTINUATION_RUNBOOK.md` after resolving these sources. Its checklist and work IDs are navigation only; apply the scheduled task's actual permissions and preserve any dirty checkout.
+
 `CURRENT_STATUS.md` is the concise current-operations index and `research/status/current-operations-v0-3.json` is its machine-readable companion. A SHA stored as `evidence_basis.parent_main_sha` records the reviewed parent used to prepare that status version; it is explicitly **not** a claim that the SHA remains the latest `main` after the status version is merged. Dated present-tense summaries in `PROJECT_STATUS.md`, `README.md`, historical handoffs, or dashboard fixtures may remain as historical evidence. Do not regress lifecycle state or restart completed work from older prose when later merged evidence supersedes it. Versioned configs, receipts, immutable run evidence, and current merged code still control authority and scope.
 
 ## Non-negotiable boundaries
@@ -84,8 +86,8 @@ Repository `main` is the formal current authority. Resolve `main` live at read t
 - Core100 Training run `34918219864` completed successfully; training report is PASS.
 - Model Quality remains **REJECT** and automatic promotion remains disabled.
 - Threshold replay run `34936331199` completed with no supported threshold change in `0.50` through `0.55`.
-- Pionex Validation Dataset V0.1 remains manual-only. The previous run `34991627998` failed closed before PR #321's narrow invalid-OHLC boundary fix.
-- A new Pionex materialization must be dispatched from the Repository's live `main` at dispatch time. Do not use a status file's evidence-basis SHA as a substitute for resolving current `main`.
+- Pionex Validation Dataset V0.2 is COMPLETE / PASS under run `35054729471` and `research/receipts/2026-09-16-pionex-validation-materialization-v0-2-completion.json`. The earlier V0.1 failure `34991627998` is historical; do not restart materialization from that old state.
+- Any separately authorized future materialization must resolve the Repository's live `main` at dispatch time. Do not use a status file's evidence-basis SHA as a substitute for resolving current `main`.
 - Pionex validation does not authorize private API/account data, replacement holdout access, training, source switching, model promotion, trade plans, real-money orders or live trading.
 
 ## Holdout and scientific boundary

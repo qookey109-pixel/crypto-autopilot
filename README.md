@@ -4,6 +4,22 @@ Cloud-first, exchange-agnostic crypto trading research and automation platform.
 
 > **Current mode: PAPER / LIVE-PAPER ONLY.** Public live market data, simulated live paper execution and paper-state persistence may be authorized by their versioned contracts; private exchange APIs, real-money orders and real live trading remain closed.
 
+## Start here
+
+For current work, read in this order:
+
+1. [`CURRENT_STATUS.md`](CURRENT_STATUS.md) — concise current operations state.
+2. [`research/status/current-operations-v0-3.json`](research/status/current-operations-v0-3.json) — machine-readable current-operations companion.
+3. [`PROJECT_STATUS.md`](PROJECT_STATUS.md) — project-stage, governance, compatibility and retired-workflow index.
+4. [`AGENTS.md`](AGENTS.md) — execution and safety rules for coding agents.
+5. The exact versioned config, receipt, and immutable run evidence for the stage being changed.
+
+Repository `main` is the formal current authority and must be resolved live at read time. Current Operations V0.3 intentionally does **not** claim that its stored evidence-basis SHA is the latest `main`; that SHA records the reviewed parent used to prepare the status version.
+
+Checkpoint reading: start with the completed / pending table and ordered work in `CURRENT_STATUS.md`. Use the [GitHub Actions operating map](docs/GITHUB_ACTIONS_OPERATING_MAP.md) to distinguish schedules, manual workflows and historical registrations.
+
+For scheduled checks or a new model, use the [project continuation runbook](docs/PROJECT_CONTINUATION_RUNBOOK.md) for the reading order, upcoming checkpoints, evidence format and work acceptance criteria.
+
 ## Product architecture priority
 
 Qookey Crypto Autopilot is multi-asset and opportunity-first, not a single-coin strategy project.
@@ -16,18 +32,6 @@ Qookey Crypto Autopilot is multi-asset and opportunity-first, not a single-coin 
 6. Post-trade Learning — feed outcomes back into research without silently promoting strategy authority.
 
 See [`docs/PRODUCT_ARCHITECTURE_V0_1.md`](docs/PRODUCT_ARCHITECTURE_V0_1.md), [`docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md`](docs/DAILY_OPPORTUNITY_ENGINE_V0_1.md), [`docs/EXTERNAL_MARKET_CONTEXT_V0_1.md`](docs/EXTERNAL_MARKET_CONTEXT_V0_1.md), [`docs/STRATEGY_ROUTER_V0_1.md`](docs/STRATEGY_ROUTER_V0_1.md), [`docs/STRATEGY_LIBRARY_V0_1.md`](docs/STRATEGY_LIBRARY_V0_1.md), [`docs/STRATEGY_FAMILY_VALIDATION_V0_1.md`](docs/STRATEGY_FAMILY_VALIDATION_V0_1.md), [`docs/STRATEGY_RESEARCH_SCORECARD_V0_1.md`](docs/STRATEGY_RESEARCH_SCORECARD_V0_1.md), [`docs/RISK_POSITION_SIZING_V0_1.md`](docs/RISK_POSITION_SIZING_V0_1.md), [`docs/PORTFOLIO_ADMISSION_V0_1.md`](docs/PORTFOLIO_ADMISSION_V0_1.md), [`docs/PAPER_EXECUTION_V0_1.md`](docs/PAPER_EXECUTION_V0_1.md), [`docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md`](docs/PAPER_FILL_ORDER_LIFECYCLE_V0_1.md), [`docs/PAPER_ACCOUNT_POSITION_STATE_V0_1.md`](docs/PAPER_ACCOUNT_POSITION_STATE_V0_1.md), [`docs/PAPER_CYCLE_ORCHESTRATOR_V0_1.md`](docs/PAPER_CYCLE_ORCHESTRATOR_V0_1.md), [`docs/PAPER_SUBMISSION_SESSION_V0_1.md`](docs/PAPER_SUBMISSION_SESSION_V0_1.md), [`docs/PAPER_LIFECYCLE_BATCH_V0_1.md`](docs/PAPER_LIFECYCLE_BATCH_V0_1.md), [`docs/PAPER_ACCOUNT_ADVANCE_V0_1.md`](docs/PAPER_ACCOUNT_ADVANCE_V0_1.md), [`docs/PAPER_LOOP_CHECKPOINT_V0_1.md`](docs/PAPER_LOOP_CHECKPOINT_V0_1.md), [`docs/PAPER_LOOP_RESUME_V0_1.md`](docs/PAPER_LOOP_RESUME_V0_1.md), [`docs/PAPER_LOOP_INTEGRITY_V0_1.md`](docs/PAPER_LOOP_INTEGRITY_V0_1.md), [`docs/PAPER_LOOP_RUN_PACKAGE_V0_1.md`](docs/PAPER_LOOP_RUN_PACKAGE_V0_1.md), [`docs/PAPER_RUN_PACKAGE_ARTIFACT_EXPORT_V0_1.md`](docs/PAPER_RUN_PACKAGE_ARTIFACT_EXPORT_V0_1.md), [`docs/LIVE_PAPER_SIMULATION_V0_1.md`](docs/LIVE_PAPER_SIMULATION_V0_1.md), [`docs/LIVE_PAPER_RUN_COORDINATOR_V0_1.md`](docs/LIVE_PAPER_RUN_COORDINATOR_V0_1.md), [`docs/LIVE_PAPER_RUN_RECOVERY_V0_1.md`](docs/LIVE_PAPER_RUN_RECOVERY_V0_1.md), [`docs/PAPER_RUN_STORE_V0_1.md`](docs/PAPER_RUN_STORE_V0_1.md), and [`docs/PAPER_RUN_CONDITIONAL_WRITE_V0_1.md`](docs/PAPER_RUN_CONDITIONAL_WRITE_V0_1.md).
-
-## Start here
-
-For current work, read in this order:
-
-1. [`CURRENT_STATUS.md`](CURRENT_STATUS.md) — concise current operations state.
-2. [`research/status/current-operations-v0-3.json`](research/status/current-operations-v0-3.json) — machine-readable current-operations companion.
-3. [`PROJECT_STATUS.md`](PROJECT_STATUS.md) — project-stage, governance, compatibility and retired-workflow index.
-4. [`AGENTS.md`](AGENTS.md) — execution and safety rules for coding agents.
-5. The exact versioned config, receipt, and immutable run evidence for the stage being changed.
-
-Repository `main` is the formal current authority and must be resolved live at read time. Current Operations V0.3 intentionally does **not** claim that its stored evidence-basis SHA is the latest `main`; that SHA records the reviewed parent used to prepare the status version.
 
 ## Current Core100 state — 2026-09-19
 
@@ -71,7 +75,7 @@ real-money orders and real live trading remain closed.
 
 PR #322 merged the first control-plane convergence batch and established current-state entrypoints, root-doc/security convergence, current-main PR triage, and schedule-health inventory derivation.
 
-The active cleanup is now the projection layer:
+The projection-layer items below are established behavior to preserve:
 
 - prevent Current Status from becoming stale through self-referential latest-main SHA claims;
 - build frozen/historical Dashboard authority first, then apply Current Operations V0.3 last;
@@ -79,7 +83,7 @@ The active cleanup is now the projection layer:
 - keep V0.12 historical lineage while closing its expired present-tense execution flags;
 - add broader non-blocking quality/security/dependency visibility only after the control plane is stable.
 
-Cleanup register: [`docs/TECH_DEBT_REGISTER_2026_09_16.md`](docs/TECH_DEBT_REGISTER_2026_09_16.md).
+Current cleanup register: [`docs/TECH_DEBT_REGISTER_2026_09_17.md`](docs/TECH_DEBT_REGISTER_2026_09_17.md). Read `CURRENT_STATUS.md` for the current work order; the earlier September 16 register remains historical.
 
 ## Current research components
 
