@@ -18,6 +18,8 @@ Repository `main` is the formal current authority and must be resolved live at r
 
 Checkpoint reading: start with the completed / pending table and ordered work in `CURRENT_STATUS.md`. Use the [GitHub Actions operating map](docs/GITHUB_ACTIONS_OPERATING_MAP.md) to distinguish schedules, manual workflows and historical registrations.
 
+For scheduled checks or a new model, use the [project continuation runbook](docs/PROJECT_CONTINUATION_RUNBOOK.md) for the reading order, upcoming checkpoints, evidence format and work acceptance criteria.
+
 ## Product architecture priority
 
 Qookey Crypto Autopilot is multi-asset and opportunity-first, not a single-coin strategy project.

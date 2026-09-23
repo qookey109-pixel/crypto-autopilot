@@ -10,6 +10,7 @@ Updated: 2026-09-23. This is the single human entrypoint for the current project
 2. Use the exact versioned config, receipt and immutable run evidence for any execution decision. This document adds no authority.
 3. Use [PROJECT_STATUS.md](PROJECT_STATUS.md) for governance and retired-stage lineage, [README.md](README.md) for the product map, and [AGENTS.md](AGENTS.md) for agent rules.
 4. Use live [pull requests](https://github.com/qookey109-pixel/crypto-autopilot/pulls) and [Actions](https://github.com/qookey109-pixel/crypto-autopilot/actions) for moving operational state.
+5. For scheduled checks or a new model, use the [continuation runbook](docs/PROJECT_CONTINUATION_RUNBOOK.md): startup sequence, work IDs, checkpoints, evidence fields and blocked-state handling.
 
 The machine-readable [Current Operations V0.3](research/status/current-operations-v0-3.json) remains a versioned lifecycle/evidence companion. Its evidence-basis parent `9ffe30c8f0ab28bc3b2a95ae19de6938ed613dae` has semantics `REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION` and is **not** a latest-main claim. Its dated PR counts and type-debt values are historical snapshots, not live backlog queries. Likewise, [PR triage V0.7](research/status/open-pr-triage-v0-7.json) records the completed September 22 review; do not reopen its closed dependency batch.
 

@@ -1,6 +1,6 @@
 # Technical Debt Register — 2026-09-17 (checkpoint refresh 2026-09-23)
 
-Repository `main` is authority and must be resolved live at read time. Evidence basis for this refresh: `09dfb0d79b88dc56f3cb582c91d8091617437ce2` after PR #426 merged. This SHA is historical review context, not a latest-main claim.
+Repository `main` is authority and must be resolved live at read time. Previous refresh evidence: `09dfb0d79b88dc56f3cb582c91d8091617437ce2` after PR #426. September 23 checkpoint evidence: `87ad32fd8f29a0c34bbf61ad11694fe4ef29df51` after PR #478. Both are historical review context, not latest-main claims.
 
 This register tracks cleanup work only. It grants no execution, provider, R2, holdout, promotion, source-switch, deployment, trading, or merge authority.
 
@@ -109,14 +109,17 @@ Status: **DEFERRED**
 
 ## Current cleanup order
 
-Follow the dated operational checkpoint in `CURRENT_STATUS.md`:
+Follow the dated checkpoint in `CURRENT_STATUS.md` and the [continuation runbook](PROJECT_CONTINUATION_RUNBOOK.md). These IDs extend this existing register; they add no execution authority. External waiting does not prevent independent eligible work.
 
-1. Verify Pages natural schedule / Health after #478 and keep absent or delayed runs visible.
-2. Reconcile local changed/untracked work against current main with byte-level inventory and recovery preservation.
-3. Review Core100 fingerprint dependency coverage using synthetic checks and a proposed migration contract.
-4. Recheck live open PR head/base/checks; review each merge decision separately.
-5. Organize historical Actions registrations using `docs/GITHUB_ACTIONS_OPERATING_MAP.md`.
-6. Continue non-execution type narrowing only from fresh CI visibility; keep type/security gates informational. Leave large-module responsibility splitting deferred until characterization coverage justifies it.
+| ID / priority | Checkpoint status | Next action | Completion evidence / boundary |
+| --- | --- | --- | --- |
+| TD-010 / P0 — Pages and Health | WAITING_EVIDENCE after merged #478 | Read next natural Pages schedule and subsequent Health metadata | Exact run/event/SHA; separate build/deploy/browser; no dispatch or substitute event |
+| TD-011 / P1 — Local reconciliation | DISPOSITION_REVIEWED, integration pending | Read local inventory and reconciliation plan indexed in the runbook; recheck main before each salvage slice | 78 paths mapped, original hashes unchanged; review candidate tests at current source paths; no removal/reset/overwrite from inventory alone |
+| TD-012 / P1 — Training fingerprint | LOCAL_PROPOSAL, not activated | Review full model-affecting dependency closure, baseline migration and synthetic regression | Feature/dataset change changes identity; unchanged retains NO_CHANGE; no production training/R2 or frozen receipt edits |
+| TD-013 / P1 — Delivery and PR review | LIVE_REVIEW_REQUIRED | Recheck exact head/base, existing work and checks; checkpoint docs are draft #479 | Keep draft versus merged distinct; #477 and #479 need separate explicit merge decisions; never reopen completed work from old counts |
+| TD-014 / P2 — Removed registrations | BLOCKED_PERMISSION, 0/25 disabled | After Actions:write becomes available, revalidate exact removed-file list in [Actions map](GITHUB_ACTIONS_OPERATING_MAP.md) | User authorized these 25 only; read back state, preserve runs, exclude current/frozen-source workflows and Dependabot; no repeated 403 attempts |
+
+After these items, continue TD-007 non-execution type narrowing from fresh CI visibility; keep type/security informational. TD-009 responsibility splitting stays deferred until characterization coverage justifies it.
 
 The prior 261-error baseline and dependency-batch review are historical evidence, not current measurements or unfinished dependency work.
 

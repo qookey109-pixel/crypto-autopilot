@@ -14,6 +14,8 @@ Read these first, in order:
 
 Repository `main` is the formal current authority. Resolve `main` live at read time. If chat history, an issue comment, a dashboard fixture, or an older receipt conflicts with current merged authority, preserve the historical evidence but follow the latest valid versioned authority for new work.
 
+For a scheduled check or model handoff, follow `docs/PROJECT_CONTINUATION_RUNBOOK.md` after resolving these sources. Its checklist and work IDs are navigation only; apply the scheduled task's actual permissions and preserve any dirty checkout.
+
 `CURRENT_STATUS.md` is the concise current-operations index and `research/status/current-operations-v0-3.json` is its machine-readable companion. A SHA stored as `evidence_basis.parent_main_sha` records the reviewed parent used to prepare that status version; it is explicitly **not** a claim that the SHA remains the latest `main` after the status version is merged. Dated present-tense summaries in `PROJECT_STATUS.md`, `README.md`, historical handoffs, or dashboard fixtures may remain as historical evidence. Do not regress lifecycle state or restart completed work from older prose when later merged evidence supersedes it. Versioned configs, receipts, immutable run evidence, and current merged code still control authority and scope.
 
 ## Non-negotiable boundaries

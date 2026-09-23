@@ -2,6 +2,8 @@
 
 Navigation snapshot: 2026-09-23, observed against main `87ad32fd8f29a0c34bbf61ad11694fe4ef29df51`. Resolve main and Actions live before acting. This map is not execution authority and does not add schedules, dispatches or provider/R2 permissions.
 
+For the separate Codex check cadence, shared evidence fields and model handoff procedure, see the [continuation runbook](PROJECT_CONTINUATION_RUNBOOK.md).
+
 ## What the numbers mean
 
 GitHub's paginated workflow API returned **108 registrations**: **82 workflow files present on main**, **25 registrations whose files are absent from main**, and **1 dynamic Dependabot Updates** entry. Every registration reported `active` at observation time; that API state does not imply a schedule, a currently valid execution window or authorization.
