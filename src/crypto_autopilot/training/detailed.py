@@ -4,7 +4,7 @@ import math
 from bisect import bisect_right
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Sequence, cast
 
 from crypto_autopilot.features.advanced import AdvancedTechnicalSnapshot, build_advanced_technical_series
 from crypto_autopilot.historical import INTERVAL_MS
@@ -161,25 +161,26 @@ def _technical_features(
         )
         if any(normalized.get(name) is None for name in required):
             return {}
+        normalized_values = cast(Mapping[str, float], normalized)
         output.update(
             {
                 "rsi14_15m": technical.rsi14 / 100.0,
                 "macd_histogram_fraction_15m": technical.macd_histogram / technical.close,
                 "adx14_15m": advanced.adx14 / 100.0,
                 "di_spread_15m": (advanced.plus_di14 - advanced.minus_di14) / 100.0,
-                "vwap_distance_15m": float(normalized["vwap_distance_fraction"]),
-                "volume_zscore_15m": float(normalized["volume_zscore20"]),
-                "donchian_position_15m": float(normalized["donchian_position20"]),
-                "atr_percentile_15m": float(normalized["atr_percentile100"]),
+                "vwap_distance_15m": float(normalized_values["vwap_distance_fraction"]),
+                "volume_zscore_15m": float(normalized_values["volume_zscore20"]),
+                "donchian_position_15m": float(normalized_values["donchian_position20"]),
+                "atr_percentile_15m": float(normalized_values["atr_percentile100"]),
                 "bollinger_bandwidth_percentile_15m": float(
-                    normalized["bollinger_bandwidth_percentile100"]
+                    normalized_values["bollinger_bandwidth_percentile100"]
                 ),
-                "realized_volatility_15m": float(normalized["realized_volatility20"]),
-                "parkinson_volatility_15m": float(normalized["parkinson_volatility20"]),
-                "efficiency_ratio_15m": float(normalized["kaufman_efficiency_ratio10"]),
-                "choppiness_15m": float(normalized["choppiness_index14"]) / 100.0,
+                "realized_volatility_15m": float(normalized_values["realized_volatility20"]),
+                "parkinson_volatility_15m": float(normalized_values["parkinson_volatility20"]),
+                "efficiency_ratio_15m": float(normalized_values["kaufman_efficiency_ratio10"]),
+                "choppiness_15m": float(normalized_values["choppiness_index14"]) / 100.0,
                 "volatility_adjusted_momentum_15m": float(
-                    normalized["volatility_adjusted_momentum20"]
+                    normalized_values["volatility_adjusted_momentum20"]
                 ),
             }
         )
