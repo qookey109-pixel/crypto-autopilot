@@ -1,12 +1,12 @@
 # Current Operations Status
 
-Updated: 2026-09-23. This is the single human entrypoint for the current project checkpoint.
+Updated: 2026-09-24. This is the single human entrypoint for the current project checkpoint.
 
 **PAPER / LIVE-PAPER ONLY.** The data pipelines and paper components exist; the current research results do not support model promotion or real trading. Finish operational verification and reconcile local work before expanding the research scope.
 
 ## Read and act from the right source
 
-1. **Resolve `main` live at read time.** The checkpoint below was refreshed after PR #479 merged at main `8ca0962933b18d4607b2f4ad9a3b7588a4f4db25`; it is a dated observation.
+1. **Resolve `main` live at read time.** This checkpoint was refreshed at 2026-09-24 02:27 Asia/Taipei after PR #492 merged at main `35c39d50957beccc634fd6346ef1554c20b32f35`; this is a dated observation, not a latest-main claim.
 2. Use the exact versioned config, receipt and immutable run evidence for any execution decision. This document adds no authority.
 3. Use [PROJECT_STATUS.md](PROJECT_STATUS.md) for governance and retired-stage lineage, [README.md](README.md) for the product map, and [AGENTS.md](AGENTS.md) for agent rules.
 4. Use live [pull requests](https://github.com/qookey109-pixel/crypto-autopilot/pulls) and [Actions](https://github.com/qookey109-pixel/crypto-autopilot/actions) for moving operational state.
@@ -45,12 +45,12 @@ Detailed evidence:
 | Priority | Work | Completion evidence / boundary |
 | --- | --- | --- |
 | 1 | Pages / Health reliability checkpoint | TD-010 complete: Pages `35843351924` succeeded naturally, followed by Health `35870216734` with `PASS` and zero alerts. Continue normal monitoring; do not create substitute dispatch evidence. |
-| 2 | Reconcile the old local checkout with current main | The 78-path inventory and original recovery files remain in the old checkout. Signal ingest and quality hardening are isolated in [PR #491](https://github.com/qookey109-pixel/crypto-autopilot/pull/491) and [PR #492](https://github.com/qookey109-pixel/crypto-autopilot/pull/492); continue reviewing remaining local candidates against current main without overwriting or deleting originals. |
-| 3 | Review Core100 fingerprint dependency coverage | Synthetic dependency checks and a new contract/baseline migration proposal; no new training or R2 execution authority. |
-| 4 | PR delivery checkpoint | PR #477 and PR #479 are merged; the live open-PR query at this checkpoint returned zero. Recheck GitHub before acting on any future PR. |
+| 2 | Reconcile the old local checkout with current main | The 78-path inventory and recovery files remain in the original dirty checkout. The unified Work Item intake and C4/C5 signal hardening are integrated; C2 Agent Arena and C3 synthetic daily preview were rechecked and deferred because neither has a current approved use case on main. Preserve the originals. |
+| 3 | Review Core100 fingerprint dependency coverage | The local proposal lists 18 Python paths; an AST walk of the exact current-main blobs finds 20, including `backtest.py` and `risk.py`. Classify their effect, verify dynamic/runtime inputs, then complete synthetic identity and baseline-migration checks. Prepare only `PREPARED_NOT_ACTIVE`; do not change the active runner, train, or access R2. |
+| 4 | PR delivery checkpoint | PRs #477, #479, #491 and #492 are merged. Recheck GitHub for exact live open PRs, heads, bases and checks before any future delivery action. |
 | 5 | Tidy historical Actions registrations | The [operating map](docs/GITHUB_ACTIONS_OPERATING_MAP.md) separates current workflow files, removed-file registrations and dynamic Dependabot. Preserve historical run evidence. |
 
-The [technical-debt register](docs/TECH_DEBT_REGISTER_2026_09_17.md) remains the cleanup register. This checklist is its current navigation, not a second issue tracker. Large-module refactoring, new strategy families and new schedules stay deferred until the operational checkpoint is resolved. The 261-error type baseline is historical; fetch current CI visibility before quoting a current count or choosing another typing slice.
+The [technical-debt register](docs/TECH_DEBT_REGISTER_2026_09_17.md) remains the cleanup register. This checklist is its current navigation, not a second issue tracker. Use the single [Work Item intake](.github/ISSUE_TEMPLATE/work-item.yml) for planning; issue state grants no authority. Large-module refactoring, new strategy families and new schedules stay deferred until their stated gates are met. The 261-error type baseline is historical; fetch current CI visibility before quoting a current count or choosing another typing slice.
 
 ## Automation checkpoint — September 23
 

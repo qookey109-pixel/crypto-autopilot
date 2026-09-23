@@ -1,0 +1,100 @@
+name: Work item
+description: One intake for bugs, specifications, implementation tickets and decision maps.
+title: "[Work] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        This is a planning artifact. It never grants provider, R2, holdout,
+        model-promotion, strategy-change or trading authority.
+  - type: dropdown
+    id: work_type
+    attributes:
+      label: Work type
+      options:
+        - BUG_TRIAGE
+        - SPECIFICATION
+        - IMPLEMENTATION_TICKET
+        - DECISION_MAP
+    validations:
+      required: true
+  - type: textarea
+    id: bounded_outcome
+    attributes:
+      label: Bounded outcome
+      description: State one observable destination or expected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: current_evidence
+    attributes:
+      label: Current behavior and evidence
+      description: Cite files, tests or receipts; for bugs include a minimal reproduction.
+    validations:
+      required: true
+  - type: textarea
+    id: scope_and_slice
+    attributes:
+      label: Scope and vertical slice
+      description: State what is included, excluded and the smallest end-to-end slice.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance_and_verification
+    attributes:
+      label: Acceptance and verification
+      description: Include objective pass/fail checks and runnable commands or precise manual checks.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and blocking edges
+      description: State what blocks this item and what it blocks. Use none when empty.
+    validations:
+      required: true
+  - type: textarea
+    id: decision_frontier
+    attributes:
+      label: Decision frontier, if applicable
+      description: For DECISION_MAP, list only unblocked child decisions; otherwise write not applicable.
+    validations:
+      required: true
+  - type: dropdown
+    id: authority_classification
+    attributes:
+      label: Authority classification
+      options:
+        - PLANNING_ONLY
+        - WITHIN_EXISTING_AUTHORITY
+        - NEW_VERSIONED_AUTHORITY_REQUIRED
+    validations:
+      required: true
+  - type: textarea
+    id: authority_citation
+    attributes:
+      label: Authority citation or proposal boundary
+      description: Cite exact config and receipt, or state preparation-only scope.
+    validations:
+      required: true
+  - type: dropdown
+    id: frozen_path_impact
+    attributes:
+      label: Frozen path impact
+      options:
+        - NONE
+        - REVIEW_REQUIRED
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety_acknowledgement
+    attributes:
+      label: Boundary acknowledgement
+      options:
+        - label: I will not include secrets in issues, PRs, logs, artifacts, fixtures or chat.
+          required: true
+        - label: I understand issue state and ready-for-agent never grant execution authority.
+          required: true
+        - label: I will preserve frozen evidence and fail closed when authority or evidence is missing.
+          required: true

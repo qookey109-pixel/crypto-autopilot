@@ -20,6 +20,8 @@ Checkpoint reading: start with the completed / pending table and ordered work in
 
 For scheduled checks or a new model, use the [project continuation runbook](docs/PROJECT_CONTINUATION_RUNBOOK.md) for the reading order, upcoming checkpoints, evidence format and work acceptance criteria.
 
+For GitHub work intake, use the single [Work Item form](.github/ISSUE_TEMPLATE/work-item.yml) for bugs, specifications, implementation tickets and decision maps. The [engineering workflow](docs/ENGINEERING_WORKFLOW_V0_1.md) is planning-only and does not grant execution authority or create a second task queue.
+
 ## Product architecture priority
 
 Qookey Crypto Autopilot is multi-asset and opportunity-first, not a single-coin strategy project.
