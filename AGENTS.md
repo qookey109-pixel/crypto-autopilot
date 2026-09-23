@@ -84,8 +84,8 @@ Repository `main` is the formal current authority. Resolve `main` live at read t
 - Core100 Training run `34918219864` completed successfully; training report is PASS.
 - Model Quality remains **REJECT** and automatic promotion remains disabled.
 - Threshold replay run `34936331199` completed with no supported threshold change in `0.50` through `0.55`.
-- Pionex Validation Dataset V0.1 remains manual-only. The previous run `34991627998` failed closed before PR #321's narrow invalid-OHLC boundary fix.
-- A new Pionex materialization must be dispatched from the Repository's live `main` at dispatch time. Do not use a status file's evidence-basis SHA as a substitute for resolving current `main`.
+- Pionex Validation Dataset V0.2 is COMPLETE / PASS under run `35054729471` and `research/receipts/2026-09-16-pionex-validation-materialization-v0-2-completion.json`. The earlier V0.1 failure `34991627998` is historical; do not restart materialization from that old state.
+- Any separately authorized future materialization must resolve the Repository's live `main` at dispatch time. Do not use a status file's evidence-basis SHA as a substitute for resolving current `main`.
 - Pionex validation does not authorize private API/account data, replacement holdout access, training, source switching, model promotion, trade plans, real-money orders or live trading.
 
 ## Holdout and scientific boundary

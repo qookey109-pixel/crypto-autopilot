@@ -1,4 +1,4 @@
-# Technical Debt Register — 2026-09-17 (refreshed 2026-09-22)
+# Technical Debt Register — 2026-09-17 (checkpoint refresh 2026-09-23)
 
 Repository `main` is authority and must be resolved live at read time. Evidence basis for this refresh: `09dfb0d79b88dc56f3cb582c91d8091617437ce2` after PR #426 merged. This SHA is historical review context, not a latest-main claim.
 
@@ -49,23 +49,11 @@ Historical V0.12 wording remains historical; current runtime and safety boundari
 
 ### TD-005 — Open PR backlog crosses architecture generations
 
-Status: **ACTIVE / REFRESHED 2026-09-22**
+Status: **DEPENDENCY BATCH CLOSED / LIVE TRIAGE REQUIRED**
 
-Current classification is recorded in:
+The September 22 [V0.7 review](OPEN_PR_TRIAGE_2026_09_22.md) records the completed #326–#331 dependency review: compatible replacements #447/#448 merged; incompatible/freeze-crossing proposals closed. The earlier six-open-PR list is historical.
 
-- `docs/OPEN_PR_TRIAGE_2026_09_22.md`;
-- `research/status/open-pr-triage-v0-5.json`.
-
-Current live backlog:
-
-- six Dependabot PRs only: #326–#331;
-- #302, #306, #307, #315, #336 and the older salvage drafts are closed historical references;
-- old architecture branches are no longer represented as active merge lanes;
-- each dependency PR still requires current-main compatibility review and its own merge authorization.
-
-The V0.5 review order separates patch-level tooling/SDK updates from major GitHub Action/runtime changes and records the current-main contract conflicts for #330/#331.
-
-No PR is closed or merged merely by this classification.
+At the September 23 checkpoint on main `87ad32fd8f29a0c34bbf61ad11694fe4ef29df51`, #477 was open and #478 was merged. Use live GitHub state plus exact current head/base/checks for new review. Closed architecture branches #302/#306/#307/#315/#336 remain historical salvage only. Follow the work order in `CURRENT_STATUS.md`.
 
 ## P2 — workflow and quality maintenance
 
@@ -90,7 +78,7 @@ Already implemented:
 
 Still missing:
 
-- measured mypy baseline is now recorded as 261 errors across 49 files; first remediation lane is non-execution dynamic-object narrowing with characterization tests;
+- the original 261 errors across 49 files remain historical baseline evidence; use current CI visibility for the next non-execution narrowing slice;
 - dedicated semantic dead-code tooling beyond the current conservative heuristic.
 
 Do not make these blocking until baseline noise is measured and reviewed.
@@ -104,12 +92,12 @@ Already implemented:
 - `.github/dependabot.yml` tracks both `pip` and GitHub Actions monthly;
 - update PRs are review-only; no auto-merge authority is introduced;
 - repository-controlled CodeQL runs as non-blocking security visibility and has passed on current main;
-- Open PR Triage V0.5 records a current dependency review order and separates patch-level updates from major action/runtime changes;
+- Open PR Triage V0.7 records the completed dependency review; future proposals still require compatibility review;
 - dependency classifications remain review guidance only and do not grant merge authority.
 
 Still missing:
 
-- actual current-main rebuild/compatibility decisions for the six open dependency PRs.
+- ongoing review of future dependency proposals; the prior six-PR batch is complete under V0.7. No current open dependency backlog is inferred from the historical V0.5 record.
 
 ## P3 — code structure
 
@@ -121,12 +109,16 @@ Status: **DEFERRED**
 
 ## Current cleanup order
 
-1. Keep this refreshed PR triage aligned with live `main`; do not merge stale architecture-generation branches directly.
-2. Review dependency PRs as a separate lane; breaking-major upgrades require explicit compatibility review and their own merge authorization.
-3. Reduce the measured type baseline from `docs/TYPE_DEBT_BASELINE_2026_09_22.md`, starting with non-execution dynamic-object narrowing; keep the gate informational.
-4. Treat #302/#315/#306/#307 and #166/#167/#168/#199/#249 as closed historical salvage only; rebuild selected ideas from current `main` only if deliberately revived.
-5. Review the 261-error mypy baseline by category before considering any type gate.
-6. Leave large-module responsibility splitting deferred until characterization coverage justifies it.
+Follow the dated operational checkpoint in `CURRENT_STATUS.md`:
+
+1. Verify Pages natural schedule / Health after #478 and keep absent or delayed runs visible.
+2. Reconcile local changed/untracked work against current main with byte-level inventory and recovery preservation.
+3. Review Core100 fingerprint dependency coverage using synthetic checks and a proposed migration contract.
+4. Recheck live open PR head/base/checks; review each merge decision separately.
+5. Organize historical Actions registrations using `docs/GITHUB_ACTIONS_OPERATING_MAP.md`.
+6. Continue non-execution type narrowing only from fresh CI visibility; keep type/security gates informational. Leave large-module responsibility splitting deferred until characterization coverage justifies it.
+
+The prior 261-error baseline and dependency-batch review are historical evidence, not current measurements or unfinished dependency work.
 
 ## Explicit non-goals
 
