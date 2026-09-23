@@ -352,7 +352,11 @@ def build_weekly_model_review(
             "PASS"
             if len(ready_folds) == len(fold_fractions)
             and all(
-                item["baseline_comparison"]["status"] == "PASS"
+                isinstance(
+                    baseline_comparison := item.get("baseline_comparison"),
+                    dict,
+                )
+                and baseline_comparison.get("status") == "PASS"
                 for item in ready_folds
             )
             else "REJECT"
