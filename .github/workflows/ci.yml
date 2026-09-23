@@ -50,8 +50,24 @@ jobs:
             echo "No workflow files changed."
             exit 0
           fi
-          printf 'Linting workflow: %s\n' "${workflows[@]}"
-          actionlint -shellcheck="$(command -v shellcheck)" "${workflows[@]}"
+          for workflow in "${workflows[@]}"; do
+            echo "Linting workflow: ${workflow}"
+            if [[ "${workflow}" == ".github/workflows/dashboard-github-pages.yml" ]] &&
+               grep -Fxq '  queue: max' "${workflow}"; then
+              # GitHub supports queue:max, but pinned actionlint 1.7.12 predates it.
+              # Suppress only that known parser error, for this exact workflow,
+              # after ensuring there is exactly one queue key at the root.
+              if [[ "$(grep -Ec '^[[:space:]]*queue:' "${workflow}")" != 1 ]]; then
+                echo "Pages workflow has an unexpected queue declaration" >&2
+                exit 1
+              fi
+              actionlint \
+                -ignore '^unexpected key "queue" for "concurrency" section' \
+                -shellcheck="$(command -v shellcheck)" "${workflow}"
+            else
+              actionlint -shellcheck="$(command -v shellcheck)" "${workflow}"
+            fi
+          done
 
   test:
     runs-on: ubuntu-latest
