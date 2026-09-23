@@ -69,9 +69,10 @@ def build_technical_timeframe_series(
 ) -> tuple[TechnicalTimeframeSnapshot, ...]:
     if interval not in INTERVAL_MS:
         raise ValueError(f"Unsupported technical interval: {interval}")
-    technical = build_technical_series(candles, interval)
+    source = tuple(candles)
+    technical = build_technical_series(source, interval)
     structure = build_market_structure_series(
-        candles,
+        source,
         interval,
         rolling_window=rolling_window,
         swing_left=swing_left,
