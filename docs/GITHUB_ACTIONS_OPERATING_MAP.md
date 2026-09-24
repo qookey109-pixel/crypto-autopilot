@@ -39,7 +39,7 @@ Authority references: [Operations V0.5](../config/github_automatic_research_oper
 
 A workflow_dispatch declaration means a manual entrypoint exists; it does not authorize using it. Live Paper coordinator/recovery stay manual and bounded. Completed one-shot ZEC development does not become rerunnable. Historical frozen proof workflows remain validation-only. See [PROJECT_STATUS.md](../PROJECT_STATUS.md#retired-historical-workflow-inventory) and the exact receipt before any action.
 
-The 25 entries below are API registrations with no corresponding workflow file on the observed main. They are distinct from the 17 retired validation workflows still preserved in source. They have not been disabled by this documentation change. Preserve run history; check permissions and current repository state before administrative cleanup. The dynamic `dynamic/dependabot/dependabot-updates` entry is excluded.
+The 25 entries below were API registrations with no corresponding workflow file on the observed main at the snapshot. They are distinct from the 17 retired validation workflows still preserved in source. The dynamic `dynamic/dependabot/dependabot-updates` entry is excluded. Their later disablement is recorded below.
 
 | Workflow ID | Removed main path under `.github/workflows/` |
 | --- | --- |
@@ -68,6 +68,10 @@ The 25 entries below are API registrations with no corresponding workflow file o
 | 336107067 | `pionex-binance-compare-v2.yml` |
 | 336105935 | `pionex-binance-compare.yml` |
 | 358982435 | `quality-visibility.yml` |
+
+## Removed registrations disabled (2026-09-25)
+
+On main `f9296aca33858c907b42e825db8a9d334df1986e`, all 25 listed `.github/workflows/<path>` files were rechecked through the Repository Contents API and returned 404. The authorized GitHub Actions UI operation was then applied to each exact registration ID in the table. Each workflow showed `Disable workflow` before the change, returned `Workflow disabled successfully.`, and showed `Enable workflow` afterward. Result: **25/25 disabled and read back**. No workflow source file or run was deleted; existing run history remains available. The dynamic Dependabot registration and the 17 source-preserved retired workflows were not changed.
 
 ## Verification order
 

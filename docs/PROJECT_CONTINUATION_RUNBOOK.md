@@ -102,7 +102,7 @@ evidence_urls / changed_since_previous / next_action / blocker:
 ## 5. 執行界線
 
 - 排程健檢預設不編輯程式、不 push／PR／merge、不 dispatch／rerun／cancel、不停用 workflow。若允許自動整理，須在排程提示詞另定檔案範圍、驗收與交付界線。
-- 25 個 removed-file registration 的停用已獲使用者授權，但現有 API credential 回應 403、UI 顯示 workflow 不存在；查核時 0/25 成功。需具 Actions:write 的可用連線才續辦；再次核對 exact ID／path 仍不在 main，逐項讀回 state，保留 run history。
+- 2026-09-25：TD-014 的 25 個 removed-file workflow registrations 已依 [Actions operating map](GITHUB_ACTIONS_OPERATING_MAP.md#removed-registrations-disabled-2026-09-25) 完成停用，25/25 均讀回停用狀態。來源檔在 main `f9296aca` 均回 404；保留所有 run history。動態 Dependabot 與 source-preserved retired workflows 未更動。舊 API 403／UI 404 阻礙已由 GitHub Actions UI 操作排除。
 - Core100 History、Pionex V0.2、ZEC V0.3／V0.4 不重跑。fingerprint V0.2 準備不得覆寫舊 baseline、觸發訓練或建 R2 client。
 - FREE-ONLY；PAPER／LIVE-PAPER ONLY；replacement holdout FROZEN_UNOPENED；source_switch_authorized=false。不新增 provider／R2 存取、paid service、promotion、策略／風控變更或實盤。
 - 更換模型或聊天不提升權限。缺必要工具時交接阻礙及下一步，不改寫驗收條件。
