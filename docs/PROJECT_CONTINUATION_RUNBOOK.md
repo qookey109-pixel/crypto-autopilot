@@ -1,6 +1,6 @@
 # 專案接續與排程手冊
 
-更新：2026-09-24。適用任何能讀取 Repository 與 GitHub metadata 的模型。
+更新：2026-09-25。適用任何能讀取 Repository 與 GitHub metadata 的模型。
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
@@ -18,13 +18,13 @@
 
 本手冊沒有第二份待辦資料庫。GitHub intake 使用單一 [Work Item 表單](../.github/ISSUE_TEMPLATE/work-item.yml)，其 contract 與規則見 [Engineering Workflow](ENGINEERING_WORKFLOW_V0_1.md)；issue、label、PR 與本手冊都不授予 execution authority。舊 AGENTS、草稿 PR 與本地提案不能替代 current main。
 
-### 本地未合併成果
+### 歷史本地成果（EXCLUDED_BY_USER）
 
-以下位置相對於使用者原始 checkout，**不在 main**，不可當 execution authority。換機／純雲端模型若無法取得，將該項標為 UNKNOWN 並交接精確路徑，不宣稱已讀、不重做已知完成的盤點。不要尋找或依賴先前 `/tmp` 副本。
+以下表格只保存歷史脈絡。自 2026-09-25 起，使用者要求全部工作在線上完成：不得讀寫本機檔案、使用本機終端機、要求上傳本機 recovery 或補做本機清理。這些工作統一為 EXCLUDED_BY_USER，不是雲端阻礙；已整合到 GitHub 的文件可依 exact main SHA 讀取。
 
 | 工作 | 本地成果位置 | 已完成／仍待處理 |
 | --- | --- | --- |
-| TD-011 | `docs/LOCAL_WORKSPACE_RECONCILIATION_2026_09_24.md`; original checkpoint remains in `handoffs/2026-09-23-project-checkpoint/` in the dirty checkout | All 78 outcomes and current-main blob/mode classifications are documented; all 78 status pairs still match the checkpoint, with 13 newer untracked handoff files. There are 15 untracked exact duplicates proposed as one cleanup batch; two tracked exact matches are excluded. C1/C4/C5 are integrated by PRs #493/#491/#492; C2/C3 are deferred. The original working tree remains dirty. Any local deletion requires explicit approval and final repeated status/hash checks. |
+| TD-011 | `docs/LOCAL_WORKSPACE_RECONCILIATION_2026_09_24.md`; original checkpoint remains in `handoffs/2026-09-23-project-checkpoint/` in the dirty checkout | All 78 outcomes and current-main blob/mode classifications are documented; all 78 status pairs still match the checkpoint, with 13 newer untracked handoff files. There are 15 untracked exact duplicates proposed as one cleanup batch; two tracked exact matches are excluded. C1/C4/C5 are integrated by PRs #493/#491/#492; C2/C3 are deferred. The original working tree remains dirty. Local cleanup is now EXCLUDED_BY_USER; no future cloud task may inspect or delete these files. |
 | TD-012 | 原本地提案仍保留於 handoffs/2026-09-23-core100-fingerprint-v0-2-proposal.md；main 準備文件見 [V0.2 review](CORE100_TRAINING_FINGERPRINT_V0_2.md)、[config](../config/core100_training_fingerprint_v0_2.json)、[receipt](../research/receipts/2026-09-24-core100-training-fingerprint-v0-2-prepared.json) | 31-path closure 分為 14 個 result-identity 與 17 個 runtime-guard 檔；features/advanced.py 變更會被 V0.1 漏掉，舊 baseline 為 REVIEW_REQUIRED。V0.1 runner 仍有效且未修改；任何 cutover 需另有版本化 authority |
 | 最新交接 | `handoffs/2026-09-23-project-checkpoint/README.md` | main／PR／驗證快照、原工作區狀態與新聊天接續文字；仍需 live 查核 |
 
@@ -32,12 +32,12 @@ Signal ingest parsing hardening 和 Quality V0.1 authority validation 分別由 
 
 ## 2. 每次接續的固定流程
 
-1. 記錄 UTC／Asia/Taipei 查核時間、Repository，先解析 GitHub `main` exact SHA。有 checkout 才記錄工作區、分支、HEAD 與 dirty 狀態；雲端沒有 checkout 就明記 `NO_LOCAL_CHECKOUT`，不得假設本地檔案可讀。main 解析失敗則標記 `UNKNOWN`，停止依賴最新 authority 的工作。
+1. 記錄 UTC／Asia/Taipei 查核時間、Repository，先解析 GitHub `main` exact SHA。一律記 `CLOUD_ONLY / LOCAL_WORK_EXCLUDED_BY_USER`；只能使用 GitHub 或 GitHub-hosted runner 的暫存 checkout，禁止存取使用者本機檔案。main 解析失敗則標記 `UNKNOWN`，停止依賴最新 authority 的工作。
 2. 依上表讀入口及本次涉及的版本化檔案。文件內 evidence-basis SHA 是歷史查核基準，不是最新 main。
 3. 取得 live open PR，再讀相關 PR exact head/base、draft／merged、checks。已有相同工作就接續；已完成工作不重做。
-4. 判定模式：**排程健檢**只讀 Repository／Actions metadata；**使用者指派的整理工作**依明確範圍編輯、驗證與交付。排程或待辦本身不授予寫入／merge／dispatch 權限。
-5. 排程健檢只指出一個下一步，不自行實作。使用者指派的整理工作才選一個可執行項目；遇外部等待或權限缺口，留下證據並繼續不相依項目；不反覆重試已知 403、不增加平行工作流。
-6. 執行有檔案權限的整理工作時，修改前查該檔是否被 frozen receipt／hash 綁定。原工作區有 dirty／recovery 時，在隔離 current-main checkout 改動；未提交內容不得自動帶入。純雲端健檢不需要 checkout。
+4. 判定模式：**排程健檢**只讀 Repository／Actions metadata；**使用者指派的整理工作**依明確範圍編輯、驗證與交付。排程或待辦本身不授予權限；Cloud Maintenance V0.1 合併後只授予指定文件區塊及草稿 PR 權限，沒有 merge／dispatch 權限。
+5. 一般模型健檢只指出一個下一步；已合併的固定維護程式可依 Cloud Maintenance V0.1 建立文件草稿 PR。使用者指派的整理工作才選一個可執行項目；遇外部等待或權限缺口，留下證據並繼續不相依項目；不反覆重試已知 403、不增加平行工作流。
+6. 執行有檔案權限的整理工作時，修改前查該檔是否被 frozen receipt／hash 綁定。只透過 GitHub 線上分支／API 編輯，由 GitHub-hosted runner 測試；不存取使用者 checkout 或未提交內容。
 7. 以項目驗收證據結束。文件檢查連結、矛盾及相關既有檢查；行為改動加必要回歸測試。保留實際命令、結果、未驗證事項。
 8. 交接記錄「完成、等待、下一動作」。PR 建立、CI 通過、合併、部署、自然 schedule 通過必須分開。
 
@@ -47,16 +47,20 @@ Signal ingest parsing hardening 和 Quality V0.1 authority validation 分別由 
 
 名義時間及 expiry 以 [Actions map](GITHUB_ACTIONS_OPERATING_MAP.md#scheduled-operations) 導航，再核對當下 workflow／config。不要由 Codex 再 dispatch，也不要建立平行 cron。
 
-### 雲端模型健檢：建議每 6 小時
+### GitHub 雲端維護：接在既有 Health 之後
 
-使用可在雲端執行、可讀 GitHub Repository／Actions metadata 的排程服務。[自足的雲端提示詞](CLOUD_SCHEDULED_CHECK_PROMPT.md)可直接用於建立任務；排程是否建立和執行須以該服務的任務與 run history 查核，本手冊不宣稱某個個人排程已啟用。提示詞不依賴本機電腦、`/tmp`、聊天記憶或特定模型。雲端可讀 current main 的 78 項逐檔 reconciliation receipt 與 fingerprint V0.2 preparation 文件；原始 dirty checkout 的即時檔案狀態仍是 local-only。無 checkout 時，將實際本地檔案檢視標為 `LOCAL_ONLY_UNAVAILABLE`，不能聲稱已比對當前 bytes 或執行 cleanup。
+既有 Health V0.2 在台北偶數小時 :57 名義執行，維持唯讀。
+Cloud Project Maintenance V0.1 使用 workflow_run completion，不另建 cron，
+也不依賴 ChatGPT 個人排程、特定模型或使用者電腦。
 
-每輪順序：
+新 workflow／contract／receipt 合併到 main 後才生效；啟用與驗收分開。
+inspect job 只有讀權限；propose job 重新讀取 current main／來源證據，
+只允許兩個指定區塊和 draft PR。模型提示詞見 [CLOUD_SCHEDULED_CHECK_PROMPT.md](CLOUD_SCHEDULED_CHECK_PROMPT.md)。
 
-1. 更新 main／open PR／checks metadata。
-2. 依 current main 的 `config/research_automation_health_v0_2.json` 或其已合併 successor，比對全部 cron workflow 的 active window、allowed events、allowed conclusions、freshness。先查 successor，不能永遠沿用 V0.2。
-3. 查 Pages 自然 `schedule`，分別查 build／deploy／browser-production job metadata；再查它之後的 Health `schedule`。較早的 Health 或其他事件成功不能當作恢復。
-4. 檢查到期與每週節點，再更新等待項目的證據。沒有新變更時，不自創整理工作。
+每轮將即時 main、來源 run、PR checks、Actions pagination coverage 保存於
+GitHub run summary，不新增 artifact／cache／外部儲存。
+無實質狀態改變不 commit；文件保留上次狀態變更的證據，不假裝永遠是最新快照。
+main 或來源改變、人工修改、分頁不足、403 或 schema successor 均停止發佈。
 
 ### 近期工作節點
 
@@ -64,8 +68,8 @@ Signal ingest parsing hardening 和 Quality V0.1 authority validation 分別由 
 
 | 時點（台北） | 工作與完成條件 |
 | --- | --- |
-| 雲端排程啟用後每 6 小時 | 唯讀健檢；Pages 自然 run `35843351924` 已成功，且其後自然 Health run `35870216734` 已 `PASS`、`alerts=0`。TD-010 已完成，後續只做正常健康監控並在新故障／恢復時更新 |
-| 下一個可執行的整理回合 | 等待使用者對 [15 個 untracked exact-duplicate paths](LOCAL_WORKSPACE_RECONCILIATION_2026_09_24.md) 的明確移除決定；同意後執行前重查 main、status、hash。未獲核准前不碰原 checkout。其餘 76 個狀態項保留待後續逐項審核；D、C2/C3 與 13 個後續 handoff 檔保留。PR #494 已合併，但 V0.2 仍 PREPARED_NOT_ACTIVE；啟用前另需版本化 cutover authority，不得改 runner、訓練或接觸 R2 |
+| 既有 Health 自然完成後 | 唯讀健檢；Pages 自然 run `35843351924` 已成功，且其後自然 Health run `35870216734` 已 `PASS`、`alerts=0`。TD-010 已完成，後續只做正常健康監控並在新故障／恢復時更新 |
+| 下一個可執行的整理回合 | 執行下方 CLOUD-01。#496／#497 各自查 live 狀態；本機清理 EXCLUDED_BY_USER。fingerprint V0.2 啟用仍需另一份版本化 cutover authority，不得訓練或接觸 R2。 |
 | 2026-09-27 11:53 之後 | 核對 Pionex bounded observability 最後名義 slot 的自然 schedule；保留 missing／delayed／failure |
 | 2026-09-27 12:37 之後 | 核對 Weekly Training 自然 schedule；只從 metadata 確認 workflow 結論，無 report 就不判定 NO_CHANGE／模型 PASS |
 | 自 2026-09-23 起取得至少 7 天觀測後 | 整理 delay／missing／cancelled／重複／duration；列 coverage、樣本量、未知值，再提 cadence 建議 |
@@ -101,8 +105,8 @@ evidence_urls / changed_since_previous / next_action / blocker:
 
 ## 5. 執行界線
 
-- 排程健檢預設不編輯程式、不 push／PR／merge、不 dispatch／rerun／cancel、不停用 workflow。若允許自動整理，須在排程提示詞另定檔案範圍、驗收與交付界線。
-- 25 個 removed-file registration 的停用已獲使用者授權，但現有 API credential 回應 403、UI 顯示 workflow 不存在；查核時 0/25 成功。需具 Actions:write 的可用連線才續辦；再次核對 exact ID／path 仍不在 main，逐項讀回 state，保留 run history。
+- 一般模型健檢保持唯讀。僅已合併 Cloud Maintenance V0.1 的固定程式可更新指定區塊及 draft PR；不修改程式、不 merge／dispatch／rerun／cancel／disable，不改 cron。
+- 25 個 removed-file registration 已全數停用，逐項線上確認 disabled manually，歷史 run 保留；操作紀錄 PR #497。查 live 狀態，不沿用早期 0/25 或 403 阻礙重做停用；本維護程式不具停用權限。
 - Core100 History、Pionex V0.2、ZEC V0.3／V0.4 不重跑。fingerprint V0.2 準備不得覆寫舊 baseline、觸發訓練或建 R2 client。
 - FREE-ONLY；PAPER／LIVE-PAPER ONLY；replacement holdout FROZEN_UNOPENED；source_switch_authorized=false。不新增 provider／R2 存取、paid service、promotion、策略／風控變更或實盤。
 - 更換模型或聊天不提升權限。缺必要工具時交接阻礙及下一步，不改寫驗收條件。
@@ -116,7 +120,57 @@ evidence_urls / changed_since_previous / next_action / blocker:
 等待／未知（原因、缺少哪項證據）：
 PR / merge / deployment / natural schedule：各自狀態
 下一個可開始的工作（檔案、步驟、驗收、停止條件）：
-原工作區與 recovery：有權限才記位置／異動；雲端無存取時填 NO_LOCAL_CHECKOUT
+執行環境：CLOUD_ONLY；本機與 recovery：EXCLUDED_BY_USER；本次不讀寫本機
 ```
 
 新模型先跑第 2 節，再依 [CURRENT_STATUS.md](../CURRENT_STATUS.md) 接續。舊 Handoff 保留歷史，新查核追加時間與來源。
+
+## 7. 雲端工作卡（沿用既有 Work Item intake）
+
+### CLOUD-01 — 交付與自然排程驗收
+
+- 目的：將維護程式交付為可審查 PR，合併後確認自然執行；不自動合併。
+- 前置：讀 live main、Cloud Maintenance V0.1 contract／receipt、open PR。
+- 起點：在本次 run summary／PR 填 exact main、head、base 及證據 URL，禁止使用固定舊 SHA。
+- 步驟：
+  1. 查 #497 整理紀錄及 #496 fingerprint PR。已合併則記 merge SHA；未合併則保留等待，不重做。
+  2. 查維護交付 PR 的 Python 3.12／3.13、Ruff、workflow-static 與相關治理檢查。
+  3. 需合併時列為 WAITING_USER_MERGE；缺檢查列 UNKNOWN，GitHub 要批准 CI 時列 WAITING_CI_APPROVAL。
+  4. 合併後查首次自然 Health schedule 的 completion 是否觸發維護 inspect／propose；不 dispatch 補證據。
+  5. 再查第二個不同自然 Health run；驗證維護兩次完整完成，其中無變化回合 NO_CHANGE 且 commits_created=0。
+- 驗收：兩組 source run ID／attempt、main／head、兩個 job 結果、產生的 draft PR 或 NO_CHANGE 摘要；人工檢查 generated-block-only diff。
+- 停止：main 前進、衝突、人工編輯、來源不可信、缺權限／資料、CI 失敗時轉 CLOUD-02；不得自動擴權。
+- 交付：完成／等待／未知分列。CI、merge、維護自然執行、研究結果分開。
+- 下一步：#496 合併後只準備 fingerprint V0.2 cutover 提案；列證據收集、legacy baseline 處置、完整依賴清單與回復方式。不得啟用 runner。
+
+### CLOUD-02 — 異常與程式缺陷交接
+
+- 目的：提供可由下一模型執行的最小工作卡，不自動修改研究程式。
+- 來源：本次 GitHub run summary、exact main／相關 PR checks 與當前 policy。
+- 步驟：
+  1. 抄錄固定錯誤代碼、run URL、main SHA、缺失欄位；不下載 logs／artifact、不索取 secrets。
+  2. 403／CI 待批准：列所缺權限與使用者操作位置；不重試或切換 token。
+  3. MAIN_CHANGED：重查 main；已有維護 PR 基底落後就交由使用者審查／合併或明確處置，機器人不 rebase／force-push。
+  4. MANUAL_EDIT：保留原文和現有 PR，列出衝突路徑，不覆寫。
+  5. 程式缺陷：使用既有 Work Item 欄位寫明預期與實際、重現 fixture、允許檔案、最小修正、雲端測試與驗收。自動程序只輸出工作卡，不開 issue／貼 label。
+- 驗收：下一模型可從 GitHub 取得全部輸入；缺任一來源標 UNKNOWN，不能靠聊天或本機補齊。
+- 界線：不得 provider／R2／holdout／training／promotion／source-switch／交易，不修改 frozen evidence。
+- 下一步：只有使用者指派修正後，才在線上分支修改並走 GitHub CI。
+
+## 8. 維護規格與停止方式
+
+- Contract：[Cloud Maintenance V0.1](../config/cloud_project_maintenance_v0_1.json)。
+- Workflow：[`cloud-project-maintenance-v0-1.yml`](../.github/workflows/cloud-project-maintenance-v0-1.yml)。
+- 每輪執行使用 standard GitHub-hosted Ubuntu；不需要模型 API 或新 secrets。
+- 自動只更新本手冊與 CURRENT_STATUS 的以下標記區塊，其他文字不可動。
+- 長效憑證、paid fallback、自動部署、修改 Actions settings 均不在範圍。
+- 若 GitHub 不允許 token 建 draft PR，維持 BLOCKED_PERMISSION；沒有權限就不宣稱排程全部完成。
+- 要停止此功能，可由使用者停用這個 maintenance workflow；Health 繼續唯讀。
+  程式不自行停用、刪除 workflow 或刪除歷史 run。
+- GitHub 本身排程延遲／停用時，內部 listener 無法獨立喚醒；本方案不宣稱外部全天候監控。
+- 未加入新 artifact 儲存；metadata 證據放 Actions summary。至少七天完整觀測後才提出 cadence 建議，不自動改頻率。
+- 本文件標記內資料是上次「實質變更」的證據基準；最新狀態需讀本輪 summary 和 live main。
+
+<!-- cloud-maintenance:v0.1:begin -->
+PENDING_FIRST_CLOUD_OBSERVATION
+<!-- cloud-maintenance:v0.1:end -->

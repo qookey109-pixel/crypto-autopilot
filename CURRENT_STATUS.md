@@ -2,7 +2,7 @@
 
 Updated: 2026-09-24. This is the single human entrypoint for the current project checkpoint.
 
-**PAPER / LIVE-PAPER ONLY.** The data pipelines and paper components exist; the current research results do not support model promotion or real trading. Finish operational verification and reconcile local work before expanding the research scope.
+**PAPER / LIVE-PAPER ONLY.** The data pipelines and paper components exist; the current research results do not support model promotion or real trading. Continue cloud operational verification before expanding the research scope. User policy since 2026-09-25: all project work uses GitHub/cloud sources; local files, local testing and local cleanup are excluded.
 
 ## Read and act from the right source
 
@@ -47,7 +47,7 @@ Detailed evidence:
 | Priority | Work | Completion evidence / boundary |
 | --- | --- | --- |
 | 1 | Pages / Health reliability checkpoint | TD-010 complete: Pages `35843351924` succeeded naturally, followed by Health `35870216734` with `PASS` and zero alerts. Continue normal monitoring; do not create substitute dispatch evidence. |
-| 2 | Close the 78-path local reconciliation | [Receipt](docs/LOCAL_WORKSPACE_RECONCILIATION_2026_09_24.md): all 78 paths hashed against main `c06b46b` (15 exact at path, 2 identical relocated, 34 different, 27 absent); 15 untracked exact duplicates are proposed for approval-only removal. Thirteen later handoff files remain separately preserved. C1/C4/C5 integrated; C2/C3 deferred. Original checkout remains untouched. |
+| 2 | Cloud-only continuation | Local reconciliation is EXCLUDED_BY_USER, not a pending cloud task. Preserve the historical receipt; do not inspect, synchronize, delete or request local files. |
 | 3 | Core100 fingerprint V0.2 | PR #494 merged to main `c06b46b`; V0.2 remains PREPARED_NOT_ACTIVE: 31-file import closure split into 14 result-identity and 17 runtime-guard paths; synthetic proof confirms V0.1 misses features/advanced.py. Legacy migration is REVIEW_REQUIRED; do not change the active runner, train, or access R2 without a separate versioned authority. |
 | 4 | PR delivery checkpoint | PR #494 merged at `c06b46b`; post-merge tests (3.12/3.13), CodeQL, build and Freeze Guard passed. Pages build passed; deploy and browser-production were skipped by path filters. Delivery branch was deleted. Recheck live PR heads, bases and checks before future delivery actions. |
 | 5 | Tidy historical Actions registrations | The [operating map](docs/GITHUB_ACTIONS_OPERATING_MAP.md) separates current workflow files, removed-file registrations and dynamic Dependabot. Preserve historical run evidence. |
@@ -83,3 +83,34 @@ These are dated observations, not promises of current health. PR #478 preserves 
 - Preserve frozen configs/receipts and failed evidence. Do not restart completed acquisition/development from older prose or loosen a gate after seeing a rejected result.
 - Keep secrets out of files/logs/chat; Render never receives R2 credentials.
 - The September 22 [PR review record](docs/OPEN_PR_TRIAGE_2026_09_22.md), earlier handoffs and Current Operations V0.3 retain their historical evidence. Live GitHub state takes precedence for open PRs and runs.
+
+## Cloud-only maintenance V0.1 — review checkpoint
+
+Prepared 2026-09-25 against main `f9296aca33858c907b42e825db8a9d334df1986e`; resolve main live.
+The [versioned maintenance contract](config/cloud_project_maintenance_v0_1.json)
+and [preparation receipt](research/receipts/2026-09-25-cloud-project-maintenance-v0-1.json)
+become effective only after reviewed main merge. They add a GitHub-hosted
+completion listener to natural Health V0.2, no new cron. The original Health
+workflow and its read-only policy remain unchanged.
+
+- PR #496 contains the pure fingerprint V0.2 comparator; check its live head,
+  checks and merge state. Its merge does not activate training or V0.2 cutover.
+- The 25 removed-file registrations were disabled and individually read back
+  online. PR #497 records that completed operation; recheck its live merge state.
+  Do not repeat disablement from older prose.
+- CLOUD-01 / CLOUD-02 in the [continuation runbook](docs/PROJECT_CONTINUATION_RUNBOOK.md)
+  are the bounded delivery and failure work cards. Existing Work Item intake remains
+  the only issue system; maintenance does not create or label issues.
+- All development and validation for this delivery take place on GitHub. No local
+  recovery or dataset files are inputs. Standard GitHub-hosted temporary checkouts
+  are cloud execution environments.
+- Automatic repair is limited to the marked blocks in this file and the runbook.
+  Program defects get an actionable handoff; draft PRs never merge automatically.
+- Acceptance remains **WAITING_REVIEW_MERGE_AND_TWO_NATURAL_RUNS**, including
+  a verified NO_CHANGE run with zero commits. CI success alone does not close it.
+- Current Operations V0.3 research lifecycle remains unchanged; its new maintenance
+  pointer is navigation, not execution or model authority.
+
+<!-- cloud-maintenance:v0.1:begin -->
+PENDING_FIRST_CLOUD_OBSERVATION
+<!-- cloud-maintenance:v0.1:end -->

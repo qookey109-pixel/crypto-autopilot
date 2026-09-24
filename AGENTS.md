@@ -14,7 +14,7 @@ Read these first, in order:
 
 Repository `main` is the formal current authority. Resolve `main` live at read time. If chat history, an issue comment, a dashboard fixture, or an older receipt conflicts with current merged authority, preserve the historical evidence but follow the latest valid versioned authority for new work.
 
-For a scheduled check or model handoff, follow `docs/PROJECT_CONTINUATION_RUNBOOK.md` after resolving these sources. Its checklist and work IDs are navigation only; apply the scheduled task's actual permissions and preserve any dirty checkout.
+For a scheduled check or model handoff, follow `docs/PROJECT_CONTINUATION_RUNBOOK.md` after resolving these sources. Its checklist and work IDs are navigation only; apply the scheduled task's actual permissions. User policy since 2026-09-25 is CLOUD_ONLY: do not read or write user-local files, inspect a local dirty checkout, run local terminal commands, or create local schedules. Read GitHub at an exact main SHA; use GitHub-hosted temporary checkouts for CI. Local cleanup is EXCLUDED_BY_USER.
 
 `CURRENT_STATUS.md` is the concise current-operations index and `research/status/current-operations-v0-3.json` is its machine-readable companion. A SHA stored as `evidence_basis.parent_main_sha` records the reviewed parent used to prepare that status version; it is explicitly **not** a claim that the SHA remains the latest `main` after the status version is merged. Dated present-tense summaries in `PROJECT_STATUS.md`, `README.md`, historical handoffs, or dashboard fixtures may remain as historical evidence. Do not regress lifecycle state or restart completed work from older prose when later merged evidence supersedes it. Versioned configs, receipts, immutable run evidence, and current merged code still control authority and scope.
 
@@ -134,3 +134,7 @@ For a scheduled check or model handoff, follow `docs/PROJECT_CONTINUATION_RUNBOO
 - `main` is the only long-lived branch. A short-lived delivery branch may be
   used when Repository protection requires a pull request and is removed after
   merge; audit an existing branch before cleanup.
+
+## Cloud maintenance V0.1
+
+`config/cloud_project_maintenance_v0_1.json` and its dated receipt authorize only metadata inspection, the two marked documentation blocks, and draft PRs after main merge. Follow CLOUD-01/CLOUD-02 in the continuation runbook. This is a narrow GitHub maintenance authority; it does not change the planning-only issue contract, grant issue creation, merge, dispatch, provider/R2/training access, or permit any user-local work. Do not substitute a model's judgement for the fixed publication guards.
