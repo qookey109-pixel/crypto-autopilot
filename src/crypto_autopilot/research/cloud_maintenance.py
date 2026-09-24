@@ -9,7 +9,7 @@ import base64
 import hashlib
 import json
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
 from urllib.request import HTTPRedirectHandler, Request, build_opener
@@ -367,6 +367,10 @@ def publish(api, record):
         require(pr["draft"] is True and pr["user"]["login"] == "github-actions[bot]"
                 and pr["head"]["repo"]["full_name"] == REPOSITORY, "MANUAL_EDIT_DETECTED")
         require(pr["head"]["sha"] == head, "BRANCH_CHANGED")
+    if ref and not pr:
+        history = api.pages("/pulls", params={
+            "state": "closed", "head": f"qookey109-pixel:{branch}"})
+        require(not history, "CLOSED_BRANCH_REVIEW_REQUIRED")
     if head != main:
         comparison = api.request("GET", f"/compare/{main}...{head}")
         require(comparison["status"] == "ahead" and comparison["behind_by"] == 0
@@ -380,10 +384,6 @@ def publish(api, record):
                     and commit["commit"]["message"] == MESSAGE, "MANUAL_EDIT_DETECTED")
         documents = {p: api.file(p, head) for p in TARGETS}
         validate_branch_documents(base_docs, documents)
-    elif ref and not pr:
-        # May be an interrupted create; refuse branches associated with closed PRs.
-        history = api.pages("/pulls", params={"state": "closed", "head": f"qookey109-pixel:{branch}"})
-        require(not history, "CLOSED_BRANCH_REVIEW_REQUIRED")
     proposed = project_documents(documents, record)
     changed = {p: text for p, text in proposed.items() if text != documents[p]}
     if not changed and (pr or head == main):

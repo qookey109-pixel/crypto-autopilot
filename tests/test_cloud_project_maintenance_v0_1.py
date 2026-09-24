@@ -61,6 +61,7 @@ class PublishAPI:
         self.commits = [{"author": {"login": "github-actions[bot]"},
                          "commit": {"message": MESSAGE}}]
         self.fail_pr = False
+        self.closed_prs = []
 
     def main(self):
         return self.main_sha
@@ -70,7 +71,7 @@ class PublishAPI:
 
     def pages(self, path, key=None, params=None):
         if params.get("state") == "closed":
-            return []
+            return self.closed_prs
         return [self.pr] if self.pr else []
 
     def request(self, method, path, payload=None, **kwargs):
@@ -216,6 +217,17 @@ class PureMaintenanceTests(unittest.TestCase):
         api.writes.clear()
         self.assertEqual(publish(api, record())["status"], "DRAFT_RECOVERED")
         self.assertEqual([p for _, p, _ in api.writes], ["/pulls"])
+
+    def test_closed_draft_is_not_silently_reopened(self):
+        api = PublishAPI()
+        publish(api, record())
+        api.head_docs = project_documents(documents(), record())
+        api.closed_prs = [api.pr]
+        api.pr = None
+        api.writes.clear()
+        with self.assertRaisesRegex(Stop, "CLOSED_BRANCH_REVIEW_REQUIRED"):
+            publish(api, record())
+        self.assertEqual(api.writes, [])
 
     def test_main_race_before_ref_write_stops(self):
         api = PublishAPI()
