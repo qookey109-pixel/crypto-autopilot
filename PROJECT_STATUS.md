@@ -128,7 +128,7 @@ Historical CI success on an old branch is not sufficient merge evidence after ma
 - No martingale, loss-doubling, or unlimited averaging down.
 - Render Free / Frankfurt remains the proven public-metadata transport leg where applicable.
 - Render must never receive R2 credentials.
-- R2 credentials stay inside authorized GitHub Actions/local secret boundaries only.
+- R2 credentials stay inside the authorized GitHub Actions secret boundary only. CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER applies to all project work; never access local files or use a local runtime.
 - Frozen receipts/configs/evidence must not be rewritten to make later stages appear successful.
 - Dashboards are derived evidence projections, not authority.
 - Backtests and research metrics are evidence, not proof of future profitability.

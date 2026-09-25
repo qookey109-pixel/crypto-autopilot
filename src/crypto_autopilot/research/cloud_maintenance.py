@@ -88,6 +88,8 @@ class GitHub:
         for page in range(1, MAX_PAGES + 1):
             query = urlencode({**(params or {}), "per_page": 100, "page": page})
             data = self.request("GET", f"{path}?{query}")
+            require(isinstance(data, dict) if key else isinstance(data, list),
+                    "UNKNOWN_MALFORMED_PAGE")
             rows = data.get(key) if key else data
             require(isinstance(rows, list), "UNKNOWN_MALFORMED_PAGE")
             if key:
@@ -117,7 +119,8 @@ class GitHub:
 
     def file(self, path, ref):
         data = self.request("GET", f"/contents/{quote(path, safe='/')}?ref={quote(ref, safe='')}")
-        require(data.get("type") == "file" and data.get("encoding") == "base64",
+        require(isinstance(data, dict) and data.get("type") == "file"
+                and data.get("encoding") == "base64",
                 "UNKNOWN_SOURCE_FILE")
         try:
             return base64.b64decode(data["content"], validate=False).decode("utf-8")
@@ -206,7 +209,16 @@ def render(record):
              f"- 語意摘要：`{digest(sem)}`。",
              "- 本機工作：EXCLUDED_BY_USER；研究結果：UNKNOWN_FROM_METADATA。",
              "- 每次接續先重查 main；本區塊保留上次實質變更證據，不因時間戳更新。", "",
-             "| 工作 | 狀態 | 證據 |", "| --- | --- | --- |"]
+             ]
+    if "source_health" in sem:
+        source = evidence["source"]
+        state = sem["source_health"]
+        lines.extend(["", f"觸發此輪的 Health：**{state['conclusion']}** "
+                      f"（{state['status']}）；"
+                      f"[run {source['id']}, attempt {source['run_attempt']}]"
+                      f"(https://github.com/{REPOSITORY}/actions/runs/{source['id']})。",
+                      "來源結果獨立保留；後續成功執行不覆蓋此次失敗。", ""])
+    lines.extend(["| 工作 | 狀態 | 證據 |", "| --- | --- | --- |"])
     for row in sem["workflows"]:
         run = evidence["workflows"].get(row["workflow"])
         link = (f"[run {run['id']}](https://github.com/{REPOSITORY}/actions/runs/{run['id']})"
@@ -339,12 +351,16 @@ def collect(api, event, checkout_sha, now):
         pr_evidence[str(number)] = {"head": pr["head"]["sha"], "base": pr["base"]["sha"],
                                    "checks": [{"name": c["name"], "status": c["status"],
                                                "conclusion": c.get("conclusion")} for c in checks]}
-    attention = any(r["health"] not in {"HEALTHY", "HEALTHY_CONDITIONAL", "EXPECTED_STOP",
-                                       "WAITING_WINDOW"} for r in rows)
+    source_health = {"status": source["status"],
+                     "conclusion": source.get("conclusion") or "UNKNOWN"}
+    attention = (source_health["conclusion"] != "success" or
+                 any(r["health"] not in {"HEALTHY", "HEALTHY_CONDITIONAL", "EXPECTED_STOP",
+                                        "WAITING_WINDOW"} for r in rows))
     action = ("執行 CLOUD-02：查核異常 metadata，禁止補跑或修改研究權限。" if attention else
               "執行 CLOUD-01：審查既有 PR 與雲端維護驗收；fingerprint 切換僅準備提案。")
     record = {"schema": SCHEMA,
-              "semantic": {"workflows": sorted(rows, key=lambda r: r["workflow"]),
+              "semantic": {"source_health": source_health,
+                           "workflows": sorted(rows, key=lambda r: r["workflow"]),
                            "prs": pr_rows, "next_action": action},
               "evidence": {"main_sha": main, "observed_at_utc": now.isoformat(),
                            "source": run_evidence(source), "workflows": evidence,

@@ -100,6 +100,7 @@ evidence_urls / changed_since_previous / next_action / blocker:
 - `updated_at` 不等於 completed_at；可取 job metadata 的完成時間，否則留空。started−created 是 queue delay，不能稱 cron delay。
 - API 403／rate-limit／連線失敗／缺頁：列 UNKNOWN 或 BLOCKED_PERMISSION，不可當「零失敗／不存在／完成」。不索取 token，不 dump secrets。
 - queued／in_progress 不是成功，SKIPPED 不是實際執行成功；只有 policy 明列允許 skipped 才能用於該健康判斷。
+- 維護摘要分別保存「觸發此輪的 Health 結論」及「查核時最新 workflow 狀態」。即使查核時已有更新的成功 Health，觸發來源的 failure／cancelled／timed_out／skipped／未知結論仍轉 CLOUD-02；不得以更新成功覆蓋該次失敗。
 - 相同問題用 `workflow + event + latest relevant run + conclusion + expiry state` 去重，另記首次告警及恢復。只有查核時間不同不是新進展。
 - metadata-only 健檢不讀 logs／artifacts。沒有 report 證據時，Training success 不能推出 PASS／NO_CHANGE；provider／R2 用量維持 UNKNOWN。
 
