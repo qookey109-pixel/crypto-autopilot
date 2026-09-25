@@ -63,7 +63,7 @@ class BootstrapBlocked(RuntimeError):
 
 
 def _git_blob_sha(payload: bytes) -> str:
-    header = f"blob {len(payload)}\\0".encode("ascii")
+    header = f"blob {len(payload)}\0".encode("ascii")
     return hashlib.sha1(header + payload).hexdigest()
 
 
@@ -234,8 +234,8 @@ def _validate_authority_and_implementation(
     workflow_anchor = contract["execution_context"]["workflow_blob_sha_at_preparation"]
     if actual.get(WORKFLOW_PATH) != workflow_anchor:
         raise BootstrapBlocked("workflow differs from the successor contract anchor")
-    auth_blob = _git_blob_sha((root / AUTHORITY_RECEIPT_PATH).read_bytes())
-    return implementation, auth_blob
+    implementation_blob = _git_blob_sha((root / IMPLEMENTATION_RECEIPT_PATH).read_bytes())
+    return implementation, implementation_blob
 
 
 def _verify_one_dispatch(*, checkout_sha: str) -> None:
@@ -303,7 +303,6 @@ def _verify_one_dispatch(*, checkout_sha: str) -> None:
 def _collect_git_blobs(
     *, contract: Mapping[str, Any], root: Path, checkout_sha: str
 ) -> dict[str, str]:
-    live_main = checkout_sha
     paths = set(
         contract["identity_contract"]["code_paths"]
         + contract["identity_contract"]["support_paths"]
@@ -316,8 +315,6 @@ def _collect_git_blobs(
         }
     )
     inventory = _source_inventory(root, paths)
-    if checkout_sha != live_main:
-        raise BootstrapBlocked("checkout/main source drift")
     return inventory
 
 
@@ -353,8 +350,7 @@ def _load_v02_latest(store) -> tuple[str, dict[str, Any] | None, dict[str, Any] 
 
 
 def _current_fingerprint(
-    *, contract_bytes: bytes, contract: Mapping[str, Any], expected_contract_sha256: str,
-    dataset_fingerprint: str, root: Path, checkout_sha: str,
+    *, contract: Mapping[str, Any], dataset_fingerprint: str, root: Path, checkout_sha: str,
 ) -> dict[str, Any]:
     blobs = _collect_git_blobs(contract=contract, root=root, checkout_sha=checkout_sha)
     if blobs.get(WORKFLOW_PATH) != contract["execution_context"]["workflow_blob_sha_at_preparation"]:
@@ -381,7 +377,7 @@ def _dataset_is_exact(catalog: Mapping[str, Any], state: Mapping[str, Any]) -> b
 
 
 def _publish_baseline(
-    store, *, config: dict[str, Any], model: dict[str, Any], metrics: dict[str, Any],
+    store, *, model: dict[str, Any], metrics: dict[str, Any],
     dataset_fingerprint: str, fingerprint: dict[str, Any], implementation_blob_sha: str,
     run_id: str, generated_at: str,
 ) -> dict[str, Any]:
@@ -464,6 +460,10 @@ def _run(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     checkout_sha = _require_live_main()
     config_bytes = Path(args.fingerprint_contract).read_bytes()
     parent_bytes = Path(PARENT_CONTRACT_PATH).read_bytes()
+    if args.bootstrap_authority != Path(AUTHORITY_CONFIG_PATH):
+        raise BootstrapBlocked("unexpected bootstrap authority path")
+    if args.implementation_receipt != Path(IMPLEMENTATION_RECEIPT_PATH):
+        raise BootstrapBlocked("unexpected implementation receipt path")
     implementation = _load_json(args.implementation_receipt)
     expected_contract_sha = implementation.get("successor_contract_sha256")
     if not isinstance(expected_contract_sha, str):
@@ -533,9 +533,8 @@ def _run(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
         })
         return report, 2
     current = _current_fingerprint(
-        contract_bytes=config_bytes, contract=contract,
-        expected_contract_sha256=expected_contract_sha,
-        dataset_fingerprint=dataset_fingerprint, root=ROOT, checkout_sha=checkout_sha,
+        contract=contract, dataset_fingerprint=dataset_fingerprint,
+        root=ROOT, checkout_sha=checkout_sha,
     )
     generated_at = observed.isoformat().replace("+00:00", "Z")
     report.update({
