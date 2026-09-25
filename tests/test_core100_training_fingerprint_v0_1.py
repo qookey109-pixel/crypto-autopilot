@@ -87,12 +87,13 @@ def test_v0_2_latest_pointer_reuses_exact_experiment() -> None:
     assert decision["reason"] == "EXACT_EXPERIMENT_FINGERPRINT_MATCH"
 
 
-def test_training_workflow_uses_dedupe_runner_and_keeps_weekly_schedule() -> None:
+def test_training_workflow_uses_reviewed_successor_and_keeps_weekly_schedule() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     assert 'cron: "37 4 * * 0"' in text
-    assert "train_binance_detailed_history_models_v0_3.py" in text
-    assert "--fingerprint-config config/core100_training_fingerprint_v0_1.json" in text
-    assert '"PASS", "NO_CHANGE"' in text
+    assert "train_binance_detailed_history_models_v0_4.py" in text
+    assert "--fingerprint-contract config/core100_training_fingerprint_v0_2_successor_v0_1.json" in text
+    assert "bootstrap_v0_2" in text
+    assert "REVIEW_REQUIRED" in text
     assert 'report["r2_writes_performed"] is False' in text
 
 
