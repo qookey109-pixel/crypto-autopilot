@@ -198,6 +198,11 @@ def _validate_authority_and_implementation(
         or authority.get("status") != "AUTHORIZED_NOT_ACTIVE"
         or authority.get("user_authorization", {}).get("decision") != "AUTHORIZED"
         or authority.get("authorized_execution", {}).get("one_time_bootstrap") is not True
+        or authority.get("authorized_execution", {}).get("trigger_event") != "workflow_dispatch"
+        or authority.get("authorized_execution", {}).get("required_input")
+        != {"name": "bootstrap_v0_2", "value": "true"}
+        or authority.get("proposed_r2_access", {}).get("writes_authorized_by_this_authority") is not True
+        or authority.get("proposed_r2_access", {}).get("headroom_gate_bytes") != HEADROOM_LIMIT
     ):
         raise BootstrapBlocked("versioned V0.2 authority config is invalid")
     if (
@@ -369,7 +374,9 @@ def _dataset_is_exact(catalog: Mapping[str, Any], state: Mapping[str, Any]) -> b
         and state.get("shard_count") == 10
         and state.get("total_partition_objects") == 14274
         and state.get("holdout_accessed") is False
-        and len(catalog.get("symbols", [])) == 100
+        and isinstance(catalog.get("markets"), list)
+        and len(catalog["markets"]) == 100
+        and catalog.get("selected_market_count") == 100
     )
 
 
@@ -545,7 +552,7 @@ def _run(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
             report.update({"status": "REVIEW_REQUIRED", "reason": "IMPLEMENTATION_RECEIPT_CHANGED"})
             return report, 2
         decision = compare_fingerprints(
-            current=current, previous=manifest["training_fingerprint_v0_2"]
+            contract=contract, current=current, previous=manifest["training_fingerprint_v0_2"]
         )
         report.update({
             "status": decision["status"],
