@@ -49,7 +49,7 @@
     "src/crypto_autopilot/technical.py": "9f41198c044d32044023e8133ebe33dcd226c008",
     "src/crypto_autopilot/training/__init__.py": "890a206dd7abf4cbd6b9f32cbd66f4c38a307acd",
     "src/crypto_autopilot/training/detailed.py": "f24c7345b422fca9dbe92ef5bb2b9ab272fe7236",
-    "src/crypto_autopilot/training/fingerprint_v0_2_execution.py": "967f4b3c81387b02d0563b90884519b69acbfa52",
+    "src/crypto_autopilot/training/fingerprint_v0_2_execution.py": "f71a3026fa48b53c6297bb85436e4ab0f913e879",
     "src/crypto_autopilot/training/history_quality.py": "1c66f3291fcf03ad132e2cfd68f2ffc4f9ceab1a",
     "src/crypto_autopilot/training/online_r2.py": "e2286a80aba6b3df33ddf0a52fab5ae9e23d36d9"
   },
