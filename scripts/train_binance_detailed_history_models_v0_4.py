@@ -163,6 +163,8 @@ def _required_implementation_paths(contract: Mapping[str, Any]) -> set[str]:
             SUCCESSOR_CONTRACT_PATH,
             IMPLEMENTATION_RECEIPT_PATH,
             COMPARATOR_PATH,
+            "src/crypto_autopilot/training/fingerprint_collector_v0_2.py",
+            "src/crypto_autopilot/training/fingerprint_v0_2.py",
             RUNNER_PATH,
             "requirements/ci-constraints.txt",
             "pyproject.toml",
