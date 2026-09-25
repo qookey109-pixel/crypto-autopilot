@@ -1,0 +1,119 @@
+{
+  "schema": "qookey-core100-training-fingerprint-v0.2-bootstrap-authority-receipt-v0.1",
+  "status": "AUTHORIZED_NOT_ACTIVE",
+  "authorized_on_utc_date": "2026-09-25",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "evidence_basis_main_sha": "b5fc0d138d9cd1967ffdf72d481695397522a2ba",
+  "authority_config": "config/core100_training_fingerprint_v0_2_bootstrap_authority_v0_1.json",
+  "authorizing_proposal": "config/core100_training_fingerprint_v0_2_bootstrap_authority_proposal_v0_1.json",
+  "proposal_pr": 503,
+  "proposal_merge_sha": "b5fc0d138d9cd1967ffdf72d481695397522a2ba",
+  "user_authorization": {
+    "decision": "AUTHORIZED",
+    "authorized_on_utc_date": "2026-09-25",
+    "source": "Direct user reply in this task authorizing the exact bounded scope in PR #503.",
+    "verbatim_reply": "授權 繼續吧",
+    "scope": "One-time Crypto Core 100 fingerprint V0.2 baseline using the completed existing dataset, bounded R2 reads/writes stated in the merged PR #503 proposal, no provider requests, and no holdout, source switch, promotion, or trading.",
+    "scope_expansion": "None; the separate actions:read permission below is limited to GitHub workflow-run metadata and enforces one dispatch."
+  },
+  "authorized_scope": {
+    "dataset": {
+      "markets": 100,
+      "shards": 10,
+      "expected_partition_objects": 14274,
+      "intervals": [
+        "15m",
+        "1h",
+        "4h"
+      ],
+      "source_month_start": "2022-08",
+      "source_month_end": "2026-07"
+    },
+    "execution": "Exactly one explicit workflow_dispatch of the existing weekly workflow after the authority and implementation are merged to main.",
+    "r2_reads": [
+      {
+        "key": "catalogs/binance_usdm/crypto-core-v0.1/latest.json",
+        "purpose": "Resolve exact catalog key and SHA-256"
+      },
+      {
+        "key": "training/binance_usdm/crypto-core-v0.1/backfill-state.json",
+        "purpose": "Require COMPLETE state and exact shard bindings"
+      },
+      {
+        "prefix": "catalogs/binance_usdm/crypto-core-v0.1/runs/",
+        "condition": "Only the catalog object referenced by the validated latest pointer"
+      },
+      {
+        "prefix": "receipts/historical/binance_usdm/crypto-core-v0.1/",
+        "condition": "Only the 10 receipt keys referenced by the validated complete backfill state"
+      },
+      {
+        "prefix": "market-data/binance_usdm/crypto-core-v0.1/",
+        "condition": "Only partition keys referenced by those validated receipts; maximum expected 14274 objects"
+      },
+      {
+        "key": "training/binance_usdm/crypto-core-v0.1/fingerprint-v0.2/latest.json",
+        "purpose": "Require no prior V0.2 baseline; if present, stop. Do not read or reuse the V0.1 latest pointer."
+      },
+      {
+        "operation": "list_objects_v2 across the whole bucket",
+        "purpose": "Fresh complete-pagination byte inventory for the existing 8000000000-byte FREE-ONLY hard stop; inspect key/size metadata only, no object payloads."
+      }
+    ],
+    "r2_writes": [
+      {
+        "prefix": "training/binance_usdm/crypto-core-v0.1/fingerprint-v0.2/runs/run=github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/",
+        "objects": [
+          "model.json",
+          "metrics.json",
+          "manifest.json"
+        ],
+        "condition": "One run only; immutable key equality and SHA-256 readback required."
+      },
+      {
+        "key": "training/binance_usdm/crypto-core-v0.1/fingerprint-v0.2/latest.json",
+        "condition": "Write last only after outputs are verified; preserve training/binance_usdm/crypto-core-v0.1/latest.json unchanged."
+      }
+    ],
+    "whole_bucket_headroom_gate_bytes": 8000000000,
+    "v0_1_latest_pointer": "Must not be read, reused, migrated, overwritten, or treated as V0.2 evidence."
+  },
+  "one_time_guard": {
+    "purpose": "Consume this one-time authorization on at most one workflow_dispatch run, including a run that fails before writing outputs.",
+    "method": "Use the ephemeral GITHUB_TOKEN with actions:read to paginate workflow-run metadata for this exact workflow and event; require exactly one run whose display_title starts with CORE100_V02_BOOTSTRAP and require its run_id equals GITHUB_RUN_ID.",
+    "duplicate_or_incomplete_history": "REVIEW_REQUIRED; stop before R2 access and training.",
+    "permission_scope": "actions:read only; no workflow mutation, dispatch, log, artifact, secret, or repository-content access."
+  },
+  "safety_boundaries": {
+    "provider_requests_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "local_files_or_local_runtime_authorized": false,
+    "paid_runtime_authorized": false,
+    "monthly_budget_usd": 0
+  },
+  "effects": {
+    "r2_access_performed": false,
+    "training_performed": false,
+    "provider_requests_performed": 0,
+    "r2_reads_performed": 0,
+    "r2_writes_performed": 0,
+    "workflow_changed": false,
+    "schedule_changed": false,
+    "local_files_accessed": false,
+    "paid_runtime_added": false
+  },
+  "activation_gate": {
+    "authority_config_and_receipt_merged_to_main": true,
+    "exact_implementation_receipt_merged_to_main_required": true,
+    "workflow_implementation_merged_to_main_required": true,
+    "live_main_and_checkout_sha_match_required": true,
+    "explicit_workflow_dispatch_required": true,
+    "status_until_all_gates": "NOT_ACTIVE"
+  },
+  "rollback_and_failure": "On any missing evidence, permission error, API pagination gap, duplicate dispatch, source drift, headroom >=8000000000 bytes, object collision, equality mismatch, SHA readback mismatch, or test/quality failure: stop; do not train further, write pointer, expand scope, or retry using another run."
+}
