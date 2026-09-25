@@ -106,7 +106,7 @@ evidence_urls / changed_since_previous / next_action / blocker:
 ## 5. 執行界線
 
 - 一般模型健檢保持唯讀。僅已合併 Cloud Maintenance V0.1 的固定程式可更新指定區塊及 draft PR；不修改程式、不 merge／dispatch／rerun／cancel／disable，不改 cron。
-- 25 個 removed-file registration 已全數停用，逐項線上確認 disabled manually，歷史 run 保留；操作紀錄 PR #497。查 live 狀態，不沿用早期 0/25 或 403 阻礙重做停用；本維護程式不具停用權限。
+- 2026-09-25：TD-014 的 25 個 removed-file workflow registrations 已依 [Actions operating map](GITHUB_ACTIONS_OPERATING_MAP.md#removed-registrations-disabled-2026-09-25) 完成停用，25/25 均讀回停用狀態；操作紀錄 PR #497，run history 保留。需要使用現況時另行查核；不沿用早期 0/25 或 403 阻礙重做停用，Cloud Maintenance 程式不具停用權限。
 - Core100 History、Pionex V0.2、ZEC V0.3／V0.4 不重跑。fingerprint V0.2 準備不得覆寫舊 baseline、觸發訓練或建 R2 client。
 - FREE-ONLY；PAPER／LIVE-PAPER ONLY；replacement holdout FROZEN_UNOPENED；source_switch_authorized=false。不新增 provider／R2 存取、paid service、promotion、策略／風控變更或實盤。
 - 更換模型或聊天不提升權限。缺必要工具時交接阻礙及下一步，不改寫驗收條件。
