@@ -7,8 +7,6 @@ import hashlib
 import json
 import os
 import importlib.util
-import subprocess
-import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -377,7 +375,7 @@ def _dataset_is_exact(catalog: Mapping[str, Any], state: Mapping[str, Any]) -> b
 
 
 def _publish_baseline(
-    store, *, model: dict[str, Any], metrics: dict[str, Any],
+    store, *, report: dict[str, Any], model: dict[str, Any], metrics: dict[str, Any],
     dataset_fingerprint: str, fingerprint: dict[str, Any], implementation_blob_sha: str,
     run_id: str, generated_at: str,
 ) -> dict[str, Any]:
@@ -435,7 +433,10 @@ def _publish_baseline(
         (f"{run_prefix}/manifest.json", manifest_payload, "manifest"),
     ):
         records.append(runner.put_immutable(store, key=key, payload=payload, role=role))
+        report["r2_writes_performed"] = True
+        report["written_objects"] = records.copy()
     latest_key = namespace + "/latest.json"
+    report["pointer_write_attempted"] = True
     pointer_receipt = store.put_bytes(
         latest_key, latest_payload, content_type="application/json",
         metadata={"provider": "binance_usdm", "role": "training-latest", "version": "v0.2"},
@@ -454,9 +455,8 @@ def _publish_baseline(
     }
 
 
-def _run(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
+def _run(args: argparse.Namespace, report: dict[str, Any]) -> tuple[dict[str, Any], int]:
     event = os.environ.get("GITHUB_EVENT_NAME", "")
-    report = _base_report("SKIPPED", "UNSUPPORTED_OR_NON_EXECUTION_EVENT", event=event)
     checkout_sha = _require_live_main()
     config_bytes = Path(args.fingerprint_contract).read_bytes()
     parent_bytes = Path(PARENT_CONTRACT_PATH).read_bytes()
@@ -571,7 +571,7 @@ def _run(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
         generated_at_utc=generated_at,
     )
     published = _publish_baseline(
-        store, model=model, metrics=metrics,
+        store, report=report, model=model, metrics=metrics,
         dataset_fingerprint=dataset_fingerprint, fingerprint=current,
         implementation_blob_sha=implementation_blob_sha, run_id=args.run_id,
         generated_at=generated_at,
@@ -608,10 +608,14 @@ def main() -> int:
         raise BootstrapBlocked("run id is not a safe object-key component")
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise BootstrapBlocked("local execution is excluded")
+    report = _base_report("SKIPPED", "UNSUPPORTED_OR_NON_EXECUTION_EVENT", event=os.environ.get("GITHUB_EVENT_NAME", ""))
     try:
-        report, exit_code = _run(args)
+        report, exit_code = _run(args, report)
     except (BootstrapBlocked, DetailedHistoryAuthorityError, SuccessorContractError) as exc:
-        report = _base_report("REVIEW_REQUIRED", str(exc), event=os.environ.get("GITHUB_EVENT_NAME", ""))
+        report.update({"status": "REVIEW_REQUIRED", "reason": str(exc)})
+        exit_code = 2
+    except Exception:
+        report.update({"status": "REVIEW_REQUIRED", "reason": "UNEXPECTED_EXECUTION_FAILURE"})
         exit_code = 2
     _write_report(output, report)
     return exit_code
