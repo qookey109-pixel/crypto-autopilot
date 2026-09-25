@@ -14,9 +14,20 @@ Read these first, in order:
 
 Repository `main` is the formal current authority. Resolve `main` live at read time. If chat history, an issue comment, a dashboard fixture, or an older receipt conflicts with current merged authority, preserve the historical evidence but follow the latest valid versioned authority for new work.
 
-For a scheduled check or model handoff, follow `docs/PROJECT_CONTINUATION_RUNBOOK.md` after resolving these sources. Its checklist and work IDs are navigation only; apply the scheduled task's actual permissions. User policy since 2026-09-25 is CLOUD_ONLY: do not read or write user-local files, inspect a local dirty checkout, run local terminal commands, or create local schedules. Read GitHub at an exact main SHA; use GitHub-hosted temporary checkouts for CI. Local cleanup is EXCLUDED_BY_USER.
+For scheduled checks and model handoffs, follow `docs/PROJECT_CONTINUATION_RUNBOOK.md` after resolving these sources. Its checklist and work IDs are navigation only; apply the scheduled task's actual permissions. The binding CLOUD_ONLY policy below applies to every task in this repository.
 
 `CURRENT_STATUS.md` is the concise current-operations index and `research/status/current-operations-v0-3.json` is its machine-readable companion. A SHA stored as `evidence_basis.parent_main_sha` records the reviewed parent used to prepare that status version; it is explicitly **not** a claim that the SHA remains the latest `main` after the status version is merged. Dated present-tense summaries in `PROJECT_STATUS.md`, `README.md`, historical handoffs, or dashboard fixtures may remain as historical evidence. Do not regress lifecycle state or restart completed work from older prose when later merged evidence supersedes it. Versioned configs, receipts, immutable run evidence, and current merged code still control authority and scope.
+
+## Binding CLOUD_ONLY execution policy
+
+The user's CLOUD_ONLY instruction is permanent for this repository and applies to every model, task, and workflow unless the user explicitly changes it.
+
+- Inspect, author, validate, and operate this project through GitHub repository/API and GitHub-hosted Actions only.
+- Never access the user's computer or local checkout: do not read, write, list, hash, synchronize, or clean local project files; do not run local terminal commands, tests, builds, or schedulers.
+- GitHub-hosted ephemeral checkout and execution are cloud operations and may be used only by the reviewed workflow scope. They do not authorize access to the user's machine.
+- If an input or tool is unavailable online, report `UNKNOWN` or `BLOCKED`; do not fall back to local files, ask for local recovery files, or claim unverified results.
+- Handoffs and work cards must state `CLOUD_ONLY` and `LOCAL_FILES_EXCLUDED_BY_USER`. No model's capability or memory changes this boundary.
+
 
 ## Non-negotiable boundaries
 
@@ -40,7 +51,7 @@ For a scheduled check or model handoff, follow `docs/PROJECT_CONTINUATION_RUNBOO
 - Cloudflare Containers are retired/blocked for this project; do not revive or retry that route.
 - Koyeb V0.4 is superseded; do not restore it as an active candidate without a new authority.
 - Render Free / Frankfurt is the current proven Binance public-metadata transport leg.
-- Render must never receive R2 credentials. R2 credentials belong only in the authorized GitHub Actions/local secret boundary.
+- Render must never receive R2 credentials. R2 credentials belong only in the authorized GitHub Actions secret boundary; never move or expose them through local files.
 - Apply the FREE-ONLY operational R2 hard stop/headroom gate before every authorized metadata write.
 - Historical workflows whose proof/materialization is already frozen must remain validation-only. Do not reintroduce schedule, push execution, provider requests, self-hosted execution, R2 secret bindings, or write commands without a new versioned authority.
 
