@@ -339,7 +339,7 @@ def collect(api, event, checkout_sha, now):
                      "conclusion": (latest or {}).get("conclusion") or "UNKNOWN",
                      "jobs": jobs_state})
     prs = api.pages("/pulls", params={"state": "open", "base": "main"})
-    numbers = {p["number"] for p in prs if not p["head"]["ref"].startswith(PREFIX)} | {496, 497}
+    numbers = {p["number"] for p in prs if not p["head"]["ref"].startswith(PREFIX)}
     pr_rows, pr_evidence = [], {}
     for number in sorted(numbers):
         pr = api.request("GET", f"/pulls/{number}")
@@ -357,7 +357,7 @@ def collect(api, event, checkout_sha, now):
                  any(r["health"] not in {"HEALTHY", "HEALTHY_CONDITIONAL", "EXPECTED_STOP",
                                         "WAITING_WINDOW"} for r in rows))
     action = ("執行 CLOUD-02：查核異常 metadata，禁止補跑或修改研究權限。" if attention else
-              "執行 CLOUD-01：審查既有 PR 與雲端維護驗收；fingerprint 切換僅準備提案。")
+              "執行 CLOUD-01：以 current main 與現有 open PR 為準，完成雲端維護自然驗收。")
     record = {"schema": SCHEMA,
               "semantic": {"source_health": source_health,
                            "workflows": sorted(rows, key=lambda r: r["workflow"]),
