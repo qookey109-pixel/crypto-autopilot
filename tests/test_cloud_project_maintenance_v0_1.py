@@ -35,6 +35,7 @@ def event():
 
 def record():
     return {"schema": SCHEMA, "semantic": {
+        "source_health": {"status": "completed", "conclusion": "success"},
         "workflows": [{"workflow": HEALTH.split("/")[-1], "health": "HEALTHY",
                        "conclusion": "success", "registration": "active", "jobs": []}],
         "prs": [], "next_action": "CLOUD-01"},
@@ -304,6 +305,34 @@ class PureMaintenanceTests(unittest.TestCase):
         with patch.object(api, "request", return_value=full), self.assertRaises(Stop):
             api.pages("/pulls")
 
+
+    def test_legacy_generated_record_remains_readable(self):
+        legacy = record()
+        del legacy["semantic"]["source_health"]
+        generated = project_documents(documents(), legacy)
+        self.assertEqual(existing_record(generated[TARGETS[0]]), legacy)
+        upgraded = project_documents(generated, record())
+        self.assertNotEqual(upgraded, generated)
+        self.assertEqual(existing_record(upgraded[TARGETS[0]]), record())
+
+    def test_malformed_page_envelopes_stop_with_fixed_code(self):
+        api = GitHub("synthetic-test-token")
+        for payload in (None, [], "invalid", 1, {}, {"workflow_runs": None}):
+            with self.subTest(payload=payload), patch.object(api, "request", return_value=payload):
+                with self.assertRaisesRegex(Stop, "^UNKNOWN_MALFORMED_PAGE$"):
+                    api.pages("/runs", "workflow_runs")
+        for payload in (None, {}, "invalid", 1):
+            with self.subTest(payload=payload), patch.object(api, "request", return_value=payload):
+                with self.assertRaisesRegex(Stop, "^UNKNOWN_MALFORMED_PAGE$"):
+                    api.pages("/pulls")
+
+    def test_malformed_file_envelopes_stop_with_fixed_code(self):
+        api = GitHub("synthetic-test-token")
+        for payload in (None, [], "invalid", 1):
+            with self.subTest(payload=payload), patch.object(api, "request", return_value=payload):
+                with self.assertRaisesRegex(Stop, "^UNKNOWN_SOURCE_FILE$"):
+                    api.file(TARGETS[0], A)
+
     def test_http_errors_are_sanitized(self):
         from urllib.error import HTTPError, URLError
         for error, code in ((403, "BLOCKED_PERMISSION"), (429, "UNKNOWN_RATE_LIMIT"),
@@ -325,6 +354,7 @@ class CollectAPI:
     def __init__(self):
         self.coverage = []
         self.latest = run()
+        self.source = run()
         self.state = "active"
         self.fail_pages = False
         self.now = NOW
@@ -348,7 +378,7 @@ class CollectAPI:
 
     def request(self, method, path, payload=None, **kwargs):
         if path == "/actions/runs/10":
-            return run()
+            return self.source
         if path.startswith("/git/trees/"):
             return {"truncated": False, "tree": [{"path": HEALTH}] +
                     [{"path": p, "mode": "100644"} for p in TARGETS]}
@@ -398,6 +428,40 @@ class CollectionTests(unittest.TestCase):
             collect(api, event(), A, NOW)
         with self.assertRaisesRegex(Stop, "MAIN_CHANGED"):
             collect(api, event(), B, NOW)
+
+
+    def test_trigger_failure_is_preserved_when_latest_health_has_recovered(self):
+        api = CollectAPI()
+        api.latest = run(id=20, created_at="2026-09-24T23:59:00Z",
+                         run_started_at="2026-09-24T23:59:00Z")
+        for conclusion in ("failure", "cancelled", "timed_out", "skipped", None):
+            with self.subTest(conclusion=conclusion):
+                api.source = run(conclusion=conclusion)
+                trigger = event()
+                trigger["workflow_run"] = api.source
+                result = collect(api, trigger, A, NOW)
+                self.assertEqual(result["semantic"]["workflows"][0]["health"], "HEALTHY")
+                self.assertEqual(result["semantic"]["source_health"]["conclusion"],
+                                 conclusion or "UNKNOWN")
+                self.assertIn("CLOUD-02", result["semantic"]["next_action"])
+                self.assertEqual(result["evidence"]["source"]["id"], 10)
+                self.assertEqual(result["evidence"]["workflows"][HEALTH.split("/")[-1]]["id"],
+                                 20)
+                text = render(result)
+                self.assertIn(f"**{conclusion or 'UNKNOWN'}**", text)
+                self.assertIn("/actions/runs/10)", text)
+
+    def test_source_failure_and_recovery_are_material_changes(self):
+        api = CollectAPI()
+        success = collect(api, event(), A, NOW)
+        first = project_documents(documents(), success)
+        api.source = run(conclusion="failure")
+        trigger = event()
+        trigger["workflow_run"] = api.source
+        failed = collect(api, trigger, A, NOW)
+        changed = project_documents(first, failed)
+        self.assertNotEqual(changed, first)
+        self.assertEqual(project_documents(changed, success), first)
 
     def test_semantic_digest_ignores_evidence_timestamp(self):
         api = CollectAPI()
