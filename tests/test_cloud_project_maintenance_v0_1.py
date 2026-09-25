@@ -229,6 +229,17 @@ class PureMaintenanceTests(unittest.TestCase):
             publish(api, record())
         self.assertEqual(api.writes, [])
 
+    def test_closed_draft_cannot_be_reopened_implicitly(self):
+        api = PublishAPI()
+        publish(api, record())
+        api.head_docs = project_documents(documents(), record())
+        api.closed_prs = [api.pr]
+        api.pr = None
+        api.writes.clear()
+        with self.assertRaisesRegex(Stop, "CLOSED_BRANCH_REVIEW_REQUIRED"):
+            publish(api, record())
+        self.assertEqual(api.writes, [])
+
     def test_main_race_before_ref_write_stops(self):
         api = PublishAPI()
         api.drift_after_commit = True
@@ -367,6 +378,9 @@ class CollectionTests(unittest.TestCase):
             self.assertEqual([p["number"] for p in result["semantic"]["prs"]], [496, 497])
         expired = collect(api, event(), A, datetime(2026, 10, 2, tzinfo=timezone.utc))
         self.assertEqual(expired["semantic"]["workflows"][0]["health"], "EXPECTED_STOP")
+        api.state = "disabled_manually"
+        active = collect(api, event(), A, NOW)
+        self.assertEqual(active["semantic"]["workflows"][0]["health"], "DISABLED")
 
     def test_missing_source_or_page_never_becomes_healthy(self):
         api = CollectAPI()

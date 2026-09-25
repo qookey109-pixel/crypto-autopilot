@@ -186,8 +186,10 @@ def classify_checks(checks):
 
 
 def split_block(text):
-    require(text.count(BEGIN) == 1 and text.count(END) == 1, "MANUAL_EDIT_OR_MARKER_ERROR")
+    require(text.count(BEGIN) == 1 and text.count(END) == 1,
+            "MANUAL_EDIT_OR_MARKER_ERROR")
     before, rest = text.split(BEGIN)
+    require(END in rest, "MANUAL_EDIT_OR_MARKER_ERROR")
     middle, after = rest.split(END)
     return before, middle, after
 
@@ -306,6 +308,8 @@ def collect(api, event, checkout_sha, now):
                     and run.get("head_repository", {}).get("full_name") == REPOSITORY,
                     "UNKNOWN_RUN_LINEAGE")
         row = evaluate_workflow(expectation, runs, now=now)
+        if not expired and registration["state"] != "active":
+            row = {**row, "status": "DISABLED", "alert": True}
         latest = next((r for r in runs if r["id"] == (row.get("last_run") or {}).get("id")), None)
         evidence[name] = run_evidence(latest) if latest else None
         jobs_state = []
