@@ -42,7 +42,7 @@ Authority references: [Operations V0.5](../config/github_automatic_research_oper
 
 A workflow_dispatch declaration means a manual entrypoint exists; it does not authorize using it. Live Paper coordinator/recovery stay manual and bounded. Completed one-shot ZEC development does not become rerunnable. Historical frozen proof workflows remain validation-only. See [PROJECT_STATUS.md](../PROJECT_STATUS.md#retired-historical-workflow-inventory) and the exact receipt before any action.
 
-The 25 entries below are API registrations with no corresponding workflow file on the observed main. They are distinct from the 17 retired validation workflows still preserved in source. All 25 removed-file registrations were disabled through the GitHub UI on 2026-09-25 and individually read back as disabled; run history was preserved. PR #497 records the change. This dated evidence does not replace a new live check. Preserve history and do not re-enable automatically. The dynamic `dynamic/dependabot/dependabot-updates` entry is excluded.
+The 25 entries below were API registrations with no corresponding workflow file on the observed main at the 2026-09-23 snapshot. They are distinct from the 17 retired validation workflows still preserved in source. As recorded in PR #497, all 25 removed-file registrations were disabled through the GitHub UI on 2026-09-25 and individually read back as disabled; run history was preserved. This is dated evidence and does not replace a new live check. Preserve history and do not re-enable automatically. The dynamic `dynamic/dependabot/dependabot-updates` entry is excluded.
 
 | Workflow ID | Removed main path under `.github/workflows/` |
 | --- | --- |
