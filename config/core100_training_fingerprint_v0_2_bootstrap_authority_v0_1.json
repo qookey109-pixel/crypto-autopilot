@@ -1,0 +1,147 @@
+{
+  "schema": "qookey-core100-training-fingerprint-v0.2-bootstrap-authority-v0.1",
+  "status": "AUTHORIZED_NOT_ACTIVE",
+  "prepared_at_utc": "2026-09-25 04:12:17 UTC",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "evidence_basis_main_sha": "db0acff7d3c493135cae5304d5a1b7b99abc4a63",
+  "linked_cutover_proposal": "docs/CORE100_TRAINING_FINGERPRINT_V0_2_CUTOVER_PROPOSAL.md",
+  "linked_collector_implementation": "config/core100_training_fingerprint_v0_2_collector_implementation_v0_1.json",
+  "purpose": "Offer an exact, non-authorizing scope for one initial V0.2 baseline so the workflow can stop at REVIEW_REQUIRED until a valid V0.2 predecessor exists.",
+  "proposed_execution": {
+    "one_time_bootstrap": true,
+    "trigger": "One explicit workflow_dispatch after a separate authorized activation receipt and code are merged.",
+    "existing_weekly_workflow_only": true,
+    "new_schedule_authorized": false,
+    "data_authority": "Reuse only the completed Crypto Core 100 dataset scope already defined by config/binance_usdm_detailed_history_v0_1_2.json and its authority receipt.",
+    "dataset_preconditions": {
+      "markets": 100,
+      "shard_count": 10,
+      "expected_partition_objects": 14274,
+      "intervals": [
+        "15m",
+        "1h",
+        "4h"
+      ],
+      "source_month_start": "2022-08",
+      "source_month_end": "2026-07",
+      "holdout_access_authorized": false,
+      "mismatch_result": "REVIEW_REQUIRED; stop before training and writes"
+    },
+    "fingerprint": "SHA-256 of canonical catalog-key/catalog-digest and shard receipt rows ordered by shard_index; each receipt already binds the partition object SHA-256 values.",
+    "runtime": "GitHub-hosted ubuntu-latest isolated project environment; exact Python patch, complete installed distributions, pip/setuptools/build-install tools and available runner image metadata.",
+    "existing_runtime_window": "The V0.1.2 training authority remains the source/data limit. No provider fetch is included in this proposed bootstrap."
+  },
+  "proposed_r2_access": {
+    "reads": [
+      {
+        "key": "catalogs/binance_usdm/crypto-core-v0.1/latest.json",
+        "purpose": "Resolve exact catalog key and SHA-256"
+      },
+      {
+        "key": "training/binance_usdm/crypto-core-v0.1/backfill-state.json",
+        "purpose": "Require COMPLETE state and exact shard bindings"
+      },
+      {
+        "prefix": "catalogs/binance_usdm/crypto-core-v0.1/runs/",
+        "condition": "Only the catalog object referenced by the validated latest pointer"
+      },
+      {
+        "prefix": "receipts/historical/binance_usdm/crypto-core-v0.1/",
+        "condition": "Only the 10 receipt keys referenced by the validated complete backfill state"
+      },
+      {
+        "prefix": "market-data/binance_usdm/crypto-core-v0.1/",
+        "condition": "Only partition keys referenced by those validated receipts; maximum expected 14274 objects"
+      },
+      {
+        "key": "training/binance_usdm/crypto-core-v0.1/fingerprint-v0.2/latest.json",
+        "purpose": "Require no prior V0.2 baseline; if present, stop. Do not read or reuse the V0.1 latest pointer."
+      },
+      {
+        "operation": "list_objects_v2 across the whole bucket",
+        "purpose": "Fresh complete-pagination byte inventory for the existing 8000000000-byte FREE-ONLY hard stop; inspect key/size metadata only, no object payloads."
+      }
+    ],
+    "writes": [
+      {
+        "prefix": "training/binance_usdm/crypto-core-v0.1/fingerprint-v0.2/runs/run=github-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/",
+        "objects": [
+          "model.json",
+          "metrics.json",
+          "manifest.json"
+        ],
+        "condition": "One run only; immutable key equality and SHA-256 readback required."
+      },
+      {
+        "key": "training/binance_usdm/crypto-core-v0.1/fingerprint-v0.2/latest.json",
+        "condition": "Write last only after outputs are verified; preserve training/binance_usdm/crypto-core-v0.1/latest.json unchanged."
+      }
+    ],
+    "headroom_gate_bytes": 8000000000,
+    "writes_authorized_by_this_proposal": false,
+    "writes_authorized_by_this_authority": true
+  },
+  "after_bootstrap": {
+    "exact_v0_2_match": "NO_CHANGE; no training and no R2 write",
+    "changed_dataset_runtime_or_guard": "REVIEW_REQUIRED; no automatic retraining or write under one-time authority",
+    "model_quality": "Record the configured quality result; no model promotion or trading authority follows.",
+    "legacy_v0_1_pointer": "Never read, migrate, overwrite, or treat as V0.2 predecessor."
+  },
+  "boundaries": {
+    "provider_requests_authorized": false,
+    "replacement_holdout_access_authorized": false,
+    "source_switch_authorized": false,
+    "automatic_model_promotion_authorized": false,
+    "formal_trade_plan_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false,
+    "local_files_or_local_runtime_authorized": false,
+    "paid_runtime_authorized": false,
+    "monthly_budget_usd": 0
+  },
+  "acceptance_requires": [
+    "Separate exact versioned activation authority and receipt, with user's explicit decision recorded, merged before workflow code changes.",
+    "GitHub-hosted Python 3.12 and 3.13 synthetic regression; production training remains pinned to the existing workflow's Python request unless a separately reviewed change.",
+    "Exact-head implementation receipt pins collector, comparator, runner, package imports, workflow, config and authority receipt.",
+    "No provider request, holdout access, source switch, pointer migration, promotion, or trading.",
+    "First bootstrap is one-time and manual; it is not natural-schedule evidence for maintenance acceptance.",
+    "One-time run guard must prove exactly one workflow_dispatch run carries the fixed run-name marker before any R2 access; incomplete or duplicate GitHub Actions history stops closed.",
+    "A workflow rerun (run_attempt greater than 1) is not authorized and must stop before R2 access."
+  ],
+  "authorized_from_proposal": {
+    "config": "config/core100_training_fingerprint_v0_2_bootstrap_authority_proposal_v0_1.json",
+    "proposal_pr": 503,
+    "proposal_merge_sha": "b5fc0d138d9cd1967ffdf72d481695397522a2ba"
+  },
+  "user_authorization": {
+    "decision": "AUTHORIZED",
+    "authorized_on_utc_date": "2026-09-25",
+    "source": "Direct user reply in this task authorizing the exact bounded scope in PR #503.",
+    "verbatim_reply": "授權 繼續吧",
+    "scope": "One-time Crypto Core 100 fingerprint V0.2 baseline using the completed existing dataset, bounded R2 reads/writes stated in the merged PR #503 proposal, no provider requests, and no holdout, source switch, promotion, or trading.",
+    "scope_expansion": "None; the separate actions:read permission below is limited to GitHub workflow-run metadata and enforces one dispatch."
+  },
+  "authorized_execution": {
+    "one_time_bootstrap": true,
+    "effective_only_after_authority_and_implementation_are_merged_to_main": true,
+    "workflow_path": ".github/workflows/binance-usdm-detailed-training-v0-1.yml",
+    "trigger_event": "workflow_dispatch",
+    "branch": "main",
+    "required_input": {
+      "name": "bootstrap_v0_2",
+      "value": "true"
+    },
+    "github_run_attempt": 1,
+    "run_name_marker": "CORE100_V02_BOOTSTRAP",
+    "one_dispatch_guard": {
+      "purpose": "Consume this one-time authorization on at most one workflow_dispatch run, including a run that fails before writing outputs.",
+      "method": "Use the ephemeral GITHUB_TOKEN with actions:read to paginate workflow-run metadata for this exact workflow and event; require exactly one run whose display_title starts with CORE100_V02_BOOTSTRAP and require its run_id equals GITHUB_RUN_ID.",
+      "duplicate_or_incomplete_history": "REVIEW_REQUIRED; stop before R2 access and training.",
+      "permission_scope": "actions:read only; no workflow mutation, dispatch, log, artifact, secret, or repository-content access."
+    },
+    "no_schedule_change": true,
+    "no_push_trigger_for_bootstrap": true,
+    "reruns_allowed": false,
+    "schedule_after_bootstrap": "Comparator-only under this exact authority; no automatic training or R2 write. Any changed dataset/runtime/guard is REVIEW_REQUIRED."
+  }
+}
