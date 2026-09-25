@@ -21,7 +21,7 @@
     "research/receipts/2026-09-25-core100-training-fingerprint-v0-2-bootstrap-authority.json": "0b5f2c66b2e59bcdace896807e93c42c82683cd5",
     "scripts/train_binance_detailed_history_models_v0_2.py": "e739d29579223797f5439d6feebeec81287c73a8",
     "scripts/train_binance_detailed_history_models_v0_3.py": "baf7f59ed042d895660e3a3ac612cb73bb2416b6",
-    "scripts/train_binance_detailed_history_models_v0_4.py": "b1a38095509424a351ee7e62617a56da840feda7",
+    "scripts/train_binance_detailed_history_models_v0_4.py": "1aafcb79305d88d3d9c239537e3b3b24df3b8395",
     "scripts/train_binance_detailed_history_models.py": "4e44fc0b5bb6711753e68e468120c81ee0b5eeaa",
     "src/crypto_autopilot/__init__.py": "e0879c3743d56611357d339f698c40f585bf6bd7",
     "src/crypto_autopilot/backtest.py": "03133d1a43e8282c7e1dd21ec30aef06b9199075",
