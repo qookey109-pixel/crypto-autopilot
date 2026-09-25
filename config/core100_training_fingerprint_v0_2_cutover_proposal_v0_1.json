@@ -68,7 +68,8 @@
     "exact-head import and dynamic-loader closure",
     "GitHub-hosted synthetic regression and Python 3.12/3.13 CI",
     "separate versioned activation authority and receipt merged before runner change",
-    "natural schedule evidence after activation"
+    "natural schedule evidence after activation",
+    "synthetic assertion: V0.1 or missing V0.2 predecessor returns REVIEW_REQUIRED with no training, R2 write, or automatic baseline creation"
   ],
   "rollback": "Fail closed at REVIEW_REQUIRED; preserve prior pointer; no automatic V0.1 fallback, retraining, retry, R2 write, or cadence change.",
   "side_effects": {

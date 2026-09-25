@@ -66,8 +66,8 @@ A later implementation PR must include:
 
 1. An exact-head import-closure report covering the comparator, collector, runner and workflow, including dynamic imports and package initialization.
 2. A source review proving V0.1 remains available only as historical evidence and that no old pointer can silently return NO_CHANGE under V0.2.
-3. GitHub-hosted CI for the supported Python 3.12 and 3.13 matrix, plus synthetic cases for exact match, changed dataset, changed result source, runtime change, guard change, missing fields, malformed distributions, stale main, and legacy pointer.
-4. Explicit assertions that REVIEW_REQUIRED and NO_CHANGE do not train or write to R2; unknown inputs fail closed.
+3. GitHub-hosted CI for the supported Python 3.12 and 3.13 matrix, plus synthetic cases for exact match, changed dataset, changed result source, runtime change, guard change, missing fields, malformed distributions, stale main, V0.1 pointer, and missing V0.2 predecessor. Both legacy/missing-predecessor cases must return REVIEW_REQUIRED without training, R2 writes, or automatic baseline creation.
+4. Explicit assertions that REVIEW_REQUIRED and NO_CHANGE do not train or write to R2; unknown inputs fail closed; no automatic first-baseline creation occurs.
 5. A versioned activation authority and receipt reviewed and merged before changing the active scheduled workflow. The authority must enumerate exact allowed R2 reads/writes, training behavior, FREE-ONLY headroom checks, and stop conditions.
 6. Natural schedule evidence after activation. A PR check, push, manual run, workflow success, or synthetic fingerprint cannot prove a natural run, training result, or model-quality PASS.
 7. A recovery plan before activation: on collector, migration, runtime, or publication failure, stop with REVIEW_REQUIRED and preserve the prior pointer. Do not automatically fall back to V0.1 deduplication, retrain, retry R2, or alter cadence. Recovery changes require an exact-main review and, when authority changes, a successor versioned authority.
