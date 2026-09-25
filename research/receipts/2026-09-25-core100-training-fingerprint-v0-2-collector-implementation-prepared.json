@@ -1,0 +1,221 @@
+{
+  "schema": "qookey-core100-training-fingerprint-v0.2-collector-implementation-receipt-v0.1",
+  "status": "IMPLEMENTATION_PREPARED_NOT_ACTIVE",
+  "prepared_at_utc": "2026-09-25 04:01:21 UTC",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "evidence_basis_main_sha": "b150c965bbcbc8bbb1a86824acd61b93eec519bf",
+  "implementation_spec": "config/core100_training_fingerprint_v0_2_collector_implementation_v0_1.json",
+  "implementation_document": "docs/CORE100_TRAINING_FINGERPRINT_V0_2_COLLECTOR_IMPLEMENTATION.md",
+  "collector_path": "src/crypto_autopilot/training/fingerprint_collector_v0_2.py",
+  "comparator_path": "src/crypto_autopilot/training/fingerprint_v0_2.py",
+  "test_path": "tests/test_core100_training_fingerprint_collector_v0_2.py",
+  "baseline_inventory": {
+    "prepared_contract_paths": [
+      ".github/workflows/binance-usdm-detailed-training-v0-1.yml",
+      "config/binance_usdm_detailed_history_v0_1_2.json",
+      "pyproject.toml",
+      "requirements/ci-constraints.txt",
+      "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json",
+      "scripts/train_binance_detailed_history_models.py",
+      "scripts/train_binance_detailed_history_models_v0_2.py",
+      "scripts/train_binance_detailed_history_models_v0_3.py",
+      "src/crypto_autopilot/__init__.py",
+      "src/crypto_autopilot/backtest.py",
+      "src/crypto_autopilot/binance/__init__.py",
+      "src/crypto_autopilot/binance/lifecycle_gap_policy.py",
+      "src/crypto_autopilot/binance/vision.py",
+      "src/crypto_autopilot/binance_historical.py",
+      "src/crypto_autopilot/exchanges/__init__.py",
+      "src/crypto_autopilot/exchanges/base.py",
+      "src/crypto_autopilot/exchanges/binance_usdm_public.py",
+      "src/crypto_autopilot/exchanges/paper.py",
+      "src/crypto_autopilot/exchanges/pionex_public.py",
+      "src/crypto_autopilot/features/__init__.py",
+      "src/crypto_autopilot/features/advanced.py",
+      "src/crypto_autopilot/features/market.py",
+      "src/crypto_autopilot/historical.py",
+      "src/crypto_autopilot/history/__init__.py",
+      "src/crypto_autopilot/history/detailed.py",
+      "src/crypto_autopilot/models.py",
+      "src/crypto_autopilot/risk.py",
+      "src/crypto_autopilot/storage/__init__.py",
+      "src/crypto_autopilot/storage/ephemeral.py",
+      "src/crypto_autopilot/storage/parquet.py",
+      "src/crypto_autopilot/storage/r2.py",
+      "src/crypto_autopilot/technical.py",
+      "src/crypto_autopilot/training/__init__.py",
+      "src/crypto_autopilot/training/detailed.py",
+      "src/crypto_autopilot/training/history_quality.py",
+      "src/crypto_autopilot/training/online_r2.py"
+    ],
+    "collector_and_comparator_added": 2,
+    "source_sha_observation": "38 prepared/collector/comparator blob IDs were captured from the exact implementation commit tree",
+    "dataset_pointer_read": false,
+    "r2_accessed": false,
+    "source_observation_commit_sha": "639609681aa9980c16019b97892772a6cc8e630d",
+    "source_observation_tree_sha": "0144089ea8c6f8d2bd999812ab6eb64cda953c18",
+    "source_blob_inventory": [
+      {
+        "path": ".github/workflows/binance-usdm-detailed-training-v0-1.yml",
+        "git_blob_sha": "668a0aba30e585261ec8a84416ec13e74447fb67"
+      },
+      {
+        "path": "config/binance_usdm_detailed_history_v0_1_2.json",
+        "git_blob_sha": "d45a88922980dfe4838dce3f281c1102bfede9a0"
+      },
+      {
+        "path": "pyproject.toml",
+        "git_blob_sha": "0ef7f465ab0adc32b6b5bc57c9811f15b51e80bc"
+      },
+      {
+        "path": "requirements/ci-constraints.txt",
+        "git_blob_sha": "323fbf34e2e3348f2e4acc062181f862af7019d4"
+      },
+      {
+        "path": "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json",
+        "git_blob_sha": "f0a34709b8e514d3a27662db7b76d6272d5b73e6"
+      },
+      {
+        "path": "scripts/train_binance_detailed_history_models.py",
+        "git_blob_sha": "4e44fc0b5bb6711753e68e468120c81ee0b5eeaa"
+      },
+      {
+        "path": "scripts/train_binance_detailed_history_models_v0_2.py",
+        "git_blob_sha": "e739d29579223797f5439d6feebeec81287c73a8"
+      },
+      {
+        "path": "scripts/train_binance_detailed_history_models_v0_3.py",
+        "git_blob_sha": "baf7f59ed042d895660e3a3ac612cb73bb2416b6"
+      },
+      {
+        "path": "src/crypto_autopilot/__init__.py",
+        "git_blob_sha": "e0879c3743d56611357d339f698c40f585bf6bd7"
+      },
+      {
+        "path": "src/crypto_autopilot/backtest.py",
+        "git_blob_sha": "03133d1a43e8282c7e1dd21ec30aef06b9199075"
+      },
+      {
+        "path": "src/crypto_autopilot/binance/__init__.py",
+        "git_blob_sha": "3da7520f22cff663d488be7044fa757954b3cd3c"
+      },
+      {
+        "path": "src/crypto_autopilot/binance/lifecycle_gap_policy.py",
+        "git_blob_sha": "a5634950c4e38cc13c6cb060e97311171e4f02c8"
+      },
+      {
+        "path": "src/crypto_autopilot/binance/vision.py",
+        "git_blob_sha": "1233fc52250ac1c89ef71fc03554fc1f40ae2800"
+      },
+      {
+        "path": "src/crypto_autopilot/binance_historical.py",
+        "git_blob_sha": "e1ed228cdbff3596f1e81a23875ba92a659ddd1a"
+      },
+      {
+        "path": "src/crypto_autopilot/exchanges/__init__.py",
+        "git_blob_sha": "c9f8a6bd351d20c855174dc6861556703850bb1e"
+      },
+      {
+        "path": "src/crypto_autopilot/exchanges/base.py",
+        "git_blob_sha": "816d64b72e10189575ed4398129abe7ffd336428"
+      },
+      {
+        "path": "src/crypto_autopilot/exchanges/binance_usdm_public.py",
+        "git_blob_sha": "2bc8e2a034c50f4a1fdf2355e6fb8570050ee4d2"
+      },
+      {
+        "path": "src/crypto_autopilot/exchanges/paper.py",
+        "git_blob_sha": "f0adcf906eb5288756569ab452a9434f7d8b0933"
+      },
+      {
+        "path": "src/crypto_autopilot/exchanges/pionex_public.py",
+        "git_blob_sha": "8508fa8b44b6fcf8992f4841c73550eeff9664be"
+      },
+      {
+        "path": "src/crypto_autopilot/features/__init__.py",
+        "git_blob_sha": "f5f1a572fe49a39c5d0053b123ceefeec4756278"
+      },
+      {
+        "path": "src/crypto_autopilot/features/advanced.py",
+        "git_blob_sha": "52695764c837a6cc90cd02f43d6c601ef94e5707"
+      },
+      {
+        "path": "src/crypto_autopilot/features/market.py",
+        "git_blob_sha": "fa5ecfcdf2a256429152b5465681579f56036829"
+      },
+      {
+        "path": "src/crypto_autopilot/historical.py",
+        "git_blob_sha": "8f90abe4e4f6c6f58d8dc42a1dd66fba405c5c05"
+      },
+      {
+        "path": "src/crypto_autopilot/history/__init__.py",
+        "git_blob_sha": "ae32dd6c8b202116ca295c95efc3f8550f2bccff"
+      },
+      {
+        "path": "src/crypto_autopilot/history/detailed.py",
+        "git_blob_sha": "88bb0d15b2ff42485defb7b8e61c79e46f0785b0"
+      },
+      {
+        "path": "src/crypto_autopilot/models.py",
+        "git_blob_sha": "ec7c817cf6b42694a1938adb63eccd95f6def4a0"
+      },
+      {
+        "path": "src/crypto_autopilot/risk.py",
+        "git_blob_sha": "28d7d7fc33395461847719c6eecc94be4ff3bed7"
+      },
+      {
+        "path": "src/crypto_autopilot/storage/__init__.py",
+        "git_blob_sha": "e3cc3da3be3f529263edc8065b1f38657141e8a2"
+      },
+      {
+        "path": "src/crypto_autopilot/storage/ephemeral.py",
+        "git_blob_sha": "374ca665d8d5e80efc5f21d35236f099e3203059"
+      },
+      {
+        "path": "src/crypto_autopilot/storage/parquet.py",
+        "git_blob_sha": "5095a36bf8f879b93766519118a44d3ead3a3999"
+      },
+      {
+        "path": "src/crypto_autopilot/storage/r2.py",
+        "git_blob_sha": "98002298662cd82561e9c2cd6ae38ea0561f2ce6"
+      },
+      {
+        "path": "src/crypto_autopilot/technical.py",
+        "git_blob_sha": "9f41198c044d32044023e8133ebe33dcd226c008"
+      },
+      {
+        "path": "src/crypto_autopilot/training/__init__.py",
+        "git_blob_sha": "890a206dd7abf4cbd6b9f32cbd66f4c38a307acd"
+      },
+      {
+        "path": "src/crypto_autopilot/training/detailed.py",
+        "git_blob_sha": "f24c7345b422fca9dbe92ef5bb2b9ab272fe7236"
+      },
+      {
+        "path": "src/crypto_autopilot/training/fingerprint_collector_v0_2.py",
+        "git_blob_sha": "c0b420dddf57a7bb2af94648e1bc29574d88643b"
+      },
+      {
+        "path": "src/crypto_autopilot/training/fingerprint_v0_2.py",
+        "git_blob_sha": "29a684ee6caac91af5ead468250a7676cfe6c285"
+      },
+      {
+        "path": "src/crypto_autopilot/training/history_quality.py",
+        "git_blob_sha": "1c66f3291fcf03ad132e2cfd68f2ffc4f9ceab1a"
+      },
+      {
+        "path": "src/crypto_autopilot/training/online_r2.py",
+        "git_blob_sha": "e2286a80aba6b3df33ddf0a52fab5ae9e23d36d9"
+      }
+    ]
+  },
+  "authorities_added": [],
+  "training_performed": false,
+  "provider_requests_performed": 0,
+  "r2_reads_performed": 0,
+  "r2_writes_performed": 0,
+  "active_workflow_changed": false,
+  "schedule_changed": false,
+  "local_user_files_accessed": false,
+  "paid_runtime_added": false
+}
