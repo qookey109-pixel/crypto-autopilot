@@ -1,0 +1,105 @@
+{
+  "schema": "qookey-core100-training-fingerprint-v0.2-successor-v0.1",
+  "status": "PREPARED_NOT_ACTIVE",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "purpose": "Bind the unchanged frozen V0.2 experiment identity to the reviewed active workflow for one authorized bootstrap and comparison-only weekly runs.",
+  "parent_contract_path": "config/core100_training_fingerprint_v0_2.json",
+  "parent_contract_sha256": "2ee82c6d030c3ebdb49b985220f07a7e7c1109f4fef7c15b27fba0ae02922d2a",
+  "identity_contract": {
+    "schema": "qookey-core100-training-experiment-fingerprint-v0.2",
+    "dataset_fingerprint": "Preserve catalog SHA plus ordered shard-receipt binding; each shard receipt binds the governed partition SHA values.",
+    "canonicalization": {
+      "encoding": "UTF-8",
+      "json_sort_keys": true,
+      "json_separators": [
+        ",",
+        ":"
+      ],
+      "hash": "SHA-256"
+    },
+    "code_paths": [
+      "scripts/train_binance_detailed_history_models.py",
+      "scripts/train_binance_detailed_history_models_v0_2.py",
+      "src/crypto_autopilot/binance/lifecycle_gap_policy.py",
+      "src/crypto_autopilot/binance/vision.py",
+      "src/crypto_autopilot/binance_historical.py",
+      "src/crypto_autopilot/exchanges/binance_usdm_public.py",
+      "src/crypto_autopilot/features/advanced.py",
+      "src/crypto_autopilot/historical.py",
+      "src/crypto_autopilot/history/detailed.py",
+      "src/crypto_autopilot/models.py",
+      "src/crypto_autopilot/storage/parquet.py",
+      "src/crypto_autopilot/technical.py",
+      "src/crypto_autopilot/training/detailed.py",
+      "src/crypto_autopilot/training/history_quality.py"
+    ],
+    "support_paths": [
+      "config/binance_usdm_detailed_history_v0_1_2.json",
+      "requirements/ci-constraints.txt",
+      "pyproject.toml"
+    ],
+    "runtime_manifest_required": true,
+    "runtime_manifest_fields": [
+      "sys.implementation.name",
+      "sys.version",
+      "sys.implementation.cache_tag",
+      "sysconfig.get_platform()",
+      "platform.system()",
+      "platform.release()",
+      "platform.machine()",
+      "platform.libc_ver()",
+      "sorted installed distribution name==version rows from an isolated project environment",
+      "GitHub Actions runner image metadata when available",
+      "pip and build-backend/install-tool versions",
+      "installed project package version"
+    ],
+    "dependency_install_isolation_required": true,
+    "exact_python_patch_required": true,
+    "same_dataset_result_identity_runtime_and_guard": "NO_CHANGE",
+    "exact_match_training_performed": false,
+    "exact_match_r2_write_performed": false,
+    "runtime_guard_change": "REVIEW_REQUIRED; no automatic training or R2 write",
+    "unknown_runtime_or_distribution_inventory": "REVIEW_REQUIRED; no automatic training or R2 write",
+    "runtime_guard_paths": [
+      "scripts/train_binance_detailed_history_models_v0_3.py",
+      "src/crypto_autopilot/__init__.py",
+      "src/crypto_autopilot/backtest.py",
+      "src/crypto_autopilot/binance/__init__.py",
+      "src/crypto_autopilot/exchanges/__init__.py",
+      "src/crypto_autopilot/exchanges/base.py",
+      "src/crypto_autopilot/exchanges/paper.py",
+      "src/crypto_autopilot/exchanges/pionex_public.py",
+      "src/crypto_autopilot/features/__init__.py",
+      "src/crypto_autopilot/features/market.py",
+      "src/crypto_autopilot/history/__init__.py",
+      "src/crypto_autopilot/risk.py",
+      "src/crypto_autopilot/storage/__init__.py",
+      "src/crypto_autopilot/storage/ephemeral.py",
+      "src/crypto_autopilot/storage/r2.py",
+      "src/crypto_autopilot/training/__init__.py",
+      "src/crypto_autopilot/training/online_r2.py"
+    ],
+    "runtime_guard_payload": "SHA-256 over canonical UTF-8 JSON containing path/blob rows sorted lexicographically by path.",
+    "dependency_inventory_contract": "Normalize distribution names and serialize sorted name==version rows from the isolated runtime, including pip, the project package and build-backend/install tooling versions."
+  },
+  "execution_context": {
+    "workflow_path": ".github/workflows/binance-usdm-detailed-training-v0-1.yml",
+    "workflow_blob_sha_at_preparation": "943cd028f0c9ab1765216efcdc1f969842db5820",
+    "current_training_authority_receipt_path": "research/receipts/2026-08-29-binance-usdm-crypto-core-100-v0-1-2-authority.json",
+    "authority_receipt_blob_sha_at_preparation": "f0a34709b8e514d3a27662db7b76d6272d5b73e6",
+    "workflow_python_request": "3.13",
+    "workflow_and_authority_receipt_are_provenance_not_result_identity_inputs": true,
+    "workflow_or_authority_receipt_change_result": "REVIEW_REQUIRED before evaluating reuse or training."
+  },
+  "authority": {
+    "bootstrap_config": "config/core100_training_fingerprint_v0_2_bootstrap_authority_v0_1.json",
+    "implementation_receipt": "research/receipts/2026-09-25-core100-training-fingerprint-v0-2-implementation.json",
+    "one_time_manual_bootstrap": true,
+    "scheduled_retraining": false,
+    "provider_requests": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_trading": false
+  }
+}
