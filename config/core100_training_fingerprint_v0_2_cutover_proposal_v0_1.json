@@ -1,0 +1,85 @@
+{
+  "schema": "qookey-core100-training-fingerprint-v0.2-cutover-proposal-v0.1",
+  "status": "PROPOSED_NOT_AUTHORIZED",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "prepared_at_utc": "2026-09-25 03:16:11 UTC",
+  "evidence_basis_main_sha": "e1d037d570e8641442448fad50422ca6f217b8aa",
+  "preparation_contract": "config/core100_training_fingerprint_v0_2.json",
+  "preparation_receipt": "research/receipts/2026-09-24-core100-training-fingerprint-v0-2-prepared.json",
+  "proposal_document": "docs/CORE100_TRAINING_FINGERPRINT_V0_2_CUTOVER_PROPOSAL.md",
+  "current_inventory_observation": {
+    "python_import_closure": 31,
+    "identity_support_files": 3,
+    "execution_context_anchors": 2,
+    "total_blob_entries": 36,
+    "matches_preparation_receipt": 36,
+    "changed_blob_entries": 0,
+    "missing_blob_entries": 0,
+    "method": "GitHub main tree blob metadata only",
+    "production_pointer_read": false,
+    "r2_accessed": false
+  },
+  "legacy_baseline": {
+    "v0_1_pointer_status": "REVIEW_REQUIRED",
+    "reuse_as_v0_2_predecessor_authorized": false,
+    "delete_or_overwrite_authorized": false,
+    "live_pointer_read": false,
+    "live_pointer_status": "UNKNOWN",
+    "one_time_rebaseline_or_training": "REQUIRES_SEPARATE_VERSIONED_AUTHORITY",
+    "recommended_cutover_behavior": "Missing or legacy V0.1 predecessor -> REVIEW_REQUIRED, no training and no R2 write.",
+    "initial_v0_2_baseline_auto_creation_authorized": false,
+    "initial_v0_2_baseline_requires": "A separate exact versioned authority and receipt; no implicit cutover-time run."
+  },
+  "future_execution": {
+    "workflow": "existing weekly training workflow only",
+    "new_cron_authorized": false,
+    "collector_runtime": "GitHub-hosted isolated project environment",
+    "required_runtime_inventory": [
+      "Python implementation and exact version",
+      "cache tag",
+      "platform, OS, release, architecture, libc",
+      "normalized installed distribution name/version rows",
+      "pip and build/install tool versions",
+      "installed project version",
+      "runner image metadata when available"
+    ],
+    "dataset_binding": "catalog digest plus ordered shard receipt digests per the prepared contract",
+    "unknown_evidence": "REVIEW_REQUIRED or UNKNOWN; stop",
+    "legacy_predecessor": "REVIEW_REQUIRED; no automatic fallback"
+  },
+  "authority": {
+    "documentation_review": true,
+    "active_cutover": false,
+    "training": false,
+    "provider_requests": false,
+    "r2_reads": false,
+    "r2_writes": false,
+    "holdout": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "trade_plan": false,
+    "real_money_orders": false,
+    "live_trading": false,
+    "local_files": false,
+    "local_runtime": false,
+    "paid_runtime": false
+  },
+  "acceptance_requires": [
+    "exact-head import and dynamic-loader closure",
+    "GitHub-hosted synthetic regression and Python 3.12/3.13 CI",
+    "separate versioned activation authority and receipt merged before runner change",
+    "natural schedule evidence after activation",
+    "synthetic assertion: V0.1 or missing V0.2 predecessor returns REVIEW_REQUIRED with no training, R2 write, or automatic baseline creation"
+  ],
+  "rollback": "Fail closed at REVIEW_REQUIRED; preserve prior pointer; no automatic V0.1 fallback, retraining, retry, R2 write, or cadence change.",
+  "side_effects": {
+    "active_runner_changed": false,
+    "active_workflow_changed": false,
+    "training_performed": false,
+    "provider_requests_performed": 0,
+    "r2_reads_performed": 0,
+    "r2_writes_performed": 0,
+    "holdout_accessed": false,
+    "local_user_files_accessed": false
+  }
+}
