@@ -69,7 +69,7 @@ main 或來源改變、人工修改、分頁不足、403 或 schema successor �
 | 時點（台北） | 工作與完成條件 |
 | --- | --- |
 | 既有 Health 自然完成後 | 唯讀健檢；Pages 自然 run `35843351924` 已成功，且其後自然 Health run `35870216734` 已 `PASS`、`alerts=0`。TD-010 已完成，後續只做正常健康監控並在新故障／恢復時更新 |
-| 下一個可執行的整理回合 | 執行下方 CLOUD-01。#496／#497 各自查 live 狀態；本機清理 EXCLUDED_BY_USER。fingerprint V0.2 啟用仍需另一份版本化 cutover authority，不得訓練或接觸 R2。 |
+| Cloud Maintenance V0.1 首兩次自然驗收 | PR #498 已於 2026-09-25 合併至 main `cd39f99909c5dadba7f446ccb1ccb61947ca569f`。等待兩次不同的自然 Health V0.2 schedule completion，確認各自觸發 inspect／propose 並保存 run ID／attempt、job 結果及 main SHA；不可 dispatch／rerun。至少一次 no-change 結果需 `commits_created=0`。研究結果仍為 `UNKNOWN_FROM_METADATA`。 |
 | 2026-09-27 11:53 之後 | 核對 Pionex bounded observability 最後名義 slot 的自然 schedule；保留 missing／delayed／failure |
 | 2026-09-27 12:37 之後 | 核對 Weekly Training 自然 schedule；只從 metadata 確認 workflow 結論，無 report 就不判定 NO_CHANGE／模型 PASS |
 | 自 2026-09-23 起取得至少 7 天觀測後 | 整理 delay／missing／cancelled／重複／duration；列 coverage、樣本量、未知值，再提 cadence 建議 |
@@ -141,7 +141,7 @@ PR / merge / deployment / natural schedule：各自狀態
 - 驗收：兩組 source run ID／attempt、main／head、兩個 job 結果、產生的 draft PR 或 NO_CHANGE 摘要；人工檢查 generated-block-only diff。
 - 停止：main 前進、衝突、人工編輯、來源不可信、缺權限／資料、CI 失敗時轉 CLOUD-02；不得自動擴權。
 - 交付：完成／等待／未知分列。CI、merge、維護自然執行、研究結果分開。
-- 下一步：#496 合併後只準備 fingerprint V0.2 cutover 提案；列證據收集、legacy baseline 處置、完整依賴清單與回復方式。不得啟用 runner。
+- 下一步：先完成 Cloud Maintenance V0.1 的兩次自然執行驗收。之後可準備 fingerprint V0.2 cutover 提案，列證據收集、legacy baseline 處置、完整依賴清單與回復方式；不得啟用 runner。
 
 ### CLOUD-02 — 異常與程式缺陷交接
 

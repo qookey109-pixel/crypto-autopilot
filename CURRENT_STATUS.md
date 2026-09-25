@@ -84,33 +84,21 @@ These are dated observations, not promises of current health. PR #478 preserves 
 - Keep secrets out of files/logs/chat; Render never receives R2 credentials.
 - The September 22 [PR review record](docs/OPEN_PR_TRIAGE_2026_09_22.md), earlier handoffs and Current Operations V0.3 retain their historical evidence. Live GitHub state takes precedence for open PRs and runs.
 
-## Cloud-only maintenance V0.1 — review checkpoint
+## Cloud-only maintenance V0.1 — rollout checkpoint
 
-Prepared 2026-09-25 against main `f9296aca33858c907b42e825db8a9d334df1986e`; resolve main live.
-The [versioned maintenance contract](config/cloud_project_maintenance_v0_1.json)
-and [preparation receipt](research/receipts/2026-09-25-cloud-project-maintenance-v0-1.json)
-become effective only after reviewed main merge. They add a GitHub-hosted
-completion listener to natural Health V0.2, no new cron. The original Health
-workflow and its read-only policy remain unchanged.
+PR #498 merged on 2026-09-25 at `cd39f99909c5dadba7f446ccb1ccb61947ca569f`. The [versioned maintenance contract](config/cloud_project_maintenance_v0_1.json) is now effective under its `AUTHORIZED_ON_MAIN_MERGE` gate. The linked [preparation receipt](research/receipts/2026-09-25-cloud-project-maintenance-v0-1.json) preserves its preparation-time evidence basis `f9296aca33858c907b42e825db8a9d334df1986e`; its pending acceptance snapshot is not a current run result.
 
-- PR #496 contains the pure fingerprint V0.2 comparator; check its live head,
-  checks and merge state. Its merge does not activate training or V0.2 cutover.
-- The 25 removed-file registrations were disabled and individually read back
-  online. PR #497 records that completed operation; recheck its live merge state.
-  Do not repeat disablement from older prose.
-- CLOUD-01 / CLOUD-02 in the [continuation runbook](docs/PROJECT_CONTINUATION_RUNBOOK.md)
-  are the bounded delivery and failure work cards. Existing Work Item intake remains
-  the only issue system; maintenance does not create or label issues.
-- All development and validation for this delivery take place on GitHub. No local
-  recovery or dataset files are inputs. Standard GitHub-hosted temporary checkouts
-  are cloud execution environments.
-- Automatic repair is limited to the marked blocks in this file and the runbook.
-  Program defects get an actionable handoff; draft PRs never merge automatically.
-- Acceptance remains **WAITING_REVIEW_MERGE_AND_TWO_NATURAL_RUNS**, including
-  a verified NO_CHANGE run with zero commits. CI success alone does not close it.
-- Current Operations V0.3 research lifecycle remains unchanged; its new maintenance
-  pointer is navigation, not execution or model authority.
+The GitHub-hosted listener follows same-repository natural Health V0.2 completions on `main`; it adds no cron. Health V0.2 and its read-only permissions remain unchanged.
 
+- PR #496 merged at `d77ac1356ff47c7e758b5eb0c0fadfbd05d6275d`. The fingerprint V0.2 comparator is merged but remains `PREPARED_NOT_ACTIVE`; no training or cutover is authorized.
+- PR #497 merged at `a633dcd87b4f70027e6c86e51c743ca1aa4e5a08`, recording the 25 disabled historical workflow registrations and preserved run history.
+- Post-merge checks on `cd39f999`: [CI 36083508707](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36083508707), [CodeQL 36083508741](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36083508741), [Pages 36083508786](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36083508786), and [Freeze Guard 36083508705](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36083508705) passed. Pages deploy and production-browser jobs were skipped for the documentation-only change.
+- Rollout acceptance is **WAITING_TWO_NATURAL_RUNS**. No post-merge natural Health schedule run is recorded yet. Require two distinct natural source run IDs/attempts with completed maintenance inspect/propose jobs; at least one must report `NO_CHANGE` and `commits_created=0`. Do not dispatch or rerun to manufacture evidence.
+- CLOUD-01 / CLOUD-02 in the [continuation runbook](docs/PROJECT_CONTINUATION_RUNBOOK.md) remain the model-independent work cards. Existing Work Item intake remains the only issue system.
+- All work and validation stay on GitHub-hosted sources/runners. Local files, local cleanup, and local recovery remain `EXCLUDED_BY_USER`.
+- Automatic repair stays limited to the two marked blocks. Program defects get a bounded handoff; draft PRs do not merge automatically.
+- Current Operations V0.3 and research authority remain unchanged; maintenance metadata cannot establish a research result.
+ 
 <!-- cloud-maintenance:v0.1:begin -->
 PENDING_FIRST_CLOUD_OBSERVATION
 <!-- cloud-maintenance:v0.1:end -->
