@@ -73,7 +73,7 @@ def test_successor_pins_unchanged_parent_and_every_executable_blob():
     assert receipt["source_inventory"] == script._source_inventory(
         ROOT, script._required_implementation_paths(current)
     )
-    assert script._git_blob_sha(b"") == hashlib.sha1(b"blob 0\\0").hexdigest()
+    assert script._git_blob_sha(b"") == hashlib.sha1(b"blob 0\0").hexdigest()
     implementation, blob_sha = script._validate_authority_and_implementation(
         contract=current,
         contract_sha256=receipt["successor_contract_sha256"],
