@@ -82,4 +82,4 @@ This proposal permits review and documentation only. It does not authorize:
 - dispatching, rerunning, or creating another schedule;
 - local files, local runtime, paid services, or new long-lived secrets.
 
-Next step: review this proposal and resolve any open baseline-policy questions. Only then prepare the implementation and separate activation authority.
+Next step: review this proposal, including its fail-closed baseline policy. If accepted, prepare the implementation and a separately versioned activation authority; this proposal authorizes neither cutover nor execution.
