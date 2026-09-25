@@ -357,6 +357,7 @@ class CollectAPI:
         self.source = run()
         self.state = "active"
         self.fail_pages = False
+        self.prs = [{"number": 999, "head": {"ref": PREFIX + A[:12]}}]
         self.now = NOW
 
     def main(self):
@@ -394,7 +395,7 @@ class CollectAPI:
         if self.fail_pages:
             raise Stop("UNKNOWN_MISSING_PAGE")
         if path == "/pulls":
-            return [{"number": 999, "head": {"ref": PREFIX + A[:12]}}]
+            return self.prs
         if path.startswith("/commits/"):
             return [{"id": 1, "name": "test", "status": "completed", "conclusion": "success"}]
         return [self.latest]
@@ -410,12 +411,24 @@ class CollectionTests(unittest.TestCase):
             api.latest = run(**updates)
             result = collect(api, event(), A, NOW)
             self.assertEqual(result["semantic"]["workflows"][0]["health"], expected)
-            self.assertEqual([p["number"] for p in result["semantic"]["prs"]], [496, 497])
+            self.assertEqual([p["number"] for p in result["semantic"]["prs"]], [])
         expired = collect(api, event(), A, datetime(2026, 10, 2, tzinfo=timezone.utc))
         self.assertEqual(expired["semantic"]["workflows"][0]["health"], "EXPECTED_STOP")
         api.state = "disabled_manually"
         active = collect(api, event(), A, NOW)
         self.assertEqual(active["semantic"]["workflows"][0]["health"], "DISABLED")
+
+    def test_projection_uses_live_open_prs_without_historical_hardcoding(self):
+        api = CollectAPI()
+        api.prs = [
+            {"number": 999, "head": {"ref": PREFIX + A[:12]}},
+            {"number": 123, "head": {"ref": "feature/current-open-pr"}},
+        ]
+        result = collect(api, event(), A, NOW)
+        self.assertEqual([p["number"] for p in result["semantic"]["prs"]], [123])
+        self.assertIn("current main", result["semantic"]["next_action"])
+        self.assertIn("CLOUD-01", result["semantic"]["next_action"])
+        self.assertNotIn("fingerprint", result["semantic"]["next_action"])
 
     def test_missing_source_or_page_never_becomes_healthy(self):
         api = CollectAPI()
