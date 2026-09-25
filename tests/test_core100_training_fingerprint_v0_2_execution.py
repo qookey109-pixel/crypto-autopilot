@@ -174,3 +174,77 @@ def test_failed_pointer_publish_keeps_partial_write_evidence():
     assert report["r2_writes_performed"] is True
     assert len(report["written_objects"]) == 3
     assert report["pointer_write_attempted"] is True
+
+
+def test_schedule_rejects_pointer_manifest_disagreement_without_training():
+    run_id = "github-17-1"
+    root = script.V02_NAMESPACE
+    model_key = f"{root}/runs/run={run_id}/model.json"
+    metrics_key = f"{root}/runs/run={run_id}/metrics.json"
+    manifest_key = f"{root}/runs/run={run_id}/manifest.json"
+    manifest = {
+        "schema": "binance-usdm-core100-fingerprint-v0.2-manifest-v0.1",
+        "status": "PASS", "run_id": run_id, "namespace": root,
+        "provider": "binance_usdm",
+        "dataset_fingerprint": "d" * 64,
+        "experiment_fingerprint": "e" * 64,
+        "runtime_guard_fingerprint": "g" * 64,
+        "implementation_receipt_git_blob_sha": "a" * 40,
+        "training_fingerprint_v0_2": {
+            "dataset_fingerprint": "d" * 64,
+            "experiment_fingerprint": "e" * 64,
+            "runtime_guard_fingerprint": "g" * 64,
+        },
+        "objects": [
+            {"role": "model", "key": model_key, "sha256": "1" * 64},
+            {"role": "metrics", "key": metrics_key, "sha256": "2" * 64},
+        ],
+    }
+    latest = {
+        "schema": "binance-usdm-core100-fingerprint-v0.2-latest-v0.1",
+        "namespace": root, "provider": "binance_usdm",
+        "run_id": run_id, "manifest_key": manifest_key,
+        "manifest_sha256": "3" * 64,
+        "model_key": model_key, "model_sha256": "1" * 64,
+        "metrics_key": metrics_key, "metrics_sha256": "2" * 64,
+        "dataset_fingerprint": "d" * 64,
+        "experiment_fingerprint": "e" * 64,
+        "implementation_receipt_git_blob_sha": "a" * 40,
+    }
+
+    class Store:
+        def get_bytes_if_exists(self, key):
+            assert key == root + "/latest.json"
+            return json.dumps(latest).encode()
+
+        def get_bytes_verified(self, key, *, expected_sha256):
+            assert key == manifest_key
+            assert expected_sha256 == "3" * 64
+            return json.dumps(manifest).encode()
+
+    assert script._load_v02_latest(Store())[1] == latest
+    latest["dataset_fingerprint"] = "f" * 64
+    with pytest.raises(script.BootstrapBlocked):
+        script._load_v02_latest(Store())
+
+
+def test_failed_immutable_put_marks_write_result_unknown():
+    class Store:
+        pass
+
+    report = script._base_report("SKIPPED", "SYNTHETIC", event="workflow_dispatch")
+    with patch.object(script.runner, "current_bucket_bytes", return_value=0), patch.object(
+        script.runner, "put_immutable", side_effect=RuntimeError("synthetic write failure")
+    ):
+        with pytest.raises(RuntimeError):
+            script._publish_baseline(
+                Store(), report=report, model={"authority": {}},
+                metrics={"model_quality_gate": {"status": "REJECT"}},
+                dataset_fingerprint="d" * 64,
+                fingerprint={"experiment_fingerprint": "e" * 64,
+                             "runtime_guard_fingerprint": "g" * 64},
+                implementation_blob_sha="a" * 40, run_id="github-17-1",
+                generated_at="2026-09-25T00:00:00Z",
+            )
+    assert report["r2_write_attempted"] is True
+    assert report["r2_writes_performed"] == "UNKNOWN_AFTER_WRITE_ATTEMPT"
