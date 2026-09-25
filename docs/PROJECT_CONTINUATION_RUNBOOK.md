@@ -25,8 +25,8 @@
 | 工作 | 本地成果位置 | 已完成／仍待處理 |
 | --- | --- | --- |
 | TD-011 | `docs/LOCAL_WORKSPACE_RECONCILIATION_2026_09_24.md`; original checkpoint remains in `handoffs/2026-09-23-project-checkpoint/` in the dirty checkout | All 78 outcomes and current-main blob/mode classifications are documented; all 78 status pairs still match the checkpoint, with 13 newer untracked handoff files. There are 15 untracked exact duplicates proposed as one cleanup batch; two tracked exact matches are excluded. C1/C4/C5 are integrated by PRs #493/#491/#492; C2/C3 are deferred. The original working tree remains dirty. Local cleanup is now EXCLUDED_BY_USER; no future cloud task may inspect or delete these files. |
-| TD-012 | 原本地提案仍保留於 handoffs/2026-09-23-core100-fingerprint-v0-2-proposal.md；Repository 準備文件見 [V0.2 review](CORE100_TRAINING_FINGERPRINT_V0_2.md)、[config](../config/core100_training_fingerprint_v0_2.json)、[receipt](../research/receipts/2026-09-24-core100-training-fingerprint-v0-2-prepared.json) | 31-path closure 分為 14 個 result-identity 與 17 個 runtime-guard 檔；純記憶體 comparator 與合成行為測試已準備，仍為 PREPARED_NOT_ACTIVE。下一步準備 successor cutover proposal，納入新模組／collector 的 import inventory、真實環境取證及 legacy baseline 處置。V0.1 runner 未修改；任何啟用仍需另有版本化 authority |
-| 最新交接 | `handoffs/2026-09-23-project-checkpoint/README.md` | main／PR／驗證快照、原工作區狀態與新聊天接續文字；仍需 live 查核 |
+| TD-012 | 原本地提案仍保留於 handoffs/2026-09-23-core100-fingerprint-v0-2-proposal.md；Repository 準備文件見 [V0.2 review](CORE100_TRAINING_FINGERPRINT_V0_2.md)、[config](../config/core100_training_fingerprint_v0_2.json)、[receipt](../research/receipts/2026-09-24-core100-training-fingerprint-v0-2-prepared.json) | 準備階段的 31-path closure 與 comparator 證據保持歷史狀態。PR #504/#505 已分別提供一次性 authority 和 successor implementation；bootstrap run `36110721415` 已完成，報告為 `PASS`、模型品質為 `REJECT`，V0.2 baseline 與 latest pointer 回讀驗證通過。一次性權限已消耗，禁止 rerun；future scheduled runs are comparison-only under the merged contract. |
+| 歷史交接快照 | `handoffs/2026-09-23-project-checkpoint/README.md` | 僅保存當時 main／PR／驗證與工作區脈絡；不可視為最新狀態，操作前必須查 live GitHub |
 
 Signal ingest parsing hardening 和 Quality V0.1 authority validation 分別由 [PR #491](https://github.com/qookey109-pixel/crypto-autopilot/pull/491) 與 [PR #492](https://github.com/qookey109-pixel/crypto-autopilot/pull/492) 合併，合併後 CI、CodeQL、Freeze Guard、Pages deploy 與 browser-production 均成功。不要把舊模組整檔覆蓋 current main，也不要移植舊的 Quality evaluator；main 的 dedupe、source-run binding、freshness 與單指標 `NO_CHANGE` 讀取契約已保留。C1 unified planning overlay 的單一 Work Item form、contract、模板與 AGENTS/README 導覽由 [PR #493](https://github.com/qookey109-pixel/crypto-autopilot/pull/493) 整合。C2 Agent Arena 仍無具體比較集合／使用路徑，且 registry 已能保存不可變證據、scorecard 已提供 research-priority ranking；C3 的舊 synthetic preview 使用舊 Paper report schema，而 main 已有 Daily Opportunity Engine 和 Strategy Router，兩項都先保留本地、不移植。舊 Health V0.1 cron 與缺少 #478 的 Pages workflow不可回灌。
 
@@ -66,10 +66,16 @@ main 或來源改變、人工修改、分頁不足、403 或 schema successor �
 
 日期僅是檢查時點。較晚執行時查該日期之後的 metadata，不補跑。
 
+### Core100 fingerprint V0.2 one-time baseline — completed
+
+The single authorized bootstrap [run `36110721415`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415) completed on main `41c79994a82a30d938774ff540c97767c0ad01d6`. Its report artifact is [10860768638](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415/artifacts/10860768638). Report status/stage: `PASS / CORE100_FINGERPRINT_V0_2_BASELINE_PUBLISHED`; model-quality gate: `REJECT`. It read 14,274 governed partitions / 18,235,427 rows, performed zero provider requests, and did not access holdout. Three immutable model/metrics/manifest objects were written with SHA-256 readback checks; the latest pointer was written last and verified by SHA-256 readback. Dataset fingerprint: `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`; experiment fingerprint: `12ff384302785645144832115114a88f726bcc4ce51caa56497bec1209c76ed7`; runtime guard fingerprint: `c6733aab1c4f598ce3f4be36fa1b9058757459d1de4ef7394a4d0568c3d41d79`. One-time authority is consumed; do not rerun. This result changes no promotion, source-switch, holdout, order, or live-trading authority.
+
+The report was recovered from the completed GitHub job log, which prints the same `report.json` uploaded as the artifact. The artifact is retained on GitHub Actions; use its report for future verification.
+
 | 時點（台北） | 工作與完成條件 |
 | --- | --- |
 | 既有 Health 自然完成後 | 唯讀健檢；Pages 自然 run `35843351924` 已成功，且其後自然 Health run `35870216734` 已 `PASS`、`alerts=0`。TD-010 已完成，後續只做正常健康監控並在新故障／恢復時更新 |
-| Cloud Maintenance V0.1 首兩次自然驗收 | PR #498 已合併。自然 Health `36099624753` 成功後觸發維護 `36099661460`；inspect 成功，propose 回報 `BLOCKED_PERMISSION`。兩次成功自然維護驗收仍為 0/2。先核對 GitHub Actions 建立 PR 的設定與權限決策；不得以手動 dispatch／rerun 代替自然證據。其後取得兩個不同自然 Health 來源、完整 inspect／propose、至少一次 `NO_CHANGE` 且 `commits_created=0`。研究結果仍為 `UNKNOWN_FROM_METADATA`。 |
+| Cloud Maintenance V0.1 首兩次自然驗收 | PR #498 已合併。自然 Health `36099624753` → maintenance `36099661460`，以及 Health `36134440456` → maintenance `36134490577`，兩次 inspect 均成功、propose 均為 `BLOCKED_PERMISSION`；成功自然維護驗收仍為 0/2。GitHub Actions 建立 PR 的 repository 設定仍待使用者決定；不得自行啟用，也不得用手動 dispatch／rerun 代替自然證據。權限決定後，才核對後續兩個不同自然 Health 來源，要求兩次完整成功且至少一次 `NO_CHANGE / commits_created=0`。研究結果仍為 `UNKNOWN_FROM_METADATA`。 |
 | 2026-09-27 11:53 之後 | 核對 Pionex bounded observability 最後名義 slot 的自然 schedule；保留 missing／delayed／failure |
 | 2026-09-27 12:37 之後 | 核對 Weekly Training 自然 schedule；只從 metadata 確認 workflow 結論，無 report 就不判定 NO_CHANGE／模型 PASS |
 | 自 2026-09-23 起取得至少 7 天觀測後 | 整理 delay／missing／cancelled／重複／duration；列 coverage、樣本量、未知值，再提 cadence 建議 |
@@ -108,7 +114,7 @@ evidence_urls / changed_since_previous / next_action / blocker:
 
 - 一般模型健檢保持唯讀。僅已合併 Cloud Maintenance V0.1 的固定程式可更新指定區塊及 draft PR；不修改程式、不 merge／dispatch／rerun／cancel／disable，不改 cron。
 - 2026-09-25：TD-014 的 25 個 removed-file workflow registrations 已依 [Actions operating map](GITHUB_ACTIONS_OPERATING_MAP.md#removed-registrations-disabled-2026-09-25) 完成停用，25/25 均讀回停用狀態；操作紀錄 PR #497，run history 保留。需要使用現況時另行查核；不沿用早期 0/25 或 403 阻礙重做停用，Cloud Maintenance 程式不具停用權限。
-- Core100 History、Pionex V0.2、ZEC V0.3／V0.4 不重跑。fingerprint V0.2 準備不得覆寫舊 baseline、觸發訓練或建 R2 client。
+- Core100 History、Pionex V0.2、ZEC V0.3／V0.4 不重跑。V0.2 one-time bootstrap run `36110721415` 已消耗其授權，絕不可 rerun；保留其 V0.2 namespace 與舊 V0.1 pointer。Future scheduled fingerprint runs are comparison-only; no additional training or R2 write is authorized by this completed bootstrap.
 - FREE-ONLY；PAPER／LIVE-PAPER ONLY；replacement holdout FROZEN_UNOPENED；source_switch_authorized=false。不新增 provider／R2 存取、paid service、promotion、策略／風控變更或實盤。
 - 更換模型或聊天不提升權限。缺必要工具時交接阻礙及下一步，不改寫驗收條件。
 
@@ -142,7 +148,7 @@ PR / merge / deployment / natural schedule：各自狀態
 - 驗收：兩組 source run ID／attempt、main／head、兩個 job 結果、產生的 draft PR 或 NO_CHANGE 摘要；人工檢查 generated-block-only diff。
 - 停止：main 前進、衝突、人工編輯、來源不可信、缺權限／資料、CI 失敗時轉 CLOUD-02；不得自動擴權。
 - 交付：完成／等待／未知分列。CI、merge、維護自然執行、研究結果分開。
-- 下一步：Cloud Maintenance V0.1 的 `BLOCKED_PERMISSION` 需先取得 GitHub 設定決策，之後才驗收兩次自然執行。Fingerprint V0.2 的提案與一次性授權已由 #501–#504 交付；審查草稿 PR #505 的 exact-head CI、successor contract／implementation receipt 與寫入失敗紀錄。#505 合併之前不得 dispatch；合併後的一次性執行仍須依版本化授權及即時 main 查核。
+- 下一步：Cloud Maintenance V0.1 的兩次自然 propose 均為 `BLOCKED_PERMISSION`。等待使用者對 GitHub Actions 建立 PR 設定作決定；不得自行啟用，之後再以不同自然 Health 來源驗收兩次完整維護，至少一次 `NO_CHANGE / commits_created=0`。Core100 V0.2 的 #504/#505 與一次性 bootstrap 已完成；保持 `REJECT` 研究結果，不重跑、不放寬門檻。
 
 ### CLOUD-02 — 異常與程式缺陷交接
 
