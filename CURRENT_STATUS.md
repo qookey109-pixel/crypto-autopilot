@@ -6,7 +6,7 @@ Updated: 2026-09-25. This is the single human entrypoint for the current project
 
 ## Read and act from the right source
 
-1. **Resolve `main` live at read time.** This checkpoint was refreshed at 2026-09-23 19:34 UTC / 2026-09-24 03:34 Asia/Taipei after PR #494 merged at main `c06b46b61f6a26c7a8130cfd82b7c3408e29ed67`; this is a dated observation, not a latest-main claim.
+1. **Resolve `main` live at read time.** The dated September 23 observation below is retained as history only; this document now records the V0.2 bootstrap outcome reviewed against main `41c79994a82a30d938774ff540c97767c0ad01d6` on 2026-09-25. It is not a latest-main claim after this checkpoint.
 2. Use the exact versioned config, receipt and immutable run evidence for any execution decision. This document adds no authority.
 3. Use [PROJECT_STATUS.md](PROJECT_STATUS.md) for governance and retired-stage lineage, [README.md](README.md) for the product map, and [AGENTS.md](AGENTS.md) for agent rules.
 4. Use live [pull requests](https://github.com/qookey109-pixel/crypto-autopilot/pulls) and [Actions](https://github.com/qookey109-pixel/crypto-autopilot/actions) for moving operational state.
