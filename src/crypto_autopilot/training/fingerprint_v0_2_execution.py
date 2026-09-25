@@ -131,28 +131,55 @@ def build_fingerprint(
     }
 
 
+def _validate_record(record: Mapping[str, Any], contract: Mapping[str, Any]) -> dict[str, Any]:
+    identity = contract["identity_contract"]
+    expected_paths = set(
+        identity["code_paths"] + identity["support_paths"] + identity["runtime_guard_paths"]
+    )
+    expected_paths.update(_context_anchors(contract))
+    if record.get("schema") != "qookey-core100-training-fingerprint-evidence-v0.2":
+        raise SuccessorContractError()
+    if record.get("status") != "PREPARED_NOT_ACTIVE":
+        raise SuccessorContractError()
+    if record.get("contract_sha256") != contract.get("contract_sha256"):
+        raise SuccessorContractError()
+    dataset = record.get("dataset_fingerprint")
+    blobs = record.get("git_blobs")
+    runtime = record.get("runtime_manifest")
+    if not isinstance(blobs, Mapping) or set(blobs) != expected_paths:
+        raise SuccessorContractError()
+    if not isinstance(runtime, Mapping):
+        raise SuccessorContractError()
+    rebuilt = build_fingerprint(
+        contract=contract,
+        dataset_fingerprint=str(dataset),
+        git_blobs=blobs,
+        runtime_manifest=runtime,
+    )
+    if dict(record) != rebuilt:
+        raise SuccessorContractError()
+    return rebuilt
+
+
 def compare_fingerprints(
-    *, current: Mapping[str, Any], previous: Mapping[str, Any] | None
+    *, contract: Mapping[str, Any], current: Mapping[str, Any],
+    previous: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
     if previous is None:
         return {"status": "REVIEW_REQUIRED", "reason": "NO_PREVIOUS_V0_2_EVIDENCE"}
     try:
-        if current.get("schema") != "qookey-core100-training-fingerprint-evidence-v0.2":
-            raise SuccessorContractError()
-        if previous.get("schema") != "qookey-core100-training-fingerprint-evidence-v0.2":
-            raise SuccessorContractError()
-        if current.get("contract_sha256") != previous.get("contract_sha256"):
-            return {"status": "REVIEW_REQUIRED", "reason": "SUCCESSOR_CONTRACT_CHANGED"}
-        if current.get("git_blobs") != previous.get("git_blobs"):
+        current_record = _validate_record(current, contract)
+        previous_record = _validate_record(previous, contract)
+        if current_record["git_blobs"] != previous_record["git_blobs"]:
             return {"status": "REVIEW_REQUIRED", "reason": "SOURCE_OR_EXECUTION_CONTEXT_CHANGED"}
-        if current.get("runtime_guard_fingerprint") != previous.get("runtime_guard_fingerprint"):
+        if current_record["runtime_guard_fingerprint"] != previous_record["runtime_guard_fingerprint"]:
             return {"status": "REVIEW_REQUIRED", "reason": "RUNTIME_GUARD_CHANGED"}
-        if current.get("runtime_manifest") != previous.get("runtime_manifest"):
+        if current_record["runtime_manifest"] != previous_record["runtime_manifest"]:
             return {"status": "REVIEW_REQUIRED", "reason": "RUNTIME_CHANGED"}
-        if current.get("dataset_fingerprint") != previous.get("dataset_fingerprint"):
+        if current_record["dataset_fingerprint"] != previous_record["dataset_fingerprint"]:
             return {"status": "REVIEW_REQUIRED", "reason": "DATASET_CHANGED"}
-        if current.get("experiment_fingerprint") != previous.get("experiment_fingerprint"):
+        if current_record["experiment_fingerprint"] != previous_record["experiment_fingerprint"]:
             return {"status": "REVIEW_REQUIRED", "reason": "RESULT_INPUT_CHANGED"}
-    except (SuccessorContractError, TypeError, KeyError):
+    except (SuccessorContractError, TypeError, KeyError, ValueError):
         return {"status": "REVIEW_REQUIRED", "reason": "INVALID_V0_2_EVIDENCE"}
     return {"status": "NO_CHANGE", "reason": "EXACT_V0_2_FINGERPRINT_MATCH"}
