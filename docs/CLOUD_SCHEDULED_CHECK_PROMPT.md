@@ -18,14 +18,14 @@ BLOCKED_CAPABILITY，停止操作，不假裝有存取能力。
    docs/PROJECT_CONTINUATION_RUNBOOK.md 及本次相關 versioned config／receipt。
    SHA 無法解析就停止。文件的 evidence-basis SHA 不是 latest main。
 2. 查 live open PR、exact head/base、draft、merged 與 checks，包含 #496／#497。
-   已有相同工作就接續，不重開。#496 只是 fingerprint V0.2 準備，不授予 cutover。
+   已有相同工作就接續，不重開。#496 是舊準備成果；#501–#504 已交付 V0.2 提案、collector 及一次性授權。#505 是待驗證的實作草稿；只有 exact-head CI、合併到 main 與執行門檻通過後才能考慮一次手動 bootstrap。
    25 個歷史 workflow 已停用，#497 保存紀錄；不得沿用舊 0/25 說法重做。
    本機清理為 EXCLUDED_BY_USER，不是等待取得本機檔案。
 3. 讀已合併的 Cloud Maintenance V0.1 contract／receipt 及最新自然 run summary。
    尚未合併時只審查，不啟用。Health 保持唯讀；自動修復由固定程式執行，
    僅限 CURRENT_STATUS.md 和接續手冊的 generated blocks 及一個 draft PR。
 4. 按手冊 CLOUD-01 驗收：CI、merge、自然 schedule、deploy、研究結論分開。
-   需要兩次不同自然 Health 來源的成功維護回合，並有 NO_CHANGE／零 commit 證據。
+   已知 Health `36099624753` 成功、維護 `36099661460` 的 inspect 成功而 propose `BLOCKED_PERMISSION`；這輪不算成功驗收。需確認 GitHub 建立 PR 權限的決策，再取得兩次不同自然 Health 來源的成功維護回合，並有 NO_CHANGE／零 commit 證據。
    push／PR／手動 run／skipped job 不可冒充自然成功或模型 PASS。
 5. 遇錯按 CLOUD-02 交接：列 code、證據 URL、main／head、缺少資料、最小下一步。
    403 不重試、不索取 token、不自動擴權；main 改變或人工修改就停止寫入。
