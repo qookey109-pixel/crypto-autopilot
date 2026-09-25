@@ -58,7 +58,8 @@ class GitHub:
         self.coverage = []
 
     def request(self, method, path, payload=None, *, missing_ok=False):
-        require(path.startswith("/") and "://" not in path and ".." not in path,
+        require(path.startswith("/") and "://" not in path
+                and all(part not in {".", ".."} for part in path.split("?", 1)[0].split("/")),
                 "INVALID_API_PATH")
         require(method == "GET" or self.writable, "WRITE_NOT_AUTHORIZED")
         url = f"https://api.github.com/repos/{REPOSITORY}{path}"

@@ -279,6 +279,11 @@ class PureMaintenanceTests(unittest.TestCase):
                              ("GET", "/../secrets")):
             with self.assertRaises(Stop):
                 api.request(method, path)
+        with patch("crypto_autopilot.research.cloud_maintenance.build_opener") as opener:
+            opener.return_value.open.return_value.__enter__.return_value.read.return_value = b"{}"
+            api.request("GET", f"/compare/{A}...{B}")
+            requested = opener.return_value.open.call_args.args[0]
+            self.assertIn(f"{A}...{B}", requested.full_url)
 
     def test_pagination_complete_missing_duplicate_limit(self):
         api = GitHub("synthetic-test-token")
