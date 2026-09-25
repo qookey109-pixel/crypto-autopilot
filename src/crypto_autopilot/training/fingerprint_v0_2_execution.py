@@ -11,7 +11,7 @@ import json
 from collections.abc import Mapping
 from typing import Any
 
-from .fingerprint_v0_2 import FingerprintValidationError, normalize_runtime_manifest
+from .fingerprint_v0_2 import normalize_runtime_manifest
 
 
 class SuccessorContractError(ValueError):
