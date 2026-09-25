@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-09-23
+Updated: 2026-09-25
 
 Repository `main` is the formal current authority and must be resolved live at read time. This file is the project-stage, governance-compatibility, and retired-workflow index. Exact versioned configs, receipts, immutable run evidence, and merged code remain the detailed authority for each scope.
 
@@ -23,7 +23,8 @@ For present-tense operations read `CURRENT_STATUS.md` first, then resolve the Re
 
 - Detailed Core100 History acquisition is complete: `10/10` governed shards.
 - Historical reacquisition is not required solely because the trained model was rejected by quality gates.
-- Training run `34918219864`: workflow `success`, report `PASS`.
+- Training run `34918219864`: workflow `success`, report `PASS` (legacy V0.1 baseline).
+- The separately authorized Core100 fingerprint V0.2 bootstrap [run `36110721415`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415) completed on main `41c79994a82a30d938774ff540c97767c0ad01d6`; report status `PASS`, stage `CORE100_FINGERPRINT_V0_2_BASELINE_PUBLISHED`, model-quality gate `REJECT`. It used dataset fingerprint `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`, experiment fingerprint `12ff384302785645144832115114a88f726bcc4ce51caa56497bec1209c76ed7`, and runtime guard fingerprint `c6733aab1c4f598ce3f4be36fa1b9058757459d1de4ef7394a4d0568c3d41d79`. The secret-free report artifact is [10860768638](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415/artifacts/10860768638). Three immutable outputs and the latest pointer passed SHA-256 readback; provider requests were zero and holdout was not accessed. The one-time authority is consumed. No promotion, source switch, threshold change, trade plan, order or live trading is authorized.
 - 100 symbols; 14,274 dataset partition objects; 18,235,427 rows; 249,228 examples.
 - Dataset fingerprint: `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`.
 - All folds ready: `true`.
@@ -257,13 +258,13 @@ source switch, no automatic model promotion, no formal trade plan, no
 real-money orders and no live real trading.
 
 
-## Core100 Training Fingerprint V0.2 preparation (PREPARED_NOT_ACTIVE)
+## Core100 Training Fingerprint V0.2 — preparation and one-time baseline
 
-A read-only source audit found that the active V0.1 fingerprint tracks 10 blobs but omits `features/advanced.py`. All 10 tracked current blobs still match the frozen baseline; a synthetic change to the omitted feature path leaves the V0.1 experiment identity unchanged. Therefore, if the live dataset and latest pointer remain at the legacy baseline, V0.1 may report `NO_CHANGE` for a model trained with older feature code. The current production dataset/latest pointer was not read in this audit.
+The preparation audit found that V0.1 omitted `features/advanced.py`, allowing that code change to be invisible to its fingerprint. The 31-path import closure was classified as 14 result-identity paths and 17 runtime-guard paths; the original preparation documents and receipt remain historical evidence and were not rewritten.
 
-The preparation contract records the 31-file Python import closure as 14 result-identity paths and 17 runtime-import guard paths. GitHub history shows 13 of the 14 candidate result paths match the legacy source; `features/advanced.py` differs. The V0.3 wrapper is absent at the legacy source head, and the legacy runtime lacks an exact Python patch/dependency inventory. Baseline migration is `REVIEW_REQUIRED`.
+PR #504 supplied the versioned one-time authority and PR #505 merged the separately reviewed successor execution path. The only authorized bootstrap [run `36110721415`](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415) completed on 2026-09-25. Its report artifact is [10860768638](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415/artifacts/10860768638). The report is `PASS` for baseline publication, with model-quality gate `REJECT`; all folds were ready, but not all beat naive log loss and not all base-cost average returns were positive. The run processed the existing 10/10 dataset (14,274 partitions; 18,235,427 rows), performed zero provider requests, and did not access holdout.
 
-The prepared [V0.2 contract](config/core100_training_fingerprint_v0_2.json), [review](docs/CORE100_TRAINING_FINGERPRINT_V0_2.md) and [receipt](research/receipts/2026-09-24-core100-training-fingerprint-v0-2-prepared.json) do not modify the V0.1 runner/workflow and authorize no training, provider or R2 access, holdout, source switch, promotion or trading. Any cutover requires a separately reviewed versioned authority.
+Dataset fingerprint: `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`. Experiment fingerprint: `12ff384302785645144832115114a88f726bcc4ce51caa56497bec1209c76ed7`. Runtime guard fingerprint: `c6733aab1c4f598ce3f4be36fa1b9058757459d1de4ef7394a4d0568c3d41d79`. Three immutable V0.2 objects (model, metrics, manifest) were written and readback-verified; the V0.2 latest pointer was written last and SHA-256 readback passed. The V0.1 pointer was left untouched. The one-time authority is consumed and the run must not be repeated. Future scheduled V0.2 runs are comparison-only under the successor contract. No threshold change, model promotion, source switch, trade plan, real-money order or live trading follows from this pipeline result.
 
 
 ## Automation V3 P2 — schedule and freshness convergence
