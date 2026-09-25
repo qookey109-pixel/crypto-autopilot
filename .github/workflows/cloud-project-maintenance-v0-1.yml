@@ -1,0 +1,77 @@
+name: Cloud Project Maintenance V0.1
+
+on:
+  workflow_run:
+    workflows: ["Research Automation Health V0.2"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloud-project-maintenance-v0-1
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    if: >-
+      github.repository == 'qookey109-pixel/crypto-autopilot' &&
+      github.event.repository.private == false &&
+      github.event.workflow_run.event == 'schedule' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.path == '.github/workflows/research-automation-health-v0-2.yml'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      checks: read
+    outputs:
+      main_sha: ${{ steps.inspect.outputs.main_sha }}
+      semantic_digest: ${{ steps.inspect.outputs.semantic_digest }}
+      ready: ${{ steps.inspect.outputs.ready }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+      - name: Inspect current main and natural schedule metadata
+        id: inspect
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PYTHONPATH: src
+        run: python scripts/cloud_project_maintenance.py --mode inspect
+
+  propose:
+    needs: inspect
+    if: needs.inspect.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
+      checks: read
+    steps:
+      # This SHA is the workflow's default-branch SHA, never the triggering
+      # run's checkout, a PR head, or an artifact from another workflow.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+      - name: Revalidate and publish bounded draft proposal
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          EXPECTED_MAIN: ${{ needs.inspect.outputs.main_sha }}
+          EXPECTED_DIGEST: ${{ needs.inspect.outputs.semantic_digest }}
+          PYTHONPATH: src
+        run: python scripts/cloud_project_maintenance.py --mode publish

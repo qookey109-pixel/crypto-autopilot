@@ -1,19 +1,55 @@
-# Qookey Crypto Autopilot 雲端排程提示詞
+# Qookey Crypto Autopilot：純雲端接續提示詞
 
-用途：ChatGPT 網頁端雲端 Scheduled task，建議每 6 小時。**此檔只是已備妥的提示詞；建立並讀回任務前，不能宣稱雲端排程已啟用。** 執行來源只限 GitHub，與使用者電腦是否開機無關。可使用的模型應沿用本提示詞和 GitHub current main，不依賴先前對話或本地路徑。
+更新：2026-09-25。排程平台採 GitHub Actions：既有 Health 每兩小時，
+Cloud Maintenance V0.1 接收其自然完成事件。不是另一個 ChatGPT/Codex 本機排程。
+本提示詞本身不會啟用排程；只有 main 合併、權限檢查和兩次自然執行證據才能完成驗收。
+
+以下可直接交給任何模型：
 
 ```text
-請以繁體中文唯讀健檢 GitHub Repository qookey109-pixel/crypto-autopilot，使用連接的 GitHub 來源與 GitHub Actions metadata。每輪先記錄 UTC/Asia-Taipei 查核時間，重新取得 main exact SHA、open PR 的 exact head/base/draft/merged/checks；依序讀 current main 的 CURRENT_STATUS.md、PROJECT_STATUS.md、README.md、AGENTS.md、相關 versioned config/receipt。若 docs/PROJECT_CONTINUATION_RUNBOOK.md 與 docs/GITHUB_ACTIONS_OPERATING_MAP.md 已合併到 main，沿用其工作 ID、排程圖與證據格式；若仍只在草稿 PR，該 PR 僅作提案導航，不當正式執行 authority。main 或來源不可讀就標 UNKNOWN，勿猜。
+你正在接續 qookey109-pixel/crypto-autopilot。全部資料與操作都在 GitHub／雲端；
+禁止讀写本機檔案、使用本機終端機或排程、依賴本機 checkout／recovery／聊天記憶。
+GitHub-hosted runner 的暫存 checkout 可以使用。沒有 GitHub 工具則回報
+BLOCKED_CAPABILITY，停止操作，不假裝有存取能力。
 
-從 current main workflow 檔辨認所有 cron；依 current main 的 config/research_automation_health_v0_2.json 或已合併 successor，檢查 active window、allowed_events、allowed_conclusions、max_age_seconds。每個相關 run 記 workflow path/ID、event、run ID/attempt、head SHA、nominal slot 與不確定性、created/start/completed（可取得時）、status/conclusion、policy 版本與證據 URL。查詢須注意 pagination、event filter 和可見時間範圍；若工具只能看 PR-triggered runs，不能推論自然 schedule。API 403、rate limit、資料缺頁或工具不支援，標 UNKNOWN/BLOCKED_PERMISSION，報告缺少的證據。
+依序執行，不跳步：
+1. 記錄 UTC／台北時間，透過 GitHub 解析 main exact SHA；讀取該 SHA 的
+   CURRENT_STATUS.md、PROJECT_STATUS.md、README.md、AGENTS.md、
+   docs/PROJECT_CONTINUATION_RUNBOOK.md 及本次相關 versioned config／receipt。
+   SHA 無法解析就停止。文件的 evidence-basis SHA 不是 latest main。
+2. 查 live open PR、exact head/base、draft、merged 與 checks，包含 #496／#497。
+   已有相同工作就接續，不重開。#496 只是 fingerprint V0.2 準備，不授予 cutover。
+   25 個歷史 workflow 已停用，#497 保存紀錄；不得沿用舊 0/25 說法重做。
+   本機清理為 EXCLUDED_BY_USER，不是等待取得本機檔案。
+3. 讀已合併的 Cloud Maintenance V0.1 contract／receipt 及最新自然 run summary。
+   尚未合併時只審查，不啟用。Health 保持唯讀；自動修復由固定程式執行，
+   僅限 CURRENT_STATUS.md 和接續手冊的 generated blocks 及一個 draft PR。
+4. 按手冊 CLOUD-01 驗收：CI、merge、自然 schedule、deploy、研究結論分開。
+   需要兩次不同自然 Health 來源的成功維護回合，並有 NO_CHANGE／零 commit 證據。
+   push／PR／手動 run／skipped job 不可冒充自然成功或模型 PASS。
+5. 遇錯按 CLOUD-02 交接：列 code、證據 URL、main／head、缺少資料、最小下一步。
+   403 不重試、不索取 token、不自動擴權；main 改變或人工修改就停止寫入。
+6. 9/27 台北 11:53 後查 Pionex 最後自然 slot，12:37 後查 Training；
+   10/1 08:00 後查 Pionex window 到期。過期不補跑、不延期。
+   至少七天完整 metadata coverage 才提 cadence 建議。
+7. 只處理一張可開始的工作卡：目的、前置、精確来源、編號步驟、可改範圍、
+   雲端驗證、停止條件、交付證據。程式邏輯修正需使用者指派，不由定時模型猜測執行。
 
-TD-010 的自然恢復基線已完成：Pages schedule `35843351924` 的 build/deploy/browser-production 全部成功，其後 Health schedule `35870216734` 為 `PASS`、`alerts=0`。後續維持普通健康監控，不再把這組既有成功證據當成未完成項；新的 failure/recovery 仍須依自然 schedule、event、head SHA 與 policy freshness 判定，push/PR/workflow_run 或 skipped job 不能替代自然排程證據。
+每次交付：
+- 時間、main SHA、CLOUD_ONLY。
+- 已完成：ID、變更、GitHub CI／run／PR URL。
+- 等待或未知：原因、缺少證據。
+- PR／merge／自然 schedule／部署／研究結果：各自狀態。
+- 唯一下一步：工作卡及可直接執行的步驟。
+- 本機資料：EXCLUDED_BY_USER；沒有本機依賴。
 
-每輪查當下 open PR，不固定假設任何既有 PR 仍 open。PR #479 已合併到 main；後續只能把 current main 當 authority，新的 PR 必須重新讀 exact head/base/draft/merged/checks。查 9/27 11:53 台北後 Pionex bounded observability 的最後自然 slot、9/27 12:37 後 Core100 weekly Training 自然 slot；10/1 08:00 台北後確認 Pionex window 到期。至少累積七天實際 metadata coverage、樣本與缺失後，才提頻率建議；日期經過本身不代表七天證據完整。Training workflow success 不代表模型 PASS/NO_CHANGE，沒有可讀報告時列 UNKNOWN。provider/R2 用量同理。
-
-這是純雲端任務，沒有本機 checkout：本地 78 項 reconciliation、Core100 fingerprint V0.2 本地提案和 recovery 檔不可讀，標 LOCAL_ONLY_UNAVAILABLE；不要聲稱已核對或自行重新建構這些成果。可指出 TD-010～TD-014 下一項及精確阻礙，但不自動做本地整合。25 個 removed-file Actions registration 的停用已有使用者授權，但既有連線缺 Actions:write、0/25 成功；本唯讀任務不反覆重試、也不要求 token。
-
-FREE-ONLY、0 USD/month、PAPER/LIVE-PAPER ONLY。Core100 History、Pionex V0.2、ZEC V0.3/V0.4 已完成，勿重跑；replacement holdout FROZEN_UNOPENED、source_switch_authorized=false、Live Paper automatic_schedule_authorized=false。不要讀 logs/artifacts/R2/holdout/secrets，不新增 provider 請求、不裝工具、不編輯程式、開 PR、push、merge、dispatch/rerun/cancel/disable workflow、改 cron、部署、啟用 training/promotion/交易。日期、排程與模型切換不增加 execution authority。
-
-只在有意義的新進展、完成、新故障、恢復或需要使用者決策時通知；沒有變化保持安靜。通知格式：查核時間與 main SHA、已確認變化及證據 URL、仍等待或未知、下一個可行動項目。將 PR/merge、自然 schedule、部署與研究結論分開。若連接的 GitHub 工具無法完成關鍵查詢，說明哪個 API/權限缺口，不把缺證據寫成健康。
+FREE-ONLY 0 USD/month；PAPER／LIVE-PAPER ONLY。
+Core100 History、Pionex V0.2、ZEC V0.3/V0.4 已完成，不重跑。
+holdout FROZEN_UNOPENED；source_switch_authorized=false。
+不得新增 provider／R2 存取、訓練、promotion、交易、paid fallback，
+不得自動 merge、部署、dispatch/rerun/cancel/disable 或修改 cron。
+模型或排程不會增加權限；沒有足夠工具時，正確結果是停止並列出缺口。
 ```
+
+自動程序只在有語意變更時提出文件草稿；每輪完整 metadata 留在 Actions summary。
+原有 ChatGPT 個人任務如仍存在，不應宣稱已被本次修改、停用或驗證。

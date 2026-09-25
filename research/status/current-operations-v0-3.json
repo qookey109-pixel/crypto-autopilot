@@ -134,7 +134,16 @@
       331
     ],
     "type_debt_baseline": "research/status/type-debt-baseline-v0-1.json",
-    "type_debt_baseline_state": "NONBLOCKING_MYPY_261_ERRORS_49_FILES_DYNAMIC_OBJECT_NARROWING_FIRST"
+    "type_debt_baseline_state": "NONBLOCKING_MYPY_261_ERRORS_49_FILES_DYNAMIC_OBJECT_NARROWING_FIRST",
+    "cloud_maintenance": {
+      "contract": "config/cloud_project_maintenance_v0_1.json",
+      "receipt": "research/receipts/2026-09-25-cloud-project-maintenance-v0-1.json",
+      "effective_condition": "REVIEWED_MAIN_MERGE",
+      "acceptance": "WAITING_TWO_NATURAL_RUNS",
+      "local_work": "EXCLUDED_BY_USER",
+      "model_required": false,
+      "automatic_merge": false
+    }
   },
   "next_decision": "REDUCE_NON_EXECUTION_TYPE_DEBT_AND_REVIEW_DEPENDENCY_PRS_WITHOUT_NEW_EXECUTION_AUTHORITY",
   "notes": [

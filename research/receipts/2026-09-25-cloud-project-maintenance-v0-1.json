@@ -1,0 +1,88 @@
+{
+  "schema": "cloud-project-maintenance-v0.1",
+  "policy_path": "config/cloud_project_maintenance_v0_1.json",
+  "policy_contract": {
+    "schema": "cloud-project-maintenance-v0.1",
+    "status": "AUTHORIZED_ON_MAIN_MERGE",
+    "repository": "qookey109-pixel/crypto-autopilot",
+    "purpose": "GitHub-hosted metadata observation and deterministic draft proposals for two generated documentation blocks only.",
+    "health_workflow": ".github/workflows/research-automation-health-v0-2.yml",
+    "health_policy": "config/research_automation_health_v0_2.json",
+    "trigger": {
+      "type": "workflow_run",
+      "event": "schedule",
+      "branch": "main",
+      "same_repository": true,
+      "exact_source_main_required": true,
+      "new_cron": false
+    },
+    "write_paths": [
+      "CURRENT_STATUS.md",
+      "docs/PROJECT_CONTINUATION_RUNBOOK.md"
+    ],
+    "authority": {
+      "github_metadata_read": true,
+      "generated_blocks_write": true,
+      "draft_pr": true,
+      "merge": false,
+      "dispatch": false,
+      "provider": false,
+      "r2": false,
+      "holdout": false,
+      "training": false,
+      "promotion": false,
+      "trading": false,
+      "local_user_files": false,
+      "paid_runtime": false
+    },
+    "runtime": {
+      "host": "github-hosted",
+      "runner": "ubuntu-latest",
+      "language": "Python 3.13",
+      "dependencies": "stdlib plus existing pure health evaluator",
+      "model_required": false,
+      "monthly_budget_usd": 0,
+      "public_repository_required": true
+    },
+    "evidence": {
+      "run_summary": true,
+      "artifact_upload": false,
+      "artifact_download": false,
+      "logs_read": false,
+      "pagination_max_pages": 10,
+      "metadata_lookback_days": 14,
+      "missing_pages": "STOP_UNKNOWN",
+      "research_result": "UNKNOWN_FROM_METADATA"
+    },
+    "publication": {
+      "draft_only": true,
+      "branch_prefix": "codex/cloud-maintenance-",
+      "max_open_proposals": 1,
+      "force_push": false,
+      "main_changes": "STOP",
+      "human_changes": "STOP",
+      "self_pr_in_projection": false,
+      "timestamp_only_commit": false
+    },
+    "acceptance": {
+      "natural_runs_required": 2,
+      "no_change_commit_count": 0,
+      "status": "NOT_YET_VERIFIED",
+      "merge_approval": "USER_REQUIRED",
+      "ci_approval": "HUMAN_IF_GITHUB_REQUIRES"
+    }
+  },
+  "prepared_on": "2026-09-25",
+  "evidence_basis_main": "f9296aca33858c907b42e825db8a9d334df1986e",
+  "effective_only_after_main_merge": true,
+  "acceptance_status": "WAITING_REVIEW_MERGE_AND_TWO_NATURAL_RUNS",
+  "user_authorization": "Implement approved cloud-only plan: metadata, bounded documentation blocks and draft PRs. Merge remains user decision.",
+  "health_v0_2_mutated": false,
+  "local_user_files_accessed": false,
+  "provider_accessed": false,
+  "r2_accessed": false,
+  "training_performed": false,
+  "holdout_accessed": false,
+  "source_switch_authorized": false,
+  "real_trading_authorized": false
+}
