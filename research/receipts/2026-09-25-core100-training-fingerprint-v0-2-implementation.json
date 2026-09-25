@@ -21,7 +21,7 @@
     "research/receipts/2026-09-25-core100-training-fingerprint-v0-2-bootstrap-authority.json": "0b5f2c66b2e59bcdace896807e93c42c82683cd5",
     "scripts/train_binance_detailed_history_models_v0_2.py": "e739d29579223797f5439d6feebeec81287c73a8",
     "scripts/train_binance_detailed_history_models_v0_3.py": "baf7f59ed042d895660e3a3ac612cb73bb2416b6",
-    "scripts/train_binance_detailed_history_models_v0_4.py": "1aafcb79305d88d3d9c239537e3b3b24df3b8395",
+    "scripts/train_binance_detailed_history_models_v0_4.py": "aba828ad13f2e2b911e4479d21af27464488a166",
     "scripts/train_binance_detailed_history_models.py": "4e44fc0b5bb6711753e68e468120c81ee0b5eeaa",
     "src/crypto_autopilot/__init__.py": "e0879c3743d56611357d339f698c40f585bf6bd7",
     "src/crypto_autopilot/backtest.py": "03133d1a43e8282c7e1dd21ec30aef06b9199075",
@@ -49,7 +49,9 @@
     "src/crypto_autopilot/technical.py": "9f41198c044d32044023e8133ebe33dcd226c008",
     "src/crypto_autopilot/training/__init__.py": "890a206dd7abf4cbd6b9f32cbd66f4c38a307acd",
     "src/crypto_autopilot/training/detailed.py": "f24c7345b422fca9dbe92ef5bb2b9ab272fe7236",
+    "src/crypto_autopilot/training/fingerprint_collector_v0_2.py": "c0b420dddf57a7bb2af94648e1bc29574d88643b",
     "src/crypto_autopilot/training/fingerprint_v0_2_execution.py": "f71a3026fa48b53c6297bb85436e4ab0f913e879",
+    "src/crypto_autopilot/training/fingerprint_v0_2.py": "29a684ee6caac91af5ead468250a7676cfe6c285",
     "src/crypto_autopilot/training/history_quality.py": "1c66f3291fcf03ad132e2cfd68f2ffc4f9ceab1a",
     "src/crypto_autopilot/training/online_r2.py": "e2286a80aba6b3df33ddf0a52fab5ae9e23d36d9"
   },
