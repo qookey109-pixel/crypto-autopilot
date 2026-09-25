@@ -148,7 +148,7 @@ PR / merge / deployment / natural schedule：各自狀態
 - 驗收：兩組 source run ID／attempt、main／head、兩個 job 結果、產生的 draft PR 或 NO_CHANGE 摘要；人工檢查 generated-block-only diff。
 - 停止：main 前進、衝突、人工編輯、來源不可信、缺權限／資料、CI 失敗時轉 CLOUD-02；不得自動擴權。
 - 交付：完成／等待／未知分列。CI、merge、維護自然執行、研究結果分開。
-- 下一步：Cloud Maintenance V0.1 的兩次自然 propose 均為 `BLOCKED_PERMISSION`。等待使用者對 GitHub Actions 建立 PR 設定作決定；不得自行啟用，之後再以不同自然 Health 來源驗收兩次完整維護，至少一次 `NO_CHANGE / commits_created=0`。Core100 V0.2 的 #504/#505 與一次性 bootstrap 已完成；保持 `REJECT` 研究結果，不重跑、不放寬門檻。
+- 下一步：GitHub Actions 建立／核准 PR 權限已於 2026-09-25 經使用者授權啟用，預設 `GITHUB_TOKEN` 仍唯讀。忽略設定變更前兩次 `BLOCKED_PERMISSION` 歷史來源；等待兩個不同的設定變更後自然 Health run/attempt，inspect／propose 均完整成功且至少一次 `NO_CHANGE / commits_created=0`。不得手動 dispatch／rerun 補算。Core100 V0.2 的 #504/#505 與一次性 bootstrap 已完成；保持模型品質 `REJECT`，不重跑、不放寬門檻。Auto-merge 僅逐 PR 啟用，須先核對 exact head/base、必要 review、CI 與 authority boundary。
 
 ### CLOUD-02 — 異常與程式缺陷交接
 
