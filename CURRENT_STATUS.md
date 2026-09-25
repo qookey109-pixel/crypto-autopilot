@@ -32,7 +32,7 @@ The machine-readable [Current Operations V0.3](research/status/current-operation
 Core100 dataset fingerprint: `91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876`.
 Weekly Training remains scheduled with dataset/model-blob fingerprint deduplication. An exact match returns `NO_CHANGE`, with no retraining or R2 write. The verified baseline experiment fingerprint is `25b3178ce0d13052684d20b35a0e1f6949f0d97a5ac0c5b9e8f0a52d4d12f9c8`.
 
-Fingerprint V0.2 preparation found that V0.1 omits `features/advanced.py`. If the live dataset and latest pointer still match the old baseline, the active V0.1 runner can return `NO_CHANGE` even though that feature source changed. Production R2 was not read during this audit, so the condition is not confirmed against the current dataset. V0.2 remains `PREPARED_NOT_ACTIVE`; its runner and workflow were not changed. See the [fingerprint V0.2 review](docs/CORE100_TRAINING_FINGERPRINT_V0_2.md).
+Fingerprint V0.2 preparation found that V0.1 omits `features/advanced.py`. If the live dataset and latest pointer still match the old baseline, the active V0.1 runner can return `NO_CHANGE` even though that feature source changed. Production R2 was not read during this audit, so the condition is not confirmed against the current dataset. V0.2 remains `PREPARED_NOT_ACTIVE`; a pure in-memory comparator and synthetic behavior tests are now prepared, while the active runner and workflow are unchanged. See the [fingerprint V0.2 review and implementation checkpoint](docs/CORE100_TRAINING_FINGERPRINT_V0_2.md#pure-implementation-checkpoint--2026-09-24).
 
 Detailed evidence:
 
@@ -48,7 +48,7 @@ Detailed evidence:
 | --- | --- | --- |
 | 1 | Pages / Health reliability checkpoint | TD-010 complete: Pages `35843351924` succeeded naturally, followed by Health `35870216734` with `PASS` and zero alerts. Continue normal monitoring; do not create substitute dispatch evidence. |
 | 2 | Cloud-only continuation | Local reconciliation is EXCLUDED_BY_USER, not a pending cloud task. Preserve the historical receipt; do not inspect, synchronize, delete or request local files. |
-| 3 | Core100 fingerprint V0.2 | PR #494 merged to main `c06b46b`; V0.2 remains PREPARED_NOT_ACTIVE: 31-file import closure split into 14 result-identity and 17 runtime-guard paths; synthetic proof confirms V0.1 misses features/advanced.py. Legacy migration is REVIEW_REQUIRED; do not change the active runner, train, or access R2 without a separate versioned authority. |
+| 3 | Core100 fingerprint V0.2 | PR #494 merged the frozen preparation contract; a pure comparator now validates the 36 required blob entries and complete caller-attested runtime. V0.2 remains PREPARED_NOT_ACTIVE. Legacy migration is REVIEW_REQUIRED. Next prepare a successor cutover proposal with the new module/collector import inventory and evidence-collection contract; activation still requires separate versioned authority. |
 | 4 | PR delivery checkpoint | PR #494 merged at `c06b46b`; post-merge tests (3.12/3.13), CodeQL, build and Freeze Guard passed. Pages build passed; deploy and browser-production were skipped by path filters. Delivery branch was deleted. Recheck live PR heads, bases and checks before future delivery actions. |
 | 5 | Tidy historical Actions registrations | The [operating map](docs/GITHUB_ACTIONS_OPERATING_MAP.md) separates current workflow files, removed-file registrations and dynamic Dependabot. Preserve historical run evidence. |
 
