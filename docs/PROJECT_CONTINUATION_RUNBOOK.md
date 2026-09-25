@@ -75,7 +75,7 @@ The report was recovered from the completed GitHub job log, which prints the sam
 | 時點（台北） | 工作與完成條件 |
 | --- | --- |
 | 既有 Health 自然完成後 | 唯讀健檢；Pages 自然 run `35843351924` 已成功，且其後自然 Health run `35870216734` 已 `PASS`、`alerts=0`。TD-010 已完成，後續只做正常健康監控並在新故障／恢復時更新 |
-| Cloud Maintenance V0.1 首兩次自然驗收 | PR #498 已合併。自然 Health `36099624753` → maintenance `36099661460`，以及 Health `36134440456` → maintenance `36134490577`，兩次 inspect 均成功、propose 均為 `BLOCKED_PERMISSION`；成功自然維護驗收仍為 0/2。GitHub Actions 建立 PR 的 repository 設定仍待使用者決定；不得自行啟用，也不得用手動 dispatch／rerun 代替自然證據。權限決定後，才核對後續兩個不同自然 Health 來源，要求兩次完整成功且至少一次 `NO_CHANGE / commits_created=0`。研究結果仍為 `UNKNOWN_FROM_METADATA`。 |
+| Cloud Maintenance V0.1 自然驗收 | PR #498 已合併。權限決定前的 Health `36099624753` → maintenance `36099661460`、`36134440456` → `36134490577` 都以 `BLOCKED_PERMISSION` 結束，僅保留歷史、不計入驗收。2026-09-25 經使用者授權後，已啟用 GitHub Actions 建立／核准 PR 權限；預設 `GITHUB_TOKEN` 仍唯讀。尚無權限變更後的自然 Health 來源，驗收為 **0/2**。等待兩個不同的未來自然 Health run/attempt，inspect／propose 均完整成功，且至少一次 `NO_CHANGE / commits_created=0`；禁止手動 dispatch／rerun 補算。Repository auto-merge 與合併後刪除 head branch 已啟用；只對通過精確 head/base、必要 review／CI 與 authority gate 的 PR 個別啟用 auto-merge。研究結果仍為 `UNKNOWN_FROM_METADATA`。 |
 | 2026-09-27 11:53 之後 | 核對 Pionex bounded observability 最後名義 slot 的自然 schedule；保留 missing／delayed／failure |
 | 2026-09-27 12:37 之後 | 核對 Weekly Training 自然 schedule；只從 metadata 確認 workflow 結論，無 report 就不判定 NO_CHANGE／模型 PASS |
 | 自 2026-09-23 起取得至少 7 天觀測後 | 整理 delay／missing／cancelled／重複／duration；列 coverage、樣本量、未知值，再提 cadence 建議 |
