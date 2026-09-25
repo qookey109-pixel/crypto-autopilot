@@ -58,7 +58,7 @@ The collector must distinguish these outcomes:
 
 Do not convert, delete, overwrite, or automatically reuse the V0.1 latest pointer as a V0.2 predecessor. Keep its existing run and receipts as historical evidence. The prepared receipt says the legacy run lacks the exact Python patch and installed distribution inventory and that one result-identity source differs; migration is therefore REVIEW_REQUIRED.
 
-The live pointer remains unread and UNKNOWN. A future activation review must separately decide whether to keep the workflow stopped at REVIEW_REQUIRED until a valid V0.2 predecessor is available, or authorize a one-time baseline creation/training operation under a narrowly scoped versioned authority. This proposal selects neither operation and authorizes no R2 read/write or training.
+The live pointer remains unread and UNKNOWN. The recommended cutover behavior is fixed: if only a V0.1 predecessor exists, or no valid V0.2 predecessor is available, return REVIEW_REQUIRED with no training and no R2 write. Do not auto-create the first V0.2 baseline. A one-time baseline creation/training operation requires a separate, exact versioned authority and receipt before execution. Until that authority exists and its evidence is reviewed, the V0.2 path remains blocked at this gate. This gives the proposal a deterministic safe default without treating a V0.1 record as V0.2 evidence.
 
 ## Implementation and acceptance gates
 

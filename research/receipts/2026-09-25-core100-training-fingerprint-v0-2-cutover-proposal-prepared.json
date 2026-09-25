@@ -29,5 +29,6 @@
   "r2_writes_performed": 0,
   "holdout_accessed": false,
   "local_user_files_accessed": false,
-  "paid_runtime_added": false
+  "paid_runtime_added": false,
+  "baseline_policy_recommendation": "V0.1 or missing V0.2 predecessor remains REVIEW_REQUIRED; no automatic training, R2 write, migration, or baseline creation. A one-time baseline requires a separate exact versioned authority and receipt."
 }

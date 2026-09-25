@@ -25,7 +25,10 @@
     "delete_or_overwrite_authorized": false,
     "live_pointer_read": false,
     "live_pointer_status": "UNKNOWN",
-    "one_time_rebaseline_or_training": "REQUIRES_SEPARATE_VERSIONED_AUTHORITY"
+    "one_time_rebaseline_or_training": "REQUIRES_SEPARATE_VERSIONED_AUTHORITY",
+    "recommended_cutover_behavior": "Missing or legacy V0.1 predecessor -> REVIEW_REQUIRED, no training and no R2 write.",
+    "initial_v0_2_baseline_auto_creation_authorized": false,
+    "initial_v0_2_baseline_requires": "A separate exact versioned authority and receipt; no implicit cutover-time run."
   },
   "future_execution": {
     "workflow": "existing weekly training workflow only",
