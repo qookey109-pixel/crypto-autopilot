@@ -1,0 +1,33 @@
+{
+  "schema": "qookey-core100-training-fingerprint-v0.2-cutover-proposal-preparation-v0.1",
+  "status": "PROPOSAL_PREPARED_NOT_AUTHORIZED",
+  "prepared_at_utc": "2026-09-25 03:16:11 UTC",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "evidence_basis_main_sha": "e1d037d570e8641442448fad50422ca6f217b8aa",
+  "proposal_config": "config/core100_training_fingerprint_v0_2_cutover_proposal_v0_1.json",
+  "proposal_document": "docs/CORE100_TRAINING_FINGERPRINT_V0_2_CUTOVER_PROPOSAL.md",
+  "source_contract_sha": "2ee82c6d030c3ebdb49b985220f07a7e7c1109f4fef7c15b27fba0ae02922d2a",
+  "inventory_observation": {
+    "python_import_closure": 31,
+    "identity_support_files": 3,
+    "execution_context_anchors": 2,
+    "total_blob_entries": 36,
+    "matches_preparation_receipt": 36,
+    "changed_blob_entries": 0,
+    "missing_blob_entries": 0,
+    "method": "GitHub main tree blob metadata only",
+    "production_pointer_read": false,
+    "r2_accessed": false
+  },
+  "legacy_baseline_disposition": "REVIEW_REQUIRED; do not migrate, delete, overwrite, or automatically reuse V0.1 pointer",
+  "authorities_added": [],
+  "active_runner_changed": false,
+  "active_workflow_changed": false,
+  "training_performed": false,
+  "provider_requests_performed": 0,
+  "r2_reads_performed": 0,
+  "r2_writes_performed": 0,
+  "holdout_accessed": false,
+  "local_user_files_accessed": false,
+  "paid_runtime_added": false
+}
