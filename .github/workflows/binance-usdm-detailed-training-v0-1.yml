@@ -82,7 +82,8 @@ jobs:
           set -euo pipefail
           venv="$RUNNER_TEMP/core100-fingerprint-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           python -m venv "$venv"
-          "$venv/bin/python" -m pip install -c requirements/ci-constraints.txt .
+          "$venv/bin/python" -m pip install -c requirements/ci-constraints.txt "setuptools==80.9.0"
+          "$venv/bin/python" -m pip install --no-build-isolation -c requirements/ci-constraints.txt .
           echo "CORE100_FINGERPRINT_PYTHON=$venv/bin/python" >> "$GITHUB_ENV"
           echo "CORE100_FINGERPRINT_ISOLATED_ENVIRONMENT=true" >> "$GITHUB_ENV"
 
