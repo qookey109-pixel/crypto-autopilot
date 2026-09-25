@@ -136,13 +136,13 @@ PR / merge / deployment / natural schedule：各自狀態
 
 ### CLOUD-01 — 交付與自然排程驗收
 
-- 目的：將維護程式交付為可審查 PR，合併後確認自然執行；不自動合併。
+- 目的：以 live current main 與現有 open PR 為準完成維護自然驗收；維護交付本身已合併，不從歷史 PR 重建待辦。
 - 前置：讀 live main、Cloud Maintenance V0.1 contract／receipt、open PR。
 - 起點：在本次 run summary／PR 填 exact main、head、base 及證據 URL，禁止使用固定舊 SHA。
 - 步驟：
-  1. 查 #497 整理紀錄及 #496 fingerprint PR。已合併則記 merge SHA；未合併則保留等待，不重做。
-  2. 查維護交付 PR 的 Python 3.12／3.13、Ruff、workflow-static 與相關治理檢查。
-  3. 需合併時列為 WAITING_USER_MERGE；缺檢查列 UNKNOWN，GitHub 要批准 CI 時列 WAITING_CI_APPROVAL。
+  1. 先查 current main 與所有 live open PR 的 exact head/base/draft/merged/checks；#496/#497 等舊 PR 僅保留歷史證據，不固定投影成目前待辦。
+  2. 若本輪 maintenance 產生 draft PR，查該 PR 的 Python 3.12／3.13、Ruff、workflow-static 與相關治理檢查；沒有 live PR 就不得用已合併舊 PR 代替。
+  3. 需要合併的 live PR 才列 WAITING_USER_MERGE；缺檢查列 UNKNOWN，GitHub 要批准 CI 時列 WAITING_CI_APPROVAL。
   4. 合併後查首次自然 Health schedule 的 completion 是否觸發維護 inspect／propose；不 dispatch 補證據。
   5. 再查第二個不同自然 Health run；驗證維護兩次完整完成，其中無變化回合 NO_CHANGE 且 commits_created=0。
 - 驗收：兩組 source run ID／attempt、main／head、兩個 job 結果、產生的 draft PR 或 NO_CHANGE 摘要；人工檢查 generated-block-only diff。
