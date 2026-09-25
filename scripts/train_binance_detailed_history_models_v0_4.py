@@ -326,7 +326,10 @@ def _load_v02_latest(store) -> tuple[str, dict[str, Any] | None, dict[str, Any] 
         not isinstance(latest, dict)
         or latest.get("schema") != "binance-usdm-core100-fingerprint-v0.2-latest-v0.1"
         or latest.get("namespace") != V02_NAMESPACE
-        or latest.get("run_id") is None
+        or not isinstance(latest.get("run_id"), str)
+        or not latest["run_id"].startswith("github-")
+        or not latest["run_id"].endswith("-1")
+        or runner.SAFE_RUN_ID.fullmatch(latest["run_id"]) is None
         or latest.get("manifest_key") != f"{V02_NAMESPACE}/runs/run={latest.get('run_id')}/manifest.json"
         or not isinstance(latest.get("manifest_sha256"), str)
     ):
@@ -344,6 +347,31 @@ def _load_v02_latest(store) -> tuple[str, dict[str, Any] | None, dict[str, Any] 
         or not isinstance(manifest.get("training_fingerprint_v0_2"), dict)
     ):
         raise BootstrapBlocked("V0.2 latest manifest is malformed")
+    evidence = manifest["training_fingerprint_v0_2"]
+    objects = manifest.get("objects")
+    if (
+        manifest.get("provider") != "binance_usdm"
+        or latest.get("provider") != "binance_usdm"
+        or not isinstance(objects, list)
+        or len(objects) != 2
+        or {item.get("role") for item in objects if isinstance(item, dict)}
+        != {"model", "metrics"}
+        or manifest.get("dataset_fingerprint") != latest.get("dataset_fingerprint")
+        or manifest.get("experiment_fingerprint") != latest.get("experiment_fingerprint")
+        or manifest.get("implementation_receipt_git_blob_sha")
+        != latest.get("implementation_receipt_git_blob_sha")
+        or evidence.get("dataset_fingerprint") != latest.get("dataset_fingerprint")
+        or evidence.get("experiment_fingerprint") != latest.get("experiment_fingerprint")
+        or evidence.get("runtime_guard_fingerprint") != manifest.get("runtime_guard_fingerprint")
+    ):
+        raise BootstrapBlocked("V0.2 latest pointer and manifest disagree")
+    by_role = {item["role"]: item for item in objects}
+    for role in ("model", "metrics"):
+        if (
+            by_role[role].get("key") != latest.get(role + "_key")
+            or by_role[role].get("sha256") != latest.get(role + "_sha256")
+        ):
+            raise BootstrapBlocked("V0.2 output binding is inconsistent")
     return key, latest, manifest
 
 
@@ -432,6 +460,8 @@ def _publish_baseline(
         (f"{run_prefix}/metrics.json", metrics_payload, "metrics"),
         (f"{run_prefix}/manifest.json", manifest_payload, "manifest"),
     ):
+        report["r2_write_attempted"] = True
+        report["r2_writes_performed"] = "UNKNOWN_AFTER_WRITE_ATTEMPT"
         records.append(runner.put_immutable(store, key=key, payload=payload, role=role))
         report["r2_writes_performed"] = True
         report["written_objects"] = records.copy()
