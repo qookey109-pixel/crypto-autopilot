@@ -91,6 +91,43 @@ class TypeVisibilityV01Tests(unittest.TestCase):
         )
         self.assertFalse(diagnostics["src/crypto_autopilot/live.py"]["receipt_bound"])
 
+    def test_parser_classifies_freeze_bound_without_hiding_errors(self) -> None:
+        parsed = self.module.parse_mypy_output(
+            "\n".join(
+                [
+                    "src/crypto_autopilot/receipt.py:10:5: error: Receipt issue [arg-type]",
+                    "src/crypto_autopilot/freeze.py:20:7: error: Freeze issue [assignment]",
+                    "src/crypto_autopilot/live.py:30:9: error: Live issue [attr-defined]",
+                ]
+            ),
+            receipt_bindings={
+                "src/crypto_autopilot/receipt.py": (
+                    "research/receipts/example-prepared.json",
+                )
+            },
+            freeze_bindings={
+                "src/crypto_autopilot/freeze.py": (
+                    "config/v0_10_critical_path_freeze_v0_1.json",
+                )
+            },
+        )
+        self.assertEqual(parsed["error_count"], 3)
+        self.assertEqual(parsed["receipt_bound_error_count"], 1)
+        self.assertEqual(parsed["unbound_error_count"], 2)
+        self.assertEqual(parsed["freeze_bound_error_count"], 1)
+        self.assertEqual(parsed["protected_error_count"], 2)
+        self.assertEqual(parsed["cleanup_candidate_error_count"], 1)
+        diagnostics = {row["path"]: row for row in parsed["diagnostics"]}
+        self.assertTrue(diagnostics["src/crypto_autopilot/receipt.py"]["receipt_bound"])
+        self.assertFalse(diagnostics["src/crypto_autopilot/receipt.py"]["freeze_bound"])
+        self.assertTrue(diagnostics["src/crypto_autopilot/freeze.py"]["freeze_bound"])
+        self.assertEqual(
+            diagnostics["src/crypto_autopilot/freeze.py"]["freeze_manifests"],
+            ["config/v0_10_critical_path_freeze_v0_1.json"],
+        )
+        self.assertFalse(diagnostics["src/crypto_autopilot/live.py"]["receipt_bound"])
+        self.assertFalse(diagnostics["src/crypto_autopilot/live.py"]["freeze_bound"])
+
     def test_parser_preserves_unrecognized_lines_as_visibility_metadata(self) -> None:
         parsed = self.module.parse_mypy_output("unexpected mypy output")
         self.assertEqual(parsed["diagnostic_count"], 0)
