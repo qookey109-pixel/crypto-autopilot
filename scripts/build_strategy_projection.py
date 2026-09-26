@@ -10,6 +10,9 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = {
     "baseline": ROOT / "config" / "strategy_v0_1.json",
+    "opportunity_engine": ROOT / "config" / "daily_opportunity_engine_v0_1.json",
+    "strategy_router": ROOT / "config" / "strategy_router_v0_1.json",
+    "strategy_library": ROOT / "config" / "strategy_library_v0_1.json",
     "technical": ROOT / "config" / "technical_analysis_v0_2.json",
     "parameter_sweep": ROOT / "config" / "strategy_parameter_sweep_v0_1.json",
     "shadow": ROOT / "config" / "binance_spot_shadow_v0_6.json",
@@ -42,6 +45,9 @@ def build_projection(
 ) -> dict[str, Any]:
     loaded = {name: _load(path) for name, path in SOURCES.items()}
     baseline = loaded["baseline"]
+    opportunity = loaded["opportunity_engine"]
+    strategy_router = loaded["strategy_router"]
+    strategy_library = loaded["strategy_library"]
     technical = loaded["technical"]
     sweep = loaded["parameter_sweep"]
     shadow = loaded["shadow"]
@@ -92,6 +98,59 @@ def build_projection(
         ),
         "research_loop.execution",
     )
+    _assert_false(
+        opportunity["authority"],
+        (
+            "provider_access_authorized",
+            "r2_access_authorized",
+            "holdout_access_authorized",
+            "source_switch_authorized",
+            "strategy_promotion_authorized",
+            "model_promotion_authorized",
+            "formal_trade_plan_authorized",
+            "real_money_order_authorized",
+            "live_trading_authorized",
+            "merge_authority_granted",
+        ),
+        "opportunity_engine.authority",
+    )
+    _assert_false(
+        strategy_router["authority"],
+        (
+            "strategy_edge_claimed",
+            "strategy_promotion_authorized",
+            "short_execution_authorized",
+            "provider_access_authorized",
+            "r2_access_authorized",
+            "holdout_access_authorized",
+            "source_switch_authorized",
+            "model_promotion_authorized",
+            "formal_trade_plan_authorized",
+            "real_money_order_authorized",
+            "live_trading_authorized",
+            "merge_authority_granted",
+        ),
+        "strategy_router.authority",
+    )
+    _assert_false(
+        strategy_library["authority"],
+        (
+            "strategy_edge_claimed",
+            "position_sizing_authorized",
+            "paper_execution_authorized",
+            "short_execution_authorized",
+            "provider_access_authorized",
+            "r2_access_authorized",
+            "holdout_access_authorized",
+            "strategy_promotion_authorized",
+            "model_promotion_authorized",
+            "formal_trade_plan_authorized",
+            "real_money_order_authorized",
+            "live_trading_authorized",
+            "merge_authority_granted",
+        ),
+        "strategy_library.authority",
+    )
     if sweep.get("trade_plan_authorized") is not False:
         raise RuntimeError("parameter_sweep.trade_plan_authorized must remain false")
     if loop["composition"].get("automatic_promotion") is not False:
@@ -99,6 +158,14 @@ def build_projection(
 
     families = loop["candidate_search"]["families"]
     horizons = sorted({horizon for family in families for horizon in family["horizons"]})
+    router_families = strategy_router["strategy_families"]
+    library_families = [family["family"] for family in strategy_library["families"]]
+    if router_families != library_families:
+        raise RuntimeError("strategy router/library family registries must match")
+    if opportunity["behavior"].get("may_return_zero_candidates") is not True:
+        raise RuntimeError("daily opportunity engine must preserve NO_CANDIDATE")
+    if strategy_router["behavior"].get("zero_matches_returns") != "NO_TRADE":
+        raise RuntimeError("strategy router must preserve NO_TRADE")
     feature_groups = shadow["training"]["groups"]
     return {
         "schema": "qookey-dashboard-strategy-projection-v0.1",
@@ -110,6 +177,9 @@ def build_projection(
         "summary": {
             "candidateCount": loop["candidate_search"]["expected_candidate_count"],
             "familyCount": len(families),
+            "routerFamilyCount": len(router_families),
+            "opportunityBiasCount": len(opportunity["directional_biases"]),
+            "maximumDailyOpportunityCandidates": opportunity["policy"]["maximum_candidates"],
             "horizonCount": len(horizons),
             "edgeMethodCount": len(edge["methods"]),
             "technicalIntervalCount": len(technical["supported_intervals"]),
@@ -120,7 +190,25 @@ def build_projection(
                 "id": "baseline",
                 "name": "Paper 策略基線",
                 "status": "PAPER_BASELINE",
-                "detail": "SState 准入、100 分技術品質與結構風控；目前仍為 LONG_ONLY。",
+                "detail": "Legacy Paper baseline 仍為 LONG_ONLY；不代表目前多資產、多策略研究架構只支援做多。",
+            },
+            {
+                "id": "opportunity_engine",
+                "name": "Daily Opportunity Engine V0.1",
+                "status": opportunity["status"],
+                "detail": (
+                    f"多資產注意力候選；{len(opportunity['directional_biases'])} 種 bias，"
+                    f"最多 {opportunity['policy']['maximum_candidates']} 個候選，也允許 NO_CANDIDATE。"
+                ),
+            },
+            {
+                "id": "strategy_router",
+                "name": "Strategy Router / Library V0.1",
+                "status": strategy_router["status"],
+                "detail": (
+                    f"{len(router_families)} 個研究策略家族支援 LONG/SHORT compatibility routing；"
+                    "零符合回 NO_TRADE，最終取捨仍交由 Portfolio / Risk。"
+                ),
             },
             {
                 "id": "technical",
@@ -159,6 +247,7 @@ def build_projection(
             "holdoutAccessAuthorized": False,
             "backtestAdmissionAuthorized": False,
             "automaticModelPromotionAuthorized": False,
+            "shortExecutionAuthorized": False,
             "tradePlanAuthorized": False,
             "realMoneyOrderAuthorized": False,
             "liveTradingAuthorized": False,

@@ -20,6 +20,9 @@ class DashboardStrategyProjectionTests(unittest.TestCase):
         self.assertIs(actual["authority"], False)
         self.assertIsNone(actual["generatedAtUtc"])
         self.assertEqual(actual["summary"]["candidateCount"], 120)
+        self.assertEqual(actual["summary"]["routerFamilyCount"], 6)
+        self.assertEqual(actual["summary"]["opportunityBiasCount"], 3)
+        self.assertEqual(actual["summary"]["maximumDailyOpportunityCandidates"], 5)
         self.assertEqual(actual["summary"]["edgeMethodCount"], 6)
         self.assertEqual(actual["summary"]["shadowFeatureGroupCount"], 8)
         self.assertTrue(all(value is False for value in actual["safetyBoundary"].values()))
@@ -31,6 +34,16 @@ class DashboardStrategyProjectionTests(unittest.TestCase):
             changed = Path(directory) / "shadow.json"
             changed.write_text(json.dumps(shadow), encoding="utf-8")
             with patch.dict(builder.SOURCES, {"shadow": changed}):
+                with self.assertRaisesRegex(RuntimeError, "must remain false"):
+                    builder.build_projection(checked_in_fixture=True)
+
+    def test_projection_fails_closed_if_router_gains_short_execution(self) -> None:
+        router = json.loads(builder.SOURCES["strategy_router"].read_text(encoding="utf-8"))
+        router["authority"]["short_execution_authorized"] = True
+        with tempfile.TemporaryDirectory() as directory:
+            changed = Path(directory) / "router.json"
+            changed.write_text(json.dumps(router), encoding="utf-8")
+            with patch.dict(builder.SOURCES, {"strategy_router": changed}):
                 with self.assertRaisesRegex(RuntimeError, "must remain false"):
                     builder.build_projection(checked_in_fixture=True)
 
