@@ -219,29 +219,30 @@ def main() -> int:
         raise RuntimeError("alternative-assets projection safety boundary changed")
 
     history_progress = json.loads(HISTORY_PROGRESS.read_text(encoding="utf-8"))
-    if history_progress.get("schema") != "qookey-dashboard-history-progress-v0.1":
+    if history_progress.get("schema") != "qookey-dashboard-history-progress-v0.2":
         raise RuntimeError("dashboard history progress schema changed")
     if history_progress.get("authority") is not False:
         raise RuntimeError("dashboard history progress must remain non-authoritative")
-    if history_progress.get("snapshotType") != "SECRET_FREE_GITHUB_ACTIONS_RUN_REPORT":
-        raise RuntimeError("dashboard history progress must remain a secret-free Actions report")
-    if history_progress.get("status") != "IN_PROGRESS":
-        raise RuntimeError("dashboard history progress fixture must remain in progress")
-    if history_progress.get("provider") != "binance_usdm" or history_progress.get("mode") != "backfill":
-        raise RuntimeError("dashboard history progress provider/mode changed")
-    if history_progress.get("shardCount") != 10:
-        raise RuntimeError("dashboard history progress shard count changed")
-    complete = history_progress.get("shardsComplete")
-    last_shard = history_progress.get("lastShardIndex")
-    if isinstance(complete, bool) or not isinstance(complete, int) or not 0 <= complete <= 10:
-        raise RuntimeError("dashboard history progress completion count is invalid")
-    if isinstance(last_shard, bool) or not isinstance(last_shard, int) or not 1 <= last_shard <= 10:
-        raise RuntimeError("dashboard history progress last shard is invalid")
-    source_url = history_progress.get("sourceUrl")
-    if not isinstance(source_url, str) or not source_url.startswith(
-        "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/"
+    if history_progress.get("snapshotType") != "CURRENT_OPERATIONS_PROJECTION":
+        raise RuntimeError("dashboard history progress must project current operations")
+    if history_progress.get("source") != "research/status/current-operations-v0-3.json":
+        raise RuntimeError("dashboard history progress source changed")
+    if history_progress.get("status") != "COMPLETE":
+        raise RuntimeError("dashboard history progress fixture must remain complete")
+    if (
+        history_progress.get("provider") != "binance_usdm"
+        or history_progress.get("mode") != "current_operations"
     ):
-        raise RuntimeError("dashboard history progress source URL is invalid")
+        raise RuntimeError("dashboard history progress provider/mode changed")
+    if (history_progress.get("shardsComplete"), history_progress.get("shardCount")) != (10, 10):
+        raise RuntimeError("dashboard history progress completion count changed")
+    if history_progress.get("historyReacquisitionRequired") is not False:
+        raise RuntimeError("completed history must not request reacquisition")
+    if history_progress.get("trainingRunId") != 34918219864:
+        raise RuntimeError("dashboard history progress training run changed")
+    if history_progress.get("modelQualityStatus") != "REJECT":
+        raise RuntimeError("dashboard history progress model-quality state changed")
+    complete = history_progress["shardsComplete"]
     history_security = history_progress.get("safetyBoundary") or {}
     if not history_security or any(value is not False for value in history_security.values()):
         raise RuntimeError("dashboard history progress safety boundary changed")
@@ -588,7 +589,21 @@ def main() -> int:
             raise RuntimeError(f"dashboard view missing: {view}")
 
     app_js = APP_JS.read_text(encoding="utf-8")
+    current_operations_js = (ROOT / "assets" / "js" / "current-operations.js").read_text(
+        encoding="utf-8"
+    )
     styles = STYLES.read_text(encoding="utf-8")
+    for stale_runtime in (
+        'payload.mode !== "PAPER_ONLY"',
+        'payload.pionexValidationStatus !== "PENDING_MANUAL_DISPATCH"',
+        'text("readiness-heading", "9/16 目前作業狀態")',
+    ):
+        if stale_runtime in current_operations_js:
+            raise RuntimeError(
+                f"dashboard current-operations runtime contains stale contract: {stale_runtime}"
+            )
+    if "marketCount: 15, fundingMonths: 1010" in app_js:
+        raise RuntimeError("dashboard fallback must not fabricate market/funding values")
     if "style=" in html or "style=" in app_js:
         raise RuntimeError("dashboard CSP forbids inline style attributes")
     for token in (
@@ -686,7 +701,7 @@ def main() -> int:
                 "views": 9,
                 "calendar_items": len(calendar_items),
                 "history_progress": f"{complete}/{history_progress['shardCount']}",
-                "history_snapshot_run": history_progress["sourceRunId"],
+                "history_source": history_progress["source"],
                 "locale": "zh-Hant-TW",
                 "authority_fixture": False,
                 "operational_authority": False,
