@@ -246,24 +246,24 @@ def _accumulate(
     route_count: dict[str, int] = defaultdict(int)
     directions: dict[str, set[str]] = defaultdict(set)
 
-    for item in exposures:
-        family_group = OVERLAP_GROUPS.get(item.strategy_family)
+    for exposure in exposures:
+        family_group = OVERLAP_GROUPS.get(exposure.strategy_family)
         if family_group is None:
             raise ValueError("existing exposure has ungoverned strategy overlap group")
-        symbol_risk[item.symbol] += item.realized_risk_usd
-        symbol_notional[item.symbol] += item.notional_usd
-        overlap_risk[family_group] += item.realized_risk_usd
-        route_count[item.symbol] += 1
-        directions[item.symbol].add(item.direction)
+        symbol_risk[exposure.symbol] += exposure.realized_risk_usd
+        symbol_notional[exposure.symbol] += exposure.notional_usd
+        overlap_risk[family_group] += exposure.realized_risk_usd
+        route_count[exposure.symbol] += 1
+        directions[exposure.symbol].add(exposure.direction)
 
-    for item in proposals:
-        total_risk += item.realized_risk_usd
-        gross_notional += item.approved_notional_usd
-        symbol_risk[item.symbol] += item.realized_risk_usd
-        symbol_notional[item.symbol] += item.approved_notional_usd
-        overlap_risk[item.overlap_group] += item.realized_risk_usd
-        route_count[item.symbol] += 1
-        directions[item.symbol].add(item.direction)
+    for proposal in proposals:
+        total_risk += proposal.realized_risk_usd
+        gross_notional += proposal.approved_notional_usd
+        symbol_risk[proposal.symbol] += proposal.realized_risk_usd
+        symbol_notional[proposal.symbol] += proposal.approved_notional_usd
+        overlap_risk[proposal.overlap_group] += proposal.realized_risk_usd
+        route_count[proposal.symbol] += 1
+        directions[proposal.symbol].add(proposal.direction)
 
     return (
         total_risk,
@@ -408,6 +408,15 @@ def _authority() -> dict[str, object]:
     }
 
 
+def _float_field(payload: Mapping[str, object], key: str) -> float:
+    value = payload[key]
+    if isinstance(value, bool) or not isinstance(
+        value, (str, bytes, bytearray, int, float)
+    ):
+        raise TypeError(f"{key} must be numeric")
+    return float(value)
+
+
 def position_sizing_plan_from_mapping(
     payload: Mapping[str, object],
 ) -> PositionSizingPlan:
@@ -440,17 +449,17 @@ def position_sizing_plan_from_mapping(
             status=str(payload["status"]),
             reason=str(payload["reason"]),
             direction=str(payload["direction"]),
-            equity_usd=float(payload["equity_usd"]),
-            entry_price=float(payload["entry_price"]),
-            stop_price=float(payload["stop_price"]),
-            stop_distance_fraction=float(payload["stop_distance_fraction"]),
-            target_risk_usd=float(payload["target_risk_usd"]),
-            realized_risk_usd=float(payload["realized_risk_usd"]),
-            target_notional_usd=float(payload["target_notional_usd"]),
-            approved_notional_usd=float(payload["approved_notional_usd"]),
-            required_leverage=float(payload["required_leverage"]),
-            realized_leverage=float(payload["realized_leverage"]),
-            risk_utilization_fraction=float(payload["risk_utilization_fraction"]),
+            equity_usd=_float_field(payload, "equity_usd"),
+            entry_price=_float_field(payload, "entry_price"),
+            stop_price=_float_field(payload, "stop_price"),
+            stop_distance_fraction=_float_field(payload, "stop_distance_fraction"),
+            target_risk_usd=_float_field(payload, "target_risk_usd"),
+            realized_risk_usd=_float_field(payload, "realized_risk_usd"),
+            target_notional_usd=_float_field(payload, "target_notional_usd"),
+            approved_notional_usd=_float_field(payload, "approved_notional_usd"),
+            required_leverage=_float_field(payload, "required_leverage"),
+            realized_leverage=_float_field(payload, "realized_leverage"),
+            risk_utilization_fraction=_float_field(payload, "risk_utilization_fraction"),
             clipped_by=tuple(clipped_by),
             stop_preserved=bool(payload["stop_preserved"]),
         )
@@ -524,8 +533,8 @@ def portfolio_admission_input_from_dict(
                     symbol=str(item["symbol"]),
                     strategy_family=str(item["strategy_family"]),
                     direction=str(item["direction"]),
-                    notional_usd=float(item["notional_usd"]),
-                    realized_risk_usd=float(item["realized_risk_usd"]),
+                    notional_usd=_float_field(item, "notional_usd"),
+                    realized_risk_usd=_float_field(item, "realized_risk_usd"),
                 )
             )
         except (KeyError, TypeError, ValueError) as error:
