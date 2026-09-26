@@ -249,7 +249,8 @@
       "provider-equivalence-v0-12-successor-metadata-capture.yml"
     ],
     "current_quality_or_security_visibility": [
-      "security-visibility-codeql.yml"
+      "security-visibility-codeql.yml",
+      "security-visibility-dependencies.yml"
     ]
   },
   "boundaries": {
