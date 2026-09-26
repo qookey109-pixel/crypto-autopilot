@@ -1,6 +1,6 @@
 # 專案接續與排程手冊
 
-更新：2026-09-25。適用任何能讀取 Repository 與 GitHub metadata 的模型。
+更新：2026-09-26。適用任何能讀取 Repository 與 GitHub metadata 的模型.
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
@@ -75,7 +75,7 @@ The report was recovered from the completed GitHub job log, which prints the sam
 | 時點（台北） | 工作與完成條件 |
 | --- | --- |
 | 既有 Health 自然完成後 | 唯讀健檢；Pages 自然 run `35843351924` 已成功，且其後自然 Health run `35870216734` 已 `PASS`、`alerts=0`。TD-010 已完成，後續只做正常健康監控並在新故障／恢復時更新 |
-| Cloud Maintenance V0.1 自然驗收 | PR #498 已合併。權限決定前的 Health `36099624753` → maintenance `36099661460`、`36134440456` → `36134490577` 都以 `BLOCKED_PERMISSION` 結束，僅保留歷史、不計入驗收。2026-09-25 經使用者授權後，已啟用 GitHub Actions 建立／核准 PR 權限；預設 `GITHUB_TOKEN` 仍唯讀。尚無權限變更後的自然 Health 來源，驗收為 **0/2**。等待兩個不同的未來自然 Health run/attempt，inspect／propose 均完整成功，且至少一次 `NO_CHANGE / commits_created=0`；禁止手動 dispatch／rerun 補算。Repository auto-merge 與合併後刪除 head branch 已啟用；只對通過精確 head/base、必要 review／CI 與 authority gate 的 PR 個別啟用 auto-merge。研究結果仍為 `UNKNOWN_FROM_METADATA`。 |
+| Cloud Maintenance V0.1 自然驗收 | **COMPLETE**。權限決定前的兩組 `BLOCKED_PERMISSION` 僅保留歷史、不計入。權限變更後三組自然 Health → Maintenance 鏈 `36168047712` → `36168107765`、`36193834603` → `36193882301`、`36206764619` → `36206794716` 均完成 `inspect` / `propose`；後兩組明確為 `NO_CHANGE / commits_created=0`。第一組建立 generated-block-only draft PR #509，經核准 CI 後合併為 `1e5234fc7b37572a178ee6d06b10214a50263258`。未使用 dispatch／rerun 補算；研究結果仍為 `UNKNOWN_FROM_METADATA`。 |
 | 2026-09-27 11:53 之後 | 核對 Pionex bounded observability 最後名義 slot 的自然 schedule；保留 missing／delayed／failure |
 | 2026-09-27 12:37 之後 | 核對 Weekly Training 自然 schedule；只從 metadata 確認 workflow 結論，無 report 就不判定 NO_CHANGE／模型 PASS |
 | 自 2026-09-23 起取得至少 7 天觀測後 | 整理 delay／missing／cancelled／重複／duration；列 coverage、樣本量、未知值，再提 cadence 建議 |
@@ -148,7 +148,7 @@ PR / merge / deployment / natural schedule：各自狀態
 - 驗收：兩組 source run ID／attempt、main／head、兩個 job 結果、產生的 draft PR 或 NO_CHANGE 摘要；人工檢查 generated-block-only diff。
 - 停止：main 前進、衝突、人工編輯、來源不可信、缺權限／資料、CI 失敗時轉 CLOUD-02；不得自動擴權。
 - 交付：完成／等待／未知分列。CI、merge、維護自然執行、研究結果分開。
-- 下一步：GitHub Actions 建立／核准 PR 權限已於 2026-09-25 經使用者授權啟用，預設 `GITHUB_TOKEN` 仍唯讀。忽略設定變更前兩次 `BLOCKED_PERMISSION` 歷史來源；等待兩個不同的設定變更後自然 Health run/attempt，inspect／propose 均完整成功且至少一次 `NO_CHANGE / commits_created=0`。不得手動 dispatch／rerun 補算。Core100 V0.2 的 #504/#505 與一次性 bootstrap 已完成；保持模型品質 `REJECT`，不重跑、不放寬門檻。Auto-merge 僅逐 PR 啟用，須先核對 exact head/base、必要 review、CI 與 authority boundary。
+- 下一步：CLOUD-01 自然驗收已完成；維持既有 Health / Maintenance 行為，不再補跑驗收。下一個固定檢查點是 2026-09-27 的 Pionex bounded observability 與 Weekly Training 自然 schedule。Core100 V0.2 一次性 bootstrap 已完成且模型品質保持 `REJECT`；禁止 rerun、放寬門檻、推論 promotion 或 source switch。Auto-merge 仍只對逐 PR、通過 exact head/base、必要 review／CI 與 authority boundary 的交付使用。
 
 ### CLOUD-02 — 異常與程式缺陷交接
 
