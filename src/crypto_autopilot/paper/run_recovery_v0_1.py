@@ -20,7 +20,10 @@ from crypto_autopilot.paper.run_coordinator_v0_1 import (
     verify_live_paper_run_result,
     verify_live_paper_run_step,
 )
-from crypto_autopilot.paper.run_store_v0_1 import run_store_receipt_evidence
+from crypto_autopilot.paper.run_store_v0_1 import (
+    PaperRunStoreReceipt,
+    run_store_receipt_evidence,
+)
 
 
 class PaperRunRecoveryStore(Protocol):
@@ -35,7 +38,7 @@ class PaperRunRecoveryStore(Protocol):
         kind: str,
         object_id: str,
         payload: Mapping[str, object],
-    ) -> object: ...
+    ) -> PaperRunStoreReceipt: ...
 
     def list_json_ids(self, kind: str) -> tuple[str, ...]: ...
 
@@ -342,14 +345,14 @@ def reconcile_live_paper_run(
     issues = [*step_scan_issues, *result_scan_issues, *claim_scan_issues]
 
     if not steps:
-        unresolved_claim_slots = sorted(claims)
-        if unresolved_claim_slots:
+        empty_unresolved_claim_slots = sorted(claims)
+        if empty_unresolved_claim_slots:
             issues.extend(
                 "unresolved_claim_without_step:"
                 + slot_id
                 + ":"
                 + str(claims[slot_id].get("request_id"))
-                for slot_id in unresolved_claim_slots
+                for slot_id in empty_unresolved_claim_slots
             )
         orphan_results = sorted(results)
         if orphan_results:
@@ -378,7 +381,7 @@ def reconcile_live_paper_run(
             "run_id": run_id,
             "step_count": 0,
             "claim_count": len(claims),
-            "unresolved_claim_slot_ids": unresolved_claim_slots,
+            "unresolved_claim_slot_ids": empty_unresolved_claim_slots,
             "terminal_step_id": None,
             "terminal_state_id": initial_state_id,
             "repairable_request_ids": [],
@@ -489,23 +492,46 @@ def reconcile_live_paper_run(
             issues.append(f"claim_missing_request_id:{slot_id}")
             unresolved_claim_slots.append(slot_id)
             continue
-        step = complete_steps_by_request.get(request_id)
-        if step is None:
+        claimed_step = complete_steps_by_request.get(request_id)
+        if claimed_step is None:
             issues.append(f"unresolved_claim_without_complete_step:{slot_id}:{request_id}")
             unresolved_claim_slots.append(slot_id)
             continue
+
+        claimed_sequence = claimed_step.get("sequence")
+        claimed_previous_step_id = claimed_step.get("previous_step_id")
+        claimed_previous_state_id = claimed_step.get("previous_state_id")
+        if (
+            not isinstance(claimed_sequence, int)
+            or isinstance(claimed_sequence, bool)
+            or claimed_sequence < 1
+        ):
+            issues.append(f"claim_step_sequence_invalid:{slot_id}:{request_id}")
+            unresolved_claim_slots.append(slot_id)
+            continue
+        if claimed_previous_step_id is not None and not isinstance(
+            claimed_previous_step_id, str
+        ):
+            issues.append(f"claim_step_previous_id_invalid:{slot_id}:{request_id}")
+            unresolved_claim_slots.append(slot_id)
+            continue
+        if not isinstance(claimed_previous_state_id, str) or not claimed_previous_state_id:
+            issues.append(f"claim_step_previous_state_invalid:{slot_id}:{request_id}")
+            unresolved_claim_slots.append(slot_id)
+            continue
+
         expected_slot = live_paper_run_slot_id(
             run_id=run_id,
-            sequence=int(step["sequence"]),
-            previous_step_id=step.get("previous_step_id"),
-            previous_state_id=str(step["previous_state_id"]),
+            sequence=claimed_sequence,
+            previous_step_id=claimed_previous_step_id,
+            previous_state_id=claimed_previous_state_id,
         )
         if expected_slot != slot_id:
             issues.append(f"claim_step_slot_mismatch:{slot_id}:{request_id}")
             unresolved_claim_slots.append(slot_id)
             continue
         result = results.get(request_id)
-        if result is not None and result.get("_verified_step_id") != step.get("step_id"):
+        if result is not None and result.get("_verified_step_id") != claimed_step.get("step_id"):
             issues.append(f"claim_result_step_mismatch:{slot_id}:{request_id}")
             unresolved_claim_slots.append(slot_id)
 
@@ -519,18 +545,17 @@ def reconcile_live_paper_run(
         for tick_id in orphan_ticks
     )
 
-    receipts: list[object] = []
+    receipts: list[PaperRunStoreReceipt] = []
     repaired: list[str] = []
     if repair_missing_result_seals and not issues:
         request_to_step = {
-            str(step["request_id"]): step
-            for step in steps.values()
+            str(step["request_id"]): (step, sequence)
+            for sequence, step in steps.items()
             if isinstance(step.get("request_id"), str)
         }
         for request_id in sorted(repairable):
-            step = request_to_step[request_id]
-            step_id = str(step["step_id"])
-            sequence = int(step["sequence"])
+            repair_step, sequence = request_to_step[request_id]
+            step_id = str(repair_step["step_id"])
             result_payload = build_live_paper_run_result(
                 request_id=request_id,
                 step_id=step_id,
