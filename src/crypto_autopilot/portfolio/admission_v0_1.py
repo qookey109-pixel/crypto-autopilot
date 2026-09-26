@@ -475,7 +475,7 @@ def portfolio_admission_input_from_dict(
     if isinstance(payload.get("equity_usd"), bool):
         raise ValueError("equity_usd cannot be boolean")
     try:
-        equity_usd = float(payload["equity_usd"])
+        equity_usd = _float_field(payload, "equity_usd")
     except (KeyError, TypeError, ValueError) as error:
         raise ValueError(f"invalid equity_usd: {error}") from error
 
