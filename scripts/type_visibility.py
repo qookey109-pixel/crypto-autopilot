@@ -46,21 +46,35 @@ def _receipt_bindings() -> dict[str, tuple[str, ...]]:
             payload = json.loads(receipt_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
-        artifacts = payload.get("artifacts")
-        if not isinstance(artifacts, Mapping):
-            continue
         receipt_display = receipt_path.relative_to(ROOT).as_posix()
-        for artifact in artifacts.values():
-            if not isinstance(artifact, Mapping):
-                continue
-            raw_path = artifact.get("path")
-            digest = artifact.get("sha256")
-            if not isinstance(raw_path, str) or not raw_path.strip():
-                continue
-            if not isinstance(digest, str) or len(digest) != 64:
-                continue
-            path = Path(raw_path).as_posix()
-            bindings.setdefault(path, set()).add(receipt_display)
+
+        artifacts = payload.get("artifacts")
+        if isinstance(artifacts, Mapping):
+            for artifact in artifacts.values():
+                if not isinstance(artifact, Mapping):
+                    continue
+                raw_path = artifact.get("path")
+                digest = artifact.get("sha256")
+                if not isinstance(raw_path, str) or not raw_path.strip():
+                    continue
+                if not isinstance(digest, str) or len(digest) != 64:
+                    continue
+                path = Path(raw_path).as_posix()
+                bindings.setdefault(path, set()).add(receipt_display)
+
+        bound_files = payload.get("bound_files")
+        if isinstance(bound_files, list):
+            for row in bound_files:
+                if not isinstance(row, Mapping):
+                    continue
+                raw_path = row.get("path")
+                git_blob_sha = row.get("git_blob_sha")
+                if not isinstance(raw_path, str) or not raw_path.strip():
+                    continue
+                if not isinstance(git_blob_sha, str) or len(git_blob_sha) != 40:
+                    continue
+                path = Path(raw_path).as_posix()
+                bindings.setdefault(path, set()).add(receipt_display)
 
     return {
         path: tuple(sorted(receipts))
