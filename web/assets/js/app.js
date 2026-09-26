@@ -149,6 +149,24 @@ function renderAlternativeAssets(projection) {
     badge.textContent = displayStatus(status);
     badge.className = `badge ${badgeClass(status)}`;
   }
+  if (!safe) {
+    for (const id of [
+      "alternative-assets-candidates",
+      "alternative-assets-matched",
+      "alternative-assets-equity",
+      "alternative-assets-funds",
+      "alternative-assets-metals",
+      "alternative-assets-capacity",
+    ]) {
+      setText(id, "—");
+    }
+    setText("alternative-assets-observed-at", "目錄觀測：暫不可核實");
+    setText(
+      "alternative-assets-note",
+      "Alternative-assets projection 暫不可核實；不以 0 代替缺少資料。"
+    );
+    return;
+  }
   setText("alternative-assets-candidates", number(registry.total, 0));
   setText("alternative-assets-matched", number(actual?.matched_market_count, 0));
   setText("alternative-assets-equity", number(counts.us_equity_token, 0));
