@@ -83,6 +83,20 @@ class R2Store:
             )
         return payload
 
+    def exists(self, key: str) -> bool:
+        """Return whether an object key exists without reading its payload."""
+
+        try:
+            self.client.head_object(Bucket=self.bucket, Key=key)
+        except Exception as exc:  # boto3's ClientError is optional until runtime
+            response_payload = getattr(exc, "response", {}) or {}
+            code = str(response_payload.get("Error", {}).get("Code", ""))
+            status = response_payload.get("ResponseMetadata", {}).get("HTTPStatusCode")
+            if code in {"NoSuchKey", "NotFound", "404"} or status == 404:
+                return False
+            raise
+        return True
+
     def get_bytes_if_exists(self, key: str) -> bytes | None:
         """Read an object if it exists and verify the SHA-256 metadata when present."""
 
