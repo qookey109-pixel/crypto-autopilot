@@ -455,7 +455,7 @@ def circular_shift_signal_permutation(
         shifts = rng.sample(possible_shifts, samples)
     greater_or_equal = 0
     for shift in shifts:
-        shifted = positions[-shift:] + positions[:-shift]
+        shifted = tuple(positions[-shift:]) + tuple(positions[:-shift])
         statistic = sum(position * value for position, value in zip(shifted, market_returns))
         greater_or_equal += statistic >= observed
     p_value = (greater_or_equal + 1) / (len(shifts) + 1)
