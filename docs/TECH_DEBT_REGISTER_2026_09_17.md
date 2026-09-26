@@ -92,12 +92,14 @@ Already implemented:
 - `.github/dependabot.yml` tracks both `pip` and GitHub Actions monthly;
 - update PRs are review-only; no auto-merge authority is introduced;
 - repository-controlled CodeQL runs as non-blocking security visibility and has passed on current main;
+- CI includes checksum-verified actionlint `1.7.12` for changed workflow files on pull requests;
+- CI includes pinned pip-audit `2.10.1` as informational / non-blocking dependency security visibility on every pull request and main push; it audits the frozen installed runtime dependency set and uploads CycloneDX JSON plus the audited requirements list for 30 days;
 - Open PR Triage V0.7 records the completed dependency review; future proposals still require compatibility review;
-- dependency classifications remain review guidance only and do not grant merge authority.
+- dependency classifications and vulnerability findings remain review guidance only and do not grant automatic remediation or merge authority.
 
 Still missing:
 
-- ongoing review of future dependency proposals; the prior six-PR batch is complete under V0.7. No current open dependency backlog is inferred from the historical V0.5 record.
+- ongoing review of future dependency proposals and any pip-audit findings; the prior six-PR batch is complete under V0.7. No current open dependency backlog is inferred from the historical V0.5 record.
 
 ## P3 — code structure
 
