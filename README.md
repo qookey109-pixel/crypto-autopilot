@@ -18,6 +18,8 @@ Repository `main` is the formal current authority and must be resolved live at r
 
 Checkpoint reading: start with the completed / pending table and ordered work in `CURRENT_STATUS.md`. Use the [GitHub Actions operating map](docs/GITHUB_ACTIONS_OPERATING_MAP.md) to distinguish schedules, manual workflows and historical registrations.
 
+For evidence/data cleanup and discovery, use the [Evidence and Data Index](docs/EVIDENCE_AND_DATA_INDEX_V0_1.md). It classifies current authority, versioned contracts, immutable receipts, historical snapshots, run evidence and derived projections without relocating frozen evidence.
+
 For scheduled checks or a new model, use the [project continuation runbook](docs/PROJECT_CONTINUATION_RUNBOOK.md) for the reading order, upcoming checkpoints, evidence format and work acceptance criteria.
 
 For GitHub work intake, use the single [Work Item form](.github/ISSUE_TEMPLATE/work-item.yml) for bugs, specifications, implementation tickets and decision maps. The [engineering workflow](docs/ENGINEERING_WORKFLOW_V0_1.md) is planning-only and does not grant execution authority or create a second task queue.
@@ -126,6 +128,7 @@ The repository keeps one read-only change-inspection skill at `.agents/skills/ch
 ## Useful entrypoints
 
 - [`docs/PROJECT_MAP_V0_1.md`](docs/PROJECT_MAP_V0_1.md) — repository map.
+- [`docs/EVIDENCE_AND_DATA_INDEX_V0_1.md`](docs/EVIDENCE_AND_DATA_INDEX_V0_1.md) — evidence/data classification, retention, and cleanup map.
 - [`docs/AUTOMATION_INDEX_V0_1.md`](docs/AUTOMATION_INDEX_V0_1.md) — automation index.
 - [`docs/STRATEGY_INDEX_V0_1.md`](docs/STRATEGY_INDEX_V0_1.md) — Paper baseline and research layers.
 - [`docs/TRADINGAGENTS_RESEARCH_CHALLENGER_V0_1.md`](docs/TRADINGAGENTS_RESEARCH_CHALLENGER_V0_1.md) — challenger contract.
