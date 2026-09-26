@@ -32,12 +32,12 @@ Authority references: [Operations V0.5](../config/github_automatic_research_oper
 
 ### Event-driven engineering tool schedule
 
-These checks are cloud-executed by the existing CI workflow. They are **not cron jobs** and do not count toward Research Automation Health schedule coverage or the 2026-09-27 natural Pionex / Weekly Training acceptance evidence.
+These checks are cloud-executed by event-driven GitHub Actions workflows. They are **not cron jobs** and do not count toward Research Automation Health schedule coverage or the 2026-09-27 natural Pionex / Weekly Training acceptance evidence.
 
 | Tool | Trigger | Mode / evidence |
 | --- | --- | --- |
 | actionlint `1.7.12` + ShellCheck | Pull requests; only changed workflow YAML files are linted | Blocking `workflow-static` PR validation. The actionlint binary is checksum-verified before use. |
-| pip-audit `2.10.1` | Every pull request and every push to `main` through the existing CI workflow | Informational / non-blocking dependency security visibility. Audits the pinned installed runtime set, emits CycloneDX JSON plus the frozen audited requirements list, and retains the artifact for 30 days. No automatic dependency fix or update is authorized. |
+| pip-audit `2.10.1` | Dedicated `security-visibility-dependencies.yml` on every pull request and every push to `main` | Informational / non-blocking dependency security visibility. Audits the pinned installed runtime set, emits CycloneDX JSON plus the frozen audited requirements list, and retains the artifact for 30 days. No automatic dependency fix or update is authorized. |
 
 This event-driven schedule adds no provider, R2, holdout, model, source-switch, deployment or trading authority. A vulnerability finding is evidence for dependency review; it does not authorize automatic remediation or merge.
 ## Event chains and CI
