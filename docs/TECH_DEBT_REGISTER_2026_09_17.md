@@ -93,7 +93,7 @@ Already implemented:
 - update PRs are review-only; no auto-merge authority is introduced;
 - repository-controlled CodeQL runs as non-blocking security visibility and has passed on current main;
 - CI includes checksum-verified actionlint `1.7.12` for changed workflow files on pull requests;
-- CI includes pinned pip-audit `2.10.1` as informational / non-blocking dependency security visibility on every pull request and main push; it audits the frozen installed runtime dependency set and uploads CycloneDX JSON plus the audited requirements list for 30 days;
+- dedicated `security-visibility-dependencies.yml` uses pinned pip-audit `2.10.1` as informational / non-blocking dependency security visibility on every pull request and main push; it audits the frozen installed runtime dependency set and uploads CycloneDX JSON plus the audited requirements list for 30 days;
 - Open PR Triage V0.7 records the completed dependency review; future proposals still require compatibility review;
 - dependency classifications and vulnerability findings remain review guidance only and do not grant automatic remediation or merge authority.
 
