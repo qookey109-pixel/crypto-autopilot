@@ -45,6 +45,7 @@ test("dashboard loads governed data and all primary views", async ({ page, baseU
 
   await expect(page).toHaveTitle(/Qookey Crypto Autopilot/);
   await expect(page.locator(".paper-pill")).toContainText("PAPER / LIVE-PAPER");
+  await expect(page.locator(".home-details").first()).toHaveAttribute("open", "");
   await expect(page.locator("#refresh-button")).toBeEnabled();
   await expect(page.locator("#snapshot-label")).not.toHaveText("狀態快照暫時無法讀取");
   await expect(page.locator("#pipeline-list")).not.toBeEmpty();
