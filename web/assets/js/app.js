@@ -28,6 +28,11 @@ const STATUS_LABELS = {
   WAITING_FIRST_RUN: "等待首次執行 · WAITING_FIRST_RUN",
   BASELINE_CREATED: "基準已建立 · BASELINE_CREATED",
   PREPARED: "已準備 · PREPARED",
+  PAPER_BASELINE: "舊 Paper 基線",
+  RESEARCH_ONLY: "研究限定",
+  PREPARED_RESEARCH_ONLY: "已準備 · 研究限定",
+  PREPARED_NOT_ACTIVE: "已準備 · 未啟用",
+  FRAMEWORK_ONLY: "僅框架",
   WAITING_AUTHORITY: "等待授權 · WAITING_AUTHORITY",
   PENDING: "等待中 · PENDING",
   IN_PROGRESS: "進行中 · IN_PROGRESS",
@@ -41,7 +46,7 @@ const STATUS_LABELS = {
 
 function badgeClass(status) {
   if (["PASS", "READY", "AUTHORIZED", "BASELINE_CREATED", "ACTIVE", "ACTIVE_BACKSTOP", "SCHEDULED_READ_ONLY", "ACTIVE_CONTENT_HASH_DEDUP", "ACTIVE_UNTIL_ORIGINAL_EXPIRY", "RETIRED_COMPLETE_MANUAL_REPAIR_ONLY", "ACTIVE_FINGERPRINT_DEDUP"].includes(status)) return "pass";
-  if (["PREPARED", "WAITING_AUTHORITY", "WAITING_FIRST_RUN", "PENDING", "IN_PROGRESS", "NOT_READY", "REVIEW_REQUIRED", "SCOPE_REDUCTION_REQUIRED", "COMPLETE_CRON_RETIREMENT_PENDING", "SCHEDULED_NEEDS_FINGERPRINT_DEDUPE", "WAITING_SCHEDULE_AUTHORITY", "WAITING_EXECUTION_AUTHORITY", "PLANNED_NOT_SCHEDULED"].includes(status)) return "pending";
+  if (["PREPARED", "PAPER_BASELINE", "RESEARCH_ONLY", "PREPARED_RESEARCH_ONLY", "PREPARED_NOT_ACTIVE", "FRAMEWORK_ONLY", "WAITING_AUTHORITY", "WAITING_FIRST_RUN", "PENDING", "IN_PROGRESS", "NOT_READY", "REVIEW_REQUIRED", "SCOPE_REDUCTION_REQUIRED", "COMPLETE_CRON_RETIREMENT_PENDING", "SCHEDULED_NEEDS_FINGERPRINT_DEDUPE", "WAITING_SCHEDULE_AUTHORITY", "WAITING_EXECUTION_AUTHORITY", "PLANNED_NOT_SCHEDULED"].includes(status)) return "pending";
   if (["BLOCKED", "NOT_AUTHORIZED", "FAIL"].includes(status)) return "danger";
   return "neutral";
 }
@@ -503,8 +508,8 @@ function renderStrategy(projection) {
   const exit = strategy.exit || {};
   const direction = String(strategy.direction || "LONG_ONLY");
   setText("strategy-name", strategy.name || "SState Intraday Wave");
-  setText("strategy-mode", `${String(strategy.mode || "paper").toUpperCase()} · ${direction}`);
-  setText("strategy-version", `V${strategy.version || "0.1.0"} · Repository config`);
+  setText("strategy-mode", `${String(strategy.mode || "paper").toUpperCase()} · Legacy baseline ${direction}`);
+  setText("strategy-version", `V${strategy.version || "0.1.0"} · Legacy baseline config`);
   setText("strategy-context-timeframe", timeframes.market_context || "4H");
   setText("strategy-setup-timeframe", timeframes.setup || "60M");
   setText("strategy-entry-timeframe", timeframes.entry || "15M");
@@ -546,7 +551,7 @@ function renderStrategy(projection) {
     status === "PREPARED_RESEARCH_ONLY" ? "PREPARED · SYNTHETIC ONLY" : displayStatus(status)
   );
   setText("strategy-research-candidates", number(summary.candidateCount, 0));
-  setText("strategy-research-families", number(summary.familyCount, 0));
+  setText("strategy-research-families", number(summary.routerFamilyCount ?? summary.familyCount, 0));
   setText("strategy-research-horizons", number(summary.horizonCount, 0));
   setText("strategy-edge-methods", number(summary.edgeMethodCount, 0));
   const layers = document.querySelector("#strategy-analysis-layers");
@@ -665,11 +670,12 @@ function renderHomeSummary(data, strategy, paper, calendar, historyProgress) {
   const researchStatus = research?.status || project.strategyResearchLoopState;
   if (researchStatus === "PREPARED_RESEARCH_ONLY") {
     const summary = strategy?.summary || {};
-    const counts = [summary.candidateCount, summary.familyCount, summary.horizonCount, summary.edgeMethodCount];
+    const routerFamilyCount = summary.routerFamilyCount ?? summary.familyCount;
+    const counts = [summary.candidateCount, routerFamilyCount, summary.horizonCount, summary.edgeMethodCount];
     const hasCounts = counts.every(value => Number.isFinite(value));
     setText("home-research-state", "框架就緒，實績待驗證");
     setText("home-research-detail", hasCounts
-      ? `${summary.candidateCount} 個候選 · ${summary.familyCount} 類策略 · ${summary.horizonCount} 個週期 · ${summary.edgeMethodCount} 種驗證；僅 synthetic research。`
+      ? `${summary.candidateCount} 個研究候選 · ${routerFamilyCount} 個 Router 策略家族 · ${summary.horizonCount} 個週期 · ${summary.edgeMethodCount} 種驗證；僅 research / paper 語意。`
       : "目前以合成資料驗證研究流程；尚無可據以推薦投資的實際策略成果。");
   } else {
     setText("home-research-state", safe ? "查看最新研究紀錄" : "研究資料暫不可用");
