@@ -78,14 +78,16 @@ Already implemented:
 
 Still missing:
 
-- the original 261 errors across 49 files remain historical baseline evidence; current main CI now reports **65 mypy errors**;
-- PR #519 made type visibility receipt-aware without changing blocking behavior: the 65 current errors are split into **3 receipt-bound** errors and **62 unbound** errors, with per-file counts retained in the artifact;
-- the three receipt-bound errors are in `strategy_edge_validation.py` (1) and `strategy_research_loop.py` (2). PR #518 intentionally closed without merge after exact-head CI proved that changing `strategy_edge_validation.py` breaks the immutable preparation-receipt hash; no receipt or frozen evidence was modified;
-- the 62 unbound errors are concentrated in seven runtime modules: `portfolio/admission_v0_1.py` (16), `paper/live_v0_1.py` (14), `training/detailed.py` (10), `paper/run_coordinator_v0_1.py` (8), `binance/funding_materializer_v0_2.py` (7), `paper/run_recovery_v0_1.py` (6), and `provider_metadata_capture_v0_2.py` (1);
-- direct source cleanup must now exclude receipt-bound paths first, then choose a characterized unbound slice. Do not touch `training/detailed.py` before the 2026-09-27 natural Weekly Training evidence is reviewed; execution-sensitive Paper / Portfolio / Provider paths need focused characterization before edits;
+- the original 261 errors across 49 files remain historical baseline evidence; current main CI still reports **65 mypy errors**;
+- PR #519 added receipt-aware visibility, PR #522 added V0.10 freeze-aware visibility, and PR #524 added prepared-receipt `bound_files[].git_blob_sha` detection. These remain informational only and preserve every diagnostic;
+- the current exact-head visibility baseline is **17 receipt-bound + 1 freeze-bound = 18 protected errors**, leaving **47 ordinary cleanup candidates**;
+- the 17 receipt-bound errors currently include `strategy_edge_validation.py` (1), `strategy_research_loop.py` (2), `paper/run_coordinator_v0_1.py` (8), and `paper/run_recovery_v0_1.py` (6). PR #518 and PR #523 intentionally closed without merge after immutable receipt tests rejected source-byte changes; no receipt or historical evidence was modified;
+- the single freeze-bound error is `provider_metadata_capture_v0_2.py` (1). PR #521 intentionally closed without merge after Freeze Guard confirmed both that file and the shared `storage/r2.py` adapter are V0.10 critical paths;
+- the remaining 47 ordinary cleanup candidates are concentrated in four modules: `portfolio/admission_v0_1.py` (16), `paper/live_v0_1.py` (14), `training/detailed.py` (10), and `binance/funding_materializer_v0_2.py` (7);
+- direct source cleanup must exclude all protected paths first, then choose a characterized ordinary-cleanup slice. Do not touch `training/detailed.py` before the 2026-09-27 natural Weekly Training evidence is reviewed; the remaining Portfolio / Live Paper / Funding paths require focused characterization before edits;
 - dedicated semantic dead-code tooling beyond the current conservative heuristic.
 
-Do not make these blocking until baseline noise is measured and reviewed. Receipt-bound classification is cleanup guidance only; it does not hide errors or grant permission to mutate frozen artifacts.
+Do not make these blocking until baseline noise is measured and reviewed. Protected-path classification is cleanup guidance only; it does not hide errors or grant permission to mutate immutable receipts, frozen critical paths, or historical evidence.
 
 ### TD-008 — Dependency/security maintenance visibility
 
