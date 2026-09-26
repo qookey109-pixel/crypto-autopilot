@@ -43,14 +43,25 @@ jobs:
           "$RUNNER_TEMP/pip-audit/bin/pip-audit" --version
 
       - name: Audit runtime dependencies and build CycloneDX SBOM
+        id: dependency-audit
         shell: bash
         run: |
-          set -euo pipefail
+          set +e
           "$RUNNER_TEMP/pip-audit/bin/pip-audit" \
             --no-deps \
             --requirement runtime-audit-requirements.txt \
             --format cyclonedx-json \
             --output dependency-audit.cdx.json
+          status=$?
+          set -e
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          if [[ ! -s dependency-audit.cdx.json ]]; then
+            echo "pip-audit did not produce a CycloneDX report" >&2
+            exit "${status:-1}"
+          fi
+          # pip-audit returns non-zero when vulnerabilities are found. A complete
+          # report is valid informational evidence and must not become a blocking gate.
+          exit 0
 
       - name: Summarize dependency security visibility
         if: ${{ always() }}
@@ -78,6 +89,20 @@ jobs:
                       "- scope: pinned CI runtime dependency set only",
                   ]
               )
+              components_by_ref = {
+                  component.get("bom-ref"): component
+                  for component in components
+                  if component.get("bom-ref")
+              }
+              for vulnerability in vulnerabilities[:20]:
+                  affected = []
+                  for row in vulnerability.get("affects") or []:
+                      component = components_by_ref.get(row.get("ref"), {})
+                      name = component.get("name") or row.get("ref") or "unknown-component"
+                      version = component.get("version")
+                      affected.append(f"{name}=={version}" if version else name)
+                  target = ", ".join(affected) if affected else "affected component unavailable"
+                  lines.append(f"- {vulnerability.get('id', 'UNKNOWN')}: {target}")
           summary.open("a", encoding="utf-8").write("\n".join(lines) + "\n")
           PY
 
