@@ -19,6 +19,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPT_ROOT = ROOT / "research" / "receipts"
+FREEZE_MANIFEST = ROOT / "config" / "v0_10_critical_path_freeze_v0_1.json"
 SCAN_TARGETS = ("src/crypto_autopilot",)
 MYPY_LINE_RE = re.compile(
     r"^(?P<path>.+?):(?P<line>\d+)(?::(?P<column>\d+))?: "
@@ -67,16 +68,39 @@ def _receipt_bindings() -> dict[str, tuple[str, ...]]:
     }
 
 
+def _freeze_bindings() -> dict[str, tuple[str, ...]]:
+    if not FREEZE_MANIFEST.exists():
+        return {}
+    try:
+        payload = json.loads(FREEZE_MANIFEST.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    if payload.get("status") != "FROZEN_PRE_WINDOW":
+        return {}
+    critical_paths = payload.get("critical_paths")
+    if not isinstance(critical_paths, list):
+        return {}
+    manifest_display = FREEZE_MANIFEST.relative_to(ROOT).as_posix()
+    bindings: dict[str, tuple[str, ...]] = {}
+    for raw_path in critical_paths:
+        if not isinstance(raw_path, str) or not raw_path.strip():
+            continue
+        bindings[Path(raw_path).as_posix()] = (manifest_display,)
+    return dict(sorted(bindings.items()))
+
+
 def parse_mypy_output(
     output: str,
     *,
     receipt_bindings: Mapping[str, Sequence[str]] | None = None,
+    freeze_bindings: Mapping[str, Sequence[str]] | None = None,
 ) -> dict[str, object]:
     diagnostics: list[dict[str, Any]] = []
     by_code: Counter[str] = Counter()
     by_file: Counter[str] = Counter()
     unparsable_lines: list[str] = []
-    active_bindings = receipt_bindings or {}
+    active_receipt_bindings = receipt_bindings or {}
+    active_freeze_bindings = freeze_bindings or {}
 
     for raw_line in output.splitlines():
         line = raw_line.strip()
@@ -90,7 +114,8 @@ def parse_mypy_output(
         severity = match.group("severity")
         code = match.group("code") or "NO_CODE"
         display_path = _display_path(match.group("path"))
-        receipt_paths = tuple(sorted(set(active_bindings.get(display_path, ()))))
+        receipt_paths = tuple(sorted(set(active_receipt_bindings.get(display_path, ()))))
+        freeze_manifests = tuple(sorted(set(active_freeze_bindings.get(display_path, ()))))
         row = {
             "path": display_path,
             "line": int(match.group("line")),
@@ -104,6 +129,8 @@ def parse_mypy_output(
             "message": match.group("message"),
             "receipt_bound": bool(receipt_paths),
             "receipt_paths": list(receipt_paths),
+            "freeze_bound": bool(freeze_manifests),
+            "freeze_manifests": list(freeze_manifests),
         }
         diagnostics.append(row)
         if severity == "error":
@@ -125,12 +152,24 @@ def parse_mypy_output(
         row["severity"] == "error" and bool(row["receipt_bound"])
         for row in diagnostics
     )
+    freeze_bound_error_count = sum(
+        row["severity"] == "error" and bool(row["freeze_bound"])
+        for row in diagnostics
+    )
+    protected_error_count = sum(
+        row["severity"] == "error"
+        and (bool(row["receipt_bound"]) or bool(row["freeze_bound"]))
+        for row in diagnostics
+    )
     return {
         "diagnostic_count": len(diagnostics),
         "error_count": error_count,
         "note_count": note_count,
         "receipt_bound_error_count": receipt_bound_error_count,
         "unbound_error_count": error_count - receipt_bound_error_count,
+        "freeze_bound_error_count": freeze_bound_error_count,
+        "protected_error_count": protected_error_count,
+        "cleanup_candidate_error_count": error_count - protected_error_count,
         "by_error_code": dict(sorted(by_code.items())),
         "by_error_file": dict(sorted(by_file.items())),
         "diagnostics": diagnostics[:MAX_DIAGNOSTICS],
@@ -166,6 +205,7 @@ def _mypy_version() -> dict[str, object]:
 
 def build_report(*, run_tool: bool = True) -> dict[str, object]:
     receipt_bindings = _receipt_bindings()
+    freeze_bindings = _freeze_bindings()
     version = _mypy_version() if run_tool else {
         "available": None,
         "version": None,
@@ -190,6 +230,11 @@ def build_report(*, run_tool: bool = True) -> dict[str, object]:
             "bound_file_count": len(receipt_bindings),
             "bound_files": sorted(receipt_bindings),
         },
+        "freeze_binding": {
+            "source_manifest": "config/v0_10_critical_path_freeze_v0_1.json",
+            "bound_file_count": len(freeze_bindings),
+            "bound_files": sorted(freeze_bindings),
+        },
         "tool": {
             "name": "mypy",
             **version,
@@ -207,6 +252,9 @@ def build_report(*, run_tool: bool = True) -> dict[str, object]:
             "note_count": None,
             "receipt_bound_error_count": None,
             "unbound_error_count": None,
+            "freeze_bound_error_count": None,
+            "protected_error_count": None,
+            "cleanup_candidate_error_count": None,
             "by_error_code": {},
             "by_error_file": {},
             "diagnostics": [],
@@ -248,6 +296,9 @@ def build_report(*, run_tool: bool = True) -> dict[str, object]:
             "note_count": None,
             "receipt_bound_error_count": None,
             "unbound_error_count": None,
+            "freeze_bound_error_count": None,
+            "protected_error_count": None,
+            "cleanup_candidate_error_count": None,
             "by_error_code": {},
             "by_error_file": {},
             "diagnostics": [],
@@ -261,6 +312,7 @@ def build_report(*, run_tool: bool = True) -> dict[str, object]:
     parsed = parse_mypy_output(
         completed.stdout,
         receipt_bindings=receipt_bindings,
+        freeze_bindings=freeze_bindings,
     )
     parsed.update(
         {
@@ -298,6 +350,9 @@ def main() -> int:
                 "error_count": result.get("error_count"),
                 "receipt_bound_error_count": result.get("receipt_bound_error_count"),
                 "unbound_error_count": result.get("unbound_error_count"),
+                "freeze_bound_error_count": result.get("freeze_bound_error_count"),
+                "protected_error_count": result.get("protected_error_count"),
+                "cleanup_candidate_error_count": result.get("cleanup_candidate_error_count"),
                 "blocking_gate": False,
             },
             sort_keys=True,
