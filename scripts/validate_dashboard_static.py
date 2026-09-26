@@ -565,6 +565,18 @@ def main() -> int:
         "PR #292",
         "下次 9/20",
         "目前因歷史補齊失敗而告警",
+        "持續模擬（待啟動）",
+        "後續版已準備 · 等待資料授權",
+        "V0.11 與獨立 holdout 存取 authority 完成前不自動恢復。",
+        "下一次排程：2026/09/04",
+        "PAPER · LONG_ONLY",
+        "資料由 Repository 的六份策略設定重建",
+        'id="alternative-assets-candidates">125<',
+        'id="alternative-assets-equity">90<',
+        'id="alternative-assets-funds">31<',
+        'id="alternative-assets-metals">4<',
+        'id="strategy-research-candidates">120<',
+        'id="strategy-research-families">4<',
     ):
         if stale in html:
             raise RuntimeError(f"dashboard raw template contains stale current-truth text: {stale}")
@@ -604,6 +616,10 @@ def main() -> int:
             )
     if "marketCount: 15, fundingMonths: 1010" in app_js:
         raise RuntimeError("dashboard fallback must not fabricate market/funding values")
+    if 'setText("alternative-assets-candidates", "—")' not in app_js:
+        raise RuntimeError("alternative-assets missing-data fallback must remain unknown")
+    if "不以 0 代替缺少資料" not in app_js:
+        raise RuntimeError("alternative-assets missing-data semantics regressed")
     if "style=" in html or "style=" in app_js:
         raise RuntimeError("dashboard CSP forbids inline style attributes")
     for token in (
