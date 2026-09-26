@@ -169,6 +169,29 @@ test("dashboard snapshot fetch failure fails closed without disabling refresh", 
   await expect(page.locator("#funding-months")).toHaveText("—");
 });
 
+test("alternative-assets projection failure stays unknown instead of zero", async ({ page, baseURL }) => {
+  await page.route("**/data/alternative-assets.json", route => route.fulfill({
+    status: 503,
+    contentType: "application/json",
+    body: JSON.stringify({ error: "simulated alternative-assets failure" }),
+  }));
+
+  await page.goto(baseURL, { waitUntil: "networkidle" });
+
+  for (const id of [
+    "alternative-assets-candidates",
+    "alternative-assets-matched",
+    "alternative-assets-equity",
+    "alternative-assets-funds",
+    "alternative-assets-metals",
+    "alternative-assets-capacity",
+  ]) {
+    await expect(page.locator(`#${id}`)).toHaveText("—");
+  }
+  await expect(page.locator("#alternative-assets-observed-at")).toContainText("暫不可核實");
+  await expect(page.locator("#alternative-assets-note")).toContainText("不以 0 代替缺少資料");
+});
+
 test("paper equity chart renders only from explicit paper evidence", async ({ page, baseURL }) => {
   const observedAtUtc = new Date(Date.now() - 60_000).toISOString();
   const paper = {
