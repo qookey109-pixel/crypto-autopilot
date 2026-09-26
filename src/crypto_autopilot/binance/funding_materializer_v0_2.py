@@ -120,15 +120,24 @@ def validate_runtime_authority(
         raise BinanceFundingMaterializerV02Error("Funding V0.2 config scope SHA changed")
     if config.get("expected_source_checksum_set_sha256") != EXPECTED_CHECKSUM_SET_SHA256:
         raise BinanceFundingMaterializerV02Error("Funding V0.2 config checksum-set SHA changed")
-    if int(config.get("materialization_cadence_jitter_tolerance_ms") or -1) != CADENCE_TOLERANCE_MS:
+    cadence_tolerance = config.get("materialization_cadence_jitter_tolerance_ms")
+    if (
+        not isinstance(cadence_tolerance, int)
+        or isinstance(cadence_tolerance, bool)
+        or cadence_tolerance != CADENCE_TOLERANCE_MS
+    ):
         raise BinanceFundingMaterializerV02Error("Funding V0.2 cadence tolerance changed")
 
-    authorized_scope = authority.get("authorized_scope") or {}
-    actions = authority.get("authorized_actions") or {}
-    blocked = authority.get("explicitly_not_authorized") or {}
-    deferred = authority.get("deferred_scope") or {}
+    authorized_scope = authority.get("authorized_scope")
+    actions = authority.get("authorized_actions")
+    blocked = authority.get("explicitly_not_authorized")
+    deferred = authority.get("deferred_scope")
     if not all(isinstance(value, dict) for value in (authorized_scope, actions, blocked, deferred)):
         raise BinanceFundingMaterializerV02Error("Funding V0.2 authority shape changed")
+    assert isinstance(authorized_scope, dict)
+    assert isinstance(actions, dict)
+    assert isinstance(blocked, dict)
+    assert isinstance(deferred, dict)
 
     expected_scope_fields = {
         "canonical_scope_sha256": EXPECTED_SCOPE_SHA256,
@@ -196,8 +205,8 @@ def validate_preflight_authority(preflight: dict[str, object]) -> None:
         raise BinanceFundingMaterializerV02Error("Funding V0.2 full preflight stage changed")
     if preflight.get("authority_type") != "PREWRITE_SOURCE_AND_SERIALIZATION_EVIDENCE_ONLY":
         raise BinanceFundingMaterializerV02Error("Funding V0.2 full preflight authority type changed")
-    exact = preflight.get("exact_scope") or {}
-    boundary = preflight.get("execution_boundary") or {}
+    exact = preflight.get("exact_scope")
+    boundary = preflight.get("execution_boundary")
     if not isinstance(exact, dict) or not isinstance(boundary, dict):
         raise BinanceFundingMaterializerV02Error("Funding V0.2 preflight authority shape changed")
     expected = {
