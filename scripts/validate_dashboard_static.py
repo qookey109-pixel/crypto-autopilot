@@ -616,10 +616,20 @@ def main() -> int:
             )
     if "marketCount: 15, fundingMonths: 1010" in app_js:
         raise RuntimeError("dashboard fallback must not fabricate market/funding values")
-    if 'setText("alternative-assets-candidates", "—")' not in app_js:
-        raise RuntimeError("alternative-assets missing-data fallback must remain unknown")
-    if "不以 0 代替缺少資料" not in app_js:
-        raise RuntimeError("alternative-assets missing-data semantics regressed")
+    for token in (
+        '"alternative-assets-candidates"',
+        '"alternative-assets-matched"',
+        '"alternative-assets-equity"',
+        '"alternative-assets-funds"',
+        '"alternative-assets-metals"',
+        '"alternative-assets-capacity"',
+        'setText(id, "—")',
+        "不以 0 代替缺少資料",
+    ):
+        if token not in app_js:
+            raise RuntimeError(
+                f"alternative-assets missing-data fallback regressed: {token}"
+            )
     if "style=" in html or "style=" in app_js:
         raise RuntimeError("dashboard CSP forbids inline style attributes")
     for token in (
