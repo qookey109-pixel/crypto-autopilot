@@ -558,6 +558,18 @@ def main() -> int:
         raise RuntimeError("dashboard must enforce no-referrer through HTML")
     if 'aria-describedby="nav-scroll-hint"' not in html or 'id="nav-scroll-hint"' not in html:
         raise RuntimeError("dashboard mobile navigation must expose its horizontal-scroll hint")
+    for stale in (
+        "8/10 分片",
+        "訓練尚未完成",
+        "PR #292",
+        "下次 9/20",
+        "目前因歷史補齊失敗而告警",
+    ):
+        if stale in html:
+            raise RuntimeError(f"dashboard raw template contains stale current-truth text: {stale}")
+    for status_id in ("cloud-run-updated", "home-updated"):
+        if f'id="{status_id}" role="status"' not in html:
+            raise RuntimeError(f"dashboard dynamic status message missing role=status: {status_id}")
     for label in REQUIRED_ZH_HANT_LABELS:
         if label not in html:
             raise RuntimeError(f"dashboard Traditional Chinese label missing: {label}")
