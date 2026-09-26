@@ -12,11 +12,13 @@ from collections import Counter
 import json
 import re
 import subprocess
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
+RECEIPT_ROOT = ROOT / "research" / "receipts"
 SCAN_TARGETS = ("src/crypto_autopilot",)
 MYPY_LINE_RE = re.compile(
     r"^(?P<path>.+?):(?P<line>\d+)(?::(?P<column>\d+))?: "
@@ -33,10 +35,48 @@ def _display_path(raw: str) -> str:
         return raw
 
 
-def parse_mypy_output(output: str) -> dict[str, object]:
+def _receipt_bindings() -> dict[str, tuple[str, ...]]:
+    bindings: dict[str, set[str]] = {}
+    if not RECEIPT_ROOT.exists():
+        return {}
+
+    for receipt_path in sorted(RECEIPT_ROOT.rglob("*.json")):
+        try:
+            payload = json.loads(receipt_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        artifacts = payload.get("artifacts")
+        if not isinstance(artifacts, Mapping):
+            continue
+        receipt_display = receipt_path.relative_to(ROOT).as_posix()
+        for artifact in artifacts.values():
+            if not isinstance(artifact, Mapping):
+                continue
+            raw_path = artifact.get("path")
+            digest = artifact.get("sha256")
+            if not isinstance(raw_path, str) or not raw_path.strip():
+                continue
+            if not isinstance(digest, str) or len(digest) != 64:
+                continue
+            path = Path(raw_path).as_posix()
+            bindings.setdefault(path, set()).add(receipt_display)
+
+    return {
+        path: tuple(sorted(receipts))
+        for path, receipts in sorted(bindings.items())
+    }
+
+
+def parse_mypy_output(
+    output: str,
+    *,
+    receipt_bindings: Mapping[str, Sequence[str]] | None = None,
+) -> dict[str, object]:
     diagnostics: list[dict[str, Any]] = []
     by_code: Counter[str] = Counter()
+    by_file: Counter[str] = Counter()
     unparsable_lines: list[str] = []
+    active_bindings = receipt_bindings or {}
 
     for raw_line in output.splitlines():
         line = raw_line.strip()
@@ -49,8 +89,10 @@ def parse_mypy_output(output: str) -> dict[str, object]:
 
         severity = match.group("severity")
         code = match.group("code") or "NO_CODE"
+        display_path = _display_path(match.group("path"))
+        receipt_paths = tuple(sorted(set(active_bindings.get(display_path, ()))))
         row = {
-            "path": _display_path(match.group("path")),
+            "path": display_path,
             "line": int(match.group("line")),
             "column": (
                 int(match.group("column"))
@@ -60,10 +102,13 @@ def parse_mypy_output(output: str) -> dict[str, object]:
             "severity": severity,
             "code": code,
             "message": match.group("message"),
+            "receipt_bound": bool(receipt_paths),
+            "receipt_paths": list(receipt_paths),
         }
         diagnostics.append(row)
         if severity == "error":
             by_code[code] += 1
+            by_file[display_path] += 1
 
     diagnostics.sort(
         key=lambda row: (
@@ -76,11 +121,18 @@ def parse_mypy_output(output: str) -> dict[str, object]:
     )
     error_count = sum(row["severity"] == "error" for row in diagnostics)
     note_count = sum(row["severity"] == "note" for row in diagnostics)
+    receipt_bound_error_count = sum(
+        row["severity"] == "error" and bool(row["receipt_bound"])
+        for row in diagnostics
+    )
     return {
         "diagnostic_count": len(diagnostics),
         "error_count": error_count,
         "note_count": note_count,
+        "receipt_bound_error_count": receipt_bound_error_count,
+        "unbound_error_count": error_count - receipt_bound_error_count,
         "by_error_code": dict(sorted(by_code.items())),
+        "by_error_file": dict(sorted(by_file.items())),
         "diagnostics": diagnostics[:MAX_DIAGNOSTICS],
         "diagnostics_truncated": len(diagnostics) > MAX_DIAGNOSTICS,
         "unparsable_lines": unparsable_lines[:100],
@@ -113,6 +165,7 @@ def _mypy_version() -> dict[str, object]:
 
 
 def build_report(*, run_tool: bool = True) -> dict[str, object]:
+    receipt_bindings = _receipt_bindings()
     version = _mypy_version() if run_tool else {
         "available": None,
         "version": None,
@@ -132,6 +185,11 @@ def build_report(*, run_tool: bool = True) -> dict[str, object]:
         },
         "scan_targets": list(SCAN_TARGETS),
         "python_version_target": "3.13",
+        "receipt_binding": {
+            "source_glob": "research/receipts/**/*.json",
+            "bound_file_count": len(receipt_bindings),
+            "bound_files": sorted(receipt_bindings),
+        },
         "tool": {
             "name": "mypy",
             **version,
@@ -147,7 +205,10 @@ def build_report(*, run_tool: bool = True) -> dict[str, object]:
             "diagnostic_count": None,
             "error_count": None,
             "note_count": None,
+            "receipt_bound_error_count": None,
+            "unbound_error_count": None,
             "by_error_code": {},
+            "by_error_file": {},
             "diagnostics": [],
             "diagnostics_truncated": False,
             "unparsable_lines": [],
@@ -185,7 +246,10 @@ def build_report(*, run_tool: bool = True) -> dict[str, object]:
             "diagnostic_count": None,
             "error_count": None,
             "note_count": None,
+            "receipt_bound_error_count": None,
+            "unbound_error_count": None,
             "by_error_code": {},
+            "by_error_file": {},
             "diagnostics": [],
             "diagnostics_truncated": False,
             "unparsable_lines": [],
@@ -194,7 +258,10 @@ def build_report(*, run_tool: bool = True) -> dict[str, object]:
         }
         return base
 
-    parsed = parse_mypy_output(completed.stdout)
+    parsed = parse_mypy_output(
+        completed.stdout,
+        receipt_bindings=receipt_bindings,
+    )
     parsed.update(
         {
             "ran": True,
@@ -229,6 +296,8 @@ def main() -> int:
                 "ran": result.get("ran"),
                 "baseline_clean": result.get("baseline_clean"),
                 "error_count": result.get("error_count"),
+                "receipt_bound_error_count": result.get("receipt_bound_error_count"),
+                "unbound_error_count": result.get("unbound_error_count"),
                 "blocking_gate": False,
             },
             sort_keys=True,

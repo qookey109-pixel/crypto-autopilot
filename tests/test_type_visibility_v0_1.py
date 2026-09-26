@@ -59,6 +59,38 @@ class TypeVisibilityV01Tests(unittest.TestCase):
         self.assertFalse(parsed["diagnostics_truncated"])
         self.assertEqual(parsed["unparsable_lines"], [])
 
+    def test_parser_classifies_receipt_bound_without_hiding_errors(self) -> None:
+        parsed = self.module.parse_mypy_output(
+            "\n".join(
+                [
+                    "src/crypto_autopilot/frozen.py:10:5: error: Frozen issue [arg-type]",
+                    "src/crypto_autopilot/live.py:20:7: error: Live issue [assignment]",
+                ]
+            ),
+            receipt_bindings={
+                "src/crypto_autopilot/frozen.py": (
+                    "research/receipts/example-prepared.json",
+                )
+            },
+        )
+        self.assertEqual(parsed["error_count"], 2)
+        self.assertEqual(parsed["receipt_bound_error_count"], 1)
+        self.assertEqual(parsed["unbound_error_count"], 1)
+        self.assertEqual(
+            parsed["by_error_file"],
+            {
+                "src/crypto_autopilot/frozen.py": 1,
+                "src/crypto_autopilot/live.py": 1,
+            },
+        )
+        diagnostics = {row["path"]: row for row in parsed["diagnostics"]}
+        self.assertTrue(diagnostics["src/crypto_autopilot/frozen.py"]["receipt_bound"])
+        self.assertEqual(
+            diagnostics["src/crypto_autopilot/frozen.py"]["receipt_paths"],
+            ["research/receipts/example-prepared.json"],
+        )
+        self.assertFalse(diagnostics["src/crypto_autopilot/live.py"]["receipt_bound"])
+
     def test_parser_preserves_unrecognized_lines_as_visibility_metadata(self) -> None:
         parsed = self.module.parse_mypy_output("unexpected mypy output")
         self.assertEqual(parsed["diagnostic_count"], 0)
