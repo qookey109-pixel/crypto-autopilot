@@ -290,10 +290,12 @@ def _lifecycle_policy_from_mapping(
         "exit_slippage_bps",
         "maximum_bar_participation_fraction",
     )
+    numeric_values: dict[str, float] = {}
     for key in numeric_keys:
         value = payload.get(key)
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             raise ValueError(f"live paper lifecycle policy {key} must be numeric")
+        numeric_values[key] = float(value)
     maximum_entry_bars = payload.get("maximum_entry_bars")
     if not isinstance(maximum_entry_bars, int) or isinstance(maximum_entry_bars, bool):
         raise ValueError("live paper lifecycle maximum_entry_bars must be integer")
@@ -303,25 +305,28 @@ def _lifecycle_policy_from_mapping(
         "cancel_if_target_crossed_before_first_fill",
         "close_at_end_of_data",
     )
+    boolean_values: dict[str, bool] = {}
     for key in boolean_keys:
-        if not isinstance(payload.get(key), bool):
+        value = payload.get(key)
+        if not isinstance(value, bool):
             raise ValueError(f"live paper lifecycle policy {key} must be boolean")
+        boolean_values[key] = value
     return PaperLifecyclePolicy(
-        taker_fee_bps=float(payload["taker_fee_bps"]),
-        entry_slippage_bps=float(payload["entry_slippage_bps"]),
-        exit_slippage_bps=float(payload["exit_slippage_bps"]),
-        maximum_bar_participation_fraction=float(
-            payload["maximum_bar_participation_fraction"]
-        ),
+        taker_fee_bps=numeric_values["taker_fee_bps"],
+        entry_slippage_bps=numeric_values["entry_slippage_bps"],
+        exit_slippage_bps=numeric_values["exit_slippage_bps"],
+        maximum_bar_participation_fraction=numeric_values[
+            "maximum_bar_participation_fraction"
+        ],
         maximum_entry_bars=maximum_entry_bars,
-        conservative_same_bar_exit=payload["conservative_same_bar_exit"],
-        cancel_if_stop_invalidated_before_first_fill=payload[
+        conservative_same_bar_exit=boolean_values["conservative_same_bar_exit"],
+        cancel_if_stop_invalidated_before_first_fill=boolean_values[
             "cancel_if_stop_invalidated_before_first_fill"
         ],
-        cancel_if_target_crossed_before_first_fill=payload[
+        cancel_if_target_crossed_before_first_fill=boolean_values[
             "cancel_if_target_crossed_before_first_fill"
         ],
-        close_at_end_of_data=payload["close_at_end_of_data"],
+        close_at_end_of_data=boolean_values["close_at_end_of_data"],
     )
 
 
@@ -578,14 +583,19 @@ def _parse_candidate_specs(
 def _candidate_target_map(
     parsed: Sequence[tuple[Mapping[str, object], float]],
 ) -> dict[tuple[str, str, int], float]:
-    return {
-        (
-            str(candidate["symbol"]),
-            str(candidate["strategy_family"]),
-            int(candidate["as_of_ms"]),
-        ): target
-        for candidate, target in parsed
-    }
+    output: dict[tuple[str, str, int], float] = {}
+    for candidate, target in parsed:
+        as_of_ms = candidate.get("as_of_ms")
+        if not isinstance(as_of_ms, int) or isinstance(as_of_ms, bool):
+            raise ValueError("parsed live paper candidate as_of_ms must be integer")
+        output[
+            (
+                str(candidate["symbol"]),
+                str(candidate["strategy_family"]),
+                as_of_ms,
+            )
+        ] = target
+    return output
 
 
 def _append_live_frames(
