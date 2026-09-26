@@ -8,7 +8,7 @@ For the separate Codex check cadence, shared evidence fields and model handoff p
 
 GitHub's paginated workflow API returned **108 registrations**: **82 workflow files present on main**, **25 registrations whose files are absent from main**, and **1 dynamic Dependabot Updates** entry. Every registration reported `active` at observation time; that API state does not imply a schedule, a currently valid execution window or authorization.
 
-At the 2026-09-25 review, the cloud maintenance completion listener is a new non-cron workflow, bringing the main-source inventory to 83 after its merge. The historical 108-registration counts below are a 2026-09-23 snapshot, not current state.
+At the 2026-09-26 review against main `25537c61b051d31002a576ec16bcb4a38aab9c31`, the source tree contains **84 workflow files**: the September 23 baseline of 82 plus the Cloud Maintenance completion listener and `security-visibility-dependencies.yml`. The historical 108-registration counts below are a 2026-09-23 snapshot, not current state.
 
 Among the 82 source workflows, 55 declare workflow_dispatch (32 are manual-only), 42 declare pull_request, 9 push, 3 workflow_run and 8 schedule. Event types overlap. The eight schedule files contain 11 cron expressions; seven are current-effective inside their versioned windows, while V0.12 is expired.
 
@@ -39,7 +39,7 @@ These checks are cloud-executed by event-driven GitHub Actions workflows. They a
 | actionlint `1.7.12` + ShellCheck | Pull requests; only changed workflow YAML files are linted | Blocking `workflow-static` PR validation. The actionlint binary is checksum-verified before use. |
 | pip-audit `2.10.1` | Dedicated `security-visibility-dependencies.yml` on every pull request and every push to `main` | Informational / non-blocking dependency security visibility. Audits the pinned installed runtime set, emits CycloneDX JSON plus the frozen audited requirements list, and retains the artifact for 30 days. No automatic dependency fix or update is authorized. |
 
-This event-driven schedule adds no provider, R2, holdout, model, source-switch, deployment or trading authority. A vulnerability finding is evidence for dependency review; it does not authorize automatic remediation or merge.
+This event-driven schedule adds no provider, R2, holdout, model, source-switch, deployment or trading authority. A vulnerability finding is evidence for dependency review; it does not authorize automatic remediation or merge. PR #512 merged the dependency-security workflow on main `25537c61`; post-merge run `36214047453` succeeded and uploaded artifact `10896777315` (digest `sha256:cd4709f02c413289a6058e7f6365d0f1eedf8c87c903ece232e6655abfede14c`, 30-day retention).
 ## Event chains and CI
 
 - Research Signal Layer V0.2 completion can trigger Signal Quality, subject to same-repository main/success lineage checks. Quality retains its daily fallback and exact-evidence deduplication.
