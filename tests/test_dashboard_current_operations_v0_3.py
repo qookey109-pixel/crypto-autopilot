@@ -167,7 +167,7 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
             self.assertIn("Pionex Validation", html)
             self.assertIn("COMPLETE · PASS", html)
             self.assertIn("35054729471", html)
-            self.assertIn("current-operations.js?v=current-ops-v0-3", html)
+            self.assertIn("current-operations.js?v=current-ops-v0-4", html)
             self.assertNotIn("PENDING MANUAL DISPATCH", html)
             self.assertNotIn("8/10 分片", html)
             self.assertNotIn("訓練尚未完成", html)

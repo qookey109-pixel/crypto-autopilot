@@ -273,7 +273,7 @@ jobs:
           assert '8/10 分片' not in html
           assert '訓練尚未完成' not in html
           assert 'PR #292' not in html
-          assert 'current-operations.js?v=current-ops-v0-3' in html
+          assert 'current-operations.js?v=current-ops-v0-4' in html
           assert data['project']['mode'] == 'PAPER / LIVE-PAPER ONLY'
           assert data['project']['providerEquivalenceGateState'] == 'FAIL'
           assert data['project']['renderMetadataV0_10CutoverState'] == 'EFFECTIVE_AUTHORIZED'

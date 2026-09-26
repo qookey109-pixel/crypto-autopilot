@@ -1,6 +1,6 @@
 const FALLBACK = {
-  snapshotLabel: "安全測試資料快照",
-  project: { marketCount: 15, fundingMonths: 1010 },
+  snapshotLabel: "安全空白資料快照",
+  project: { marketCount: null, fundingMonths: null },
   pipeline: [],
   gates: [],
   markets: [],
@@ -601,9 +601,9 @@ function render(data) {
   document.querySelector("#snapshot-label").textContent = data.snapshotLabel;
   document.querySelector("#dashboard-generated-at").textContent =
     `投影建立：${formatTrustedTime(data.generatedAtUtc)}`;
-  document.querySelector("#market-count").textContent = Number(data.project.marketCount || 0).toLocaleString("zh-TW");
-  const fundingMonths = data.project.fundingMonthsObserved ?? data.project.fundingMonths ?? 0;
-  document.querySelector("#funding-months").textContent = Number(fundingMonths).toLocaleString("zh-TW");
+  document.querySelector("#market-count").textContent = number(data.project?.marketCount, 0);
+  const fundingMonths = data.project?.fundingMonthsObserved ?? data.project?.fundingMonths;
+  document.querySelector("#funding-months").textContent = number(fundingMonths, 0);
   renderPipeline(data.pipeline || []);
   renderCriticalGates(data.gates || []);
   renderAllGates(data.gates || []);
@@ -618,14 +618,28 @@ async function fetchJson(path) {
 
 
 function historyProgressIsSafe(progress) {
-  if (!progress || progress.schema !== "qookey-dashboard-history-progress-v0.1") return false;
-  if (progress.authority !== false || progress.snapshotType !== "SECRET_FREE_GITHUB_ACTIONS_RUN_REPORT") return false;
-  if (progress.status !== "IN_PROGRESS" || progress.provider !== "binance_usdm" || progress.mode !== "backfill") return false;
+  if (!progress || progress.authority !== false || progress.provider !== "binance_usdm") return false;
+  const boundary = progress.safetyBoundary || {};
+  if (!Object.keys(boundary).length || Object.values(boundary).some(value => value !== false)) return false;
+
+  if (progress.schema === "qookey-dashboard-history-progress-v0.2") {
+    return progress.snapshotType === "CURRENT_OPERATIONS_PROJECTION"
+      && progress.status === "COMPLETE"
+      && progress.mode === "current_operations"
+      && progress.shardCount === 10
+      && progress.shardsComplete === 10
+      && progress.historyReacquisitionRequired === false
+      && Number.isInteger(progress.trainingRunId)
+      && progress.modelQualityStatus === "REJECT";
+  }
+
+  if (progress.schema !== "qookey-dashboard-history-progress-v0.1") return false;
+  if (progress.snapshotType !== "SECRET_FREE_GITHUB_ACTIONS_RUN_REPORT") return false;
+  if (progress.status !== "IN_PROGRESS" || progress.mode !== "backfill") return false;
   if (progress.shardCount !== 10 || !Number.isInteger(progress.shardsComplete) || progress.shardsComplete < 0 || progress.shardsComplete > progress.shardCount) return false;
   if (!Number.isInteger(progress.lastShardIndex) || progress.lastShardIndex < 1 || progress.lastShardIndex > progress.shardCount) return false;
   if (typeof progress.sourceUrl !== "string" || !progress.sourceUrl.startsWith("https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/")) return false;
-  const boundary = progress.safetyBoundary || {};
-  return Object.keys(boundary).length > 0 && Object.values(boundary).every(value => value === false);
+  return true;
 }
 
 function renderHomeSummary(data, strategy, paper, calendar, historyProgress) {
@@ -642,8 +656,23 @@ function renderHomeSummary(data, strategy, paper, calendar, historyProgress) {
   const history = calendar?.items?.find(item => item.id === "detailed-history-backfill" || item.title === "Crypto Core 100 歷史回補" || item.detail?.includes("10 個可續跑分片"));
   const historyAuthorized = Boolean(history && String(history.status || "").startsWith("AUTHORIZED"));
   const historySnapshotSafe = historyProgressIsSafe(historyProgress);
+  const currentHistoryComplete = project.core100HistoryState === "COMPLETE_10_OF_10"
+    || (historySnapshotSafe && historyProgress.status === "COMPLETE" && historyProgress.shardsComplete === 10);
   const historySource = document.querySelector("#home-history-source");
-  if (historySnapshotSafe) {
+  if (currentHistoryComplete) {
+    const trainingRunId = project.core100TrainingRunId ?? historyProgress?.trainingRunId;
+    setText("home-history-state", "10/10 分片 · COMPLETE");
+    setText(
+      "home-history-detail",
+      trainingRunId
+        ? `Core100 歷史資料已完成；Training run ${trainingRunId} 已完成。Model Quality REJECT 不會自動重啟歷史資料取得。`
+        : "Core100 歷史資料已完成；Model Quality REJECT 不會自動重啟歷史資料取得。"
+    );
+    if (historySource) {
+      historySource.href = "https://github.com/qookey109-pixel/crypto-autopilot/blob/main/CURRENT_STATUS.md";
+      historySource.textContent = "查看 Current Status ↗";
+    }
+  } else if (historySnapshotSafe && historyProgress.status === "IN_PROGRESS") {
     setText("home-history-state", `${historyProgress.shardsComplete}/${historyProgress.shardCount} 分片 · 進行中`);
     setText("home-history-detail", `最後核實分片 #${historyProgress.lastShardIndex}；${formatTrustedTime(historyProgress.observedAtUtc)} 的 GitHub Actions 報告快照，不是即時 R2 查詢。`);
     if (historySource) {

@@ -8,16 +8,18 @@
 
   function validate(payload) {
     if (!payload || payload.schema !== "qookey-current-operations-web-v0.3") return false;
-    if (payload.authority !== false || payload.mode !== "PAPER_ONLY") return false;
+    if (payload.authority !== false || payload.mode !== "PAPER_AND_LIVE_PAPER_ONLY") return false;
     if (payload.repositoryAuthority !== "RESOLVE_MAIN_LIVE_AT_READ_TIME") return false;
     if (payload.evidenceBasisIsLatestMainClaim !== false) return false;
     if (payload.historyStatus !== "COMPLETE" || payload.historyCompleteShards !== 10 || payload.historyTotalShards !== 10) return false;
     if (payload.trainingStatus !== "COMPLETED_PASS") return false;
     if (payload.modelQualityStatus !== "REJECT") return false;
     if (payload.thresholdChangeSupported !== false) return false;
-    if (payload.pionexValidationStatus !== "PENDING_MANUAL_DISPATCH") return false;
+    if (payload.pionexValidationStatus !== "COMPLETE_PASS") return false;
     if (payload.holdoutState !== "FROZEN_UNOPENED") return false;
-    if (payload.sourceSwitchAuthorized !== false || payload.liveTradingAuthorized !== false) return false;
+    if (payload.pionexMaterializationRunId !== 35054729471) return false;
+    if (payload.publicLiveMarketDataAuthorized !== true || payload.livePaperSimulationAuthorized !== true) return false;
+    if (payload.sourceSwitchAuthorized !== false || payload.liveTradingAuthorized !== false || payload.liveRealTradingAuthorized !== false) return false;
     return true;
   }
 
@@ -39,7 +41,7 @@
       `Threshold replay run ${payload.thresholdReplayRunId} 已完成；0.50–0.55 沒有 supported threshold change，configured threshold 保持不變。`
     );
 
-    text("readiness-heading", "9/16 目前作業狀態");
+    text("readiness-heading", `${payload.updatedDate} 目前作業狀態`);
   }
 
   window.addEventListener("DOMContentLoaded", async () => {

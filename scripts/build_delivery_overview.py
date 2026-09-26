@@ -309,7 +309,7 @@ def build(site: Path, root: Path = ROOT) -> None:
         script_pattern = r'(\s*<script src="\./assets/js/app\.js[^"]*" defer></script>)'
         content, count = re.subn(
             script_pattern,
-            r'\1\n  <script src="./assets/js/current-operations.js?v=current-ops-v0-3" defer></script>',
+            r'\1\n  <script src="./assets/js/current-operations.js?v=current-ops-v0-4" defer></script>',
             content,
             count=1,
         )

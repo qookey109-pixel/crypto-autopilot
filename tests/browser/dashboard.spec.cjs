@@ -43,6 +43,14 @@ test("dashboard loads governed data and all primary views", async ({ page, baseU
   await expect(page.locator("#refresh-button")).toBeEnabled();
   await expect(page.locator("#snapshot-label")).not.toHaveText("狀態快照暫時無法讀取");
   await expect(page.locator("#pipeline-list")).not.toBeEmpty();
+  await expect(page.locator("#home-history-state")).toHaveText("10/10 分片 · COMPLETE");
+  await expect(page.locator("#home-history-detail")).toContainText("Core100 歷史資料已完成");
+  await expect(page.locator("#home-history-state")).not.toContainText("8/10");
+  await expect(page.locator("#home-history-source")).toHaveAttribute(
+    "href",
+    "https://github.com/qookey109-pixel/crypto-autopilot/blob/main/CURRENT_STATUS.md"
+  );
+  await expect(page.locator("#readiness-heading")).not.toContainText("9/16");
 
   for (const [view, title] of EXPECTED_VIEWS) {
     const button = page.locator(`.nav-item[data-view="${view}"]`);
@@ -157,6 +165,8 @@ test("dashboard snapshot fetch failure fails closed without disabling refresh", 
   await expect(page.locator("#snapshot-label")).toHaveText("狀態快照暫時無法讀取");
   await expect(page.locator("#refresh-button")).toBeEnabled();
   await expect(page.locator("#cloud-run-updated")).toContainText("暫不可核實");
+  await expect(page.locator("#market-count")).toHaveText("—");
+  await expect(page.locator("#funding-months")).toHaveText("—");
 });
 
 test("paper equity chart renders only from explicit paper evidence", async ({ page, baseURL }) => {
