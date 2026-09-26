@@ -34,7 +34,8 @@ any versioned authority.
 27. `docs/PAPER_RUN_CONDITIONAL_WRITE_V0_1.md` — storage-only atomic create-if-absent primitive for future run-slot claims; not wired into Coordinator.
 28. `docs/AUTOMATION_INDEX_V0_1.md` — the schedules that can still run.
 29. `docs/STRATEGY_INDEX_V0_1.md` — baseline, technical analysis and research layers.
-30. The exact config and receipt named by the stage being changed.
+30. `docs/EVIDENCE_AND_DATA_INDEX_V0_1.md` — authority / status / config / receipt / historical / projection classification and retention rules.
+31. The exact config and receipt named by the stage being changed.
 
 ## Current bounded data and Paper stages
 
@@ -59,6 +60,7 @@ trade count, open replacement holdout or authorize real-money trading.
 | `scripts/` | stable CLI entrypoints used by Actions and frozen receipts; intentionally flat so historical command paths do not move |
 | `config/` | versioned contracts and authorities; older versions remain immutable evidence |
 | `research/receipts/` | immutable results and transitions; never a cleanup target |
+| `research/status/` | structured current/historical status snapshots; only versions explicitly named by current root docs are active companions |
 | `.github/workflows/` | executable, manual or regression Action entrypoints; current classification is machine-checked by `config/project_convergence_v0_1.json` |
 | `web/` | static read-only Pages shell and non-authoritative projections |
 | `tests/` | fail-closed behavior, lineage and authority regression tests |
