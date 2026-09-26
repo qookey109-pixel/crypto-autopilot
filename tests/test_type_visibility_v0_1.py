@@ -128,6 +128,15 @@ class TypeVisibilityV01Tests(unittest.TestCase):
         self.assertFalse(diagnostics["src/crypto_autopilot/live.py"]["receipt_bound"])
         self.assertFalse(diagnostics["src/crypto_autopilot/live.py"]["freeze_bound"])
 
+    def test_repository_receipt_bindings_include_git_blob_bound_files(self) -> None:
+        bindings = self.module._receipt_bindings()
+        path = "src/crypto_autopilot/paper/run_recovery_v0_1.py"
+        self.assertIn(path, bindings)
+        self.assertIn(
+            "research/receipts/2026-09-22-live-paper-run-slot-claim-v0-1-prepared.json",
+            bindings[path],
+        )
+
     def test_parser_preserves_unrecognized_lines_as_visibility_metadata(self) -> None:
         parsed = self.module.parse_mypy_output("unexpected mypy output")
         self.assertEqual(parsed["diagnostic_count"], 0)
