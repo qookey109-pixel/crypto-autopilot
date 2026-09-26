@@ -38,6 +38,11 @@ test("dashboard loads governed data and all primary views", async ({ page, baseU
 
   await page.goto(baseURL, { waitUntil: "networkidle" });
 
+  const skipLink = page.locator(".skip-link");
+  await expect(skipLink).toHaveAttribute("href", "#top");
+  await skipLink.focus();
+  await expect(skipLink).toBeFocused();
+
   await expect(page).toHaveTitle(/Qookey Crypto Autopilot/);
   await expect(page.locator(".paper-pill")).toContainText("PAPER / LIVE-PAPER");
   await expect(page.locator("#refresh-button")).toBeEnabled();
