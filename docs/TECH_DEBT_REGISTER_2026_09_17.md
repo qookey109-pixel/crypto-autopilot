@@ -78,13 +78,13 @@ Already implemented:
 
 Still missing:
 
-- the original 261 errors across 49 files remain historical baseline evidence; current main CI still reports **65 mypy errors**;
+- the original 261 errors across 49 files remain historical baseline evidence; current main CI now reports **33 mypy errors**;
 - PR #519 added receipt-aware visibility, PR #522 added V0.10 freeze-aware visibility, and PR #524 added prepared-receipt `bound_files[].git_blob_sha` detection. These remain informational only and preserve every diagnostic;
-- the current exact-head visibility baseline is **17 receipt-bound + 1 freeze-bound = 18 protected errors**, leaving **47 ordinary cleanup candidates**;
-- the 17 receipt-bound errors currently include `strategy_edge_validation.py` (1), `strategy_research_loop.py` (2), `paper/run_coordinator_v0_1.py` (8), and `paper/run_recovery_v0_1.py` (6). PR #518 and PR #523 intentionally closed without merge after immutable receipt tests rejected source-byte changes; no receipt or historical evidence was modified;
-- the single freeze-bound error is `provider_metadata_capture_v0_2.py` (1). PR #521 intentionally closed without merge after Freeze Guard confirmed both that file and the shared `storage/r2.py` adapter are V0.10 critical paths;
-- the remaining 47 ordinary cleanup candidates are concentrated in four modules: `portfolio/admission_v0_1.py` (16), `paper/live_v0_1.py` (14), `training/detailed.py` (10), and `binance/funding_materializer_v0_2.py` (7);
-- direct source cleanup must exclude all protected paths first, then choose a characterized ordinary-cleanup slice. Do not touch `training/detailed.py` before the 2026-09-27 natural Weekly Training evidence is reviewed; the remaining Portfolio / Live Paper / Funding paths require focused characterization before edits;
+- the current exact-head visibility baseline is **17 receipt-bound + 1 freeze-bound = 18 protected errors**, leaving **15 ordinary cleanup candidates**;
+- the 17 receipt-bound errors remain `strategy_edge_validation.py` (1), `strategy_research_loop.py` (2), `paper/run_coordinator_v0_1.py` (8), and `paper/run_recovery_v0_1.py` (6). PR #518 and PR #523 intentionally closed without merge after immutable receipt tests rejected source-byte changes; no receipt or historical evidence was modified;
+- the single freeze-bound error remains `provider_metadata_capture_v0_2.py` (1). PR #521 intentionally closed without merge after Freeze Guard confirmed both that file and the shared `storage/r2.py` adapter are V0.10 critical paths;
+- PR #526 removed the 7 ordinary errors from `binance/funding_materializer_v0_2.py` without changing authority gates; PRs #528 and #529 removed all 16 ordinary errors from `portfolio/admission_v0_1.py`; PR #530 removed 9 parser/config errors from `paper/live_v0_1.py` while leaving its execution-chain diagnostics untouched;
+- the remaining **15 ordinary cleanup candidates** are now limited to `paper/live_v0_1.py` (5 execution-chain ID typing diagnostics) and `training/detailed.py` (10). Do not touch either before the 2026-09-27 natural Pionex observability / Weekly Training evidence is reviewed;
 - dedicated semantic dead-code tooling beyond the current conservative heuristic.
 
 Do not make these blocking until baseline noise is measured and reviewed. Protected-path classification is cleanup guidance only; it does not hide errors or grant permission to mutate immutable receipts, frozen critical paths, or historical evidence.
@@ -127,7 +127,7 @@ Follow the dated checkpoint in `CURRENT_STATUS.md` and the [continuation runbook
 | TD-013 / P1 — Delivery and PR review | MERGE VERIFIED THROUGH PR #512 | For every future delivery, resolve live main/open PRs and recheck exact head/base/checks; do not project historical PRs as current work | PR #509 merged Cloud Maintenance acceptance evidence at `1e5234fc`; PR #510 merged the evidence/data organization index at `463b9393`; PR #512 merged dependency audit / SBOM visibility at `25537c61`. #512 passed exact-head Python 3.12/3.13, workflow-static, dependency-security and CodeQL; post-merge main passed Python 3.12/3.13, Freeze Guard, dependency-security and CodeQL. Current delivery evidence does not grant execution or merge authority by itself. |
 | TD-014 / P2 — Removed registrations | COMPLETE, 25/25 disabled (2026-09-25) | Keep the exact ID/path list and dated state readback in [Actions map](GITHUB_ACTIONS_OPERATING_MAP.md#removed-registrations-disabled-2026-09-25); reopen only if a listed registration is re-enabled | All 25 main paths returned 404; GitHub Actions UI showed success and Enable workflow for every target. Run history retained. Dependabot and source-preserved retired workflows untouched. |
 
-After these items, continue TD-007 from fresh receipt-aware CI visibility: preserve all diagnostics, exclude receipt-bound artifacts from ordinary cleanup, and take only characterized unbound slices. Keep type/security informational. TD-009 responsibility splitting stays deferred until characterization coverage justifies it.
+After these items, continue TD-007 only after the 2026-09-27 natural schedule evidence is reviewed: preserve all diagnostics, exclude protected artifacts from ordinary cleanup, and take only characterized slices outside active execution evidence. Keep type/security informational. TD-009 responsibility splitting stays deferred until characterization coverage justifies it.
 
 The prior 261-error baseline and dependency-batch review are historical evidence, not current measurements or unfinished dependency work.
 
