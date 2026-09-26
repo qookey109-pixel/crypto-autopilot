@@ -17,7 +17,9 @@
     if (payload.thresholdChangeSupported !== false) return false;
     if (payload.pionexValidationStatus !== "COMPLETE_PASS") return false;
     if (payload.holdoutState !== "FROZEN_UNOPENED") return false;
-    if (payload.pionexMaterializationRunId !== 35054729471) return false;\n    if (payload.publicLiveMarketDataAuthorized !== true || payload.livePaperSimulationAuthorized !== true) return false;\n    if (payload.sourceSwitchAuthorized !== false || payload.liveTradingAuthorized !== false || payload.liveRealTradingAuthorized !== false) return false;
+    if (payload.pionexMaterializationRunId !== 35054729471) return false;
+    if (payload.publicLiveMarketDataAuthorized !== true || payload.livePaperSimulationAuthorized !== true) return false;
+    if (payload.sourceSwitchAuthorized !== false || payload.liveTradingAuthorized !== false || payload.liveRealTradingAuthorized !== false) return false;
     return true;
   }
 
