@@ -78,10 +78,14 @@ Already implemented:
 
 Still missing:
 
-- the original 261 errors across 49 files remain historical baseline evidence; use current CI visibility for the next non-execution narrowing slice;
+- the original 261 errors across 49 files remain historical baseline evidence; current main CI now reports **65 mypy errors**;
+- PR #519 made type visibility receipt-aware without changing blocking behavior: the 65 current errors are split into **3 receipt-bound** errors and **62 unbound** errors, with per-file counts retained in the artifact;
+- the three receipt-bound errors are in `strategy_edge_validation.py` (1) and `strategy_research_loop.py` (2). PR #518 intentionally closed without merge after exact-head CI proved that changing `strategy_edge_validation.py` breaks the immutable preparation-receipt hash; no receipt or frozen evidence was modified;
+- the 62 unbound errors are concentrated in seven runtime modules: `portfolio/admission_v0_1.py` (16), `paper/live_v0_1.py` (14), `training/detailed.py` (10), `paper/run_coordinator_v0_1.py` (8), `binance/funding_materializer_v0_2.py` (7), `paper/run_recovery_v0_1.py` (6), and `provider_metadata_capture_v0_2.py` (1);
+- direct source cleanup must now exclude receipt-bound paths first, then choose a characterized unbound slice. Do not touch `training/detailed.py` before the 2026-09-27 natural Weekly Training evidence is reviewed; execution-sensitive Paper / Portfolio / Provider paths need focused characterization before edits;
 - dedicated semantic dead-code tooling beyond the current conservative heuristic.
 
-Do not make these blocking until baseline noise is measured and reviewed.
+Do not make these blocking until baseline noise is measured and reviewed. Receipt-bound classification is cleanup guidance only; it does not hide errors or grant permission to mutate frozen artifacts.
 
 ### TD-008 — Dependency/security maintenance visibility
 
@@ -121,7 +125,7 @@ Follow the dated checkpoint in `CURRENT_STATUS.md` and the [continuation runbook
 | TD-013 / P1 — Delivery and PR review | MERGE VERIFIED THROUGH PR #512 | For every future delivery, resolve live main/open PRs and recheck exact head/base/checks; do not project historical PRs as current work | PR #509 merged Cloud Maintenance acceptance evidence at `1e5234fc`; PR #510 merged the evidence/data organization index at `463b9393`; PR #512 merged dependency audit / SBOM visibility at `25537c61`. #512 passed exact-head Python 3.12/3.13, workflow-static, dependency-security and CodeQL; post-merge main passed Python 3.12/3.13, Freeze Guard, dependency-security and CodeQL. Current delivery evidence does not grant execution or merge authority by itself. |
 | TD-014 / P2 — Removed registrations | COMPLETE, 25/25 disabled (2026-09-25) | Keep the exact ID/path list and dated state readback in [Actions map](GITHUB_ACTIONS_OPERATING_MAP.md#removed-registrations-disabled-2026-09-25); reopen only if a listed registration is re-enabled | All 25 main paths returned 404; GitHub Actions UI showed success and Enable workflow for every target. Run history retained. Dependabot and source-preserved retired workflows untouched. |
 
-After these items, continue TD-007 non-execution type narrowing from fresh CI visibility; keep type/security informational. TD-009 responsibility splitting stays deferred until characterization coverage justifies it.
+After these items, continue TD-007 from fresh receipt-aware CI visibility: preserve all diagnostics, exclude receipt-bound artifacts from ordinary cleanup, and take only characterized unbound slices. Keep type/security informational. TD-009 responsibility splitting stays deferred until characterization coverage justifies it.
 
 The prior 261-error baseline and dependency-batch review are historical evidence, not current measurements or unfinished dependency work.
 
