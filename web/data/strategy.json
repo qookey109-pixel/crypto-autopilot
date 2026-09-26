@@ -5,6 +5,9 @@
   "generatedAtUtc": null,
   "sourceConfigs": [
     "config/strategy_v0_1.json",
+    "config/daily_opportunity_engine_v0_1.json",
+    "config/strategy_router_v0_1.json",
+    "config/strategy_library_v0_1.json",
     "config/technical_analysis_v0_2.json",
     "config/strategy_parameter_sweep_v0_1.json",
     "config/binance_spot_shadow_v0_6.json",
@@ -46,12 +49,12 @@
     },
     "risk": {
       "risk_fraction_per_trade": 0.01,
-      "max_leverage": 3.0,
-      "daily_loss_limit_r": 3.0,
+      "max_leverage": 3,
+      "daily_loss_limit_r": 3,
       "max_structural_stop_atr": 2.5
     },
     "exit": {
-      "partial_at_r": 1.0,
+      "partial_at_r": 1,
       "partial_fraction": 0.3,
       "runner_fraction": 0.7,
       "max_holding_hours": 12
@@ -63,14 +66,29 @@
     "horizonCount": 3,
     "edgeMethodCount": 6,
     "technicalIntervalCount": 3,
-    "shadowFeatureGroupCount": 8
+    "shadowFeatureGroupCount": 8,
+    "routerFamilyCount": 6,
+    "opportunityBiasCount": 3,
+    "maximumDailyOpportunityCandidates": 5
   },
   "analysisLayers": [
     {
       "id": "baseline",
       "name": "Paper 策略基線",
       "status": "PAPER_BASELINE",
-      "detail": "SState 准入、100 分技術品質與結構風控；目前仍為 LONG_ONLY。"
+      "detail": "Legacy Paper baseline 仍為 LONG_ONLY；不代表目前多資產、多策略研究架構只支援做多。"
+    },
+    {
+      "id": "opportunity_engine",
+      "name": "Daily Opportunity Engine V0.1",
+      "status": "PREPARED_RESEARCH_ONLY",
+      "detail": "多資產注意力候選；3 種 bias，最多 5 個候選，也允許 NO_CANDIDATE。"
+    },
+    {
+      "id": "strategy_router",
+      "name": "Strategy Router / Library V0.1",
+      "status": "PREPARED_RESEARCH_ONLY",
+      "detail": "6 個研究策略家族支援 LONG/SHORT compatibility routing；零符合回 NO_TRADE，最終取捨仍交由 Portfolio / Risk。"
     },
     {
       "id": "technical",
@@ -111,6 +129,7 @@
     "automaticModelPromotionAuthorized": false,
     "tradePlanAuthorized": false,
     "realMoneyOrderAuthorized": false,
-    "liveTradingAuthorized": false
+    "liveTradingAuthorized": false,
+    "shortExecutionAuthorized": false
   }
 }
