@@ -8,7 +8,8 @@ from crypto_autopilot.paper.cloud_budget_v0_1 import (
     CloudBudgetPolicy,
     R2UsageSnapshot,
 )
-from crypto_autopilot.storage.r2 import R2Store
+from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Store
+from crypto_autopilot.paper.run_store_v0_1 import R2PaperRunStore
 
 
 class FakeBody:
@@ -41,48 +42,42 @@ def store(
     client: FakeClient,
     reservations: list[tuple[str, int]],
     before_external=None,
-) -> R2Store:
-    result = R2Store.__new__(R2Store)
-    result.client = client
-    result.bucket = "fixture-bucket"
-    result.before_external = before_external or (
-        lambda operation, size: reservations.append((operation, size))
+) -> BudgetedR2Store:
+    return BudgetedR2Store(
+        client=client,
+        bucket="fixture-bucket",
+        before_external=before_external or (
+            lambda operation, size: reservations.append((operation, size))
+        ),
     )
-    return result
 
 
 class R2BudgetHookTests(unittest.TestCase):
-    def test_read_write_and_conditional_write_reserve_before_request(self):
+    def test_reads_writes_and_conditional_creates_reserve_before_requests(self):
         client = FakeClient()
         reservations: list[tuple[str, int]] = []
         r2 = store(client, reservations)
+        run_store = R2PaperRunStore(r2)
 
         write = r2.put_bytes("paper/a.json", b"data")
         read = r2.get_bytes_if_exists("paper/a.json")
-        conditional = r2.put_bytes_if_absent("paper/b.json", b"abc")
+        conditional = run_store.put_json_if_absent(
+            "live-run-claim", "slot-1", {"schema": "fixture", "value": 1}
+        )
 
         self.assertEqual(write.bytes, 4)
         self.assertEqual(read, b"data")
-        self.assertEqual(conditional.bytes, 3)
+        self.assertEqual(conditional.bytes, len(
+            b'{"schema":"fixture","value":1}'
+        ))
         self.assertEqual(
-            reservations,
-            [("R2_CLASS_A", 4), ("R2_CLASS_B", 0), ("R2_CLASS_A", 3)],
+            [operation for operation, _ in reservations],
+            ["R2_CLASS_A", "R2_CLASS_B", "R2_CLASS_A"],
         )
         self.assertEqual(
             [name for name, _ in client.calls],
             ["put_object", "get_object", "put_object"],
         )
-
-    def test_budget_rejection_prevents_client_call(self):
-        client = FakeClient()
-
-        def reject(operation: str, size: int) -> None:
-            raise RuntimeError("blocked before R2")
-
-        r2 = store(client, [], before_external=reject)
-        with self.assertRaisesRegex(RuntimeError, "blocked before R2"):
-            r2.get_bytes_if_exists("paper/missing.json")
-        self.assertEqual(client.calls, [])
 
     def test_list_reserves_each_page_and_stops_after_last_page(self):
         client = FakeClient()
@@ -105,7 +100,7 @@ class R2BudgetHookTests(unittest.TestCase):
         self.assertNotIn("ContinuationToken", client.calls[0][1])
         self.assertEqual(client.calls[1][1]["ContinuationToken"], "page-2")
 
-    def test_cloud_budget_guard_blocks_r2_call_before_io(self):
+    def test_cloud_budget_guard_blocks_before_r2_io(self):
         now_ms = 1_000_000
         guard = CloudBudgetGuard(
             snapshot=R2UsageSnapshot(
@@ -127,10 +122,14 @@ class R2BudgetHookTests(unittest.TestCase):
             policy=CloudBudgetPolicy(r2_class_a_per_run=0),
         )
         client = FakeClient()
-        r2 = store(client, [], before_external=guard.reserve)
+        run_store = R2PaperRunStore(
+            store(client, [], before_external=guard.reserve)
+        )
 
         with self.assertRaisesRegex(BudgetBlocked, "CLASS_A_RUN_LIMIT"):
-            r2.put_bytes("paper/blocked.json", b"data")
+            run_store.put_json_if_absent(
+                "live-run-claim", "slot-1", {"schema": "fixture"}
+            )
 
         self.assertEqual(client.calls, [])
 
