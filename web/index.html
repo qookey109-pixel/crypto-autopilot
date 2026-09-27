@@ -10,9 +10,10 @@
   <meta name="description" content="Qookey Crypto Autopilot 紙上交易與研究證據控制台。" />
   <title>Qookey Crypto Autopilot｜Research Space</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23075744'/%3E%3Ccircle cx='32' cy='32' r='21' fill='none' stroke='%23f2b28f' stroke-width='4'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='27' font-weight='700' fill='white'%3EQ%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="./assets/css/styles.css?v=delivery-review-20260912" />
+  <link rel="stylesheet" href="./assets/css/styles.css?v=ui-polish-20260926-v1" />
 </head>
 <body>
+  <a class="skip-link" href="#top">跳到主要內容</a>
   <header class="site-header">
     <div class="header-inner">
       <a class="brand view-link" href="./" data-view="overview" aria-label="回到 Qookey 總覽"><span class="brand-mark">Q</span><span class="brand-copy"><strong>Qookey</strong><small>RESEARCH SPACE</small></span></a>
@@ -32,7 +33,7 @@
     </div>
   </header>
 
-  <main id="top">
+  <main id="top" tabindex="-1">
     <p class="sr-only">目前只做紙上與 Live Paper 模擬；真實交易目前停用。</p>
     <h1 class="page-title" id="page-title">總覽</h1>
 
@@ -46,7 +47,7 @@
         <ul id="cloud-run-list" class="cloud-run-list" aria-live="polite"></ul>
       </section>
       <!-- DELIVERY_OVERVIEW_END -->
-      <details class="home-details">
+      <details class="home-details" open>
         <summary>查看資料、策略與候選明細</summary>
       <section class="home-grid" aria-label="每日四項重點">
         <article class="panel home-card" aria-labelledby="home-history-title">
@@ -142,7 +143,7 @@
       </div>
       <article class="panel strategy-score-panel"><div class="panel-header"><div><p class="card-kicker">OPPORTUNITY SCORE</p><h3>100 分候選訊號模型</h3></div><span class="badge neutral">最低進場分數 <strong id="strategy-min-score">—</strong></span></div><div class="strategy-score-list" id="strategy-score-list"></div></article>
       <div class="dashboard-grid two-one strategy-grid"><article class="panel"><div class="panel-header"><div><p class="card-kicker">RISK BOUNDARY</p><h3>風險限制</h3></div></div><div class="strategy-facts"><div><span>單筆風險</span><strong id="strategy-risk">—</strong></div><div><span>最大槓桿</span><strong id="strategy-leverage">—</strong></div><div><span>每日新倉上限</span><strong id="strategy-daily-trades">—</strong></div><div><span>每日停止線</span><strong id="strategy-daily-loss">—</strong></div></div></article><article class="panel"><div class="panel-header"><div><p class="card-kicker">EXIT RESEARCH</p><h3>出場假設</h3></div></div><div class="strategy-facts"><div><span>部分止盈</span><strong id="strategy-partial">—</strong></div><div><span>Runner</span><strong id="strategy-runner">—</strong></div><div><span>最大持有</span><strong id="strategy-holding">—</strong></div><div><span>停損依據</span><strong>結構失效＋ATR 緩衝</strong></div></div></article></div>
-      <article class="strategy-safety panel"><div><p class="card-kicker">FAIL-CLOSED BOUNDARY</p><h3>研究展示，不是交易授權</h3><p>此頁只呈現 Repository 的版本化策略設定。真實訂單、交易計畫、強制交易配額、馬丁格爾與無限攤平仍維持關閉。</p></article>
+      <article class="strategy-safety panel"><div><p class="card-kicker">FAIL-CLOSED BOUNDARY</p><h3>研究展示，不是交易授權</h3><p>此頁只呈現 Repository 的版本化策略設定。真實訂單、交易計畫、強制交易配額、馬丁格爾與無限攤平仍維持關閉。</p></div></article>
     </section>
     <section class="view" id="view-positions"><article class="panel evidence-panel"><div class="panel-header"><div><p class="card-kicker">PAPER POSITION CONTRACT</p><h3>模擬持倉與生命週期</h3><p class="panel-intro">只接受 Repository 產生、明確標示 PAPER-ONLY 的持倉投影；不讀交易所私有帳戶。</p></div><span class="badge pending" id="positions-state">尚未就緒 · NOT_READY</span></div><p class="evidence-time" id="evidence-generated-at">研究投影：尚未提供</p><div class="table-wrap"><table><thead><tr><th>標的</th><th>方向</th><th>開倉時間</th><th>進場</th><th>參考價</th><th>未實現損益</th><th>停損</th><th>生命週期</th></tr></thead><tbody id="paper-position-table"><tr><td colspan="8">目前尚無正式模擬持倉資料；未提供資料時不推算持倉。</td></tr></tbody></table></div></article></section>
     <section class="view" id="view-trades"><article class="panel"><div class="panel-header"><div><p class="card-kicker">REPOSITORY PAPER BROKER</p><h3>最新模擬成交</h3></div><span class="badge neutral">非 Pionex 真實訂單</span></div><div class="table-wrap"><table><thead><tr><th>標的</th><th>進場時間</th><th>出場時間</th><th>進場</th><th>出場</th><th>原因</th><th>淨損益</th><th>R</th></tr></thead><tbody id="paper-trade-table"><tr><td colspan="8">目前沒有模擬成交</td></tr></tbody></table></div></article></section>

@@ -543,6 +543,10 @@ def main() -> int:
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     if '<html lang="zh-Hant-TW">' not in html:
         raise RuntimeError("dashboard HTML must declare zh-Hant-TW")
+    if '<a class="skip-link" href="#top">跳到主要內容</a>' not in html:
+        raise RuntimeError("dashboard keyboard skip link missing")
+    if html.count("<div") != html.count("</div>"):
+        raise RuntimeError("dashboard HTML div structure is unbalanced")
     if 'http-equiv="Content-Security-Policy"' not in html:
         raise RuntimeError("dashboard must enforce a CSP meta policy on GitHub Pages")
     for directive in (
@@ -634,6 +638,9 @@ def main() -> int:
         raise RuntimeError("dashboard CSP forbids inline style attributes")
     for token in (
         ".site-header { position: sticky",
+        ".skip-link",
+        "scroll-snap-type: x proximity",
+        ".home-details[open] > summary::after",
         ".table-wrap:focus-visible",
         ".strategy-score-progress",
         ".cloud-run-card",
