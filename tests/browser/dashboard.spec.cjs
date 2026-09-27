@@ -255,3 +255,15 @@ test("paper equity chart renders only from explicit paper evidence", async ({ pa
   await expect(page.locator("#paper-equity-line")).not.toHaveAttribute("d", "M0 150 H800");
   await expect(page.locator("#paper-equity-note")).toContainText("4 個已記錄節點");
 });
+
+
+test("cloud paper dashboard shows inactive state without inventing account evidence", async ({ page, baseURL }) => {
+  await page.goto(baseURL, { waitUntil: "networkidle" });
+  await expect(page.locator("#cloud-paper-status")).toHaveText("已實作 · 尚未啟用");
+  await expect(page.locator("#cloud-paper-last-run")).toHaveText("尚未執行");
+  await expect(page.locator("#cloud-paper-candidates")).toHaveText("NO_TRADE · 空策略登錄");
+  await expect(page.locator("#cloud-paper-regime")).toHaveText("REGIME_UNAVAILABLE · 等待資料來源授權");
+  await expect(page.locator("#cloud-paper-account")).toHaveText("尚未初始化");
+  await expect(page.locator("#cloud-paper-budget")).toHaveText("BLOCKED · 等待額度閘門");
+  await expect(page.locator(".cloud-paper-panel")).toContainText("API key");
+});
