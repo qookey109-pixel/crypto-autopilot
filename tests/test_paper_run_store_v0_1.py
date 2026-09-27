@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
+from crypto_autopilot.storage.r2 import R2ObjectAlreadyExistsError, R2Store
 from crypto_autopilot.paper.run_store_v0_1 import (
     LocalPaperRunStore,
     PaperRunObjectAlreadyExistsError,
@@ -37,7 +38,19 @@ class FakeR2:
         self.objects[key] = payload
         return SimpleNamespace(bytes=len(payload))
 
-    def list_keys(self, prefix: str) -> tuple[str, ...]:
+    def put_bytes_if_absent(
+        self,
+        key: str,
+        payload: bytes,
+        *,
+        content_type: str = "application/octet-stream",
+        metadata: dict[str, str] | None = None,
+    ) -> SimpleNamespace:
+        if key in self.objects:
+            raise R2ObjectAlreadyExistsError(key)
+        return self.put_bytes(key, payload, content_type=content_type, metadata=metadata)
+
+    def list_keys(self, prefix: str, *, max_pages: int = 100) -> tuple[str, ...]:
         return tuple(sorted(key for key in self.objects if key.startswith(prefix)))
 
 
@@ -64,7 +77,7 @@ class PaperRunStoreV01Tests(unittest.TestCase):
         with self.assertRaises(ValueError):
             LocalPaperRunStore("relative/path")
 
-    def test_r2_conditional_create_uses_if_none_match_and_maps_412_conflict(self) -> None:
+    def test_r2_conditional_create_uses_if_none_match_and_maps_412_conflict(self):
         class ConditionalClient:
             def __init__(self, *, conflict: bool = False) -> None:
                 self.conflict = conflict
@@ -80,12 +93,16 @@ class PaperRunStoreV01Tests(unittest.TestCase):
                     }
                     raise error
 
+        def adapter(client: ConditionalClient, calls: list[tuple[str, int]]) -> R2Store:
+            store = R2Store.__new__(R2Store)
+            store.client = client
+            store.bucket = "fixture-bucket"
+            store.before_external = lambda operation, size: calls.append((operation, size))
+            return store
+
         first_client = ConditionalClient()
-        first_store = SimpleNamespace(
-            client=first_client,
-            bucket="fixture-bucket",
-        )
-        store = R2PaperRunStore(first_store)  # type: ignore[arg-type]
+        reservations: list[tuple[str, int]] = []
+        store = R2PaperRunStore(adapter(first_client, reservations))
         receipt = store.put_json_if_absent(
             "live-run-claim",
             "slot-1",
@@ -93,6 +110,7 @@ class PaperRunStoreV01Tests(unittest.TestCase):
         )
         self.assertFalse(receipt.replayed)
         self.assertEqual(len(first_client.calls), 1)
+        self.assertEqual(reservations, [("R2_CLASS_A", receipt.bytes)])
         call = first_client.calls[0]
         self.assertEqual(call["Bucket"], "fixture-bucket")
         self.assertEqual(call["IfNoneMatch"], "*")
@@ -108,8 +126,8 @@ class PaperRunStoreV01Tests(unittest.TestCase):
 
         conflict_client = ConditionalClient(conflict=True)
         conflict_store = R2PaperRunStore(
-            SimpleNamespace(client=conflict_client, bucket="fixture-bucket")
-        )  # type: ignore[arg-type]
+            adapter(conflict_client, [])
+        )
         with self.assertRaises(PaperRunObjectAlreadyExistsError):
             conflict_store.put_json_if_absent(
                 "live-run-claim",
