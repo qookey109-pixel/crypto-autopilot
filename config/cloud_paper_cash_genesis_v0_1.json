@@ -1,0 +1,14 @@
+{
+  "schema": "qookey-cloud-paper-cash-genesis-v0.1",
+  "status": "PREPARED_EXECUTION_DISABLED",
+  "initial_equity_usd": 10000,
+  "trade_records": 0,
+  "provider_requests": 0,
+  "persistent_writes": 0,
+  "authority": {
+    "synthetic_trades": false,
+    "holdout_access": false,
+    "real_orders": false,
+    "live_trading": false
+  }
+}
