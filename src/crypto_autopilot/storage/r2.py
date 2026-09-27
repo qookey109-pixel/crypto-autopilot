@@ -49,12 +49,15 @@ class R2Store:
         self.endpoint_url = endpoint_url or (
             f"https://{account_id}.r2.cloudflarestorage.com"
         )
+        from botocore.config import Config
+
         self.client = boto3.client(
             "s3",
             endpoint_url=self.endpoint_url,
             aws_access_key_id=access_key_id,
             aws_secret_access_key=secret_access_key,
             region_name="auto",
+            config=Config(retries={"max_attempts": 0, "mode": "standard"}),
         )
 
     def _before(self, operation: str, new_bytes: int = 0) -> None:
