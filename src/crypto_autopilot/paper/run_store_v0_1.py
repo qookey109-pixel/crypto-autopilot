@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import tempfile
@@ -9,7 +8,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import cast
 
-from crypto_autopilot.storage.r2 import R2Store
+from crypto_autopilot.storage.r2 import R2ObjectAlreadyExistsError, R2Store
 
 
 
@@ -288,45 +287,27 @@ class R2PaperRunStore:
 
         key = self._key(kind, object_id)
         body = _canonical_bytes(payload)
-        client = getattr(self.store, "client", None)
-        bucket = getattr(self.store, "bucket", None)
-        if client is None or not isinstance(bucket, str) or not bucket:
-            raise ValueError(
-                "R2 paper run conditional create requires the S3-compatible client"
-            )
-
-        sha256 = hashlib.sha256(body).hexdigest()
         try:
-            client.put_object(
-                Bucket=bucket,
-                Key=key,
-                Body=body,
-                ContentType="application/json",
-                Metadata={
-                    "sha256": sha256,
+            receipt = self.store.put_bytes_if_absent(
+                key,
+                body,
+                content_type="application/json",
+                metadata={
                     "paper-run-kind": _clean_component(kind, "kind"),
                     "paper-run-id": _clean_component(object_id, "object_id"),
                 },
-                IfNoneMatch="*",
             )
-        except Exception as exc:
-            response_payload = getattr(exc, "response", {}) or {}
-            code = str(response_payload.get("Error", {}).get("Code", ""))
-            status = response_payload.get("ResponseMetadata", {}).get(
-                "HTTPStatusCode"
-            )
-            if code in {"PreconditionFailed", "412"} or status == 412:
-                raise PaperRunObjectAlreadyExistsError(
-                    f"paper run conditional create conflict: {kind}/{object_id}"
-                ) from exc
-            raise
+        except R2ObjectAlreadyExistsError as exc:
+            raise PaperRunObjectAlreadyExistsError(
+                f"paper run conditional create conflict: {kind}/{object_id}"
+            ) from exc
 
         return PaperRunStoreReceipt(
             backend="R2_JSON",
             kind=kind,
             object_id=object_id,
             location=key,
-            bytes=len(body),
+            bytes=receipt.bytes,
             replayed=False,
         )
 
@@ -345,28 +326,7 @@ class R2PaperRunStore:
         prefix = f"{self.prefix}/{clean_kind}/"
         identifiers: list[str] = []
 
-        list_keys = getattr(self.store, "list_keys", None)
-        if callable(list_keys):
-            keys = tuple(list_keys(prefix))
-        else:
-            client = getattr(self.store, "client", None)
-            bucket = getattr(self.store, "bucket", None)
-            if client is None or not isinstance(bucket, str) or not bucket:
-                raise ValueError("R2 paper run store cannot list object ids")
-            paginator = client.get_paginator("list_objects_v2")
-            discovered: list[str] = []
-            for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
-                contents = page.get("Contents", [])
-                if not isinstance(contents, list):
-                    raise ValueError("R2 list response Contents must be an array")
-                for row in contents:
-                    if not isinstance(row, dict):
-                        raise ValueError("R2 list response object must be a mapping")
-                    key = row.get("Key")
-                    if not isinstance(key, str) or not key:
-                        raise ValueError("R2 list response key is invalid")
-                    discovered.append(key)
-            keys = tuple(sorted(set(discovered)))
+        keys = self.store.list_keys(prefix, max_pages=100)
 
         for key in keys:
             if not isinstance(key, str):
