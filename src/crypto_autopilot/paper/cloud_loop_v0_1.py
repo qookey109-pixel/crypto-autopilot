@@ -29,6 +29,8 @@ def digest(value: object) -> str:
 def slot_id(tick_ms: int) -> str:
     if type(tick_ms) is not int or tick_ms < SLOT_OFFSET_MS:
         raise CloudLoopReviewRequired("INVALID_TICK")
+    if tick_ms % SLOT_MS != SLOT_OFFSET_MS:
+        raise CloudLoopReviewRequired("OFF_SCHEDULE_TICK")
     return str((tick_ms - SLOT_OFFSET_MS) // SLOT_MS)
 
 
@@ -62,6 +64,7 @@ def run_cloud_step(
     *, tick_ms: int, previous_slot: str | None, store: PaperRunStoreLike,
     feed: LivePaperMarketFeed, market_supplier: Callable[[], Mapping[str, object]],
     candidate_supplier: Callable[[Mapping[str, object], Mapping[str, object]], Sequence[object]],
+    strategy_registry: Mapping[str, object],
     before_external: Callable[[], None],
     run_name: str = "cloud-paper-v0-1",
 ) -> dict[str, object]:
@@ -73,6 +76,11 @@ def run_cloud_step(
     putting test strategy evidence in a production registry.
     """
     slot = slot_id(tick_ms)
+    if strategy_registry.get("schema") != "qookey-cloud-paper-strategy-registry-v0.1":
+        raise CloudLoopReviewRequired("INVALID_STRATEGY_REGISTRY")
+    registrations = strategy_registry.get("strategies")
+    if not isinstance(registrations, list):
+        raise CloudLoopReviewRequired("INVALID_STRATEGY_REGISTRY")
     before_external()
     prior_result = committed_report(store, slot)
     if prior_result is not None:
@@ -97,6 +105,14 @@ def run_cloud_step(
     before_external()
     market = dict(market_supplier())
     candidates = tuple(candidate_supplier(market, state))
+    if not registrations and candidates:
+        raise CloudLoopReviewRequired("EMPTY_PRODUCTION_STRATEGY_REGISTRY")
+    allowed_ids = {entry.get("strategy_id") for entry in registrations
+                   if isinstance(entry, Mapping)}
+    if any(not isinstance(item, Mapping)
+           or item.get("strategy_id") not in allowed_ids
+           for item in candidates):
+        raise CloudLoopReviewRequired("UNREGISTERED_STRATEGY_CANDIDATE")
     if len(candidates) > 5:
         raise CloudLoopReviewRequired("TOO_MANY_CANDIDATES")
     report = coordinate_live_paper_run_step(
