@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "af35764fa05d3b3d9e1639c9538f8fa08b9e8c55",
+  "evidence_basis_parent_main_sha": "cfc642328ec9085830ab372ea286f25cb649c222",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -10,7 +10,7 @@
     "market_adapter": "MERGED",
     "paper_loop": "MERGED",
     "activation": "BLOCKED_BUDGET_EVIDENCE_AND_CONTROLLED_ACCEPTANCE",
-    "dashboard": "IN_PROGRESS"
+    "dashboard": "MERGED_AND_DEPLOYED"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING",
@@ -22,5 +22,17 @@
   "model_quality": "REJECT",
   "production_strategy_registry": "EMPTY_NO_ELIGIBLE_STRATEGIES",
   "macro_regime": "REGIME_UNAVAILABLE",
-  "local_work": "EXCLUDED_BY_USER"
+  "local_work": "EXCLUDED_BY_USER",
+  "dashboard_production_evidence": {
+    "main_sha": "cfc642328ec9085830ab372ea286f25cb649c222",
+    "workflow_run_id": 36332228415,
+    "build": "SUCCESS",
+    "deploy": "SUCCESS",
+    "browser_production": "SUCCESS",
+    "browser_tests_passed": 12,
+    "browser_targets": [
+      "desktop-chromium",
+      "mobile-chromium"
+    ]
+  }
 }
