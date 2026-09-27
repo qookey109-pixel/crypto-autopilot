@@ -1,8 +1,8 @@
 """Fail-closed reservation checks for the inactive Cloud Paper Loop.
 
 This module does not fetch usage data or create a reservation ledger. Callers must
-supply an account-wide, fresh snapshot and verified reservations not yet visible
-in that snapshot. It is a policy primitive, not production activation evidence.
+supply a fresh account-wide snapshot plus verified reservations not yet reflected
+in it. This primitive is not production activation evidence.
 """
 from __future__ import annotations
 
@@ -22,15 +22,21 @@ class R2UsageSnapshot:
     storage_bytes: int
     class_a_month: int
     class_b_month: int
+    class_a_31_days: int
+    class_b_31_days: int
     class_a_day: int
     class_b_day: int
     provider_requests_day: int
+    new_bytes_day: int
     pending_storage_bytes: int = 0
     pending_class_a_month: int = 0
     pending_class_b_month: int = 0
+    pending_class_a_31_days: int = 0
+    pending_class_b_31_days: int = 0
     pending_class_a_day: int = 0
     pending_class_b_day: int = 0
     pending_provider_requests_day: int = 0
+    pending_new_bytes_day: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,7 +77,7 @@ class CloudBudgetGuard:
         self._class_a_run = 0
         self._class_b_run = 0
         self._new_bytes_run = 0
-        self._new_bytes_day = snapshot.pending_storage_bytes
+        self._new_bytes_day = 0
 
     def _validate_evidence(self) -> None:
         s = self.snapshot
@@ -81,11 +87,13 @@ class CloudBudgetGuard:
             raise BudgetBlocked("BLOCKED_BUDGET_CLOCK_INVALID")
         numeric = (
             s.observed_at_ms, s.measured_through_ms, s.storage_bytes,
-            s.class_a_month, s.class_b_month, s.class_a_day, s.class_b_day,
-            s.provider_requests_day, s.pending_storage_bytes,
+            s.class_a_month, s.class_b_month, s.class_a_31_days,
+            s.class_b_31_days, s.class_a_day, s.class_b_day,
+            s.provider_requests_day, s.new_bytes_day, s.pending_storage_bytes,
             s.pending_class_a_month, s.pending_class_b_month,
+            s.pending_class_a_31_days, s.pending_class_b_31_days,
             s.pending_class_a_day, s.pending_class_b_day,
-            s.pending_provider_requests_day,
+            s.pending_provider_requests_day, s.pending_new_bytes_day,
         )
         if any(type(value) is not int or value < 0 for value in numeric):
             raise BudgetBlocked("BLOCKED_BUDGET_USAGE_UNKNOWN")
@@ -98,10 +106,11 @@ class CloudBudgetGuard:
 
     def reserve_provider_request(self) -> None:
         self._validate_evidence()
-        used = self.snapshot.provider_requests_day + self.snapshot.pending_provider_requests_day
-        if self._provider_run >= self.policy.provider_per_run:
+        s, p = self.snapshot, self.policy
+        used = s.provider_requests_day + s.pending_provider_requests_day
+        if self._provider_run >= p.provider_per_run:
             raise BudgetBlocked("BLOCKED_BUDGET_PROVIDER_RUN_LIMIT")
-        if used + self._provider_run >= self.policy.provider_per_day:
+        if used + self._provider_run >= p.provider_per_day:
             raise BudgetBlocked("BLOCKED_BUDGET_PROVIDER_DAILY_LIMIT")
         self._provider_run += 1
 
@@ -120,32 +129,36 @@ class CloudBudgetGuard:
         s, p = self.snapshot, self.policy
         if self._new_bytes_run + new_bytes > p.r2_new_bytes_per_run:
             raise BudgetBlocked("BLOCKED_BUDGET_RUN_BYTES_LIMIT")
-        if s.pending_storage_bytes + self._new_bytes_run + new_bytes > p.r2_new_bytes_per_day:
+        if s.new_bytes_day + s.pending_new_bytes_day + self._new_bytes_day + new_bytes > p.r2_new_bytes_per_day:
             raise BudgetBlocked("BLOCKED_BUDGET_DAILY_BYTES_LIMIT")
         if s.storage_bytes + s.pending_storage_bytes + self._new_bytes_run + new_bytes > p.r2_hard_stop_bytes:
             raise BudgetBlocked("BLOCKED_BUDGET_STORAGE_HARD_STOP")
 
         if operation == "A":
-            monthly = s.class_a_month + s.pending_class_a_month + self._class_a_run
-            daily = s.class_a_day + s.pending_class_a_day + self._class_a_run
+            month = s.class_a_month + s.pending_class_a_month
+            rolling = s.class_a_31_days + s.pending_class_a_31_days
+            daily = s.class_a_day + s.pending_class_a_day
             if self._class_a_run >= p.r2_class_a_per_run:
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_A_RUN_LIMIT")
-            if daily >= p.r2_class_a_per_day:
+            if daily + self._class_a_run >= p.r2_class_a_per_day:
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_A_DAILY_LIMIT")
-            if monthly >= min(p.r2_class_a_per_31_days, p.project_class_a_per_month,
-                              p.free_class_a_per_month):
+            if month >= min(p.project_class_a_per_month, p.free_class_a_per_month):
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_A_MONTHLY_LIMIT")
+            if rolling + self._class_a_run >= p.r2_class_a_per_31_days:
+                raise BudgetBlocked("BLOCKED_BUDGET_CLASS_A_31_DAY_LIMIT")
             self._class_a_run += 1
         else:
-            monthly = s.class_b_month + s.pending_class_b_month + self._class_b_run
-            daily = s.class_b_day + s.pending_class_b_day + self._class_b_run
+            month = s.class_b_month + s.pending_class_b_month
+            rolling = s.class_b_31_days + s.pending_class_b_31_days
+            daily = s.class_b_day + s.pending_class_b_day
             if self._class_b_run >= p.r2_class_b_per_run:
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_B_RUN_LIMIT")
-            if daily >= p.r2_class_b_per_day:
+            if daily + self._class_b_run >= p.r2_class_b_per_day:
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_B_DAILY_LIMIT")
-            if monthly >= min(p.r2_class_b_per_31_days, p.project_class_b_per_month,
-                              p.free_class_b_per_month):
+            if month >= min(p.project_class_b_per_month, p.free_class_b_per_month):
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_B_MONTHLY_LIMIT")
+            if rolling + self._class_b_run >= p.r2_class_b_per_31_days:
+                raise BudgetBlocked("BLOCKED_BUDGET_CLASS_B_31_DAY_LIMIT")
             self._class_b_run += 1
         self._new_bytes_run += new_bytes
         self._new_bytes_day += new_bytes
