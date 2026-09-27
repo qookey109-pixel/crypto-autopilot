@@ -126,11 +126,17 @@ After Pionex and Weekly Training:
 
 | Check | Run ID | Head SHA | Result | Artifact / evidence | Next action |
 | --- | --- | --- | --- | --- | --- |
-| Pionex 11:53 | pending | pending | pending | pending | wait for natural schedule |
-| Core100 12:37 | pending | pending | pending | pending | wait for natural schedule |
-| Pages 12:43 | pending | pending | pending | pending | verify build/deploy/browser separately |
-| Health 12:57 | pending | pending | pending | pending | verify alerts and coverage |
-| Cloud Maintenance | pending | pending | pending | pending | record NO_CHANGE/proposal only if naturally triggered |
+| Pionex 11:53 | no qualifying natural run observed as of 2026-09-27 14:29 Asia/Taipei | `fd68650472188e6cdded4d4e6aa5b1a452774f72` expected default-branch baseline | `MISSING / DELAYED / UNKNOWN` | manual supplemental run `36299696477` is recorded above but is not natural evidence | keep the natural slot unresolved; do not relabel manual evidence |
+| Core100 12:37 | no qualifying natural run observed as of 2026-09-27 14:29 Asia/Taipei | `fd68650472188e6cdded4d4e6aa5b1a452774f72` expected default-branch baseline | `MISSING / DELAYED / UNKNOWN` | manual supplemental run `36299706656` was `SKIPPED` safely and is not natural evidence | keep the natural slot unresolved; do not infer NO_CHANGE |
+| Pages 12:43 | no qualifying daily natural schedule observed as of 2026-09-27 14:29 Asia/Taipei | `fd68650472188e6cdded4d4e6aa5b1a452774f72` expected default-branch baseline | `MISSING / DELAYED / UNKNOWN` | workflow-run Pages `36299744851` succeeded after manual Pionex, but is event-driven rather than the daily schedule | keep natural schedule observation separate from event-driven success |
+| Health 12:57 | no later qualifying natural Health run observed as of 2026-09-27 14:29 Asia/Taipei | `fd68650472188e6cdded4d4e6aa5b1a452774f72` | `MISSING / DELAYED / UNKNOWN` | latest 2026-09-27 natural Health remains run `36284094605` from 08:58 Asia/Taipei | preserve the missing/delayed observation |
+| Cloud Maintenance | no qualifying new trigger after the unresolved midday Health slot | `fd68650472188e6cdded4d4e6aa5b1a452774f72` | `NOT TRIGGERED FROM QUALIFYING NEW NATURAL HEALTH` | earlier natural chain `36284094605` → `36284116625` succeeded; no manual substitute accepted | wait only for a qualifying natural Health completion |
+
+## Observation checkpoint — 2026-09-27 14:29 Asia/Taipei
+
+A live recheck at `2026-09-27 14:29:42+08:00` still showed `main=fd68650472188e6cdded4d4e6aa5b1a452774f72`. The 2026-09-27 schedule feed still exposed only natural Health run `36284094605` for the date; no qualifying Pionex 11:53, Core100 12:37, daily Pages 12:43, or later Health 12:57 natural run was visible at that checkpoint.
+
+Per the repository operating map, this is recorded as `MISSING / DELAYED / UNKNOWN`, not as a scheduler-failure diagnosis and not as acceptance success. Manual and workflow-run evidence remain useful runtime evidence but stay separate from the natural-schedule acceptance claim.
 
 ## Boundaries
 
