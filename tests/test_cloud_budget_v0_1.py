@@ -64,18 +64,21 @@ class CloudBudgetGuardTests(unittest.TestCase):
             with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_STALE"):
                 guard.reserve_r2_class_b()
 
-    def test_daily_and_rolling_limits_include_reserved_operations(self):
+    def test_daily_limit_includes_operations_reserved_in_this_run(self):
         guard = CloudBudgetGuard(
-            snapshot=snapshot(
-                class_a_day=12_287,
-                class_a_31_days=380_927,
-                class_a_month=500_000,
-            ),
+            snapshot=snapshot(class_a_day=12_287, class_a_month=500_000),
             now_ms=NOW,
         )
         guard.reserve_r2_class_a()
         with self.assertRaisesRegex(BudgetBlocked, "CLASS_A_DAILY_LIMIT"):
             guard.reserve_r2_class_a()
+
+    def test_rolling_31_day_limit_blocks(self):
+        guard = CloudBudgetGuard(
+            snapshot=snapshot(class_b_31_days=380_928), now_ms=NOW
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "CLASS_B_31_DAY_LIMIT"):
+            guard.reserve_r2_class_b()
 
     def test_account_free_and_project_monthly_limits_block(self):
         for count in (750_000, 1_000_000):
@@ -128,6 +131,13 @@ class CloudBudgetGuardTests(unittest.TestCase):
         guard.reserve_provider_request()
         guard.reserve_provider_request()
         with self.assertRaisesRegex(BudgetBlocked, "PROVIDER_RUN_LIMIT"):
+            guard.reserve_provider_request()
+
+    def test_provider_daily_ceiling_blocks(self):
+        guard = CloudBudgetGuard(
+            snapshot=snapshot(provider_requests_day=1_728), now_ms=NOW
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "PROVIDER_DAILY_LIMIT"):
             guard.reserve_provider_request()
 
 
