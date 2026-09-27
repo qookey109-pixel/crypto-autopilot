@@ -4,12 +4,13 @@ import unittest
 from dataclasses import dataclass
 
 from crypto_autopilot.features.market import OrderBookSnapshot, PublicTrade
-from crypto_autopilot.paper.cloud_loop_v0_1 import CompleteTapePionexFeed
-from crypto_autopilot.paper.live_v0_1 import LivePaperPolicy
-
 from crypto_autopilot.paper.cloud_loop_v0_1 import (
-    CloudLoopReviewRequired, run_cloud_step, slot_id,
+    CloudLoopReviewRequired,
+    CompleteTapePionexFeed,
+    run_cloud_step,
+    slot_id,
 )
+from crypto_autopilot.paper.live_v0_1 import LivePaperPolicy
 from crypto_autopilot.paper.run_store_v0_1 import PaperRunObjectAlreadyExistsError
 
 
