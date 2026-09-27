@@ -97,7 +97,7 @@ The nominal Pionex/Core100 natural schedule slots had not appeared in the Action
 | --- | --- | --- | --- | --- |
 | Pionex Alternative Assets Observability V0.2 | `36299696477`, attempt 1 | `fd68650472188e6cdded4d4e6aa5b1a452774f72` | SUCCESS | Report `REVIEW_REQUIRED`; catalog diff `PASS`; validation `REVIEW_REQUIRED`; 80 matched markets from 125 frozen registry candidates; 0 added / 0 removed; 62 unresolved X-suffix symbols were review-only and not selected. |
 | Binance USD-M Crypto Core 100 Training V0.2 | `36299706656`, attempt 1 | `fd68650472188e6cdded4d4e6aa5b1a452774f72` | SUCCESS | Report `SKIPPED` with reason `MANUAL_DISPATCH_WITHOUT_BOOTSTRAP_INPUT`; training=false; provider requests=0; R2 access/reads/writes=false; consumed bootstrap was not rerun. |
-| Dashboard GitHub Pages (follow-up) | `36299744851` | `fd68650472188e6cdded4d4e6aa5b1a452774f72` | SUCCESS | Triggered by `workflow_run` after the manual Pionex completion; confirms the current-main dashboard pipeline can complete, but is not the missing natural 12:43 schedule evidence. |
+| Dashboard GitHub Pages (follow-up) | `36299744851` | `fd68650472188e6cdded4d4e6aa5b1a452774f72` | SUCCESS | Triggered by `workflow_run` after manual Pionex. `build=success`, `deploy=success`, `browser-production=success`; deployed desktop/mobile browser validation passed. This is current-main event-driven production evidence, not the missing natural 12:43 schedule evidence. |
 
 ### Pionex manual-review classification
 
