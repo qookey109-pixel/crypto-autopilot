@@ -8,13 +8,13 @@ This document is an observation checklist, **not execution authority**. Before a
 
 The next fixed checkpoint is the 2026-09-27 natural Pionex observability and Core100 Weekly Training sequence. Keep the runtime baseline stable until those runs are reviewed. In particular, do not edit:
 
-- `src/qookey/paper/live_v0_1.py` execution-chain typing paths;
-- `src/qookey/training/detailed.py`;
+- `src/crypto_autopilot/paper/live_v0_1.py` execution-chain typing paths;
+- `src/crypto_autopilot/training/detailed.py`;
 - the Pionex observability workflow/config/authority;
 - the Core100 Weekly Training workflow/fingerprint contract;
 - thresholds, promotion gates, source-switch authority, holdout state, or live-trading authority.
 
-The current type-visibility baseline is 33 diagnostics: 18 protected and 15 ordinary cleanup candidates. The 15 ordinary candidates are the five remaining Live Paper execution-chain diagnostics plus ten `training/detailed.py` diagnostics. Resume those slices only after the natural evidence below is reviewed.
+The current type-visibility baseline is 33 diagnostics: 18 protected and 15 ordinary cleanup candidates. The 15 ordinary candidates are the five remaining Live Paper execution-chain diagnostics plus ten `training/detailed.py` diagnostics. Natural evidence review is necessary but not sufficient to resume a slice. The visibility label "ordinary" does not mean fingerprint-independent: `src/crypto_autopilot/training/detailed.py` is explicitly listed in the active V0.2 successor contract's `identity_contract.code_paths`. Keep its ten diagnostics deferred until a separately reviewed fingerprint-impact decision exists. Recheck the five Live Paper diagnostics against current receipt, identity, runtime-guard and dependency bindings before selecting any bounded change.
 
 ## Current pre-check evidence
 
@@ -83,7 +83,7 @@ Record:
 Interpretation:
 
 - `NO_CHANGE`: require `training_performed=false`, `r2_writes_performed=false`, and `provider_requests_performed=0`. This is the expected deduplication path only if the governed fingerprints are unchanged.
-- `PASS`: preserve the new evidence and inspect why the fingerprint changed. PASS is pipeline evidence, not automatic model acceptance.
+- `PASS`: preserve the report and treat it as unexpected for the current comparison-only natural schedule. The active successor contract has `scheduled_retraining=false`; the consumed bootstrap does not authorize another training run or R2 write. Inspect the report and current authority before any follow-up; do not rerun or infer model acceptance.
 - `REVIEW_REQUIRED`: stop for review; do not loosen a gate or rerun until the reason is understood.
 - `SKIPPED`: confirm the explicit guard reason and zero unauthorized activity.
 
@@ -120,7 +120,7 @@ After Pionex and Weekly Training:
 3. Review the subsequent Health natural run. Preserve delayed/missing slots as observations instead of replacing them with dispatch evidence.
 4. Review Cloud Maintenance only if it was triggered by the qualifying natural Health run.
 5. Update status documentation with exact run IDs, attempts, head SHAs and artifact IDs.
-6. Only then reopen TD-007 ordinary cleanup for the five Live Paper execution-chain diagnostics and ten `training/detailed.py` diagnostics.
+6. Only then review eligibility for the five Live Paper execution-chain diagnostics. Keep the ten `training/detailed.py` diagnostics deferred because the file is experiment-identity-bound; natural acceptance alone does not remove that binding.
 
 ## Decision ledger
 
@@ -137,6 +137,43 @@ After Pionex and Weekly Training:
 A live recheck at `2026-09-27 14:29:42+08:00` still showed `main=fd68650472188e6cdded4d4e6aa5b1a452774f72`. The 2026-09-27 schedule feed still exposed only natural Health run `36284094605` for the date; no qualifying Pionex 11:53, Core100 12:37, daily Pages 12:43, or later Health 12:57 natural run was visible at that checkpoint.
 
 Per the repository operating map, this is recorded as `MISSING / DELAYED / UNKNOWN`, not as a scheduler-failure diagnosis and not as acceptance success. Manual and workflow-run evidence remain useful runtime evidence but stay separate from the natural-schedule acceptance claim.
+
+
+## Audit follow-up — 2026-09-27 14:45 Asia/Taipei
+
+Mode: `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`. Reviewed main remains `fd68650472188e6cdded4d4e6aa5b1a452774f72`. This section adds observations and review blockers; it does not close natural acceptance.
+
+### Local-day coverage and Health freshness
+
+The earlier 14:29 observation is retained as history. Its statement about the September 27 feed must not be interpreted as complete Asia/Taipei-day coverage. A Taipei calendar day starts at 16:00 UTC on the preceding date.
+
+At the 14:43 recheck, the repository Actions API query used `event=schedule`, `created>=2026-09-26T16:00:00Z`, and `per_page=100`: one page returned all four records (`total_count=4`).
+
+| Natural run | Created UTC | Created Asia/Taipei | Result |
+| --- | --- | --- | --- |
+| Health `36261294774` | 2026-09-26 18:05:09 | 2026-09-27 02:05:09 | SUCCESS |
+| Health `36273577136` | 2026-09-26 21:37:32 | 2026-09-27 05:37:32 | SUCCESS |
+| Health `36284094605` | 2026-09-27 00:58:11 | 2026-09-27 08:58:11 | SUCCESS |
+| Resource Hub `36300466626` | 2026-09-27 06:33:54 | 2026-09-27 14:33:54 | SUCCESS |
+
+No Pionex, Core100, or daily Pages natural run was present in that complete returned interval. Nominal-slot assignment for Health remains UNKNOWN where the run metadata cannot identify the original cron occurrence; do not assign each run to the nearest slot.
+
+At `2026-09-27T06:45:23Z`, the latest natural Health run's verified `run_started_at=2026-09-27T00:58:11Z` was 20,832 seconds old (5h 47m 12s). Current `config/research_automation_health_v0_2.json` allows 14,400 seconds, and `src/crypto_autopilot/research/automation_health.py` evaluates age from `run_started_at` first. Applying that existing policy gives **STALE** at this observation. This is a metadata-derived current freshness finding, not a new Health report or a diagnosis of GitHub scheduler failure. The earlier run's historical SUCCESS is preserved. The Health-dependent Maintenance listener cannot independently wake when Health does not run.
+
+### PR review blockers
+
+- PR #533 head `746459127d1692a6f47ef562bb725e68d307ace6` has zero check runs and five pull-request workflow runs with conclusion `action_required`: `36261391901`, `36261391908`, `36261391902`, `36261391903`, and `36261391918`. Classification: **WAITING_CI_APPROVAL**, not PASS. GitHub documents the approval requirement for PR events generated with `GITHUB_TOKEN`: [Triggering a workflow](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
+- #533 changes only the two generated maintenance blocks in `CURRENT_STATUS.md` and the continuation runbook; #532 adds this separate checklist. They do not directly overwrite the same file. Review snapshot freshness and CI before disposition; do not close or merge solely because one snapshot is older.
+- #533's source Health `36261294774` was created September 27 at 02:05 Asia/Taipei, although its UTC date is September 26.
+- #534 remains Draft. Its PR build/checks passed, while PR `deploy` and `browser-production` were SKIPPED; those skips are not production validation of the proposed UI.
+
+### Bounded follow-up order
+
+1. Resolve the Health freshness alert using a later qualifying natural run and its actual result; preserve this stale interval. Keep Pionex/Core100 natural acceptance unresolved until evidence review or an explicit documented missed-observation closure decision.
+2. Correct documentation/readiness classifications before resuming engineering work. Fingerprint-bound training cleanup stays deferred.
+3. Review Pionex failure-evidence retention after the current natural observation closes: its artifact-upload step currently lacks a failure condition, while the final cleanup runs with `always()`. A preceding build/assertion failure can skip upload and remove runner output. This is a code-review finding, not a failure observed in today's successful manual run; any fix requires the existing authority/binding review and cloud regression.
+4. Continue the existing seven-day observation through September 30 at 20:49 Asia/Taipei (168 hours from September 23 at 20:49). A preliminary query at this audit returned all 32 natural runs since `2026-09-23T12:49:00Z` on one 100-row page, all with workflow conclusion SUCCESS. That count is not slot coverage or proof of healthy freshness; missing slots, ambiguous assignments and queue/duration data still need review.
+5. On October 1 after 08:00 Asia/Taipei, review Pionex expiry under the existing authority. These are review checkpoints, not newly installed schedules. Existing cron expressions remain unchanged.
 
 ## Boundaries
 
