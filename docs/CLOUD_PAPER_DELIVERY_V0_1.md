@@ -23,3 +23,12 @@ These are explicit product dependencies, not reasons to reinstate the cancelled 
 The cloud step adapter now binds a valid quarter-hour slot to a prior verified committed step, atomically creates a slot claim, and verifies the account/state/step/result readbacks. Replays return the existing report with zero market calls. With the approved strategy registry empty, production candidate injection is rejected and the valid no-trade path is exercised in CI. This adapter is not connected to an Actions schedule or R2 credentials; budget gate, full live-frame completeness, controlled activation and dashboard work remain outstanding.
 
 Before an open paper session advances, the successor feed requests at most 500 recent public trades and requires the returned page to cover the prior lifecycle timestamp. Saturated, gapped, stale, future-dated or invalid tape evidence blocks the slot for review; the older V0.1 feed's 100-record slice is not treated as complete lifecycle history.
+
+
+## Delivery status (2026-09-28)
+
+The contract, bounded Pionex market adapter and persistent slot coordinator are merged. GitHub CI covers both the production-safe empty-registry `NO_TRADE` path and a separate synthetic full lifecycle (risk admission, paper entry, target exit, account update and next slot). Synthetic fixtures are never registered as production strategies.
+
+The Dashboard projects `NOT_RUN`, `REGIME_UNAVAILABLE`, the empty production strategy registry and the 10,000 USD planned genesis without claiming that an account or position exists. Pionex public market endpoints do not supply TOTAL3 or BTC dominance; API credentials do not add those global metrics. No alternative provider is used without authority.
+
+Activation remains blocked: the contract requires fresh shared-account R2 usage evidence, but the per-access budget reservation guard is not implemented and the controlled main acceptance has not run. No provider/R2 operation or natural schedule has been started for this loop. The strategy registry remains empty and model quality remains `REJECT`.
