@@ -53,6 +53,12 @@ Integrate #533's unchanged generated snapshot into #532 as historical evidence f
 
 TD-007, large refactors, new research and Pionex failure-report redesign are outside today's delivery scope and remain deferred in the existing debt/work intake. The current model-quality result is **REJECT**. This delivery does not change holdout, source-switch, promotion, training or trading authority.
 
+## Cloud Paper product delivery — active work
+
+User approved implementation of the complete cloud simulation loop on September 27. Track the five batches in [Cloud Paper delivery](research/status/cloud-paper-delivery-v0-1.json): contract, public-market adapter, persistent paper loop, controlled activation, and dashboard. [Loop V0.1](config/cloud_paper_loop_v0_1.json) fixes 10,000 USD virtual initial equity and a 15-minute target cadence. Execution remains disabled until implementation, cloud CI, zero-cost evidence and controlled main acceptance are recorded. The production strategy registry starts empty; no synthetic or rejected strategy may create a production position. Missing strategy evidence produces NO_TRADE, not an invented trade.
+
+The documentation/UI delivery PRs #532/#534 are merged and #533 is closed after evidence integration. Their delivery is separate from the new product loop, which is not complete or scheduled yet. No seven-day observation or October 1 extra manual audit is reinstated.
+
 ## Current work, in order
 
 | Priority | Work | Completion evidence / boundary |

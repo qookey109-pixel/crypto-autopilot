@@ -1,0 +1,18 @@
+{
+  "schema": "qookey-cloud-paper-delivery-v0.1",
+  "updated_date": "2026-09-27",
+  "evidence_basis_parent_main_sha": "ce3bcad8b4c047b88dd6fd5251e9f6e28ad9a9ec",
+  "is_latest_main_claim": false,
+  "status": "IMPLEMENTATION_IN_PROGRESS",
+  "contract": "config/cloud_paper_loop_v0_1.json",
+  "batches": {
+    "contract": "PREPARED",
+    "market_adapter": "PENDING",
+    "paper_loop": "PENDING",
+    "activation": "DISABLED",
+    "dashboard": "PENDING"
+  },
+  "natural_acceptance": "NOT_ESTABLISHED",
+  "model_quality": "REJECT",
+  "local_work": "EXCLUDED_BY_USER"
+}
