@@ -175,6 +175,14 @@ At `2026-09-27T06:45:23Z`, the latest natural Health run's verified `run_started
 4. Continue the existing seven-day observation through September 30 at 20:49 Asia/Taipei (168 hours from September 23 at 20:49). A preliminary query at this audit returned all 32 natural runs since `2026-09-23T12:49:00Z` on one 100-row page, all with workflow conclusion SUCCESS. That count is not slot coverage or proof of healthy freshness; missing slots, ambiguous assignments and queue/duration data still need review.
 5. On October 1 after 08:00 Asia/Taipei, review Pionex expiry under the existing authority. These are review checkpoints, not newly installed schedules. Existing cron expressions remain unchanged.
 
+## Follow-up — 2026-09-27 15:11 Asia/Taipei
+
+A fresh GitHub read found main still at `fd68650472188e6cdded4d4e6aa5b1a452774f72`. The repository Actions query `event=schedule`, `created>=2026-09-26T16:00:00Z`, `per_page=100` returned `total_count=4` on one page: the same three natural Health runs and Resource Hub run listed above. No qualifying natural Pionex, Core100, or daily Pages run had appeared. The midday Health slot still lacks an identifiable qualifying run; nominal-slot attribution remains UNKNOWN. The latest observed natural Health remains `36284094605` from 08:58 Asia/Taipei, so the dated freshness concern remains open. Manual and event-driven runs do not close these natural observations.
+
+The maintainer-approved PR #533 workflows have now run against exact head `746459127d1692a6f47ef562bb725e68d307ace6`. GitHub reports nine completed checks: seven successful (Python 3.12 and 3.13 tests, workflow-static, Pages build, Zh-Hant snapshot, CodeQL, dependency-security) and two skipped (PR Pages deploy and browser-production). The earlier `WAITING_CI_APPROVAL` statement remains an accurate 14:45 historical observation; its current classification for this head is `CI_COMPLETE_WITH_EXPECTED_PR_SKIPS`.
+
+PR #533 changes only the generated maintenance blocks in `CURRENT_STATUS.md` and the continuation runbook, using an observation from 02:06 Asia/Taipei before the Pionex/Core100 checkpoints. PR #532 adds this separate, later checklist. Keep #533 Draft while the 9/27 natural schedule observation is unresolved; its bot may update the same branch after a later qualifying natural Health completion. The current maintenance publisher explicitly reuses an open draft with its branch prefix, and a closed PR with its branch retained stops at `CLOSED_BRANCH_REVIEW_REQUIRED`. Recheck the exact head, snapshot and CI before any later merge or closure. This PR review changes no cron, runtime or research authority.
+
 ## Boundaries
 
 Budget remains FREE-ONLY / 0 USD per month. The project remains PAPER / LIVE-PAPER ONLY. Replacement holdout remains frozen and unopened. `source_switch_authorized=false`. Do not write secrets to repository content, logs, artifacts, or chat.
