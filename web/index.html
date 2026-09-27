@@ -47,6 +47,22 @@
         <ul id="cloud-run-list" class="cloud-run-list" aria-live="polite"></ul>
       </section>
       <!-- DELIVERY_OVERVIEW_END -->
+<!-- CLOUD_PAPER_LOOP_PANEL_START -->
+      <section class="panel cloud-paper-panel" aria-labelledby="cloud-paper-heading">
+        <div class="panel-header">
+          <div><p class="card-kicker">CLOUD PAPER LOOP</p><h3 id="cloud-paper-heading">雲端模擬循環</h3></div>
+          <span class="badge neutral" id="cloud-paper-status">讀取狀態</span>
+        </div>
+        <p id="cloud-paper-detail">讀取版本化模擬循環狀態。</p>
+        <div class="delivery-metrics" aria-label="模擬循環狀態">
+          <article><p>最近循環</p><strong id="cloud-paper-last-run">—</strong><p>只接受正式雲端報告；CI fixture 不算正式循環。</p></article>
+          <article><p>候選與總體狀態</p><strong id="cloud-paper-candidates">—</strong><p id="cloud-paper-regime">—</p></article>
+          <article><p>虛擬帳戶</p><strong id="cloud-paper-account">—</strong><p id="cloud-paper-positions">—</p></article>
+          <article><p>執行與費用閘門</p><strong id="cloud-paper-budget">—</strong><p>每次 provider/R2 存取的額度預留及共享帳戶用量證據未完成。</p></article>
+        </div>
+        <p class="muted">Pionex 公開行情 API 不提供 TOTAL3／BTC dominance；提供 API key 也不會補出這些全市場指標。未授權切換資料來源前，系統保留 REGIME_UNAVAILABLE。</p>
+      </section>
+      <!-- CLOUD_PAPER_LOOP_PANEL_END -->
       <details class="home-details" open>
         <summary>查看資料、策略與候選明細</summary>
       <section class="home-grid" aria-label="每日四項重點">
