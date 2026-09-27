@@ -17,3 +17,9 @@ Technical features, opportunity scoring and strategy routing reuse the existing 
 4. Shared-account R2 allowance evidence and implementation-bound activation are required before enabling the proposed cron.
 
 These are explicit product dependencies, not reasons to reinstate the cancelled seven-day/October 1 manual audits. Engineering integration tests use synthetic inputs only on GitHub CI; they must never be presented as production strategy evidence.
+
+## Persistent coordinator primitive
+
+The cloud step adapter now binds a valid quarter-hour slot to a prior verified committed step, atomically creates a slot claim, and verifies the account/state/step/result readbacks. Replays return the existing report with zero market calls. With the approved strategy registry empty, production candidate injection is rejected and the valid no-trade path is exercised in CI. This adapter is not connected to an Actions schedule or R2 credentials; budget gate, full live-frame completeness, controlled activation and dashboard work remain outstanding.
+
+Before an open paper session advances, the successor feed requests at most 500 recent public trades and requires the returned page to cover the prior lifecycle timestamp. Saturated, gapped, stale, future-dated or invalid tape evidence blocks the slot for review; the older V0.1 feed's 100-record slice is not treated as complete lifecycle history.
