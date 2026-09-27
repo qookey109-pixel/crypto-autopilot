@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "9381fb78b8c364de272ac4061505a276a2edcac6",
+  "evidence_basis_parent_main_sha": "610ff6b2ebd997cd02797fe24d85e72435edcf27",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -11,11 +11,12 @@
     "paper_loop": "MERGED",
     "activation": "BLOCKED_BUDGET_EVIDENCE_AND_CONTROLLED_ACCEPTANCE",
     "dashboard": "MERGED_AND_DEPLOYED",
-    "budget_guard": "PRIMITIVE_IMPLEMENTED_NOT_WIRED"
+    "budget_guard": "PRIMITIVE_IMPLEMENTED_NOT_WIRED",
+    "r2_adapter_budget_hooks": "IMPLEMENTED_NOT_CONFIGURED"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING",
-    "per_external_access_reservation_guard": "PRIMITIVE_IMPLEMENTED_NOT_WIRED",
+    "per_external_access_reservation_guard": "R2_ADAPTER_HOOKS_IMPLEMENTED_CLOUD_LOOP_NOT_WIRED",
     "complete_account_wide_reservation_ledger": "MISSING",
     "controlled_main_acceptance": "NOT_RUN"
   },

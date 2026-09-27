@@ -114,6 +114,21 @@ class CloudBudgetGuard:
             raise BudgetBlocked("BLOCKED_BUDGET_PROVIDER_DAILY_LIMIT")
         self._provider_run += 1
 
+    def reserve(self, operation: str, new_bytes: int = 0) -> None:
+        """Callback-compatible reservation entry point for provider/R2 adapters."""
+        if operation == "PIONEX_PUBLIC":
+            if new_bytes != 0:
+                raise BudgetBlocked("BLOCKED_BUDGET_PROVIDER_BYTES_INVALID")
+            self.reserve_provider_request()
+        elif operation == "R2_CLASS_A":
+            self.reserve_r2_class_a(new_bytes=new_bytes)
+        elif operation == "R2_CLASS_B":
+            if new_bytes != 0:
+                raise BudgetBlocked("BLOCKED_BUDGET_CLASS_B_BYTES_INVALID")
+            self.reserve_r2_class_b()
+        else:
+            raise BudgetBlocked("BLOCKED_BUDGET_OPERATION_UNKNOWN")
+
     def reserve_r2_class_a(self, *, new_bytes: int = 0) -> None:
         self._reserve_r2(operation="A", new_bytes=new_bytes)
 
