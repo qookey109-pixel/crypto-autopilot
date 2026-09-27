@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import unittest
 
 from crypto_autopilot.storage.r2 import R2Store
