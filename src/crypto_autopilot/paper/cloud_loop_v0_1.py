@@ -8,7 +8,6 @@ from collections.abc import Callable, Mapping, Sequence
 from crypto_autopilot.paper.cloud_genesis_v0_1 import initialize_cloud_paper_state
 from crypto_autopilot.paper.live_v0_1 import LivePaperMarketFeed, verify_live_paper_state
 from crypto_autopilot.exchanges.pionex_public import PionexPublicClient
-from crypto_autopilot.features.market import OrderBookSnapshot, PublicTrade
 from crypto_autopilot.paper.live_v0_1 import LivePaperMarketFrame, LivePaperPolicy
 from crypto_autopilot.paper.run_claim_v0_1 import LivePaperRunClaimPolicy
 from crypto_autopilot.paper.run_coordinator_v0_1 import (
