@@ -28,7 +28,9 @@ Before an open paper session advances, the successor feed requests at most 500 r
 
 `src/crypto_autopilot/paper/cloud_budget_v0_1.py` validates account-wide usage evidence timestamps, measured-through freshness, complete reservation coverage, monthly/daily/rolling-31-day operation ceilings, object/run/day byte ceilings and the 8 GB storage hard stop before allowing a provider or R2 reservation. Synthetic tests cover stale, missing, incomplete, negative, over-limit and successful reservations.
 
-This is only a policy primitive. It does not collect Cloudflare analytics, create an atomic account-wide reservation ledger, wrap the Pionex/R2 clients, or prove that unrelated account writers are included. The production path has not wired it before every access. Shared-account usage evidence remains missing; no deployment, controlled main acceptance, provider/R2 operation, or natural schedule is authorized by this code change.
+`R2Store` now accepts a pre-access callback and invokes it before each Class A write/list page and Class B read; `R2PaperRunStore` routes conditional writes and key listing through those guarded methods. The budget guard exposes a callback-compatible dispatcher, and the Pionex adapters already accept pre-request callbacks. Synthetic CI checks verify the R2 callback runs before I/O.
+
+This is still adapter support, not production wiring. The Cloud Paper workflow, Cloudflare usage collector, atomic account-wide reservation ledger, and complete coverage of unrelated account writers are absent. Shared-account usage evidence remains missing; no deployment, controlled main acceptance, provider/R2 operation, or natural schedule is authorized by this change.
 
 ## Delivery status (2026-09-28)
 
