@@ -1,0 +1,116 @@
+{
+  "schema": "qookey-cloud-paper-loop-v0.1",
+  "status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "mode": "PAPER_AND_LIVE_PAPER_ONLY",
+  "activation": {
+    "enabled": false,
+    "receipt": "research/receipts/cloud-paper-loop-v0-1-activation.json",
+    "require_implementation_sha_binding": true,
+    "require_cloud_ci_success": true,
+    "require_controlled_main_acceptance": true,
+    "require_free_only_evidence": true
+  },
+  "schedule": {
+    "cron_utc": "7,22,37,52 * * * *",
+    "timeout_minutes": 10,
+    "maximum_slots_per_utc_day": 96,
+    "concurrency_group": "live-paper-persistence-v0-1",
+    "backfill": false,
+    "rerun_consumed_slots": false,
+    "stale_start_max_seconds": 600
+  },
+  "account": {
+    "initial_equity_usd": 10000,
+    "direction": "LONG_ONLY",
+    "one_active_basket": true,
+    "genesis_requires_zero_records": true,
+    "reset_on_restart": false
+  },
+  "market": {
+    "provider": "PIONEX_PUBLIC",
+    "governed_universe": "config/pionex_research_universe_v0_1.json",
+    "alternative_registry": "config/pionex_alternative_assets_v0_1.json",
+    "exclude_alternative_assets": true,
+    "unknown_assets": "REJECT",
+    "maximum_scan_markets": 5,
+    "maximum_candidates": 5,
+    "interval": "60M",
+    "maximum_klines": 240,
+    "only_closed_bars": true,
+    "earliest_candle_utc": "2026-09-04T00:00:00Z",
+    "maximum_snapshot_age_seconds": 60,
+    "maximum_closed_bar_age_seconds": 3600,
+    "missing_or_noncontiguous_bars": "REVIEW_REQUIRED",
+    "provider_fallback": false,
+    "history_materialization": false
+  },
+  "strategy": {
+    "registry": "config/cloud_paper_strategy_registry_v0_1.json",
+    "model_quality": "REJECT",
+    "empty_registry_result": "NO_TRADE",
+    "research_score_is_execution_authority": false,
+    "entry_stop_target_required": true,
+    "existing_risk_and_portfolio_policies_unchanged": true
+  },
+  "budget": {
+    "monthly_budget_usd": 0,
+    "provider_requests_per_run": 18,
+    "provider_requests_per_utc_day": 1728,
+    "provider_request_formula": "3 universe + 5 klines + 2 * 5 execution frames = 18; no retries",
+    "r2_class_a_per_run": 128,
+    "r2_class_b_per_run": 128,
+    "r2_new_bytes_per_run": 2097152,
+    "r2_class_a_per_utc_day": 12288,
+    "r2_class_b_per_utc_day": 12288,
+    "r2_new_bytes_per_utc_day": 201326592,
+    "r2_class_a_per_31_days": 380928,
+    "r2_class_b_per_31_days": 380928,
+    "r2_headroom_listing_max_pages": 100,
+    "r2_object_max_bytes": 262144,
+    "r2_hard_stop_bytes": 8000000000,
+    "headroom_max_age_seconds": 60,
+    "account_wide_usage_evidence_required": true,
+    "unknown_allowance": "BLOCKED_BUDGET",
+    "reservation_before_external_access": true,
+    "sdk_retries": 0
+  },
+  "storage": {
+    "prefix": "paper-run-store/cloud-loop-v0.1",
+    "append_only": true,
+    "atomic_slot_claim": true,
+    "claim_takeover": false,
+    "partial_write": "REVIEW_REQUIRED",
+    "result_written_last": true,
+    "readback_required": true,
+    "automatic_delete": false
+  },
+  "report": {
+    "schema": "qookey-cloud-paper-loop-report-v0.1",
+    "states": [
+      "NO_TRADE",
+      "COMMITTED",
+      "REPLAYED",
+      "REVIEW_REQUIRED",
+      "BLOCKED_BUDGET",
+      "DISABLED"
+    ],
+    "retain_failure_evidence": true,
+    "unknown_operation_count_is_null": true,
+    "synthetic_evidence_in_production": false
+  },
+  "authority": {
+    "public_pionex_market_data": true,
+    "paper_candidate_generation": true,
+    "paper_simulation": true,
+    "paper_evidence_persistence": true,
+    "scheduling_only_after_activation": true,
+    "private_exchange_api": false,
+    "real_money_order": false,
+    "live_trading": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "training": false,
+    "strategy_parameter_changes": false
+  }
+}

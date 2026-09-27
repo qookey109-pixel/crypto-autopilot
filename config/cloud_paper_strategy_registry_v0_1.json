@@ -1,0 +1,10 @@
+{
+  "schema": "qookey-cloud-paper-strategy-registry-v0.1",
+  "status": "EMPTY_NO_ELIGIBLE_STRATEGIES",
+  "provider": "PIONEX_PUBLIC",
+  "strategies": [],
+  "model_quality": "REJECT",
+  "production_fixture_admission": false,
+  "automatic_promotion": false,
+  "note": "An entry requires a separately reviewed versioned authority binding strategy implementation, provider, family validation evidence, symbols/regimes, and entry/stop/target outputs. No registration is inferred from research ranking."
+}

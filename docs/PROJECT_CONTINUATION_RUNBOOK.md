@@ -225,3 +225,7 @@ PR / merge / deployment / natural schedule：各自狀態
 
 下一步：執行 CLOUD-01：以 current main 與現有 open PR 為準，完成雲端維護自然驗收。
 <!-- cloud-maintenance:v0.1:end -->
+
+## Cloud Paper product delivery — September 27
+
+Current priority is the approved full cloud simulation loop, tracked by [delivery status](../research/status/cloud-paper-delivery-v0-1.json) and [bounded contract](../config/cloud_paper_loop_v0_1.json). Execute the five batches in order: contract → public-market adapter → persistent simulation → controlled activation → dashboard. CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER applies. Reuse the existing Work Item intake; this section is navigation, not a second queue. Do not use completed UI/document delivery as proof of product completion. Production NO_TRADE with an empty approved registry is valid; synthetic trading evidence belongs only in cloud CI. Initial account creation must contain zero trades. Activation needs separate exact implementation/CI/free-only/controlled-main evidence. Existing cron declarations and runtime expiry gates are unchanged during preparation.

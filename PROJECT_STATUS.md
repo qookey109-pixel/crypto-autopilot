@@ -371,3 +371,7 @@ Live Paper run-slot details:
 - Private exchange APIs, holdout access, real-money orders and real live trading remain closed.
 
 PR #423 post-merge CI, CodeQL, Dashboard GitHub Pages and V0.10 Critical Path Freeze Guard all completed successfully.
+
+## Cloud Paper Loop V0.1 — implementation in progress
+
+The user-approved complete simulation product is tracked by `research/status/cloud-paper-delivery-v0-1.json` and `config/cloud_paper_loop_v0_1.json`. This successor overlay preserves all frozen manual contracts. Activation is disabled until its separate implementation/CI/budget/main-acceptance receipt exists. The initial production strategy registry is empty; model quality remains REJECT. This preparation adds no active cron and performs no provider/R2 operations.
