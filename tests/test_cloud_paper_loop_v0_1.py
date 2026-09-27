@@ -82,7 +82,7 @@ class CloudPaperLoopTests(unittest.TestCase):
         self.assertEqual(first["account"]["initial_equity_usd"], 10000.0)
         self.assertEqual(first["account"]["open_position_count"], 0)
         self.assertEqual(first["operation_counts"]["provider_requests"], 8)
-        self.assertEqual(first["operation_counts"]["r2_write_attempts"], 9)
+        self.assertEqual(first["operation_counts"]["r2_write_attempts"], 10)
         replay = step(store, 420000, None)
         self.assertEqual(replay["state"], "REPLAYED")
         self.assertEqual(replay["provider_requests_performed"], 0)
@@ -98,7 +98,7 @@ class CloudPaperLoopTests(unittest.TestCase):
         with self.assertRaisesRegex(CloudLoopReviewRequired, "EMPTY_PRODUCTION"):
             run_cloud_step(
                 tick_ms=420000, previous_slot=None, store=store,
-                feed=NeverCalledFeed(), market_supplier=lambda: {},
+                feed=NeverCalledFeed(), market_supplier=lambda: {"provider_requests_performed": 0},
                 candidate_supplier=inject, strategy_registry=REGISTRY,
                 before_external=lambda: None,
             )
