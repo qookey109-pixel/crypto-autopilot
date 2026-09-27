@@ -909,6 +909,49 @@ function renderCloudRuns(report) {
   }
 }
 
+function renderCloudPaperLoop(data) {
+  const status = document.querySelector("#cloud-paper-status");
+  const detail = document.querySelector("#cloud-paper-detail");
+  const set = (selector, value) => {
+    const node = document.querySelector(selector);
+    if (node) node.textContent = value;
+  };
+  const valid = data
+    && data.schema === "qookey-cloud-paper-dashboard-v0.1"
+    && data.authority === false
+    && data.activation?.enabled === false
+    && data.strategy?.registry_status === "EMPTY_NO_ELIGIBLE_STRATEGIES"
+    && data.latest_run?.status === "NOT_RUN"
+    && data.model_quality === "REJECT"
+    && data.budget?.account_wide_usage_evidence === "MISSING"
+    && data.budget?.reservation_guard === "NOT_IMPLEMENTED";
+  if (!valid) {
+    if (status) status.textContent = "無法核實";
+    if (status) status.className = "badge danger";
+    if (detail) detail.textContent = "循環狀態投影缺失或契約不符；不顯示為已執行。";
+    set("#cloud-paper-last-run", "未核實");
+    set("#cloud-paper-candidates", "未核實");
+    set("#cloud-paper-regime", "未核實");
+    set("#cloud-paper-account", "未核實");
+    set("#cloud-paper-positions", "未核實");
+    set("#cloud-paper-budget", "BLOCKED");
+    return;
+  }
+  if (status) {
+    status.textContent = "已實作 · 尚未啟用";
+    status.className = "badge neutral";
+  }
+  if (detail) {
+    detail.textContent = "循環協調器與全路徑 CI 已合併；正式 provider/R2 執行及自然排程尚未啟用。正式策略登錄目前為空，因此執行後應回報 NO_TRADE。";
+  }
+  set("#cloud-paper-last-run", "尚未執行");
+  set("#cloud-paper-candidates", "NO_TRADE · 空策略登錄");
+  set("#cloud-paper-regime", "REGIME_UNAVAILABLE · 等待資料來源授權");
+  set("#cloud-paper-account", "尚未初始化");
+  set("#cloud-paper-positions", "持倉與損益尚無正式證據");
+  set("#cloud-paper-budget", "BLOCKED · 等待額度閘門");
+}
+
 async function loadData() {
   const refreshButton = document.querySelector("#refresh-button");
   refreshButton?.setAttribute("aria-busy", "true");
@@ -980,11 +1023,14 @@ async function loadData() {
     renderResearchEvidence(researchEvidence);
     try { renderCloudRuns(await fetchJson("./data/cloud-runs.json")); }
     catch { renderCloudRuns(null); }
+    try { renderCloudPaperLoop(await fetchJson("./data/cloud-paper-loop.json")); }
+    catch { renderCloudPaperLoop(null); }
   } catch (error) {
     console.error("Dashboard snapshot load failed", error);
     render(FALLBACK);
     renderHomeSummary(null, null, null, null, null);
     renderCloudRuns(null);
+    renderCloudPaperLoop(null);
     renderCalendar(null);
     renderOperationsSchedule(null);
     renderPaperTraining(null);

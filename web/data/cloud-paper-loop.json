@@ -1,0 +1,56 @@
+{
+  "schema": "qookey-cloud-paper-dashboard-v0.1",
+  "authority": false,
+  "mode": "PAPER_AND_LIVE_PAPER_ONLY",
+  "evidence_basis_main_sha": "af35764fa05d3b3d9e1639c9538f8fa08b9e8c55",
+  "observed_at_utc": null,
+  "activation": {
+    "enabled": false,
+    "status": "BLOCKED"
+  },
+  "latest_run": {
+    "status": "NOT_RUN",
+    "run_id": null,
+    "attempt": null,
+    "head_sha": null,
+    "report_status": null,
+    "report_artifact": null
+  },
+  "strategy": {
+    "registry_status": "EMPTY_NO_ELIGIBLE_STRATEGIES",
+    "eligible_count": 0,
+    "empty_registry_result": "NO_TRADE"
+  },
+  "market": {
+    "provider": "PIONEX_PUBLIC",
+    "macro_regime": "REGIME_UNAVAILABLE",
+    "unavailable_fields": [
+      "TOTAL3",
+      "BTC_DOMINANCE"
+    ],
+    "provider_fallback": false
+  },
+  "account": {
+    "initialized": false,
+    "planned_initial_equity_usd": 10000,
+    "confirmed_equity_usd": null,
+    "open_position_count": null,
+    "realized_pnl_usd": null,
+    "unrealized_pnl_usd": null
+  },
+  "budget": {
+    "monthly_budget_usd": 0,
+    "account_wide_usage_evidence": "MISSING",
+    "reservation_guard": "NOT_IMPLEMENTED",
+    "state": "BLOCKED_BUDGET"
+  },
+  "model_quality": "REJECT",
+  "boundary": {
+    "paper_only": true,
+    "real_money_orders": false,
+    "live_trading": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false
+  }
+}

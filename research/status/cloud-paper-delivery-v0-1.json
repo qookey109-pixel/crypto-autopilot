@@ -1,18 +1,26 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
-  "updated_date": "2026-09-27",
-  "evidence_basis_parent_main_sha": "ce3bcad8b4c047b88dd6fd5251e9f6e28ad9a9ec",
+  "updated_date": "2026-09-28",
+  "evidence_basis_parent_main_sha": "af35764fa05d3b3d9e1639c9538f8fa08b9e8c55",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
   "batches": {
-    "contract": "PREPARED",
-    "market_adapter": "PENDING",
-    "paper_loop": "PENDING",
-    "activation": "DISABLED",
-    "dashboard": "PENDING"
+    "contract": "MERGED",
+    "market_adapter": "MERGED",
+    "paper_loop": "MERGED",
+    "activation": "BLOCKED_BUDGET_EVIDENCE_AND_CONTROLLED_ACCEPTANCE",
+    "dashboard": "IN_PROGRESS"
   },
-  "natural_acceptance": "NOT_ESTABLISHED",
+  "activation_blockers": {
+    "shared_account_r2_usage_evidence": "MISSING",
+    "per_external_access_reservation_guard": "NOT_IMPLEMENTED",
+    "controlled_main_acceptance": "NOT_RUN"
+  },
+  "synthetic_full_cycle_ci": "PASS",
+  "natural_schedule_acceptance": "NOT_ESTABLISHED",
   "model_quality": "REJECT",
+  "production_strategy_registry": "EMPTY_NO_ELIGIBLE_STRATEGIES",
+  "macro_regime": "REGIME_UNAVAILABLE",
   "local_work": "EXCLUDED_BY_USER"
 }
