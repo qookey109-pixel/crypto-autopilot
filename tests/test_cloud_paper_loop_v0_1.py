@@ -3,6 +3,10 @@ from __future__ import annotations
 import unittest
 from dataclasses import dataclass
 
+from crypto_autopilot.features.market import OrderBookSnapshot, PublicTrade
+from crypto_autopilot.paper.cloud_loop_v0_1 import CompleteTapePionexFeed
+from crypto_autopilot.paper.live_v0_1 import LivePaperPolicy
+
 from crypto_autopilot.paper.cloud_loop_v0_1 import (
     CloudLoopReviewRequired, run_cloud_step, slot_id,
 )
@@ -76,7 +80,8 @@ class CloudPaperLoopTests(unittest.TestCase):
         self.assertEqual(first["reason"], "NO_ELIGIBLE_STRATEGY")
         self.assertEqual(first["account"]["initial_equity_usd"], 10000.0)
         self.assertEqual(first["account"]["open_position_count"], 0)
-        self.assertEqual(first["coordinator"]["provider_requests_performed"], 0)
+        self.assertEqual(first["operation_counts"]["provider_requests"], 8)
+        self.assertEqual(first["operation_counts"]["r2_write_attempts"], 9)
         replay = step(store, 420000, None)
         self.assertEqual(replay["state"], "REPLAYED")
         self.assertEqual(replay["provider_requests_performed"], 0)
@@ -109,11 +114,6 @@ class CloudPaperLoopTests(unittest.TestCase):
                 strategy_registry=REGISTRY, before_external=lambda: None,
             )
         self.assertEqual(called, [])
-
-from datetime import UTC, datetime
-from crypto_autopilot.paper.cloud_loop_v0_1 import CompleteTapePionexFeed
-from crypto_autopilot.paper.live_v0_1 import LivePaperPolicy
-from crypto_autopilot.features.market import OrderBookSnapshot, PublicTrade
 
 TICK = 1_790_000_000_000
 

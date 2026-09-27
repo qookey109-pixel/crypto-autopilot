@@ -155,12 +155,16 @@ def run_cloud_step(
              else previous["tick_report"]["next_state"])
     verify_live_paper_state(state)
     before_external()
-    claim = {"slot_id": slot, "tick_ms": tick_ms, "previous_slot": previous_slot,
-             "previous_state_id": state["state_id"], "run_name": run_name}
-    store.put_json_if_absent("cloud-slot", slot, claim)
+    store.put_json_if_absent("cloud-slot", slot, {
+        "slot_id": slot, "tick_ms": tick_ms, "previous_slot": previous_slot,
+        "previous_state_id": state["state_id"], "run_name": run_name,
+    })
     # An unsealed claim is never taken over, even if the request is identical.
     before_external()
     market = dict(market_supplier())
+    market_requests = market.get("provider_requests_performed")
+    if type(market_requests) is not int or not 0 <= market_requests <= 8:
+        raise CloudLoopReviewRequired("MARKET_REQUEST_COUNT_UNKNOWN_OR_OVER_LIMIT")
     candidates = tuple(candidate_supplier(market, state))
     if not registrations and candidates:
         raise CloudLoopReviewRequired("EMPTY_PRODUCTION_STRATEGY_REGISTRY")
@@ -188,6 +192,12 @@ def run_cloud_step(
         "slot_id": slot, "previous_slot": previous_slot, "tick_ms": tick_ms,
         "market": market, "candidate_count": len(candidates),
         "coordinator": report,
+        "operation_counts": {
+            "provider_requests": market_requests + int(report.get("provider_requests_performed", 0)),
+            "r2_write_attempts": int(report.get("persistent_objects_created", 0)) + 3,
+            "r2_write_replays": 0,
+            "status": "KNOWN",
+        },
         "account": checkpoint["account_snapshot"],
         "reason": ("NO_ELIGIBLE_STRATEGY" if not candidates else "QUALIFIED_CANDIDATES"),
         "authority": {"paper_only": True, "real_money_orders": False,
