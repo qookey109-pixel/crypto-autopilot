@@ -183,6 +183,14 @@ The maintainer-approved PR #533 workflows have now run against exact head `74645
 
 PR #533 changes only the generated maintenance blocks in `CURRENT_STATUS.md` and the continuation runbook, using an observation from 02:06 Asia/Taipei before the Pionex/Core100 checkpoints. PR #532 adds this separate, later checklist. Keep #533 Draft while the 9/27 natural schedule observation is unresolved; its bot may update the same branch after a later qualifying natural Health completion. The current maintenance publisher explicitly reuses an open draft with its branch prefix, and a closed PR with its branch retained stops at `CLOSED_BRANCH_REVIEW_REQUIRED`. Recheck the exact head, snapshot and CI before any later merge or closure. This PR review changes no cron, runtime or research authority.
 
+## Final manual-observation disposition — September 27
+
+The user accelerated the delivery to today and explicitly cancelled the additional seven-day observation and October 1 expiry audit. Those future reviews are removed from this iteration's pending work and delivery prerequisites. This latest decision supersedes earlier Draft-hold guidance, the follow-up order's future audit items, and the intermediate September 30 delivery target. Historical observations above are retained unchanged.
+
+At the 15:18 Asia/Taipei checkpoint, the complete returned Taipei-day query still contained only the three Health runs and Resource Hub run listed above. Close this manual-observation task with Pionex/Core100/Pages evidence **MISSING / DELAYED / UNKNOWN**, natural acceptance **NOT ESTABLISHED**, and Health freshness unresolved. The recorded absence is not scheduler-failure proof; manual evidence does not become natural evidence. Existing governed workflows and their runtime expiry guards continue normally, with no additional manual observation window required for today's documentation/UI delivery.
+
+#532 integrates #533's exact generated blocks from head `746459127d1692a6f47ef562bb725e68d307ace6` as historical 02:06 evidence. Close #533 after main readback confirms integration. Deliver #534 after review against current main and required CI, then verify actual Pages deployment/browser results. The [existing continuation runbook](PROJECT_CONTINUATION_RUNBOOK.md#accelerated-delivery-2026-09-27) records today's sequence. TD-007 and fingerprint-bound engineering remain deferred. Documentation/UI delivery does not imply natural acceptance, model acceptance or trading permission.
+
 ## Boundaries
 
 Budget remains FREE-ONLY / 0 USD per month. The project remains PAPER / LIVE-PAPER ONLY. Replacement holdout remains frozen and unopened. `source_switch_authorized=false`. Do not write secrets to repository content, logs, artifacts, or chat.
