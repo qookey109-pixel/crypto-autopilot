@@ -7,6 +7,9 @@ from collections.abc import Callable, Mapping, Sequence
 
 from crypto_autopilot.paper.cloud_genesis_v0_1 import initialize_cloud_paper_state
 from crypto_autopilot.paper.live_v0_1 import LivePaperMarketFeed, verify_live_paper_state
+from crypto_autopilot.exchanges.pionex_public import PionexPublicClient
+from crypto_autopilot.features.market import OrderBookSnapshot, PublicTrade
+from crypto_autopilot.paper.live_v0_1 import LivePaperMarketFrame, LivePaperPolicy
 from crypto_autopilot.paper.run_claim_v0_1 import LivePaperRunClaimPolicy
 from crypto_autopilot.paper.run_coordinator_v0_1 import (
     LivePaperRunCoordinatorPolicy, PaperRunStoreLike,
@@ -20,6 +23,60 @@ SLOT_OFFSET_MS = 420_000
 class CloudLoopReviewRequired(ValueError):
     """A stable reason code; never includes provider errors or secret values."""
 
+
+
+
+class CompleteTapePionexFeed:
+    """Fail-closed paper feed requiring the complete recent-trade window.
+
+    The provider endpoint returns at most 500 recent records. A saturated page
+    or a first returned trade later than the prior lifecycle time cannot prove
+    continuity and cannot safely advance an open paper position.
+    """
+    def __init__(self, *, client: PionexPublicClient,
+                 policy: LivePaperPolicy,
+                 before_request: Callable[[], None]) -> None:
+        self.client = client
+        self.policy = policy
+        self.before_request = before_request
+
+    def fetch_frame(self, symbol: str, *, tick_time_ms: int,
+                    since_ms: int) -> LivePaperMarketFrame:
+        if tick_time_ms <= since_ms:
+            raise CloudLoopReviewRequired("INVALID_MARKET_FRAME_WINDOW")
+        self.before_request()
+        book = self.client.get_order_book(symbol, limit=self.policy.order_book_depth_limit)
+        self.before_request()
+        trades = self.client.get_recent_trades(symbol, limit=500)
+        if len(trades) >= 500:
+            raise CloudLoopReviewRequired("TRADE_TAPE_PAGE_SATURATED")
+        if any(t.symbol != symbol or not t.trade_id or t.price <= 0
+               or t.time_ms <= 0 or t.time_ms > tick_time_ms for t in trades):
+            raise CloudLoopReviewRequired("TRADE_TAPE_INVALID")
+        if len({t.trade_id for t in trades}) != len(trades):
+            raise CloudLoopReviewRequired("TRADE_TAPE_DUPLICATE")
+        causal = [t for t in trades if since_ms < t.time_ms <= tick_time_ms]
+        if trades and min(t.time_ms for t in trades) > since_ms:
+            raise CloudLoopReviewRequired("TRADE_TAPE_GAP_UNPROVEN")
+        if not book.bids or not book.asks:
+            raise CloudLoopReviewRequired("EMPTY_ORDER_BOOK")
+        bid, ask = max(book.bids, key=lambda x: x[0]), min(book.asks, key=lambda x: x[0])
+        if (bid[0] <= 0 or ask[0] < bid[0] or ask[0] <= 0
+            or book.update_time_ms <= 0 or book.update_time_ms > tick_time_ms
+            or tick_time_ms - book.update_time_ms > self.policy.maximum_source_age_ms):
+            raise CloudLoopReviewRequired("ORDER_BOOK_INVALID_OR_STALE")
+        midpoint = (bid[0] + ask[0]) / 2.0
+        prices = [bid[0], ask[0], midpoint] + [trade.price for trade in causal]
+        return LivePaperMarketFrame(
+            provider="PIONEX_PUBLIC", symbol=symbol, time_ms=tick_time_ms,
+            source_time_ms=max([book.update_time_ms] + [t.time_ms for t in causal]),
+            open=causal[0].price if causal else ask[0],
+            high=max(prices), low=min(prices),
+            close=causal[-1].price if causal else midpoint,
+            mark_price=midpoint,
+            available_notional_usd=sum(p*q for p,q in book.asks if p > 0 and q > 0),
+            provider_request_count=2, source_trade_count=len(causal),
+        )
 
 def digest(value: object) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"),

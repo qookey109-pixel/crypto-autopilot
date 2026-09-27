@@ -109,3 +109,64 @@ class CloudPaperLoopTests(unittest.TestCase):
                 strategy_registry=REGISTRY, before_external=lambda: None,
             )
         self.assertEqual(called, [])
+
+from datetime import UTC, datetime
+from crypto_autopilot.paper.cloud_loop_v0_1 import CompleteTapePionexFeed
+from crypto_autopilot.paper.live_v0_1 import LivePaperPolicy
+from crypto_autopilot.features.market import OrderBookSnapshot, PublicTrade
+
+TICK = 1_790_000_000_000
+
+class TapeClient:
+    def __init__(self, trades):
+        self.trades = trades
+        self.calls = []
+    def get_order_book(self, symbol, *, limit):
+        self.calls.append("book")
+        return OrderBookSnapshot(symbol=symbol, bids=((100.0, 2.0),),
+                                 asks=((101.0, 3.0),), update_time_ms=TICK-1000)
+    def get_recent_trades(self, symbol, *, limit):
+        self.calls.append(("trades", limit))
+        return self.trades
+
+
+def trade(identifier, time_ms):
+    return PublicTrade(symbol="BTC_USDT_PERP", trade_id=str(identifier),
+                       price=100.0, size=1.0, side="BUY", time_ms=time_ms)
+
+
+class CompleteTapeFeedTests(unittest.TestCase):
+    def test_full_since_window_builds_frame_with500_limit(self):
+        client = TapeClient([trade(1, TICK-2000), trade(2, TICK-500)])
+        feed = CompleteTapePionexFeed(
+            client=client, policy=LivePaperPolicy(), before_request=lambda: None)
+        frame = feed.fetch_frame("BTC_USDT_PERP", tick_time_ms=TICK,
+                                 since_ms=TICK-1000)
+        self.assertEqual(frame.source_trade_count, 1)
+        self.assertEqual(frame.provider_request_count, 2)
+        self.assertEqual(client.calls[1], ("trades", 500))
+
+    def test_gap_and_saturated_pages_fail_closed(self):
+        for rows, reason in (
+            ([trade(1, TICK-500)], "TRADE_TAPE_GAP"),
+            ([trade(i, TICK-i) for i in range(500)], "TRADE_TAPE_PAGE_SATURATED"),
+        ):
+            feed = CompleteTapePionexFeed(
+                client=TapeClient(rows), policy=LivePaperPolicy(),
+                before_request=lambda: None)
+            with self.assertRaisesRegex(CloudLoopReviewRequired, reason):
+                feed.fetch_frame("BTC_USDT_PERP", tick_time_ms=TICK,
+                                 since_ms=TICK-1000)
+
+    def test_budget_guard_runs_before_each_provider_request(self):
+        client = TapeClient([])
+        calls = []
+        def reject():
+            calls.append("budget")
+            if len(calls) == 2:
+                raise CloudLoopReviewRequired("BLOCKED_BUDGET")
+        feed = CompleteTapePionexFeed(
+            client=client, policy=LivePaperPolicy(), before_request=reject)
+        with self.assertRaisesRegex(CloudLoopReviewRequired, "BLOCKED_BUDGET"):
+            feed.fetch_frame("BTC_USDT_PERP", tick_time_ms=TICK, since_ms=TICK-1000)
+        self.assertEqual(client.calls, ["book"])
