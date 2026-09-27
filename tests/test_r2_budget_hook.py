@@ -2,6 +2,12 @@ from __future__ import annotations
 
 import unittest
 
+from crypto_autopilot.paper.cloud_budget_v0_1 import (
+    BudgetBlocked,
+    CloudBudgetGuard,
+    CloudBudgetPolicy,
+    R2UsageSnapshot,
+)
 from crypto_autopilot.storage.r2 import R2Store
 
 
@@ -98,6 +104,35 @@ class R2BudgetHookTests(unittest.TestCase):
         self.assertEqual(len(client.calls), 2)
         self.assertNotIn("ContinuationToken", client.calls[0][1])
         self.assertEqual(client.calls[1][1]["ContinuationToken"], "page-2")
+
+    def test_cloud_budget_guard_blocks_r2_call_before_io(self):
+        now_ms = 1_000_000
+        guard = CloudBudgetGuard(
+            snapshot=R2UsageSnapshot(
+                account_wide=True,
+                reservation_coverage_complete=True,
+                observed_at_ms=now_ms,
+                measured_through_ms=now_ms,
+                storage_bytes=0,
+                class_a_month=0,
+                class_b_month=0,
+                class_a_31_days=0,
+                class_b_31_days=0,
+                class_a_day=0,
+                class_b_day=0,
+                provider_requests_day=0,
+                new_bytes_day=0,
+            ),
+            now_ms=now_ms,
+            policy=CloudBudgetPolicy(r2_class_a_per_run=0),
+        )
+        client = FakeClient()
+        r2 = store(client, [], before_external=guard.reserve)
+
+        with self.assertRaisesRegex(BudgetBlocked, "CLASS_A_RUN_LIMIT"):
+            r2.put_bytes("paper/blocked.json", b"data")
+
+        self.assertEqual(client.calls, [])
 
     def test_malformed_pagination_fails_after_bounded_reservation(self):
         client = FakeClient()
