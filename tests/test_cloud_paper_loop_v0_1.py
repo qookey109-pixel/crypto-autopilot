@@ -132,7 +132,8 @@ class CloudPaperLoopTests(unittest.TestCase):
             "status": "SYNTHETIC_TEST_ONLY",
             "strategies": [{"strategy_id": strategy_id}],
         }
-        supplier = lambda market, state: (spec,) if not state["active_session"] else ()
+        def supplier(market, state):
+            return (spec,) if not state["active_session"] else ()
         first = run_cloud_step(
             tick_ms=420000, previous_slot=None, store=store, feed=Frames(),
             market_supplier=lambda: {"context_status": "REGIME_UNAVAILABLE",
