@@ -4,6 +4,17 @@
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
+## Cloud Paper 短期交付狀態 — 2026-09-28
+
+目前正式基準為 [main `39c9e8cb7b5ae98b3951fbad7e71ff6be814a8e5`](https://github.com/qookey109-pixel/crypto-autopilot/commit/39c9e8cb7b5ae98b3951fbad7e71ff6be814a8e5)。短期交付範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)；狀態機見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。
+
+- 完成：主循環與市場 adapter、empty-registry no-trade composition、合成完整循環測試、Dashboard 空狀態與 Pages 桌機／手機驗證；PR #579 將行情和 R2 adapter 綁到同一 run-scoped guard；PR #581 同步交付計畫與機器狀態。
+- 未完成：共享帳戶 R2 用量證據、跨所有 writer 的完整 reservation coverage、D1 實際使用量證據及 ledger provisioning／runtime wiring、正式受控 main acceptance。生產入口與自然排程不存在，`config/cloud_paper_loop_v0_1.json` 的 `activation.enabled` 必須維持 false。
+- 下一個可直接執行的工程工作：只在 GitHub CI 用合成 evidence 完成 D1 ledger 與 composition 的接線和拒絕／重播／部分失敗測試。不得建立 D1、讀寫 R2、呼叫 provider、開 schedule 或啟用 runtime；正式使用前仍須有 account-wide FREE-ONLY evidence。
+- 研究邊界維持 `0 USD/month`、PAPER／LIVE-PAPER ONLY、holdout 關閉、source switch 關閉、promotion 關閉、real-money／live trading 關閉。模型品質仍是 `REJECT`；自然排程驗收不能由手動執行代替。
+- PR #578 是以舊 main 為 base 的 maintenance draft，需與 current main reconciliation 後再處理，不能直接合併。
+
+
 ## 1. 固定入口
 
 | 問題 | 主要入口 |
