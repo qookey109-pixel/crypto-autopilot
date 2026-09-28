@@ -2,20 +2,21 @@
 
 Updated: 2026-09-28. This is the single human entrypoint for the current project checkpoint.
 
-## Cloud Paper current checkpoint — after PR #593
+## Cloud Paper current checkpoint — after PR #595
 
-查核基準：[PR #593 合併後 main `64e3a586ad39c0c11b229fc3a18a47fe788cef81`](https://github.com/qookey109-pixel/crypto-autopilot/commit/64e3a586ad39c0c11b229fc3a18a47fe788cef81)。這是本次文件更新前的精確基準；它不是文件更新後 main 的 SHA。
+查核基準：[PR #595 合併後 main `705da0a67a3e9a2aaedfb757ba6800b09cee075`](https://github.com/qookey109-pixel/crypto-autopilot/commit/64e3a586ad39c0c11b229fc3a18a47fe788cef81)。這是本次文件更新前的精確基準；它不是文件更新後 main 的 SHA。
 
 - PR #590 已將成功 settlement 接在 Paper result 完整保存及 readback 後；執行失敗或 settlement 結果不確定時保留完整 reservation。
+- PR #595 讓已 SETTLED slot 只在四個實際用量欄位完全相同時接受 settlement 重送；變更用量仍 `REVIEW_REQUIRED`。這可安全重送同一 settlement statement，不等於重啟後核驗 immutable R2 報告的 recovery workflow。
 - PR #592 已合併：D1 ledger 只接受 canonical 15-minute slot；每 query 預留／硬停止 4,000 rows。31-day ledger scan 結構上最多 2,976 slots；96 slots × 2 queries × 4,000 = **768,000 rows/day**。這是程式與 SQLite query-plan CI 證據，不是 Cloudflare production metadata 實測，也沒有證明其他 D1 writers 已納入。
 - PR #592 head 的 Python 3.12／3.13、workflow-static、CodeQL、dependency-security 通過；合併後 main run [36428372077](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36428372077) 的 Python 3.13 因 concurrency test fixture 預約 out-of-order future slots 而失敗（1,783 passed、1 failed）。PR #593 將並行測試改為同一 canonical slot 的競爭，並補 stale snapshot future-slot 測試；其 head Python 3.12／3.13、workflow-static、CodeQL、dependency-security 全通過，合併後 main `64e3a586` 的 Python 3.12／3.13、CodeQL、Freeze Guard、dependency-security 全通過；workflow-static 因 workflow 未變更而 skipped。初次失敗保留為歷史證據。
 - 最近 Pages 主線證據仍是 PR #590 後 build／deploy／browser-production 全通過；#592 對應 Pages build 通過，deploy/browser-production 略過，#593 是測試修正且未觸發 Pages。沒有以測試 CI 推論策略或 runtime。
 - Cloud Paper 仍 `activation.enabled=false`；execution workflow、正式受控 main acceptance 與自然排程尚未建立。模型品質為 `REJECT`、production strategy registry 為空、macro regime 為 `REGIME_UNAVAILABLE`；目前唯一合規正式結果仍是 `NO_TRADE`。
-- P0 尚未完成：account-wide D1/R2 用量與 freshness、D1 rows-read/write 跨 workflow shared reservation、settlement 不確定結果 recovery、所有 D1/R2 writers coverage、D1 provisioning/runner binding，以及全帳戶免費額度容量證明。新的 768,000 rows/day 只界定此 Cloud Paper workload。
+- P0 尚未完成：account-wide D1/R2 用量與 freshness、D1 rows-read/write 跨 workflow shared reservation、重啟後核對 immutable R2 result 的 settlement recovery、所有 D1/R2 writers coverage、D1 provisioning/runner binding，以及全帳戶免費額度容量證明。新的 768,000 rows/day 只界定此 Cloud Paper workload。
 - CMC global context 仍為 proposal only，未核對映射／授權／額度、未呼叫 API；source switch 關閉。
 - 唯一開放 PR [#578](https://github.com/qookey109-pixel/crypto-autopilot/pull/578) 是舊 base `e80d2d27` 的 Draft；先與 current main reconciliation，不直接合併。
 
-下一步：完成 D1 跨 workflow shared rows budget 與 settlement recovery，再核實帳戶級 freshness、全部 writers 及 R2 headroom；只有全帳戶零費用容量成立，才可 provisioning、受控驗收及啟用排程。維持 `activation.enabled=false`、0 USD、PAPER／LIVE-PAPER ONLY、holdout／source switch 關閉。
+下一步：完成 D1 跨 workflow shared rows budget 與重啟後 settlement recovery，再核實帳戶級 freshness、全部 writers 及 R2 headroom；只有全帳戶零費用容量成立，才可 provisioning、受控驗收及啟用排程。維持 `activation.enabled=false`、0 USD、PAPER／LIVE-PAPER ONLY、holdout／source switch 關閉。
 
 ## Live Cloud Paper checkpoint — 2026-09-28
 
