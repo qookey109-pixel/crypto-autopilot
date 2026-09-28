@@ -25,7 +25,7 @@
 | D1 ledger | #599/#600 recovery audit；#603 rows reservation；#605 storage-growth reservation | migrations prepare-only；D1 未 provision/bind；usage freshness、全 writer coverage、儲存校準與 FREE-ONLY headroom 未證明 |
 | 帳戶用量 audit | #611 bounded Analytics audit workflow 與零網路 readiness 已合併 | readiness [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) 為 `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`；Cloudflare requests=0；一次性 audit 未執行、權限未消耗 |
 | R2 容量保護 | PR #616 定義 256 KiB/object、2 MiB/run、192 MiB/day、6,241,124,352 theoretical bytes/31 days；guard 在 6.4 GB 回報 WARNING，projected 8 GB 起 fail closed | 正式用量、freshness 與全 writer coverage 未驗證；政策不授權刪除 |
-| Dashboard | 既有 Pages production 有桌機／手機驗證 | 本批未改 dashboard；目前沒有 production Cloud Paper runtime 報告可投影 |
+| Dashboard | 本批更新 Cloud Paper 投影，明確分開 `NOT_RUN`、空策略登錄、`REGIME_UNAVAILABLE`、`BLOCKED_BUDGET` 與容量實際用量未知；瀏覽器回歸待 CI | production runtime 尚未啟用；帳戶用量不顯示為 0，正式帳戶與持倉數值維持 null |
 | 排程與運作驗收 | 合成完整循環 CI 已通過 | 沒有正式 execution workflow 或自然 Paper schedule；controlled main acceptance 未執行 |
 
 PR #614 head checks：Python 3.12／3.13、workflow-static、CodeQL、Dependency/SBOM 均通過。合併 main `abda84a45de66dc214be40ce05ee0c2ccb79e415` 後，CI、CodeQL、Dependency/SBOM、Freeze Guard 通過；push 上 workflow-static 未觸發。這些證據不代表 production runtime、策略品質或自然排程已驗收。
