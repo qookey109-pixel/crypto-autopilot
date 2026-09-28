@@ -10,7 +10,8 @@
 
 - PR #590 成功 settlement 已接在 Paper result 完整保存與 readback 後；運行失敗或 settlement 結果不明時保留完整 reservation。PR checks 及合併後 main 的 Python 3.12／3.13、CodeQL、Freeze Guard、dependency-security、Pages build／deploy／browser-production 均通過；workflow-static 因 workflow 未變更而 skipped。
 - 行情／R2 run-scoped guard、D1 per-query evidence gate、跨執行 slot reservation primitive 與成功 settlement 已合併；合成完整循環與 no-trade 驗收為 PASS。合成 CI 不等於正式帳戶用量或 runtime acceptance。
-- 未完成：D1 rows-read/write 的跨執行 budget reservation、settlement recovery、可信 account-wide D1/R2 用量與 freshness watermark、所有 D1/R2 writers 覆蓋、96 slots/day FREE-ONLY 容量證明、D1 provisioning/runner binding、正式受控 main acceptance。execution workflow 與自然排程仍不存在；`config/cloud_paper_loop_v0_1.json` 的 `activation.enabled` 必須保持 false。
+- PR #592 將 D1 ledger slot 綁定至 canonical 15-minute schedule，單次 query guard 上限 4,000 rows；rolling 31-day query 的結構上界為 2,976 slots，96 slots × 2 次 D1 query 的理論 envelope 為 768,000 rows/day。SQLite EXPLAIN CI 只能驗證索引路徑，不是 Cloudflare meta.rows_read 實測。
+- 未完成：account-wide D1 rows-read/write shared reservation、settlement recovery、可信 account-wide D1/R2 用量與 freshness watermark、所有 D1/R2 writers 覆蓋、帳戶級 FREE-ONLY 容量證明、D1 provisioning/runner binding、正式受控 main acceptance。execution workflow 與自然排程仍不存在；`config/cloud_paper_loop_v0_1.json` 的 `activation.enabled` 必須保持 false。
 - 策略品質仍為 `REJECT`、production registry 為空、macro regime 為 `REGIME_UNAVAILABLE`。CMC global context 只到 proposal，沒有授權或 API 呼叫；不得用替代資料讓 regime 變成可用。
 - 唯一開放 PR [#578](https://github.com/qookey109-pixel/crypto-autopilot/pull/578) 是舊 base `e80d2d27` 的 maintenance draft，先 reconciliation，不直接合併。
 - 固定界線：`0 USD/month`、PAPER／LIVE-PAPER ONLY、holdout／source switch／promotion／real-money trading 關閉。不得 provisioning／呼叫 D1、讀寫 R2、呼叫行情 provider、開 schedule 或啟用 runtime，直到版本化 authority、免費額度證據、writer coverage 與受控驗收條件都成立。
