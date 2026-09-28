@@ -1,8 +1,9 @@
 # Crypto Autopilot 短期交付目標
 
 - 文件日期：2026-09-29
-- 最新文件同步：PR #626 合併至 main `9d897b6d4fb7f7c783170c4c3bbf7bcbc4ca1e08`；文件更新未改 runtime 或 authority。
-- PR #626 合併後 CI [36490182195](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182195)、CodeQL [36490182214](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182214)、Dependency/SBOM [36490182254](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182254)、Freeze Guard [36490182675](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182675) 均成功。Pages [36490182321](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182321) build 成功；deploy/browser-production 因文件變更跳過。
+- 本次文件查核基準：PR #628 已合併後 main `245504769e678174512b88bc91b2d362c483c889`；此文件不授予 runtime 或資料存取權限。
+- PR #628 exact head `3e2c67b0848eb541c43f54a47f7c6edb267a5632` 的 CI [36493558502](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493558502)、CodeQL [36493558486](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493558486)、Dependency/SBOM [36493558471](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493558471) 通過；main CI [36493744676](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493744676)、CodeQL [36493744613](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493744613)、Dependency/SBOM [36493744586](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493744586)、Freeze Guard [36493744563](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493744563) 均成功。此 PR 未改網站，Pages 未觸發。
+- PR #628 加入 repo-source-only D1 REST client 邊界檢查；帳戶級用量新鮮度與外部 writer 覆蓋仍未證明。
 - Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pixel/crypto-autopilot)
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
 - 歷史證據基準：PR #614 合併至 main `abda84a45de66dc214be40ce05ee0c2ccb79e415`；PR #618 Dashboard 部署證據維持獨立記錄。
@@ -16,14 +17,14 @@
 - Retention is indefinite and append-only. Automatic or manual deletion is not authorized; partial writes retain evidence and require `REVIEW_REQUIRED`.
 - PR #616 merged to main `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`; post-merge CI run `36478324594`, Dependency/SBOM `36478324445`, and Freeze Guard `36478324502` passed. CodeQL [36478324500](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324500) passed. These limits are a project policy envelope, not production account usage evidence or a capacity guarantee. Account-wide usage freshness, all-writer coverage, D1 calibration and production acceptance remain open.
 
-## 最新驗收證據狀態 — PR #622 合併後
+## 最新驗收證據狀態 — PR #628 合併後（產品循環證據仍以 #622／#624）
 
 | 項目 | 工程／合成證據 | 正式產品狀態 |
 |---|---|---|
 | 行情、候選、Paper loop、保存 | PR #614 接通資格門控 adapter；PR #622 讓合格 synthetic fixture 經同一 composition 驗證入場、出場、帳戶更新、保存及下一輪 | 正式 registry 空、模型 `REJECT`，沒有正式交易；正向交易證據僅限 CI fixture |
 | 候選資格與資料 lineage | 檢查 Pionex evidence、router route、策略 receipt/implementation SHA、equity/sizing；候選時間綁定已收盤 bar | Pionex global context 為 `REGIME_UNAVAILABLE`；不得用未授權來源替代 |
 | Provider／R2 guard | Shared run-scoped guard 與 R2 adapter hooks 已合併 | 帳戶級用量、freshness 與所有 writer coverage 未證明 |
-| D1 ledger | #599/#600 recovery audit；#603 rows reservation；#605 storage-growth reservation | migrations prepare-only；D1 未 provision/bind；usage freshness、全 writer coverage、儲存校準與 FREE-ONLY headroom 未證明 |
+| D1 ledger | #599/#600 recovery audit；#603 rows reservation；#605 storage-growth reservation；#628 CI enforces the repository D1 REST source boundary and guarded query order | migrations prepare-only；D1 未 provision/bind；account-wide usage freshness、external writer coverage、儲存校準與 FREE-ONLY headroom 未證明 |
 | 帳戶用量 audit | #611 bounded Analytics audit workflow 與零網路 readiness 已合併 | readiness [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) 為 `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`；Cloudflare requests=0；一次性 audit 未執行、權限未消耗 |
 | R2 容量保護 | PR #616 定義 256 KiB/object、2 MiB/run、192 MiB/day、6,241,124,352 theoretical bytes/31 days；guard 在 6.4 GB 回報 WARNING，projected 8 GB 起 fail closed | 正式用量、freshness 與全 writer coverage 未驗證；政策不授權刪除 |
 | Dashboard | PR #618 已合併並部署；Pages build/deploy 通過，正式站桌機／手機共 14 項瀏覽器檢查通過。投影明確區分 `NOT_RUN`、空策略登錄、`REGIME_UNAVAILABLE`、`BLOCKED_BUDGET` 與未知容量 | production runtime 尚未啟用；帳戶用量不顯示為 0，正式帳戶與持倉數值維持 null |
