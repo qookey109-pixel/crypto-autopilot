@@ -131,4 +131,4 @@ TradingAgents 保留既有研究定位，後續另行評估。
 
 ## 9. 下一個可直接開始的工作
 
-從最新 main 核對 Cloud Paper 共用預算接線 PR 的 exact head 與 CI。通過後再逐項處理共享帳戶用量證據、完整 reservation coverage、D1 配置與正式受控驗收阻塞。合成快照只供 CI，不得充當正式帳戶預算證據。
+PR #579 已將 Pionex 行情與 Cloud Paper R2 保存接到同一 run-scoped budget guard，PR-head 與 main CI 均通過。接續先完成正式帳戶級用量證據來源、所有目前 R2 writer 的 reservation coverage 與 D1 ledger 配置審查；任何證據缺漏或過期都須在外部存取前 fail closed。之後才可在既有 authority 下準備受控 main acceptance。合成快照僅供 CI，不得充當正式帳戶預算證據；在啟用條件滿足前，保持 runtime disabled。
