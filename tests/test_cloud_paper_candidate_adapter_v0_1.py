@@ -3,9 +3,9 @@ from __future__ import annotations
 import hashlib
 import json
 import unittest
+from dataclasses import asdict
 
 from crypto_autopilot.paper.cloud_candidate_adapter_v0_1 import (
-    CandidateSelection,
     CloudCandidateRegistryBlocked,
     select_qualified_candidates,
     validate_strategy_registry,
@@ -136,12 +136,7 @@ def market_and_candidate() -> tuple[dict[str, object], dict[str, object]]:
         "entry_price": entry,
         "stop_price": stop,
         "family_validation_report": report,
-        "position_sizing_plan": {
-            **sizing.__dict__ if hasattr(sizing, "__dict__") else {
-                field: getattr(sizing, field)
-                for field in sizing.__dataclass_fields__
-            }
-        },
+        "position_sizing_plan": asdict(sizing),
     }
     market = {
         "schema": "qookey-cloud-paper-market-report-v0.1",
@@ -215,7 +210,7 @@ class CloudPaperCandidateAdapterTests(unittest.TestCase):
         self.assertEqual(selection.candidates, ())
 
     def test_qualified_output_binds_to_market_route_and_equity_then_enters_core(self):
-        market, candidate = market_and_candidate()
+        market, _ = market_and_candidate()
         state = initialize_cloud_paper_state()
         registry = qualified_registry()
         selection = select_qualified_candidates(
