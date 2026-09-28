@@ -4,7 +4,7 @@ Updated: 2026-09-29 (current Cloud Paper checkpoint below; historical stage note
 
 ## Cloud Paper delivery checkpoint — 2026-09-29
 
-Live main is `6deabddd7f925b6d586b9565a9f6641105a2fd29`. PR #618 merged the Dashboard status and capacity projection. Main Python 3.12/3.13 CI, CodeQL, Dependency/SBOM, and Freeze Guard passed; Pages build/deploy passed and production desktop/mobile browser validation passed 14/14 tests. Main-push workflow-static was skipped because workflow files were unchanged.
+Product/code evidence basis is main `6deabddd7f925b6d586b9565a9f6641105a2fd29`, where PR #618 merged the Dashboard status and capacity projection. PR [#619](https://github.com/qookey109-pixel/crypto-autopilot/pull/619) later merged a documentation-only reconciliation as `4ede28b4154745a1b1bbeee2f5aa2770553b85a5`; it changed no runtime or authority. At the PR #618 product merge, Python 3.12/3.13 CI, CodeQL, Dependency/SBOM, and Freeze Guard passed; Pages build/deploy passed and production desktop/mobile browser validation passed 14/14 tests. Main-push workflow-static was skipped because workflow files were unchanged. Resolve live `main` before any operation.
 
 The Dashboard reports the Cloud Paper production run as `NOT_RUN`; empty strategy registry, `REGIME_UNAVAILABLE`, `BLOCKED_BUDGET`, and unknown account storage are distinct. The production registry remains empty and Core100 quality is `REJECT`. These UI and CI checks do not constitute a production simulation or trading result.
 
