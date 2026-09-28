@@ -179,5 +179,12 @@
       "readiness_state": "BLOCKED_MISSING_READ_ONLY_CREDENTIAL",
       "cloudflare_requests_performed": 0
     }
+  },
+  "d1_source_boundary": {
+    "expected_d1_rest_client_path": "src/crypto_autopilot/paper/cloud_budget_ledger_v0_1.py",
+    "guard_sequence": "LOCAL_USAGE_RESERVATION_THEN_SHARED_ADMISSION_THEN_TARGET_D1_QUERY",
+    "scope": "REPOSITORY_SOURCE_ONLY",
+    "account_wide_coverage": "NOT_PROVEN",
+    "note": "The CI scan prevents a second in-repository D1 REST client from appearing outside the guarded client. It does not enumerate external account writers or prove fresh account-wide usage evidence."
   }
 }
