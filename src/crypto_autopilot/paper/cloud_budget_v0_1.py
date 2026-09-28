@@ -6,6 +6,7 @@ in it. This primitive is not production activation evidence.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 
 
@@ -67,11 +68,13 @@ class CloudBudgetGuard:
         self,
         *,
         snapshot: R2UsageSnapshot,
-        now_ms: int,
+        clock_ms: Callable[[], int],
         policy: CloudBudgetPolicy = CloudBudgetPolicy(),
     ) -> None:
         self.snapshot = snapshot
-        self.now_ms = now_ms
+        if not callable(clock_ms):
+            raise ValueError("a live budget-evidence clock is required")
+        self.clock_ms = clock_ms
         self.policy = policy
         self._provider_run = 0
         self._class_a_run = 0
@@ -83,7 +86,8 @@ class CloudBudgetGuard:
         s = self.snapshot
         if not s.account_wide or not s.reservation_coverage_complete:
             raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_INCOMPLETE")
-        if type(self.now_ms) is not int or self.now_ms < 0:
+        current_time_ms = self.clock_ms()
+        if type(current_time_ms) is not int or current_time_ms < 0:
             raise BudgetBlocked("BLOCKED_BUDGET_CLOCK_INVALID")
         numeric = (
             s.observed_at_ms, s.measured_through_ms, s.storage_bytes,
@@ -97,8 +101,8 @@ class CloudBudgetGuard:
         )
         if any(type(value) is not int or value < 0 for value in numeric):
             raise BudgetBlocked("BLOCKED_BUDGET_USAGE_UNKNOWN")
-        age = self.now_ms - s.observed_at_ms
-        coverage_age = self.now_ms - s.measured_through_ms
+        age = current_time_ms - s.observed_at_ms
+        coverage_age = current_time_ms - s.measured_through_ms
         if age < 0 or coverage_age < 0:
             raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_FROM_FUTURE")
         if max(age, coverage_age) > self.policy.max_evidence_age_ms:
