@@ -1,13 +1,14 @@
 # Current Operations Status
 
-## Cloud Paper Usage Audit Readiness — 2026-09-29
+## Cloud Paper current checkpoint — 2026-09-29 (PR #612 merged)
 
-- Authority snapshot: main `600bff79145908f9785427a66689c2f90322dfcf`; PR #611 merged.
-- PR #611 post-merge CI: CI, CodeQL, Dependency/SBOM, and V0.10 Critical Path Freeze Guard succeeded. Workflow-static was not triggered on push; its PR-head check passed.
-- Readiness run [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643): workflow completed, report state `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`; Cloudflare requests = 0; one-time usage audit authority remains unconsumed; no secret values printed.
-- Next gate: set the `CLOUDFLARE_ACCOUNT_ID` Actions variable and `CLOUDFLARE_READONLY_API_TOKEN` Actions secret in GitHub Settings, then run the zero-network readiness check again. Do not dispatch the one-time audit until readiness reports READY.
-- Cloud Paper remains inactive: no execution workflow or natural schedule; model quality remains `REJECT`; production strategy registry remains empty; budget/account-wide usage evidence and controlled main acceptance remain outstanding. `FREE-ONLY / 0 USD`, PAPER/LIVE-PAPER only, holdout closed, and source switch closed remain binding.
-
+- Live Repository authority: main `df932f863354fa0047e0833ed29163e8e47f0c3b`; no open PRs.
+- PR [#611](https://github.com/qookey109-pixel/crypto-autopilot/pull/611) merged bounded account-wide usage-audit preparation and a zero-network readiness workflow. Its post-merge CI, CodeQL, Dependency/SBOM, and Freeze Guard passed; workflow-static passed on the PR head and was not triggered on push.
+- Readiness run [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) ran on parent main `600bff79145908f9785427a66689c2f90322dfcf`: report state `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`, Cloudflare requests = 0, one-time audit authority unconsumed, no secret values printed.
+- PR [#612](https://github.com/qookey109-pixel/crypto-autopilot/pull/612) synchronized CURRENT_STATUS, PROJECT_STATUS, writer inventory, and the machine-readable delivery tracker; PR CI and post-merge checks passed. This follow-up aligns the continuation runbook and short-term delivery document with the same evidence.
+- Next access gate: add `CLOUDFLARE_ACCOUNT_ID` as an Actions variable and `CLOUDFLARE_READONLY_API_TOKEN` as an Actions secret in GitHub Settings. Then rerun the zero-network readiness check. Do not dispatch the one-time usage audit until it reports READY.
+- The product remains inactive: no production execution workflow or natural Paper schedule; production strategy registry is empty and model quality is `REJECT`; account-wide usage/freshness and complete writer coverage are unproven; D1 is not provisioned; controlled main acceptance has not run. Keep `FREE-ONLY / 0 USD`, PAPER/LIVE-PAPER only, holdout, source switch, promotion and real trading boundaries unchanged.
+- Independent next engineering slice: connect a qualification-gated production candidate adapter through the existing orchestration path, preserving an empty-registry `NO_TRADE` result and test-only injected positive fixtures; define report-size/retention/capacity-stop policy before schedule activation.
 
 Updated: 2026-09-29. This is the single human entrypoint for the current project checkpoint.
 
