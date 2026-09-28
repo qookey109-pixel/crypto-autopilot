@@ -324,10 +324,10 @@ def run_cloud_step(
     def candidate_strategy_id(item: object) -> object:
         if not isinstance(item, Mapping):
             return None
-        payload = item.get("candidate", item)
-        if not isinstance(payload, Mapping):
-            return None
-        return payload.get("strategy_id")
+        payload = item.get("candidate")
+        if isinstance(payload, Mapping):
+            return payload.get("strategy_id", item.get("strategy_id"))
+        return item.get("strategy_id")
 
     if any(candidate_strategy_id(item) not in allowed_ids
            for item in candidates):
