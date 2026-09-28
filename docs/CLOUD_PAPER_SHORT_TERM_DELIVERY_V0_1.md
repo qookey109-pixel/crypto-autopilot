@@ -152,7 +152,7 @@ PR [#579](https://github.com/qookey109-pixel/crypto-autopilot/pull/579) 將 Pion
 PR #590/#595 完成成功 settlement 與完全相同用量的安全重送。PR #599 新增預設關閉的跨重啟核對路徑：驗證 immutable R2 result/report 後記錄 D1 recovery audit receipt，完整 reservation 仍保留；PR #600 再核對 result pointer 的 slot 與 `COMMITTED` 狀態。這是 recovery audit，不是 settlement/release 恢復，也未在正式 runtime 執行。PR #603 加入 prepare-only shared D1 rows reservation，每日最多 384 次 query reservation，每次預留 admission 與目標 query 共 8,000 rows read／20 rows written；政策最大 envelope 為 3,072,000 rows read／7,680 rows written/day。這是 SQLite CI 的程式證據，不是 production D1 用量量測；migration 未套用。
 
 P0 預算與保存仍未完成，不啟用 runtime、不做受控 main acceptance。剩餘工作為 cross-run storage-growth reservation、可信且及時的 account-wide usage source、所有 D1 writers coverage、R2/D1 FREE-ONLY headroom 證據與 production binding。shared guard 只涵蓋使用該 client 的 query；超過 384 次／日 fail closed。未能證明 96 slots/day 與 recovery/retry 查詢都在預算內，就保持 `activation.enabled=false`；不得把合成證據當正式用量。
-## 10. D1／R2 預算可行性查核 — 2026-09-28
+## 10. D1／R2 預算可行性查核 — updated 2026-09-29 (original review 2026-09-28)
 
 ### D1 用量來源與 freshness
 
@@ -181,7 +181,7 @@ R2 的契約上界也需保留共享餘量：2 MiB × 96 slots × 31 days = **6.
 
 ### 啟用前的必過條件
 
-1. 用實際 SQL／索引與 D1 query metadata 建立每種 query 的有界 rows-read／rows-written 預留；預留操作本身的成本也要入帳。不可只把 25,000 改小來讓算式通過。
+1. 以 Cloudflare production query metadata 核對 admission 與目標 SQL 的 rows-read／rows-written 上界，並將 reservation statement 本身的成本納入；SQLite 合成結果不能當 production measurement。
 2. 將每 slot reservation、所有 D1 writer 的共享預留、成功 settlement 與失敗保留／恢復放進同一個原子且可稽核的方案；未確認副作用時不得釋放保留額度。
 3. 取得具 freshness watermark 的帳戶級 baseline，證明 D1/R2 全 writer coverage 及保留給本專案的 headroom；合成 fixture 只驗證邏輯，不能當成帳戶證據。
 4. 以以上證據重算 96 slots/day 是否仍符合 0 USD safety ceiling，再進行正式受控循環。若不能證明容量，保持 `activation.enabled=false`，不要用手動 dispatch 或降低 guard 上界假裝完成。
