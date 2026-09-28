@@ -3,9 +3,9 @@ import json
 from pathlib import Path
 import unittest
 
-ROOT = Path(__file__).resolve().parents[1]
-
 from crypto_autopilot.paper.cloud_budget_v0_1 import CloudBudgetPolicy
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class CloudPaperLoopContractTests(unittest.TestCase):
@@ -31,7 +31,7 @@ class CloudPaperLoopContractTests(unittest.TestCase):
         self.assertEqual(storage["scope"]["max_slots_per_utc_day"], policy["schedule"]["maximum_slots_per_utc_day"])
         self.assertEqual(
             storage["scope"]["max_31_day_growth_bytes"],
-            storage["per_utc_day_growth_max_bytes"] * 31,
+            storage["scope"]["per_utc_day_growth_max_bytes"] * 31,
         )
         self.assertLess(storage["scope"]["warning_threshold_bytes"], storage["scope"]["hard_stop_bytes"])
         self.assertEqual(
