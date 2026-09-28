@@ -31,7 +31,7 @@ def contains_d1_access_reference(contents: str) -> bool:
 
 
 D1_REST_SOURCE_MARKER = re.compile(
-    r"api\.cloudflare\.com/client/v4/accounts/"
+    r"api\.cloudflare\.com/client/v4/accounts/[^/\\s]+/d1/(?:database|databases)(?:/|\\b)"
     r"|/d1/(?:database|databases)(?:/|\b)"
     r"|\bclass\s+CloudflareD1QueryClient\b",
     re.IGNORECASE,
