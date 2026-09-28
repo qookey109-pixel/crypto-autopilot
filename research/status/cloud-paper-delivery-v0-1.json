@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "2154a1201059ef16a650c9bb9d52e757ccbcc196",
+  "evidence_basis_parent_main_sha": "e3f94cd4b2d5a7262cc76382b93ae27316d44395",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -13,7 +13,7 @@
     "dashboard": "MERGED_AND_DEPLOYED",
     "budget_guard": "SHARED_PROVIDER_AND_R2_RUN_SCOPED_GUARD_MERGED_PR579",
     "r2_adapter_budget_hooks": "SHARED_GUARD_INTEGRATED; PRODUCTION_USAGE_EVIDENCE_AND_FRESHNESS_SOURCE_NOT_CONFIGURED",
-    "d1_reservation_ledger": "SUCCESS_SETTLEMENT_WIRED_AFTER_VERIFIED_PAPER_RESULT; FAILURE_RETAINS_RESERVED_ENVELOPE; RECOVERY_NOT_WIRED; NOT_PROVISIONED",
+    "d1_reservation_ledger": "PR590_MERGED; SUCCESS_SETTLEMENT_AFTER_VERIFIED_PAPER_RESULT; FAILURE_RETAINS_RESERVED_ENVELOPE; RECOVERY_NOT_WIRED; NOT_PROVISIONED",
     "cash_genesis": "IMPLEMENTED_AND_SYNTHETIC_CI_VERIFIED",
     "ledger_resolution": "MERGED_AND_POST_MERGE_CI_VERIFIED_BOUNDED_READS",
     "decision_reason_codes": "MERGED_PR_CI_AND_POST_MERGE_CI_PASSED",
@@ -26,11 +26,12 @@
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING",
     "per_external_access_reservation_guard": "PROVIDER_AND_R2_SHARED_RUN_SCOPED_GUARD; D1_CLIENT_REQUIRES_PER_QUERY_GUARD; ACCOUNT_WIDE_EVIDENCE_AND_CROSS_RUN_WRITER_COVERAGE_UNPROVEN",
-    "complete_account_wide_reservation_ledger": "PROVIDER_R2_SLOT_RESERVATION_PRIMITIVE_CROSS_RUN; D1_QUERY_GUARD_IS_INSTANCE_LOCAL; D1_ROWS_DAILY_SHARED_RESERVATION_AND_ALL_WRITER_COVERAGE_UNPROVEN",
+    "complete_account_wide_reservation_ledger": "PROVIDER_R2_SLOT_RESERVATION_PRIMITIVE_CROSS_RUN; D1_QUERY_USAGE_GUARD_INSTANCE_LOCAL; D1_ROWS_DAILY_SHARED_RESERVATION_AND_ALL_WRITER_COVERAGE_UNPROVEN",
     "controlled_main_acceptance": "NOT_RUN",
     "d1_free_tier_usage_evidence": "MISSING_PRODUCTION_ACCOUNT_WIDE_SNAPSHOT_SOURCE",
     "genesis_empty_ledger_proof": "ENFORCED_BY_LEDGER_RESOLVER; CONTROLLED_ACCEPTANCE_NOT_RUN",
-    "production_entrypoint_workflow": "MANUAL_NON_ACCESS_PREFLIGHT_ONLY; EXECUTION_WORKFLOW_NOT_WIRED; NO_NATURAL_SCHEDULE"
+    "production_entrypoint_workflow": "MANUAL_NON_ACCESS_PREFLIGHT_ONLY; EXECUTION_WORKFLOW_NOT_WIRED; NO_NATURAL_SCHEDULE",
+    "settlement_recovery": "NOT_WIRED; UNCERTAIN_SETTLEMENT_RETAINS_FULL_SLOT_RESERVATION"
   },
   "synthetic_full_cycle_ci": "PASS",
   "natural_schedule_acceptance": "NOT_ESTABLISHED",
@@ -188,5 +189,21 @@
     "d1_http_requests_performed": 0,
     "production_usage_evidence_source_configured": false,
     "activation_enabled": false
+  },
+  "post_merge_main_ci_evidence": {
+    "main_sha": "e3f94cd4b2d5a7262cc76382b93ae27316d44395",
+    "pr_number": 590,
+    "pr_head_sha": "fae0cd669b2bf30d26f8719bd9e60581c646b702",
+    "python_3_12": "SUCCESS",
+    "python_3_13": "SUCCESS",
+    "codeql_visibility_python": "SUCCESS",
+    "critical_path_freeze": "SUCCESS",
+    "dependency_security": "SUCCESS",
+    "pages_build": "SUCCESS",
+    "pages_deploy": "SUCCESS",
+    "browser_production": "SUCCESS",
+    "workflow_static": "SKIPPED_NO_WORKFLOW_CHANGE",
+    "activation_enabled": false,
+    "provider_r2_d1_runtime_access_performed": false
   }
 }
