@@ -1,14 +1,16 @@
 {
   "schema": "qookey-cloud-paper-r2-writer-inventory-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_main_sha": "ceb298226234c0d92202ba944b6ee3da3862ca01",
+  "evidence_basis_main_sha": "9dbdb0d16d5072f36ba2f080a32cb0e7a6e9c964",
   "is_latest_main_claim": false,
   "scan": {
-    "workflow_file_count": 84,
+    "workflow_file_count": 85,
     "workflows_with_r2_or_cloudflare_secret_references": 17,
     "scanner_contract": "scripts/validate_cloud_paper_r2_writer_inventory.py",
     "exact_reference_scan": true,
-    "values_or_secret_contents_read": false
+    "values_or_secret_contents_read": false,
+    "workflow_count_before_nonaccess_preflight": 84,
+    "note": "One new manual non-access preflight workflow was added after the recorded main; it contains no R2 or Cloudflare secret references. The 17 credential-referencing workflow paths remain unchanged."
   },
   "account_wide_reservation_coverage": {
     "cloud_paper_d1_ledger": "NOT_PROVISIONED_OR_WIRED",
