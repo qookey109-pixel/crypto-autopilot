@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-29",
-  "evidence_basis_parent_main_sha": "6deabddd7f925b6d586b9565a9f6641105a2fd29",
+  "evidence_basis_parent_main_sha": "cb22d3c3905a079eb754f0fab6d917923512f624",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -29,9 +29,10 @@
     "d1_storage_growth_budget": "PR605_MERGED_SHARED_LEDGER_RESERVATION; 16384_BYTES_PER_ADMISSION_AND_TARGET_STATEMENT; MAX_12582912_BYTES_PER_UTC_DAY; POLICY_ESTIMATE_ONLY; NO_PRODUCTION_CALIBRATION; MIGRATIONS_PREPARE_ONLY",
     "d1_workflow_inventory_guard": "PR609_MERGED; PR_HEAD_PYTHON_312_313_WORKFLOW_STATIC_CODEQL_DEPENDENCY_SNAPSHOT_BUILD_PASS; POST_MERGE_PYTHON_312_313_BUILD_FREEZE_GUARD_DEPENDENCY_CODEQL_PASS; REPOSITORY_WORKFLOW_MARKERS_ONLY",
     "cloudflare_usage_audit": "PR611_MERGED; MAIN_CI_PASS; READINESS_RUN_36471242643_BLOCKED_MISSING_READ_ONLY_CREDENTIAL; ZERO_CLOUDFLARE_REQUESTS; ONE_TIME_AUDIT_AUTHORITY_UNCONSUMED",
-    "qualified_candidate_adapter": "PR614_MERGED; REGISTRY_AND_MARKET_ROUTE_LINEAGE_GATES_CONNECTED_TO_CLOUD_PAPER_COMPOSITION; PR_AND_POST_MERGE_CI_PASS; SYNTHETIC_POSITIVE_FIXTURES_ONLY",
+    "qualified_candidate_adapter": "PR614_MERGED; VERSIONED_REGISTRY_AND_MARKET_ROUTE_LINEAGE_GATES_CONNECTED; PR622_CI_ONLY_QUALIFIED_FIXTURE_THROUGH_SAME_COMPOSITION_ENTRY_EXIT_ACCOUNT_ADVANCEMENT_PERSISTENCE_NEXT_NO_TRADE; PRODUCTION_REGISTRY_EMPTY",
     "storage_policy": "PR616_MERGED; PR_HEAD_PYTHON_312_313_RUFF_WORKFLOW_STATIC_CODEQL_DEPENDENCY_PASS; POST_MERGE_CI_CODEQL_DEPENDENCY_AND_FREEZE_GUARD_PASS",
-    "dashboard_capacity_projection": "PR618_MERGED; DISTINGUISHES_NOT_RUN_EMPTY_REGISTRY_REGIME_UNAVAILABLE_BLOCKED_BUDGET_AND_UNKNOWN_STORAGE; MEASURED_STORAGE_NULL; DOES_NOT_ACTIVATE_RUNTIME"
+    "dashboard_capacity_projection": "PR618_MERGED; DISTINGUISHES_NOT_RUN_EMPTY_REGISTRY_REGIME_UNAVAILABLE_BLOCKED_BUDGET_AND_UNKNOWN_STORAGE; MEASURED_STORAGE_NULL; DOES_NOT_ACTIVATE_RUNTIME",
+    "composition_positive_cycle": "PR622_MERGED_MAIN_CB22D3C; PR_HEAD_PYTHON_312_313_WORKFLOW_STATIC_CODEQL_DEPENDENCY_SBOM_PASS; POST_MERGE_CI_CODEQL_DEPENDENCY_SBOM_FREEZE_GUARD_PASS; SYNTHETIC_TEST_ONLY; NO_RUNTIME_AUTHORITY"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING; readiness run 36471242643 blocked on missing read-only credential; zero Cloudflare requests; one-time audit authority unconsumed.",
@@ -43,11 +44,11 @@
     "production_entrypoint_workflow": "MANUAL_NON_ACCESS_PREFLIGHT_ONLY; EXECUTION_WORKFLOW_NOT_WIRED; NO_NATURAL_SCHEDULE",
     "settlement_recovery": "PR599_DISABLED_BY_DEFAULT_RECOVERY_AUDIT_VERIFIES_IMMUTABLE_R2_RESULT_REPORT_AND_WRITES_D1_AUDIT_RECEIPT_WHILE_RETAINING_FULL_RESERVATION; PR600_VALIDATES_RESULT_POINTER_SLOT_AND_COMMITTED_STATE; DOES_NOT_SETTLE_OR_RELEASE_BUDGET; PRODUCTION_RUNTIME_NOT_AUTHORIZED_OR_WIRED",
     "d1_storage_growth_calibration": "PR605_POLICY_RESERVES_16384_BYTES_PER_STATEMENT; CLOUDFLARE_SIZE_AFTER_CALIBRATION_NOT_RUN; ADMISSION_OR_RESERVATION_LEDGER_SELF_GROWTH_COVERAGE_UNVERIFIED",
-    "production_candidate_path": "PR614_ADAPTER_MERGED_AND_CONNECTED; PRODUCTION_REGISTRY_EMPTY; CORE100_MODEL_QUALITY_REJECT; POSITIVE_PATH_SYNTHETIC_CI_ONLY; NO_PRODUCTION_STRATEGY_OR_EXECUTION_AUTHORITY",
+    "production_candidate_path": "PR614_QUALIFIED_ADAPTER_CONNECTED; PR622_SAME_COMPOSITION_TEST_FIXTURE_COVERS_ENTRY_EXIT_ACCOUNT_ADVANCEMENT_PERSISTENCE_NEXT_NO_TRADE; PRODUCTION_REGISTRY_EMPTY; CORE100_MODEL_QUALITY_REJECT; MACRO_REGIME_UNAVAILABLE; NO_PRODUCTION_STRATEGY_OR_EXECUTION_AUTHORITY",
     "long_term_storage": "PR616_POLICY_MERGED: 262144_BYTES_PER_OBJECT; 2097152_BYTES_PER_RUN; 201326592_BYTES_PER_DAY; 6241124352_THEORETICAL_BYTES_PER_31_DAYS; WARNING_AT_6400000000; HARD_STOP_AT_PROJECTED_8000000000; INDEFINITE_APPEND_ONLY; NO_DELETE_AUTHORITY. PRODUCTION_ACCOUNT_USAGE_FRESHNESS_AND_ALL_WRITER_COVERAGE_UNVERIFIED.",
     "cloudflare_account_usage_audit": "READINESS_RUN_36471242643_ON_MAIN_600BFF7_FOUND_MISSING_READ_ONLY_CREDENTIAL; NO_CLOUDFLARE_REQUEST_PERFORMED; ONE_TIME_AUDIT_NOT_DISPATCHED; ADD CLOUDFLARE_ACCOUNT_ID VARIABLE AND CLOUDFLARE_READONLY_API_TOKEN SECRET IN GITHUB ACTIONS SETTINGS THEN REPEAT ZERO-NETWORK READINESS"
   },
-  "synthetic_full_cycle_ci": "PASS",
+  "synthetic_full_cycle_ci": "PASS_PR622_TEST_ONLY_QUALIFIED_ENTRY_EXIT_ACCOUNT_PERSISTENCE_NEXT_NO_TRADE_THROUGH_COMPOSITION",
   "natural_schedule_acceptance": "NOT_ESTABLISHED",
   "model_quality": "REJECT",
   "production_strategy_registry": "EMPTY_NO_ELIGIBLE_STRATEGIES",
@@ -206,17 +207,16 @@
     "activation_enabled": false
   },
   "post_merge_main_ci_evidence": {
-    "main_sha": "6deabddd7f925b6d586b9565a9f6641105a2fd29",
-    "pr_number": 618,
-    "pr_head_sha": "d5413670cb747f0025255f9e79c60aaaa2e4ca5d",
+    "main_sha": "cb22d3c3905a079eb754f0fab6d917923512f624",
+    "pr_number": 622,
+    "pr_head_sha": "aac48898dfa4e69589c7c369a73a919b07b63c95",
     "python_3_12": "SUCCESS",
     "python_3_13": "SUCCESS",
     "codeql_visibility_python": "SUCCESS",
     "critical_path_freeze": "SUCCESS",
     "dependency_security": "SUCCESS",
     "workflow_static": "SKIPPED_NO_WORKFLOW_CHANGE",
-    "pages_pipeline": "BUILD_DEPLOY_BROWSER_SUCCESS",
-    "pages_browser_tests_passed": 14,
+    "pages_pipeline": "NOT_TRIGGERED_TEST_ONLY_CHANGE",
     "activation_enabled": false,
     "provider_r2_d1_runtime_access_performed": false,
     "production_cycle_status": "NOT_RUN"
@@ -371,42 +371,34 @@
     "runtime_authority_changed": false
   },
   "latest_repository_checkpoint": {
-    "evidence_basis_main_sha": "6deabddd7f925b6d586b9565a9f6641105a2fd29",
-    "pull_request": 618,
-    "pr_head_sha": "d5413670cb747f0025255f9e79c60aaaa2e4ca5d",
-    "base_sha": "9f2973ae6b104dd9af02632afaec892daa7514c5",
-    "merge_sha": "6deabddd7f925b6d586b9565a9f6641105a2fd29",
+    "evidence_basis_main_sha": "cb22d3c3905a079eb754f0fab6d917923512f624",
+    "pull_request": 622,
+    "pr_head_sha": "aac48898dfa4e69589c7c369a73a919b07b63c95",
+    "base_sha": "aeb80bbc8695f10a5e8708abed07acc2892f72b9",
+    "merge_sha": "cb22d3c3905a079eb754f0fab6d917923512f624",
     "pr_checks": {
+      "ci_run_id": 36485693958,
       "python_312": "SUCCESS",
       "python_313": "SUCCESS",
       "workflow_static": "SUCCESS",
-      "dashboard_snapshot": "SUCCESS",
-      "dashboard_static_smoke": "SUCCESS",
+      "codeql_run_id": 36485693395,
       "codeql": "SUCCESS",
-      "dependency_sbom": "SUCCESS",
-      "prepared_cutover": "SUCCESS"
+      "dependency_sbom_run_id": 36485693376,
+      "dependency_sbom": "SUCCESS"
     },
     "post_merge": {
-      "ci_run_id": 36479940078,
+      "ci_run_id": 36485948145,
       "ci": "SUCCESS",
-      "codeql_run_id": 36479940139,
+      "codeql_run_id": 36485948118,
       "codeql": "SUCCESS",
-      "dependency_run_id": 36479940055,
+      "dependency_run_id": 36485948349,
       "dependency": "SUCCESS",
-      "freeze_guard_run_id": 36479940101,
+      "freeze_guard_run_id": 36485948205,
       "freeze_guard": "SUCCESS",
-      "workflow_static": "SKIPPED_NO_WORKFLOW_CHANGE",
-      "pages_run_id": 36479940093,
-      "pages_build": "SUCCESS",
-      "pages_deploy": "SUCCESS",
-      "browser_production": "SUCCESS",
-      "browser_tests_passed": 14,
-      "browser_targets": [
-        "desktop-chromium",
-        "mobile-chromium"
-      ]
+      "workflow_static": "SKIPPED_NO_WORKFLOW_CHANGE"
     },
-    "runtime_authority_changed": false,
+    "activation_enabled": false,
+    "provider_r2_d1_runtime_access_performed": false,
     "production_cycle_status": "NOT_RUN"
   },
   "post_merge_storage_policy_evidence": {
