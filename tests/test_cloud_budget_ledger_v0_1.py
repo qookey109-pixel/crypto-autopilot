@@ -10,8 +10,6 @@ from pathlib import Path
 from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
     D1CloudBudgetLedger,
     RESERVE_SLOT_SQL,
-    READ_SLOT_RESERVATION_SQL,
-    RECORD_RECOVERY_RECEIPT_SQL,
     D1LedgerLimits,
     D1QueryResult,
     D1UsageGuard,
