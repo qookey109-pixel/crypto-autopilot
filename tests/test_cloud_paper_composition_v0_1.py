@@ -55,7 +55,6 @@ class FakeReservationLedger:
         if slot_id not in self.slots:
             raise BudgetBlocked("BLOCKED_BUDGET_SETTLEMENT_REVIEW_REQUIRED")
         self.settlements.append((slot_id, completed_at_ms, usage))
-        self.slots.remove(slot_id)
 
 
 class FakeClient:
@@ -327,7 +326,7 @@ class CloudPaperCompositionTests(unittest.TestCase):
         runtime = composition(
             client, store, accesses=accesses, reservation_ledger=ledger,
         )
-        with self.assertRaisesRegex(Exception, "D1_LEDGER_REQUEST_FAILED"):
+        with self.assertRaisesRegex(D1LedgerUnavailable, "D1_LEDGER_REQUEST_FAILED"):
             runtime.run_slot(
                 tick_ms=NOW, previous_slot=None, activation_enabled=True,
                 run_id="run-test",
