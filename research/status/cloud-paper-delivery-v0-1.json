@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "77138c1b1ce7c4b99555c6c5f35eaf66dd82c26a",
+  "evidence_basis_parent_main_sha": "1a6ff6e169164794e2c6217adc30338087da3df3",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -11,8 +11,8 @@
     "paper_loop": "MERGED",
     "activation": "BLOCKED_BUDGET_EVIDENCE_AND_CONTROLLED_ACCEPTANCE",
     "dashboard": "MERGED_AND_DEPLOYED",
-    "budget_guard": "PRIMITIVE_IMPLEMENTED_NOT_WIRED",
-    "r2_adapter_budget_hooks": "IMPLEMENTED_NOT_CONFIGURED",
+    "budget_guard": "SHARED_PROVIDER_AND_R2_RUN_SCOPED_GUARD_MERGED_PR579",
+    "r2_adapter_budget_hooks": "SHARED_GUARD_INTEGRATED; PRODUCTION_USAGE_EVIDENCE_AND_FRESHNESS_SOURCE_NOT_CONFIGURED",
     "d1_reservation_ledger": "PRIMITIVE_IMPLEMENTED_AND_MERGED_NOT_PROVISIONED_OR_WIRED",
     "cash_genesis": "IMPLEMENTED_AND_SYNTHETIC_CI_VERIFIED",
     "ledger_resolution": "MERGED_AND_POST_MERGE_CI_VERIFIED_BOUNDED_READS",
@@ -24,7 +24,7 @@
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING",
-    "per_external_access_reservation_guard": "R2_ADAPTER_HOOKS_IMPLEMENTED_CLOUD_LOOP_NOT_WIRED",
+    "per_external_access_reservation_guard": "PROVIDER_AND_R2_SHARE_GUARD_IN_COMPOSITION; PRODUCTION_USAGE_EVIDENCE_AND_ALL_ACCOUNT_WRITER_COVERAGE_NOT_PROVEN",
     "complete_account_wide_reservation_ledger": "STATIC_INVENTORY_CLASSIFIED; D1_LEDGER_NOT_PROVISIONED_OR_WIRED; SHARED_RESERVATION_COVERAGE_AND_USAGE_EVIDENCE_NOT_PROVEN",
     "controlled_main_acceptance": "NOT_RUN",
     "d1_free_tier_usage_evidence": "MISSING",
@@ -148,5 +148,21 @@
         "refresh_request_budget": "NOT_DEFINED"
       }
     }
+  },
+  "shared_budget_guard_merge_evidence": {
+    "pr_number": 579,
+    "merged_main_sha": "1a6ff6e169164794e2c6217adc30338087da3df3",
+    "pr_head_sha": "e98412502e43c07c2d4dedeafb637c5bae65b1af",
+    "pr_head_checks": "PYTHON_3_12_PASS; PYTHON_3_13_PASS; WORKFLOW_STATIC_PASS; CODEQL_PASS; DEPENDENCY_SECURITY_PASS",
+    "main_checks": {
+      "python_3_12": "SUCCESS",
+      "python_3_13": "SUCCESS",
+      "codeql_visibility_python": "SUCCESS",
+      "critical_path_freeze": "SUCCESS",
+      "dependency_security": "SUCCESS",
+      "workflow_static": "SKIPPED_NO_WORKFLOW_CHANGE"
+    },
+    "activation_enabled": false,
+    "provider_or_r2_runtime_access_performed": false
   }
 }
