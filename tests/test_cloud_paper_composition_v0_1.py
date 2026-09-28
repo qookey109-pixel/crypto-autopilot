@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import json
 import unittest
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 
 from crypto_autopilot.models import BookTicker, Candle, MarketTicker
-from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import D1LedgerUnavailable
+from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
+    D1LedgerUnavailable,
+    D1SlotReservation,
+    SlotUsage,
+)
 from crypto_autopilot.paper.cloud_budget_v0_1 import (
     BudgetBlocked,
     CloudBudgetGuard,
@@ -43,6 +47,8 @@ class FakeReservationLedger:
         self.reservations = []
         self.settlements = []
         self.slots = set()
+        self.reservations_by_slot = {}
+        self.recovery_receipts = {}
 
     def reserve_slot(self, *, slot_id, run_id, now_ms, snapshot):
         self.events.append("reservation")
@@ -50,12 +56,32 @@ class FakeReservationLedger:
             raise BudgetBlocked("BLOCKED_BUDGET_RESERVATION_REJECTED")
         self.slots.add(slot_id)
         self.reservations.append((slot_id, run_id, now_ms, snapshot))
+        self.reservations_by_slot[slot_id] = D1SlotReservation(
+            slot_id, run_id, now_ms, "RESERVED", SlotUsage(18, 128, 128, 2097152),
+        )
 
     def settle_slot(self, *, slot_id, completed_at_ms, usage):
         self.events.append("settlement")
         if slot_id not in self.slots:
             raise BudgetBlocked("BLOCKED_BUDGET_SETTLEMENT_REVIEW_REQUIRED")
         self.settlements.append((slot_id, completed_at_ms, usage))
+        current = self.reservations_by_slot[slot_id]
+        self.reservations_by_slot[slot_id] = replace(current, state="SETTLED")
+
+    def get_slot_reservation(self, *, slot_id):
+        self.events.append("read-reservation")
+        return self.reservations_by_slot.get(slot_id)
+
+    def record_verified_result_recovery(
+        self, *, slot_id, run_id, report_id, recovered_at_ms,
+    ):
+        self.events.append("recovery-receipt")
+        value = (run_id, report_id, recovered_at_ms)
+        existing = self.recovery_receipts.get(slot_id)
+        if existing is not None and existing[:2] != value[:2]:
+            raise BudgetBlocked("BLOCKED_BUDGET_RECOVERY_REVIEW_REQUIRED")
+        if existing is None:
+            self.recovery_receipts[slot_id] = value
 
 
 class FakeClient:
@@ -321,6 +347,59 @@ class CloudPaperCompositionTests(unittest.TestCase):
         self.assertGreater(usage.class_b, 0)
         self.assertGreater(usage.new_bytes, 0)
         self.assertGreater(accesses.index("settlement"), accesses.index("reservation"))
+
+    def test_restart_recovery_verifies_result_and_keeps_full_reservation(self):
+        client, store, accesses = FakeClient(), MemoryStore(), []
+        ledger = FakeReservationLedger(accesses)
+        runtime = composition(
+            client, store, accesses=accesses, reservation_ledger=ledger,
+        )
+        first = runtime.run_slot(
+            tick_ms=NOW, previous_slot=None, activation_enabled=True,
+            run_id="github-run-recovery",
+        )
+        self.assertEqual(first["state"], "NO_TRADE")
+        slot = first["slot_id"]
+        reserved = ledger.reservations_by_slot[slot]
+        ledger.reservations_by_slot[slot] = replace(reserved, state="RESERVED")
+        before_calls = list(store.calls)
+
+        recovery = runtime.recover_completed_slot(
+            slot=slot, recovery_enabled=True,
+        )
+
+        self.assertEqual(recovery["state"], "RECOVERED_RESERVED_FULL")
+        self.assertFalse(recovery["budget_released"])
+        self.assertEqual(recovery["r2_writes_performed"], 0)
+        self.assertEqual(ledger.reservations_by_slot[slot].state, "RESERVED")
+        self.assertEqual(ledger.recovery_receipts[slot][0], "github-run-recovery")
+        recovery_calls = store.calls[len(before_calls):]
+        self.assertTrue(recovery_calls)
+        self.assertTrue(all(call[0] == "get" for call in recovery_calls))
+        self.assertEqual(client.calls, ["symbols", "tickers", "books", ("klines", "BTC_USDT_PERP", "1H", 240, NOW // HOUR_MS * HOUR_MS)])
+
+    def test_recovery_defaults_disabled_and_missing_result_retains_reservation(self):
+        client, store, accesses = FakeClient(), MemoryStore(), []
+        ledger = FakeReservationLedger(accesses)
+        runtime = composition(
+            client, store, accesses=accesses, reservation_ledger=ledger,
+        )
+        disabled = runtime.recover_completed_slot(slot="0")
+        self.assertEqual(disabled["state"], "DISABLED")
+        self.assertEqual(store.calls, [])
+        self.assertEqual(client.calls, [])
+
+        slot = str((NOW - 7 * 60 * 1000) // (15 * 60 * 1000))
+        ledger.slots.add(slot)
+        ledger.reservations_by_slot[slot] = D1SlotReservation(
+            slot, "reserved-run", NOW, "RESERVED", SlotUsage(18, 128, 128, 2097152),
+        )
+        with self.assertRaisesRegex(
+            CloudPaperCompositionBlocked, "RECOVERY_RESULT_MISSING",
+        ):
+            runtime.recover_completed_slot(slot=slot, recovery_enabled=True)
+        self.assertNotIn(slot, ledger.recovery_receipts)
+        self.assertEqual(ledger.reservations_by_slot[slot].state, "RESERVED")
 
     def test_failed_settlement_keeps_reserved_slot_and_does_not_replay_io(self):
         class FailingSettlementLedger(FakeReservationLedger):
