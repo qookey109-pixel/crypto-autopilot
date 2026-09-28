@@ -104,6 +104,32 @@ WHERE slot_id = CAST(? AS TEXT)
 RETURNING slot_id
 """
 
+READ_SLOT_RESERVATION_SQL = """
+SELECT slot_id, run_id, reserved_at_ms, state,
+       reserved_provider_requests, reserved_class_a,
+       reserved_class_b, reserved_new_bytes
+FROM cloud_paper_budget_reservations
+WHERE slot_id = CAST(? AS TEXT)
+LIMIT 1
+"""
+
+RECORD_RECOVERY_RECEIPT_SQL = """
+INSERT INTO cloud_paper_settlement_recovery_receipts (
+    slot_id, run_id, report_id, recovered_at_ms
+)
+SELECT CAST(? AS TEXT), CAST(? AS TEXT), CAST(? AS TEXT), CAST(? AS INTEGER)
+WHERE EXISTS (
+    SELECT 1 FROM cloud_paper_budget_reservations
+    WHERE slot_id = CAST(? AS TEXT)
+      AND run_id = CAST(? AS TEXT)
+      AND state = 'RESERVED'
+)
+ON CONFLICT(slot_id) DO UPDATE SET slot_id = excluded.slot_id
+WHERE cloud_paper_settlement_recovery_receipts.run_id = excluded.run_id
+  AND cloud_paper_settlement_recovery_receipts.report_id = excluded.report_id
+RETURNING slot_id, run_id, report_id, recovered_at_ms
+"""
+
 ACCOUNT_ID_RE = re.compile(r"^[0-9a-fA-F]{32}$")
 DATABASE_ID_RE = re.compile(
     r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
@@ -393,6 +419,15 @@ class SlotUsage:
     new_bytes: int
 
 
+@dataclass(frozen=True, slots=True)
+class D1SlotReservation:
+    slot_id: str
+    run_id: str
+    reserved_at_ms: int
+    state: str
+    reserved_usage: SlotUsage
+
+
 class D1CloudBudgetLedger:
     """One atomic D1 reservation row per Cloud Paper slot.
 
@@ -485,6 +520,72 @@ class D1CloudBudgetLedger:
         self._validate_query_usage(result)
         if not result.rows or result.rows[0].get("slot_id") != slot_id:
             raise BudgetBlocked("BLOCKED_BUDGET_RESERVATION_REJECTED")
+
+    def get_slot_reservation(self, *, slot_id: str) -> D1SlotReservation | None:
+        """Read one bounded reservation without changing or releasing its envelope."""
+        if not isinstance(slot_id, str) or not slot_id or len(slot_id) > 80:
+            raise BudgetBlocked("BLOCKED_BUDGET_SLOT_ID_INVALID")
+        result = self.client.query(READ_SLOT_RESERVATION_SQL, (slot_id,))
+        self._validate_query_usage(result)
+        if not result.rows:
+            return None
+        row = result.rows[0]
+        run_id, reserved_at_ms, state = (
+            row.get("run_id"), row.get("reserved_at_ms"), row.get("state"),
+        )
+        values = (
+            row.get("reserved_provider_requests"),
+            row.get("reserved_class_a"),
+            row.get("reserved_class_b"),
+            row.get("reserved_new_bytes"),
+        )
+        if (
+            row.get("slot_id") != slot_id
+            or not isinstance(run_id, str) or not run_id
+            or type(reserved_at_ms) is not int or reserved_at_ms < 0
+            or state not in {"RESERVED", "SETTLED"}
+            or any(type(value) is not int or value < 0 for value in values)
+        ):
+            raise BudgetBlocked("BLOCKED_BUDGET_RESERVATION_REVIEW_REQUIRED")
+        return D1SlotReservation(
+            slot_id=slot_id,
+            run_id=run_id,
+            reserved_at_ms=reserved_at_ms,
+            state=state,
+            reserved_usage=SlotUsage(*values),
+        )
+
+    def record_verified_result_recovery(
+        self, *, slot_id: str, run_id: str, report_id: str,
+        recovered_at_ms: int,
+    ) -> None:
+        """Record verified completion while retaining the full RESERVED envelope.
+
+        This audit receipt does not settle or release budget. The report must have
+        been verified from immutable storage by the caller before this method.
+        """
+        if (
+            not isinstance(slot_id, str) or not slot_id or len(slot_id) > 80
+            or not isinstance(run_id, str) or not run_id or len(run_id) > 100
+            or not isinstance(report_id, str) or not re.fullmatch(r"[0-9a-f]{64}", report_id)
+        ):
+            raise BudgetBlocked("BLOCKED_BUDGET_RECOVERY_EVIDENCE_INVALID")
+        if type(recovered_at_ms) is not int or recovered_at_ms < 0:
+            raise BudgetBlocked("BLOCKED_BUDGET_CLOCK_INVALID")
+        result = self.client.query(
+            RECORD_RECOVERY_RECEIPT_SQL,
+            (slot_id, run_id, report_id, recovered_at_ms, slot_id, run_id),
+        )
+        self._validate_query_usage(result)
+        if not result.rows:
+            raise BudgetBlocked("BLOCKED_BUDGET_RECOVERY_REVIEW_REQUIRED")
+        row = result.rows[0]
+        if (
+            row.get("slot_id") != slot_id
+            or row.get("run_id") != run_id
+            or row.get("report_id") != report_id
+        ):
+            raise BudgetBlocked("BLOCKED_BUDGET_RECOVERY_REVIEW_REQUIRED")
 
     def settle_slot(
         self,

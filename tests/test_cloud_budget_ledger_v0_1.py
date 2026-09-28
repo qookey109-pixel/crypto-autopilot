@@ -37,6 +37,11 @@ MIGRATION = (
     / "migrations"
     / "cloud_paper_budget_ledger_v0_1.sql"
 ).read_text(encoding="utf-8")
+RECOVERY_MIGRATION = (
+    Path(__file__).parents[1]
+    / "migrations"
+    / "cloud_paper_settlement_recovery_v0_1.sql"
+).read_text(encoding="utf-8")
 
 
 class SQLiteQueryClient:
@@ -45,7 +50,7 @@ class SQLiteQueryClient:
     def __init__(self) -> None:
         self.connection = sqlite3.connect(":memory:", check_same_thread=False)
         self.connection.row_factory = sqlite3.Row
-        self.connection.executescript(MIGRATION)
+        self.connection.executescript(MIGRATION + "\n" + RECOVERY_MIGRATION)
         self.lock = threading.Lock()
         self.query_plans: list[str] = []
 
@@ -366,6 +371,65 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
                 snapshot=snapshot(),
             )
         self.assertEqual(client.query_plans, [])
+
+
+    def test_recovery_receipt_keeps_full_reservation_and_is_idempotent(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        slot = paper_slot_id(NOW)
+        ledger.reserve_slot(
+            slot_id=slot, run_id="run-recovery",
+            now_ms=NOW, snapshot=snapshot(),
+        )
+
+        reservation = ledger.get_slot_reservation(slot_id=slot)
+        self.assertIsNotNone(reservation)
+        self.assertEqual(reservation.state, "RESERVED")
+        self.assertEqual(reservation.reserved_usage, SlotUsage(2, 2, 2, 10))
+
+        report_id = "a" * 64
+        ledger.record_verified_result_recovery(
+            slot_id=slot, run_id="run-recovery", report_id=report_id,
+            recovered_at_ms=NOW + 10,
+        )
+        ledger.record_verified_result_recovery(
+            slot_id=slot, run_id="run-recovery", report_id=report_id,
+            recovered_at_ms=NOW + 20,
+        )
+
+        reservation_after = ledger.get_slot_reservation(slot_id=slot)
+        self.assertEqual(reservation_after.state, "RESERVED")
+        receipt = client.connection.execute(
+            "SELECT slot_id, run_id, report_id, recovered_at_ms "
+            "FROM cloud_paper_settlement_recovery_receipts WHERE slot_id = ?",
+            (slot,),
+        ).fetchone()
+        self.assertEqual(
+            tuple(receipt), (slot, "run-recovery", report_id, NOW + 10),
+        )
+
+    def test_recovery_receipt_conflict_or_missing_reservation_fails_closed(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        slot = paper_slot_id(NOW)
+        with self.assertRaisesRegex(BudgetBlocked, "RECOVERY_REVIEW_REQUIRED"):
+            ledger.record_verified_result_recovery(
+                slot_id=slot, run_id="no-reservation", report_id="b" * 64,
+                recovered_at_ms=NOW,
+            )
+        ledger.reserve_slot(
+            slot_id=slot, run_id="run-recovery",
+            now_ms=NOW, snapshot=snapshot(),
+        )
+        ledger.record_verified_result_recovery(
+            slot_id=slot, run_id="run-recovery", report_id="b" * 64,
+            recovered_at_ms=NOW,
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "RECOVERY_REVIEW_REQUIRED"):
+            ledger.record_verified_result_recovery(
+                slot_id=slot, run_id="run-recovery", report_id="c" * 64,
+                recovered_at_ms=NOW + 1,
+            )
 
 
 class D1UsageGuardTests(unittest.TestCase):

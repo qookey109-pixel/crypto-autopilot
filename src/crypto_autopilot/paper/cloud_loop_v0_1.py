@@ -90,11 +90,21 @@ def slot_id(tick_ms: int) -> str:
     return str((tick_ms - SLOT_OFFSET_MS) // SLOT_MS)
 
 
-def committed_report(store: PaperRunStoreLike, slot: str) -> dict[str, object] | None:
-    result = store.get_json("cloud-result", slot)
+def committed_report(
+    store: PaperRunStoreLike,
+    slot: str,
+    *,
+    before_external: Callable[[], None] | None = None,
+) -> dict[str, object] | None:
+    def get_json(kind: str, object_id: str) -> dict[str, object] | None:
+        if before_external is not None:
+            before_external()
+        return store.get_json(kind, object_id)
+
+    result = get_json("cloud-result", slot)
     if result is None:
         return None
-    report = store.get_json("cloud-report", str(result.get("report_id", "")))
+    report = get_json("cloud-report", str(result.get("report_id", "")))
     if report is None or digest(report) != result.get("report_id"):
         raise CloudLoopReviewRequired("RESULT_REPORT_MISMATCH")
     if report.get("slot_id") != slot:
@@ -106,11 +116,11 @@ def committed_report(store: PaperRunStoreLike, slot: str) -> dict[str, object] |
     if not isinstance(step, Mapping):
         raise CloudLoopReviewRequired("RESULT_STEP_MISSING")
     verified = verify_live_paper_run_step(step)
-    persisted = store.get_json("live-run-step", verified)
-    state = store.get_json("live-state", str(step["next_state_id"]))
+    persisted = get_json("live-run-step", verified)
+    state = get_json("live-state", str(step["next_state_id"]))
     if persisted != step or state is None or verify_live_paper_state(state) != step["next_state_id"]:
         raise CloudLoopReviewRequired("RESULT_PERSISTENCE_MISMATCH")
-    seal = store.get_json("live-run-result", str(step["request_id"]))
+    seal = get_json("live-run-result", str(step["request_id"]))
     if seal is None or seal.get("step_id") != verified:
         raise CloudLoopReviewRequired("COORDINATOR_SEAL_MISSING")
     return report
