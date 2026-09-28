@@ -8,7 +8,9 @@
 
 PR [#630](https://github.com/qookey109-pixel/crypto-autopilot/pull/630) merged a versioned, one-time, read-only Cloudflare subscriptions snapshot. Its contract is `config/cloud_paper_billing_evidence_v0_1.json`; the report covers plan/state/listed subscription prices only and cannot establish invoice totals or zero cost. The API has not been called.
 
-Before any use, run `Cloud Paper Billing Evidence Readiness V0.1`. Only if it reports `READY`, the one-time audit may be dispatched once from `main`, with dedicated secret `CLOUDFLARE_BILLING_READONLY_API_TOKEN` scoped to Account Billing Read. The readiness check performs zero network calls and does not consume the audit. Preserve any first audit result; never rerun it. This is separate from, and neither consumes nor replaces, the one-time D1/R2 usage audit V0.1. Neither audit enables Cloud Paper.
+Billing readiness run [36497596228](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36497596228) completed on main `d4580c1142f9ddadb92cacc810f29bc1988a39df` with `BLOCKED_MISSING_BILLING_READ_ONLY_CREDENTIAL`; the run made zero Cloudflare requests, printed no secret values, and left the one-time audit unconsumed. The separate D1/R2 readiness [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) reports `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`, also with zero Cloudflare requests.
+
+Configure the required account ID variable and scoped read-only credentials out of band, then run zero-network readiness. Only if the billing check reports `READY`, the one-time audit may be dispatched once from `main`, with dedicated secret `CLOUDFLARE_BILLING_READONLY_API_TOKEN` scoped to Account Billing Read. The readiness check performs zero network calls and does not consume the audit. Preserve any first audit result; never rerun it. This is separate from, and neither consumes nor replaces, the one-time D1/R2 usage audit V0.1. Neither audit enables Cloud Paper.
 
 ## Cloud Paper delivery status — product evidence basis `cb22d3c3905a079eb754f0fab6d917923512f624`
 
