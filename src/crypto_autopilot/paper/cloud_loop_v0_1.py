@@ -210,6 +210,7 @@ def latest_committed_slot(
             raise CloudLoopReviewRequired("LEDGER_CHAIN_MISMATCH")
     return latest_slot
 
+
 def decision_reason_codes(
     *, market: Mapping[str, object], registrations: Sequence[object],
     candidates: Sequence[object],
