@@ -1,22 +1,23 @@
 # Current Operations Status
 
-Updated: 2026-09-28. This is the single human entrypoint for the current project checkpoint.
+Updated: 2026-09-29. This is the single human entrypoint for the current project checkpoint.
 
-## Cloud Paper current checkpoint — PR #600 merged
+## Cloud Paper current checkpoint — PR #603 merged
 
-本節查核快照（PR #601 文件同步前）：`main=3dd8be803f5e7bfda26cd14bdbe5aaae507b338c`、當時 open PR = 0；PR #599/#600 已合併。此 SHA 是歷史 evidence basis，不是即時 main claim；接續操作必須先重查 GitHub main。最新 main 必要檢查：Python 3.12／3.13、V0.10 Freeze Guard、CodeQL、Dependency/SBOM 均成功；workflow-static 為 skipped（本次未改 workflow）。
+本節狀態以 2026-09-29 對 GitHub 的查核為準：PR #603 的 exact head `e3d7fee4520d8b91d0a9ef81057f21cb3cace0bf` 已合併，main 為 `4c50af897a451c5cf537e549a8563497b9b5fbc9`，查核時 open PR = 0。PR-head Python 3.12／3.13、Ruff、預算檢查、CodeQL、Dependency/SBOM 通過；合併後 Python 3.12／3.13、V0.10 Freeze Guard、CodeQL、Dependency/SBOM 通過，workflow-static skipped（本次未改 workflow）。此 SHA 是本次文件更新前的 evidence basis，後續仍須重新解析 live main。
 
 - PR #590/#595：Paper 結果保存回讀後 settlement；完全相同用量可安全重送，執行／結果不明時保留完整 reservation。
 - PR #599：新增預設關閉的跨重啟「已完成結果核對」路徑：讀取 slot reservation，驗證 immutable R2 result/report 與 digest 後記錄 D1 recovery audit receipt。它**不做 settlement、不釋放／降低 reservation**；缺失或不一致時 fail closed 並保留完整 reservation。
 - PR #600：recovery 另核對 result pointer 內的 slot identity 與 `COMMITTED` 狀態，避免錯 slot／錯狀態被當成已完成結果。
 - 這些是程式與合成 CI 證據；D1 尚未 provision/bind，recovery 預設關閉，沒有執行正式 D1/R2 recovery。
-- PR #592 的 4,000 rows/query guard 與 96 × 2 × 4,000 = **768,000 rows/day** 僅界定一般 reservation/settlement envelope；不是 Cloudflare production metadata 實測，也未涵蓋 recovery/retry 額外讀寫、其他 D1 writers 或全帳戶餘額。D1 account-wide shared reservation、可信用量 freshness、所有 writer coverage 與 FREE-ONLY 容量證明仍未完成。
+- PR #603 新增 prepare-only 的共享 D1 rows 預留：每個受 guard 保護的 query 在執行前，以單一原子 upsert 預留 admission 與目標 query 兩筆查詢的上限；每日最多 384 次預留，理論上限為 **3,072,000 rows read／7,680 rows written**。PR 與合併後 CI 都是合成 SQLite／程式檢查，非 Cloudflare 生產量測；migration 未套用、D1 未 provision。
+- 啟用仍被跨 runner storage-growth 預留、可信且持續更新的帳戶級 usage snapshot/freshness source、所有 D1 writers 都走共享 guard 的證據、D1/R2 FREE-ONLY 合併容量證明及正式受控驗收阻擋。任何未覆蓋 writer 或超出 guard 的查詢都不可視為已納入。
 - 最近已核實的 Pages production build/deploy/browser run 是 [36414262259](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36414262259)（SHA `9753c6b3`）；PR #599/#600 不含 dashboard 內容，沒有新 Pages deploy 證據。部署與 Cloud Paper runtime acceptance 分開。
 - 模型品質仍為 `REJECT`、production strategy registry 為空、macro regime 為 `REGIME_UNAVAILABLE`。正式路徑目前只可安全輸出 `NO_TRADE`，不能宣稱策略有效或獲利。
 - Cloud Paper `activation.enabled=false`；execution workflow／自然模擬排程／正式受控 main acceptance 均未啟用。維持 0 USD、PAPER／LIVE-PAPER ONLY、holdout/source switch/promotion/real-money trading 關閉。
 - 一次性 Core100 bootstrap [run 36110721415](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415) 已完成一次，報告 `PASS / CORE100_FINGERPRINT_V0_2_BASELINE_PUBLISHED`、model quality `REJECT`；3 個 immutable objects 與 latest pointer 完成 SHA-256 readback，零 provider requests、未碰 holdout。授權已消耗，禁止 rerun。
 
-下一步：先完成 Cloud Paper shared account-wide D1 rows budget／恢復讀取的完整成本模型，再取得有 freshness watermark 的帳戶級用量與全 writer coverage；證明免費容量前不 provision、不做正式受控驗收、不啟用排程。
+下一步：先補跨 runner D1 storage-growth 預留與可驗證的帳戶級 usage freshness source，逐一盤點所有 D1 writers 是否經共享 guard；更新後以包含 admission query、settlement、recovery/retry 的實際查詢數重算 D1/R2 預算。證據與免費容量均通過前，不套用 migration、不 provision、不做正式受控驗收、不啟用排程。
 ## Live Cloud Paper checkpoint — 2026-09-28
 
 Evidence basis before this documentation update: `main=77138c1b1ce7c4b99555c6c5f35eaf66dd82c26a`; this is the reviewed parent for the global-context source decision map, not a latest-main claim after this update.
