@@ -10,6 +10,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
+from crypto_autopilot.paper.cloud_budget_v0_1 import CloudBudgetGuard
 from crypto_autopilot.storage.r2 import R2ObjectReceipt
 
 
@@ -52,15 +53,33 @@ class BudgetedR2Store:
         *,
         client: Any,
         bucket: str,
-        before_external: Callable[[str, int], None],
+        before_external: Callable[[str, int], None] | None = None,
+        budget_guard: CloudBudgetGuard | None = None,
+        freshness_check: Callable[[], None] | None = None,
         policy: BudgetedR2Policy = BudgetedR2Policy(),
     ) -> None:
         if not isinstance(bucket, str) or not bucket:
             raise ValueError("R2 bucket is required")
+        if (before_external is None) == (budget_guard is None):
+            raise ValueError("provide exactly one R2 budget reservation mechanism")
+        if freshness_check is not None and budget_guard is None:
+            raise ValueError("freshness_check requires a shared cloud budget guard")
+        if freshness_check is not None and not callable(freshness_check):
+            raise ValueError("freshness_check must be callable")
         self.bucket = bucket
         self.policy = policy
+        self.budget_guard = budget_guard
+        if budget_guard is None:
+            reserve = before_external
+        else:
+            def reserve(operation: str, size: int) -> None:
+                if freshness_check is not None:
+                    freshness_check()
+                budget_guard.reserve(operation, size)
+        if not callable(reserve):
+            raise ValueError("R2 budget reservation callback is required")
         self.client = BudgetedR2Client(
-            client=client, before_external=before_external,
+            client=client, before_external=reserve,
         )
 
     @classmethod
@@ -71,7 +90,9 @@ class BudgetedR2Store:
         bucket: str,
         access_key_id: str,
         secret_access_key: str,
-        before_external: Callable[[str, int], None],
+        before_external: Callable[[str, int], None] | None = None,
+        budget_guard: CloudBudgetGuard | None = None,
+        freshness_check: Callable[[], None] | None = None,
         policy: BudgetedR2Policy = BudgetedR2Policy(),
     ) -> BudgetedR2Store:
         if not all((account_id, bucket, access_key_id, secret_access_key)):
@@ -89,6 +110,7 @@ class BudgetedR2Store:
         )
         return cls(
             client=client, bucket=bucket, before_external=before_external,
+            budget_guard=budget_guard, freshness_check=freshness_check,
             policy=policy,
         )
 
