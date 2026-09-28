@@ -104,6 +104,39 @@ WHERE slot_id = CAST(? AS TEXT)
 RETURNING slot_id
 """
 
+
+D1_SHARED_ROWS_RESERVATION_SQL = """
+INSERT INTO cloud_paper_d1_daily_rows_budget (
+    utc_day, baseline_rows_read, baseline_rows_written,
+    reserved_rows_read, reserved_rows_written, reservation_count
+)
+SELECT
+    CAST(? AS TEXT), CAST(? AS INTEGER), CAST(? AS INTEGER),
+    CAST(? AS INTEGER), CAST(? AS INTEGER), 1
+WHERE CAST(? AS INTEGER) + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
+  AND CAST(? AS INTEGER) + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
+ON CONFLICT(utc_day) DO UPDATE SET
+    reserved_rows_read = cloud_paper_d1_daily_rows_budget.reserved_rows_read
+        + excluded.reserved_rows_read,
+    reserved_rows_written = cloud_paper_d1_daily_rows_budget.reserved_rows_written
+        + excluded.reserved_rows_written,
+    reservation_count = cloud_paper_d1_daily_rows_budget.reservation_count + 1
+WHERE excluded.baseline_rows_read
+          <= cloud_paper_d1_daily_rows_budget.baseline_rows_read
+             + cloud_paper_d1_daily_rows_budget.reserved_rows_read
+  AND excluded.baseline_rows_written
+          <= cloud_paper_d1_daily_rows_budget.baseline_rows_written
+             + cloud_paper_d1_daily_rows_budget.reserved_rows_written
+  AND cloud_paper_d1_daily_rows_budget.baseline_rows_read
+          + cloud_paper_d1_daily_rows_budget.reserved_rows_read
+          + excluded.reserved_rows_read <= CAST(? AS INTEGER)
+  AND cloud_paper_d1_daily_rows_budget.baseline_rows_written
+          + cloud_paper_d1_daily_rows_budget.reserved_rows_written
+          + excluded.reserved_rows_written <= CAST(? AS INTEGER)
+  AND cloud_paper_d1_daily_rows_budget.reservation_count < CAST(? AS INTEGER)
+RETURNING utc_day, reservation_count
+"""
+
 READ_SLOT_RESERVATION_SQL = """
 SELECT slot_id, run_id, reserved_at_ms, state,
        reserved_provider_requests, reserved_class_a,
@@ -287,6 +320,96 @@ class D1UsageGuard:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_STALE")
 
 
+
+@dataclass(frozen=True, slots=True)
+class D1SharedRowsBudgetPolicy:
+    """Per-day cross-run envelope for every query using the shared D1 client.
+
+    One reservation covers the admission query itself plus the following D1
+    query. Reservations are never released within the UTC day; ambiguous or
+    failed calls therefore remain charged at their full conservative envelope.
+    """
+
+    max_evidence_age_ms: int = 60_000
+    request_timeout_reserve_ms: int = 10_000
+    max_rows_read_per_query: int = 4_000
+    max_rows_written_per_query: int = 10
+    rows_read_per_day: int = 4_000_000
+    rows_written_per_day: int = 75_000
+    max_query_reservations_per_day: int = 384
+
+
+class D1SharedRowsBudgetGuard:
+    """Atomically reserve shared D1 rows across independent runner processes."""
+
+    def __init__(
+        self, *, policy: D1SharedRowsBudgetPolicy = D1SharedRowsBudgetPolicy(),
+    ) -> None:
+        self.policy = policy
+
+    def reserve_query(
+        self, *,
+        execute: Callable[[str, tuple[object, ...]], D1QueryResult],
+        snapshot: D1UsageSnapshot,
+        now_ms: int,
+    ) -> None:
+        p = self.policy
+        values = (
+            p.max_evidence_age_ms, p.request_timeout_reserve_ms,
+            p.max_rows_read_per_query, p.max_rows_written_per_query,
+            p.rows_read_per_day, p.rows_written_per_day,
+            p.max_query_reservations_per_day,
+        )
+        if any(type(value) is not int or value <= 0 for value in values):
+            raise BudgetBlocked("BLOCKED_D1_SHARED_POLICY_INVALID")
+        if p.max_evidence_age_ms <= p.request_timeout_reserve_ms:
+            raise BudgetBlocked("BLOCKED_D1_SHARED_POLICY_INVALID")
+        if not snapshot.account_wide or not snapshot.reservation_coverage_complete:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_INCOMPLETE")
+        evidence_values = (
+            snapshot.observed_at_ms, snapshot.measured_through_ms,
+            snapshot.rows_read_day, snapshot.rows_written_day,
+            snapshot.storage_bytes, snapshot.pending_rows_read_day,
+            snapshot.pending_rows_written_day, snapshot.pending_storage_bytes,
+        )
+        if any(type(value) is not int or value < 0 for value in evidence_values):
+            raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_UNKNOWN")
+        if type(now_ms) is not int or now_ms < 0:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_CLOCK_INVALID")
+        age = now_ms - snapshot.observed_at_ms
+        coverage_age = now_ms - snapshot.measured_through_ms
+        if age < 0 or coverage_age < 0:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_FROM_FUTURE")
+        if max(age, coverage_age) > p.max_evidence_age_ms - p.request_timeout_reserve_ms:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_STALE")
+
+        baseline_read = snapshot.rows_read_day + snapshot.pending_rows_read_day
+        baseline_written = snapshot.rows_written_day + snapshot.pending_rows_written_day
+        reserve_read = 2 * p.max_rows_read_per_query
+        reserve_written = 2 * p.max_rows_written_per_query
+        day = datetime.fromtimestamp(now_ms / 1000, tz=UTC).date().isoformat()
+        result = execute(
+            D1_SHARED_ROWS_RESERVATION_SQL,
+            (
+                day, baseline_read, baseline_written,
+                reserve_read, reserve_written,
+                baseline_read, reserve_read, p.rows_read_per_day,
+                baseline_written, reserve_written, p.rows_written_per_day,
+                p.rows_read_per_day, p.rows_written_per_day,
+                p.max_query_reservations_per_day,
+            ),
+        )
+        if (
+            type(result.rows_read) is not int or result.rows_read < 0
+            or type(result.rows_written) is not int or result.rows_written < 0
+            or result.rows_read > p.max_rows_read_per_query
+            or result.rows_written > p.max_rows_written_per_query
+        ):
+            raise D1LedgerUnavailable("D1_SHARED_ROWS_RESERVATION_USAGE_INVALID")
+        if not result.rows or result.rows[0].get("utc_day") != day:
+            raise BudgetBlocked("BLOCKED_D1_SHARED_ROWS_BUDGET")
+
+
 class D1QueryUsageBudgetGate(Protocol):
     """Budget gate required by every external D1 query."""
 
@@ -309,6 +432,7 @@ class CloudflareD1QueryClient:
         account_id: str,
         database_id: str,
         usage_guard: D1QueryUsageBudgetGate,
+        shared_rows_guard: D1SharedRowsBudgetGuard | None = None,
         timeout_seconds: float = 10.0,
     ) -> None:
         if not api_token or any(ch in api_token for ch in "\r\n"):
@@ -325,17 +449,20 @@ class CloudflareD1QueryClient:
         self._account_id = account_id
         self._database_id = database_id
         self._usage_guard = usage_guard
+        self._shared_rows_guard = shared_rows_guard
         self._timeout_seconds = timeout_seconds
 
     @classmethod
     def from_environment(
         cls, *, usage_guard: D1QueryUsageBudgetGate,
+        shared_rows_guard: D1SharedRowsBudgetGuard,
     ) -> CloudflareD1QueryClient:
         return cls(
             api_token=os.environ.get("CLOUDFLARE_D1_API_TOKEN", ""),
             account_id=os.environ.get("CLOUDFLARE_ACCOUNT_ID", ""),
             database_id=os.environ.get("CLOUDFLARE_D1_DATABASE_ID", ""),
             usage_guard=usage_guard,
+            shared_rows_guard=shared_rows_guard,
         )
 
     def __repr__(self) -> str:
@@ -347,6 +474,24 @@ class CloudflareD1QueryClient:
         if len(params) > 100:
             raise D1LedgerUnavailable("D1_LEDGER_PARAMETER_LIMIT")
         self._usage_guard.reserve_query()
+        if self._shared_rows_guard is None:
+            raise BudgetBlocked("BLOCKED_D1_SHARED_ROWS_GUARD_MISSING")
+        snapshot = getattr(self._usage_guard, "snapshot", None)
+        clock_ms = getattr(self._usage_guard, "clock_ms", None)
+        if not isinstance(snapshot, D1UsageSnapshot) or not callable(clock_ms):
+            raise BudgetBlocked("BLOCKED_D1_SHARED_ROWS_EVIDENCE_MISSING")
+        self._shared_rows_guard.reserve_query(
+            execute=self._request, snapshot=snapshot, now_ms=clock_ms(),
+        )
+        result = self._request(sql, params)
+        if (
+            result.rows_read > self._shared_rows_guard.policy.max_rows_read_per_query
+            or result.rows_written > self._shared_rows_guard.policy.max_rows_written_per_query
+        ):
+            raise D1LedgerUnavailable("D1_LEDGER_QUERY_HARD_STOP")
+        return result
+
+    def _request(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
         payload = json.dumps(
             {"sql": sql, "params": [str(value) for value in params]},
             separators=(",", ":"),
@@ -391,16 +536,13 @@ class CloudflareD1QueryClient:
         rows_read = meta.get("rows_read")
         rows_written = meta.get("rows_written")
         if (
-            type(rows_read) is not int
-            or rows_read < 0
-            or type(rows_written) is not int
-            or rows_written < 0
+            type(rows_read) is not int or rows_read < 0
+            or type(rows_written) is not int or rows_written < 0
         ):
             raise D1LedgerUnavailable("D1_LEDGER_USAGE_UNKNOWN")
         if any(not isinstance(row, dict) for row in rows):
             raise D1LedgerUnavailable("D1_LEDGER_RESPONSE_INVALID")
         return D1QueryResult(tuple(rows), rows_read, rows_written)
-
 
 @dataclass(frozen=True, slots=True)
 class D1LedgerLimits:
