@@ -63,16 +63,16 @@ WHERE (SELECT reservation_count FROM cloud_paper_budget_meta WHERE singleton = 1
       SELECT 1 FROM cloud_paper_budget_reservations
       WHERE slot_id = CAST(? AS TEXT)
   )
-  AND CAST(? AS INTEGER) + CAST(? AS INTEGER) + month_a + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
-  AND CAST(? AS INTEGER) + CAST(? AS INTEGER) + day_a + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
-  AND CAST(? AS INTEGER) + CAST(? AS INTEGER) + rolling_a + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
-  AND CAST(? AS INTEGER) + CAST(? AS INTEGER) + month_b + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
-  AND CAST(? AS INTEGER) + CAST(? AS INTEGER) + day_b + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
-  AND CAST(? AS INTEGER) + CAST(? AS INTEGER) + rolling_b + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
-  AND CAST(? AS INTEGER) + CAST(? AS INTEGER) + day_provider + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
+  AND CAST(? AS INTEGER) + month_a + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
+  AND CAST(? AS INTEGER) + day_a + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
+  AND CAST(? AS INTEGER) + rolling_a + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
+  AND CAST(? AS INTEGER) + month_b + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
+  AND CAST(? AS INTEGER) + day_b + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
+  AND CAST(? AS INTEGER) + rolling_b + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
+  AND CAST(? AS INTEGER) + day_provider + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
   AND run_provider + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
-  AND CAST(? AS INTEGER) + CAST(? AS INTEGER) + day_bytes + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
-  AND CAST(? AS INTEGER) + CAST(? AS INTEGER) + rolling_bytes + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
+  AND CAST(? AS INTEGER) + day_bytes + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
+  AND CAST(? AS INTEGER) + rolling_bytes + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
 RETURNING slot_id
 """
 
@@ -274,6 +274,8 @@ class D1CloudBudgetLedger:
             snapshot.measured_through_ms,
             rolling_start_ms,
             now_ms,
+            month_start_ms,
+            day_start_ms,
             month_start_ms,
             day_start_ms,
             day_start_ms,
