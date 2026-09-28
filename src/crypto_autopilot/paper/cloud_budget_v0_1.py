@@ -67,6 +67,7 @@ class CloudBudgetPolicy:
     free_class_b_per_month: int = 10_000_000
     project_class_a_per_month: int = 750_000
     project_class_b_per_month: int = 7_500_000
+    r2_warning_bytes: int = 6_400_000_000
     r2_hard_stop_bytes: int = 8_000_000_000
     r2_object_max_bytes: int = 262_144
 
@@ -131,6 +132,24 @@ class CloudBudgetGuard:
         if max(age, coverage_age) > self.policy.max_evidence_age_ms:
             raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_STALE")
 
+    def storage_capacity_state(self) -> str:
+        """Classify observed plus reserved R2 bytes before another access.
+
+        WARNING is advisory at the versioned threshold. HARD_STOP prevents any
+        write whose projected storage reaches the project ceiling.
+        """
+        self._validate_evidence()
+        projected = (
+            self.snapshot.storage_bytes
+            + self.snapshot.pending_storage_bytes
+            + self._new_bytes_run
+        )
+        if projected >= self.policy.r2_hard_stop_bytes:
+            return "HARD_STOP"
+        if projected >= self.policy.r2_warning_bytes:
+            return "WARNING"
+        return "OK"
+
     def reserve_provider_request(self) -> None:
         self._validate_evidence()
         s, p = self.snapshot, self.policy
@@ -173,7 +192,7 @@ class CloudBudgetGuard:
             raise BudgetBlocked("BLOCKED_BUDGET_RUN_BYTES_LIMIT")
         if s.new_bytes_day + s.pending_new_bytes_day + self._new_bytes_day + new_bytes > p.r2_new_bytes_per_day:
             raise BudgetBlocked("BLOCKED_BUDGET_DAILY_BYTES_LIMIT")
-        if s.storage_bytes + s.pending_storage_bytes + self._new_bytes_run + new_bytes > p.r2_hard_stop_bytes:
+        if s.storage_bytes + s.pending_storage_bytes + self._new_bytes_run + new_bytes >= p.r2_hard_stop_bytes:
             raise BudgetBlocked("BLOCKED_BUDGET_STORAGE_HARD_STOP")
 
         if operation == "A":

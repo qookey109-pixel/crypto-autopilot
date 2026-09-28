@@ -158,6 +158,29 @@ class CloudBudgetGuardTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "STORAGE_HARD_STOP"):
             storage_guard.reserve_r2_class_a(new_bytes=1)
 
+        reaches_hard_stop_guard = CloudBudgetGuard(
+            snapshot=snapshot(storage_bytes=7_999_999_999), clock_ms=lambda: NOW
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "STORAGE_HARD_STOP"):
+            reaches_hard_stop_guard.reserve_r2_class_a(new_bytes=1)
+
+    def test_storage_capacity_warning_uses_observed_and_reserved_bytes(self):
+        warning = CloudBudgetGuard(
+            snapshot=snapshot(storage_bytes=6_399_999_999, pending_storage_bytes=1),
+            clock_ms=lambda: NOW,
+        )
+        self.assertEqual(warning.storage_capacity_state(), "WARNING")
+
+        below_warning = CloudBudgetGuard(
+            snapshot=snapshot(storage_bytes=6_399_999_999), clock_ms=lambda: NOW
+        )
+        self.assertEqual(below_warning.storage_capacity_state(), "OK")
+
+        hard_stop = CloudBudgetGuard(
+            snapshot=snapshot(storage_bytes=8_000_000_000), clock_ms=lambda: NOW
+        )
+        self.assertEqual(hard_stop.storage_capacity_state(), "HARD_STOP")
+
     def test_unknown_or_negative_usage_blocks(self):
         for value in (None, -1, True):
             guard = CloudBudgetGuard(
