@@ -8,7 +8,7 @@ This adapter connects a strategy output that already has explicit paper eligibil
 
 The current registry remains `EMPTY_NO_ELIGIBLE_STRATEGIES`; this produces zero candidates and a normal `NO_TRADE`. A non-empty registry must be the versioned `QUALIFIED_PAPER_STRATEGIES_AVAILABLE` state. Each entry binds the strategy family, Pionex provider, allowed symbols and regimes, implementation SHA-256, and a paper qualification receipt. The receipt must explicitly authorize paper execution and keep holdout, source switch, promotion, real-money orders, and live trading closed. A Core100 dependent strategy requires a model-quality PASS.
 
-Each strategy output must match the current market report's exact `as_of_ms`, Pionex market-evidence hash and router-route hash. The qualification receipt and implementation hashes must match the registry. Entry, stop, target and position sizing must be supplied by the qualified strategy output and be internally consistent. This layer validates those values; it does not calculate or repair them.
+Each strategy output must use the matching evidence's `last_bar_ms` as its candidate `as_of_ms`; the market report's `as_of_ms` remains the capture time. It must also match the Pionex market-evidence hash and router-route hash. The qualification receipt and implementation hashes must match the registry. Entry, stop, target and position sizing must be supplied by the qualified strategy output and be internally consistent. This layer validates those values; it does not calculate or repair them.
 
 ## Failure behavior
 
