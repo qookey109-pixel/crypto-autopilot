@@ -1,0 +1,33 @@
+name: Cloud Paper Usage Audit Readiness V0.1
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloud-paper-usage-audit-readiness-v0-1
+  cancel-in-progress: false
+
+jobs:
+  readiness:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Report credential-name readiness without network access
+        env:
+          CF_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CF_READONLY_TOKEN: ${{ secrets.CLOUDFLARE_READONLY_API_TOKEN }}
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          import os
+          print(json.dumps({
+              "state": "READY" if os.environ.get("CF_ACCOUNT_ID") and os.environ.get("CF_READONLY_TOKEN") else "BLOCKED_MISSING_READ_ONLY_CREDENTIAL",
+              "cloudflare_requests_performed": 0,
+              "secret_values_printed": False,
+              "one_time_authority_consumed": False
+          }, sort_keys=True))
+          PY

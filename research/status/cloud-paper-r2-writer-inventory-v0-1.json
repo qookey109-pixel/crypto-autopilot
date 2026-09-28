@@ -1,16 +1,16 @@
 {
   "schema": "qookey-cloud-paper-r2-writer-inventory-v0.1",
   "updated_date": "2026-09-29",
-  "evidence_basis_main_sha": "0de21f67bd8f122933164f4b1f4a91179d9d3d40",
+  "evidence_basis_main_sha": "4456dffe2d9440529a3c84221a2c1fb27b186513",
   "is_latest_main_claim": false,
   "scan": {
-    "workflow_file_count": 85,
+    "workflow_file_count": 87,
     "workflows_with_r2_or_cloudflare_secret_references": 17,
     "scanner_contract": "scripts/validate_cloud_paper_r2_writer_inventory.py",
     "exact_reference_scan": true,
     "values_or_secret_contents_read": false,
     "workflow_count_before_nonaccess_preflight": 84,
-    "note": "One new manual non-access preflight workflow was added after the recorded main; it contains no R2 or Cloudflare secret references. The 17 credential-referencing workflow paths remain unchanged.",
+    "note": "At PR #611 head, two manual Cloud Paper audit workflows were added. The readiness workflow performs no network access; the one-time usage audit reads account-wide D1/R2 analytics via one Cloudflare GraphQL query and performs no object or SQL access. Neither workflow references R2 write credentials.",
     "d1_access_marker_scan": "scripts/validate_cloud_paper_r2_writer_inventory.py"
   },
   "account_wide_reservation_coverage": {
@@ -158,13 +158,15 @@
     }
   ],
   "d1_access_workflows": {
-    "workflow_count": 0,
-    "workflow_paths": [],
-    "classification": "NO_DIRECT_D1_ACCESS_WORKFLOW_MARKERS_FOUND_AT_BASELINE",
-    "scope_note": "Scans repository GitHub Actions workflow files for D1 secret references, Wrangler D1 commands, D1 bindings, Cloudflare D1 REST endpoints, and D1 analytics datasets. Does not prove account-wide or external-service writer coverage.",
-    "validated_in_pr_head": "c99e55fd0331df1140f30b6def33cfb309566061",
-    "pull_request": 609,
+    "workflow_count": 1,
+    "workflow_paths": [
+      ".github/workflows/cloud-paper-usage-audit-v0-1.yml"
+    ],
+    "classification": "READ_ONLY_ACCOUNT_D1_R2_ANALYTICS_AUDIT",
+    "scope_note": "Detects workflow-level D1 marker references and account analytics datasets. The new workflow reads only account-wide analytics aggregates; it does not issue D1 SQL, inspect database rows, access R2 objects, or prove account-wide/external writer coverage.",
+    "validated_in_pr_head": "446b8e8b9351f9e23337de7f575f9356662cb07d",
+    "pull_request": 611,
     "pr_ci_status": "PASS",
-    "post_merge_ci_status": "PASS"
+    "post_merge_ci_status": "NOT_RUN"
   }
 }

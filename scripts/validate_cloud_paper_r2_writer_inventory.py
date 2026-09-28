@@ -19,13 +19,14 @@ D1_ACCESS_REF = re.compile(
     r"|\bwrangler\s+d1\b"
     r"|^\s*d1_databases\s*:"
     r"|/(?:accounts|zones)/[^\s\"']+/d1/(?:database|databases)(?:/|\b)"
-    r"|\bd1(?:Analytics|Storage|Queries)AdaptiveGroups\b",
+    r"|\bd1(?:Analytics|Storage|Queries)AdaptiveGroups\b"
+    r"|\bcloud_paper_usage_audit_v0_1\.py\b",
     re.IGNORECASE | re.MULTILINE,
 )
 
 
 def contains_d1_access_reference(contents: str) -> bool:
-    """Detect common direct Cloudflare D1 access markers in workflow source."""
+    """Detect direct D1 markers and the explicitly scoped analytics audit entrypoint."""
     return D1_ACCESS_REF.search(contents) is not None
 
 

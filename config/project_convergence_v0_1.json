@@ -197,7 +197,8 @@
       "validate-v0-10-capture-window-operations.yml",
       "validate-v0-11-metadata-stability-evaluator.yml",
       "zec-v0-3-development-execution-v0-1.yml",
-      "zec-v0-4-development-execution-v0-1.yml"
+      "zec-v0-4-development-execution-v0-1.yml",
+      "cloud-paper-usage-audit-v0-1.yml"
     ],
     "post_cutoff_manual_fail_closed": [
       "binance-spot-r2-monthly-governance-v0-5.yml",
@@ -253,7 +254,8 @@
       "security-visibility-dependencies.yml"
     ],
     "current_nonaccess_preflight": [
-      "cloud-paper-loop-v0-1-preflight.yml"
+      "cloud-paper-loop-v0-1-preflight.yml",
+      "cloud-paper-usage-audit-readiness-v0-1.yml"
     ]
   },
   "boundaries": {
