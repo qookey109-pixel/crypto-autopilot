@@ -8,10 +8,13 @@ a separately reviewed candidate builder and strategy authority exist.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from typing import Protocol
 from dataclasses import dataclass
+from typing import Protocol
 
-from crypto_autopilot.paper.cloud_budget_v0_1 import CloudBudgetGuard
+from crypto_autopilot.paper.cloud_budget_v0_1 import (
+    CloudBudgetGuard,
+    R2UsageSnapshot,
+)
 from crypto_autopilot.paper.cloud_loop_v0_1 import (
     CompleteTapePionexFeed,
     run_cloud_step,
@@ -35,7 +38,7 @@ class BudgetSlotReservationLedger(Protocol):
 
     def reserve_slot(
         self, *, slot_id: str, run_id: str, now_ms: int,
-        snapshot: object,
+        snapshot: R2UsageSnapshot,
     ) -> None:
         """Reserve the bounded slot envelope or fail closed."""
 
@@ -95,8 +98,11 @@ class CloudPaperNoTradeComposition:
         self.budget_guard.reserve_provider_request()
 
     def run_slot(
-        self, *, tick_ms: int, previous_slot: str | None,
-        activation_enabled: bool = False, run_id: str | None = None,
+        self, *,
+        tick_ms: int,
+        previous_slot: str | None,
+        activation_enabled: bool = False,
+        run_id: str | None = None,
     ) -> dict[str, object]:
         """Run one explicitly enabled no-trade slot; default is side-effect free."""
         if type(activation_enabled) is not bool:
@@ -116,7 +122,9 @@ class CloudPaperNoTradeComposition:
         self._require_empty_production_registry()
 
         if self.reservation_ledger is None or self.d1_usage_guard is None:
-            raise CloudPaperCompositionBlocked("D1_BUDGET_EVIDENCE_OR_LEDGER_MISSING")
+            raise CloudPaperCompositionBlocked(
+                "D1_BUDGET_EVIDENCE_OR_LEDGER_MISSING"
+            )
         if not isinstance(run_id, str) or not run_id or len(run_id) > 100:
             raise CloudPaperCompositionBlocked("RUN_ID_INVALID")
         slot = slot_id(tick_ms)
