@@ -2,6 +2,15 @@
 
 Updated: 2026-09-27. This is the single human entrypoint for the current project checkpoint.
 
+## Live Cloud Paper checkpoint — 2026-09-28
+
+Evidence basis before this documentation update: `main=0f18fd2ab45b11f245b4dcb305f66dea11ffd8fa`; this SHA is a reviewed parent, not a latest-main claim after merge.
+
+- PR [#547](https://github.com/qookey109-pixel/crypto-autopilot/pull/547) merged at exact reviewed head `1fc09d255465abb22e5b4b6be833bcd2a8343db8`. It fixes monthly Class A/B reservations so each operation already reserved in the current run is counted before another is accepted.
+- Cloud CI passed on the PR head: Python 3.12, Python 3.13, workflow-static, dependency-security and CodeQL visibility. Post-merge Python 3.12/3.13, dependency-security, CodeQL visibility and critical-path freeze checks passed; workflow-static was skipped because workflow files were unchanged.
+- This closes a budget-guard arithmetic defect only. Cloud Paper activation remains disabled. Shared-account usage evidence, a complete atomic reservation ledger across all account writers, production composition wiring, and controlled main acceptance remain incomplete. No Cloud Paper provider/R2 operation or natural schedule has started.
+- Current production strategy registry remains empty; Core100 quality remains `REJECT`; missing market regime remains `REGIME_UNAVAILABLE`. The valid production result is `NO_TRADE`, not an invented position.
+
 **PAPER / LIVE-PAPER ONLY.** The data pipelines and paper components exist; the current research results do not support model promotion or real trading. Continue cloud operational verification before expanding the research scope. User policy since 2026-09-25: all project work uses GitHub/cloud sources; local files, local testing and local cleanup are excluded.
 
 ## Read and act from the right source
