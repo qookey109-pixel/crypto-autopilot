@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import threading
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Protocol
@@ -114,6 +115,132 @@ class D1QueryResult:
 class D1QueryClient(Protocol):
     def query(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
         """Execute one parameterized statement and return bounded metadata."""
+
+
+@dataclass(frozen=True, slots=True)
+class D1UsageSnapshot:
+    """Account-wide D1 usage evidence plus already-known outstanding reservations."""
+
+    account_wide: bool
+    reservation_coverage_complete: bool
+    observed_at_ms: int
+    measured_through_ms: int
+    rows_read_day: int
+    rows_written_day: int
+    storage_bytes: int
+    pending_rows_read_day: int = 0
+    pending_rows_written_day: int = 0
+    pending_storage_bytes: int = 0
+
+
+@dataclass(frozen=True, slots=True)
+class D1UsagePolicy:
+    """Project guardrails below Cloudflare's free-tier limits.
+
+    The storage growth reservation is a conservative project envelope per query;
+    it is not a claim about measured D1 row or index size.
+    """
+
+    max_evidence_age_ms: int = 60_000
+    request_timeout_reserve_ms: int = 10_000
+    rows_read_per_day: int = 4_000_000
+    rows_written_per_day: int = 75_000
+    storage_bytes_total: int = 4_000_000_000
+    rows_read_per_query: int = 25_000
+    rows_written_per_query: int = 10
+    storage_growth_per_query_bytes: int = 16_384
+
+
+class D1UsageGuard:
+    """Fail closed on stale/incomplete account usage before reserving a query.
+
+    Reservations accumulate only within this guard instance. Production use also
+    requires an account-wide atomic ledger covering every D1 writer; this class
+    does not claim to coordinate independent runners or workflows.
+    """
+
+    def __init__(
+        self,
+        *,
+        snapshot: D1UsageSnapshot,
+        clock_ms: Callable[[], int],
+        policy: D1UsagePolicy = D1UsagePolicy(),
+    ) -> None:
+        if not callable(clock_ms):
+            raise ValueError("a D1 usage evidence clock is required")
+        self.snapshot = snapshot
+        self.clock_ms = clock_ms
+        self.policy = policy
+        self._reserved_reads_day = 0
+        self._reserved_writes_day = 0
+        self._reserved_storage_bytes = 0
+        self._lock = threading.Lock()
+
+    def reserve_query(self) -> None:
+        """Reserve one conservative query envelope before its external request."""
+        with self._lock:
+            now_ms = self.clock_ms()
+            self._validate_evidence(now_ms)
+            p, s = self.policy, self.snapshot
+            if (
+                self._reserved_reads_day + p.rows_read_per_query
+                + s.rows_read_day + s.pending_rows_read_day > p.rows_read_per_day
+            ):
+                raise BudgetBlocked("BLOCKED_D1_ROWS_READ_DAILY_LIMIT")
+            if (
+                self._reserved_writes_day + p.rows_written_per_query
+                + s.rows_written_day + s.pending_rows_written_day
+                > p.rows_written_per_day
+            ):
+                raise BudgetBlocked("BLOCKED_D1_ROWS_WRITTEN_DAILY_LIMIT")
+            if (
+                self._reserved_storage_bytes + p.storage_growth_per_query_bytes
+                + s.storage_bytes + s.pending_storage_bytes > p.storage_bytes_total
+            ):
+                raise BudgetBlocked("BLOCKED_D1_STORAGE_HARD_STOP")
+            self._reserved_reads_day += p.rows_read_per_query
+            self._reserved_writes_day += p.rows_written_per_query
+            self._reserved_storage_bytes += p.storage_growth_per_query_bytes
+
+    def _validate_evidence(self, now_ms: int) -> None:
+        s, p = self.snapshot, self.policy
+        policy_values = (
+            p.max_evidence_age_ms,
+            p.request_timeout_reserve_ms,
+            p.rows_read_per_day,
+            p.rows_written_per_day,
+            p.storage_bytes_total,
+            p.rows_read_per_query,
+            p.rows_written_per_query,
+            p.storage_growth_per_query_bytes,
+        )
+        if any(type(value) is not int or value <= 0 for value in policy_values):
+            raise BudgetBlocked("BLOCKED_D1_USAGE_POLICY_INVALID")
+        if p.max_evidence_age_ms <= p.request_timeout_reserve_ms:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_POLICY_INVALID")
+        if not s.account_wide or not s.reservation_coverage_complete:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_INCOMPLETE")
+        evidence_values = (
+            s.observed_at_ms,
+            s.measured_through_ms,
+            s.rows_read_day,
+            s.rows_written_day,
+            s.storage_bytes,
+            s.pending_rows_read_day,
+            s.pending_rows_written_day,
+            s.pending_storage_bytes,
+        )
+        if any(type(value) is not int or value < 0 for value in evidence_values):
+            raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_UNKNOWN")
+        if type(now_ms) is not int or now_ms < 0:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_CLOCK_INVALID")
+        observed_age = now_ms - s.observed_at_ms
+        coverage_age = now_ms - s.measured_through_ms
+        if observed_age < 0 or coverage_age < 0:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_FROM_FUTURE")
+        usable_age = p.max_evidence_age_ms - p.request_timeout_reserve_ms
+        if max(observed_age, coverage_age) > usable_age:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_STALE")
 
 
 class _NoRedirect(HTTPRedirectHandler):
