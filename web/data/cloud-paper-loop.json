@@ -14,7 +14,8 @@
     "attempt": null,
     "head_sha": null,
     "report_status": null,
-    "report_artifact": null
+    "report_artifact": null,
+    "decision_trace_status": "NOT_AVAILABLE_NO_OFFICIAL_RUN"
   },
   "strategy": {
     "registry_status": "EMPTY_NO_ELIGIBLE_STRATEGIES",
@@ -41,8 +42,10 @@
   "budget": {
     "monthly_budget_usd": 0,
     "account_wide_usage_evidence": "MISSING",
-    "reservation_guard": "NOT_IMPLEMENTED",
-    "state": "BLOCKED_BUDGET"
+    "reservation_guard": "R2_ADAPTER_HOOKS_IMPLEMENTED_CLOUD_LOOP_NOT_WIRED",
+    "state": "BLOCKED_BUDGET",
+    "d1_reservation_ledger": "PRIMITIVE_PREPARED_NOT_PROVISIONED_OR_WIRED",
+    "d1_free_tier_usage_evidence": "MISSING"
   },
   "model_quality": "REJECT",
   "boundary": {
@@ -52,5 +55,9 @@
     "holdout_access": false,
     "source_switch": false,
     "model_promotion": false
+  },
+  "production": {
+    "entrypoint_workflow": "NOT_WIRED",
+    "natural_schedule": "NOT_CONFIGURED"
   }
 }
