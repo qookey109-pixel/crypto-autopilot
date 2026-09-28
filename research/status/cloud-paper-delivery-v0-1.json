@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-29",
-  "evidence_basis_parent_main_sha": "cb22d3c3905a079eb754f0fab6d917923512f624",
+  "evidence_basis_parent_main_sha": "f26ac2d0971bc9b147ad788a8c401469422a0ad0",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -32,7 +32,8 @@
     "qualified_candidate_adapter": "PR614_MERGED; VERSIONED_REGISTRY_AND_MARKET_ROUTE_LINEAGE_GATES_CONNECTED; PR622_CI_ONLY_QUALIFIED_FIXTURE_THROUGH_SAME_COMPOSITION_ENTRY_EXIT_ACCOUNT_ADVANCEMENT_PERSISTENCE_NEXT_NO_TRADE; PRODUCTION_REGISTRY_EMPTY",
     "storage_policy": "PR616_MERGED; PR_HEAD_PYTHON_312_313_RUFF_WORKFLOW_STATIC_CODEQL_DEPENDENCY_PASS; POST_MERGE_CI_CODEQL_DEPENDENCY_AND_FREEZE_GUARD_PASS",
     "dashboard_capacity_projection": "PR618_MERGED; DISTINGUISHES_NOT_RUN_EMPTY_REGISTRY_REGIME_UNAVAILABLE_BLOCKED_BUDGET_AND_UNKNOWN_STORAGE; MEASURED_STORAGE_NULL; DOES_NOT_ACTIVATE_RUNTIME",
-    "composition_positive_cycle": "PR622_MERGED_MAIN_CB22D3C; PR_HEAD_PYTHON_312_313_WORKFLOW_STATIC_CODEQL_DEPENDENCY_SBOM_PASS; POST_MERGE_CI_CODEQL_DEPENDENCY_SBOM_FREEZE_GUARD_PASS; SYNTHETIC_TEST_ONLY; NO_RUNTIME_AUTHORITY"
+    "composition_positive_cycle": "PR622_MERGED_MAIN_CB22D3C; PR_HEAD_PYTHON_312_313_WORKFLOW_STATIC_CODEQL_DEPENDENCY_SBOM_PASS; POST_MERGE_CI_CODEQL_DEPENDENCY_SBOM_FREEZE_GUARD_PASS; SYNTHETIC_TEST_ONLY; NO_RUNTIME_AUTHORITY",
+    "engineering_ci_acceptance_matrix": "PASS_ON_PR622_AND_POST_MERGE_MAIN_CI; POSITIVE_NO_TRADE_REJECT_STALE_DATA_BUDGET_REPLAY_CONCURRENCY_RECOVERY_PARTIAL_SETTLEMENT; SYNTHETIC_ONLY"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING; readiness run 36471242643 blocked on missing read-only credential; zero Cloudflare requests; one-time audit authority unconsumed.",
@@ -420,5 +421,43 @@
     "production_usage_calibrated": false,
     "account_wide_all_writer_coverage_proven": false
   },
-  "production_cycle_status": "NOT_RUN"
+  "production_cycle_status": "NOT_RUN",
+  "latest_documentation_sync": {
+    "pull_request": 623,
+    "pr_head_sha": "af4bd4553a08988ee3ea5bd2e243644045ad0017",
+    "merged_main_sha": "f26ac2d0971bc9b147ad788a8c401469422a0ad0",
+    "changed_runtime_or_authority": false,
+    "post_merge_main_ci_run_id": 36487609826,
+    "python_3_12": "SUCCESS",
+    "python_3_13": "SUCCESS",
+    "codeql_run_id": 36487609822,
+    "codeql": "SUCCESS",
+    "dependency_sbom_run_id": 36487609879,
+    "dependency_sbom": "SUCCESS",
+    "freeze_guard_run_id": 36487609927,
+    "freeze_guard": "SUCCESS",
+    "pages_run_id": 36487609824,
+    "pages_build": "SUCCESS",
+    "pages_deploy": "SKIPPED_DOCUMENTATION_ONLY",
+    "browser_production": "SKIPPED_DOCUMENTATION_ONLY"
+  },
+  "engineering_ci_acceptance_matrix": {
+    "evidence_code_commit": "cb22d3c3905a079eb754f0fab6d917923512f624",
+    "code_commit_ci_run_id": 36485948145,
+    "documentation_sync_main": "f26ac2d0971bc9b147ad788a8c401469422a0ad0",
+    "documentation_sync_main_ci_run_id": 36487609826,
+    "python_3_12": "PASS",
+    "python_3_13": "PASS",
+    "scenarios": {
+      "qualified_entry_exit_account_persistence_next_no_trade": "PASS_TEST_ONLY",
+      "empty_registry_no_trade_and_core100_reject_before_external_work": "PASS_SYNTHETIC_CI",
+      "stale_unclosed_duplicate_holdout_and_budget_rejection": "PASS_SYNTHETIC_CI",
+      "duplicate_slot_and_identical_settlement_replay": "PASS_SYNTHETIC_CI",
+      "concurrent_duplicate_slot_reservation": "PASS_SYNTHETIC_D1_LEDGER",
+      "restart_recovery_and_failed_settlement_reservation_retention": "PASS_SYNTHETIC_CI"
+    },
+    "production_cycle": "NOT_RUN",
+    "cloudflare_account_usage_and_headroom": "UNVERIFIED",
+    "natural_schedule": "NOT_ESTABLISHED"
+  }
 }
