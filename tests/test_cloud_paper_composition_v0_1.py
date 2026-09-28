@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from dataclasses import dataclass
 from datetime import UTC, datetime
 
 from crypto_autopilot.models import BookTicker, Candle, MarketTicker
@@ -62,6 +63,11 @@ class FakeClient:
         raise AssertionError("empty-registry no-trade path must not fetch trades")
 
 
+@dataclass
+class Receipt:
+    replayed: bool
+
+
 class MemoryStore:
     def __init__(self):
         self.objects = {}
@@ -84,9 +90,9 @@ class MemoryStore:
         if key in self.objects:
             if self.objects[key] != dict(payload):
                 raise ValueError("immutable collision")
-            return {"replayed": True}
+            return Receipt(True)
         self.objects[key] = dict(payload)
-        return {"replayed": False}
+        return Receipt(False)
 
     def put_json_if_absent(self, kind, object_id, payload):
         self.calls.append(("put_if_absent", kind, object_id))
@@ -94,7 +100,7 @@ class MemoryStore:
         if key in self.objects:
             raise PaperRunObjectAlreadyExistsError("already claimed")
         self.objects[key] = dict(payload)
-        return {"replayed": False}
+        return Receipt(False)
 
 
 REGISTRY = {
