@@ -15,6 +15,11 @@ from crypto_autopilot.paper.cloud_budget_v0_1 import (
     CloudBudgetGuard,
     R2UsageSnapshot,
 )
+from crypto_autopilot.paper.cloud_candidate_adapter_v0_1 import (
+    CloudCandidateRegistryBlocked,
+    select_qualified_candidates,
+    validate_strategy_registry,
+)
 from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
     D1SlotReservation,
     SlotUsage,
@@ -109,19 +114,33 @@ class CloudPaperNoTradeComposition:
         if not isinstance(self.run_name, str) or not self.run_name:
             raise ValueError("run_name is required")
 
-    def _require_empty_production_registry(self) -> None:
-        registry = self.strategy_registry
-        if (
-            registry.get("schema") != "qookey-cloud-paper-strategy-registry-v0.1"
-            or registry.get("status") != "EMPTY_NO_ELIGIBLE_STRATEGIES"
-            or registry.get("model_quality") != "REJECT"
-            or registry.get("production_fixture_admission") is not False
-            or registry.get("automatic_promotion") is not False
-            or registry.get("strategies") != []
-        ):
+    def _validate_strategy_registry(self) -> None:
+        try:
+            validate_strategy_registry(self.strategy_registry)
+        except CloudCandidateRegistryBlocked:
             raise CloudPaperCompositionBlocked(
                 "PRODUCTION_STRATEGY_AUTHORITY_UNAVAILABLE"
-            )
+            ) from None
+
+    def _select_candidates(
+        self,
+        market: Mapping[str, object],
+        state: Mapping[str, object],
+    ) -> tuple[Mapping[str, object], ...]:
+        selection = select_qualified_candidates(
+            market,
+            state,
+            self.strategy_registry,
+            allowed_base_assets=self.allowed_base_assets,
+        )
+        # run_cloud_step materializes market as a dict before invoking this
+        # callback, so selection state and rejection reasons are persisted with
+        # the same immutable Paper report.
+        if not isinstance(market, dict):
+            raise CloudPaperCompositionBlocked("MARKET_REPORT_NOT_MUTABLE")
+        market["execution_selection_status"] = selection.status
+        market["execution_selection_reasons"] = list(selection.reasons)
+        return selection.candidates
 
     def _reserve_provider_request(self) -> None:
         self.before_external()
@@ -211,9 +230,9 @@ class CloudPaperNoTradeComposition:
                 "persistent_state_writes_performed": 0,
             }
 
-        # This composition may only exercise the currently approved empty
-        # production registry. Synthetic positive-path candidates remain in CI.
-        self._require_empty_production_registry()
+        # Validate registry authority before any D1, provider, or R2 access.
+        # The current empty registry remains a normal no-trade configuration.
+        self._validate_strategy_registry()
 
         if self.reservation_ledger is None or self.d1_usage_guard is None:
             raise CloudPaperCompositionBlocked(
@@ -260,7 +279,9 @@ class CloudPaperNoTradeComposition:
             store=self.store,
             feed=feed,
             market_supplier=market_supplier,
-            candidate_supplier=lambda market, state: (),
+            candidate_supplier=lambda market, state: self._select_candidates(
+                market, state,
+            ),
             strategy_registry=self.strategy_registry,
             before_external=self.before_external,
             run_name=self.run_name,
@@ -268,6 +289,10 @@ class CloudPaperNoTradeComposition:
         # Only a completely returned, immutable/readback-verified Paper result
         # may release unused reservation. Exceptions leave the full envelope in
         # RESERVED for explicit recovery; settlement errors propagate unchanged.
+        if result.get("state") in {"REVIEW_REQUIRED", "REPLAYED"}:
+            # Keep the complete D1 reservation when the report needs review or
+            # the slot already committed. Never infer usage from a replay.
+            return result
         if result.get("state") not in {"COMMITTED", "NO_TRADE"}:
             raise CloudPaperCompositionBlocked("PAPER_RESULT_NOT_SETTLEABLE")
         self.d1_usage_guard.validate_evidence()
