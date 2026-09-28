@@ -1,19 +1,19 @@
 # 專案接續與排程手冊
 
-更新：2026-09-27。適用任何能讀取 Repository 與 GitHub metadata 的模型.
+更新：2026-09-28。適用任何能讀取 Repository 與 GitHub metadata 的模型.
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
 ## Cloud Paper 短期交付狀態 — 2026-09-28
 
-目前正式基準為 [main `39c9e8cb7b5ae98b3951fbad7e71ff6be814a8e5`](https://github.com/qookey109-pixel/crypto-autopilot/commit/39c9e8cb7b5ae98b3951fbad7e71ff6be814a8e5)。短期交付範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)；狀態機見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。
+查核基準：[PR #587 合併後 main `2154a1201059ef16a650c9bb9d52e757ccbcc196`](https://github.com/qookey109-pixel/crypto-autopilot/commit/2154a1201059ef16a650c9bb9d52e757ccbcc196)。短期範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)，狀態機見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。開始新工作仍要重讀最新 main。
 
-- 完成：主循環與市場 adapter、empty-registry no-trade composition、合成完整循環測試、Dashboard 空狀態與 Pages 桌機／手機驗證；PR #579 將行情和 R2 adapter 綁到同一 run-scoped guard；PR #581 同步交付計畫與機器狀態。
-- 未完成：共享帳戶 R2 用量證據、跨所有 writer 的完整 reservation coverage、D1 實際使用量證據及 ledger provisioning／runtime wiring、正式受控 main acceptance。生產入口與自然排程不存在，`config/cloud_paper_loop_v0_1.json` 的 `activation.enabled` 必須維持 false。
-- 下一個可直接執行的工程工作：只在 GitHub CI 用合成 evidence 完成 D1 ledger 與 composition 的接線和拒絕／重播／部分失敗測試。不得建立 D1、讀寫 R2、呼叫 provider、開 schedule 或啟用 runtime；正式使用前仍須有 account-wide FREE-ONLY evidence。
-- 研究邊界維持 `0 USD/month`、PAPER／LIVE-PAPER ONLY、holdout 關閉、source switch 關閉、promotion 關閉、real-money／live trading 關閉。模型品質仍是 `REJECT`；自然排程驗收不能由手動執行代替。
-- PR #578 是以舊 main 為 base 的 maintenance draft，需與 current main reconciliation 後再處理，不能直接合併。
-
+- 完成：主循環與市場 adapter、empty-registry no-trade composition、合成完整循環測試、Dashboard 空狀態與 Pages 桌機／手機驗證；PR #579 共用行情/R2 run-scoped guard；PR #585 D1 evidence/slot reservation composition interface；PR #587 concrete D1 evidence guard、逐 query REST client gate 與合成 CI。
+- 未完成：production D1 evidence snapshot source、跨 runner/workflow 的 atomic D1 reservation、settlement/failure recovery、D1 provisioning/production runner binding、共享帳戶 R2 用量與全 writer coverage、正式受控 main acceptance。Execution workflow 與自然排程不存在；`config/cloud_paper_loop_v0_1.json` 的 `activation.enabled` 必須保持 false。
+- PR #587 checks：head Python 3.12/3.13、workflow-static、CodeQL、dependency-security 全通過；post-merge Python 3.12/3.13、Freeze Guard、CodeQL、dependency-security 通過，workflow-static 因 workflow 未改變而 skipped。沒有 D1/R2/provider 存取；這不是正式用量或 runtime acceptance。
+- 下一個工程工作：在 GitHub CI 合成驗證 account-wide D1 evidence source contract、cross-run reservation/settlement/recovery 和 composition wiring；只有帳戶級 FREE-ONLY 證據、完整 writer coverage 與明確 runtime authority 都成立後，才考慮正式受控驗收。不得 provisioning/呼叫 D1、讀寫 R2、呼叫行情 provider、開 schedule 或啟用 runtime。
+- 固定邊界：`0 USD/month`、PAPER／LIVE-PAPER ONLY、holdout 關閉、source switch 關閉、promotion 關閉、real-money／live trading 關閉。模型品質仍為 `REJECT`。自然排程驗收不能由手動執行代替。
+- PR [#578](https://github.com/qookey109-pixel/crypto-autopilot/pull/578) 是舊 base `e80d2d27` 的 maintenance draft，先與 current main reconciliation，不直接合併。
 
 ## 1. 固定入口
 
