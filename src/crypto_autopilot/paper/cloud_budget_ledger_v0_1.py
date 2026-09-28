@@ -16,6 +16,7 @@ from typing import Protocol
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
+from crypto_autopilot.paper.cloud_loop_v0_1 import slot_id as canonical_cloud_slot_id
 from crypto_autopilot.paper.cloud_budget_v0_1 import (
     BudgetBlocked,
     CloudBudgetPolicy,
@@ -147,7 +148,10 @@ class D1UsagePolicy:
     rows_read_per_day: int = 4_000_000
     rows_written_per_day: int = 75_000
     storage_bytes_total: int = 4_000_000_000
-    rows_read_per_query: int = 25_000
+    # At most 31 * 96 = 2,976 canonical Paper slots are scanned; reserve
+    # 1,024 additional rows for query/index/metadata overhead and fail closed
+    # when Cloudflare reports more than this bound.
+    rows_read_per_query: int = 4_000
     rows_written_per_query: int = 10
     storage_growth_per_query_bytes: int = 16_384
 
@@ -368,7 +372,7 @@ class CloudflareD1QueryClient:
 class D1LedgerLimits:
     max_evidence_age_ms: int = 60_000
     request_timeout_reserve_ms: int = 10_000
-    max_rows_read_per_request: int = 25_000
+    max_rows_read_per_request: int = 4_000
     max_rows_written_per_request: int = 10
     max_reservations: int = 100_000
 
@@ -544,6 +548,12 @@ class D1CloudBudgetLedger:
             raise BudgetBlocked("BLOCKED_BUDGET_SLOT_ID_INVALID")
         if type(now_ms) is not int or now_ms < 0:
             raise BudgetBlocked("BLOCKED_BUDGET_CLOCK_INVALID")
+        try:
+            expected_slot_id = canonical_cloud_slot_id(now_ms)
+        except ValueError:
+            raise BudgetBlocked("BLOCKED_BUDGET_SLOT_ID_INVALID") from None
+        if slot_id != expected_slot_id:
+            raise BudgetBlocked("BLOCKED_BUDGET_SLOT_ID_INVALID")
         if not snapshot.account_wide or not snapshot.reservation_coverage_complete:
             raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_INCOMPLETE")
         numeric = (
