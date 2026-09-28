@@ -40,6 +40,5 @@
       "mobile-chromium"
     ],
     "inactive_state_assertion": "PASS"
-  },
-  "activation": "BLOCKED_BUDGET_EVIDENCE_AND_CONTROLLED_ACCEPTANCE"
+  }
 }
