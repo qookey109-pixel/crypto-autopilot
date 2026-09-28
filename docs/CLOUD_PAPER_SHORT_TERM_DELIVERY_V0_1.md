@@ -1,8 +1,9 @@
 # Crypto Autopilot 短期交付目標
 
 - 文件日期：2026-09-29
-- 最新文件同步：PR #626 合併至 main `9d897b6d4fb7f7c783170c4c3bbf7bcbc4ca1e08`；文件更新未改 runtime 或 authority。
-- PR #626 合併後 CI [36490182195](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182195)、CodeQL [36490182214](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182214)、Dependency/SBOM [36490182254](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182254)、Freeze Guard [36490182675](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182675) 均成功。Pages [36490182321](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182321) build 成功；deploy/browser-production 因文件變更跳過。
+- 本次文件查核基準：PR #628 已合併後 main `245504769e678174512b88bc91b2d362c483c889`；此文件不授予 runtime 或資料存取權限。
+- PR #628 exact head `3e2c67b0848eb541c43f54a47f7c6edb267a5632` 的 CI [36493558502](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493558502)、CodeQL [36493558486](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493558486)、Dependency/SBOM [36493558471](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493558471) 通過；main CI [36493744676](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493744676)、CodeQL [36493744613](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493744613)、Dependency/SBOM [36493744586](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493744586)、Freeze Guard [36493744563](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493744563) 均成功。此 PR 未改網站，Pages 未觸發。
+- PR #628 加入 repo-source-only D1 REST client 邊界檢查；帳戶級用量新鮮度與外部 writer 覆蓋仍未證明。
 - Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pixel/crypto-autopilot)
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
 - 歷史證據基準：PR #614 合併至 main `abda84a45de66dc214be40ce05ee0c2ccb79e415`；PR #618 Dashboard 部署證據維持獨立記錄。
