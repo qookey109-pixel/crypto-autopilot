@@ -1,8 +1,8 @@
 # Crypto Autopilot 短期交付目標
 
 - 文件日期：2026-09-29
-- 最新文件同步：PR #625 合併至 main `5efdc045690b320aed47a68e5ff52f0119f912a0`；文件更新未改 runtime 或 authority。
-- PR #625 合併至 main `5efdc045690b320aed47a68e5ff52f0119f912a0`，未改 runtime 或 authority。CI、CodeQL、Dependency/SBOM、Freeze Guard 均成功；Pages build 成功，deploy 與 browser-production 因文件變更而跳過；workflow-static 因未改 workflow 而跳過。
+- 最新文件同步：PR #626 合併至 main `9d897b6d4fb7f7c783170c4c3bbf7bcbc4ca1e08`；文件更新未改 runtime 或 authority。
+- PR #626 合併後 CI [36490182195](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182195)、CodeQL [36490182214](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182214)、Dependency/SBOM [36490182254](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182254)、Freeze Guard [36490182675](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182675) 均成功。Pages [36490182321](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36490182321) build 成功；deploy/browser-production 因文件變更跳過。
 - Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pixel/crypto-autopilot)
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
 - 歷史證據基準：PR #614 合併至 main `abda84a45de66dc214be40ce05ee0c2ccb79e415`；PR #618 Dashboard 部署證據維持獨立記錄。
