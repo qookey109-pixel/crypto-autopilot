@@ -912,6 +912,8 @@ function renderCloudRuns(report) {
 function renderCloudPaperLoop(data) {
   const status = document.querySelector("#cloud-paper-status");
   const detail = document.querySelector("#cloud-paper-detail");
+  const traceStatus = document.querySelector("#cloud-paper-trace-status");
+  const traceDetail = document.querySelector("#cloud-paper-trace-detail");
   const set = (selector, value) => {
     const node = document.querySelector(selector);
     if (node) node.textContent = value;
@@ -922,13 +924,23 @@ function renderCloudPaperLoop(data) {
     && data.activation?.enabled === false
     && data.strategy?.registry_status === "EMPTY_NO_ELIGIBLE_STRATEGIES"
     && data.latest_run?.status === "NOT_RUN"
+    && data.latest_run?.decision_trace_status === "NOT_AVAILABLE_NO_OFFICIAL_RUN"
     && data.model_quality === "REJECT"
     && data.budget?.account_wide_usage_evidence === "MISSING"
-    && data.budget?.reservation_guard === "NOT_IMPLEMENTED";
+    && data.budget?.reservation_guard === "R2_ADAPTER_HOOKS_IMPLEMENTED_CLOUD_LOOP_NOT_WIRED"
+    && data.budget?.d1_reservation_ledger === "PRIMITIVE_PREPARED_NOT_PROVISIONED_OR_WIRED"
+    && data.budget?.d1_free_tier_usage_evidence === "MISSING"
+    && data.production?.entrypoint_workflow === "NOT_WIRED"
+    && data.production?.natural_schedule === "NOT_CONFIGURED";
   if (!valid) {
     if (status) status.textContent = "無法核實";
     if (status) status.className = "badge danger";
     if (detail) detail.textContent = "循環狀態投影缺失或契約不符；不顯示為已執行。";
+    if (traceStatus) {
+      traceStatus.textContent = "無法核實";
+      traceStatus.className = "badge danger";
+    }
+    if (traceDetail) traceDetail.textContent = "逐市場決策軌跡投影缺失或契約不符。";
     set("#cloud-paper-last-run", "未核實");
     set("#cloud-paper-candidates", "未核實");
     set("#cloud-paper-regime", "未核實");
@@ -942,14 +954,21 @@ function renderCloudPaperLoop(data) {
     status.className = "badge neutral";
   }
   if (detail) {
-    detail.textContent = "循環協調器與全路徑 CI 已合併；正式 provider/R2 執行及自然排程尚未啟用。正式策略登錄目前為空，因此執行後應回報 NO_TRADE。";
+    detail.textContent = "正式 provider/R2 執行與自然排程尚未接線。R2 預約 adapter 已實作但未接入循環，D1 原語尚未佈署；共享用量與 D1 額度證據缺失。正式策略登錄為空，故目前不得建立倉位。";
+  }
+  if (traceStatus) {
+    traceStatus.textContent = "尚無正式循環報告";
+    traceStatus.className = "badge neutral";
+  }
+  if (traceDetail) {
+    traceDetail.textContent = "最新正式 run 為 NOT_RUN；逐市場決策軌跡尚無資料。合成 CI 證據不會投影成正式市場決策。";
   }
   set("#cloud-paper-last-run", "尚未執行");
   set("#cloud-paper-candidates", "NO_TRADE · 空策略登錄");
   set("#cloud-paper-regime", "REGIME_UNAVAILABLE · 等待資料來源授權");
   set("#cloud-paper-account", "尚未初始化");
   set("#cloud-paper-positions", "持倉與損益尚無正式證據");
-  set("#cloud-paper-budget", "BLOCKED · 等待額度閘門");
+  set("#cloud-paper-budget", "BLOCKED · 預約接線與用量證據待補");
 }
 
 async function loadData() {
