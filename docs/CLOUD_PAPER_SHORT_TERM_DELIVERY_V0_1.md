@@ -131,6 +131,8 @@ TradingAgents 保留既有研究定位，後續另行評估。
 
 ## 9. 下一個可直接開始的工作
 
-PR [#579](https://github.com/qookey109-pixel/crypto-autopilot/pull/579) 已將 Pionex 行情與 R2 保存接到同一 run-scoped budget guard；PR [#585](https://github.com/qookey109-pixel/crypto-autopilot/pull/585) 再要求 composition 在任何 provider/R2 存取前取得 D1 用量證據閘門與 per-slot 原子預留。#585 的合成 CI 證明缺少證據、預留被拒及重複 slot 都會在 provider/R2 前停止。
+PR [#579](https://github.com/qookey109-pixel/crypto-autopilot/pull/579) 將 Pionex 行情與 R2 保存接到同一 run-scoped guard；PR [#585](https://github.com/qookey109-pixel/crypto-autopilot/pull/585) 加上 D1 usage-evidence preflight 與 per-slot reservation interface；PR [#587](https://github.com/qookey109-pixel/crypto-autopilot/pull/587) 完成 concrete D1 evidence guard、composition preflight 及 Cloudflare D1 REST client 的逐 query guard。#587 的 PR head 與 post-merge 必要 CI 均通過。
 
-目前尚未把 production Cloudflare D1 client、真實帳戶級 D1 用量證據來源或 reservation settlement/recovery 接到正式 runner；帳戶級 R2 用量與所有 writer coverage 也未證實。因此不勾選 P0 完成、不啟用 runtime，也不做受控 main acceptance。下一步是在不呼叫 D1 的 CI 合成路徑中完成 D1 使用量快照驗證、reservation settlement/failure recovery 和正式 composition wiring，並保留 0 USD hard stop。合成快照不等於正式帳戶預算證據；在帳戶級證據及啟用條件具備前保持 runtime disabled。
+接下來尚需建立可信的帳戶級 D1 usage evidence source，以及涵蓋所有 D1 writers 的跨 runner/workflow atomic reservation、settlement 與 failure recovery。現有 guard 的 reservation 只在單一 instance 累計；Cloudflare D1 client 尚未綁定 production runner，D1 尚未 provisioning，R2 account-wide usage/headroom 和完整 writer coverage 也未證明。
+
+因此 P0 預算與保存批次仍未完成，不啟用 runtime、不做受控 main acceptance。下一批先用 GitHub CI 合成驗證 D1 usage evidence provider contract、跨執行 reservation/settlement/recovery 與 composition wiring；只有完成獨立 account-wide FREE-ONLY evidence 和所有 writer coverage 後，才可另行進行任何 production D1/R2 驗收。不得以合成證據取代正式帳戶用量資料。

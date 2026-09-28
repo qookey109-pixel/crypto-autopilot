@@ -2,19 +2,19 @@
 
 Updated: 2026-09-28. This is the single human entrypoint for the current project checkpoint.
 
-## Cloud Paper current checkpoint — after PR #585
+## Cloud Paper current checkpoint — after PR #587
 
-查核基準：`main=9fbe37f622d716d3492444c87c09eac3147ee0a0`（2026-09-28）。本節為目前摘要；下方較早的逐 PR 記錄仍是歷史證據。
+查核基準：本次狀態依 PR [#587](https://github.com/qookey109-pixel/crypto-autopilot/pull/587) 合併後 main `2154a1201059ef16a650c9bb9d52e757ccbcc196` 建立；文件合併後仍須即時重查 main。下方較早逐 PR 記錄保留作歷史證據。
 
-- [短期交付目標](docs/CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md) 為交付範圍與驗收清單；PR [#581](https://github.com/qookey109-pixel/crypto-autopilot/pull/581) 同步機器狀態，PR [#585](https://github.com/qookey109-pixel/crypto-autopilot/pull/585) 將 composition 接上必需的 per-slot 原子預留介面。PR [#579](https://github.com/qookey109-pixel/crypto-autopilot/pull/579) 已將 Pionex 請求及 R2 adapter 接到同一 run-scoped budget guard。
-- PR #585 exact head 的 Python 3.12／3.13、workflow-static、CodeQL、dependency-security 全通過。合併後 main 的 Python 3.12／3.13、CodeQL、Freeze Guard、dependency-security 通過；workflow-static 因 workflow 未變更而 skipped。合成測試覆蓋缺少 D1 證據／ledger、預留拒絕與重複 slot 在 provider/R2 前停止。
-- 合成完整循環 CI 為 PASS，含正向模擬成交／出場、正常 `NO_TRADE`、重播與重啟、行情缺口拒絕、provider 預算阻擋等測試。最近一次 Pages production browser 驗證為 run [36414198068](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36414198068)，合併 #583 時 desktop/mobile browser 成功；後續 #584 與 #585 未修改 Dashboard UI。
-- Cloud Paper 仍 `activation.enabled=false`。策略 registry 為空、模型品質 `REJECT`、macro regime `REGIME_UNAVAILABLE`。帳戶級 R2 用量證據、所有帳戶 writer 的 reservation coverage、實際 D1 用量證據、D1 provisioning／production adapter 綁定／settlement、正式 main 受控驗收仍未完成；自然排程也未建立。
-- PR #585 僅接上可注入的預留介面與 D1 證據閘門；沒有 production D1 client 或用量快照來源接入。這是合成 CI 證據，不是正式帳戶級零費用證據。
-- 本輪沒有執行 provider、R2、D1、training、holdout 或排程 runtime；沒有新增 authority。不得將 CI 成功解讀成策略有效或交易授權。
-- 開放中的 PR #578 是舊 base `e80d2d27` 的 maintenance draft；不要直接合併，先把它的文件快照與目前 main 證據 reconciliation。
+- [短期交付目標](docs/CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md) 是交付範圍與驗收清單；PR [#587](https://github.com/qookey109-pixel/crypto-autopilot/pull/587) 新增 D1 account-wide usage evidence guard、要求 Cloudflare D1 REST client 每次 HTTP query 前預留，並讓 composition 在 per-slot reservation 前驗證證據。
+- PR #587 exact head `4bf7b27a438d571b8306d005bd828369a62b9e80` 的 Python 3.12、Python 3.13、workflow-static、CodeQL、dependency-security 全通過。合併後 main 的 Python 3.12／3.13、CodeQL、Freeze Guard、dependency-security 全通過；workflow-static 因 workflow 未變更而 skipped。沒有啟動 Pages deploy/browser-production。
+- 合成測試驗證 D1 evidence 缺漏、不完整、過期、未來時間、格式錯誤、每日讀寫額度與 storage hard stop；D1 guard 拒絕時不建立 HTTP opener。合成測試不讀取 Cloudflare 帳戶資料。
+- Cloud Paper 仍 `activation.enabled=false`。模型品質 `REJECT`、production strategy registry 為空、macro regime `REGIME_UNAVAILABLE`。帳戶級 D1 用量來源、跨 runner/workflow 的原子 D1 預留與全 writer 覆蓋、D1 使用量 settlement／失敗恢復、production provisioning/binding、帳戶級 R2 用量證據、正式 main 受控驗收均未完成；execution workflow 與自然排程未建立。
+- PR #587 的 query guard 需要外部注入 account-wide evidence，預留只在 guard instance 內累計；不能當成跨執行共享 ledger，也不能證明真正免費額度。storage_growth_per_query_bytes 是保守專案預留值，不是量測出的 row/index 大小。
+- 本輪沒有執行 provider、R2、D1、training、holdout 或排程 runtime，也沒有新增資料存取或交易 authority。CI 通過不代表策略有效或可交易。
+- 開放中的 PR [#578](https://github.com/qookey109-pixel/crypto-autopilot/pull/578) 仍以舊 base `e80d2d27` 為基礎；須先與 current main reconciliation，不直接合併。
 
-下一個工程批次：完成 concrete D1 usage-evidence guard、Cloudflare D1 adapter 綁定與 reservation settlement／failure recovery 的合成驗收；正式 D1/R2 使用仍需帳戶級免費額度證據與完整 writer 覆蓋，且啟用設定保持關閉。
+下一步：完成 D1 account-wide usage evidence 的可信來源與跨 workflow 原子預留／settlement／失敗恢復設計及合成 CI；同步盤點 R2 全 writer headroom。production adapter、受控 main acceptance 或排程都須等帳戶級零費用證據與完整 reservation coverage，`activation.enabled` 持續為 `false`。
 
 ## Live Cloud Paper checkpoint — 2026-09-28
 
