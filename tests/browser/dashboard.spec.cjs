@@ -262,7 +262,8 @@ test("cloud paper dashboard shows inactive state without inventing account evide
   await expect(page.locator("#cloud-paper-status")).toHaveText("已實作 · 尚未啟用");
   await expect(page.locator("#cloud-paper-last-run")).toHaveText("尚未執行");
   await expect(page.locator("#cloud-paper-candidates")).toHaveText("NO_TRADE · 空策略登錄");
-  await expect(page.locator("#cloud-paper-regime")).toHaveText("REGIME_UNAVAILABLE · 等待資料來源授權");
+  await expect(page.locator("#cloud-paper-regime")).toHaveText("REGIME_UNAVAILABLE · 缺 TOTAL3 / BTC dominance；23 市場 breadth 覆蓋未驗證");
+  await expect(page.locator(".cloud-paper-panel")).toContainText("固定 23 市場 breadth 成員已準備，歷史覆蓋仍未驗證");
   await expect(page.locator("#cloud-paper-account")).toHaveText("尚未初始化");
   await expect(page.locator("#cloud-paper-budget")).toHaveText("BLOCKED · 預約接線與用量證據待補");
   await expect(page.locator("#cloud-paper-trace-status")).toHaveText("尚無正式循環報告");

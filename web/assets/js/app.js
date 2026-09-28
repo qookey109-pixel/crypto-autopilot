@@ -925,6 +925,11 @@ function renderCloudPaperLoop(data) {
     && data.strategy?.registry_status === "EMPTY_NO_ELIGIBLE_STRATEGIES"
     && data.latest_run?.status === "NOT_RUN"
     && data.latest_run?.decision_trace_status === "NOT_AVAILABLE_NO_OFFICIAL_RUN"
+    && data.market?.provider === "PIONEX_PUBLIC"
+    && data.market?.pionex_public_market_data_api_key_required === false
+    && data.market?.unavailable_fields?.includes("ALIGNED_BREADTH")
+    && data.market?.breadth_coverage?.status === "PREPARED_CANDIDATE_MEMBERSHIP_ONLY_COVERAGE_UNVERIFIED"
+    && data.market?.breadth_coverage?.coverage_verified === false
     && data.model_quality === "REJECT"
     && data.budget?.account_wide_usage_evidence === "MISSING"
     && data.budget?.reservation_guard === "R2_ADAPTER_HOOKS_IMPLEMENTED_CLOUD_LOOP_NOT_WIRED"
@@ -965,7 +970,7 @@ function renderCloudPaperLoop(data) {
   }
   set("#cloud-paper-last-run", "尚未執行");
   set("#cloud-paper-candidates", "NO_TRADE · 空策略登錄");
-  set("#cloud-paper-regime", "REGIME_UNAVAILABLE · 等待資料來源授權");
+  set("#cloud-paper-regime", "REGIME_UNAVAILABLE · 缺 TOTAL3 / BTC dominance；23 市場 breadth 覆蓋未驗證");
   set("#cloud-paper-account", "尚未初始化");
   set("#cloud-paper-positions", "持倉與損益尚無正式證據");
   set("#cloud-paper-budget", "BLOCKED · 預約接線與用量證據待補");
