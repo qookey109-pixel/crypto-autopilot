@@ -215,8 +215,6 @@ def decision_reason_codes(
     candidates: Sequence[object],
 ) -> tuple[str, ...]:
     """Summarize why a slot did or did not produce eligible paper candidates."""
-    if candidates:
-        return ("QUALIFIED_CANDIDATES",)
     reasons: list[str] = []
     if market.get("market_status") == "REVIEW_REQUIRED":
         reasons.append("MARKET_INPUT_REVIEW_REQUIRED")
@@ -227,11 +225,13 @@ def decision_reason_codes(
             if context_status == "REGIME_UNAVAILABLE"
             else "MARKET_CONTEXT_UNAVAILABLE"
         )
-    if not registrations:
+    if candidates:
+        reasons.append("QUALIFIED_CANDIDATES")
+    elif not registrations:
         reasons.append("NO_ELIGIBLE_STRATEGY")
-    if not reasons:
+    else:
         reasons.append("NO_QUALIFIED_CANDIDATE")
-    return tuple(reasons)
+    return tuple(dict.fromkeys(reasons))
 
 
 def run_cloud_step(
@@ -315,6 +315,9 @@ def run_cloud_step(
     )
     next_state = report["run_step"]["tick_report"]["next_state"]
     checkpoint = next_state["checkpoint_report"]
+    reasons = decision_reason_codes(
+        market=market, registrations=registrations, candidates=candidates,
+    )
     outcome = {
         "schema": "qookey-cloud-paper-loop-report-v0.1",
         "state": "COMMITTED" if candidates or state["active_session"] else "NO_TRADE",
@@ -328,12 +331,8 @@ def run_cloud_step(
             "status": "KNOWN",
         },
         "account": checkpoint["account_snapshot"],
-        "reason": decision_reason_codes(
-            market=market, registrations=registrations, candidates=candidates,
-        )[0],
-        "reason_codes": list(decision_reason_codes(
-            market=market, registrations=registrations, candidates=candidates,
-        )),
+        "reason": reasons[0],
+        "reason_codes": list(reasons),
         "authority": {"paper_only": True, "real_money_orders": False,
                       "holdout_access": False, "source_switch": False,
                       "model_promotion": False},
