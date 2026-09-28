@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sqlite3
 import threading
+from unittest.mock import patch
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -11,6 +12,7 @@ from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
     D1LedgerLimits,
     D1QueryResult,
     D1UsageGuard,
+    CloudflareD1QueryClient,
     D1UsagePolicy,
     D1UsageSnapshot,
     SlotUsage,
@@ -301,6 +303,25 @@ class D1UsageGuardTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_STORAGE_HARD_STOP"):
             guard.reserve_query()
         self.assertEqual(guard._reserved_storage_bytes, 0)
+
+
+    def test_cloudflare_client_reserves_usage_before_http_request(self):
+        class RejectingGuard:
+            def reserve_query(self):
+                raise BudgetBlocked("BLOCKED_D1_ROWS_READ_DAILY_LIMIT")
+
+        client = CloudflareD1QueryClient(
+            api_token="test-token",
+            account_id="a" * 32,
+            database_id="00000000-0000-0000-0000-000000000001",
+            usage_guard=RejectingGuard(),
+        )
+        with patch("crypto_autopilot.paper.cloud_budget_ledger_v0_1.build_opener") as opener:
+            with self.assertRaisesRegex(
+                BudgetBlocked, "BLOCKED_D1_ROWS_READ_DAILY_LIMIT"
+            ):
+                client.query("SELECT 1", ())
+        opener.assert_not_called()
 
     def test_invalid_policy_fails_closed(self):
         guard = self.make_guard(policy_changes={"request_timeout_reserve_ms": 60_000})
