@@ -189,7 +189,7 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
         first_slot = paper_slot_id(first_ms)
         ledger.reserve_slot(
             slot_id=first_slot, run_id="run-1",
-            now_ms=first_ms, snapshot=snapshot(at_ms=first_ms),
+            now_ms=first_ms, snapshot=snapshot(),
         )
         ledger.settle_slot(
             slot_id=first_slot,
@@ -198,12 +198,12 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
         )
         ledger.reserve_slot(
             slot_id=paper_slot_id(second_ms), run_id="run-2",
-            now_ms=second_ms, snapshot=snapshot(at_ms=second_ms),
+            now_ms=second_ms, snapshot=snapshot(),
         )
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
             ledger.reserve_slot(
                 slot_id=paper_slot_id(third_ms), run_id="run-3",
-                now_ms=third_ms, snapshot=snapshot(at_ms=third_ms),
+                now_ms=third_ms, snapshot=snapshot(),
             )
 
     def test_unsettled_slot_keeps_the_full_reservation(self):
