@@ -13,6 +13,8 @@ from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
     D1LedgerLimits,
     D1QueryResult,
     D1UsageGuard,
+    D1SharedRowsBudgetGuard,
+    D1SharedRowsBudgetPolicy,
     CloudflareD1QueryClient,
     D1UsagePolicy,
     D1UsageSnapshot,
@@ -42,6 +44,11 @@ RECOVERY_MIGRATION = (
     / "migrations"
     / "cloud_paper_settlement_recovery_v0_1.sql"
 ).read_text(encoding="utf-8")
+SHARED_ROWS_MIGRATION = (
+    Path(__file__).parents[1]
+    / "migrations"
+    / "cloud_paper_d1_shared_rows_budget_v0_1.sql"
+).read_text(encoding="utf-8")
 
 
 class SQLiteQueryClient:
@@ -50,7 +57,9 @@ class SQLiteQueryClient:
     def __init__(self) -> None:
         self.connection = sqlite3.connect(":memory:", check_same_thread=False)
         self.connection.row_factory = sqlite3.Row
-        self.connection.executescript(MIGRATION + "\n" + RECOVERY_MIGRATION)
+        self.connection.executescript(
+            MIGRATION + "\n" + RECOVERY_MIGRATION + "\n" + SHARED_ROWS_MIGRATION
+        )
         self.lock = threading.Lock()
         self.query_plans: list[str] = []
 
@@ -525,6 +534,97 @@ class D1UsageGuardTests(unittest.TestCase):
         guard = self.make_guard(policy_changes={"request_timeout_reserve_ms": 60_000})
         with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_USAGE_POLICY_INVALID"):
             guard.reserve_query()
+
+
+
+class D1SharedRowsBudgetGuardTests(unittest.TestCase):
+    def make_snapshot(self, **changes):
+        from dataclasses import replace
+
+        base = D1UsageSnapshot(
+            account_wide=True,
+            reservation_coverage_complete=True,
+            observed_at_ms=NOW,
+            measured_through_ms=NOW,
+            rows_read_day=0,
+            rows_written_day=0,
+            storage_bytes=0,
+        )
+        return replace(base, **changes)
+
+    def test_shared_daily_reservations_coordinate_independent_guard_instances(self):
+        client = SQLiteQueryClient()
+        policy = D1SharedRowsBudgetPolicy(
+            max_evidence_age_ms=60_000,
+            request_timeout_reserve_ms=10_000,
+            max_rows_read_per_query=10,
+            max_rows_written_per_query=2,
+            rows_read_per_day=40,
+            rows_written_per_day=8,
+            max_query_reservations_per_day=3,
+        )
+        left = D1SharedRowsBudgetGuard(policy=policy)
+        right = D1SharedRowsBudgetGuard(policy=policy)
+        evidence = self.make_snapshot()
+
+        left.reserve_query(execute=client.query, snapshot=evidence, now_ms=NOW)
+        right.reserve_query(execute=client.query, snapshot=evidence, now_ms=NOW)
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_SHARED_ROWS_BUDGET"):
+            left.reserve_query(execute=client.query, snapshot=evidence, now_ms=NOW)
+
+        row = client.connection.execute(
+            "SELECT baseline_rows_read, reserved_rows_read, reservation_count "
+            "FROM cloud_paper_d1_daily_rows_budget",
+        ).fetchone()
+        self.assertEqual(tuple(row), (0, 40, 2))
+
+    def test_shared_daily_guard_rejects_incomplete_or_stale_evidence_before_query(self):
+        client = SQLiteQueryClient()
+        guard = D1SharedRowsBudgetGuard()
+        cases = (
+            (
+                self.make_snapshot(reservation_coverage_complete=False),
+                NOW,
+                "BLOCKED_D1_USAGE_EVIDENCE_INCOMPLETE",
+            ),
+            (
+                self.make_snapshot(measured_through_ms=NOW - 50_001),
+                NOW,
+                "BLOCKED_D1_USAGE_EVIDENCE_STALE",
+            ),
+        )
+        for evidence, now_ms, expected in cases:
+            with self.subTest(expected=expected):
+                with self.assertRaisesRegex(BudgetBlocked, expected):
+                    guard.reserve_query(
+                        execute=client.query, snapshot=evidence, now_ms=now_ms,
+                    )
+        count = client.connection.execute(
+            "SELECT COUNT(*) FROM cloud_paper_d1_daily_rows_budget",
+        ).fetchone()[0]
+        self.assertEqual(count, 0)
+
+    def test_shared_daily_guard_detects_unaccounted_usage_growth(self):
+        client = SQLiteQueryClient()
+        guard = D1SharedRowsBudgetGuard(
+            policy=D1SharedRowsBudgetPolicy(
+                max_rows_read_per_query=10,
+                max_rows_written_per_query=2,
+                rows_read_per_day=100,
+                rows_written_per_day=100,
+            ),
+        )
+        guard.reserve_query(
+            execute=client.query, snapshot=self.make_snapshot(), now_ms=NOW,
+        )
+        changed = self.make_snapshot(rows_read_day=21)
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_SHARED_ROWS_BUDGET"):
+            guard.reserve_query(execute=client.query, snapshot=changed, now_ms=NOW)
+        row = client.connection.execute(
+            "SELECT reserved_rows_read, reservation_count "
+            "FROM cloud_paper_d1_daily_rows_budget",
+        ).fetchone()
+        self.assertEqual(tuple(row), (20, 1))
 
 
 if __name__ == "__main__":
