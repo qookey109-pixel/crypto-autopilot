@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "570e5179f4a09d9a1c17eb7b4df5bfbcce6b8224",
+  "evidence_basis_parent_main_sha": "77138c1b1ce7c4b99555c6c5f35eaf66dd82c26a",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -94,6 +94,33 @@
     ],
     "cause": "PIONEX_PUBLIC_EXCHANGE_DATA_DOES_NOT_SUPPLY_THE_REQUIRED_GLOBAL_CONTEXT; EXTERNAL_CONTEXT_NETWORK_CAPTURE_IS_CLOSED",
     "pionex_public_market_data_api_key_required": false,
-    "credential_workaround_authorized": false
+    "credential_workaround_authorized": false,
+    "source_decision_map": {
+      "path": "docs/GLOBAL_MARKET_CONTEXT_SOURCE_DECISION_V0_1.md",
+      "status": "PROPOSAL_ONLY_NO_SOURCE_AUTHORIZED_NO_NETWORK_CAPTURE",
+      "candidate_reviewed": "COINMARKETCAP_KEYLESS_PUBLIC_API",
+      "api_endpoint_calls_performed": 0,
+      "source_switch_authorized": false,
+      "metric_mapping": {
+        "btc_dominance": "FIELD_AVAILABLE_ALIGNMENT_NOT_YET_VERIFIED",
+        "total3": "NOT_EQUIVALENCE_VERIFIED",
+        "aligned_breadth": "NOT_DEFINED_OR_VERIFIED"
+      },
+      "conditional_budget_impact": {
+        "additional_requests_per_slot": 2,
+        "current_requests_per_run": 18,
+        "candidate_requests_per_run": 20,
+        "current_requests_per_utc_day": 1728,
+        "candidate_requests_per_utc_day": 1920,
+        "status": "EXCEEDS_V0_1_CEILINGS"
+      },
+      "next_gates": [
+        "provider terms and production use rights",
+        "keyless request limit and availability",
+        "TOTAL3 method equivalence",
+        "aligned breadth universe and timestamp contract",
+        "new versioned budget authority before any external access"
+      ]
+    }
   }
 }

@@ -4,7 +4,7 @@ Updated: 2026-09-28. This is the single human entrypoint for the current project
 
 ## Live Cloud Paper checkpoint — 2026-09-28
 
-Evidence basis before this documentation update: `main=570e5179f4a09d9a1c17eb7b4df5bfbcce6b8224`; this is the reviewed parent for the preflight run record, not a latest-main claim after this update.
+Evidence basis before this documentation update: `main=77138c1b1ce7c4b99555c6c5f35eaf66dd82c26a`; this is the reviewed parent for the global-context source decision map, not a latest-main claim after this update.
 
 - PR [#547](https://github.com/qookey109-pixel/crypto-autopilot/pull/547) merged at exact reviewed head `1fc09d255465abb22e5b4b6be833bcd2a8343db8`. It fixes monthly Class A/B reservations so each operation already reserved in the current run is counted before another is accepted.
 - Cloud CI passed on the PR head: Python 3.12, Python 3.13, workflow-static, dependency-security and CodeQL visibility. Post-merge Python 3.12/3.13, dependency-security, CodeQL visibility and critical-path freeze checks passed; workflow-static was skipped because workflow files were unchanged.
@@ -27,6 +27,7 @@ Evidence basis before this documentation update: `main=570e5179f4a09d9a1c17eb7b4
 - PR #547 closes the Class A/B reservation arithmetic defect; PR #553 adds bounded ledger recovery checks. No-trade reports now distinguish context, registry, and candidate-selection reasons. Cloud Paper activation remains disabled. Shared-account usage evidence, a complete atomic reservation ledger across all account writers, production workflow/entrypoint wiring, and controlled main acceptance remain incomplete. No Cloud Paper provider/R2 operation or natural schedule has started.
 - Current production strategy registry remains empty; Core100 quality remains `REJECT`; missing market regime remains `REGIME_UNAVAILABLE`. The valid production result is `NO_TRADE`, not an invented position.
 - `REGIME_UNAVAILABLE` is not caused by a missing Pionex API key. Public Pionex market data does not require a key, but the required global TOTAL3, BTC-dominance and aligned-breadth context is not supplied by Pionex endpoints; the existing context source registry remains prepared-only with network capture closed. See the Cloud Paper delivery section “Pionex API key and market-context clarification.”
+- The [global market-context source decision map](docs/GLOBAL_MARKET_CONTEXT_SOURCE_DECISION_V0_1.md) evaluates CoinMarketCap Keyless as proposal-only. A global-metrics plus breadth approach may require 2 extra calls per slot, exceeding V0.1's 18/run and 1,728/day ceilings; no provider endpoint has been called and no source/authority is selected.
 
 **PAPER / LIVE-PAPER ONLY.** The data pipelines and paper components exist; the current research results do not support model promotion or real trading. Continue cloud operational verification before expanding the research scope. User policy since 2026-09-25: all project work uses GitHub/cloud sources; local files, local testing and local cleanup are excluded.
 
