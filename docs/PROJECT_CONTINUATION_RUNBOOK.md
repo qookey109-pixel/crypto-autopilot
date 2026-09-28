@@ -4,15 +4,15 @@
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
-## Cloud Paper 短期交付狀態 — 2026-09-29（PR #612 合併後）
+## Cloud Paper 短期交付狀態 — PR #614 合併後
 
-查核基準：即時 main `df932f863354fa0047e0833ed29163e8e47f0c3b`，open PR = 0。PR #612 已同步 CURRENT_STATUS、PROJECT_STATUS、writer inventory 與機器交付狀態；PR CI 通過。本批補齊本手冊與短期交付文件的同步。合併後 CI、CodeQL、Dependency/SBOM、Freeze Guard 均成功；Pages build 成功，deploy/browser-production 因文件變更而 skipped。用量稽核與啟用狀態見 [CURRENT_STATUS](../CURRENT_STATUS.md) 和 [機器交付狀態](../research/status/cloud-paper-delivery-v0-1.json)。
+本節證據基準 main：`abda84a45de66dc214be40ce05ee0c2ccb79e415`。PR #614 已合併；分支已刪除。PR head 的 Python 3.12／3.13、workflow-static、CodeQL、Dependency/SBOM 均通過。合併後 main CI、CodeQL、Dependency/SBOM、Freeze Guard 通過；push 上 workflow-static 未觸發。詳細進度見 [CURRENT_STATUS](../CURRENT_STATUS.md) 和 [機器交付狀態](../research/status/cloud-paper-delivery-v0-1.json)。
 
-- PR #611 的 account-wide D1/R2 Analytics audit 僅為唯讀查核準備。readiness run [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) 在 main `600bff79145908f9785427a66689c2f90322dfcf` 上回報 `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`；Cloudflare requests = 0，一次性 audit authority 未消耗。必須先在 GitHub Actions 設定 `CLOUDFLARE_ACCOUNT_ID` variable 與 `CLOUDFLARE_READONLY_API_TOKEN` secret，再跑零網路 readiness；READY 前不得 dispatch 一次性 audit。
-- #579/#587 已接 shared provider/R2 guard 與 D1 query evidence gate；#590/#595/#599/#600/#603/#605/#609 已完成相應的 settlement、保留 reservation 的 recovery audit、rows/storage reservation 與 workflow inventory guard。D1 migration 仍 prepare-only、D1 未 provision；SQLite CI 不是 production calibration。
-- #611 除 audit preparation 外不改變 runtime authority。Cloud Paper activation 仍 disabled，沒有 execution workflow 或自然 schedule。策略 registry 空、Core100 品質 `REJECT`、macro context `REGIME_UNAVAILABLE`；正式結果仍安全 `NO_TRADE`。
-- 尚缺可信且新鮮的 account-wide D1/R2 usage evidence、所有 writer coverage、D1 storage envelope production calibration、FREE-ONLY 合併容量證明及正式受控 main acceptance。R2 8 GB hard stop 已存在但尚未用正式 usage evidence 驗證；報告大小／保留／容量警示政策待定。
-- 獨立可推進的下一工程批：資格門控 production candidate adapter 接入既有 orchestration，保持 production registry 空時 `NO_TRADE`，以僅測試 fixture 驗正向路徑；同步定義 report size/retention/capacity-stop。憑證、用量、全 writer coverage 未過前，不做 production acceptance、migration、provisioning 或排程啟用。
+- PR #614 把 qualified candidate adapter 接入 Cloud Paper composition；檢查 registry、Pionex evidence/route、策略 qualification/implementation hashes、風險 sizing 與已驗證帳戶 equity。候選 `as_of_ms` 綁定 source `last_bar_ms`；市場報告 `as_of_ms` 是 capture time。
+- 正式 strategy registry 仍為空，Core100 品質 `REJECT`。空 registry 保持 `NO_TRADE`；正向候選和模擬成交只由 synthetic CI fixture 驗證，沒有新增正式策略。
+- Cloud Paper activation 仍 disabled，沒有 execution workflow 或自然 schedule。尚無 controlled main acceptance、正式帳戶級用量證據、完整 writer coverage、D1 provision/calibration 或正式儲存增量量測。
+- PR #611 readiness run [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) 為 `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`，Cloudflare requests=0，一次性 audit authority 未消耗。在 GitHub Actions 設定 `CLOUDFLARE_ACCOUNT_ID` variable 與 `CLOUDFLARE_READONLY_API_TOKEN` secret 後，只先重跑零網路 readiness；READY 前不 dispatch audit。
+- 下一個獨立工程批是定義報告大小、31-day append-only growth 上限、容量警示／硬停條件與保留政策。維持 no-delete authority；正式用量及 writer coverage 未證明前，不做 production acceptance、migration、provisioning 或排程啟用。
 
 
 ## 1. 固定入口
