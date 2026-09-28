@@ -104,6 +104,8 @@ def committed_report(
     result = get_json("cloud-result", slot)
     if result is None:
         return None
+    if result.get("slot_id") != slot or result.get("state") != "COMMITTED":
+        raise CloudLoopReviewRequired("RESULT_POINTER_MISMATCH")
     report = get_json("cloud-report", str(result.get("report_id", "")))
     if report is None or digest(report) != result.get("report_id"):
         raise CloudLoopReviewRequired("RESULT_REPORT_MISMATCH")
