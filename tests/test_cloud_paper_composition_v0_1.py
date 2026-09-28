@@ -15,6 +15,7 @@ from crypto_autopilot.paper.cloud_composition_v0_1 import (
     CloudPaperCompositionBlocked,
     CloudPaperNoTradeComposition,
 )
+from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import D1LedgerUnavailable
 from crypto_autopilot.paper.live_v0_1 import LivePaperPolicy
 from crypto_autopilot.paper.run_store_v0_1 import PaperRunObjectAlreadyExistsError
 
@@ -39,6 +40,7 @@ class FakeReservationLedger:
         self.events = events if events is not None else []
         self.reject = reject
         self.reservations = []
+        self.settlements = []
         self.slots = set()
 
     def reserve_slot(self, *, slot_id, run_id, now_ms, snapshot):
@@ -47,6 +49,13 @@ class FakeReservationLedger:
             raise BudgetBlocked("BLOCKED_BUDGET_RESERVATION_REJECTED")
         self.slots.add(slot_id)
         self.reservations.append((slot_id, run_id, now_ms, snapshot))
+
+    def settle_slot(self, *, slot_id, completed_at_ms, usage):
+        self.events.append("settlement")
+        if slot_id not in self.slots:
+            raise BudgetBlocked("BLOCKED_BUDGET_SETTLEMENT_REVIEW_REQUIRED")
+        self.settlements.append((slot_id, completed_at_ms, usage))
+        self.slots.remove(slot_id)
 
 
 class FakeClient:
@@ -196,6 +205,7 @@ def composition(
         paper_policy=LivePaperPolicy(),
         budget_guard=guard,
         before_external=lambda: accesses.append("guard"),
+        completion_clock_ms=lambda: NOW + 1,
         reservation_ledger=ledger,
         d1_usage_guard=usage_guard,
     )
@@ -296,6 +306,36 @@ class CloudPaperCompositionTests(unittest.TestCase):
         self.assertIs(snapshot, runtime.budget_guard.snapshot)
         self.assertTrue(slot.isdigit())
         self.assertLess(accesses.index("reservation"), accesses.index("guard", 1))
+        self.assertEqual(len(ledger.settlements), 1)
+        settled_slot, completed_at, usage = ledger.settlements[0]
+        self.assertEqual(settled_slot, slot)
+        self.assertEqual(completed_at, NOW + 1)
+        self.assertEqual(usage.provider_requests, 4)
+        self.assertGreater(usage.class_a, 0)
+        self.assertGreater(usage.class_b, 0)
+        self.assertGreater(usage.new_bytes, 0)
+        self.assertGreater(accesses.index("settlement"), accesses.index("reservation"))
+
+    def test_failed_settlement_keeps_reserved_slot_and_does_not_replay_io(self):
+        class FailingSettlementLedger(FakeReservationLedger):
+            def settle_slot(self, *, slot_id, completed_at_ms, usage):
+                self.events.append("settlement")
+                raise D1LedgerUnavailable("D1_LEDGER_REQUEST_FAILED")
+
+        client, store, accesses = FakeClient(), MemoryStore(), []
+        ledger = FailingSettlementLedger(accesses)
+        runtime = composition(
+            client, store, accesses=accesses, reservation_ledger=ledger,
+        )
+        with self.assertRaisesRegex(Exception, "D1_LEDGER_REQUEST_FAILED"):
+            runtime.run_slot(
+                tick_ms=NOW, previous_slot=None, activation_enabled=True,
+                run_id="run-test",
+            )
+        self.assertEqual(len(ledger.reservations), 1)
+        self.assertEqual(ledger.settlements, [])
+        self.assertIn(ledger.reservations[0][0], ledger.slots)
+        self.assertTrue(any(kind == "cloud-result" for kind, _ in store.objects))
 
     def test_duplicate_slot_rejected_before_provider_or_r2_replay(self):
         client, store, accesses = FakeClient(), MemoryStore(), []
