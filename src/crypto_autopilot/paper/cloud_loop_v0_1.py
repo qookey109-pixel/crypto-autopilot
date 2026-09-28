@@ -231,6 +231,14 @@ def decision_reason_codes(
     reasons: list[str] = []
     if market.get("market_status") == "REVIEW_REQUIRED":
         reasons.append("MARKET_INPUT_REVIEW_REQUIRED")
+    if market.get("execution_selection_status") == "REVIEW_REQUIRED":
+        reasons.append("CANDIDATE_SELECTION_REVIEW_REQUIRED")
+    selection_reasons = market.get("execution_selection_reasons")
+    if isinstance(selection_reasons, Sequence) and not isinstance(selection_reasons, str):
+        reasons.extend(
+            item for item in selection_reasons
+            if isinstance(item, str) and item
+        )
     context_status = market.get("context_status")
     if context_status != "AVAILABLE":
         reasons.append(
@@ -333,7 +341,12 @@ def run_cloud_step(
     )
     outcome = {
         "schema": "qookey-cloud-paper-loop-report-v0.1",
-        "state": "COMMITTED" if candidates or state["active_session"] else "NO_TRADE",
+        "state": (
+            "REVIEW_REQUIRED"
+            if market.get("market_status") == "REVIEW_REQUIRED"
+            or market.get("execution_selection_status") == "REVIEW_REQUIRED"
+            else "COMMITTED" if candidates or state["active_session"] else "NO_TRADE"
+        ),
         "slot_id": slot, "previous_slot": previous_slot, "tick_ms": tick_ms,
         "market": market, "candidate_count": len(candidates),
         "coordinator": report,
