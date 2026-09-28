@@ -24,7 +24,13 @@ from crypto_autopilot.paper.cloud_budget_v0_1 import (
 )
 
 
-NOW = 1_790_000_000_000
+SLOT_MS = 15 * 60 * 1000
+SLOT_OFFSET_MS = 7 * 60 * 1000
+NOW = 1_789_999_620_000
+
+
+def paper_slot_id(now_ms: int) -> str:
+    return str((now_ms - SLOT_OFFSET_MS) // SLOT_MS)
 MIGRATION = (
     Path(__file__).parents[1]
     / "migrations"
@@ -49,12 +55,12 @@ class SQLiteQueryClient:
             return D1QueryResult(rows, rows_read=0, rows_written=written)
 
 
-def snapshot(**changes: object) -> R2UsageSnapshot:
+def snapshot(*, at_ms: int = NOW, **changes: object) -> R2UsageSnapshot:
     base = R2UsageSnapshot(
         account_wide=True,
         reservation_coverage_complete=True,
-        observed_at_ms=NOW,
-        measured_through_ms=NOW,
+        observed_at_ms=at_ms,
+        measured_through_ms=at_ms,
         storage_bytes=0,
         class_a_month=0,
         class_b_month=0,
@@ -99,17 +105,27 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
         return D1CloudBudgetLedger(
             client,
             policy=policy(**policy_changes),
-            limits=D1LedgerLimits(max_rows_read_per_request=25_000),
+            limits=D1LedgerLimits(max_rows_read_per_request=4_000),
         )
 
     def test_slot_reservation_is_atomic_and_daily_budget_is_shared(self):
         client = SQLiteQueryClient()
         ledger = self.make_ledger(client)
-        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
-        ledger.reserve_slot(slot_id="slot-2", run_id="run-2", now_ms=NOW, snapshot=snapshot())
+        first_ms = NOW
+        second_ms = NOW + SLOT_MS
+        third_ms = NOW + 2 * SLOT_MS
+        ledger.reserve_slot(
+            slot_id=paper_slot_id(first_ms), run_id="run-1",
+            now_ms=first_ms, snapshot=snapshot(at_ms=first_ms),
+        )
+        ledger.reserve_slot(
+            slot_id=paper_slot_id(second_ms), run_id="run-2",
+            now_ms=second_ms, snapshot=snapshot(at_ms=second_ms),
+        )
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
             ledger.reserve_slot(
-                slot_id="slot-3", run_id="run-3", now_ms=NOW, snapshot=snapshot()
+                slot_id=paper_slot_id(third_ms), run_id="run-3",
+                now_ms=third_ms, snapshot=snapshot(at_ms=third_ms),
             )
         count = client.connection.execute(
             "SELECT reservation_count FROM cloud_paper_budget_meta WHERE singleton = 1"
@@ -119,63 +135,107 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
     def test_duplicate_slot_cannot_reserve_or_replay(self):
         client = SQLiteQueryClient()
         ledger = self.make_ledger(client)
-        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+        slot = paper_slot_id(NOW)
+        ledger.reserve_slot(
+            slot_id=slot, run_id="run-1", now_ms=NOW, snapshot=snapshot(),
+        )
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
             ledger.reserve_slot(
-                slot_id="slot-1", run_id="run-2", now_ms=NOW, snapshot=snapshot()
+                slot_id=slot, run_id="run-2", now_ms=NOW, snapshot=snapshot(),
             )
+
+    def test_noncanonical_slot_rejected_before_d1_query(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        with self.assertRaisesRegex(BudgetBlocked, "SLOT_ID_INVALID"):
+            ledger.reserve_slot(
+                slot_id="custom-slot", run_id="run-custom",
+                now_ms=NOW, snapshot=snapshot(),
+            )
+        with self.assertRaisesRegex(BudgetBlocked, "SLOT_ID_INVALID"):
+            ledger.reserve_slot(
+                slot_id=paper_slot_id(NOW), run_id="run-off-schedule",
+                now_ms=NOW + 1, snapshot=snapshot(),
+            )
+        self.assertEqual(
+            client.connection.execute(
+                "SELECT reservation_count FROM cloud_paper_budget_meta WHERE singleton = 1"
+            ).fetchone()[0],
+            0,
+        )
+
+    def test_bounded_d1_read_envelope_fits_96_slot_two_query_ceiling(self):
+        per_query = D1UsagePolicy().rows_read_per_query
+        self.assertEqual(per_query, D1LedgerLimits().max_rows_read_per_request)
+        daily_envelope = 96 * 2 * per_query
+        self.assertEqual(daily_envelope, 768_000)
+        self.assertLess(daily_envelope, D1UsagePolicy().rows_read_per_day)
 
     def test_settlement_releases_only_unused_envelope(self):
         client = SQLiteQueryClient()
         ledger = self.make_ledger(client)
-        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+        first_ms, second_ms, third_ms = NOW, NOW + SLOT_MS, NOW + 2 * SLOT_MS
+        first_slot = paper_slot_id(first_ms)
+        ledger.reserve_slot(
+            slot_id=first_slot, run_id="run-1",
+            now_ms=first_ms, snapshot=snapshot(at_ms=first_ms),
+        )
         ledger.settle_slot(
-            slot_id="slot-1",
-            completed_at_ms=NOW + 1,
+            slot_id=first_slot,
+            completed_at_ms=first_ms + 1,
             usage=SlotUsage(provider_requests=1, class_a=1, class_b=1, new_bytes=1),
         )
         ledger.reserve_slot(
-            slot_id="slot-2", run_id="run-2", now_ms=NOW + 2, snapshot=snapshot()
+            slot_id=paper_slot_id(second_ms), run_id="run-2",
+            now_ms=second_ms, snapshot=snapshot(at_ms=second_ms),
         )
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
             ledger.reserve_slot(
-                slot_id="slot-3", run_id="run-3", now_ms=NOW + 3, snapshot=snapshot()
+                slot_id=paper_slot_id(third_ms), run_id="run-3",
+                now_ms=third_ms, snapshot=snapshot(at_ms=third_ms),
             )
 
     def test_unsettled_slot_keeps_the_full_reservation(self):
         client = SQLiteQueryClient()
         ledger = self.make_ledger(client)
-        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+        next_ms = NOW + SLOT_MS
+        ledger.reserve_slot(
+            slot_id=paper_slot_id(NOW), run_id="run-1",
+            now_ms=NOW, snapshot=snapshot(),
+        )
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
             ledger.reserve_slot(
-                slot_id="slot-2",
-                run_id="run-2",
-                now_ms=NOW,
-                snapshot=snapshot(class_a_day=2),
+                slot_id=paper_slot_id(next_ms), run_id="run-2",
+                now_ms=next_ms, snapshot=snapshot(at_ms=next_ms, class_a_day=2),
             )
 
     def test_monthly_headroom_includes_other_slot_reservations(self):
         client = SQLiteQueryClient()
         ledger = self.make_ledger(client)
-        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+        next_ms = NOW + SLOT_MS
+        ledger.reserve_slot(
+            slot_id=paper_slot_id(NOW), run_id="run-1",
+            now_ms=NOW, snapshot=snapshot(),
+        )
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
             ledger.reserve_slot(
-                slot_id="slot-2",
-                run_id="run-2",
-                now_ms=NOW,
-                snapshot=snapshot(class_a_month=18),
+                slot_id=paper_slot_id(next_ms), run_id="run-2",
+                now_ms=next_ms, snapshot=snapshot(at_ms=next_ms, class_a_month=18),
             )
 
     def test_storage_hard_stop_includes_other_slot_reservations(self):
         client = SQLiteQueryClient()
         ledger = self.make_ledger(client)
-        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+        next_ms = NOW + SLOT_MS
+        ledger.reserve_slot(
+            slot_id=paper_slot_id(NOW), run_id="run-1",
+            now_ms=NOW, snapshot=snapshot(),
+        )
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
             ledger.reserve_slot(
-                slot_id="slot-2",
-                run_id="run-2",
-                now_ms=NOW + 1,
-                snapshot=snapshot(storage_bytes=81),
+                slot_id=paper_slot_id(next_ms), run_id="run-2",
+                now_ms=next_ms,
+                snapshot=snapshot(at_ms=next_ms, storage_bytes=81),
             )
 
     def test_missing_incomplete_or_stale_account_evidence_blocks_before_io(self):
@@ -190,7 +250,7 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
             with self.subTest(index=index):
                 with self.assertRaises(BudgetBlocked):
                     ledger.reserve_slot(
-                        slot_id=f"slot-{index}",
+                        slot_id=paper_slot_id(NOW),
                         run_id=f"run-{index}",
                         now_ms=NOW,
                         snapshot=evidence,
@@ -207,19 +267,23 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
         )
         ledger = self.make_ledger(client)
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
-            ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+            ledger.reserve_slot(
+                slot_id=paper_slot_id(NOW), run_id="run-1",
+                now_ms=NOW, snapshot=snapshot(),
+            )
 
     def test_concurrent_slots_cannot_overreserve(self):
         client = SQLiteQueryClient()
         ledger = self.make_ledger(client)
 
         def reserve(index: int) -> bool:
+            now_ms = NOW + index * SLOT_MS
             try:
                 ledger.reserve_slot(
-                    slot_id=f"slot-{index}",
+                    slot_id=paper_slot_id(now_ms),
                     run_id=f"run-{index}",
-                    now_ms=NOW,
-                    snapshot=snapshot(),
+                    now_ms=now_ms,
+                    snapshot=snapshot(at_ms=now_ms),
                 )
             except BudgetBlocked:
                 return False
