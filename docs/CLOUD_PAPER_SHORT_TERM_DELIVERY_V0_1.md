@@ -229,12 +229,10 @@ R2 的契約上界也需保留共享餘量：2 MiB × 96 slots × 31 days = **6.
 這項查核補充了第 9 節的下一個工程工作，不改寫任何 frozen receipt、既有預算 authority 或 runtime 權限。
 
 
-## 帳戶方案證據缺口 — V0.1 billing snapshot delivery
+## 帳戶方案證據缺口 — PR #630 已合併
 
-查核基準為 parent main `0d135a6ca67a72f5071d295293477ba6196e249b`。既有 V0.1 用量 audit 仍不查詢方案或帳單，且 readiness 曾因缺少 read-only credential 而零網路停止。其 frozen 合約與一次性次數未更動。
+查核基準為 parent main `e2e4a911b1fa62c35c6e16a3eb4850e68d23f090`。PR [#630](https://github.com/qookey109-pixel/crypto-autopilot/pull/630) 以 exact head `e204e4062b448f2d19a5bf98afbe3986dc1dded9` 合併。PR-head CI [36496143905](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496143905)、CodeQL [36496143925](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496143925)、Dependency/SBOM [36496143898](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496143898) 與 retired-workflow guard [36496143862](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496143862) 通過。合併 main 為 `e2e4a911b1fa62c35c6e16a3eb4850e68d23f090`；main CI [36496372548](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496372548)、CodeQL [36496372401](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496372401)、Dependency/SBOM [36496372521](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496372521) 與 Freeze Guard [36496372302](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496372302) 通過；main 上 PR-only workflow-static skipped。
 
-本交付分支新增一個單次、只讀的 Cloudflare subscriptions snapshot 合約、程式、零網路 readiness、workflow 與合成驗證。它最多查一頁 20 筆，要求完整頁面，輸出方案 ID／狀態／列示 USD 價格，不保存帳戶 ID、訂閱 ID 或原始回應。使用獨立的 GitHub Actions secret `CLOUDFLARE_BILLING_READONLY_API_TOKEN`，只需 Account Billing Read。不得使用 Billing Edit 或 Global API Key。
+新增合約與 workflow 是一次、只讀、單一 Cloudflare subscriptions GET，使用獨立 secret `CLOUDFLARE_BILLING_READONLY_API_TOKEN`（Account Billing Read）。零網路 readiness 先檢查變數／secret 是否存在；只有 `READY` 才可使用一次性 audit。既有 D1/R2 用量 audit 的合約與一次性次數沒有改動。
 
-這項快照只支持 billing review；**不證明 invoice 總額、所有計量產品、外部 writer 覆蓋或零成本**。零成本仍須與新鮮 D1/R2 用量、實際帳單及完整 writer 覆蓋證據一起核對。PR 尚待雲端 CI；未執行 Cloudflare API，也未消耗既有用量 audit 的一次性授權。所有 runtime、D1/R2 寫入與排程仍關閉。
-
-來源：[List Subscriptions API](https://developers.cloudflare.com/api/resources/accounts/subresources/subscriptions/methods/get/)、[Billing permissions](https://developers.cloudflare.com/billing/understand/billing-permissions/)。
+Cloudflare API **尚未呼叫**。billing readiness 尚未執行；結果不會證明 invoice 總額、所有計量產品、外部 writer 覆蓋或零成本。零費用結論仍需 fresh account-wide usage、帳單與完整 writer coverage 證據。Cloud Paper runtime、D1/R2 寫入與排程仍關閉。
