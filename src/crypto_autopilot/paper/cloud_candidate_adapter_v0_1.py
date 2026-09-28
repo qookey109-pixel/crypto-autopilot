@@ -12,7 +12,6 @@ import math
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any
 
 REGISTRY_SCHEMA = "qookey-cloud-paper-strategy-registry-v0.1"
 MARKET_SCHEMA = "qookey-cloud-paper-market-report-v0.1"
