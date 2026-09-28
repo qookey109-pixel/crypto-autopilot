@@ -1,5 +1,14 @@
 # Current Operations Status
 
+## Cloud Paper Usage Audit Readiness — 2026-09-29
+
+- Authority snapshot: main `600bff79145908f9785427a66689c2f90322dfcf`; PR #611 merged.
+- PR #611 post-merge CI: CI, CodeQL, Dependency/SBOM, and V0.10 Critical Path Freeze Guard succeeded. Workflow-static was not triggered on push; its PR-head check passed.
+- Readiness run [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643): workflow completed, report state `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`; Cloudflare requests = 0; one-time usage audit authority remains unconsumed; no secret values printed.
+- Next gate: set the `CLOUDFLARE_ACCOUNT_ID` Actions variable and `CLOUDFLARE_READONLY_API_TOKEN` Actions secret in GitHub Settings, then run the zero-network readiness check again. Do not dispatch the one-time audit until readiness reports READY.
+- Cloud Paper remains inactive: no execution workflow or natural schedule; model quality remains `REJECT`; production strategy registry remains empty; budget/account-wide usage evidence and controlled main acceptance remain outstanding. `FREE-ONLY / 0 USD`, PAPER/LIVE-PAPER only, holdout closed, and source switch closed remain binding.
+
+
 Updated: 2026-09-29. This is the single human entrypoint for the current project checkpoint.
 
 ## Cloud Paper current checkpoint — PR #609 merged
