@@ -179,6 +179,7 @@ def composition(
         FakeReservationLedger(accesses)
         if reservation_ledger == "default" else reservation_ledger
     )
+
     def default_d1_usage_guard(tick_ms):
         accesses.append("d1-evidence")
 
@@ -254,6 +255,7 @@ class CloudPaperCompositionTests(unittest.TestCase):
 
     def test_d1_usage_evidence_gate_runs_before_atomic_slot_reservation(self):
         client, store, accesses = FakeClient(), MemoryStore(), []
+
         def reject_stale_evidence(tick_ms):
             accesses.append("d1-evidence")
             raise BudgetBlocked("D1_USAGE_EVIDENCE_STALE")
@@ -311,7 +313,10 @@ class CloudPaperCompositionTests(unittest.TestCase):
         guard = make_budget_guard(CloudBudgetPolicy(provider_per_run=3))
         runtime = composition(client, MemoryStore(), guard=guard, accesses=accesses)
         with self.assertRaisesRegex(BudgetBlocked, "PROVIDER_RUN_LIMIT"):
-            runtime.run_slot(tick_ms=NOW, previous_slot=None, activation_enabled=True, run_id="run-test")
+            runtime.run_slot(
+                tick_ms=NOW, previous_slot=None, activation_enabled=True,
+                run_id="run-test",
+            )
         self.assertEqual(len(client.calls), 3)
 
     def test_enabled_empty_registry_composes_to_audited_no_trade(self):
