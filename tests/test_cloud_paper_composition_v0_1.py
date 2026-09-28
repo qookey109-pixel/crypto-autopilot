@@ -402,6 +402,32 @@ class CloudPaperCompositionTests(unittest.TestCase):
         self.assertNotIn(slot, ledger.recovery_receipts)
         self.assertEqual(ledger.reservations_by_slot[slot].state, "RESERVED")
 
+    def test_recovery_rejects_mismatched_immutable_result_pointer(self):
+        client, store, accesses = FakeClient(), MemoryStore(), []
+        ledger = FakeReservationLedger(accesses)
+        runtime = composition(
+            client, store, accesses=accesses, reservation_ledger=ledger,
+        )
+        first = runtime.run_slot(
+            tick_ms=NOW, previous_slot=None, activation_enabled=True,
+            run_id="github-run-pointer-mismatch",
+        )
+        slot = first["slot_id"]
+        ledger.reservations_by_slot[slot] = replace(
+            ledger.reservations_by_slot[slot], state="RESERVED",
+        )
+        pointer = dict(store.objects[("cloud-result", slot)])
+        pointer["slot_id"] = "different-slot"
+        store.objects[("cloud-result", slot)] = pointer
+
+        with self.assertRaisesRegex(
+            CloudPaperCompositionBlocked, "RESULT_POINTER_MISMATCH",
+        ):
+            runtime.recover_completed_slot(slot=slot, recovery_enabled=True)
+
+        self.assertNotIn(slot, ledger.recovery_receipts)
+        self.assertEqual(ledger.reservations_by_slot[slot].state, "RESERVED")
+
     def test_failed_settlement_keeps_reserved_slot_and_does_not_replay_io(self):
         class FailingSettlementLedger(FakeReservationLedger):
             def settle_slot(self, *, slot_id, completed_at_ms, usage):
