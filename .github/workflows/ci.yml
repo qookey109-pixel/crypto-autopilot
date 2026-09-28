@@ -90,6 +90,10 @@ jobs:
         run: python -m pip install -c requirements/ci-constraints.txt pytest
       - name: Ruff core correctness
         run: ruff check src tests scripts
+
+      - name: Validate dashboard static safety contract (Python 3.12 only)
+        if: ${{ matrix.python-version == '3.12' }}
+        run: python scripts/validate_dashboard_static.py
       - name: Unit test runner compatibility (Python 3.12 only)
         if: ${{ matrix.python-version == '3.12' }}
         run: python -m unittest discover -s tests -v
