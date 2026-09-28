@@ -157,7 +157,7 @@ class CloudBudgetGuard:
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_A_RUN_LIMIT")
             if daily + self._class_a_run >= p.r2_class_a_per_day:
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_A_DAILY_LIMIT")
-            if month >= min(p.project_class_a_per_month, p.free_class_a_per_month):
+            if month + self._class_a_run >= min(p.project_class_a_per_month, p.free_class_a_per_month):
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_A_MONTHLY_LIMIT")
             if rolling + self._class_a_run >= p.r2_class_a_per_31_days:
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_A_31_DAY_LIMIT")
@@ -170,7 +170,7 @@ class CloudBudgetGuard:
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_B_RUN_LIMIT")
             if daily + self._class_b_run >= p.r2_class_b_per_day:
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_B_DAILY_LIMIT")
-            if month >= min(p.project_class_b_per_month, p.free_class_b_per_month):
+            if month + self._class_b_run >= min(p.project_class_b_per_month, p.free_class_b_per_month):
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_B_MONTHLY_LIMIT")
             if rolling + self._class_b_run >= p.r2_class_b_per_31_days:
                 raise BudgetBlocked("BLOCKED_BUDGET_CLASS_B_31_DAY_LIMIT")
