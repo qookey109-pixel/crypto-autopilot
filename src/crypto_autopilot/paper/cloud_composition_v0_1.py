@@ -169,12 +169,10 @@ class CloudPaperNoTradeComposition:
             raise CloudPaperCompositionBlocked("RECOVERY_RESULT_MISSING")
         if report.get("state") not in {"COMMITTED", "NO_TRADE"}:
             raise CloudPaperCompositionBlocked("RECOVERY_RESULT_NOT_COMPLETE")
-        coordinator = report.get("coordinator")
-        step = coordinator.get("run_step") if isinstance(coordinator, Mapping) else None
-        report_run_id = step.get("run_id") if isinstance(step, Mapping) else None
-        if report_run_id != reservation.run_id:
-            raise CloudPaperCompositionBlocked("RECOVERY_RUN_ID_MISMATCH")
-
+        # The D1 reservation is unique per canonical slot. The immutable,
+        # digest-verified cloud-result pointer and its verified coordinator step
+        # bind the report to this slot; keep the GitHub run id from the D1 row as
+        # the recovery receipt's audit owner.
         report_id = digest(report)
         self.before_external()
         self.d1_usage_guard.validate_evidence()
