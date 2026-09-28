@@ -104,7 +104,7 @@
       "metric_mapping": {
         "btc_dominance": "FIELD_AVAILABLE_SOURCE_TIMESTAMP_ALIGNMENT_UNVERIFIED",
         "total3": "PROJECT_DEFINITION_EX_BTC_ETH_PROVIDER_ALTMARKETCAP_METHOD_UNVERIFIED",
-        "aligned_breadth": "PROJECT_DEFINITION_KNOWN_FIXED_PIONEX_CRYPTO_UNIVERSE_MISSING"
+        "aligned_breadth": "PROJECT_RULES_KNOWN_23_MARKET_CANDIDATE_PREPARED_COVERAGE_UNVERIFIED"
       },
       "conditional_budget_impact": {
         "current_requests_per_run": 18,
@@ -118,8 +118,9 @@
       },
       "next_gates": [
         "CMC altcoin_market_cap methodology equivalence to the project ex-BTC/ETH definition",
-        "fixed exact crypto-only Pionex breadth universe of at least 20 aligned markets",
-        "Pionex breadth completeness, 4H or 1D refresh cadence, and request budget",
+        "verify exact 23-market Pionex breadth partitions under separate bounded R2-read authority",
+        "freeze 4H and/or 1D interval and prove complete exact timestamp grid without dropping members",
+        "Pionex breadth completeness, refresh cadence, and request budget",
         "CMC terms for scheduled use, storage, derived use, public display, and attribution",
         "CMC and Pionex account-wide budget headroom under the 0 USD hard stop",
         "new versioned source and budget authority before any provider/R2 operation"
@@ -135,17 +136,16 @@
         "keyless_route": "AVAILABLE_BUT_PROTOTYPE_PATH_NOT_SELECTED_FOR_PRODUCTION"
       },
       "pionex_breadth": {
-        "research_intervals": [
-          "4H",
-          "1D"
-        ],
-        "minimum_crypto_markets": 20,
-        "fixed_aligned_universe_required": true,
-        "existing_breadth_background_symbols": 68,
-        "existing_breadth_background_crypto_symbols": 0,
-        "exact_crypto_membership": "NOT_FROZEN",
-        "refresh_request_budget": "NOT_DEFINED",
-        "historical_r2_read_authority": "NOT_ESTABLISHED"
+        "candidate_config": "config/market_regime_pionex_breadth_universe_v0_1.json",
+        "membership_count": 23,
+        "basis": "CURATED_CRYPTO_POOL_EX_BTC_ETH_INTERSECT_PIONEX_4H_1D_CRYPTO_CLASSIFIED_PROFILES",
+        "exact_membership_status": "PREPARED",
+        "partition_completeness": "NOT_VERIFIED",
+        "timestamp_grid": "NOT_VERIFIED",
+        "recent_freshness": "NOT_VERIFIED",
+        "r2_reads_performed": false,
+        "missing_member_policy": "REGIME_UNAVAILABLE_NO_MEMBER_DROPPING",
+        "refresh_request_budget": "NOT_DEFINED"
       }
     }
   }
