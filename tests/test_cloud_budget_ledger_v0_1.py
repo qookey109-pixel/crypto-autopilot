@@ -52,7 +52,7 @@ class SQLiteQueryClient:
     def __init__(self) -> None:
         self.connection = sqlite3.connect(":memory:", check_same_thread=False)
         self.connection.row_factory = sqlite3.Row
-        self.connection.executescript(MIGRATION + "\\n" + RECOVERY_MIGRATION)
+        self.connection.executescript(MIGRATION + "\n" + RECOVERY_MIGRATION)
         self.lock = threading.Lock()
         self.query_plans: list[str] = []
 
