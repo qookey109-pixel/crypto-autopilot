@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "705da0a67a3e9a2aaedfb757ba6803eb5f0e9907",
+  "evidence_basis_parent_main_sha": "7383faad99ec00713bc334090e2ecd6b52a384e1",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -233,5 +233,57 @@
     "pages_pipeline": "NOT_TRIGGERED_TEST_ONLY_CHANGE",
     "activation_enabled": false,
     "provider_r2_d1_runtime_access_performed": false
+  },
+  "latest_schedule_observations": {
+    "evidence_basis_parent_main_sha": "7383faad99ec00713bc334090e2ecd6b52a384e1",
+    "pionex_alternative_observability": {
+      "run_id": 36309712506,
+      "event": "schedule",
+      "head_sha": "dcd6e49524240d4df4345fd5053a939199c6bc70",
+      "workflow_conclusion": "SUCCESS",
+      "report_status": "REVIEW_REQUIRED",
+      "catalog_diff_status": "PASS",
+      "added_count": 0,
+      "removed_count": 0,
+      "artifact_id": 10928581594
+    },
+    "core100_fingerprint": {
+      "run_id": 36311651477,
+      "event": "schedule",
+      "head_sha": "dcd6e49524240d4df4345fd5053a939199c6bc70",
+      "workflow_conclusion": "SUCCESS",
+      "report_status": "NO_CHANGE",
+      "training_performed": false,
+      "provider_requests_performed": 0,
+      "r2_writes_performed": false,
+      "artifact_id": 10929537009
+    },
+    "health": {
+      "run_id": 36400618100,
+      "event": "schedule",
+      "head_sha": "e80d2d2757425b93fea68c213fe19a80fc175062",
+      "workflow_conclusion": "SUCCESS",
+      "artifact_id": 10959219725
+    },
+    "cloud_maintenance": {
+      "run_id": 36400671117,
+      "event": "workflow_run",
+      "head_sha": "e80d2d2757425b93fea68c213fe19a80fc175062",
+      "workflow_conclusion": "SUCCESS",
+      "inspect": "SUCCESS",
+      "propose": "SUCCESS",
+      "result": "DRAFT_UPDATED_WAITING_CI_VERIFICATION",
+      "pull_request": 578
+    },
+    "pages_natural": {
+      "run_id": 36414262259,
+      "event": "schedule",
+      "head_sha": "9753c6b347ecb631aa4bc682c08d10b3cb9f904f",
+      "workflow_conclusion": "SUCCESS",
+      "build": "SUCCESS",
+      "deploy": "SUCCESS",
+      "browser_production": "SUCCESS"
+    },
+    "cloud_paper_schedule": "NOT_ESTABLISHED"
   }
 }
