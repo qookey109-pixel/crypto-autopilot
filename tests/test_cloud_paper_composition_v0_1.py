@@ -591,7 +591,7 @@ class CloudPaperCompositionTests(unittest.TestCase):
                             else (346.0, 346.1))
                 return OrderBookSnapshot(
                     symbol=requested_symbol,
-                    bids=((bid, 10.0),), asks=((ask, 10.0),),
+                    bids=((bid, 1_000.0),), asks=((ask, 1_000.0),),
                     update_time_ms=self.tick_ms,
                 )
 
@@ -626,7 +626,7 @@ class CloudPaperCompositionTests(unittest.TestCase):
             market["routes"] = [route]
             market["candidate_specs"] = []
             if emit_candidate:
-                entry, stop = 340.0, 339.0
+                entry, stop = 340.05, 339.05
                 market["candidate_specs"] = [{
                     "candidate": {
                         "strategy_id": "test-only-trend",
