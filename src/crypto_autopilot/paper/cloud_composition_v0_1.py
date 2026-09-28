@@ -43,6 +43,13 @@ class BudgetSlotReservationLedger(Protocol):
         """Reserve the bounded slot envelope or fail closed."""
 
 
+class D1UsageBudgetGate(Protocol):
+    """Account-wide D1 usage guard required before the atomic slot reservation."""
+
+    def reserve_query(self) -> None:
+        """Validate current evidence and reserve a bounded D1 query envelope."""
+
+
 @dataclass(frozen=True, slots=True)
 class CloudPaperNoTradeComposition:
     """Compose Pionex scan, opportunity analysis, and a fail-closed paper step.
@@ -61,7 +68,7 @@ class CloudPaperNoTradeComposition:
     budget_guard: CloudBudgetGuard
     before_external: Callable[[], None]
     reservation_ledger: BudgetSlotReservationLedger | None = None
-    d1_usage_guard: Callable[[int], None] | None = None
+    d1_usage_guard: D1UsageBudgetGate | None = None
     run_name: str = "cloud-paper-v0-1"
 
     def __post_init__(self) -> None:
@@ -132,7 +139,7 @@ class CloudPaperNoTradeComposition:
         # evidence, then atomically reserve the R2/provider envelope before any
         # provider or R2 request. The disabled-by-default path never gets here.
         self.before_external()
-        self.d1_usage_guard(tick_ms)
+        self.d1_usage_guard.reserve_query()
         self.reservation_ledger.reserve_slot(
             slot_id=slot,
             run_id=run_id,
