@@ -363,6 +363,7 @@ class CloudPaperCompositionTests(unittest.TestCase):
         reserved = ledger.reservations_by_slot[slot]
         ledger.reservations_by_slot[slot] = replace(reserved, state="RESERVED")
         before_calls = list(store.calls)
+        before_provider_calls = list(client.calls)
 
         recovery = runtime.recover_completed_slot(
             slot=slot, recovery_enabled=True,
@@ -376,7 +377,7 @@ class CloudPaperCompositionTests(unittest.TestCase):
         recovery_calls = store.calls[len(before_calls):]
         self.assertTrue(recovery_calls)
         self.assertTrue(all(call[0] == "get" for call in recovery_calls))
-        self.assertEqual(client.calls, ["symbols", "tickers", "books", ("klines", "BTC_USDT_PERP", "1H", 240, NOW // HOUR_MS * HOUR_MS)])
+        self.assertEqual(client.calls, before_provider_calls)
 
     def test_recovery_defaults_disabled_and_missing_result_retains_reservation(self):
         client, store, accesses = FakeClient(), MemoryStore(), []
