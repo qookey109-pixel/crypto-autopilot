@@ -290,11 +290,14 @@ class CloudflareD1QueryClient:
         self._timeout_seconds = timeout_seconds
 
     @classmethod
-    def from_environment(cls) -> CloudflareD1QueryClient:
+    def from_environment(
+        cls, *, usage_guard: D1QueryUsageBudgetGate,
+    ) -> CloudflareD1QueryClient:
         return cls(
             api_token=os.environ.get("CLOUDFLARE_D1_API_TOKEN", ""),
             account_id=os.environ.get("CLOUDFLARE_ACCOUNT_ID", ""),
             database_id=os.environ.get("CLOUDFLARE_D1_DATABASE_ID", ""),
+            usage_guard=usage_guard,
         )
 
     def __repr__(self) -> str:
