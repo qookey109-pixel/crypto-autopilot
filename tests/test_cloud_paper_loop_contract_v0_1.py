@@ -18,6 +18,28 @@ class CloudPaperLoopContractTests(unittest.TestCase):
         for key in ("provider_requests", "r2_class_a", "r2_class_b", "r2_new_bytes"):
             self.assertEqual(policy["budget"][key + "_per_utc_day"],
                              96 * policy["budget"][key + "_per_run"])
+        storage = json.loads(
+            (ROOT / "config/cloud_paper_storage_policy_v0_1.json").read_text()
+        )
+        budget = policy["budget"]
+        self.assertEqual(storage["status"], "POLICY_ONLY_NOT_ACTIVATION_AUTHORITY")
+        self.assertEqual(storage["report_object_max_bytes"], budget["r2_object_max_bytes"])
+        self.assertEqual(storage["per_run_growth_max_bytes"], budget["r2_new_bytes_per_run"])
+        self.assertEqual(storage["per_utc_day_growth_max_bytes"], budget["r2_new_bytes_per_utc_day"])
+        self.assertEqual(storage["max_slots_per_utc_day"], policy["schedule"]["maximum_slots_per_utc_day"])
+        self.assertEqual(
+            storage["max_31_day_growth_bytes"],
+            storage["per_utc_day_growth_max_bytes"] * 31,
+        )
+        self.assertLess(storage["warning_threshold_bytes"], storage["hard_stop_bytes"])
+        self.assertFalse(storage["retention"]["automatic_delete"])
+        self.assertFalse(storage["retention"]["manual_delete_authorized"])
+        self.assertEqual(
+            storage["retention"]["mode"],
+            "INDEFINITE_APPEND_ONLY_UNTIL_SEPARATE_AUTHORITY",
+        )
+        self.assertFalse(storage["activation_authorized"])
+
         for key in ("private_exchange_api", "real_money_order", "live_trading",
                     "holdout_access", "source_switch", "model_promotion",
                     "training", "strategy_parameter_changes"):

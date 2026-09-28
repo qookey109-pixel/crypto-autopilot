@@ -1,0 +1,50 @@
+{
+  "schema": "qookey-cloud-paper-storage-policy-v0.1",
+  "updated_date": "2026-09-29",
+  "evidence_basis_parent_main_sha": "d302b3ce1a6969864881c2a15a64f05e7da4ecf2",
+  "is_latest_main_claim": false,
+  "status": "POLICY_ONLY_NOT_ACTIVATION_AUTHORITY",
+  "purpose": "Define bounded Cloud Paper result storage and exhaustion behavior; this policy does not prove production account usage or authorize runtime activation.",
+  "scope": {
+    "backend": "R2_STANDARD",
+    "prefix": "paper-run-store/cloud-loop-v0.1",
+    "max_slots_per_utc_day": 96,
+    "report_object_max_bytes": 262144,
+    "per_run_growth_max_bytes": 2097152,
+    "per_utc_day_growth_max_bytes": 201326592,
+    "max_31_day_growth_bytes": 6241124352,
+    "max_31_day_growth_calculation": "201326592 bytes/day * 31 days at 96 slots/day",
+    "warning_threshold_bytes": 6400000000,
+    "warning_threshold_basis": "80% of the 8,000,000,000-byte project hard stop",
+    "hard_stop_bytes": 8000000000,
+    "hard_stop_trigger": "BLOCK before a write when observed + pending + current-run projected storage is greater than or equal to the hard-stop ceiling.",
+    "shared_account_note": "The 31-day growth is a theoretical project envelope, not reserved capacity. Other account writers and actual account-wide headroom remain unverified."
+  },
+  "retention": {
+    "mode": "INDEFINITE_APPEND_ONLY_UNTIL_SEPARATE_AUTHORITY",
+    "automatic_delete": false,
+    "manual_delete_authorized": false,
+    "failure_evidence": "RETAIN",
+    "partial_write": "REVIEW_REQUIRED",
+    "cleanup_requires": "A separate versioned authority that preserves frozen evidence and verifies exact target objects."
+  },
+  "exhaustion": {
+    "warning_state": "WARNING",
+    "warning_trigger": "Fresh complete account-wide observed plus pending storage reaches the warning threshold.",
+    "hard_stop_state": "BLOCKED_BUDGET_STORAGE_HARD_STOP",
+    "unknown_or_stale_usage": "BLOCKED_BUDGET; no provider or storage access",
+    "retry_or_fallback": false,
+    "partial_write_recovery": "Preserve evidence and report REVIEW_REQUIRED; no automatic cleanup or takeover."
+  },
+  "authority": {
+    "activation_authorized": false,
+    "d1_provisioning_authorized": false,
+    "schedule_enabled": false,
+    "provider_or_r2_access_by_this_policy": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}

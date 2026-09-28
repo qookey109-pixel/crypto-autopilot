@@ -6,6 +6,14 @@
 - 證據基準：PR #614 已合併至 main `abda84a45de66dc214be40ce05ee0c2ccb79e415`；本文件只記錄該基準的驗收，不宣稱其後 main SHA。
 - 狀態：Cloud Paper 持續實作，activation disabled。PR #614 已接通資格門控 adapter，但正式策略 registry 仍空。
 
+## 保存上限與耗盡政策 — engineering guard implementation
+
+- Versioned policy: `config/cloud_paper_storage_policy_v0_1.json`; it defines limits only and grants no activation, provisioning, schedule, or data-access authority.
+- Existing guard limits are formalized: 256 KiB per report/object, 2 MiB per run, 192 MiB/day at 96 slots, and a theoretical 6,241,124,352 bytes per 31 days.
+- The guard exposes a warning at 6.4 GB (80% of the 8 GB project hard stop) and blocks writes whose projected storage reaches 8 GB. Stale, incomplete, or unknown account-wide evidence still blocks before external access.
+- Retention is indefinite and append-only. Automatic or manual deletion is not authorized; partial writes retain evidence and require `REVIEW_REQUIRED`.
+- These limits are a project policy envelope, not production account usage evidence or a capacity guarantee. Account-wide usage freshness, all-writer coverage, D1 calibration and production acceptance remain open.
+
 ## 最新驗收證據狀態 — PR #614 合併後
 
 | 項目 | 工程／合成證據 | 正式產品狀態 |
