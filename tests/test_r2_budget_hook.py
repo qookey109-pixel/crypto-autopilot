@@ -118,7 +118,7 @@ class R2BudgetHookTests(unittest.TestCase):
                 provider_requests_day=0,
                 new_bytes_day=0,
             ),
-            now_ms=now_ms,
+            clock_ms=lambda: now_ms,
             policy=CloudBudgetPolicy(r2_class_a_per_run=0),
         )
         client = FakeClient()
