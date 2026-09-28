@@ -4,15 +4,15 @@
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
-## Cloud Paper 短期交付狀態 — 2026-09-29（PR #608 合併後）
+## Cloud Paper 短期交付狀態 — 2026-09-29（PR #609 合併後）
 
-文件查核基準：PR #608 exact head `af1bcb67bf6e3d5932b4c4b8c3d01bef0ad3f036` 合併至 main `1c6a8f1ee7449a9bb1a787646c6d813ce93edbb1`（base `96ed9dbff430b98df56a8fa2aa51b4b22fc3caf2`）；live open PR = 0。適用 CI、workflow-static、CodeQL、Dependency/SBOM 通過；Pages deploy/browser-production 因本次文件未涉網站而 skipped。完整交付範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)，機器狀態見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。
+文件查核基準：PR #609 exact head `c99e55fd0331df1140f30b6def33cfb309566061` 合併至 main `0de21f67bd8f122933164f4b1f4a91179d9d3d40`（base `1c6a8f1ee7449a9bb1a787646c6d813ce93edbb1`）；live open PR = 0。PR-head Python 3.12／3.13、build、workflow-static、CodeQL、Dependency/SBOM、snapshot 通過；main Python 3.12／3.13、build、Freeze Guard、Dependency/SBOM、CodeQL 均通過（[CI 36466531872](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36466531872), [CodeQL 36466532665](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36466532665)）。Pages deploy/browser-production 因本批未涉網站而 skipped。完整交付範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)，機器狀態見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。
 
 - #590/#595：成功保存和 readback 後 settlement；完全相同用量可冪等重送，不確定結果保留完整 reservation。
 - #599/#600：預設關閉的 verified-result recovery audit，驗證 immutable R2 result/report 與 pointer slot/state；記錄 D1 audit receipt，不 settlement、不釋放額度。
 - #603/#605：prepare-only shared D1 rows/storage-growth reservations；每日政策上限分別 3,072,000 rows read／7,680 rows written，以及 12,582,912 bytes estimated storage growth。兩個 migration 未套用、D1 未 provision；SQLite CI 不是 production D1 calibration。
-- #607/#608：確認既有 8 GB R2 hard stop 在新寫入前 fail closed，並同步該狀態文件。未完成的是實際用量證據下的觸發核驗、報告大小/保留/警示規則；無刪除 authority。
-- 本批增加 required CI 的 Repository workflow D1 marker inventory guard。基線 main 的 85 個 workflow 檔掃描為 0 marker；這只防止 Repository workflow 清單漂移，不證明 Cloudflare 帳戶或外部 writer 全面覆蓋。
+- #607/#609：確認既有 8 GB R2 hard stop 在新寫入前 fail closed，並同步該狀態文件。未完成的是實際用量證據下的觸發核驗、報告大小/保留/警示規則；無刪除 authority。
+- PR #609 已將 required CI 的 Repository workflow D1 marker inventory guard 合併；85 個 workflow 檔中偵測 0 marker，PR CI 通過。這只防止 Repository workflow 清單漂移，不證明 Cloudflare 帳戶或外部 writer 全面覆蓋。
 - 尚未完成：可信且新鮮的 account-wide D1/R2 usage evidence、全 D1 writer coverage、storage envelope 實際校準、FREE-ONLY 合併容量證明、正式 runner wiring、controlled main acceptance。正式 strategy registry 空、Core100 品質 `REJECT`、macro context `REGIME_UNAVAILABLE`；production candidate builder 未接線，所以有效正式結果仍是 `NO_TRADE`。
 - execution workflow、Cloud Paper 自然排程及受控 main acceptance 尚未啟用；contract 的 `activation.enabled=false` 維持原狀。一次性 Core100 bootstrap 已使用，不可重跑。
 - 不因手動測試宣稱自然排程驗收；不把 Pages、CI 或 synthetic full-cycle CI 當成正式策略／runtime 證據。

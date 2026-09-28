@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-r2-writer-inventory-v0.1",
   "updated_date": "2026-09-29",
-  "evidence_basis_main_sha": "1c6a8f1ee7449a9bb1a787646c6d813ce93edbb1",
+  "evidence_basis_main_sha": "0de21f67bd8f122933164f4b1f4a91179d9d3d40",
   "is_latest_main_claim": false,
   "scan": {
     "workflow_file_count": 85,
@@ -161,6 +161,10 @@
     "workflow_count": 0,
     "workflow_paths": [],
     "classification": "NO_DIRECT_D1_ACCESS_WORKFLOW_MARKERS_FOUND_AT_BASELINE",
-    "scope_note": "Scans repository GitHub Actions workflow files for D1 secret references, Wrangler D1 commands, D1 bindings, Cloudflare D1 REST endpoints, and D1 analytics datasets. Does not prove account-wide or external-service writer coverage."
+    "scope_note": "Scans repository GitHub Actions workflow files for D1 secret references, Wrangler D1 commands, D1 bindings, Cloudflare D1 REST endpoints, and D1 analytics datasets. Does not prove account-wide or external-service writer coverage.",
+    "validated_in_pr_head": "c99e55fd0331df1140f30b6def33cfb309566061",
+    "pull_request": 609,
+    "pr_ci_status": "PASS",
+    "post_merge_ci_status": "PASS"
   }
 }
