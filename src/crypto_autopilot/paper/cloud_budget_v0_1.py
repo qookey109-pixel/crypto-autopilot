@@ -41,6 +41,16 @@ class R2UsageSnapshot:
 
 
 @dataclass(frozen=True, slots=True)
+class CloudBudgetUsage:
+    """Provider and R2 operation reservations recorded for one completed slot."""
+
+    provider_requests: int
+    class_a_requests: int
+    class_b_requests: int
+    new_bytes: int
+
+
+@dataclass(frozen=True, slots=True)
 class CloudBudgetPolicy:
     max_evidence_age_ms: int = 60_000
     provider_per_run: int = 18
@@ -81,6 +91,19 @@ class CloudBudgetGuard:
         self._class_b_run = 0
         self._new_bytes_run = 0
         self._new_bytes_day = 0
+
+    def attempted_usage(self) -> CloudBudgetUsage:
+        """Return operation counts reserved immediately before external calls.
+
+        The composition settles these counters only after a complete run returns.
+        On any exception it leaves the full slot envelope reserved for review.
+        """
+        return CloudBudgetUsage(
+            provider_requests=self._provider_run,
+            class_a_requests=self._class_a_run,
+            class_b_requests=self._class_b_run,
+            new_bytes=self._new_bytes_run,
+        )
 
     def _validate_evidence(self) -> None:
         s = self.snapshot

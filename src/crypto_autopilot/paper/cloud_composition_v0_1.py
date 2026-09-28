@@ -15,6 +15,7 @@ from crypto_autopilot.paper.cloud_budget_v0_1 import (
     CloudBudgetGuard,
     R2UsageSnapshot,
 )
+from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import SlotUsage
 from crypto_autopilot.paper.cloud_loop_v0_1 import (
     CompleteTapePionexFeed,
     run_cloud_step,
@@ -42,6 +43,11 @@ class BudgetSlotReservationLedger(Protocol):
     ) -> None:
         """Reserve the bounded slot envelope or fail closed."""
 
+    def settle_slot(
+        self, *, slot_id: str, completed_at_ms: int, usage: SlotUsage,
+    ) -> None:
+        """Settle an exactly observed completed slot or retain its reservation."""
+
 
 class D1UsageBudgetGate(Protocol):
     """Account-wide D1 usage guard required before the atomic slot reservation."""
@@ -67,6 +73,7 @@ class CloudPaperNoTradeComposition:
     paper_policy: LivePaperPolicy
     budget_guard: CloudBudgetGuard
     before_external: Callable[[], None]
+    completion_clock_ms: Callable[[], int]
     reservation_ledger: BudgetSlotReservationLedger | None = None
     d1_usage_guard: D1UsageBudgetGate | None = None
     run_name: str = "cloud-paper-v0-1"
@@ -78,6 +85,8 @@ class CloudPaperNoTradeComposition:
             raise ValueError("a cloud budget guard is required")
         if not callable(self.before_external):
             raise ValueError("an external-access guard is required")
+        if not callable(self.completion_clock_ms):
+            raise ValueError("a completion clock is required for settlement")
         store_guard = getattr(self.store, "budget_guard", None)
         if store_guard is None:
             store_guard = getattr(getattr(self.store, "store", None), "budget_guard", None)
@@ -167,7 +176,7 @@ class CloudPaperNoTradeComposition:
             policy=self.paper_policy,
             before_request=self._reserve_provider_request,
         )
-        return run_cloud_step(
+        result = run_cloud_step(
             tick_ms=tick_ms,
             previous_slot=previous_slot,
             store=self.store,
@@ -178,3 +187,21 @@ class CloudPaperNoTradeComposition:
             before_external=self.before_external,
             run_name=self.run_name,
         )
+        # Only a completely returned, immutable/readback-verified Paper result
+        # may release unused reservation. Exceptions leave the full envelope in
+        # RESERVED for explicit recovery; settlement errors propagate unchanged.
+        if result.get("state") not in {"COMMITTED", "NO_TRADE"}:
+            raise CloudPaperCompositionBlocked("PAPER_RESULT_NOT_SETTLEABLE")
+        self.d1_usage_guard.validate_evidence()
+        usage = self.budget_guard.attempted_usage()
+        self.reservation_ledger.settle_slot(
+            slot_id=slot,
+            completed_at_ms=self.completion_clock_ms(),
+            usage=SlotUsage(
+                provider_requests=usage.provider_requests,
+                class_a=usage.class_a_requests,
+                class_b=usage.class_b_requests,
+                new_bytes=usage.new_bytes,
+            ),
+        )
+        return result
