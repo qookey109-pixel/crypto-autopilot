@@ -241,7 +241,6 @@ def select_qualified_candidates(
             or direction != "LONG"
             or not isinstance(candidate_as_of, int)
             or isinstance(candidate_as_of, bool)
-            or candidate_as_of != as_of_ms
             or not isinstance(regime, str)
             or registration.get("strategy_family") != family
             or registration.get("provider") != "PIONEX_PUBLIC"
@@ -268,6 +267,7 @@ def select_qualified_candidates(
             return CandidateSelection("REVIEW_REQUIRED", (), ("CANDIDATE_LINEAGE_MISSING",))
         if (
             source.get("provider") != "PIONEX_PUBLIC"
+            or candidate_as_of != source.get("last_bar_ms")
             or not _is_sha256(source.get("sha256"))
             or candidate.get("market_evidence_sha256") != source.get("sha256")
             or candidate.get("strategy_route_sha256") != _canonical_sha256(route)
