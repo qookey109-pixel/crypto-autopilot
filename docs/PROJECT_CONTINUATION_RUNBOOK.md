@@ -4,9 +4,9 @@
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
-## Cloud Paper delivery status — main `6deabddd7f925b6d586b9565a9f6641105a2fd29`
+## Cloud Paper delivery status — product evidence basis `6deabddd7f925b6d586b9565a9f6641105a2fd29`
 
-Updated 2026-09-29 from live GitHub after PR #618. PR #618 merged the Dashboard status/capacity projection. Main Python 3.12/3.13 CI, CodeQL, Dependency/SBOM and Freeze Guard passed. Pages run [36479940093](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36479940093) passed build/deploy and 14 production browser checks across desktop Chromium and mobile Chromium. See [CURRENT_STATUS](../CURRENT_STATUS.md), [PROJECT_STATUS](../PROJECT_STATUS.md), the [short-term delivery checklist](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md), and the [machine delivery status](../research/status/cloud-paper-delivery-v0-1.json).
+Updated 2026-09-29 from live GitHub. Product/code evidence is based on main `6deabddd7f925b6d586b9565a9f6641105a2fd29` after PR #618. PRs [#619](https://github.com/qookey109-pixel/crypto-autopilot/pull/619) and [#620](https://github.com/qookey109-pixel/crypto-autopilot/pull/620) later merged documentation-only status syncs; they changed no runtime or authority. Resolve live `main` before operating. At the PR #618 product merge, Python 3.12/3.13 CI, CodeQL, Dependency/SBOM and Freeze Guard passed. Pages run [36479940093](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36479940093) passed build/deploy and 14 production browser checks across desktop Chromium and mobile Chromium. See [CURRENT_STATUS](../CURRENT_STATUS.md), [PROJECT_STATUS](../PROJECT_STATUS.md), the [short-term delivery checklist](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md), and the [machine delivery status](../research/status/cloud-paper-delivery-v0-1.json).
 
 - Dashboard projection says `NOT_RUN`; it separately shows the empty strategy registry, `REGIME_UNAVAILABLE`, `BLOCKED_BUDGET`, and unknown account storage. Browser success verifies presentation only, not a formal Cloud Paper run.
 - Storage policy: 256 KiB/object, 2 MiB/run, 192 MiB/day, 6,241,124,352 theoretical bytes per 31 days at 96 slots/day; WARNING at 6.4 GB and hard stop at projected 8 GB. Retention remains indefinite and append-only; deletion has no authority.
