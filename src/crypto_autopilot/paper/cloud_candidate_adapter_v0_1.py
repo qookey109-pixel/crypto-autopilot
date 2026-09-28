@@ -149,7 +149,7 @@ def _route_match(
     regime: str,
 ) -> bool:
     matches = route.get("matches")
-    if not isinstance(matches, list):
+    if not isinstance(matches, Sequence) or isinstance(matches, (str, bytes)):
         return False
     return any(
         isinstance(match, Mapping)
