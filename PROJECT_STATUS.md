@@ -1,14 +1,16 @@
 # Project Status
 
-Updated: 2026-09-29 (Cloud Paper checkpoint below; historical stage notes retain their dated evidence).
+Updated: 2026-09-29 (current Cloud Paper checkpoint below; historical stage notes retain their dated evidence).
 
 ## Cloud Paper delivery checkpoint — 2026-09-29
 
-Live main is `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`. PR #614 connected the qualification-gated candidate adapter; PR #615 synchronized delivery status; PR #616 defined the bounded append-only R2 policy and implemented a 6.4 GB warning / 8 GB fail-closed guard. PR #616 merged with PR checks and post-merge Python 3.12/3.13 CI, Dependency/SBOM and Freeze Guard passing. Its post-merge CodeQL run [36478324500](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324500) passed.
+Live main is `6deabddd7f925b6d586b9565a9f6641105a2fd29`. PR #618 merged the Dashboard status and capacity projection. Main Python 3.12/3.13 CI, CodeQL, Dependency/SBOM, and Freeze Guard passed; Pages build/deploy passed and production desktop/mobile browser validation passed 14/14 tests. Main-push workflow-static was skipped because workflow files were unchanged.
 
-The storage envelope is 256 KiB/object, 2 MiB/run, 192 MiB/day and 6,241,124,352 theoretical bytes over 31 days at 96 slots/day. Evidence remains append-only with no deletion authority. These limits do not establish actual account usage or all-writer coverage.
+The Dashboard reports the Cloud Paper production run as `NOT_RUN`; empty strategy registry, `REGIME_UNAVAILABLE`, `BLOCKED_BUDGET`, and unknown account storage are distinct. The production registry remains empty and Core100 quality is `REJECT`. These UI and CI checks do not constitute a production simulation or trading result.
 
-Cloud Paper activation remains disabled. Account-wide usage/freshness and all-writer coverage are unproven; D1 is not provisioned; production controlled acceptance and the execution workflow/natural schedule do not exist. The production strategy registry is empty and model quality is `REJECT`; synthetic CI trade fixtures are not production trades. The Cloudflare audit readiness run remains blocked on missing read-only credentials and performed zero Cloudflare requests. Continue only after zero-network readiness is READY, and retain all existing FREE-ONLY and research/trading boundaries.
+The #616 storage envelope remains 256 KiB/object, 2 MiB/run, 192 MiB/day, and 6,241,124,352 theoretical bytes over 31 days. It warns at 6.4 GB and fails closed at projected 8 GB. Evidence retention is append-only; deletion is not authorized. Actual account usage/freshness, all-writer coverage, and D1 storage calibration remain unverified.
+
+Activation remains disabled. The Cloudflare account-usage readiness run [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) is `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`, with zero Cloudflare requests; one-time audit authority remains unconsumed. D1 is not provisioned, no production execution workflow or natural schedule exists, and controlled main acceptance has not run. Configure the Actions account ID variable and read-only token secret, run zero-network readiness, then dispatch the one-time audit only when readiness is `READY`. Continue to keep FREE-ONLY / 0 USD and all research/trading boundaries in force.
 
 Repository `main` is the formal current authority and must be resolved live at read time. This file is the project-stage, governance-compatibility, and retired-workflow index. Exact versioned configs, receipts, immutable run evidence, and merged code remain the detailed authority for each scope.
 
@@ -388,5 +390,5 @@ PR #614 merged at `abda84a45de66dc214be40ce05ee0c2ccb79e415`. Its candidate adap
 
 PR #614 head CI passed Python 3.12/3.13, workflow-static, CodeQL, and Dependency/SBOM. Post-merge [CI 36476179028](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36476179028), [CodeQL 36476178911](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36476178911), [Dependency/SBOM 36476178980](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36476178980), and [Freeze Guard 36476179061](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36476179061) succeeded. `workflow-static` was not triggered by the main push.
 
-Activation remains disabled. Account-wide usage/freshness evidence and all-writer coverage are unproven; D1 is not provisioned or wired; controlled main acceptance has not run; and no production execution workflow or natural schedule exists. R2 8 GB hard stop fails closed, but report-size/retention/capacity-warning policy and production usage verification remain incomplete. Next independent engineering work is to bound report size and append-only growth and define capacity warning/stop behavior without adding delete authority. Keep empty-registry `NO_TRADE` and all fail-closed controls.
+Activation remains disabled. Account-wide usage/freshness evidence and all-writer coverage are unproven; D1 is not provisioned or wired; controlled main acceptance has not run; and no production execution workflow or natural schedule exists. PR #616 has since defined the report/object ceilings, append-only growth envelope, 6.4 GB warning, and projected 8 GB fail-closed stop. Production usage verification, D1 calibration, account-wide writer coverage, controlled acceptance, and execution schedule remain incomplete. Keep empty-registry `NO_TRADE` and all fail-closed controls.
 

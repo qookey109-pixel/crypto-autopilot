@@ -1,19 +1,19 @@
 # Current Operations Status
 
-## Cloud Paper delivery checkpoint — main `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`
+## Cloud Paper delivery checkpoint — main `6deabddd7f925b6d586b9565a9f6641105a2fd29`
 
-Updated 2026-09-29 from live GitHub. This is the current Cloud Paper checkpoint; the later #614 section below remains a historical snapshot.
+Updated 2026-09-29 from live GitHub after PR #618. This section is the current Cloud Paper checkpoint; the later dated sections retain historical evidence.
 
-- PR [#615](https://github.com/qookey109-pixel/crypto-autopilot/pull/615) synchronized Cloud Paper status after the candidate adapter. It merged as `d302b3ce1a6969864881c2a15a64f05e7da4ecf2`; its post-merge CI, CodeQL, Dependency/SBOM, Freeze Guard, and Pages build succeeded. Pages deploy/browser jobs were skipped because this was a documentation-only change.
-- PR [#616](https://github.com/qookey109-pixel/crypto-autopilot/pull/616) added the storage-capacity policy and warning guard; it merged as `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`. PR-head Python 3.12/3.13, Ruff, workflow-static, CodeQL and Dependency/SBOM passed. Main CI [36478324594](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324594), Dependency/SBOM [36478324445](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324445) and Freeze Guard [36478324502](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324502) passed. CodeQL [36478324500](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324500) passed.
-- Storage policy: maximum 256 KiB/object, 2 MiB/run, 192 MiB/day at 96 slots, theoretical 6,241,124,352 bytes/31 days; warning at 6.4 GB and hard stop before a write reaches 8 GB. Evidence retention stays indefinite and append-only; deletion is not authorized.
-- These are project ceilings and synthetic guard checks, not Cloudflare account usage evidence. Production account usage/freshness and all-writer reservation coverage remain unverified.
-- Cloud Paper remains inactive: no execution workflow or natural schedule; controlled main acceptance has not run; D1 migrations remain prepare-only and D1 is not provisioned. The production strategy registry is empty and Core100 quality is `REJECT`; positive fills are CI fixtures only.
-- Account-usage audit readiness run [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) remains `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`, with zero Cloudflare requests; the one-time audit authority is unconsumed.
-- Next gate: configure `CLOUDFLARE_ACCOUNT_ID` as a GitHub Actions variable and `CLOUDFLARE_READONLY_API_TOKEN` as a GitHub Actions secret, then run only zero-network readiness. Dispatch the one-time audit only after readiness is `READY`; do not activate Paper until all budget, D1, controlled-acceptance and authority gates pass.
-- Keep FREE-ONLY / 0 USD, PAPER/LIVE-PAPER only, and holdout, source switch, promotion, real-money orders and live trading closed.
+- PR [#618](https://github.com/qookey109-pixel/crypto-autopilot/pull/618) clarified the inactive Dashboard state and storage-capacity projection. It merged to main as `6deabddd7f925b6d586b9565a9f6641105a2fd29`.
+- PR-head checks passed Python 3.12/3.13, workflow-static, Dashboard snapshot/static smoke, CodeQL, Dependency/SBOM, and prepared-cutover validation. Post-merge CI [36479940078](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36479940078), CodeQL [36479940139](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36479940139), Dependency/SBOM [36479940055](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36479940055), and Freeze Guard [36479940101](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36479940101) passed. Main-push workflow-static was skipped because no workflow changed.
+- Pages [run 36479940093](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36479940093) passed build and deploy; production browser checks passed all 14 desktop Chromium and mobile Chromium tests, including the inactive Cloud Paper state. This verifies the Dashboard projection, not a Cloud Paper execution.
+- The Dashboard now distinguishes `NOT_RUN`, an empty strategy registry, `REGIME_UNAVAILABLE`, `BLOCKED_BUDGET`, and unknown account storage. Actual usage remains unknown, not zero. Policy ceilings remain 256 KiB/object, 2 MiB/run, 192 MiB/day, 6,241,124,352 theoretical bytes/31 days, WARNING at 6.4 GB, and a fail-closed hard stop at projected 8 GB. Evidence is append-only; deletion is not authorized.
+- Cloud Paper remains inactive: no production execution workflow or natural schedule; controlled main acceptance has not run; D1 migrations remain prepare-only and D1 is not provisioned. The production strategy registry is empty and Core100 quality is `REJECT`; positive fills remain CI-only.
+- Account-usage readiness [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) remains `BLOCKED_MISSING_READ_ONLY_CREDENTIAL` with zero Cloudflare requests; the one-time audit authority is unconsumed. Account-wide usage/freshness and all-writer reservation coverage remain unverified.
+- Next gate: configure `CLOUDFLARE_ACCOUNT_ID` as a GitHub Actions variable and `CLOUDFLARE_READONLY_API_TOKEN` as a GitHub Actions secret. Run zero-network readiness first; dispatch the one-time audit only when it returns `READY`. Do not enable Paper runtime until account-wide budget, D1, controlled-acceptance, and separate authority gates are satisfied.
+- Keep FREE-ONLY / 0 USD, PAPER/LIVE-PAPER only, and holdout, source switch, promotion, real-money orders, and live trading closed.
 
-## Cloud Paper current checkpoint — PR #614 merged
+## Historical Cloud Paper checkpoint — PR #614 merged (superseded by this section)
 
 - Evidence basis: main `abda84a45de66dc214be40ce05ee0c2ccb79e415` after PR #614; re-resolve live main before acting. PR #614 is merged and its delivery branch was deleted.
 - PR [#614](https://github.com/qookey109-pixel/crypto-autopilot/pull/614) connects the versioned qualification-gated candidate adapter to the Cloud Paper composition. It checks registry eligibility, current Pionex market/route lineage, closed-bar time (`candidate.as_of_ms == evidence.last_bar_ms`), qualification/implementation hashes, and verified account equity/sizing.
@@ -25,7 +25,7 @@ Updated 2026-09-29 from live GitHub. This is the current Cloud Paper checkpoint;
 - Keep `FREE-ONLY / 0 USD`, PAPER/LIVE-PAPER only, holdout/source switch/model promotion/real trading closed. Do not treat CI success or synthetic fills as production acceptance or strategy validity.
 
 Updated: 2026-09-29. This is the human entrypoint; `main` and versioned authority remain the formal source of truth.
-## Cloud Paper current checkpoint — PR #609 merged
+## Historical checkpoint — PR #609 merge (superseded by the current checkpoint above)
 
 本節於 2026-09-29 依 GitHub 查核：PR #609 exact head `c99e55fd0331df1140f30b6def33cfb309566061` 已合併至 `0de21f67bd8f122933164f4b1f4a91179d9d3d40`（base `1c6a8f1ee7449a9bb1a787646c6d813ce93edbb1`）。PR-head Python 3.12／3.13、build、workflow-static、CodeQL、Dependency/SBOM、snapshot 均通過；main 的 Python 3.12／3.13、build、Freeze Guard、Dependency/SBOM、CodeQL 均通過（CI [36466531872](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36466531872)、CodeQL [36466532665](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36466532665)）。Pages deploy/browser-production 因未涉及網站而 skipped。PR #609 [run](https://github.com/qookey109-pixel/crypto-autopilot/pull/609)。
 
