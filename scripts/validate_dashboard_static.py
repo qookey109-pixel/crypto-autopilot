@@ -134,12 +134,33 @@ def main() -> int:
         raise RuntimeError("Cloud Paper monthly budget must remain zero")
     if cloud_budget.get("account_wide_usage_evidence") != "MISSING":
         raise RuntimeError("Cloud Paper shared-account usage evidence must remain missing")
-    if cloud_budget.get("reservation_guard") != "R2_ADAPTER_HOOKS_IMPLEMENTED_CLOUD_LOOP_NOT_WIRED":
-        raise RuntimeError("Cloud Paper reservation wiring status changed")
-    if cloud_budget.get("d1_reservation_ledger") != "PRIMITIVE_PREPARED_NOT_PROVISIONED_OR_WIRED":
+    if cloud_budget.get("reservation_guard") != "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED":
+        raise RuntimeError("Cloud Paper provider/R2 guard projection changed")
+    if cloud_budget.get("d1_reservation_ledger") != "SHARED_LEDGER_CODE_PREPARED_MIGRATIONS_NOT_APPLIED_D1_NOT_PROVISIONED":
         raise RuntimeError("Cloud Paper D1 reservation ledger status changed")
     if cloud_budget.get("d1_free_tier_usage_evidence") != "MISSING":
         raise RuntimeError("Cloud Paper D1 free-tier evidence must remain missing")
+    capacity = cloud_budget.get("storage_capacity") or {}
+    if capacity.get("state") != "USAGE_UNKNOWN_BLOCKED":
+        raise RuntimeError("Cloud Paper storage usage must remain blocked while unknown")
+    if capacity.get("measured_storage_bytes") is not None:
+        raise RuntimeError("unknown Cloud Paper storage usage must remain null, not zero")
+    if capacity.get("usage_evidence") != "MISSING_NOT_ZERO":
+        raise RuntimeError("Cloud Paper storage usage evidence semantics changed")
+    if capacity.get("report_object_max_bytes") != 262_144:
+        raise RuntimeError("Cloud Paper per-object storage ceiling changed")
+    if capacity.get("per_run_growth_max_bytes") != 2_097_152:
+        raise RuntimeError("Cloud Paper per-run storage ceiling changed")
+    if capacity.get("per_utc_day_growth_max_bytes") != 201_326_592:
+        raise RuntimeError("Cloud Paper daily storage ceiling changed")
+    if capacity.get("max_31_day_growth_bytes") != 6_241_124_352:
+        raise RuntimeError("Cloud Paper 31-day growth envelope changed")
+    if capacity.get("warning_threshold_bytes") != 6_400_000_000:
+        raise RuntimeError("Cloud Paper storage warning threshold changed")
+    if capacity.get("hard_stop_bytes") != 8_000_000_000:
+        raise RuntimeError("Cloud Paper storage hard stop changed")
+    if capacity.get("all_writer_coverage_proven") is not False:
+        raise RuntimeError("Cloud Paper writer coverage must remain unproven")
     production = cloud_paper.get("production") or {}
     if production.get("entrypoint_workflow") != "NOT_WIRED":
         raise RuntimeError("Cloud Paper production entrypoint must remain not wired")

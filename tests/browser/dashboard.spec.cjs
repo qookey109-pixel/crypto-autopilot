@@ -261,13 +261,15 @@ test("cloud paper dashboard shows inactive state without inventing account evide
   await page.goto(baseURL, { waitUntil: "networkidle" });
   await expect(page.locator("#cloud-paper-status")).toHaveText("已實作 · 尚未啟用");
   await expect(page.locator("#cloud-paper-last-run")).toHaveText("尚未執行");
-  await expect(page.locator("#cloud-paper-candidates")).toHaveText("NO_TRADE · 空策略登錄");
+  await expect(page.locator("#cloud-paper-candidates")).toHaveText("尚未執行 · 空策略登錄，沒有合格候選");
   await expect(page.locator("#cloud-paper-regime")).toHaveText("REGIME_UNAVAILABLE · 缺 TOTAL3 / BTC dominance；23 市場 breadth 覆蓋未驗證");
   await expect(page.locator(".cloud-paper-panel")).toContainText("固定 23 市場 breadth 成員已準備，歷史覆蓋仍未驗證");
   await expect(page.locator("#cloud-paper-account")).toHaveText("尚未初始化");
-  await expect(page.locator("#cloud-paper-budget")).toHaveText("BLOCKED · 預約接線與用量證據待補");
+  await expect(page.locator("#cloud-paper-budget")).toHaveText("BLOCKED_BUDGET · 帳戶級用量證據缺失");
+  await expect(page.locator("#cloud-paper-storage-capacity")).toHaveText("實際用量未知 · 警示 6.4 GB · 硬停 8.0 GB");
   await expect(page.locator("#cloud-paper-trace-status")).toHaveText("尚無正式循環報告");
   await expect(page.locator("#cloud-paper-trace-detail")).toContainText("最新正式 run 為 NOT_RUN");
   await expect(page.locator(".cloud-paper-panel")).toContainText("API key");
-  await expect(page.locator(".cloud-paper-panel")).toContainText("D1 原語尚未佈署");
+  await expect(page.locator(".cloud-paper-panel")).toContainText("D1 migrations 尚未套用且 D1 未 provision");
+  await expect(page.locator(".cloud-paper-panel")).toContainText("未知值不顯示成 0");
 });

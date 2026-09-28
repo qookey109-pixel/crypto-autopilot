@@ -2,7 +2,7 @@
   "schema": "qookey-cloud-paper-dashboard-v0.1",
   "authority": false,
   "mode": "PAPER_AND_LIVE_PAPER_ONLY",
-  "evidence_basis_main_sha": "af35764fa05d3b3d9e1639c9538f8fa08b9e8c55",
+  "evidence_basis_main_sha": "9f2973ae6b104dd9af02632afaec892daa7514c5",
   "observed_at_utc": null,
   "activation": {
     "enabled": false,
@@ -20,7 +20,8 @@
   "strategy": {
     "registry_status": "EMPTY_NO_ELIGIBLE_STRATEGIES",
     "eligible_count": 0,
-    "empty_registry_result": "NO_TRADE"
+    "empty_registry_result": "NO_TRADE",
+    "runtime_result": "NOT_RUN_NO_FORMAL_NO_TRADE_RESULT"
   },
   "market": {
     "provider": "PIONEX_PUBLIC",
@@ -50,10 +51,24 @@
   "budget": {
     "monthly_budget_usd": 0,
     "account_wide_usage_evidence": "MISSING",
-    "reservation_guard": "R2_ADAPTER_HOOKS_IMPLEMENTED_CLOUD_LOOP_NOT_WIRED",
+    "reservation_guard": "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED",
     "state": "BLOCKED_BUDGET",
-    "d1_reservation_ledger": "PRIMITIVE_PREPARED_NOT_PROVISIONED_OR_WIRED",
-    "d1_free_tier_usage_evidence": "MISSING"
+    "d1_reservation_ledger": "SHARED_LEDGER_CODE_PREPARED_MIGRATIONS_NOT_APPLIED_D1_NOT_PROVISIONED",
+    "d1_free_tier_usage_evidence": "MISSING",
+    "d1_storage_growth_bytes_per_statement": 16384,
+    "d1_storage_growth_policy_bytes_per_utc_day": 12582912,
+    "storage_capacity": {
+      "state": "USAGE_UNKNOWN_BLOCKED",
+      "measured_storage_bytes": null,
+      "usage_evidence": "MISSING_NOT_ZERO",
+      "report_object_max_bytes": 262144,
+      "per_run_growth_max_bytes": 2097152,
+      "per_utc_day_growth_max_bytes": 201326592,
+      "max_31_day_growth_bytes": 6241124352,
+      "warning_threshold_bytes": 6400000000,
+      "hard_stop_bytes": 8000000000,
+      "all_writer_coverage_proven": false
+    }
   },
   "model_quality": "REJECT",
   "boundary": {

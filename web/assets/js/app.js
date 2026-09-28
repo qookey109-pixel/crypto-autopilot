@@ -932,8 +932,17 @@ function renderCloudPaperLoop(data) {
     && data.market?.breadth_coverage?.coverage_verified === false
     && data.model_quality === "REJECT"
     && data.budget?.account_wide_usage_evidence === "MISSING"
-    && data.budget?.reservation_guard === "R2_ADAPTER_HOOKS_IMPLEMENTED_CLOUD_LOOP_NOT_WIRED"
-    && data.budget?.d1_reservation_ledger === "PRIMITIVE_PREPARED_NOT_PROVISIONED_OR_WIRED"
+    && data.budget?.reservation_guard === "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED"
+    && data.budget?.d1_reservation_ledger === "SHARED_LEDGER_CODE_PREPARED_MIGRATIONS_NOT_APPLIED_D1_NOT_PROVISIONED"
+    && data.budget?.storage_capacity?.state === "USAGE_UNKNOWN_BLOCKED"
+    && data.budget?.storage_capacity?.measured_storage_bytes === null
+    && data.budget?.storage_capacity?.report_object_max_bytes === 262144
+    && data.budget?.storage_capacity?.per_run_growth_max_bytes === 2097152
+    && data.budget?.storage_capacity?.per_utc_day_growth_max_bytes === 201326592
+    && data.budget?.storage_capacity?.max_31_day_growth_bytes === 6241124352
+    && data.budget?.storage_capacity?.warning_threshold_bytes === 6400000000
+    && data.budget?.storage_capacity?.hard_stop_bytes === 8000000000
+    && data.budget?.storage_capacity?.all_writer_coverage_proven === false
     && data.budget?.d1_free_tier_usage_evidence === "MISSING"
     && data.production?.entrypoint_workflow === "NOT_WIRED"
     && data.production?.natural_schedule === "NOT_CONFIGURED";
@@ -951,7 +960,8 @@ function renderCloudPaperLoop(data) {
     set("#cloud-paper-regime", "未核實");
     set("#cloud-paper-account", "未核實");
     set("#cloud-paper-positions", "未核實");
-    set("#cloud-paper-budget", "BLOCKED");
+    set("#cloud-paper-budget", "BLOCKED_BUDGET · 無法核實");
+    set("#cloud-paper-storage-capacity", "用量未知 · 不顯示為 0");
     return;
   }
   if (status) {
@@ -959,7 +969,7 @@ function renderCloudPaperLoop(data) {
     status.className = "badge neutral";
   }
   if (detail) {
-    detail.textContent = "正式 provider/R2 執行與自然排程尚未接線。R2 預約 adapter 已實作但未接入循環，D1 原語尚未佈署；共享用量與 D1 額度證據缺失。正式策略登錄為空，故目前不得建立倉位。";
+    detail.textContent = "正式循環尚未啟用，沒有正式 run。共享 provider/R2 守門程式已實作，但 Cloud Paper runtime 尚未啟用；帳戶級用量、freshness 與所有 writer 覆蓋仍未驗證。D1 migrations 尚未套用且 D1 未 provision。策略登錄為空、模型品質為 REJECT，因此目前不會建立倉位。";
   }
   if (traceStatus) {
     traceStatus.textContent = "尚無正式循環報告";
@@ -969,11 +979,12 @@ function renderCloudPaperLoop(data) {
     traceDetail.textContent = "最新正式 run 為 NOT_RUN；逐市場決策軌跡尚無資料。合成 CI 證據不會投影成正式市場決策。";
   }
   set("#cloud-paper-last-run", "尚未執行");
-  set("#cloud-paper-candidates", "NO_TRADE · 空策略登錄");
+  set("#cloud-paper-candidates", "尚未執行 · 空策略登錄，沒有合格候選");
   set("#cloud-paper-regime", "REGIME_UNAVAILABLE · 缺 TOTAL3 / BTC dominance；23 市場 breadth 覆蓋未驗證");
   set("#cloud-paper-account", "尚未初始化");
   set("#cloud-paper-positions", "持倉與損益尚無正式證據");
-  set("#cloud-paper-budget", "BLOCKED · 預約接線與用量證據待補");
+  set("#cloud-paper-budget", "BLOCKED_BUDGET · 帳戶級用量證據缺失");
+  set("#cloud-paper-storage-capacity", "實際用量未知 · 警示 6.4 GB · 硬停 8.0 GB");
 }
 
 async function loadData() {
