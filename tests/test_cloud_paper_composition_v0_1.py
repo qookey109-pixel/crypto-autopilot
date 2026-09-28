@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import unittest
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime
 from unittest.mock import patch
 
