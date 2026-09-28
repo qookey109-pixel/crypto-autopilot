@@ -210,6 +210,31 @@ def latest_committed_slot(
             raise CloudLoopReviewRequired("LEDGER_CHAIN_MISMATCH")
     return latest_slot
 
+
+def decision_reason_codes(
+    *, market: Mapping[str, object], registrations: Sequence[object],
+    candidates: Sequence[object],
+) -> tuple[str, ...]:
+    """Summarize why a slot did or did not produce eligible paper candidates."""
+    reasons: list[str] = []
+    if market.get("market_status") == "REVIEW_REQUIRED":
+        reasons.append("MARKET_INPUT_REVIEW_REQUIRED")
+    context_status = market.get("context_status")
+    if context_status != "AVAILABLE":
+        reasons.append(
+            "REGIME_UNAVAILABLE"
+            if context_status == "REGIME_UNAVAILABLE"
+            else "MARKET_CONTEXT_UNAVAILABLE"
+        )
+    if candidates:
+        reasons.append("QUALIFIED_CANDIDATES")
+    elif not registrations:
+        reasons.append("NO_ELIGIBLE_STRATEGY")
+    else:
+        reasons.append("NO_QUALIFIED_CANDIDATE")
+    return tuple(dict.fromkeys(reasons))
+
+
 def run_cloud_step(
     *, tick_ms: int, previous_slot: str | None, store: PaperRunStoreLike,
     feed: LivePaperMarketFeed, market_supplier: Callable[[], Mapping[str, object]],
@@ -291,6 +316,9 @@ def run_cloud_step(
     )
     next_state = report["run_step"]["tick_report"]["next_state"]
     checkpoint = next_state["checkpoint_report"]
+    reasons = decision_reason_codes(
+        market=market, registrations=registrations, candidates=candidates,
+    )
     outcome = {
         "schema": "qookey-cloud-paper-loop-report-v0.1",
         "state": "COMMITTED" if candidates or state["active_session"] else "NO_TRADE",
@@ -304,7 +332,8 @@ def run_cloud_step(
             "status": "KNOWN",
         },
         "account": checkpoint["account_snapshot"],
-        "reason": ("NO_ELIGIBLE_STRATEGY" if not candidates else "QUALIFIED_CANDIDATES"),
+        "reason": reasons[0],
+        "reason_codes": list(reasons),
         "authority": {"paper_only": True, "real_money_orders": False,
                       "holdout_access": False, "source_switch": False,
                       "model_promotion": False},

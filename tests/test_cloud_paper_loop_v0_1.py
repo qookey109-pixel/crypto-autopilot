@@ -182,7 +182,10 @@ class CloudPaperLoopTests(unittest.TestCase):
         store = MemoryStore()
         first = step(store, 420000, None)
         self.assertEqual(first["state"], "NO_TRADE")
-        self.assertEqual(first["reason"], "NO_ELIGIBLE_STRATEGY")
+        self.assertEqual(first["reason"], "REGIME_UNAVAILABLE")
+        self.assertEqual(first["reason_codes"], [
+            "REGIME_UNAVAILABLE", "NO_ELIGIBLE_STRATEGY",
+        ])
         self.assertEqual(first["account"]["initial_equity_usd"], 10000.0)
         self.assertEqual(first["account"]["open_position_count"], 0)
         self.assertEqual(first["operation_counts"]["provider_requests"], 8)
@@ -194,6 +197,26 @@ class CloudPaperLoopTests(unittest.TestCase):
         self.assertEqual(second["state"], "NO_TRADE")
         self.assertEqual(second["coordinator"]["sequence"], 2)
         self.assertEqual(second["account"]["initial_equity_usd"], 10000.0)
+
+    def test_nonempty_registry_without_candidates_reports_no_qualified_candidate(self):
+        store = MemoryStore()
+        result = run_cloud_step(
+            tick_ms=420000, previous_slot=None, store=store,
+            feed=NeverCalledFeed(),
+            market_supplier=lambda: {
+                "context_status": "AVAILABLE", "provider_requests_performed": 0,
+            },
+            candidate_supplier=lambda market, state: [],
+            strategy_registry={
+                "schema": "qookey-cloud-paper-strategy-registry-v0.1",
+                "status": "SYNTHETIC_TEST_ONLY",
+                "strategies": [{"strategy_id": "synthetic-ci-only"}],
+            },
+            before_external=lambda: None,
+        )
+        self.assertEqual(result["state"], "NO_TRADE")
+        self.assertEqual(result["reason"], "NO_QUALIFIED_CANDIDATE")
+        self.assertEqual(result["reason_codes"], ["NO_QUALIFIED_CANDIDATE"])
 
     def test_empty_registry_rejects_injected_production_candidate(self):
         store = MemoryStore()
