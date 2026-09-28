@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-29",
-  "evidence_basis_parent_main_sha": "b1fe413b08550802a69f3fcaa64cf815a4bcc1c1",
+  "evidence_basis_parent_main_sha": "96ed9dbff430b98df56a8fa2aa51b4b22fc3caf2",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
