@@ -149,9 +149,9 @@ TradingAgents 保留既有研究定位，後續另行評估。
 
 PR [#579](https://github.com/qookey109-pixel/crypto-autopilot/pull/579) 將 Pionex 行情與 R2 保存接到同一 run-scoped guard；PR [#585](https://github.com/qookey109-pixel/crypto-autopilot/pull/585) 加上 D1 usage-evidence preflight 與 per-slot reservation interface；PR [#587](https://github.com/qookey109-pixel/crypto-autopilot/pull/587) 完成 concrete D1 evidence guard、composition preflight 及 Cloudflare D1 REST client 的逐 query guard。#587 的 PR head 與 post-merge 必要 CI 均通過。
 
-PR #590/#595 完成成功 settlement 與完全相同用量的安全重送。PR #599 新增預設關閉的跨重啟核對路徑：驗證 immutable R2 result/report 後記錄 D1 recovery audit receipt，完整 reservation 仍保留；PR #600 再核對 result pointer 的 slot 與 `COMMITTED` 狀態。這是 recovery audit，不是 settlement/release 恢復，也未在正式 runtime 執行。跨 runner/account-wide D1 rows reservation、recovery/retry 查詢成本、可信帳戶級 D1/R2 usage freshness、所有 writers coverage、production runner binding、D1 provisioning 仍未證明。
+PR #590/#595 完成成功 settlement 與完全相同用量的安全重送。PR #599 新增預設關閉的跨重啟核對路徑：驗證 immutable R2 result/report 後記錄 D1 recovery audit receipt，完整 reservation 仍保留；PR #600 再核對 result pointer 的 slot 與 `COMMITTED` 狀態。這是 recovery audit，不是 settlement/release 恢復，也未在正式 runtime 執行。PR #603 加入 prepare-only shared D1 rows reservation，每日最多 384 次 query reservation，每次預留 admission 與目標 query 共 8,000 rows read／20 rows written；政策最大 envelope 為 3,072,000 rows read／7,680 rows written/day。這是 SQLite CI 的程式證據，不是 production D1 用量量測；migration 未套用。
 
-因此 P0 預算與保存批次仍未完成，不啟用 runtime、不做受控 main acceptance。下一批應先解決跨執行 D1 rows-read/write reservation 與 settlement 的結果恢復，再完成有 freshness watermark 的帳戶級 usage source 和所有 writer coverage。只有證明 96 slots/day 在 FREE-ONLY 預算下可行，才可進行正式 D1/R2 驗收；不得把合成證據當成正式用量，也不得以降低 25,000/query 上界讓算式通過。
+P0 預算與保存仍未完成，不啟用 runtime、不做受控 main acceptance。剩餘工作為 cross-run storage-growth reservation、可信且及時的 account-wide usage source、所有 D1 writers coverage、R2/D1 FREE-ONLY headroom 證據與 production binding。shared guard 只涵蓋使用該 client 的 query；超過 384 次／日 fail closed。未能證明 96 slots/day 與 recovery/retry 查詢都在預算內，就保持 `activation.enabled=false`；不得把合成證據當正式用量。
 ## 10. D1／R2 預算可行性查核 — 2026-09-28
 
 ### D1 用量來源與 freshness
@@ -166,16 +166,16 @@ D1 query API 的 `meta.rows_read`／`meta.rows_written` 是單次查詢執行後
 
 ### 查詢容量推導
 
-原始 guard 以 25,000 rows/query 預留；96 slots/day × reservation/settlement 兩次 query 為 4,800,000 rows/day，高於 4,000,000 專案 safety ceiling。這是 guard 上界而非實測，原設定不能證明 96-slot 可行。
+歷史初始 guard 曾預留 25,000 rows/query，已由 PR #592 的 4,000/query 上界取代。原始 96 × 2 × 25,000 = 4,800,000 rows/day 高於 4,000,000 safety ceiling；這只是歷史 guard 上界，並非 D1 production measurement。
 
 PR #592 加入結構性上界：
 
 - D1 ledger 只接受與 `cloud_loop_v0_1.slot_id(now_ms)` 相同的 canonical 15-minute slot，拒絕任意 slot ID 或非排程時間。
 - rolling query 使用 `reserved_at_ms` 索引，窗口為最多 31 天；每 15 分鐘最多一個唯一 slot，因此目標完整窗口最多掃描 31 × 96 = **2,976** 筆 ledger slot。
 - 單次 guard ceiling 設為 **4,000 rows**，包括最多 2,976 筆 slot 與 1,024 rows 的額外保留空間；超過 ceiling 時 fail closed。GitHub CI 的 SQLite `EXPLAIN QUERY PLAN` 檢查索引路徑，合成測試驗證 canonical slot 與日容量算式。
-- 96 slots/day × 2 D1 queries/slot × 4,000 rows = **768,000 rows/day**，低於 4,000,000 ceiling，算術上留下 **3,232,000 rows/day** 給其他 D1 用量。
+- PR #603 shared guard 每個 query call 先原子預留 admission statement 與目標 statement，各最多 4,000 rows read／10 rows written。384 次預留/day 的 envelope 是 **3,072,000 rows read／7,680 rows written**，低於 4,000,000／75,000 safety ceiling；算術餘額為 928,000／67,320，但不等於可用 account headroom。透過 shared client 的 reservation、settlement、recovery/retry 均消耗同一 384 次上限；reservation 不退額。
 
-這是程式結構及 SQLite CI 類比下的正常兩 query Cloud Paper workload envelope；**不是 Cloudflare 的實測 rows_read，也不能證明其他 workflows／資料庫 writers 已納入**。PR #599 recovery audit 額外讀取與寫入及重試成本尚未納入此日預算。Cloud Paper 啟用仍需要帳戶級 baseline、完整 writer coverage、跨 workflow reservation/recovery，以及授權後的 D1 metadata 對照，必須依實際 query 數重算。
+這是政策上界與 SQLite 合成 CI，不是 Cloudflare production measurement。跨 runner storage-growth 預留、可信 usage freshness source、所有 D1 writers coverage 與 account-wide D1/R2 headroom 仍未完成；不得因合成測試通過就 provisioning 或啟用 runtime。
 
 R2 的契約上界也需保留共享餘量：2 MiB × 96 slots × 31 days = **6.24 GB／31 days**，對 8 GB 專案 hard stop 僅留下 **1.76 GB** 給其他 writers；Class A 預留為 380,928／31 days，仍須與全帳戶其他 writers 合併核算。這些都是既有 per-slot envelope 的推導，不是實際使用量。
 
