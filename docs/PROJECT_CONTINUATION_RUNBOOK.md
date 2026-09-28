@@ -6,7 +6,7 @@
 
 ## Cloud Paper 短期交付狀態 — 2026-09-29（PR #612 合併後）
 
-查核基準：即時 main `df932f863354fa0047e0833ed29163e8e47f0c3b`，open PR = 0。PR #612 已同步 CURRENT_STATUS、PROJECT_STATUS、本手冊、短期交付文件及機器狀態；PR CI 通過。合併後 CI、CodeQL、Dependency/SBOM、Freeze Guard 均成功；Pages build 成功，deploy/browser-production 因文件變更而 skipped。用量稽核與啟用狀態見 [CURRENT_STATUS](../CURRENT_STATUS.md) 和 [機器交付狀態](../research/status/cloud-paper-delivery-v0-1.json)。
+查核基準：即時 main `df932f863354fa0047e0833ed29163e8e47f0c3b`，open PR = 0。PR #612 已同步 CURRENT_STATUS、PROJECT_STATUS、writer inventory 與機器交付狀態；PR CI 通過。本批補齊本手冊與短期交付文件的同步。合併後 CI、CodeQL、Dependency/SBOM、Freeze Guard 均成功；Pages build 成功，deploy/browser-production 因文件變更而 skipped。用量稽核與啟用狀態見 [CURRENT_STATUS](../CURRENT_STATUS.md) 和 [機器交付狀態](../research/status/cloud-paper-delivery-v0-1.json)。
 
 - PR #611 的 account-wide D1/R2 Analytics audit 僅為唯讀查核準備。readiness run [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) 在 main `600bff79145908f9785427a66689c2f90322dfcf` 上回報 `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`；Cloudflare requests = 0，一次性 audit authority 未消耗。必須先在 GitHub Actions 設定 `CLOUDFLARE_ACCOUNT_ID` variable 與 `CLOUDFLARE_READONLY_API_TOKEN` secret，再跑零網路 readiness；READY 前不得 dispatch 一次性 audit。
 - #579/#587 已接 shared provider/R2 guard 與 D1 query evidence gate；#590/#595/#599/#600/#603/#605/#609 已完成相應的 settlement、保留 reservation 的 recovery audit、rows/storage reservation 與 workflow inventory guard。D1 migration 仍 prepare-only、D1 未 provision；SQLite CI 不是 production calibration。
