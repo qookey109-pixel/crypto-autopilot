@@ -4,24 +4,19 @@
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
-## Cloud Paper 短期交付狀態 — 2026-09-29（PR #605 合併後）
+## Cloud Paper 短期交付狀態 — 2026-09-29（PR #607 合併後）
 
-本次文件更新前 main：`b1fe413b08550802a69f3fcaa64cf815a4bcc1c1`；PR #605 exact head `73482e126fc7b038d7fc975ead25e4c487e3551a` 已合併，查核時 open PR = 0。短期範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)，狀態機見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。
+文件查核基準：PR #607 exact head `9891600c610e1ada9a9ffe0d297ffcab4a879815` 合併至 main `96ed9dbff430b98df56a8fa2aa51b4b22fc3caf2`（base `cc7367c4748657649c2180790d5603c288cb495f`）；live open PR = 0。#607 的 Python 3.12／3.13、Freeze Guard、CodeQL、Dependency/SBOM 均通過；main Pages build 成功，deploy/browser-production 因本次文件未涉及網站而 skipped。完整交付範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)，機器狀態見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。
 
-- #590/#595：成功保存及 readback 後 settlement；相同用量 settlement 可冪等重送，不確定結果保留完整 reservation。
-- #599：預設關閉的 verified-result recovery audit，驗證 immutable R2 result/report 後記錄 D1 audit receipt；保留完整 reservation，不 settlement、不釋放額度。#600 核對 result pointer slot identity 與 `COMMITTED` 狀態。
-- #603：prepare-only per-UTC-day shared D1 rows reservation。每日最多 384 次 query reservation，每次涵蓋 admission statement 與目標 query；政策最大 envelope 為 3,072,000 rows read／7,680 rows written。
-- #605：在同一原子 ledger 加入 shared storage-growth reservation；每次 query reservation 涵蓋兩個 statement 各 16 KiB，每日上限 12,582,912 bytes。這是保守 policy envelope，非 Cloudflare 生產 storage 增量量測。
-- PR-head Python 3.12／3.13、Ruff/相關預算檢查、workflow-static、CodeQL、Dependency/SBOM 通過；合併後 main `b1fe413b08550802a69f3fcaa64cf815a4bcc1c1` 的 Python 3.12／3.13、V0.10 Freeze Guard、CodeQL、Dependency/SBOM 通過，workflow-static skipped（workflow 未變更）。SQLite CI 為合成驗證，非 production D1 用量測量。
-- 兩個 D1 shared-budget migration 都 prepare-only，未套用；D1 未 provision，未執行 production D1/R2/provider request。
-- 未完成：可信且及時的 account-wide D1/R2 usage source、所有 D1 writers coverage、storage envelope 與 Cloudflare 實際 size 行為核對、FREE-ONLY 合併容量證明、production runner binding、正式受控 main acceptance。execution workflow／自然 Cloud Paper schedule 尚未建立；`activation.enabled=false`。
-- 官方 Cloudflare D1 GraphQL analytics 範例以 date 維度聚合，文件未承諾符合 60 秒 freshness；不直接視為 pre-access snapshot。D1 query API 的 `meta.rows_read`／`rows_written` 和 `size_after` 是單次查詢後回報值，可協助校準實際成本，但本身不能在查詢前證明帳戶級 baseline 或其他 database/writer 覆蓋。[Metrics and analytics](https://developers.cloudflare.com/d1/observability/metrics-analytics/) · [Query D1 Database](https://developers.cloudflare.com/api/resources/d1/subresources/database/methods/query/)
-- 最近已驗證 Pages production build/deploy/browser 仍是 run [36414262259](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36414262259)（SHA `9753c6b3`）；#603/#605 無 dashboard 改動。PR #604 文件更新的 Pages build pass、deploy/browser skipped，未提供新 production deployment evidence。
-- Core100 bootstrap [run 36110721415](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415) 已唯一一次完成：report `PASS / CORE100_FINGERPRINT_V0_2_BASELINE_PUBLISHED`、quality `REJECT`、zero provider requests、holdout 未存取、immutable objects／latest pointer readback 成功。一次性 authority 已消耗，不得 rerun。
-- 模型仍 `REJECT`、production registry 空、macro regime `REGIME_UNAVAILABLE`；有效正式結果仍是 `NO_TRADE`。維持 0 USD、PAPER／LIVE-PAPER ONLY、holdout/source switch/promotion/real-money trading 關閉。
+- #590/#595：成功保存和 readback 後 settlement；完全相同用量可冪等重送，不確定結果保留完整 reservation。
+- #599/#600：預設關閉的 verified-result recovery audit，驗證 immutable R2 result/report 與 pointer slot/state；記錄 D1 audit receipt，不 settlement、不釋放額度。
+- #603/#605：prepare-only shared D1 rows/storage-growth reservations；每日政策上限分別 3,072,000 rows read／7,680 rows written，以及 12,582,912 bytes estimated storage growth。兩個 migration 未套用、D1 未 provision；SQLite CI 不是 production D1 calibration。
+- #607：修正文檔，確認既有 8 GB R2 hard stop 已在新寫入前 fail closed。未完成的是實際用量證據下的觸發核驗、報告大小/保留/警示規則；無刪除 authority。
+- 尚未完成：可信且新鮮的 account-wide D1/R2 usage evidence、全 D1 writer coverage、storage envelope 實際校準、FREE-ONLY 合併容量證明、正式 runner wiring、controlled main acceptance。正式 strategy registry 空、Core100 品質 `REJECT`、macro context `REGIME_UNAVAILABLE`；production candidate builder 未接線，所以有效正式結果仍是 `NO_TRADE`。
+- execution workflow、Cloud Paper 自然排程及受控 main acceptance 尚未啟用；contract 的 `activation.enabled=false` 維持原狀。一次性 Core100 bootstrap 已使用，不可重跑。
+- 不因手動測試宣稱自然排程驗收；不把 Pages、CI 或 synthetic full-cycle CI 當成正式策略／runtime 證據。
 
-下一批：確認 production account usage 的權威來源與 freshness，完成 D1 writer inventory/coverage 證明並校準 storage envelope；核算含 admission、settlement、recovery/retry 的總預留。平行完成資格門控的 production candidate adapter，讓正式空 registry `NO_TRADE` 和測試限定的 positive path 經同一 orchestration 驗收；定義 append-only 報告大小、保存期限與容量警示；既有 8 GB hard stop 已規定 fail closed，待取得合法用量證據後驗證觸發與回報。通過前不套 migration、不 provision、不做正式受控驗收、不啟用 schedule.
-
+下一批依可獨立推進的順序：先完成不觸發外部 I/O 的資格門控 candidate adapter 與正向／拒絕雲端 CI；並行整理報告大小與容量停機政策提案。帳戶級用量來源、全 writer 覆蓋或 FREE-ONLY headroom 未取得時，正式受控 acceptance、migration、provisioning 與 schedule 仍維持阻擋。
 ## 1. 固定入口
 
 | 問題 | 主要入口 |
