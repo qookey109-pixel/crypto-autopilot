@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import unittest
+from dataclasses import asdict, dataclass
 
 from crypto_autopilot.paper.cloud_candidate_adapter_v0_1 import (
     CloudCandidateRegistryBlocked,
@@ -135,7 +136,7 @@ def market_and_candidate() -> tuple[dict[str, object], dict[str, object]]:
         "entry_price": entry,
         "stop_price": stop,
         "family_validation_report": report,
-        "position_sizing_plan": sizing,
+        "position_sizing_plan": asdict(sizing),
     }
     market = {
         "schema": "qookey-cloud-paper-market-report-v0.1",
@@ -151,6 +152,8 @@ def market_and_candidate() -> tuple[dict[str, object], dict[str, object]]:
     return market, candidate
 
 
+
+@dataclass
 class Receipt:
     replayed: bool = False
 
