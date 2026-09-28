@@ -20,7 +20,7 @@
 - Core100 bootstrap [run 36110721415](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415) 已唯一一次完成：report `PASS / CORE100_FINGERPRINT_V0_2_BASELINE_PUBLISHED`、quality `REJECT`、zero provider requests、holdout 未存取、immutable objects／latest pointer readback 成功。一次性 authority 已消耗，不得 rerun。
 - 模型仍 `REJECT`、production registry 空、macro regime `REGIME_UNAVAILABLE`；有效正式結果仍是 `NO_TRADE`。維持 0 USD、PAPER／LIVE-PAPER ONLY、holdout/source switch/promotion/real-money trading 關閉。
 
-下一批：確認 production account usage 的權威來源與 freshness，完成 D1 writer inventory/coverage 證明並校準 storage envelope；核算含 admission、settlement、recovery/retry 的總預留。平行完成資格門控的 production candidate adapter，讓正式空 registry `NO_TRADE` 和測試限定的 positive path 經同一 orchestration 驗收；定義 append-only R2 容量警戒與 hard-stop 行為。通過前不套 migration、不 provision、不做正式受控驗收、不啟用 schedule.
+下一批：確認 production account usage 的權威來源與 freshness，完成 D1 writer inventory/coverage 證明並校準 storage envelope；核算含 admission、settlement、recovery/retry 的總預留。平行完成資格門控的 production candidate adapter，讓正式空 registry `NO_TRADE` 和測試限定的 positive path 經同一 orchestration 驗收；定義 append-only 報告大小、保存期限與容量警示；既有 8 GB hard stop 已規定 fail closed，待取得合法用量證據後驗證觸發與回報。通過前不套 migration、不 provision、不做正式受控驗收、不啟用 schedule.
 
 ## 1. 固定入口
 
