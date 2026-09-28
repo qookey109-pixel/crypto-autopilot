@@ -1,0 +1,66 @@
+{
+  "schema": "qookey-cloud-paper-usage-audit-v0.1",
+  "authority_status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "purpose": "One-time read-only account-wide D1 and R2 usage calibration for Cloud Paper budget planning.",
+  "execution": {
+    "trigger": "workflow_dispatch_on_main_only",
+    "maximum_workflow_runs": 1,
+    "maximum_attempts": 1,
+    "maximum_cloudflare_http_requests": 1,
+    "maximum_graphql_requests": 1,
+    "timeout_seconds": 20,
+    "retry_count": 0,
+    "history_check": "One GitHub Actions workflow-runs metadata request; prior or ambiguous runs fail closed."
+  },
+  "query": {
+    "endpoint": "https://api.cloudflare.com/client/v4/graphql",
+    "account_scope": "accountTag_only_no_database_or_bucket_filter",
+    "window_days": 30,
+    "maximum_groups_per_dataset": 10000,
+    "freshness_limit_seconds": 172800,
+    "datasets": [
+      "d1AnalyticsAdaptiveGroups",
+      "d1StorageAdaptiveGroups",
+      "r2OperationsAdaptiveGroups",
+      "r2StorageAdaptiveGroups"
+    ],
+    "report_only_aggregates": true,
+    "persist_raw_response": false,
+    "persist_account_id": false,
+    "persist_database_or_bucket_names": false
+  },
+  "allowed_operations": [
+    "One Cloudflare GraphQL analytics request for account-wide D1 rows read/written and storage, plus R2 operation counts and storage.",
+    "Read-only report artifact and Actions summary."
+  ],
+  "forbidden_operations": [
+    "R2 object listing, object reads, writes, deletes, or S3 credentials.",
+    "D1 SQL, migrations, database writes, or reservation settlement.",
+    "Provider requests, market data capture, holdout, training, promotion, or trading.",
+    "Additional Cloudflare calls, retries, pagination, or automatic reruns.",
+    "Inferring plan, billing amount, or complete writer coverage from usage analytics."
+  ],
+  "limits_for_comparison_only": {
+    "cloud_paper_r2_hard_stop_bytes": 8000000000,
+    "r2_standard_free_storage_gb_month": 10,
+    "r2_standard_free_class_a_requests_month": 1000000,
+    "r2_standard_free_class_b_requests_month": 10000000,
+    "d1_workers_free_rows_read_day": 5000000,
+    "d1_workers_free_rows_written_day": 100000,
+    "d1_workers_free_storage_bytes": 5000000000,
+    "source_urls": [
+      "https://developers.cloudflare.com/d1/observability/metrics-analytics/",
+      "https://developers.cloudflare.com/d1/platform/pricing/",
+      "https://developers.cloudflare.com/r2/platform/metrics-analytics/",
+      "https://developers.cloudflare.com/r2/pricing/"
+    ]
+  },
+  "result_semantics": {
+    "successful_metrics_capture": "READY_FOR_REVIEW",
+    "empty_or_incomplete_dataset": "REVIEW_REQUIRED",
+    "stale_dataset": "REVIEW_REQUIRED",
+    "plan_or_billing_status": "UNKNOWN_NOT_QUERIED",
+    "account_wide_writer_coverage": "UNKNOWN_NOT_PROVEN",
+    "cloud_paper_activation": "REMAINS_DISABLED"
+  }
+}
