@@ -31,7 +31,7 @@ WITH recent AS (
         COALESCE(actual_class_b, reserved_class_b) AS class_b,
         COALESCE(actual_new_bytes, reserved_new_bytes) AS new_bytes
     FROM cloud_paper_budget_reservations
-    WHERE reserved_at_ms > CAST(? AS INTEGER)
+    WHERE reserved_at_ms >= CAST(? AS INTEGER)
       AND reserved_at_ms >= CAST(? AS INTEGER)
       AND reserved_at_ms <= CAST(? AS INTEGER)
 ), totals AS (
