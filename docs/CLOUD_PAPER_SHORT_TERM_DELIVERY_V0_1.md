@@ -5,7 +5,7 @@
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
 - 狀態：計畫文件。各批狀態以最新 main、PR checks 與版本化證據為準。
 
-## 最新驗收證據狀態 — 2026-09-29（#608 已合併）
+## 最新驗收證據狀態 — 2026-09-29（#609 已合併）
 
 以下是證據分層；下方未完成項目仍是**完整交付門檻**，不代表相關工程或合成測試完全沒有完成。
 
@@ -14,14 +14,14 @@
 | 行情、候選、Paper loop、保存 | 已合併；完整循環 CI 與 empty-registry `NO_TRADE` 合成路徑通過 | 正式 composition 仍只接受空 registry 且使用空 candidate supplier；尚無合格 production candidate builder 或正式 execution workflow |
 | Provider／R2 guard | 共用 run-scoped guard、R2 adapter hooks 已合併 | 帳戶級用量、freshness 與所有 writer coverage 未證明 |
 | D1 ledger | #599/#600 預設關閉的 recovery audit；#603 shared rows reservation；#605 shared storage-growth reservation | migration 均為 prepare-only，未套用；D1 未 provision/bind；production usage freshness、全 writer coverage、儲存預留校準與 FREE-ONLY headroom 未證明 |
-| D1 workflow inventory | baseline main 的 85 個 workflow 檔掃描為 0 個直接 D1 marker；本批新增 required CI drift guard 與單元案例 | 僅涵蓋 Repository workflow source markers；不證明帳戶級／外部 writer coverage，也不代表 D1 已 provision |
+| D1 workflow inventory | PR #609 將 85 個 workflow 檔、0 個直接 D1 marker 的 inventory drift guard 與單元案例合併並通過 PR CI | 僅涵蓋 Repository workflow source markers；不證明帳戶級／外部 writer coverage，也不代表 D1 已 provision |
 | R2 容量保護 | #607 確認既有 8 GB hard stop 會在新寫入前 fail closed | 實際 hard-stop 觸發尚未用合法帳戶用量證據驗證；append-only 報告大小、保留與警示政策仍未定義，沒有刪除權限 |
 | 端到端正向路徑 | synthetic full-cycle CI 記錄為 `PASS` | 僅是工程測試證據；不能推論模型資格、策略獲利或可產生正式交易 |
-| Dashboard | 既有 Pages production 曾完成桌機／手機驗證 | #608 main Pages deploy/browser skipped；Cloud Paper runtime 未啟用，無正式循環報告可投影 |
+| Dashboard | 既有 Pages production 曾完成桌機／手機驗證 | #609 main Pages deploy/browser skipped；Cloud Paper runtime 未啟用，無正式循環報告可投影 |
 | Global context | CMC candidate 與指標映射僅 proposal | 未授權、未呼叫；`REGIME_UNAVAILABLE` 維持 fail-closed |
 | 排程與交易資格 | 無 Cloud Paper 正式排程 | 模型 `REJECT`、production registry 為空；正式只能 `NO_TRADE` |
 
-查核基準：PR #608 exact head `af1bcb67bf6e3d5932b4c4b8c3d01bef0ad3f036` 已合併，base `96ed9dbff430b98df56a8fa2aa51b4b22fc3caf2`，merge/main SHA `1c6a8f1ee7449a9bb1a787646c6d813ce93edbb1`，live open PR = 0。PR #608 的適用 CI、workflow-static、CodeQL、Dependency/SBOM 通過；Pages deploy/browser-production skipped。D1 baseline inventory 掃描涵蓋 85 個 Repository workflow 檔、0 marker；掃描不涵蓋 Cloudflare 帳戶或外部 writer。CI、Pages、帳戶用量證據、受控 runtime acceptance 及自然排程驗收各自獨立。
+查核基準：PR #609 exact head `c99e55fd0331df1140f30b6def33cfb309566061` 已合併，base `1c6a8f1ee7449a9bb1a787646c6d813ce93edbb1`，merge/main SHA `0de21f67bd8f122933164f4b1f4a91179d9d3d40`，live open PR = 0。PR #609 head 的 Python 3.12／3.13、build、workflow-static、CodeQL、Dependency/SBOM、snapshot 通過；main 的 Python 3.12／3.13、build、Freeze Guard、Dependency/SBOM、CodeQL 均通過（[CI 36466531872](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36466531872), [CodeQL 36466532665](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36466532665)）；Pages deploy/browser-production skipped。D1 inventory guard 通過 PR CI 並併入 main；覆蓋 85 個 Repository workflow 檔中的直接 marker，不證明 Cloudflare 帳戶或外部 writer 覆蓋。CI、Pages、帳戶用量證據、受控 runtime acceptance 及自然排程驗收各自獨立。
 
 ## 2026-09-27／28 自然排程旁證
 
