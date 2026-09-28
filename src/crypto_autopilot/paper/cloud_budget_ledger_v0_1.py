@@ -87,12 +87,20 @@ SET state = 'SETTLED',
     actual_class_b = CAST(? AS INTEGER),
     actual_new_bytes = CAST(? AS INTEGER)
 WHERE slot_id = CAST(? AS TEXT)
-  AND state = 'RESERVED'
   AND CAST(? AS INTEGER) >= reserved_at_ms
-  AND CAST(? AS INTEGER) <= reserved_provider_requests
-  AND CAST(? AS INTEGER) <= reserved_class_a
-  AND CAST(? AS INTEGER) <= reserved_class_b
-  AND CAST(? AS INTEGER) <= reserved_new_bytes
+  AND (
+      (state = 'RESERVED'
+       AND CAST(? AS INTEGER) <= reserved_provider_requests
+       AND CAST(? AS INTEGER) <= reserved_class_a
+       AND CAST(? AS INTEGER) <= reserved_class_b
+       AND CAST(? AS INTEGER) <= reserved_new_bytes)
+      OR
+      (state = 'SETTLED'
+       AND actual_provider_requests = CAST(? AS INTEGER)
+       AND actual_class_a = CAST(? AS INTEGER)
+       AND actual_class_b = CAST(? AS INTEGER)
+       AND actual_new_bytes = CAST(? AS INTEGER))
+  )
 RETURNING slot_id
 """
 
@@ -514,6 +522,10 @@ class D1CloudBudgetLedger:
                 usage.new_bytes,
                 slot_id,
                 completed_at_ms,
+                usage.provider_requests,
+                usage.class_a,
+                usage.class_b,
+                usage.new_bytes,
                 usage.provider_requests,
                 usage.class_a,
                 usage.class_b,
