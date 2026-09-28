@@ -5,6 +5,8 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 
+from crypto_autopilot.paper.cloud_budget_v0_1 import CloudBudgetPolicy
+
 
 class CloudPaperLoopContractTests(unittest.TestCase):
     def test_bounded_inactive_contract(self):
@@ -23,22 +25,30 @@ class CloudPaperLoopContractTests(unittest.TestCase):
         )
         budget = policy["budget"]
         self.assertEqual(storage["status"], "POLICY_ONLY_NOT_ACTIVATION_AUTHORITY")
-        self.assertEqual(storage["report_object_max_bytes"], budget["r2_object_max_bytes"])
-        self.assertEqual(storage["per_run_growth_max_bytes"], budget["r2_new_bytes_per_run"])
-        self.assertEqual(storage["per_utc_day_growth_max_bytes"], budget["r2_new_bytes_per_utc_day"])
-        self.assertEqual(storage["max_slots_per_utc_day"], policy["schedule"]["maximum_slots_per_utc_day"])
+        self.assertEqual(storage["scope"]["report_object_max_bytes"], budget["r2_object_max_bytes"])
+        self.assertEqual(storage["scope"]["per_run_growth_max_bytes"], budget["r2_new_bytes_per_run"])
+        self.assertEqual(storage["scope"]["per_utc_day_growth_max_bytes"], budget["r2_new_bytes_per_utc_day"])
+        self.assertEqual(storage["scope"]["max_slots_per_utc_day"], policy["schedule"]["maximum_slots_per_utc_day"])
         self.assertEqual(
-            storage["max_31_day_growth_bytes"],
+            storage["scope"]["max_31_day_growth_bytes"],
             storage["per_utc_day_growth_max_bytes"] * 31,
         )
-        self.assertLess(storage["warning_threshold_bytes"], storage["hard_stop_bytes"])
+        self.assertLess(storage["scope"]["warning_threshold_bytes"], storage["scope"]["hard_stop_bytes"])
+        self.assertEqual(
+            CloudBudgetPolicy().r2_warning_bytes,
+            storage["scope"]["warning_threshold_bytes"],
+        )
+        self.assertEqual(
+            CloudBudgetPolicy().r2_hard_stop_bytes,
+            storage["scope"]["hard_stop_bytes"],
+        )
         self.assertFalse(storage["retention"]["automatic_delete"])
         self.assertFalse(storage["retention"]["manual_delete_authorized"])
         self.assertEqual(
             storage["retention"]["mode"],
             "INDEFINITE_APPEND_ONLY_UNTIL_SEPARATE_AUTHORITY",
         )
-        self.assertFalse(storage["activation_authorized"])
+        self.assertFalse(storage["authority"]["activation_authorized"])
 
         for key in ("private_exchange_api", "real_money_order", "live_trading",
                     "holdout_access", "source_switch", "model_promotion",
