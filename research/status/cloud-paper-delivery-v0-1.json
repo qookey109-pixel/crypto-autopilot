@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "9dbdb0d16d5072f36ba2f080a32cb0e7a6e9c964",
+  "evidence_basis_parent_main_sha": "abe94ebbe138445a8d64a15a8165148d84c09e52",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -20,7 +20,7 @@
     "no_trade_composition": "MERGED_PR_AND_POST_MERGE_CI_VERIFIED_NOT_ACTIVATED",
     "market_decision_trace": "MERGED_PR_AND_POST_MERGE_CI_VERIFIED_REPORT_ONLY",
     "r2_writer_inventory": "CLASSIFIED_AND_REQUIRED_CI_GUARDED",
-    "cloud_paper_nonaccess_preflight": "IMPLEMENTED_AND_CI_VERIFIED_NON_ACCESS_ONLY"
+    "cloud_paper_nonaccess_preflight": "MERGED; MAIN_CI_PASS; MANUAL_WORKFLOW_NOT_RUN"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING",
@@ -51,5 +51,29 @@
     "inactive_state_assertion": "PASS"
   },
   "r2_writer_inventory": "research/status/cloud-paper-r2-writer-inventory-v0-1.json",
-  "preflight_workflow": ".github/workflows/cloud-paper-loop-v0-1-preflight.yml"
+  "preflight_workflow": ".github/workflows/cloud-paper-loop-v0-1-preflight.yml",
+  "preflight_ci_evidence": {
+    "pr_number": 569,
+    "pr_head_sha": "57cd13a5225bb752f64c5e12ce9c97f61c7a28e0",
+    "merged_main_sha": "abe94ebbe138445a8d64a15a8165148d84c09e52",
+    "post_merge_ci_run_id": 36389778241,
+    "post_merge_ci_status": "SUCCESS",
+    "manual_workflow_run": "NOT_RUN",
+    "ci_asserted_provider_requests_performed": 0,
+    "ci_asserted_r2_access_performed": false,
+    "ci_asserted_d1_access_performed": false,
+    "ci_asserted_training_performed": false,
+    "ci_asserted_holdout_accessed": false
+  },
+  "market_context": {
+    "status": "REGIME_UNAVAILABLE",
+    "required_global_context": [
+      "TOTAL3",
+      "BTC_DOMINANCE",
+      "ALIGNED_BREADTH"
+    ],
+    "cause": "PIONEX_PUBLIC_EXCHANGE_DATA_DOES_NOT_SUPPLY_THE_REQUIRED_GLOBAL_CONTEXT; EXTERNAL_CONTEXT_NETWORK_CAPTURE_IS_CLOSED",
+    "pionex_public_market_data_api_key_required": false,
+    "credential_workaround_authorized": false
+  }
 }
