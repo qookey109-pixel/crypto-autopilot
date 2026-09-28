@@ -131,4 +131,6 @@ TradingAgents 保留既有研究定位，後續另行評估。
 
 ## 9. 下一個可直接開始的工作
 
-PR #579 已將 Pionex 行情與 Cloud Paper R2 保存接到同一 run-scoped budget guard，PR-head 與 main CI 均通過。接續先完成正式帳戶級用量證據來源、所有目前 R2 writer 的 reservation coverage 與 D1 ledger 配置審查；任何證據缺漏或過期都須在外部存取前 fail closed。之後才可在既有 authority 下準備受控 main acceptance。合成快照僅供 CI，不得充當正式帳戶預算證據；在啟用條件滿足前，保持 runtime disabled。
+PR [#579](https://github.com/qookey109-pixel/crypto-autopilot/pull/579) 已將 Pionex 行情與 R2 保存接到同一 run-scoped budget guard；PR [#585](https://github.com/qookey109-pixel/crypto-autopilot/pull/585) 再要求 composition 在任何 provider/R2 存取前取得 D1 用量證據閘門與 per-slot 原子預留。#585 的合成 CI 證明缺少證據、預留被拒及重複 slot 都會在 provider/R2 前停止。
+
+目前尚未把 production Cloudflare D1 client、真實帳戶級 D1 用量證據來源或 reservation settlement/recovery 接到正式 runner；帳戶級 R2 用量與所有 writer coverage 也未證實。因此不勾選 P0 完成、不啟用 runtime，也不做受控 main acceptance。下一步是在不呼叫 D1 的 CI 合成路徑中完成 D1 使用量快照驗證、reservation settlement/failure recovery 和正式 composition wiring，並保留 0 USD hard stop。合成快照不等於正式帳戶預算證據；在帳戶級證據及啟用條件具備前保持 runtime disabled。
