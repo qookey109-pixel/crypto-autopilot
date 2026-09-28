@@ -49,6 +49,11 @@ SHARED_ROWS_MIGRATION = (
     / "migrations"
     / "cloud_paper_d1_shared_rows_budget_v0_1.sql"
 ).read_text(encoding="utf-8")
+SHARED_STORAGE_MIGRATION = (
+    Path(__file__).parents[1]
+    / "migrations"
+    / "cloud_paper_d1_shared_storage_budget_v0_1.sql"
+).read_text(encoding="utf-8")
 
 
 class SQLiteQueryClient:
@@ -59,6 +64,7 @@ class SQLiteQueryClient:
         self.connection.row_factory = sqlite3.Row
         self.connection.executescript(
             MIGRATION + "\n" + RECOVERY_MIGRATION + "\n" + SHARED_ROWS_MIGRATION
+            + "\n" + SHARED_STORAGE_MIGRATION
         )
         self.lock = threading.Lock()
         self.query_plans: list[str] = []
@@ -577,6 +583,79 @@ class D1SharedRowsBudgetGuardTests(unittest.TestCase):
             "FROM cloud_paper_d1_daily_rows_budget",
         ).fetchone()
         self.assertEqual(tuple(row), (0, 40, 2))
+
+    def test_shared_storage_growth_reservations_coordinate_independent_guards(self):
+        client = SQLiteQueryClient()
+        policy = D1SharedRowsBudgetPolicy(
+            max_rows_read_per_query=10,
+            max_rows_written_per_query=2,
+            rows_read_per_day=100,
+            rows_written_per_day=100,
+            storage_bytes_total=40,
+            storage_growth_per_query_bytes=10,
+        )
+        left = D1SharedRowsBudgetGuard(policy=policy)
+        right = D1SharedRowsBudgetGuard(policy=policy)
+        evidence = self.make_snapshot()
+
+        left.reserve_query(execute=client.query, snapshot=evidence, now_ms=NOW)
+        right.reserve_query(execute=client.query, snapshot=evidence, now_ms=NOW)
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_SHARED_ROWS_BUDGET"):
+            left.reserve_query(execute=client.query, snapshot=evidence, now_ms=NOW)
+
+        row = client.connection.execute(
+            "SELECT baseline_storage_bytes, reserved_storage_bytes, reservation_count "
+            "FROM cloud_paper_d1_daily_rows_budget",
+        ).fetchone()
+        self.assertEqual(tuple(row), (0, 40, 2))
+
+    def test_shared_storage_guard_detects_unaccounted_storage_growth(self):
+        client = SQLiteQueryClient()
+        guard = D1SharedRowsBudgetGuard(
+            policy=D1SharedRowsBudgetPolicy(
+                max_rows_read_per_query=10,
+                max_rows_written_per_query=2,
+                rows_read_per_day=100,
+                rows_written_per_day=100,
+                storage_bytes_total=100,
+                storage_growth_per_query_bytes=10,
+            ),
+        )
+        guard.reserve_query(
+            execute=client.query, snapshot=self.make_snapshot(), now_ms=NOW,
+        )
+        changed = self.make_snapshot(storage_bytes=21)
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_SHARED_ROWS_BUDGET"):
+            guard.reserve_query(execute=client.query, snapshot=changed, now_ms=NOW)
+
+        row = client.connection.execute(
+            "SELECT baseline_storage_bytes, reserved_storage_bytes, reservation_count "
+            "FROM cloud_paper_d1_daily_rows_budget",
+        ).fetchone()
+        self.assertEqual(tuple(row), (0, 20, 1))
+
+    def test_shared_storage_limit_rejects_new_daily_reservation(self):
+        client = SQLiteQueryClient()
+        guard = D1SharedRowsBudgetGuard(
+            policy=D1SharedRowsBudgetPolicy(
+                max_rows_read_per_query=10,
+                max_rows_written_per_query=2,
+                rows_read_per_day=100,
+                rows_written_per_day=100,
+                storage_bytes_total=39,
+                storage_growth_per_query_bytes=10,
+            ),
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_SHARED_ROWS_BUDGET"):
+            guard.reserve_query(
+                execute=client.query,
+                snapshot=self.make_snapshot(storage_bytes=20),
+                now_ms=NOW,
+            )
+        count = client.connection.execute(
+            "SELECT COUNT(*) FROM cloud_paper_d1_daily_rows_budget",
+        ).fetchone()[0]
+        self.assertEqual(count, 0)
 
     def test_shared_daily_guard_rejects_incomplete_or_stale_evidence_before_query(self):
         client = SQLiteQueryClient()
