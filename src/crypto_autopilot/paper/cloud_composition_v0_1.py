@@ -186,7 +186,7 @@ class CloudPaperNoTradeComposition:
         )
         if report is None:
             raise CloudPaperCompositionBlocked("RECOVERY_RESULT_MISSING")
-        if report.get("state") not in {"COMMITTED", "NO_TRADE"}:
+        if report.get("state") not in {"COMMITTED", "NO_TRADE", "REVIEW_REQUIRED"}:
             raise CloudPaperCompositionBlocked("RECOVERY_RESULT_NOT_COMPLETE")
         # The D1 reservation is unique per canonical slot. The immutable,
         # digest-verified cloud-result pointer and its verified coordinator step
