@@ -98,29 +98,55 @@
     "source_decision_map": {
       "path": "docs/GLOBAL_MARKET_CONTEXT_SOURCE_DECISION_V0_1.md",
       "status": "PROPOSAL_ONLY_NO_SOURCE_AUTHORIZED_NO_NETWORK_CAPTURE",
-      "candidate_reviewed": "COINMARKETCAP_KEYLESS_PUBLIC_API",
+      "candidate_reviewed": "COINMARKETCAP_GLOBAL_METRICS_BASIC",
       "api_endpoint_calls_performed": 0,
       "source_switch_authorized": false,
       "metric_mapping": {
-        "btc_dominance": "FIELD_AVAILABLE_ALIGNMENT_NOT_YET_VERIFIED",
-        "total3": "NOT_EQUIVALENCE_VERIFIED",
-        "aligned_breadth": "NOT_DEFINED_OR_VERIFIED"
+        "btc_dominance": "FIELD_AVAILABLE_SOURCE_TIMESTAMP_ALIGNMENT_UNVERIFIED",
+        "total3": "PROJECT_DEFINITION_EX_BTC_ETH_PROVIDER_ALTMARKETCAP_METHOD_UNVERIFIED",
+        "aligned_breadth": "PROJECT_DEFINITION_KNOWN_FIXED_PIONEX_CRYPTO_UNIVERSE_MISSING"
       },
       "conditional_budget_impact": {
-        "additional_requests_per_slot": 2,
         "current_requests_per_run": 18,
-        "candidate_requests_per_run": 20,
         "current_requests_per_utc_day": 1728,
-        "candidate_requests_per_utc_day": 1920,
-        "status": "EXCEEDS_V0_1_CEILINGS"
+        "cmc_additional_requests_per_slot": 1,
+        "candidate_requests_per_run_before_breadth_refresh": 19,
+        "candidate_requests_per_utc_day_before_breadth_refresh": 1824,
+        "candidate_cmc_calls_per_31_day_month": 2976,
+        "pionex_breadth_refresh_requests": "UNBUDGETED",
+        "status": "REQUIRES_SUCCESSOR_BUDGET_AND_ACCOUNT_WIDE_HEADROOM"
       },
       "next_gates": [
-        "provider terms and production use rights",
-        "keyless request limit and availability",
-        "TOTAL3 method equivalence",
-        "aligned breadth universe and timestamp contract",
-        "new versioned budget authority before any external access"
-      ]
+        "CMC altcoin_market_cap methodology equivalence to the project ex-BTC/ETH definition",
+        "fixed exact crypto-only Pionex breadth universe of at least 20 aligned markets",
+        "Pionex breadth completeness, 4H or 1D refresh cadence, and request budget",
+        "CMC terms for scheduled use, storage, derived use, public display, and attribution",
+        "CMC and Pionex account-wide budget headroom under the 0 USD hard stop",
+        "new versioned source and budget authority before any provider/R2 operation"
+      ],
+      "candidate_plan": {
+        "plan": "CMC_BASIC_FREE_KEYED",
+        "monthly_api_call_credits": 15000,
+        "requests_per_minute": 50,
+        "global_metrics_cache_refresh_minutes": 5,
+        "calls_per_cloud_paper_slot": 1,
+        "estimated_calls_per_31_day_month": 2976,
+        "account_wide_remaining_credits": "UNKNOWN",
+        "keyless_route": "AVAILABLE_BUT_PROTOTYPE_PATH_NOT_SELECTED_FOR_PRODUCTION"
+      },
+      "pionex_breadth": {
+        "research_intervals": [
+          "4H",
+          "1D"
+        ],
+        "minimum_crypto_markets": 20,
+        "fixed_aligned_universe_required": true,
+        "existing_breadth_background_symbols": 68,
+        "existing_breadth_background_crypto_symbols": 0,
+        "exact_crypto_membership": "NOT_FROZEN",
+        "refresh_request_budget": "NOT_DEFINED",
+        "historical_r2_read_authority": "NOT_ESTABLISHED"
+      }
     }
   }
 }
