@@ -108,11 +108,17 @@ def policy(**changes: object) -> CloudBudgetPolicy:
 
 
 class D1CloudBudgetLedgerTests(unittest.TestCase):
-    def make_ledger(self, client: SQLiteQueryClient, **policy_changes: object):
+    def make_ledger(
+        self, client: SQLiteQueryClient, *, max_evidence_age_ms: int = 7_200_000,
+        **policy_changes: object,
+    ):
         return D1CloudBudgetLedger(
             client,
             policy=policy(**policy_changes),
-            limits=D1LedgerLimits(max_evidence_age_ms=7_200_000, max_rows_read_per_request=4_000),
+            limits=D1LedgerLimits(
+                max_evidence_age_ms=max_evidence_age_ms,
+                max_rows_read_per_request=4_000,
+            ),
         )
 
     def test_slot_reservation_is_atomic_and_daily_budget_is_shared(self):
@@ -283,17 +289,17 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
                 now_ms=NOW, snapshot=snapshot(),
             )
 
-    def test_concurrent_slots_cannot_overreserve(self):
+    def test_concurrent_duplicate_slot_cannot_double_reserve(self):
         client = SQLiteQueryClient()
         ledger = self.make_ledger(client)
+        slot = paper_slot_id(NOW)
 
         def reserve(index: int) -> bool:
-            now_ms = NOW + index * SLOT_MS
             try:
                 ledger.reserve_slot(
-                    slot_id=paper_slot_id(now_ms),
+                    slot_id=slot,
                     run_id=f"run-{index}",
-                    now_ms=now_ms,
+                    now_ms=NOW,
                     snapshot=snapshot(),
                 )
             except BudgetBlocked:
@@ -302,11 +308,24 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
 
         with ThreadPoolExecutor(max_workers=8) as executor:
             accepted = list(executor.map(reserve, range(8)))
-        self.assertEqual(sum(accepted), 2)
+        self.assertEqual(sum(accepted), 1)
         count = client.connection.execute(
             "SELECT reservation_count FROM cloud_paper_budget_meta WHERE singleton = 1"
         ).fetchone()[0]
-        self.assertEqual(count, 2)
+        self.assertEqual(count, 1)
+
+    def test_stale_snapshot_cannot_reserve_a_future_slot(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client, max_evidence_age_ms=60_000)
+        future_ms = NOW + SLOT_MS
+        with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_STALE"):
+            ledger.reserve_slot(
+                slot_id=paper_slot_id(future_ms),
+                run_id="future-run",
+                now_ms=future_ms,
+                snapshot=snapshot(),
+            )
+        self.assertEqual(client.query_plans, [])
 
 
 class D1UsageGuardTests(unittest.TestCase):
