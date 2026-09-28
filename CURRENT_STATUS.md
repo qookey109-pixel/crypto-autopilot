@@ -4,7 +4,7 @@ Updated: 2026-09-28. This is the single human entrypoint for the current project
 
 ## Cloud Paper current checkpoint — PR #600 merged
 
-即時查核：`main=3dd8be803f5e7bfda26cd14bdbe5aaae507b338c`；open PR = 0。PR #599、#600 均已合併。最新 main 必要檢查：Python 3.12／3.13、V0.10 Freeze Guard、CodeQL、Dependency/SBOM 均成功；workflow-static 為 skipped（本次未改 workflow）。
+本節查核快照（PR #601 文件同步前）：`main=3dd8be803f5e7bfda26cd14bdbe5aaae507b338c`、當時 open PR = 0；PR #599/#600 已合併。此 SHA 是歷史 evidence basis，不是即時 main claim；接續操作必須先重查 GitHub main。最新 main 必要檢查：Python 3.12／3.13、V0.10 Freeze Guard、CodeQL、Dependency/SBOM 均成功；workflow-static 為 skipped（本次未改 workflow）。
 
 - PR #590/#595：Paper 結果保存回讀後 settlement；完全相同用量可安全重送，執行／結果不明時保留完整 reservation。
 - PR #599：新增預設關閉的跨重啟「已完成結果核對」路徑：讀取 slot reservation，驗證 immutable R2 result/report 與 digest 後記錄 D1 recovery audit receipt。它**不做 settlement、不釋放／降低 reservation**；缺失或不一致時 fail closed 並保留完整 reservation。
