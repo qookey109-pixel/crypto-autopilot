@@ -668,7 +668,10 @@ class CloudPaperCompositionTests(unittest.TestCase):
             self.assertEqual(first["candidate_count"], 1)
             self.assertEqual(first["market"]["execution_selection_status"], "READY")
             self.assertEqual(first["account"]["initial_equity_usd"], 10_000.0)
-            self.assertEqual(first["account"]["open_position_count"], 1)
+            self.assertEqual(
+                first["account"]["open_position_count"], 1,
+                json.dumps(first["coordinator"]["run_step"]["tick_report"], sort_keys=True),
+            )
 
             client.tick_ms = NOW + 15 * 60 * 1000
             second = runtime.run_slot(
