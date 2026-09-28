@@ -107,19 +107,24 @@ RETURNING slot_id
 
 D1_SHARED_ROWS_RESERVATION_SQL = """
 INSERT INTO cloud_paper_d1_daily_rows_budget (
-    utc_day, baseline_rows_read, baseline_rows_written,
-    reserved_rows_read, reserved_rows_written, reservation_count
+    utc_day, baseline_rows_read, baseline_rows_written, baseline_storage_bytes,
+    reserved_rows_read, reserved_rows_written, reserved_storage_bytes,
+    reservation_count
 )
 SELECT
     CAST(? AS TEXT), CAST(? AS INTEGER), CAST(? AS INTEGER),
-    CAST(? AS INTEGER), CAST(? AS INTEGER), 1
+    CAST(? AS INTEGER), CAST(? AS INTEGER), CAST(? AS INTEGER),
+    CAST(? AS INTEGER), 1
 WHERE CAST(? AS INTEGER) + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
+  AND CAST(? AS INTEGER) + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
   AND CAST(? AS INTEGER) + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
 ON CONFLICT(utc_day) DO UPDATE SET
     reserved_rows_read = cloud_paper_d1_daily_rows_budget.reserved_rows_read
         + excluded.reserved_rows_read,
     reserved_rows_written = cloud_paper_d1_daily_rows_budget.reserved_rows_written
         + excluded.reserved_rows_written,
+    reserved_storage_bytes = cloud_paper_d1_daily_rows_budget.reserved_storage_bytes
+        + excluded.reserved_storage_bytes,
     reservation_count = cloud_paper_d1_daily_rows_budget.reservation_count + 1
 WHERE excluded.baseline_rows_read
           <= cloud_paper_d1_daily_rows_budget.baseline_rows_read
@@ -127,12 +132,18 @@ WHERE excluded.baseline_rows_read
   AND excluded.baseline_rows_written
           <= cloud_paper_d1_daily_rows_budget.baseline_rows_written
              + cloud_paper_d1_daily_rows_budget.reserved_rows_written
+  AND excluded.baseline_storage_bytes
+          <= cloud_paper_d1_daily_rows_budget.baseline_storage_bytes
+             + cloud_paper_d1_daily_rows_budget.reserved_storage_bytes
   AND cloud_paper_d1_daily_rows_budget.baseline_rows_read
           + cloud_paper_d1_daily_rows_budget.reserved_rows_read
           + excluded.reserved_rows_read <= CAST(? AS INTEGER)
   AND cloud_paper_d1_daily_rows_budget.baseline_rows_written
           + cloud_paper_d1_daily_rows_budget.reserved_rows_written
           + excluded.reserved_rows_written <= CAST(? AS INTEGER)
+  AND cloud_paper_d1_daily_rows_budget.baseline_storage_bytes
+          + cloud_paper_d1_daily_rows_budget.reserved_storage_bytes
+          + excluded.reserved_storage_bytes <= CAST(? AS INTEGER)
   AND cloud_paper_d1_daily_rows_budget.reservation_count < CAST(? AS INTEGER)
 RETURNING utc_day, reservation_count
 """
@@ -336,6 +347,8 @@ class D1SharedRowsBudgetPolicy:
     max_rows_written_per_query: int = 10
     rows_read_per_day: int = 4_000_000
     rows_written_per_day: int = 75_000
+    storage_bytes_total: int = 4_000_000_000
+    storage_growth_per_query_bytes: int = 16_384
     max_query_reservations_per_day: int = 384
 
 
@@ -358,6 +371,7 @@ class D1SharedRowsBudgetGuard:
             p.max_evidence_age_ms, p.request_timeout_reserve_ms,
             p.max_rows_read_per_query, p.max_rows_written_per_query,
             p.rows_read_per_day, p.rows_written_per_day,
+            p.storage_bytes_total, p.storage_growth_per_query_bytes,
             p.max_query_reservations_per_day,
         )
         if any(type(value) is not int or value <= 0 for value in values):
@@ -385,18 +399,21 @@ class D1SharedRowsBudgetGuard:
 
         baseline_read = snapshot.rows_read_day + snapshot.pending_rows_read_day
         baseline_written = snapshot.rows_written_day + snapshot.pending_rows_written_day
+        baseline_storage = snapshot.storage_bytes + snapshot.pending_storage_bytes
         reserve_read = 2 * p.max_rows_read_per_query
         reserve_written = 2 * p.max_rows_written_per_query
+        reserve_storage = 2 * p.storage_growth_per_query_bytes
         day = datetime.fromtimestamp(now_ms / 1000, tz=UTC).date().isoformat()
         result = execute(
             D1_SHARED_ROWS_RESERVATION_SQL,
             (
-                day, baseline_read, baseline_written,
-                reserve_read, reserve_written,
+                day, baseline_read, baseline_written, baseline_storage,
+                reserve_read, reserve_written, reserve_storage,
                 baseline_read, reserve_read, p.rows_read_per_day,
                 baseline_written, reserve_written, p.rows_written_per_day,
+                baseline_storage, reserve_storage, p.storage_bytes_total,
                 p.rows_read_per_day, p.rows_written_per_day,
-                p.max_query_reservations_per_day,
+                p.storage_bytes_total, p.max_query_reservations_per_day,
             ),
         )
         if (
