@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "e3f94cd4b2d5a7262cc76382b93ae27316d44395",
+  "evidence_basis_parent_main_sha": "64e3a586ad39c0c11b229fc3a18a47fe788cef81",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -22,7 +22,8 @@
     "r2_writer_inventory": "CLASSIFIED_AND_REQUIRED_CI_GUARDED",
     "cloud_paper_nonaccess_preflight": "MERGED; MAIN_CI_PASS; MANUAL_NONACCESS_PREFLIGHT_PASS; REPORT_ARTIFACT_PRESERVED; NOT_PRODUCTION_ACCEPTANCE",
     "d1_usage_evidence_guard": "MERGED_PR587; PER_QUERY_CLIENT_GATE_AND_COMPOSITION_PREFLIGHT; PR_AND_POST_MERGE_CI_PASS; SYNTHETIC_ONLY",
-    "d1_query_read_envelope": "PR592_CANONICAL_15M_SLOT; MAX_4000_ROWS_PER_QUERY; 31_DAY_SCAN_BOUND_2976_SLOTS; 96_SLOT_TWO_QUERY_ENVELOPE_768000_ROWS_DAY; SQLITE_EXPLAIN_CI_ONLY_NOT_PRODUCTION_MEASUREMENT"
+    "d1_query_read_envelope": "PR592_CANONICAL_15M_SLOT; MAX_4000_ROWS_PER_QUERY; 31_DAY_SCAN_BOUND_2976_SLOTS; 96_SLOT_TWO_QUERY_ENVELOPE_768000_ROWS_DAY; SQLITE_EXPLAIN_CI_ONLY_NOT_PRODUCTION_MEASUREMENT",
+    "d1_slot_concurrency_test": "PR593_MERGED; SAME_CANONICAL_SLOT_CONCURRENCY_ONE_WINNER; STALE_SNAPSHOT_FUTURE_SLOT_REJECTED; PR_AND_POST_MERGE_PYTHON_312_313_PASS"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING",
@@ -192,19 +193,29 @@
     "activation_enabled": false
   },
   "post_merge_main_ci_evidence": {
-    "main_sha": "e3f94cd4b2d5a7262cc76382b93ae27316d44395",
-    "pr_number": 590,
-    "pr_head_sha": "fae0cd669b2bf30d26f8719bd9e60581c646b702",
+    "main_sha": "64e3a586ad39c0c11b229fc3a18a47fe788cef81",
+    "pr_number": 593,
+    "pr_head_sha": "bc4454841df109041864055627aca36a3b4c7486",
     "python_3_12": "SUCCESS",
     "python_3_13": "SUCCESS",
     "codeql_visibility_python": "SUCCESS",
     "critical_path_freeze": "SUCCESS",
     "dependency_security": "SUCCESS",
-    "pages_build": "SUCCESS",
-    "pages_deploy": "SUCCESS",
-    "browser_production": "SUCCESS",
     "workflow_static": "SKIPPED_NO_WORKFLOW_CHANGE",
+    "pages_pipeline": "NOT_TRIGGERED_TEST_ONLY_CHANGE",
     "activation_enabled": false,
     "provider_r2_d1_runtime_access_performed": false
+  },
+  "historical_ci_regressions": {
+    "pr_592_post_merge_python_3_13": {
+      "run_id": 36428372077,
+      "conclusion": "FAILURE",
+      "failing_test": "test_concurrent_slots_cannot_overreserve",
+      "cause": "TEST_FIXTURE_CONCURRENTLY_RESERVED_FUTURE_SLOTS_WITH_TWO_HOUR_SYNTHETIC_EVIDENCE_WINDOW",
+      "corrected_by_pr": 593,
+      "replacement_tests": "CONCURRENT_SAME_SLOT_ONE_WINNER_AND_STALE_SNAPSHOT_FUTURE_SLOT_REJECTION",
+      "corrected_main_sha": "64e3a586ad39c0c11b229fc3a18a47fe788cef81",
+      "corrected_python_3_12_13": "SUCCESS"
+    }
   }
 }

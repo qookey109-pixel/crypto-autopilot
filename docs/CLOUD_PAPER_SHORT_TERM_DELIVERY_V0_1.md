@@ -19,7 +19,7 @@
 | Global context | CMC candidate 與指標映射僅 proposal | 未授權、未呼叫；`REGIME_UNAVAILABLE` 維持預期 fail-closed 狀態 |
 | 排程與交易資格 | 不適用 | 排程尚未建立；模型 `REJECT`、production strategy registry 為空，因此正式只可 `NO_TRADE` |
 
-查核基準：PR [#590](https://github.com/qookey109-pixel/crypto-autopilot/pull/590) 合併後 main `e3f94cd4b2d5a7262cc76382b93ae27316d44395`；合併後 Python 3.12／3.13、CodeQL、Freeze Guard、依賴安全、Pages build／deploy／browser-production 通過。這些結果不替代帳戶用量證據、受控 runtime acceptance 或自然排程驗收。
+查核基準：PR [#593](https://github.com/qookey109-pixel/crypto-autopilot/pull/593) 合併後 main `64e3a586ad39c0c11b229fc3a18a47fe788cef81`。PR #592 的一次 post-merge Python 3.13 test fixture failure（run 36428372077）由 #593 修正，修正後 main Python 3.12／3.13、CodeQL、Freeze Guard、依賴安全通過；workflow-static 因 workflow 未變更而 skipped。最近 Pages build／deploy／browser-production 成功證據仍是 #590 後的 run。所有 CI／Pages 結果均不替代帳戶用量證據、受控 runtime acceptance 或自然排程驗收。
 
 ## 1. 本輪目標
 
