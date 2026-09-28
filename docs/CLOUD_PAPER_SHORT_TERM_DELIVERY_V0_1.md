@@ -3,29 +3,27 @@
 - 文件日期：2026-09-29
 - Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pixel/crypto-autopilot)
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
-- 即時查核基準：main `df932f863354fa0047e0833ed29163e8e47f0c3b`；open PR = 0。
-- 狀態：持續實作中。PR #611/#612 已合併；Cloud Paper 尚未啟用。
+- 證據基準：PR #614 已合併至 main `abda84a45de66dc214be40ce05ee0c2ccb79e415`；本文件只記錄該基準的驗收，不宣稱其後 main SHA。
+- 狀態：Cloud Paper 持續實作，activation disabled。PR #614 已接通資格門控 adapter，但正式策略 registry 仍空。
 
-## 最新驗收證據狀態 — 2026-09-29（#612 合併後）
+## 最新驗收證據狀態 — PR #614 合併後
 
 | 項目 | 工程／合成證據 | 正式產品狀態 |
 |---|---|---|
-| 行情、候選、Paper loop、保存 | 已合併；full-cycle CI、empty-registry `NO_TRADE` 合成路徑通過 | 正式 composition 尚無資格門控 candidate builder；正式 registry 空，不產生交易 |
+| 行情、候選、Paper loop、保存 | PR #614 將 qualified candidate adapter 接入既有 composition；PR 與 main Python 3.12／3.13 CI 通過 | 正式 registry 空、模型 `REJECT`，因此沒有正式交易；positive trade 只在合成 fixture 驗證 |
+| 候選資格與資料 lineage | 檢查 Pionex evidence、router route、策略 receipt/implementation SHA、equity/sizing；候選時間綁定已收盤 bar | Pionex global context 為 `REGIME_UNAVAILABLE`；不得用未授權來源替代 |
 | Provider／R2 guard | Shared run-scoped guard 與 R2 adapter hooks 已合併 | 帳戶級用量、freshness 與所有 writer coverage 未證明 |
 | D1 ledger | #599/#600 recovery audit；#603 rows reservation；#605 storage-growth reservation | migrations prepare-only；D1 未 provision/bind；usage freshness、全 writer coverage、儲存校準與 FREE-ONLY headroom 未證明 |
-| D1 workflow inventory | #609 workflow marker drift guard 已合併 | 只涵蓋 Repository workflow source markers，不證明 Cloudflare account/external writer coverage |
-| 帳戶用量 audit | #611 bounded Analytics audit workflow 與零網路 readiness 已合併；PR/main CI 通過 | readiness [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) 為 `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`；Cloudflare requests=0；一次性 audit 未執行、權限未消耗 |
-| R2 容量保護 | 現有 8 GB hard stop 在寫入前 fail closed | 尚未以正式用量證據驗證；報告大小、保留、容量警示與增長政策待定；沒有刪除權限 |
-| End-to-end | synthetic full-cycle CI = `PASS` | 僅工程測試證據，未證明 production runtime 或策略獲利 |
-| Dashboard | 既有 Pages production 有桌機／手機驗證 | #612 Pages build 成功；deploy/browser 因純文件變更 skipped；沒有 Cloud Paper runtime 報告可投影 |
-| Global context | CMC 與指標映射僅 proposal | 未授權、未呼叫；`REGIME_UNAVAILABLE` 維持 fail-closed |
-| 排程與策略資格 | 現有研究排程持續依各自 authority | Cloud Paper 沒有正式排程；模型 `REJECT`、production registry 空，正式循環只能安全 `NO_TRADE` |
+| 帳戶用量 audit | #611 bounded Analytics audit workflow 與零網路 readiness 已合併 | readiness [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) 為 `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`；Cloudflare requests=0；一次性 audit 未執行、權限未消耗 |
+| R2 容量保護 | 現有 8 GB hard stop 在寫入前 fail closed | 正式用量證據未驗證；報告大小、保留、警示及容量政策待完成；沒有刪除權限 |
+| Dashboard | 既有 Pages production 有桌機／手機驗證 | 本批未改 dashboard；目前沒有 production Cloud Paper runtime 報告可投影 |
+| 排程與運作驗收 | 合成完整循環 CI 已通過 | 沒有正式 execution workflow 或自然 Paper schedule；controlled main acceptance 未執行 |
 
-PR #611（以及後續文件同步 PR）在 main `600bff79145908f9785427a66689c2f90322dfcf` 的 readiness 報告為缺少 read-only credential；未發出 Cloudflare request，亦未消耗一次性 audit authority。PR #612 合併為 main `df932f863354fa0047e0833ed29163e8e47f0c3b`：PR CI 通過；main CI、CodeQL、Dependency/SBOM、Freeze Guard 通過；Pages build 成功、deploy/browser skipped。主分支為唯一 authority。CI、Pages、帳戶用量證據、受控 runtime acceptance 及自然排程驗收彼此獨立。
+PR #614 head checks：Python 3.12／3.13、workflow-static、CodeQL、Dependency/SBOM 均通過。合併 main `abda84a45de66dc214be40ce05ee0c2ccb79e415` 後，CI、CodeQL、Dependency/SBOM、Freeze Guard 通過；push 上 workflow-static 未觸發。這些證據不代表 production runtime、策略品質或自然排程已驗收。
 
-設定入口：GitHub Repository Settings → Secrets and variables → Actions。需要 `CLOUDFLARE_ACCOUNT_ID` variable 和 `CLOUDFLARE_READONLY_API_TOKEN` secret；勿貼進聊天。設定後先跑零網路 readiness；未得 `READY` 不執行一次性 audit。
+PR #611 readiness 缺少 read-only credential；未發出 Cloudflare request，亦未消耗一次性 audit authority。GitHub Actions 設定 `CLOUDFLARE_ACCOUNT_ID` variable 和 `CLOUDFLARE_READONLY_API_TOKEN` secret 後，先跑零網路 readiness；未得 `READY` 不執行一次性 audit。
 
-undefined
+## 2026-09-27／28 自然排程旁證
 ## 2026-09-27／28 自然排程旁證
 
 - Pionex [run 36309712506](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36309712506)：`REVIEW_REQUIRED`，catalog diff `PASS`、新增／移除皆為 0；保留安全分類結果。
