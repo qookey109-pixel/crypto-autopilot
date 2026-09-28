@@ -8,12 +8,14 @@ a separately reviewed candidate builder and strategy authority exist.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from typing import Protocol
 from dataclasses import dataclass
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import CloudBudgetGuard
 from crypto_autopilot.paper.cloud_loop_v0_1 import (
     CompleteTapePionexFeed,
     run_cloud_step,
+    slot_id,
 )
 from crypto_autopilot.paper.cloud_market_v0_1 import (
     PublicMarketClient,
@@ -26,6 +28,16 @@ from crypto_autopilot.paper.run_coordinator_v0_1 import PaperRunStoreLike
 
 class CloudPaperCompositionBlocked(RuntimeError):
     """Stable reason for a composition that lacks production authority."""
+
+
+class BudgetSlotReservationLedger(Protocol):
+    """Atomic shared ledger for one slot before any provider or R2 access."""
+
+    def reserve_slot(
+        self, *, slot_id: str, run_id: str, now_ms: int,
+        snapshot: object,
+    ) -> None:
+        """Reserve the bounded slot envelope or fail closed."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,6 +57,8 @@ class CloudPaperNoTradeComposition:
     paper_policy: LivePaperPolicy
     budget_guard: CloudBudgetGuard
     before_external: Callable[[], None]
+    reservation_ledger: BudgetSlotReservationLedger | None = None
+    d1_usage_guard: Callable[[int], None] | None = None
     run_name: str = "cloud-paper-v0-1"
 
     def __post_init__(self) -> None:
@@ -82,7 +96,7 @@ class CloudPaperNoTradeComposition:
 
     def run_slot(
         self, *, tick_ms: int, previous_slot: str | None,
-        activation_enabled: bool = False,
+        activation_enabled: bool = False, run_id: str | None = None,
     ) -> dict[str, object]:
         """Run one explicitly enabled no-trade slot; default is side-effect free."""
         if type(activation_enabled) is not bool:
@@ -100,6 +114,23 @@ class CloudPaperNoTradeComposition:
         # This composition may only exercise the currently approved empty
         # production registry. Synthetic positive-path candidates remain in CI.
         self._require_empty_production_registry()
+
+        if self.reservation_ledger is None or self.d1_usage_guard is None:
+            raise CloudPaperCompositionBlocked("D1_BUDGET_EVIDENCE_OR_LEDGER_MISSING")
+        if not isinstance(run_id, str) or not run_id or len(run_id) > 100:
+            raise CloudPaperCompositionBlocked("RUN_ID_INVALID")
+        slot = slot_id(tick_ms)
+        # D1 itself is an external access: require fresh account-wide D1 usage
+        # evidence, then atomically reserve the R2/provider envelope before any
+        # provider or R2 request. The disabled-by-default path never gets here.
+        self.before_external()
+        self.d1_usage_guard(tick_ms)
+        self.reservation_ledger.reserve_slot(
+            slot_id=slot,
+            run_id=run_id,
+            now_ms=tick_ms,
+            snapshot=self.budget_guard.snapshot,
+        )
 
         def market_supplier() -> Mapping[str, object]:
             capture = capture_market(
