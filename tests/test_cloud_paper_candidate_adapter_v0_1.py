@@ -128,7 +128,7 @@ def market_and_candidate() -> tuple[dict[str, object], dict[str, object]]:
         "direction": "LONG",
         "regime_state": "ALT_EXPANSION",
         "provider": "PIONEX_PUBLIC",
-        "as_of_ms": TICK_MS,
+        "as_of_ms": evidence["last_bar_ms"],
         "market_evidence_sha256": evidence["sha256"],
         "strategy_route_sha256": sha256(route),
         "qualification_receipt_sha256": qualification["receipt_sha256"],
