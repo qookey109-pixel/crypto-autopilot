@@ -35,19 +35,19 @@ def snapshot(**changes: object) -> R2UsageSnapshot:
 
 class CloudBudgetGuardTests(unittest.TestCase):
     def test_fresh_complete_snapshot_reserves_each_operation(self):
-        guard = CloudBudgetGuard(snapshot=snapshot(), now_ms=NOW)
+        guard = CloudBudgetGuard(snapshot=snapshot(), clock_ms=lambda: NOW)
         guard.reserve_provider_request()
         guard.reserve_r2_class_a(new_bytes=100)
         guard.reserve_r2_class_b()
 
     def test_missing_account_wide_evidence_blocks_before_reservation(self):
-        guard = CloudBudgetGuard(snapshot=snapshot(account_wide=False), now_ms=NOW)
+        guard = CloudBudgetGuard(snapshot=snapshot(account_wide=False), clock_ms=lambda: NOW)
         with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_INCOMPLETE"):
             guard.reserve_provider_request()
 
     def test_untracked_account_activity_blocks(self):
         guard = CloudBudgetGuard(
-            snapshot=snapshot(reservation_coverage_complete=False), now_ms=NOW
+            snapshot=snapshot(reservation_coverage_complete=False), clock_ms=lambda: NOW
         )
         with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_INCOMPLETE"):
             guard.reserve_r2_class_a()
@@ -59,15 +59,34 @@ class CloudBudgetGuardTests(unittest.TestCase):
             {"measured_through_ms": NOW - 60_001},
         ):
             guard = CloudBudgetGuard(
-                snapshot=snapshot(**values), now_ms=NOW, policy=policy
+                snapshot=snapshot(**values), clock_ms=lambda: NOW, policy=policy
             )
             with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_STALE"):
                 guard.reserve_r2_class_b()
 
+    def test_evidence_that_ages_during_run_blocks_the_next_operation(self):
+        current_time = [NOW]
+        guard = CloudBudgetGuard(
+            snapshot=snapshot(), clock_ms=lambda: current_time[0],
+        )
+        guard.reserve_provider_request()
+        current_time[0] += 60_001
+        with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_STALE"):
+            guard.reserve_r2_class_b()
+
+    def test_invalid_current_clock_blocks_before_reservation(self):
+        for current_time in (None, -1, True):
+            guard = CloudBudgetGuard(
+                snapshot=snapshot(), clock_ms=lambda: current_time,
+            )
+            with self.subTest(current_time=current_time):
+                with self.assertRaisesRegex(BudgetBlocked, "CLOCK_INVALID"):
+                    guard.reserve_provider_request()
+
     def test_daily_limit_includes_operations_reserved_in_this_run(self):
         guard = CloudBudgetGuard(
             snapshot=snapshot(class_a_day=12_287, class_a_month=500_000),
-            now_ms=NOW,
+            clock_ms=lambda: NOW,
         )
         guard.reserve_r2_class_a()
         with self.assertRaisesRegex(BudgetBlocked, "CLASS_A_DAILY_LIMIT"):
@@ -82,7 +101,7 @@ class CloudBudgetGuardTests(unittest.TestCase):
             with self.subTest(operation=operation):
                 guard = CloudBudgetGuard(
                     snapshot=snapshot(**{field: ceiling - 1}),
-                    now_ms=NOW,
+                    clock_ms=lambda: NOW,
                     policy=CloudBudgetPolicy(
                         r2_class_a_per_run=10,
                         r2_class_b_per_run=10,
@@ -99,7 +118,7 @@ class CloudBudgetGuardTests(unittest.TestCase):
 
     def test_rolling_31_day_limit_blocks(self):
         guard = CloudBudgetGuard(
-            snapshot=snapshot(class_b_31_days=380_928), now_ms=NOW
+            snapshot=snapshot(class_b_31_days=380_928), clock_ms=lambda: NOW
         )
         with self.assertRaisesRegex(BudgetBlocked, "CLASS_B_31_DAY_LIMIT"):
             guard.reserve_r2_class_b()
@@ -107,7 +126,7 @@ class CloudBudgetGuardTests(unittest.TestCase):
     def test_account_free_and_project_monthly_limits_block(self):
         for count in (750_000, 1_000_000):
             guard = CloudBudgetGuard(
-                snapshot=snapshot(class_a_month=count), now_ms=NOW
+                snapshot=snapshot(class_a_month=count), clock_ms=lambda: NOW
             )
             with self.assertRaisesRegex(BudgetBlocked, "CLASS_A_MONTHLY_LIMIT"):
                 guard.reserve_r2_class_a()
@@ -115,26 +134,26 @@ class CloudBudgetGuardTests(unittest.TestCase):
     def test_object_run_day_and_storage_limits_block(self):
         policy = CloudBudgetPolicy(r2_new_bytes_per_run=100)
         oversized_guard = CloudBudgetGuard(
-            snapshot=snapshot(), now_ms=NOW, policy=policy
+            snapshot=snapshot(), clock_ms=lambda: NOW, policy=policy
         )
         with self.assertRaisesRegex(BudgetBlocked, "OBJECT_LIMIT"):
             oversized_guard.reserve_r2_class_a(new_bytes=262_145)
 
         run_guard = CloudBudgetGuard(
-            snapshot=snapshot(), now_ms=NOW, policy=policy
+            snapshot=snapshot(), clock_ms=lambda: NOW, policy=policy
         )
         run_guard.reserve_r2_class_a(new_bytes=100)
         with self.assertRaisesRegex(BudgetBlocked, "RUN_BYTES_LIMIT"):
             run_guard.reserve_r2_class_a(new_bytes=1)
 
         daily_guard = CloudBudgetGuard(
-            snapshot=snapshot(new_bytes_day=201_326_592), now_ms=NOW
+            snapshot=snapshot(new_bytes_day=201_326_592), clock_ms=lambda: NOW
         )
         with self.assertRaisesRegex(BudgetBlocked, "DAILY_BYTES_LIMIT"):
             daily_guard.reserve_r2_class_a(new_bytes=1)
 
         storage_guard = CloudBudgetGuard(
-            snapshot=snapshot(storage_bytes=8_000_000_000), now_ms=NOW
+            snapshot=snapshot(storage_bytes=8_000_000_000), clock_ms=lambda: NOW
         )
         with self.assertRaisesRegex(BudgetBlocked, "STORAGE_HARD_STOP"):
             storage_guard.reserve_r2_class_a(new_bytes=1)
@@ -142,7 +161,7 @@ class CloudBudgetGuardTests(unittest.TestCase):
     def test_unknown_or_negative_usage_blocks(self):
         for value in (None, -1, True):
             guard = CloudBudgetGuard(
-                snapshot=snapshot(class_b_month=value), now_ms=NOW
+                snapshot=snapshot(class_b_month=value), clock_ms=lambda: NOW
             )
             with self.assertRaisesRegex(BudgetBlocked, "USAGE_UNKNOWN"):
                 guard.reserve_r2_class_b()
@@ -150,7 +169,7 @@ class CloudBudgetGuardTests(unittest.TestCase):
     def test_provider_daily_and_per_run_ceiling(self):
         policy = CloudBudgetPolicy(provider_per_run=2, provider_per_day=3)
         guard = CloudBudgetGuard(
-            snapshot=snapshot(provider_requests_day=1), now_ms=NOW, policy=policy
+            snapshot=snapshot(provider_requests_day=1), clock_ms=lambda: NOW, policy=policy
         )
         guard.reserve_provider_request()
         guard.reserve_provider_request()
@@ -159,7 +178,7 @@ class CloudBudgetGuardTests(unittest.TestCase):
 
     def test_provider_daily_ceiling_blocks(self):
         guard = CloudBudgetGuard(
-            snapshot=snapshot(provider_requests_day=1_728), now_ms=NOW
+            snapshot=snapshot(provider_requests_day=1_728), clock_ms=lambda: NOW
         )
         with self.assertRaisesRegex(BudgetBlocked, "PROVIDER_DAILY_LIMIT"):
             guard.reserve_provider_request()
