@@ -10,11 +10,12 @@ Updated: 2026-09-28. This is the single human entrypoint for the current project
 - 合併後 main Python 3.12／3.13、CodeQL、Freeze Guard、dependency-security、Pages build／deploy／browser-production 全通過；workflow-static 因 workflow 未變更而 skipped。
 - 行情／R2 共用 run-scoped guard、D1 每次 query 前檢查、D1 slot 預留與成功 settlement 已接線；合成完整循環及 no-trade 測試通過。這些 CI 證據不是正式帳戶用量或 runtime acceptance。
 - Cloud Paper 仍 `activation.enabled=false`；正式 execution workflow、受控 main acceptance 與自然排程尚未建立。模型品質仍為 `REJECT`、production strategy registry 為空、macro regime 為 `REGIME_UNAVAILABLE`，所以目前唯一合規正式結果是 `NO_TRADE`。
-- P0 尚未完成：可信且夠新的 D1/R2 account-wide usage source、D1 rows-read/write 跨執行預留、settlement 不確定結果 recovery、所有 D1/R2 writers coverage、D1 provisioning/runner binding，以及 96 slots/day 的 FREE-ONLY 容量證明。D1 的 25,000 rows/query 是 guard 上界，不是實測。
+- PR #592 將 D1 ledger 限制為 canonical 15-minute slot，單次 query guard 上限 4,000 rows；31-day rolling scan 的程式結構最多涵蓋 2,976 個 slot，兩次 D1 查詢 × 96 slots 的理論上界為 768,000 rows/day。CI SQLite query plan 檢查與 Cloudflare 實測不同，這不是 production 用量證據。
+- P0 尚未完成：可信且夠新的 D1/R2 account-wide usage source、跨 workflow 的 D1 rows-read/write 預留、settlement 不確定結果 recovery、所有 D1/R2 writers coverage、D1 provisioning/runner binding，以及帳戶級 FREE-ONLY 容量證明。
 - CMC global context 仍為 proposal only，未核對映射／授權／額度，未呼叫 API；source switch 關閉，regime unavailable 應持續 fail closed。
 - 唯一開放 PR [#578](https://github.com/qookey109-pixel/crypto-autopilot/pull/578) 是舊 base `e80d2d27` 的 Draft；先比對 current main 與新證據，不直接合併。
 
-下一步：先完成 D1 query rows-read 的有界成本證明與跨執行 budget reservation/recovery，再核實帳戶級 freshness、全部 writers 及 R2 headroom。正式 provisioning、controlled acceptance 和 schedule activation 必須等免費額度可行性證明成立；維持 `activation.enabled=false`、0 USD、PAPER／LIVE-PAPER ONLY。
+下一步：完成 D1 跨 workflow shared rows budget 與 settlement recovery，再核實帳戶級 freshness、全部 writers 及 R2 headroom。正式 provisioning、controlled acceptance 和 schedule activation 必須等免費額度可行性證明成立；維持 `activation.enabled=false`、0 USD、PAPER／LIVE-PAPER ONLY。
 
 ## Live Cloud Paper checkpoint — 2026-09-28
 
