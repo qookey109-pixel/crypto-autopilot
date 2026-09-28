@@ -1,0 +1,233 @@
+from __future__ import annotations
+
+import sqlite3
+import threading
+import unittest
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
+    D1CloudBudgetLedger,
+    D1LedgerLimits,
+    D1QueryResult,
+    SlotUsage,
+)
+from crypto_autopilot.paper.cloud_budget_v0_1 import (
+    BudgetBlocked,
+    CloudBudgetPolicy,
+    R2UsageSnapshot,
+)
+
+
+NOW = 1_790_000_000_000
+MIGRATION = (
+    Path(__file__).parents[1]
+    / "migrations"
+    / "cloud_paper_budget_ledger_v0_1.sql"
+).read_text(encoding="utf-8")
+
+
+class SQLiteQueryClient:
+    """Cloud CI-only SQLite analogue for D1's single-writer statement behavior."""
+
+    def __init__(self) -> None:
+        self.connection = sqlite3.connect(":memory:", check_same_thread=False)
+        self.connection.row_factory = sqlite3.Row
+        self.connection.executescript(MIGRATION)
+        self.lock = threading.Lock()
+
+    def query(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
+        with self.lock:
+            cursor = self.connection.execute(sql, params)
+            rows = tuple(dict(row) for row in cursor.fetchall())
+            written = max(cursor.rowcount, 0)
+            return D1QueryResult(rows, rows_read=0, rows_written=written)
+
+
+def snapshot(**changes: object) -> R2UsageSnapshot:
+    base = R2UsageSnapshot(
+        account_wide=True,
+        reservation_coverage_complete=True,
+        observed_at_ms=NOW,
+        measured_through_ms=NOW,
+        storage_bytes=0,
+        class_a_month=0,
+        class_b_month=0,
+        class_a_31_days=0,
+        class_b_31_days=0,
+        class_a_day=0,
+        class_b_day=0,
+        provider_requests_day=0,
+        new_bytes_day=0,
+    )
+    from dataclasses import replace
+
+    return replace(base, **changes)
+
+
+def policy(**changes: object) -> CloudBudgetPolicy:
+    base = CloudBudgetPolicy(
+        provider_per_run=2,
+        provider_per_day=8,
+        r2_class_a_per_run=2,
+        r2_class_b_per_run=2,
+        r2_new_bytes_per_run=10,
+        r2_class_a_per_day=4,
+        r2_class_b_per_day=4,
+        r2_new_bytes_per_day=40,
+        r2_class_a_per_31_days=20,
+        r2_class_b_per_31_days=20,
+        project_class_a_per_month=20,
+        project_class_b_per_month=20,
+        free_class_a_per_month=30,
+        free_class_b_per_month=30,
+        r2_hard_stop_bytes=100,
+        r2_object_max_bytes=10,
+    )
+    from dataclasses import replace
+
+    return replace(base, **changes)
+
+
+class D1CloudBudgetLedgerTests(unittest.TestCase):
+    def make_ledger(self, client: SQLiteQueryClient, **policy_changes: object):
+        return D1CloudBudgetLedger(
+            client,
+            policy=policy(**policy_changes),
+            limits=D1LedgerLimits(max_rows_read_per_request=25_000),
+        )
+
+    def test_slot_reservation_is_atomic_and_daily_budget_is_shared(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+        ledger.reserve_slot(slot_id="slot-2", run_id="run-2", now_ms=NOW, snapshot=snapshot())
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
+            ledger.reserve_slot(
+                slot_id="slot-3", run_id="run-3", now_ms=NOW, snapshot=snapshot()
+            )
+        count = client.connection.execute(
+            "SELECT reservation_count FROM cloud_paper_budget_meta WHERE singleton = 1"
+        ).fetchone()[0]
+        self.assertEqual(count, 2)
+
+    def test_duplicate_slot_cannot_reserve_or_replay(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
+            ledger.reserve_slot(
+                slot_id="slot-1", run_id="run-2", now_ms=NOW, snapshot=snapshot()
+            )
+
+    def test_settlement_releases_only_unused_envelope(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+        ledger.settle_slot(
+            slot_id="slot-1",
+            completed_at_ms=NOW + 1,
+            usage=SlotUsage(provider_requests=1, class_a=1, class_b=1, new_bytes=1),
+        )
+        ledger.reserve_slot(
+            slot_id="slot-2", run_id="run-2", now_ms=NOW + 2, snapshot=snapshot()
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
+            ledger.reserve_slot(
+                slot_id="slot-3", run_id="run-3", now_ms=NOW + 3, snapshot=snapshot()
+            )
+
+    def test_unsettled_slot_keeps_the_full_reservation(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
+            ledger.reserve_slot(
+                slot_id="slot-2",
+                run_id="run-2",
+                now_ms=NOW,
+                snapshot=snapshot(class_a_day=2),
+            )
+
+    def test_monthly_headroom_includes_other_slot_reservations(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
+            ledger.reserve_slot(
+                slot_id="slot-2",
+                run_id="run-2",
+                now_ms=NOW,
+                snapshot=snapshot(class_a_month=18),
+            )
+
+    def test_storage_hard_stop_includes_other_slot_reservations(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
+            ledger.reserve_slot(
+                slot_id="slot-2",
+                run_id="run-2",
+                now_ms=NOW + 1,
+                snapshot=snapshot(storage_bytes=81),
+            )
+
+    def test_missing_incomplete_or_stale_account_evidence_blocks_before_io(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        cases = (
+            snapshot(account_wide=False),
+            snapshot(reservation_coverage_complete=False),
+            snapshot(measured_through_ms=NOW - 51_000),
+        )
+        for index, evidence in enumerate(cases):
+            with self.subTest(index=index):
+                with self.assertRaises(BudgetBlocked):
+                    ledger.reserve_slot(
+                        slot_id=f"slot-{index}",
+                        run_id=f"run-{index}",
+                        now_ms=NOW,
+                        snapshot=evidence,
+                    )
+        count = client.connection.execute(
+            "SELECT reservation_count FROM cloud_paper_budget_meta WHERE singleton = 1"
+        ).fetchone()[0]
+        self.assertEqual(count, 0)
+
+    def test_exhausted_ledger_row_ceiling_fails_closed(self):
+        client = SQLiteQueryClient()
+        client.connection.execute(
+            "UPDATE cloud_paper_budget_meta SET reservation_count = 100000 WHERE singleton = 1"
+        )
+        ledger = self.make_ledger(client)
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
+            ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+
+    def test_concurrent_slots_cannot_overreserve(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+
+        def reserve(index: int) -> bool:
+            try:
+                ledger.reserve_slot(
+                    slot_id=f"slot-{index}",
+                    run_id=f"run-{index}",
+                    now_ms=NOW,
+                    snapshot=snapshot(),
+                )
+            except BudgetBlocked:
+                return False
+            return True
+
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            accepted = list(executor.map(reserve, range(8)))
+        self.assertEqual(sum(accepted), 2)
+        count = client.connection.execute(
+            "SELECT reservation_count FROM cloud_paper_budget_meta WHERE singleton = 1"
+        ).fetchone()[0]
+        self.assertEqual(count, 2)
+
+
+if __name__ == "__main__":
+    unittest.main()
