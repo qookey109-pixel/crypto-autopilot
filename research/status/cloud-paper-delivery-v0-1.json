@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "c32d5abca28a566c62a4904703f6f46ea9b9c78a",
+  "evidence_basis_parent_main_sha": "cfa47a3c5747766535a5bad0ac0815a423735455",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -36,8 +36,8 @@
   "macro_regime": "REGIME_UNAVAILABLE",
   "local_work": "EXCLUDED_BY_USER",
   "dashboard_production_evidence": {
-    "main_sha": "2bd90925d9913788aa13877576360401e56a3814",
-    "workflow_run_id": 36332831281,
+    "main_sha": "cfa47a3c5747766535a5bad0ac0815a423735455",
+    "workflow_run_id": 36385444044,
     "build": "SUCCESS",
     "deploy": "SUCCESS",
     "browser_production": "SUCCESS",
