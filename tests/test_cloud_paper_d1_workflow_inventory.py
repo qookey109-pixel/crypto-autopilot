@@ -4,8 +4,8 @@ import unittest
 
 from scripts.validate_cloud_paper_r2_writer_inventory import (
     contains_d1_access_reference,
-    validate_d1_source_boundary,
     find_d1_rest_source_paths,
+    validate_d1_source_boundary,
 )
 
 
