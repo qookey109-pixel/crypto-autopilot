@@ -1,6 +1,14 @@
 # Project Status
 
-Updated: 2026-09-25
+Updated: 2026-09-29 (Cloud Paper checkpoint below; historical stage notes retain their dated evidence).
+
+## Cloud Paper delivery checkpoint — 2026-09-29
+
+Live main is `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`. PR #614 connected the qualification-gated candidate adapter; PR #615 synchronized delivery status; PR #616 defined the bounded append-only R2 policy and implemented a 6.4 GB warning / 8 GB fail-closed guard. PR #616 merged with PR checks and post-merge Python 3.12/3.13 CI, Dependency/SBOM and Freeze Guard passing. Its post-merge CodeQL run [36478324500](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324500) passed.
+
+The storage envelope is 256 KiB/object, 2 MiB/run, 192 MiB/day and 6,241,124,352 theoretical bytes over 31 days at 96 slots/day. Evidence remains append-only with no deletion authority. These limits do not establish actual account usage or all-writer coverage.
+
+Cloud Paper activation remains disabled. Account-wide usage/freshness and all-writer coverage are unproven; D1 is not provisioned; production controlled acceptance and the execution workflow/natural schedule do not exist. The production strategy registry is empty and model quality is `REJECT`; synthetic CI trade fixtures are not production trades. The Cloudflare audit readiness run remains blocked on missing read-only credentials and performed zero Cloudflare requests. Continue only after zero-network readiness is READY, and retain all existing FREE-ONLY and research/trading boundaries.
 
 Repository `main` is the formal current authority and must be resolved live at read time. This file is the project-stage, governance-compatibility, and retired-workflow index. Exact versioned configs, receipts, immutable run evidence, and merged code remain the detailed authority for each scope.
 
