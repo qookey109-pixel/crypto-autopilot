@@ -1,11 +1,11 @@
 # Crypto Autopilot 短期交付目標
 
 - 文件日期：2026-09-29
-- 最新證據基準：PR #618 已合併，main `6deabddd7f925b6d586b9565a9f6641105a2fd29`；本文件記錄截至此 SHA 的查核證據。
+- 最新證據基準：PR #622 已合併，main `cb22d3c3905a079eb754f0fab6d917923512f624`；PR #622 是 CI 測試變更，不改執行權限。
 - Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pixel/crypto-autopilot)
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
 - 歷史證據基準：PR #614 合併至 main `abda84a45de66dc214be40ce05ee0c2ccb79e415`；目前查核基準見上方 PR #618。
-- 狀態：Cloud Paper 持續實作，activation disabled。PR #614 已接通資格門控 adapter，PR #618 已合併 Dashboard 狀態／容量投影；正式策略 registry 仍空，正式循環為 `NOT_RUN`。
+- 狀態：Cloud Paper 持續實作，activation disabled。PR #614 已接通資格門控 adapter；PR #622 用 test-only fixture 驗證同一 composition 的入場／出場／帳戶延續／保存／後續 `NO_TRADE`。正式策略 registry 仍空，正式循環為 `NOT_RUN`。
 
 ## 保存上限與耗盡政策 — PR #616 merged
 
@@ -15,11 +15,11 @@
 - Retention is indefinite and append-only. Automatic or manual deletion is not authorized; partial writes retain evidence and require `REVIEW_REQUIRED`.
 - PR #616 merged to main `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`; post-merge CI run `36478324594`, Dependency/SBOM `36478324445`, and Freeze Guard `36478324502` passed. CodeQL [36478324500](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324500) passed. These limits are a project policy envelope, not production account usage evidence or a capacity guarantee. Account-wide usage freshness, all-writer coverage, D1 calibration and production acceptance remain open.
 
-## 最新驗收證據狀態 — PR #618 合併後
+## 最新驗收證據狀態 — PR #622 合併後
 
 | 項目 | 工程／合成證據 | 正式產品狀態 |
 |---|---|---|
-| 行情、候選、Paper loop、保存 | PR #614 將 qualified candidate adapter 接入既有 composition；PR 與 main Python 3.12／3.13 CI 通過 | 正式 registry 空、模型 `REJECT`，因此沒有正式交易；positive trade 只在合成 fixture 驗證 |
+| 行情、候選、Paper loop、保存 | PR #614 接通資格門控 adapter；PR #622 讓合格 synthetic fixture 經同一 composition 驗證入場、出場、帳戶更新、保存及下一輪 | 正式 registry 空、模型 `REJECT`，沒有正式交易；正向交易證據僅限 CI fixture |
 | 候選資格與資料 lineage | 檢查 Pionex evidence、router route、策略 receipt/implementation SHA、equity/sizing；候選時間綁定已收盤 bar | Pionex global context 為 `REGIME_UNAVAILABLE`；不得用未授權來源替代 |
 | Provider／R2 guard | Shared run-scoped guard 與 R2 adapter hooks 已合併 | 帳戶級用量、freshness 與所有 writer coverage 未證明 |
 | D1 ledger | #599/#600 recovery audit；#603 rows reservation；#605 storage-growth reservation | migrations prepare-only；D1 未 provision/bind；usage freshness、全 writer coverage、儲存校準與 FREE-ONLY headroom 未證明 |
@@ -28,7 +28,7 @@
 | Dashboard | PR #618 已合併並部署；Pages build/deploy 通過，正式站桌機／手機共 14 項瀏覽器檢查通過。投影明確區分 `NOT_RUN`、空策略登錄、`REGIME_UNAVAILABLE`、`BLOCKED_BUDGET` 與未知容量 | production runtime 尚未啟用；帳戶用量不顯示為 0，正式帳戶與持倉數值維持 null |
 | 排程與運作驗收 | 合成完整循環 CI 已通過 | 沒有正式 execution workflow 或自然 Paper schedule；controlled main acceptance 未執行 |
 
-PR #618 head checks：Python 3.12／3.13、workflow-static、Dashboard snapshot/static smoke、CodeQL、Dependency/SBOM 與 prepared-cutover 均通過。合併 main `6deabddd7f925b6d586b9565a9f6641105a2fd29` 後，CI、CodeQL、Dependency/SBOM、Freeze Guard、Pages build/deploy 及桌機／手機瀏覽器驗證通過；main-push workflow-static skipped（未修改 workflow）。正式瀏覽器 14 項全通過。這些證據不代表 production runtime、策略品質或自然排程已驗收。
+PR #618 的 Dashboard 部署與 14/14 桌機／手機瀏覽器驗證屬於其產品 commit 的證據。PR #622 head `aac48898dfa4e69589c7c369a73a919b07b63c95` 的 Python 3.12／3.13、workflow-static、CodeQL、Dependency/SBOM 通過；合併 main `cb22d3c3905a079eb754f0fab6d917923512f624` 後 CI、CodeQL、Dependency/SBOM、Freeze Guard 通過，main-push workflow-static 因未修改 workflow 而跳過。這些是工程／合成 CI 證據，不代表 production runtime、策略品質或自然排程已驗收。
 
 PR #611 readiness 缺少 read-only credential；未發出 Cloudflare request，亦未消耗一次性 audit authority。GitHub Actions 設定 `CLOUDFLARE_ACCOUNT_ID` variable 和 `CLOUDFLARE_READONLY_API_TOKEN` secret 後，先跑零網路 readiness；未得 `READY` 不執行一次性 audit。
 
@@ -89,7 +89,7 @@ PR #611 readiness 缺少 read-only credential；未發出 Cloudflare request，�
 
 ### 驗收清單
 
-- [ ] 合成正向路徑通過：候選 → 風控 → 模擬入場 → 出場 → 帳戶更新 → 下一輪。
+- [x] 合成正向路徑通過：qualified fixture 經同一 composition 完成模擬入場、出場、帳戶更新、保存及下一輪 `NO_TRADE`（PR #622 CI；僅測試資料，不是 production 策略）。
 - [ ] 無候選、無合格策略及模型 `REJECT` 均輸出明確原因且零新倉。
 - [ ] 過期、未收盤、缺漏或不連續資料按契約拒絕。
 - [ ] 風險超限、來源失效及額度不足時停止相關操作。
@@ -137,7 +137,7 @@ Public APIs、free-for.dev 僅作候選發現入口；實際採用須核對來�
 
 ### 正式候選接線現況
 
-目前 merged production composition 只接受空策略 registry，候選 supplier 也固定輸出空集合。因此 synthetic positive-trade CI 尚不能證明正式 composition 已接通合格策略到 paper fills。下一批需在版本化資格邊界內完成候選 adapter，並以測試限定的 injected fixtures 經相同 orchestration path 驗證入場／出場；production registry 維持空，直到策略具備有效資格。此工作不得放寬 `REJECT`、使用測試策略或改變交易權限。
+PR #614 已將版本化資格門控 adapter 接入 composition；PR #622 進一步以 test-only qualified fixture 經相同 orchestration 驗證入場、出場、帳戶延續、持久化及下一輪 `NO_TRADE`。工程接線的 CI 路徑已覆蓋；production registry 仍空，Core100 為 `REJECT`，正式環境不會使用測試策略建立交易。此結果不改變資格規則、策略品質或交易權限。
 
 ## 6. 完成判定
 
@@ -171,11 +171,12 @@ TradingAgents 保留既有研究定位，後續另行評估。
 
 ## 9. 下一個可直接開始的工作
 
-PR [#579](https://github.com/qookey109-pixel/crypto-autopilot/pull/579) 將 Pionex 行情與 R2 保存接到同一 run-scoped guard；PR [#585](https://github.com/qookey109-pixel/crypto-autopilot/pull/585) 加上 D1 usage-evidence preflight 與 per-slot reservation interface；PR [#587](https://github.com/qookey109-pixel/crypto-autopilot/pull/587) 完成 concrete D1 evidence guard、composition preflight 及 Cloudflare D1 REST client 的逐 query guard。#587 的 PR head 與 post-merge 必要 CI 均通過。
+PR #622 已完成 qualified synthetic candidate 經完整 composition 的 CI 覆蓋。Cloud Paper 仍不可啟用：帳戶用量 readiness [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) 因缺少 read-only credential 而在零 Cloudflare request 下回報 `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`；不得執行一次性 usage audit，直到零網路 readiness 回報 `READY`。credential 由使用者在 GitHub Actions Settings 以 variable／secret 設定，不得在聊天或 PR 傳送值。
 
-PR #590/#595 完成成功 settlement 與完全相同用量的安全重送。PR #599 新增預設關閉的跨重啟核對路徑：驗證 immutable R2 result/report 後記錄 D1 recovery audit receipt，完整 reservation 仍保留；PR #600 再核對 result pointer 的 slot 與 `COMMITTED` 狀態。這是 recovery audit，不是 settlement/release 恢復，也未在正式 runtime 執行。PR #603 加入 prepare-only shared D1 rows reservation，每日最多 384 次 query reservation，每次預留 admission 與目標 query 共 8,000 rows read／20 rows written；政策最大 envelope 為 3,072,000 rows read／7,680 rows written/day。PR #605 對 admission 與目標 statement 各預留 16 KiB 儲存成長，每日政策上限 12,582,912 bytes。兩項 migration 未套用；SQLite CI 是合成程式證據，不是 production D1 用量／儲存量測。
+仍可獨立完成的工程工作：按 acceptance matrix 核對 replay、並行 slot、部分寫入、恢復、拒絕路徑與每次外部操作的 budget guard 測試覆蓋；掃描 Repository 中所有 D1/R2 writer，逐一核對是否確實使用共享 guard；整理 D1 reservation、settlement、recovery SQL 的讀寫與儲存量界限。現有 4,000 rows/query、384 query reservations/day、16 KiB/statement 是 policy/test envelope，並非 Cloudflare production calibration。不得因合成 CI 通過就宣稱 production usage/headroom 完成。
 
-P0 預算與保存仍未完成，不啟用 runtime、不做受控 main acceptance。PR #605 已加入 guarded-client 跨 runner storage-growth reservation；仍須以 Cloudflare 實際 query metadata 核對 16 KiB 預留，並證明 admission/reservation statement 自身的成長也受涵蓋。其他阻塞是可信且及時的 account-wide usage source、所有 D1 writers coverage、R2/D1 FREE-ONLY headroom 及 production binding。shared guard 只保護使用該 client 的 query；超過 384 次／日 fail closed。沒有 96 slots/day 加上 settlement/recovery/retry 的容量證據前，保持 `activation.enabled=false`。
+PR #616 已定義報告大小、每日成長上限、容量警示與 8 GB fail-closed stop；append-only 保存，沒有刪除權限。仍需可信帳戶級 freshness evidence、所有 writer coverage、D1/R2 免費額度與容量證明，以及 96 slots/day 加 settlement/recovery/retry 的總需求。條件具備後才依獨立受控驗收 authority 執行正式 main 循環並驗證保存回讀；自然排程另以真正 schedule run 驗收。
+
 ## 10. D1／R2 預算可行性查核 — updated 2026-09-29 (original review 2026-09-28)
 
 ### D1 用量來源與 freshness
@@ -202,7 +203,7 @@ PR #592 加入結構性上界：
 
 這是政策上界與 SQLite 合成 CI，不是 Cloudflare production measurement。PR #605 的 storage-growth reservation code 已合併，但尚未校準 Cloudflare 實際用量；可信 usage freshness source、所有 D1 writers coverage 與 account-wide D1/R2 headroom 仍未完成。不得因合成測試通過就 provisioning 或啟用 runtime。
 
-R2 的契約上界也需保留共享餘量：2 MiB × 96 slots × 31 days = **6.24 GB／31 days**，對 8 GB 專案 hard stop 僅留下 **1.76 GB** 給其他 writers；Class A 預留為 380,928／31 days，仍須與全帳戶其他 writers 合併核算。這些都是既有 per-slot envelope 的推導，不是實際使用量。由於循環證據採 append-only 且不自動刪除，須另定每輪報告大小、保存期限與容量警示。現行 Cloud Paper policy 已設定 8 GB hard stop，budget guard 在新增寫入前 fail closed 並回報 `BLOCKED_BUDGET_STORAGE_HARD_STOP`；仍須在取得授權的正式用量證據後驗證觸發時結果。這項政策不授權刪除 frozen 證據。
+R2 的契約上界也需保留共享餘量：2 MiB × 96 slots × 31 days = **6.24 GB／31 days**，對 8 GB 專案 hard stop 僅留下 **1.76 GB** 給其他 writers；Class A 預留為 380,928／31 days，仍須與全帳戶其他 writers 合併核算。這些都是既有 per-slot envelope 的推導，不是實際使用量。由於循環證據採 append-only 且不自動刪除，PR #616 已定義每輪報告大小、成長上限、容量警示與 8 GB hard stop，budget guard 在新增寫入前 fail closed 並回報 `BLOCKED_BUDGET_STORAGE_HARD_STOP`；仍須在取得授權的正式用量證據後驗證觸發時結果。這項政策不授權刪除 frozen 證據。
 
 ### 啟用前的必過條件
 
