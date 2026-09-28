@@ -9,6 +9,7 @@ from pathlib import Path
 
 from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
     D1CloudBudgetLedger,
+    RESERVE_SLOT_SQL,
     D1LedgerLimits,
     D1QueryResult,
     D1UsageGuard,
@@ -46,9 +47,15 @@ class SQLiteQueryClient:
         self.connection.row_factory = sqlite3.Row
         self.connection.executescript(MIGRATION)
         self.lock = threading.Lock()
+        self.query_plans: list[str] = []
 
     def query(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
         with self.lock:
+            if sql == RESERVE_SLOT_SQL:
+                plan_rows = self.connection.execute(
+                    "EXPLAIN QUERY PLAN " + sql, params,
+                ).fetchall()
+                self.query_plans.append(" ".join(str(tuple(row)) for row in plan_rows))
             cursor = self.connection.execute(sql, params)
             rows = tuple(dict(row) for row in cursor.fetchall())
             written = max(cursor.rowcount, 0)
@@ -131,6 +138,10 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
             "SELECT reservation_count FROM cloud_paper_budget_meta WHERE singleton = 1"
         ).fetchone()[0]
         self.assertEqual(count, 2)
+        self.assertTrue(client.query_plans)
+        self.assertIn(
+            "cloud_paper_budget_reserved_at_idx", client.query_plans[0],
+        )
 
     def test_duplicate_slot_cannot_reserve_or_replay(self):
         client = SQLiteQueryClient()
