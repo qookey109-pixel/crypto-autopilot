@@ -285,15 +285,20 @@ def select_qualified_candidates(
             return CandidateSelection("REVIEW_REQUIRED", (), ("CANDIDATE_LINEAGE_MISMATCH",))
         if not _route_match(route, family=family, direction=direction, regime=regime):
             return CandidateSelection("REVIEW_REQUIRED", (), ("STRATEGY_ROUTE_NOT_MATCHED",))
+        checkpoint = state.get("checkpoint_report")
+        account = checkpoint.get("account_snapshot") if isinstance(checkpoint, Mapping) else None
+        equity = account.get("equity_usd") if isinstance(account, Mapping) else None
         entry = candidate.get("entry_price")
         stop = candidate.get("stop_price")
         if (
-            not _positive_number(entry)
+            not _positive_number(equity)
+            or not _positive_number(entry)
             or not _positive_number(stop)
             or not _positive_number(target_price)
             or not float(stop) < float(entry) < float(target_price)
             or sizing.get("status") != "SIZING_READY"
             or sizing.get("direction") != direction
+            or sizing.get("equity_usd") != equity
             or sizing.get("entry_price") != entry
             or sizing.get("stop_price") != stop
             or not _positive_number(sizing.get("approved_notional_usd"))
