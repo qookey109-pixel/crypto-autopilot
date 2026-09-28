@@ -166,7 +166,16 @@ D1 query API 的 `meta.rows_read`／`meta.rows_written` 是單次查詢執行後
 
 ### 查詢容量推導
 
-目前 nominal schedule 為 96 slots／UTC day。目標完整循環每 slot 至少有 D1 reservation 與 settlement 兩次查詢，即 192 queries／day。沿用目前每次 query 預留上界 25,000 rows read，保守 envelope 為 **4,800,000 rows read／day**，高於專案 D1 safety ceiling **4,000,000 rows／day**。這是 guard 上界乘以目標查詢數，不是實測用量；但足以證明目前上界不能作為 96-slot 啟用的容量證據。現有 composition 尚未呼叫 settlement，故不能用它目前只有 reservation 的成本推稱完整預留／結算已可運行。
+原始 guard 以 25,000 rows/query 預留；96 slots/day × reservation/settlement 兩次 query 為 4,800,000 rows/day，高於 4,000,000 專案 safety ceiling。這是 guard 上界而非實測，原設定不能證明 96-slot 可行。
+
+PR #592 加入結構性上界：
+
+- D1 ledger 只接受與 `cloud_loop_v0_1.slot_id(now_ms)` 相同的 canonical 15-minute slot，拒絕任意 slot ID 或非排程時間。
+- rolling query 使用 `reserved_at_ms` 索引，窗口為最多 31 天；每 15 分鐘最多一個唯一 slot，因此目標完整窗口最多掃描 31 × 96 = **2,976** 筆 ledger slot。
+- 單次 guard ceiling 設為 **4,000 rows**，包括最多 2,976 筆 slot 與 1,024 rows 的額外保留空間；超過 ceiling 時 fail closed。GitHub CI 的 SQLite `EXPLAIN QUERY PLAN` 檢查索引路徑，合成測試驗證 canonical slot 與日容量算式。
+- 96 slots/day × 2 D1 queries/slot × 4,000 rows = **768,000 rows/day**，低於 4,000,000 ceiling，算術上留下 **3,232,000 rows/day** 給其他 D1 用量。
+
+這是程式結構及 SQLite CI 類比下的單一 Cloud Paper workload envelope；**不是 Cloudflare 的實測 rows_read，也不能證明其他 workflows／資料庫 writers 已納入**。Cloud Paper 啟用仍需要帳戶級 baseline、完整 writer coverage、跨 workflow reservation/recovery，以及授權後的 D1 metadata 對照。settlement recovery 新增查詢時必須納入重新計算，不能沿用兩 query 假設。
 
 R2 的契約上界也需保留共享餘量：2 MiB × 96 slots × 31 days = **6.24 GB／31 days**，對 8 GB 專案 hard stop 僅留下 **1.76 GB** 給其他 writers；Class A 預留為 380,928／31 days，仍須與全帳戶其他 writers 合併核算。這些都是既有 per-slot envelope 的推導，不是實際使用量。
 
