@@ -301,7 +301,7 @@
     "production_d1_requests_performed": 0,
     "activation_enabled": false,
     "production_usage_source_configured": false,
-    "cross_run_storage_reservation": "NOT_IMPLEMENTED",
+    "cross_run_storage_reservation": "PR605_IMPLEMENTED_FOR_GUARDED_CLIENT; PRODUCTION_STORAGE_CALIBRATION_NOT_RUN",
     "all_d1_writer_coverage": "UNPROVEN",
     "storage_growth_pr_605": {
       "pr_number": 605,
