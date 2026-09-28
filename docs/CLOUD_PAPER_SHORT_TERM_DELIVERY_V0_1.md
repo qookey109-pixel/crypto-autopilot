@@ -5,22 +5,22 @@
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
 - 狀態：計畫文件。各批狀態以最新 main、PR checks 與版本化證據為準。
 
-## 最新驗收證據狀態 — 2026-09-29（#605 已合併）
+## 最新驗收證據狀態 — 2026-09-29（#607 已合併）
 
-以下是證據分層；下方 `[ ]` 是**完整交付門檻**，不代表相關工程或合成測試完全沒有完成。
+以下是證據分層；下方未完成項目仍是**完整交付門檻**，不代表相關工程或合成測試完全沒有完成。
 
 | 項目 | 工程／合成證據 | 正式產品狀態 |
 |---|---|---|
-| 行情、候選、Paper loop、保存 | 已合併；完整循環 CI 與 empty-registry `NO_TRADE` 合成路徑通過 | 尚無正式 execution workflow 或受控 main run |
-| Provider／R2 guard | 共用 run-scoped guard 與 adapter hooks 已合併；合成檢查通過 | 帳戶級用量、freshness、全 writer coverage 未證明 |
-| D1 ledger | #599/#600 增加預設關閉的 recovery audit 與 pointer slot/state 核驗；#603 加入每日最多 384 次的共享 rows reservation；#605 加入每次 query 兩個 statement 各 16 KiB 的儲存成長預留 | 兩項 migration 均未套用、D1 未 provision/bind；production 用量 freshness、全 writer coverage、預留校準與 FREE-ONLY headroom 仍未證明 |
-| 端到端正向路徑 | machine status 記錄 synthetic full-cycle CI `PASS` | 不能推論模型資格、策略獲利或可產生正式交易 |
-| Dashboard | main Pages build、deploy、browser-production 已驗證 | Cloud Paper runtime 未啟用，網站尚無正式循環報告可投影 |
-| Global context | CMC candidate 與指標映射僅 proposal | 未授權、未呼叫；`REGIME_UNAVAILABLE` 維持預期 fail-closed 狀態 |
-| 排程與交易資格 | 不適用 | 排程尚未建立；模型 `REJECT`、production strategy registry 為空，因此正式只可 `NO_TRADE` |
+| 行情、候選、Paper loop、保存 | 已合併；完整循環 CI 與 empty-registry `NO_TRADE` 合成路徑通過 | 正式 composition 仍只接受空 registry 且使用空 candidate supplier；尚無合格 production candidate builder 或正式 execution workflow |
+| Provider／R2 guard | 共用 run-scoped guard、R2 adapter hooks 已合併 | 帳戶級用量、freshness 與所有 writer coverage 未證明 |
+| D1 ledger | #599/#600 預設關閉的 recovery audit；#603 shared rows reservation；#605 shared storage-growth reservation | migration 均為 prepare-only，未套用；D1 未 provision/bind；production usage freshness、全 writer coverage、儲存預留校準與 FREE-ONLY headroom 未證明 |
+| R2 容量保護 | #607 確認既有 8 GB hard stop 會在新寫入前 fail closed | 實際 hard-stop 觸發尚未用合法帳戶用量證據驗證；append-only 報告大小、保留與警示政策仍未定義，沒有刪除權限 |
+| 端到端正向路徑 | synthetic full-cycle CI 記錄為 `PASS` | 僅是工程測試證據；不能推論模型資格、策略獲利或可產生正式交易 |
+| Dashboard | 既有 Pages production 曾完成桌機／手機驗證 | #607 main Pages build 成功但 deploy/browser skipped；Cloud Paper runtime 未啟用，無正式循環報告可投影 |
+| Global context | CMC candidate 與指標映射僅 proposal | 未授權、未呼叫；`REGIME_UNAVAILABLE` 維持 fail-closed |
+| 排程與交易資格 | 無 Cloud Paper 正式排程 | 模型 `REJECT`、production registry 為空；正式只能 `NO_TRADE` |
 
-查核基準：本次文件同步前 main `b1fe413b08550802a69f3fcaa64cf815a4bcc1c1`，PR #605 exact head `73482e126fc7b038d7fc975ead25e4c487e3551a` 已合併，live open PR = 0。PR-head Python 3.12／3.13、workflow-static、CodeQL、Dependency/SBOM 通過；合併後 main Python 3.12／3.13、V0.10 Freeze Guard、CodeQL、Dependency/SBOM 通過（CI `36450240488`、Freeze Guard `36450240495`、CodeQL `36450240527`、Dependency/SBOM `36450240459`），workflow-static 因無 workflow 變更而 skipped。最近已驗證的 Pages production build／deploy／browser-production 是 [36414262259](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36414262259)（SHA `9753c6b3`）；#599/#600 未改 dashboard，無新部署證據。CI／Pages 不能替代帳戶用量證據、受控 runtime acceptance 或自然 Cloud Paper 排程驗收。
-
+查核基準：PR #607 exact head `9891600c610e1ada9a9ffe0d297ffcab4a879815` 已合併，base `cc7367c4748657649c2180790d5603c288cb495f`，merge/main SHA `96ed9dbff430b98df56a8fa2aa51b4b22fc3caf2`，live open PR = 0。PR-head 與 main 的 Python 3.12／3.13、Freeze Guard、CodeQL、Dependency/SBOM 均通過（main runs [36454492059](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36454492059), [36454492089](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36454492089), [36454492103](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36454492103), [36454492246](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36454492246)）。Pages [36454492166](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36454492166) build 成功，deploy/browser-production 因文件未改網站而 skipped。CI、Pages、帳戶用量證據、受控 runtime acceptance 及自然排程驗收各自獨立。
 ## 2026-09-27／28 自然排程旁證
 
 - Pionex [run 36309712506](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36309712506)：`REVIEW_REQUIRED`，catalog diff `PASS`、新增／移除皆為 0；保留安全分類結果。
