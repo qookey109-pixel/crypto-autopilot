@@ -19,9 +19,9 @@
 | Global context | CMC candidate 與指標映射僅 proposal | 未授權、未呼叫；`REGIME_UNAVAILABLE` 維持預期 fail-closed 狀態 |
 | 排程與交易資格 | 不適用 | 排程尚未建立；模型 `REJECT`、production strategy registry 為空，因此正式只可 `NO_TRADE` |
 
-查核基準：PR [#595](https://github.com/qookey109-pixel/crypto-autopilot/pull/595) 合併後 main `705da0a67a3e9a2aaedfb757ba6803eb5f0e9907`。PR #592 的一次 post-merge Python 3.13 test fixture failure（run 36428372077）由 #593 修正，修正後 main Python 3.12／3.13、CodeQL、Freeze Guard、依賴安全通過；workflow-static 因 workflow 未變更而 skipped。最近 Pages build／deploy／browser-production 成功證據仍是 #590 後的 run。所有 CI／Pages 結果均不替代帳戶用量證據、受控 runtime acceptance 或自然排程驗收。
+查核基準：PR [#596](https://github.com/qookey109-pixel/crypto-autopilot/pull/596) 合併後 main `7383faad99ec00713bc334090e2ecd6b52a384e1`。PR #592 的一次 post-merge Python 3.13 test fixture failure（run 36428372077）由 #593 修正，修正後 main Python 3.12／3.13、CodeQL、Freeze Guard、依賴安全通過；workflow-static 因 workflow 未變更而 skipped。最近自然 Pages run [36414262259](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36414262259) 的 build／deploy／browser-production 均成功；PR #596 後 main Pages run [36432893991](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36432893991) build 成功，deploy/browser-production skipped（沒有可部署內容變更）。所有 CI／Pages 結果均不替代帳戶用量證據、受控 runtime acceptance 或自然排程驗收。
 
-## 1. 本輪目標
+## 2026-09-27／28 自然排程旁證\n\n- Pionex [run 36309712506](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36309712506)：`REVIEW_REQUIRED`，catalog diff `PASS`、新增／移除皆為 0；保留安全分類結果。\n- Core100 [run 36311651477](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36311651477)：精確指紋 `NO_CHANGE`，無訓練、無 provider request、無 R2 寫入。\n- Health [run 36400618100](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36400618100) 和其 Cloud Maintenance [run 36400671117](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36400671117) 成功；Maintenance 更新 #578 草稿但仍待 CI。\n\n以上屬於既有研究、觀測和網站流程的自然排程證據，**不是 Cloud Paper execution workflow 或自然模擬排程驗收**。\n\n## 1. 本輪目標
 
 完成一個**可保存、可恢復、可追溯、看得懂**的雲端模擬循環：
 
