@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "abe94ebbe138445a8d64a15a8165148d84c09e52",
+  "evidence_basis_parent_main_sha": "570e5179f4a09d9a1c17eb7b4df5bfbcce6b8224",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -20,7 +20,7 @@
     "no_trade_composition": "MERGED_PR_AND_POST_MERGE_CI_VERIFIED_NOT_ACTIVATED",
     "market_decision_trace": "MERGED_PR_AND_POST_MERGE_CI_VERIFIED_REPORT_ONLY",
     "r2_writer_inventory": "CLASSIFIED_AND_REQUIRED_CI_GUARDED",
-    "cloud_paper_nonaccess_preflight": "MERGED; MAIN_CI_PASS; MANUAL_WORKFLOW_NOT_RUN"
+    "cloud_paper_nonaccess_preflight": "MERGED; MAIN_CI_PASS; MANUAL_NONACCESS_PREFLIGHT_PASS; REPORT_ARTIFACT_PRESERVED; NOT_PRODUCTION_ACCEPTANCE"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING",
@@ -58,12 +58,32 @@
     "merged_main_sha": "abe94ebbe138445a8d64a15a8165148d84c09e52",
     "post_merge_ci_run_id": 36389778241,
     "post_merge_ci_status": "SUCCESS",
-    "manual_workflow_run": "NOT_RUN",
+    "manual_workflow_run": "36391083122_SUCCESS_NONACCESS_PREFLIGHT_ONLY",
     "ci_asserted_provider_requests_performed": 0,
     "ci_asserted_r2_access_performed": false,
     "ci_asserted_d1_access_performed": false,
     "ci_asserted_training_performed": false,
-    "ci_asserted_holdout_accessed": false
+    "ci_asserted_holdout_accessed": false,
+    "manual_preflight_run": {
+      "run_id": 36391083122,
+      "event": "workflow_dispatch",
+      "branch": "main",
+      "head_sha": "570e5179f4a09d9a1c17eb7b4df5bfbcce6b8224",
+      "conclusion": "SUCCESS",
+      "job": "preflight",
+      "report_state": "DISABLED",
+      "artifact_id": 10956367820,
+      "artifact_name": "cloud-paper-nonaccess-preflight-36391083122-1",
+      "artifact_sha256": "3947758dc8016c6158713cc13b90992a4bfde878f926b70b18b9e87af9391efe",
+      "assertions": {
+        "provider_requests_performed": 0,
+        "r2_access_performed": false,
+        "d1_access_performed": false,
+        "training_performed": false,
+        "holdout_accessed": false
+      },
+      "scope": "NON_ACCESS_PREFLIGHT_ONLY_NOT_RUNTIME_ACCEPTANCE_OR_ACTIVATION"
+    }
   },
   "market_context": {
     "status": "REGIME_UNAVAILABLE",
