@@ -119,7 +119,7 @@ class CloudPaperNoTradeComposition:
         feed = CompleteTapePionexFeed(
             client=self.client,
             policy=self.paper_policy,
-            before_request=self.reserve_provider_request,
+            before_request=self._reserve_provider_request,
         )
         return run_cloud_step(
             tick_ms=tick_ms,
