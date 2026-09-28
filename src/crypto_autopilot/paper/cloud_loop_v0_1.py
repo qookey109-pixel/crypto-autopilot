@@ -238,6 +238,14 @@ def decision_reason_codes(
             if context_status == "REGIME_UNAVAILABLE"
             else "MARKET_CONTEXT_UNAVAILABLE"
         )
+    if market.get("execution_selection_status") == "REVIEW_REQUIRED":
+        reasons.append("CANDIDATE_SELECTION_REVIEW_REQUIRED")
+    selection_reasons = market.get("execution_selection_reasons")
+    if isinstance(selection_reasons, Sequence) and not isinstance(selection_reasons, str):
+        reasons.extend(
+            item for item in selection_reasons
+            if isinstance(item, str) and item
+        )
     if candidates:
         reasons.append("QUALIFIED_CANDIDATES")
     elif not registrations:
@@ -312,8 +320,16 @@ def run_cloud_step(
         raise CloudLoopReviewRequired("EMPTY_PRODUCTION_STRATEGY_REGISTRY")
     allowed_ids = {entry.get("strategy_id") for entry in registrations
                    if isinstance(entry, Mapping)}
-    if any(not isinstance(item, Mapping)
-           or item.get("strategy_id") not in allowed_ids
+
+    def candidate_strategy_id(item: object) -> object:
+        if not isinstance(item, Mapping):
+            return None
+        payload = item.get("candidate")
+        if isinstance(payload, Mapping):
+            return payload.get("strategy_id", item.get("strategy_id"))
+        return item.get("strategy_id")
+
+    if any(candidate_strategy_id(item) not in allowed_ids
            for item in candidates):
         raise CloudLoopReviewRequired("UNREGISTERED_STRATEGY_CANDIDATE")
     if len(candidates) > 5:
@@ -333,7 +349,12 @@ def run_cloud_step(
     )
     outcome = {
         "schema": "qookey-cloud-paper-loop-report-v0.1",
-        "state": "COMMITTED" if candidates or state["active_session"] else "NO_TRADE",
+        "state": (
+            "REVIEW_REQUIRED"
+            if market.get("market_status") == "REVIEW_REQUIRED"
+            or market.get("execution_selection_status") == "REVIEW_REQUIRED"
+            else "COMMITTED" if candidates or state["active_session"] else "NO_TRADE"
+        ),
         "slot_id": slot, "previous_slot": previous_slot, "tick_ms": tick_ms,
         "market": market, "candidate_count": len(candidates),
         "coordinator": report,
