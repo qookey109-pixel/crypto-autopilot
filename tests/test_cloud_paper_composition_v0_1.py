@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import unittest
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime
+from unittest.mock import patch
 
+from crypto_autopilot.features.market import OrderBookSnapshot
 from crypto_autopilot.models import BookTicker, Candle, MarketTicker
 from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
     D1LedgerUnavailable,
@@ -22,8 +25,10 @@ from crypto_autopilot.paper.cloud_composition_v0_1 import (
     CloudPaperNoTradeComposition,
 )
 from crypto_autopilot.paper.cloud_loop_v0_1 import CloudLoopReviewRequired
+from crypto_autopilot.paper.cloud_market_v0_1 import analyze_capture
 from crypto_autopilot.paper.live_v0_1 import LivePaperPolicy
 from crypto_autopilot.paper.run_store_v0_1 import PaperRunObjectAlreadyExistsError
+from crypto_autopilot.risk import plan_position_size
 
 NOW = int(datetime(2026, 9, 27, 8, 7, tzinfo=UTC).timestamp() * 1000)
 HOUR_MS = 3_600_000
@@ -498,6 +503,198 @@ class CloudPaperCompositionTests(unittest.TestCase):
                 run_id="run-test",
             )
         self.assertEqual(len(client.calls), 3)
+
+    def test_qualified_fixture_completes_entry_exit_and_no_trade_through_composition(self):
+        symbol = "BTC_USDT_PERP"
+        implementation_sha = "a" * 64
+        family_validation = {
+            "schema": "qookey-strategy-family-validation-report-v0.1",
+            "family": "TREND_FOLLOWING",
+            "category": "fixture",
+            "state": "FAMILY_EVIDENCE_READY_FOR_HUMAN_REVIEW",
+            "reasons": ["synthetic_ci_fixture"],
+            "coverage": {}, "policy": {}, "lineage": {},
+            "authority": {
+                "research_evidence_only": True,
+                "family_registry_mutated": False,
+                "strategy_edge_claimed": False,
+                "provider_requests_performed": False,
+                "r2_accessed": False,
+                "holdout_accessed": False,
+                "promotion_authority": 0,
+                "position_sizing_authorized": False,
+                "paper_execution_authorized": False,
+                "trade_plan_authorized": False,
+                "real_money_order_authorized": False,
+                "live_trading_authorized": False,
+            },
+            "limitations": [],
+        }
+
+        def canonical_sha(payload):
+            encoded = json.dumps(
+                payload, sort_keys=True, separators=(",", ":"),
+                ensure_ascii=True, allow_nan=False,
+            ).encode("utf-8")
+            return hashlib.sha256(encoded).hexdigest()
+
+        qualification = {
+            "state": "PAPER_ELIGIBLE",
+            "receipt_path": "research/receipts/test-only-candidate-qualification.json",
+            "receipt_sha256": "b" * 64,
+            "implementation_sha256": implementation_sha,
+            "family_validation_report_sha256": canonical_sha(family_validation),
+            "paper_execution_authorized": True,
+            "holdout_accessed": False,
+            "source_switch_authorized": False,
+            "model_promotion_authorized": False,
+            "real_money_order_authorized": False,
+            "live_trading_authorized": False,
+        }
+        registry = {
+            "schema": "qookey-cloud-paper-strategy-registry-v0.1",
+            "status": "QUALIFIED_PAPER_STRATEGIES_AVAILABLE",
+            "provider": "PIONEX_PUBLIC",
+            "strategies": [{
+                "strategy_id": "test-only-trend",
+                "strategy_family": "TREND_FOLLOWING",
+                "provider": "PIONEX_PUBLIC",
+                "symbols": [symbol],
+                "regimes": ["ALT_EXPANSION"],
+                "implementation_sha256": implementation_sha,
+                "model_dependency": "NONE",
+                "qualification": qualification,
+            }],
+            "model_quality": "REJECT",
+            "production_fixture_admission": False,
+            "automatic_promotion": False,
+        }
+
+        class MovingClient(FakeClient):
+            def __init__(self):
+                super().__init__()
+                self.tick_ms = NOW
+
+            def list_perpetual_book_tickers(self):
+                self.calls.append("books")
+                return [
+                    BookTicker(
+                        symbol=s, bid_price=340, bid_size=10,
+                        ask_price=340.1, ask_size=10, timestamp_ms=self.tick_ms,
+                    )
+                    for s in (symbol, "UNKNOWNX_USDT_PERP")
+                ]
+
+            def get_order_book(self, requested_symbol, *, limit):
+                self.calls.append(("depth", requested_symbol, limit))
+                bid, ask = ((340.0, 340.1) if self.tick_ms == NOW
+                            else (346.0, 346.1))
+                return OrderBookSnapshot(
+                    symbol=requested_symbol,
+                    bids=((bid, 1_000.0),), asks=((ask, 1_000.0),),
+                    update_time_ms=self.tick_ms,
+                )
+
+            def get_recent_trades(self, requested_symbol, *, limit):
+                self.calls.append(("trades", requested_symbol, limit))
+                return []
+
+        client, store, accesses = MovingClient(), MemoryStore(), []
+        base_analyze = analyze_capture
+        emit_candidate = True
+
+        def analyzed_fixture(capture, *, allowed_base_assets):
+            nonlocal emit_candidate
+            market = base_analyze(
+                capture, allowed_base_assets=allowed_base_assets,
+            )
+            evidence = market["market_evidence"].get(symbol)
+            if not isinstance(evidence, dict):
+                raise AssertionError("synthetic cycle requires captured BTC evidence")
+            route = {
+                "symbol": symbol,
+                "status": "ROUTE_MATCHED",
+                "regime_state": "ALT_EXPANSION",
+                "matches": [{
+                    "family": "TREND_FOLLOWING",
+                    "direction": "LONG",
+                    "regime_state": "ALT_EXPANSION",
+                    "reasons": ["synthetic CI route"],
+                }],
+            }
+            market["context_status"] = "AVAILABLE"
+            market["routes"] = [route]
+            market["candidate_specs"] = []
+            if emit_candidate:
+                entry, stop = 340.05, 336.65
+                market["candidate_specs"] = [{
+                    "candidate": {
+                        "strategy_id": "test-only-trend",
+                        "symbol": symbol,
+                        "strategy_family": "TREND_FOLLOWING",
+                        "direction": "LONG",
+                        "regime_state": "ALT_EXPANSION",
+                        "provider": "PIONEX_PUBLIC",
+                        "as_of_ms": evidence["last_bar_ms"],
+                        "market_evidence_sha256": evidence["sha256"],
+                        "strategy_route_sha256": canonical_sha(route),
+                        "qualification_receipt_sha256": qualification["receipt_sha256"],
+                        "strategy_implementation_sha256": implementation_sha,
+                        "entry_price": entry,
+                        "stop_price": stop,
+                        "family_validation_report": family_validation,
+                        "position_sizing_plan": asdict(plan_position_size(
+                            direction="LONG", equity_usd=10_000.0,
+                            entry_price=entry, stop_price=stop,
+                        )),
+                    },
+                    "target_price": 345.0,
+                }]
+                emit_candidate = False
+            return market
+
+        runtime = composition(
+            client, store, registry=registry, accesses=accesses,
+        )
+        with patch(
+            "crypto_autopilot.paper.cloud_composition_v0_1.analyze_capture",
+            side_effect=analyzed_fixture,
+        ):
+            first = runtime.run_slot(
+                tick_ms=NOW, previous_slot=None, activation_enabled=True,
+                run_id="synthetic-entry",
+            )
+            self.assertEqual(first["state"], "COMMITTED")
+            self.assertEqual(first["candidate_count"], 1)
+            self.assertEqual(first["market"]["execution_selection_status"], "READY")
+            self.assertEqual(first["account"]["initial_equity_usd"], 10_000.0)
+            self.assertEqual(first["account"]["open_position_count"], 1)
+
+            client.tick_ms = NOW + 15 * 60 * 1000
+            second = runtime.run_slot(
+                tick_ms=client.tick_ms, previous_slot=first["slot_id"],
+                activation_enabled=True, run_id="synthetic-exit",
+            )
+            self.assertEqual(second["state"], "COMMITTED")
+            self.assertEqual(second["account"]["open_position_count"], 0)
+            self.assertGreater(
+                second["account"]["realized_closed_net_pnl_usd"], 0,
+            )
+
+            client.tick_ms = NOW + 30 * 60 * 1000
+            third = runtime.run_slot(
+                tick_ms=client.tick_ms, previous_slot=second["slot_id"],
+                activation_enabled=True, run_id="synthetic-no-trade",
+            )
+        self.assertEqual(third["state"], "NO_TRADE")
+        self.assertEqual(third["candidate_count"], 0)
+        self.assertEqual(third["coordinator"]["sequence"], 3)
+        self.assertEqual(third["account"]["open_position_count"], 0)
+        self.assertTrue(any(kind == "cloud-report" for kind, _ in store.objects))
+        self.assertTrue(any(kind == "cloud-result" for kind, _ in store.objects))
+        self.assertEqual(
+            len([event for event in accesses if event == "settlement"]), 3,
+        )
 
     def test_enabled_empty_registry_composes_to_audited_no_trade(self):
         client, store, accesses = FakeClient(), MemoryStore(), []
