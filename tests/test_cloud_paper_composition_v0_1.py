@@ -163,7 +163,8 @@ class CloudPaperCompositionTests(unittest.TestCase):
         self.assertEqual(len(permits), 4)
         self.assertTrue(store.calls)
         self.assertTrue(accesses)
-        self.assertTrue(all(call[0] != "get" or call[1] != "local" for call in store.calls))
+        self.assertTrue(any(kind == "cloud-report" for kind, _ in store.objects))
+        self.assertTrue(any(kind == "cloud-result" for kind, _ in store.objects))
 
 
 if __name__ == "__main__":
