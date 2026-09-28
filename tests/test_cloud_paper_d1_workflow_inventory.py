@@ -4,10 +4,63 @@ import unittest
 
 from scripts.validate_cloud_paper_r2_writer_inventory import (
     contains_d1_access_reference,
+    validate_d1_source_boundary,
 )
 
 
 class D1WorkflowInventoryTests(unittest.TestCase):
+
+    def test_accepts_single_guarded_repository_d1_client(self) -> None:
+        path = "src/crypto_autopilot/paper/cloud_budget_ledger_v0_1.py"
+        source = """class CloudflareD1QueryClient:
+    def query(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
+        self._usage_guard.reserve_query()
+        if self._shared_rows_guard is None:
+            raise BudgetBlocked()
+        self._shared_rows_guard.reserve_query(
+            result = self._request(sql, params)
+    def _request(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
+        return D1QueryResult()
+"""
+        self.assertEqual(
+            validate_d1_source_boundary({path: source}, path),
+            [path],
+        )
+
+    def test_rejects_unlisted_direct_d1_rest_source(self) -> None:
+        path = "src/crypto_autopilot/paper/cloud_budget_ledger_v0_1.py"
+        source = """class CloudflareD1QueryClient:
+    def query(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
+        self._usage_guard.reserve_query()
+        if self._shared_rows_guard is None:
+            raise BudgetBlocked()
+        self._shared_rows_guard.reserve_query(
+            result = self._request(sql, params)
+    def _request(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
+        return D1QueryResult()
+"""
+        second_path = "scripts/direct_d1_writer.py"
+        with self.assertRaisesRegex(RuntimeError, "source boundary mismatch"):
+            validate_d1_source_boundary(
+                {
+                    path: source,
+                    second_path: 'url = "https://api.cloudflare.com/client/v4/accounts/a/d1/database"',
+                },
+                path,
+            )
+
+    def test_rejects_missing_shared_budget_guard(self) -> None:
+        path = "src/crypto_autopilot/paper/cloud_budget_ledger_v0_1.py"
+        source = """class CloudflareD1QueryClient:
+    def query(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
+        result = self._request(sql, params)
+    def _request(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
+        return D1QueryResult()
+"""
+        with self.assertRaisesRegex(RuntimeError, "guards are missing"):
+            validate_d1_source_boundary({path: source}, path)
+
+
     def test_detects_d1_secret_reference(self) -> None:
         self.assertTrue(contains_d1_access_reference("env: ${{ secrets.D1_DATABASE_ID }}"))
 
