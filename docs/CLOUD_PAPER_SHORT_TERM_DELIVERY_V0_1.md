@@ -13,13 +13,13 @@
 |---|---|---|
 | 行情、候選、Paper loop、保存 | 已合併；完整循環 CI 與 empty-registry `NO_TRADE` 合成路徑通過 | 尚無正式 execution workflow 或受控 main run |
 | Provider／R2 guard | 共用 run-scoped guard 與 adapter hooks 已合併；合成檢查通過 | 帳戶級用量、freshness、全 writer coverage 未證明 |
-| D1 ledger | slot reservation、成功結果 readback 後 settlement，以及相同用量 settlement 重送已合併 | D1 未 provision／bind；rows budget 仍未跨 query/run 協調；跨 runner／重啟 recovery 未完成 |
+| D1 ledger | #599 已加入預設關閉的 recovery audit：核驗 immutable result/report 並寫 audit receipt；#600 核驗 pointer slot/state | 仍不 settlement／釋放 reservation；D1 未 provision／bind，account-wide rows budget、recovery/retry 成本與 writer coverage 未完成 |
 | 端到端正向路徑 | machine status 記錄 synthetic full-cycle CI `PASS` | 不能推論模型資格、策略獲利或可產生正式交易 |
 | Dashboard | main Pages build、deploy、browser-production 已驗證 | Cloud Paper runtime 未啟用，網站尚無正式循環報告可投影 |
 | Global context | CMC candidate 與指標映射僅 proposal | 未授權、未呼叫；`REGIME_UNAVAILABLE` 維持預期 fail-closed 狀態 |
 | 排程與交易資格 | 不適用 | 排程尚未建立；模型 `REJECT`、production strategy registry 為空，因此正式只可 `NO_TRADE` |
 
-查核基準：PR [#596](https://github.com/qookey109-pixel/crypto-autopilot/pull/596) 合併後 main `7383faad99ec00713bc334090e2ecd6b52a384e1`。PR #592 的一次 post-merge Python 3.13 test fixture failure（run 36428372077）由 #593 修正，修正後 main Python 3.12／3.13、CodeQL、Freeze Guard、依賴安全通過；workflow-static 因 workflow 未變更而 skipped。最近自然 Pages run [36414262259](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36414262259) 的 build／deploy／browser-production 均成功；PR #596 後 main Pages run [36432893991](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36432893991) build 成功，deploy/browser-production skipped（沒有可部署內容變更）。所有 CI／Pages 結果均不替代帳戶用量證據、受控 runtime acceptance 或自然排程驗收。
+查核基準：文件 PR 前 main `3dd8be803f5e7bfda26cd14bdbe5aaae507b338c`。PR #599/#600 head 與合併後 main 的 Python 3.12／3.13、V0.10 Freeze Guard、CodeQL、Dependency/SBOM 均通過；workflow-static skipped（workflow 未變更）。最近已驗證的 Pages production build／deploy／browser-production 是 [36414262259](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36414262259)（SHA `9753c6b3`）；#599/#600 未改 dashboard，無新部署證據。CI／Pages 不能替代帳戶用量證據、受控 runtime acceptance 或自然 Cloud Paper 排程驗收。
 
 ## 2026-09-27／28 自然排程旁證\n\n- Pionex [run 36309712506](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36309712506)：`REVIEW_REQUIRED`，catalog diff `PASS`、新增／移除皆為 0；保留安全分類結果。\n- Core100 [run 36311651477](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36311651477)：精確指紋 `NO_CHANGE`，無訓練、無 provider request、無 R2 寫入。\n- Health [run 36400618100](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36400618100) 和其 Cloud Maintenance [run 36400671117](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36400671117) 成功並更新當時的 #578 草稿；該草稿後續已關閉且未合併，不能列為目前待審項目。\n\n以上屬於既有研究、觀測和網站流程的自然排程證據，**不是 Cloud Paper execution workflow 或自然模擬排程驗收**。\n\n## 1. 本輪目標
 
@@ -149,7 +149,7 @@ TradingAgents 保留既有研究定位，後續另行評估。
 
 PR [#579](https://github.com/qookey109-pixel/crypto-autopilot/pull/579) 將 Pionex 行情與 R2 保存接到同一 run-scoped guard；PR [#585](https://github.com/qookey109-pixel/crypto-autopilot/pull/585) 加上 D1 usage-evidence preflight 與 per-slot reservation interface；PR [#587](https://github.com/qookey109-pixel/crypto-autopilot/pull/587) 完成 concrete D1 evidence guard、composition preflight 及 Cloudflare D1 REST client 的逐 query guard。#587 的 PR head 與 post-merge 必要 CI 均通過。
 
-PR #590 將成功 settlement 接在 Paper 完整寫入及 readback 之後；若運行或 settlement 失敗，完整 reservation 保留。PR #595 使完全相同的已結算用量可安全重送；跨 runner 用量預留與 restart recovery 仍未完成。這不是故障恢復完成：現有 D1 query guard 仍只在單一 instance 累計，沒有跨執行的 D1 rows-read reservation；未確認 settlement 結果時也沒有自動恢復流程。可信的帳戶級 D1 usage evidence source、所有 D1 writers 覆蓋、production runner binding、D1 provisioning、R2 account-wide usage/headroom 仍未證明。
+PR #590/#595 完成成功 settlement 與完全相同用量的安全重送。PR #599 新增預設關閉的跨重啟核對路徑：驗證 immutable R2 result/report 後記錄 D1 recovery audit receipt，完整 reservation 仍保留；PR #600 再核對 result pointer 的 slot 與 `COMMITTED` 狀態。這是 recovery audit，不是 settlement/release 恢復，也未在正式 runtime 執行。跨 runner/account-wide D1 rows reservation、recovery/retry 查詢成本、可信帳戶級 D1/R2 usage freshness、所有 writers coverage、production runner binding、D1 provisioning 仍未證明。
 
 因此 P0 預算與保存批次仍未完成，不啟用 runtime、不做受控 main acceptance。下一批應先解決跨執行 D1 rows-read/write reservation 與 settlement 的結果恢復，再完成有 freshness watermark 的帳戶級 usage source 和所有 writer coverage。只有證明 96 slots/day 在 FREE-ONLY 預算下可行，才可進行正式 D1/R2 驗收；不得把合成證據當成正式用量，也不得以降低 25,000/query 上界讓算式通過。
 ## 10. D1／R2 預算可行性查核 — 2026-09-28
@@ -175,7 +175,7 @@ PR #592 加入結構性上界：
 - 單次 guard ceiling 設為 **4,000 rows**，包括最多 2,976 筆 slot 與 1,024 rows 的額外保留空間；超過 ceiling 時 fail closed。GitHub CI 的 SQLite `EXPLAIN QUERY PLAN` 檢查索引路徑，合成測試驗證 canonical slot 與日容量算式。
 - 96 slots/day × 2 D1 queries/slot × 4,000 rows = **768,000 rows/day**，低於 4,000,000 ceiling，算術上留下 **3,232,000 rows/day** 給其他 D1 用量。
 
-這是程式結構及 SQLite CI 類比下的單一 Cloud Paper workload envelope；**不是 Cloudflare 的實測 rows_read，也不能證明其他 workflows／資料庫 writers 已納入**。Cloud Paper 啟用仍需要帳戶級 baseline、完整 writer coverage、跨 workflow reservation/recovery，以及授權後的 D1 metadata 對照。settlement recovery 新增查詢時必須納入重新計算，不能沿用兩 query 假設。
+這是程式結構及 SQLite CI 類比下的正常兩 query Cloud Paper workload envelope；**不是 Cloudflare 的實測 rows_read，也不能證明其他 workflows／資料庫 writers 已納入**。PR #599 recovery audit 額外讀取與寫入及重試成本尚未納入此日預算。Cloud Paper 啟用仍需要帳戶級 baseline、完整 writer coverage、跨 workflow reservation/recovery，以及授權後的 D1 metadata 對照，必須依實際 query 數重算。
 
 R2 的契約上界也需保留共享餘量：2 MiB × 96 slots × 31 days = **6.24 GB／31 days**，對 8 GB 專案 hard stop 僅留下 **1.76 GB** 給其他 writers；Class A 預留為 380,928／31 days，仍須與全帳戶其他 writers 合併核算。這些都是既有 per-slot envelope 的推導，不是實際使用量。
 
