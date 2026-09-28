@@ -1,0 +1,57 @@
+{
+  "schema": "qookey-cloud-paper-candidate-adapter-v0.1",
+  "status": "PREPARED_INTERFACE_ONLY",
+  "purpose": "Bind already-produced strategy outputs to a current versioned paper qualification and current Pionex market/router evidence; do not implement or select strategies.",
+  "source": "config/cloud_paper_strategy_registry_v0_1.json plus same-slot cloud market report candidate_specs",
+  "candidate_limit": 5,
+  "empty_registry_behavior": "NO_TRADE; zero candidates",
+  "nonempty_registry_requirements": {
+    "registry_status": "QUALIFIED_PAPER_STRATEGIES_AVAILABLE",
+    "entry_fields": [
+      "strategy_id",
+      "strategy_family",
+      "provider",
+      "symbols",
+      "regimes",
+      "implementation_sha256",
+      "model_dependency",
+      "qualification"
+    ],
+    "qualification_state": "PAPER_ELIGIBLE",
+    "qualification_receipt_path_prefix": "research/receipts/",
+    "paper_execution_authorized": true,
+    "forbidden_authority": [
+      "holdout_accessed",
+      "source_switch_authorized",
+      "model_promotion_authorized",
+      "real_money_order_authorized",
+      "live_trading_authorized"
+    ],
+    "core100_dependency_requires_model_quality": "PASS"
+  },
+  "output_binding": [
+    "Pionex provider",
+    "same as_of_ms",
+    "market evidence SHA-256",
+    "router match SHA-256",
+    "qualification receipt SHA-256",
+    "strategy implementation SHA-256",
+    "LONG direction",
+    "entry/stop/target and risk plan consistency"
+  ],
+  "invalid_output": "REVIEW_REQUIRED; reject the entire candidate basket without ranking or partial selection",
+  "production_registry_current_status": "EMPTY_NO_ELIGIBLE_STRATEGIES",
+  "activation_enabled": false,
+  "authority": {
+    "strategy_selection": false,
+    "strategy_parameters": false,
+    "paper_execution": false,
+    "provider_access": false,
+    "r2_access": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
