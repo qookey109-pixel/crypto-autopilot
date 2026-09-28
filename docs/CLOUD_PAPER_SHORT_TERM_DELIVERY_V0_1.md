@@ -1,7 +1,7 @@
 # Crypto Autopilot 短期交付目標
 
 - 文件日期：2026-09-29
-- 最新產品／CI 證據基準：PR #622 已合併至 main `cb22d3c3905a079eb754f0fab6d917923512f624`。狀態文件由 PR #623 同步並合併至 main `f26ac2d0971bc9b147ad788a8c401469422a0ad0`；PR #623 未改 runtime 或 authority。
+- 最新產品／CI 證據基準：PR #622 已合併至 main `cb22d3c3905a079eb754f0fab6d917923512f624`。狀態文件 PR #623、CI 驗收矩陣 PR #624 合併後 main 為 `9527d2c618240426db8d557505e9c024309bb6b1`；兩者均未改 runtime 或 authority。
 - Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pixel/crypto-autopilot)
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
 - 歷史證據基準：PR #614 合併至 main `abda84a45de66dc214be40ce05ee0c2ccb79e415`；PR #618 Dashboard 部署證據維持獨立記錄。
@@ -32,9 +32,9 @@ PR #618 的 Dashboard 部署與 14/14 桌機／手機瀏覽器驗證屬於其產
 
 PR #611 readiness 缺少 read-only credential；未發出 Cloudflare request，亦未消耗一次性 audit authority。GitHub Actions 設定 `CLOUDFLARE_ACCOUNT_ID` variable 和 `CLOUDFLARE_READONLY_API_TOKEN` secret 後，先跑零網路 readiness；未得 `READY` 不執行一次性 audit。
 
-## Cloud CI 工程驗收矩陣 — main `f26ac2d`
+## Cloud CI 工程驗收矩陣 — main `9527d2c`
 
-下列情境由 GitHub CI 的 Python 3.12／3.13 全套測試驗證；PR #622 加入正向 qualified fixture，合併後測試 run [36485948145](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36485948145) 通過，PR #623 合併後 main CI [36487609826](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36487609826) 的兩個 Python job 也通過。這些是合成／假 client 證據，不代表 Cloudflare 帳戶、正式交易或自然排程已驗收。
+下列情境由 GitHub CI 的 Python 3.12／3.13 全套測試驗證；PR #622 加入正向 qualified fixture，合併後測試 run [36485948145](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36485948145) 通過，PR #624 合併後 main CI [36488331170](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36488331170) 的兩個 Python job 也通過。這些是合成／假 client 證據，不代表 Cloudflare 帳戶、正式交易或自然排程已驗收。
 
 | 情境 | 代表性 CI 測試 | 狀態與界線 |
 |---|---|---|
