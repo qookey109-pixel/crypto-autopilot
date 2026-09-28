@@ -4,16 +4,15 @@
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
-## Cloud Paper delivery status — main `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`
+## Cloud Paper delivery status — main `6deabddd7f925b6d586b9565a9f6641105a2fd29`
 
-Updated 2026-09-29 from live GitHub. PR #614 connected the qualification-gated adapter; PR #615 reconciled status; PR #616 defined R2 storage ceilings and implemented a capacity warning guard. PR #616's main CI, Dependency/SBOM and Freeze Guard passed; post-merge CodeQL [36478324500](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324500) passed. See [CURRENT_STATUS](../CURRENT_STATUS.md) and the [machine delivery status](../research/status/cloud-paper-delivery-v0-1.json).
+Updated 2026-09-29 from live GitHub after PR #618. PR #618 merged the Dashboard status/capacity projection. Main Python 3.12/3.13 CI, CodeQL, Dependency/SBOM and Freeze Guard passed. Pages run [36479940093](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36479940093) passed build/deploy and 14 production browser checks across desktop Chromium and mobile Chromium. See [CURRENT_STATUS](../CURRENT_STATUS.md), [PROJECT_STATUS](../PROJECT_STATUS.md), the [short-term delivery checklist](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md), and the [machine delivery status](../research/status/cloud-paper-delivery-v0-1.json).
 
-- Storage policy: 256 KiB/object, 2 MiB/run, 192 MiB/day, 6,241,124,352 theoretical bytes per 31 days at 96 slots/day; WARNING at 6.4 GB, hard stop at projected 8 GB. Indefinite append-only retention; no delete authority.
-- This is an engineering envelope, not production usage or capacity evidence. The account-level usage run [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) stopped at `BLOCKED_MISSING_READ_ONLY_CREDENTIAL` before Cloudflare requests; one-time audit authority remains unconsumed. Configure the Actions account ID variable and read-only token secret, then run only zero-network readiness. Do not run the audit before READY.
-- The production strategy registry remains empty and Core100 quality is `REJECT`; positive path is synthetic CI only. Activation stays false, D1 stays unprovisioned with migrations prepare-only, controlled main acceptance has not run, and no Cloud Paper execution workflow/natural schedule exists.
-- Next: close the credential-gated account usage/freshness audit; verify all-writer coverage, D1 free-tier/storage calibration and shared budget headroom; only then prepare the separately authorized controlled acceptance. Keep activation disabled until each gate has evidence.
-
-Historical PR #614 status details are represented by the merged PR and prior dated evidence; the section below remains current operational guidance.
+- Dashboard projection says `NOT_RUN`; it separately shows the empty strategy registry, `REGIME_UNAVAILABLE`, `BLOCKED_BUDGET`, and unknown account storage. Browser success verifies presentation only, not a formal Cloud Paper run.
+- Storage policy: 256 KiB/object, 2 MiB/run, 192 MiB/day, 6,241,124,352 theoretical bytes per 31 days at 96 slots/day; WARNING at 6.4 GB and hard stop at projected 8 GB. Retention remains indefinite and append-only; deletion has no authority.
+- The policy is not production usage evidence. Account-level usage readiness [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) stopped at `BLOCKED_MISSING_READ_ONLY_CREDENTIAL` before Cloudflare requests; one-time audit authority remains unconsumed. Configure the Actions account ID variable and read-only token secret, then run zero-network readiness. Run the audit only after READY.
+- Production strategy registry is empty and Core100 quality is `REJECT`; positive-path fills remain synthetic CI evidence. Activation stays false, D1 stays unprovisioned with migrations prepare-only, controlled main acceptance has not run, and there is no production execution workflow or natural schedule.
+- Next gate: resolve credential-gated usage/freshness readiness; prove account-wide writer coverage, D1 free-tier/storage calibration and shared budget headroom; then satisfy the separate controlled-acceptance authority. Keep runtime disabled until each gate has evidence.
 
 ## 1. 固定入口
 
@@ -177,7 +176,7 @@ PR / merge / deployment / natural schedule：各自狀態
 - 驗收：兩組 source run ID／attempt、main／head、兩個 job 結果、產生的 draft PR 或 NO_CHANGE 摘要；人工檢查 generated-block-only diff。
 - 停止：main 前進、衝突、人工編輯、來源不可信、缺權限／資料、CI 失敗時轉 CLOUD-02；不得自動擴權。
 - 交付：完成／等待／未知分列。CI、merge、維護自然執行、研究結果分開。
-- 下一步：本段 2026-09-27 Pionex／Weekly Training 排程是歷史檢查點，不能當作目前待辦或補跑歷史 slot。現在的 Cloud Paper 交付狀態與下一批以本手冊頂端的 PR #605 checkpoint 為準；Core100 V0.2 一次性 bootstrap 已完成、品質保持 `REJECT`，禁止 rerun、放寬門檻、推論 promotion 或 source switch。Auto-merge 僅用於逐 PR 核對 exact head/base、必要 review／CI 與 authority boundary 後的交付。
+- 下一步：本段 2026-09-27 Pionex／Weekly Training 排程是歷史檢查點，不能當作目前待辦或補跑歷史 slot。現在的 Cloud Paper 交付狀態與下一步以本手冊頂端的 main checkpoint 為準；Core100 V0.2 一次性 bootstrap 已完成、品質保持 `REJECT`，禁止 rerun、放寬門檻、推論 promotion 或 source switch。Auto-merge 僅用於逐 PR 核對 exact head/base、必要 review／CI 與 authority boundary 後的交付。
 
 ### CLOUD-02 — 異常與程式缺陷交接
 

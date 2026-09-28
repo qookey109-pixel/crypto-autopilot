@@ -1,11 +1,11 @@
 # Crypto Autopilot 短期交付目標
 
 - 文件日期：2026-09-29
-- 最新證據基準：PR #616 已合併，main `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`；文件只記錄已查核證據，不宣稱後續 main SHA。
+- 最新證據基準：PR #618 已合併，main `6deabddd7f925b6d586b9565a9f6641105a2fd29`；本文件記錄截至此 SHA 的查核證據。
 - Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pixel/crypto-autopilot)
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
-- 證據基準：PR #614 已合併至 main `abda84a45de66dc214be40ce05ee0c2ccb79e415`；本文件只記錄該基準的驗收，不宣稱其後 main SHA。
-- 狀態：Cloud Paper 持續實作，activation disabled。PR #614 已接通資格門控 adapter，但正式策略 registry 仍空。
+- 歷史證據基準：PR #614 合併至 main `abda84a45de66dc214be40ce05ee0c2ccb79e415`；目前查核基準見上方 PR #618。
+- 狀態：Cloud Paper 持續實作，activation disabled。PR #614 已接通資格門控 adapter，PR #618 已合併 Dashboard 狀態／容量投影；正式策略 registry 仍空，正式循環為 `NOT_RUN`。
 
 ## 保存上限與耗盡政策 — PR #616 merged
 
@@ -15,7 +15,7 @@
 - Retention is indefinite and append-only. Automatic or manual deletion is not authorized; partial writes retain evidence and require `REVIEW_REQUIRED`.
 - PR #616 merged to main `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`; post-merge CI run `36478324594`, Dependency/SBOM `36478324445`, and Freeze Guard `36478324502` passed. CodeQL [36478324500](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324500) passed. These limits are a project policy envelope, not production account usage evidence or a capacity guarantee. Account-wide usage freshness, all-writer coverage, D1 calibration and production acceptance remain open.
 
-## 最新驗收證據狀態 — PR #614 合併後
+## 最新驗收證據狀態 — PR #618 合併後
 
 | 項目 | 工程／合成證據 | 正式產品狀態 |
 |---|---|---|
@@ -25,10 +25,10 @@
 | D1 ledger | #599/#600 recovery audit；#603 rows reservation；#605 storage-growth reservation | migrations prepare-only；D1 未 provision/bind；usage freshness、全 writer coverage、儲存校準與 FREE-ONLY headroom 未證明 |
 | 帳戶用量 audit | #611 bounded Analytics audit workflow 與零網路 readiness 已合併 | readiness [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) 為 `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`；Cloudflare requests=0；一次性 audit 未執行、權限未消耗 |
 | R2 容量保護 | PR #616 定義 256 KiB/object、2 MiB/run、192 MiB/day、6,241,124,352 theoretical bytes/31 days；guard 在 6.4 GB 回報 WARNING，projected 8 GB 起 fail closed | 正式用量、freshness 與全 writer coverage 未驗證；政策不授權刪除 |
-| Dashboard | 本批更新 Cloud Paper 投影，明確分開 `NOT_RUN`、空策略登錄、`REGIME_UNAVAILABLE`、`BLOCKED_BUDGET` 與容量實際用量未知；瀏覽器回歸待 CI | production runtime 尚未啟用；帳戶用量不顯示為 0，正式帳戶與持倉數值維持 null |
+| Dashboard | PR #618 已合併並部署；Pages build/deploy 通過，正式站桌機／手機共 14 項瀏覽器檢查通過。投影明確區分 `NOT_RUN`、空策略登錄、`REGIME_UNAVAILABLE`、`BLOCKED_BUDGET` 與未知容量 | production runtime 尚未啟用；帳戶用量不顯示為 0，正式帳戶與持倉數值維持 null |
 | 排程與運作驗收 | 合成完整循環 CI 已通過 | 沒有正式 execution workflow 或自然 Paper schedule；controlled main acceptance 未執行 |
 
-PR #614 head checks：Python 3.12／3.13、workflow-static、CodeQL、Dependency/SBOM 均通過。合併 main `abda84a45de66dc214be40ce05ee0c2ccb79e415` 後，CI、CodeQL、Dependency/SBOM、Freeze Guard 通過；push 上 workflow-static 未觸發。這些證據不代表 production runtime、策略品質或自然排程已驗收。
+PR #618 head checks：Python 3.12／3.13、workflow-static、Dashboard snapshot/static smoke、CodeQL、Dependency/SBOM 與 prepared-cutover 均通過。合併 main `6deabddd7f925b6d586b9565a9f6641105a2fd29` 後，CI、CodeQL、Dependency/SBOM、Freeze Guard、Pages build/deploy 及桌機／手機瀏覽器驗證通過；main-push workflow-static skipped（未修改 workflow）。正式瀏覽器 14 項全通過。這些證據不代表 production runtime、策略品質或自然排程已驗收。
 
 PR #611 readiness 缺少 read-only credential；未發出 Cloudflare request，亦未消耗一次性 audit authority。GitHub Actions 設定 `CLOUDFLARE_ACCOUNT_ID` variable 和 `CLOUDFLARE_READONLY_API_TOKEN` secret 後，先跑零網路 readiness；未得 `READY` 不執行一次性 audit。
 
