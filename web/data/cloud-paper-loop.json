@@ -27,9 +27,17 @@
     "macro_regime": "REGIME_UNAVAILABLE",
     "unavailable_fields": [
       "TOTAL3",
-      "BTC_DOMINANCE"
+      "BTC_DOMINANCE",
+      "ALIGNED_BREADTH"
     ],
-    "provider_fallback": false
+    "provider_fallback": false,
+    "pionex_public_market_data_api_key_required": false,
+    "breadth_coverage": {
+      "candidate_market_count": 23,
+      "minimum_required_market_count": 20,
+      "membership_state": "PREPARED_CANDIDATE_MEMBERSHIP_ONLY_COVERAGE_UNVERIFIED",
+      "coverage_verified": false
+    }
   },
   "account": {
     "initialized": false,
