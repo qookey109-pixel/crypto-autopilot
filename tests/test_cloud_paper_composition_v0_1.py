@@ -21,6 +21,7 @@ from crypto_autopilot.paper.cloud_composition_v0_1 import (
     CloudPaperCompositionBlocked,
     CloudPaperNoTradeComposition,
 )
+from crypto_autopilot.paper.cloud_loop_v0_1 import CloudLoopReviewRequired
 from crypto_autopilot.paper.live_v0_1 import LivePaperPolicy
 from crypto_autopilot.paper.run_store_v0_1 import PaperRunObjectAlreadyExistsError
 
@@ -421,7 +422,7 @@ class CloudPaperCompositionTests(unittest.TestCase):
         store.objects[("cloud-result", slot)] = pointer
 
         with self.assertRaisesRegex(
-            CloudPaperCompositionBlocked, "RESULT_POINTER_MISMATCH",
+            CloudLoopReviewRequired, "RESULT_POINTER_MISMATCH",
         ):
             runtime.recover_completed_slot(slot=slot, recovery_enabled=True)
 
