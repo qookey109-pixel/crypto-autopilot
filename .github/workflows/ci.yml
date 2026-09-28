@@ -94,7 +94,7 @@ jobs:
       - name: Validate dashboard static safety contract (Python 3.12 only)
         if: ${{ matrix.python-version == '3.12' }}
         run: python scripts/validate_dashboard_static.py
-      - name: Validate Cloud Paper R2 writer inventory (Python 3.12 only)
+      - name: Validate Cloud Paper R2 and D1 workflow inventories (Python 3.12 only)
         if: ${{ matrix.python-version == '3.12' }}
         run: python scripts/validate_cloud_paper_r2_writer_inventory.py
       - name: Verify Cloud Paper non-access preflight (Python 3.12 only)

@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-r2-writer-inventory-v0.1",
-  "updated_date": "2026-09-28",
-  "evidence_basis_main_sha": "9dbdb0d16d5072f36ba2f080a32cb0e7a6e9c964",
+  "updated_date": "2026-09-29",
+  "evidence_basis_main_sha": "1c6a8f1ee7449a9bb1a787646c6d813ce93edbb1",
   "is_latest_main_claim": false,
   "scan": {
     "workflow_file_count": 85,
@@ -10,7 +10,8 @@
     "exact_reference_scan": true,
     "values_or_secret_contents_read": false,
     "workflow_count_before_nonaccess_preflight": 84,
-    "note": "One new manual non-access preflight workflow was added after the recorded main; it contains no R2 or Cloudflare secret references. The 17 credential-referencing workflow paths remain unchanged."
+    "note": "One new manual non-access preflight workflow was added after the recorded main; it contains no R2 or Cloudflare secret references. The 17 credential-referencing workflow paths remain unchanged.",
+    "d1_access_marker_scan": "scripts/validate_cloud_paper_r2_writer_inventory.py"
   },
   "account_wide_reservation_coverage": {
     "cloud_paper_d1_ledger": "NOT_PROVISIONED_OR_WIRED",
@@ -155,5 +156,11 @@
       "authority": "config/research_signal_quality_v0_1.json",
       "evidence": "reads prior lineage/evidence; no R2 write"
     }
-  ]
+  ],
+  "d1_access_workflows": {
+    "workflow_count": 0,
+    "workflow_paths": [],
+    "classification": "NO_DIRECT_D1_ACCESS_WORKFLOW_MARKERS_FOUND_AT_BASELINE",
+    "scope_note": "Scans repository GitHub Actions workflow files for D1 secret references, Wrangler D1 commands, D1 bindings, Cloudflare D1 REST endpoints, and D1 analytics datasets. Does not prove account-wide or external-service writer coverage."
+  }
 }

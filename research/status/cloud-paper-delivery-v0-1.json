@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-29",
-  "evidence_basis_parent_main_sha": "96ed9dbff430b98df56a8fa2aa51b4b22fc3caf2",
+  "evidence_basis_parent_main_sha": "1c6a8f1ee7449a9bb1a787646c6d813ce93edbb1",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -26,7 +26,8 @@
     "d1_slot_concurrency_test": "PR593_MERGED; SAME_CANONICAL_SLOT_CONCURRENCY_ONE_WINNER; STALE_SNAPSHOT_FUTURE_SLOT_REJECTED; PR_AND_POST_MERGE_PYTHON_312_313_PASS",
     "d1_settlement_retry": "PR595_MERGED; EXACT_SAME_USAGE_REPLAY_ACCEPTED; CHANGED_USAGE_REJECTED; PR_AND_POST_MERGE_PYTHON_312_313_PASS",
     "d1_shared_rows_budget": "PR603_MERGED; MAX_384_QUERY_RESERVATIONS_UTC_DAY; EACH_RESERVATION_COVERS_ADMISSION_PLUS_TARGET_QUERY; MAX_ENVELOPE_3072000_ROWS_READ_AND_7680_ROWS_WRITTEN; SQLITE_SYNTHETIC_CI_ONLY; PR605_SHARED_STORAGE_GROWTH_RESERVATION; 16384_BYTES_PER_STATEMENT; MAX_12582912_BYTES_PER_DAY; SYNTHETIC_CI_ONLY_NOT_PRODUCTION_CALIBRATION",
-    "d1_storage_growth_budget": "PR605_MERGED_SHARED_LEDGER_RESERVATION; 16384_BYTES_PER_ADMISSION_AND_TARGET_STATEMENT; MAX_12582912_BYTES_PER_UTC_DAY; POLICY_ESTIMATE_ONLY; NO_PRODUCTION_CALIBRATION; MIGRATIONS_PREPARE_ONLY"
+    "d1_storage_growth_budget": "PR605_MERGED_SHARED_LEDGER_RESERVATION; 16384_BYTES_PER_ADMISSION_AND_TARGET_STATEMENT; MAX_12582912_BYTES_PER_UTC_DAY; POLICY_ESTIMATE_ONLY; NO_PRODUCTION_CALIBRATION; MIGRATIONS_PREPARE_ONLY",
+    "d1_workflow_inventory_guard": "REPOSITORY_WORKFLOW_MARKER_GUARD_ADDED; BASELINE_MAIN_1C6A_SCAN_FOUND_ZERO_MARKERS_ACROSS_85_WORKFLOW_FILES; ACCOUNT_WIDE_AND_EXTERNAL_WRITER_COVERAGE_NOT_PROVEN"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING",
@@ -316,5 +317,15 @@
       "activation_enabled": false,
       "all_d1_writer_coverage": "UNPROVEN"
     }
+  },
+  "d1_workflow_inventory": {
+    "baseline_main_sha": "1c6a8f1ee7449a9bb1a787646c6d813ce93edbb1",
+    "repository_workflow_file_count": 85,
+    "detected_d1_access_marker_count": 0,
+    "inventory_path": "research/status/cloud-paper-r2-writer-inventory-v0-1.json",
+    "scanner_path": "scripts/validate_cloud_paper_r2_writer_inventory.py",
+    "required_ci_step": ".github/workflows/ci.yml: Validate Cloud Paper R2 and D1 workflow inventories (Python 3.12 only)",
+    "scope": "Repository GitHub Actions workflow files only",
+    "account_wide_writer_coverage_proven": false
   }
 }

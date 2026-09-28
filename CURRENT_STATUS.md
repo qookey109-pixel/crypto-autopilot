@@ -2,10 +2,11 @@
 
 Updated: 2026-09-29. This is the single human entrypoint for the current project checkpoint.
 
-## Cloud Paper current checkpoint — PR #607 merged
+## Cloud Paper current checkpoint — PR #608 merged
 
-本節於 2026-09-29 依 GitHub 即時查核：PR #607 exact head `9891600c610e1ada9a9ffe0d297ffcab4a879815` 已合併至 `96ed9dbff430b98df56a8fa2aa51b4b22fc3caf2`，合併前 base 為 `cc7367c4748657649c2180790d5603c288cb495f`；查核時 open PR = 0。PR #607 的 Python 3.12／3.13、Freeze Guard、CodeQL、Dependency/SBOM 均通過；main 的 CI run [36454492059](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36454492059)、Freeze Guard [36454492089](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36454492089)、CodeQL [36454492103](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36454492103)、Dependency/SBOM [36454492246](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36454492246) 通過。Pages run [36454492166](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36454492166) build 通過；deploy/browser-production 因本次文件未涉及網站而 skipped。
+本節於 2026-09-29 依 GitHub 即時查核：PR #608 exact head `af1bcb67bf6e3d5932b4c4b8c3d01bef0ad3f036` 已合併至 `1c6a8f1ee7449a9bb1a787646c6d813ce93edbb1`，base 為 `96ed9dbff430b98df56a8fa2aa51b4b22fc3caf2`；查核時 open PR = 0。PR #608 的 Python 3.12／3.13、workflow-static、CodeQL、Dependency/SBOM 等適用檢查通過；Pages deploy/browser-production 因文件未涉及網站而 skipped。此 SHA 是本批 reviewed baseline，不代表後續 latest main。
 
+- 本批新增必要 CI 的 D1 workflow marker inventory：在上述 baseline 的 85 個 GitHub Actions workflow 檔中，未發現直接 D1 存取標記。掃描範圍限 Repository workflows；不證明 Cloudflare 帳戶或外部服務沒有其他 writer，也不代表 D1 已 provision。
 - PR #590/#595：Paper 結果保存回讀後 settlement；完全相同用量可安全重送，執行／結果不明時保留完整 reservation。
 - PR #599：新增預設關閉的跨重啟「已完成結果核對」路徑：讀取 slot reservation，驗證 immutable R2 result/report 與 digest 後記錄 D1 recovery audit receipt。它**不做 settlement、不釋放／降低 reservation**；缺失或不一致時 fail closed 並保留完整 reservation。
 - PR #600：recovery 另核對 result pointer 內的 slot identity 與 `COMMITTED` 狀態，避免錯 slot／錯狀態被當成已完成結果。
