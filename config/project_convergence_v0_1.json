@@ -251,6 +251,9 @@
     "current_quality_or_security_visibility": [
       "security-visibility-codeql.yml",
       "security-visibility-dependencies.yml"
+    ],
+    "current_nonaccess_preflight": [
+      "cloud-paper-loop-v0-1-preflight.yml"
     ]
   },
   "boundaries": {
