@@ -221,6 +221,23 @@ class CloudPaperLoopTests(unittest.TestCase):
             )
         self.assertEqual(called, [])
 
+    def test_orphan_state_in_nonempty_ledger_blocks_before_market(self):
+        store = MemoryStore()
+        step(store, 420000, None)
+        store.put_json("live-state", "orphan-state", {"state_id": "orphan-state"})
+        called = []
+        with self.assertRaisesRegex(
+            CloudLoopReviewRequired, "LEDGER_STATE_RESULT_COVERAGE_MISMATCH"
+        ):
+            run_cloud_step(
+                tick_ms=1320000, previous_slot="0", store=store,
+                feed=NeverCalledFeed(),
+                market_supplier=lambda: called.append(True) or {},
+                candidate_supplier=lambda market, state: [],
+                strategy_registry=REGISTRY, before_external=lambda: None,
+            )
+        self.assertEqual(called, [])
+
     def test_latest_committed_slot_is_required_after_restart(self):
         store = MemoryStore()
         step(store, 420000, None)
