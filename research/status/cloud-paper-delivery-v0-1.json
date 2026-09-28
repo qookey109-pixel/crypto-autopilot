@@ -345,5 +345,23 @@
     "cloudflare_requests_performed": 0,
     "one_time_usage_audit_authority_consumed": false,
     "secret_values_printed": false
+  },
+  "documentation_sync_pr_612": {
+    "parent_main_sha": "df932f863354fa0047e0833ed29163e8e47f0c3b",
+    "pr_head_sha": "bc1a80df45cb123f4fcfbe12a1b92704cdbed592",
+    "merged_main_sha": "df932f863354fa0047e0833ed29163e8e47f0c3b",
+    "pr_checks": "PASS",
+    "post_merge": {
+      "ci_run_id": 36472111716,
+      "codeql_run_id": 36472111804,
+      "dependency_security_run_id": 36472111738,
+      "freeze_guard_run_id": 36472111798,
+      "pages_run_id": 36472112011,
+      "pages_build": "SUCCESS",
+      "pages_deploy": "SKIPPED_DOCUMENTATION_ONLY",
+      "browser_production": "SKIPPED_DOCUMENTATION_ONLY"
+    },
+    "open_prs_after_merge": 0,
+    "runtime_authority_changed": false
   }
 }
