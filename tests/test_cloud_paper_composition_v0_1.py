@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import unittest
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -121,7 +122,10 @@ class MemoryStore:
         ))
 
     def put_json(self, kind, object_id, payload):
-        self._reserve("R2_CLASS_A")
+        encoded = json.dumps(
+            dict(payload), sort_keys=True, separators=(",", ":"), allow_nan=False,
+        ).encode("utf-8")
+        self._reserve("R2_CLASS_A", len(encoded))
         self.calls.append(("put", kind, object_id))
         key = (kind, object_id)
         if key in self.objects:
@@ -132,7 +136,10 @@ class MemoryStore:
         return Receipt(False)
 
     def put_json_if_absent(self, kind, object_id, payload):
-        self._reserve("R2_CLASS_A")
+        encoded = json.dumps(
+            dict(payload), sort_keys=True, separators=(",", ":"), allow_nan=False,
+        ).encode("utf-8")
+        self._reserve("R2_CLASS_A", len(encoded))
         self.calls.append(("put_if_absent", kind, object_id))
         key = (kind, object_id)
         if key in self.objects:
