@@ -4,22 +4,20 @@
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
-## Cloud Paper 短期交付狀態 — 2026-09-28（PR #596 合併後）
+## Cloud Paper 短期交付狀態 — 2026-09-28（PR #600 合併後）
 
-查核基準：[本次同步前 main `7383faad99ec00713bc334090e2ecd6b52a384e1`](https://github.com/qookey109-pixel/crypto-autopilot/commit/7383faad99ec00713bc334090e2ecd6b52a384e1)。此 SHA 是本次文件分支的精確基準。短期範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)，狀態機見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。
+本次文件同步前 main：`3dd8be803f5e7bfda26cd14bdbe5aaae507b338c`；PR #599/#600 均已合併。短期範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)，狀態機見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。
 
-- PR #590 合併成功 Paper result readback 後 settlement；執行失敗或 settlement 結果不明時保留完整 reservation。
-- PR #595 允許同 slot 已 SETTLED 且四個實際用量完全相同時重送 settlement；不同用量仍 `REVIEW_REQUIRED`。不含重啟後核對 immutable R2 結果的 recovery workflow。
-- PR #592 合併 canonical 15-minute ledger slot，單 query 4,000 rows guard；31-day scan bound 2,976 slots，96 slots × 2 queries 為 768,000 rows/day。SQLite EXPLAIN/query-plan CI 不是 Cloudflare `meta.rows_read` 實測，且不含其他 writers。
-- PR #592 post-merge main run [36428372077](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36428372077) 的 Python 3.13 曾因 test fixture 並行預留未來 slots 而失敗。PR #593 改為同一 slot 競爭與 stale snapshot 測試；PR head Python 3.12/3.13、workflow-static、CodeQL、dependency-security 通過，post-merge main 的 Python 3.12/3.13、Freeze Guard、CodeQL、dependency-security 全通過；workflow-static 因 workflow 未變更而 skipped。失敗 run 保留，不以新 PASS 覆寫歷史。
-- 未完成：D1 rows-read/write account-wide shared reservation、重啟後 settlement recovery、可信 account-wide D1/R2 usage 與 freshness、全部 writer coverage、FREE-ONLY capacity proof、D1 provisioning/runner binding、正式受控 main acceptance。execution workflow 與自然排程仍不存在；`activation.enabled=false`。
-- 最近的自然 Pages run [36414262259](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36414262259) 在 head `9753c6b347ecb631aa4bc682c08d10b3cb9f904f` 的 build/deploy/browser-production 均成功。PR #596 後 main Pages run [36432893991](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36432893991) 僅 build 成功，deploy/browser-production 因無可部署內容變更而 skipped。
-- 模型品質 `REJECT`、production strategy registry 空、macro regime `REGIME_UNAVAILABLE`。CMC global context proposal 尚未授權或呼叫；不得替代來源。
-- 9/27 Pionex 自然 run [36309712506](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36309712506) workflow 成功，報告 `REVIEW_REQUIRED`、catalog diff `PASS`、零增刪；Core100 自然 run [36311651477](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36311651477) 是精確指紋 `NO_CHANGE`，未訓練、未寫 R2。這些不是 Cloud Paper 自然排程驗收。\n- 9/28 Maintenance run [36400671117](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36400671117) inspect/propose 成功並更新 Draft；後續舊 Draft #578 關閉且未合併，不能再描述為等待 CI。前面三次失敗的 propose job 回報 `MAIN_CHANGED`。\n- Cloud Maintenance PR [#578](https://github.com/qookey109-pixel/crypto-autopilot/pull/578) 後續已關閉且未合併；其舊 base `e80d2d27` 僅為歷史證據。即時 main/open-PR 狀態須於每次接手時重新查詢。
-- 固定界線：`0 USD/month`、PAPER／LIVE-PAPER ONLY、holdout/source switch/promotion/real-money trading 關閉。不得 provisioning／呼叫 D1、讀寫 R2、呼叫 provider 或啟用 runtime，直到完整 account-wide authority、用量 freshness、writer coverage 與 FREE-ONLY 容量都成立。
+- #590/#595：成功保存及 readback 後 settlement；相同用量 settlement 可冪等重送，不確定結果保留完整 reservation。
+- #599：新增預設關閉的 verified-result recovery audit，讀 D1 reservation、驗證 immutable R2 result/report，然後記錄 D1 recovery audit receipt；reservation 維持完整，不 settlement、不釋放額度。#600 加入 result pointer slot identity 與 `COMMITTED` 狀態檢查。
+- #599/#600 的 Python 3.12／3.13、workflow-static、CodeQL、dependency-security checks 通過；post-merge main `3dd8be803f5e7bfda26cd14bdbe5aaae507b338c` 的 Python 3.12／3.13、V0.10 Freeze Guard、CodeQL、Dependency/SBOM 通過，workflow-static skipped（workflow 未變更）。原失敗 run 保留為歷史證據。
+- 未完成：account-wide D1 rows-read/write shared reservation、Recovery/retry 成本納入 shared envelope、可信 account-wide D1/R2 usage freshness、全 writer coverage、FREE-ONLY capacity proof、D1 provisioning/runner binding、正式受控 main acceptance。execution workflow／自然 Cloud Paper schedule 尚未建立；`activation.enabled=false`。
+- PR #592 的 96 × 2 × 4,000 = 768,000 rows/day 只代表一般 reservation／settlement 兩 query 的 SQLite query-plan 上界；非 production measurement，且不含 #599 recovery audit、重試及其他 writers。
+- 最近已驗證 Pages production build/deploy/browser 是 run [36414262259](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36414262259)（SHA `9753c6b3`）；#599/#600 沒有 dashboard 改動或新 deployment。
+- Core100 bootstrap [run 36110721415](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415) 已唯一一次完成：report `PASS / CORE100_FINGERPRINT_V0_2_BASELINE_PUBLISHED`、quality `REJECT`、zero provider requests、holdout 未存取、immutable objects／latest pointer readback 成功。一次性 authority 已消耗，不得 rerun。
+- 模型仍 `REJECT)、production registry 空、macro regime `REGIME_UNAVAILABLE`；正常正式結果仍是 `NO_TRADE`。固定界線為 0 USD、PAPER／LIVE-PAPER ONLY、holdout/source switch/promotion/real-money trading 關閉。不得因程式接線完成而 provisioning、呼叫 D1/R2/provider 或啟用 runtime。
 
-下一個工程批次：將 account-wide D1 rows reservation、成功 settlement 與 settlement failure recovery 收斂成單一可測流程；將 recovery 查詢也納入 D1 rows envelope。接著取得授權的 D1/R2 usage evidence，完成受控驗收前仍保持 runtime 關閉。
-
+下一批：設計並驗證納入 reservation、settlement、recovery audit 與 retry 成本的 account-wide D1 rows budget；再取得有 freshness watermark 的正式用量來源及全 writers 覆蓋。免費容量未證明前不進行受控 main acceptance 或啟用 schedule。
 ## 1. 固定入口
 
 | 問題 | 主要入口 |
