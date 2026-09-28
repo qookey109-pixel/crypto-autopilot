@@ -231,6 +231,13 @@ def decision_reason_codes(
     reasons: list[str] = []
     if market.get("market_status") == "REVIEW_REQUIRED":
         reasons.append("MARKET_INPUT_REVIEW_REQUIRED")
+    context_status = market.get("context_status")
+    if context_status != "AVAILABLE":
+        reasons.append(
+            "REGIME_UNAVAILABLE"
+            if context_status == "REGIME_UNAVAILABLE"
+            else "MARKET_CONTEXT_UNAVAILABLE"
+        )
     if market.get("execution_selection_status") == "REVIEW_REQUIRED":
         reasons.append("CANDIDATE_SELECTION_REVIEW_REQUIRED")
     selection_reasons = market.get("execution_selection_reasons")
@@ -238,13 +245,6 @@ def decision_reason_codes(
         reasons.extend(
             item for item in selection_reasons
             if isinstance(item, str) and item
-        )
-    context_status = market.get("context_status")
-    if context_status != "AVAILABLE":
-        reasons.append(
-            "REGIME_UNAVAILABLE"
-            if context_status == "REGIME_UNAVAILABLE"
-            else "MARKET_CONTEXT_UNAVAILABLE"
         )
     if candidates:
         reasons.append("QUALIFIED_CANDIDATES")
@@ -320,8 +320,16 @@ def run_cloud_step(
         raise CloudLoopReviewRequired("EMPTY_PRODUCTION_STRATEGY_REGISTRY")
     allowed_ids = {entry.get("strategy_id") for entry in registrations
                    if isinstance(entry, Mapping)}
-    if any(not isinstance(item, Mapping)
-           or item.get("strategy_id") not in allowed_ids
+
+    def candidate_strategy_id(item: object) -> object:
+        if not isinstance(item, Mapping):
+            return None
+        payload = item.get("candidate", item)
+        if not isinstance(payload, Mapping):
+            return None
+        return payload.get("strategy_id")
+
+    if any(candidate_strategy_id(item) not in allowed_ids
            for item in candidates):
         raise CloudLoopReviewRequired("UNREGISTERED_STRATEGY_CANDIDATE")
     if len(candidates) > 5:
