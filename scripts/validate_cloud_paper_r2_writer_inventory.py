@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github" / "workflows"
 INVENTORY = ROOT / "research" / "status" / "cloud-paper-r2-writer-inventory-v0-1.json"
 SECRET_REF = re.compile(
-    r"\$\{\{[^}]*\bsecrets\.(?:CLOUDFLARE_ACCOUNT_ID|R2_[A-Z0-9_]+)\b",
+    r"\$\{\{[^}]*\bsecrets\.(?:CLOUDFLARE_ACCOUNT_ID|CLOUDFLARE_BILLING_READONLY_API_TOKEN|R2_[A-Z0-9_]+)\b",
     re.IGNORECASE,
 )
 
