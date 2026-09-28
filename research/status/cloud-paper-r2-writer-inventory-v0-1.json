@@ -1,0 +1,157 @@
+{
+  "schema": "qookey-cloud-paper-r2-writer-inventory-v0.1",
+  "updated_date": "2026-09-28",
+  "evidence_basis_main_sha": "ceb298226234c0d92202ba944b6ee3da3862ca01",
+  "is_latest_main_claim": false,
+  "scan": {
+    "workflow_file_count": 84,
+    "workflows_with_r2_or_cloudflare_secret_references": 17,
+    "scanner_contract": "scripts/validate_cloud_paper_r2_writer_inventory.py",
+    "exact_reference_scan": true,
+    "values_or_secret_contents_read": false
+  },
+  "account_wide_reservation_coverage": {
+    "cloud_paper_d1_ledger": "NOT_PROVISIONED_OR_WIRED",
+    "every_current_writer_reserves_through_shared_ledger": false,
+    "shared_account_r2_usage_evidence": "MISSING",
+    "conclusion": "INVENTORY_CLASSIFIED; ACCOUNT_WIDE_RESERVATION_COVERAGE_NOT_PROVEN"
+  },
+  "workflows": [
+    {
+      "workflow": ".github/workflows/binance-spot-r2-monthly-governance-v0-5.yml",
+      "access": "WRITE_CAPABLE_FAIL_CLOSED",
+      "lifecycle": "FROZEN_WINDOW_BLOCKED",
+      "trigger": "workflow_dispatch",
+      "authority": "config/binance_spot_r2_training_governance_v0_5.json",
+      "evidence": "provider/R2 preflight stops at 2026-08-27; no automatic resume"
+    },
+    {
+      "workflow": ".github/workflows/binance-spot-r2-training-governance-v0-5.yml",
+      "access": "WRITE_CAPABLE_FAIL_CLOSED",
+      "lifecycle": "FROZEN_WINDOW_BLOCKED",
+      "trigger": "workflow_dispatch",
+      "authority": "config/binance_spot_r2_training_governance_v0_5.json",
+      "evidence": "provider/R2 preflight stops at 2026-08-27; no automatic resume"
+    },
+    {
+      "workflow": ".github/workflows/binance-usdm-detailed-history-v0-1.yml",
+      "access": "CONDITIONAL_WRITER",
+      "lifecycle": "MANUAL_REPAIR_ONLY",
+      "trigger": "workflow_dispatch",
+      "authority": "config/core100_history_retirement_v0_1.json; config/bnx_archive_repair_bundle_v0_3.json",
+      "evidence": "retired history workflow; bounded missing-shard repair only, existing partitions are not overwritten"
+    },
+    {
+      "workflow": ".github/workflows/binance-usdm-detailed-training-v0-1.yml",
+      "access": "CONDITIONAL_WRITER",
+      "lifecycle": "CURRENT_WEEKLY_CONDITIONAL",
+      "trigger": "schedule + workflow_dispatch + guarded authority push",
+      "authority": "config/core100_training_fingerprint_v0_2_successor_v0_1.json; consumed one-shot bootstrap receipt",
+      "evidence": "NO_CHANGE/SKIPPED assert zero R2 writes; only valid changed-fingerprint training can publish"
+    },
+    {
+      "workflow": ".github/workflows/context-forward-capture-execution-v0-1.yml",
+      "access": "WRITE_CAPABLE_FAIL_CLOSED",
+      "lifecycle": "EXPIRED_2026-09-19",
+      "trigger": "workflow_dispatch",
+      "authority": "config/context_forward_capture_execution_v0_1.json",
+      "evidence": "one-shot expiry passed; do not rerun or infer new authority"
+    },
+    {
+      "workflow": ".github/workflows/core100-effective-signal-audit-v0-1.yml",
+      "access": "READ_ONLY",
+      "lifecycle": "CURRENT_READ_ONLY_AUDIT",
+      "trigger": "workflow_dispatch",
+      "authority": "Core100 effective signal audit contract",
+      "evidence": "report requires r2_writes_performed=false"
+    },
+    {
+      "workflow": ".github/workflows/live-paper-run-coordinator-v0-1.yml",
+      "access": "WRITER",
+      "lifecycle": "CURRENT_MANUAL_PAPER_PERSISTENCE",
+      "trigger": "workflow_dispatch on main",
+      "authority": "config/live_paper_run_coordinator_v0_1.json; config/live_paper_simulation_v0_1.json",
+      "evidence": "persists run header, states, tick reports, steps and claims; no schedule"
+    },
+    {
+      "workflow": ".github/workflows/live-paper-run-recovery-v0-1.yml",
+      "access": "CONDITIONAL_WRITER",
+      "lifecycle": "CURRENT_MANUAL_RESULT_SEAL_REPAIR_ONLY",
+      "trigger": "workflow_dispatch on main",
+      "authority": "config/live_paper_run_recovery_v0_1.json",
+      "evidence": "may repair a missing result seal only; provider/account state/step/tick mutation is forbidden"
+    },
+    {
+      "workflow": ".github/workflows/pionex-alternative-assets-observability-v0-2.yml",
+      "access": "WRITER",
+      "lifecycle": "CURRENT_BOUNDED_SCHEDULE_UNTIL_2026-10-01",
+      "trigger": "bounded schedule + workflow_dispatch",
+      "authority": "config/pionex_alternative_assets_observability_v0_2.json; 2026-08-30 authority receipt",
+      "evidence": "metadata-only catalog R2 lineage; 4 MB per-run plan and fresh 8 GB headroom checks"
+    },
+    {
+      "workflow": ".github/workflows/pionex-historical-research-execution-v0-1.yml",
+      "access": "WRITE_CAPABLE_FAIL_CLOSED",
+      "lifecycle": "EXPIRED_2026-09-24",
+      "trigger": "workflow_dispatch",
+      "authority": "config/pionex_historical_research_execution_v0_2.json",
+      "evidence": "one-success pilot stop passed"
+    },
+    {
+      "workflow": ".github/workflows/pionex-validation-materialization-v0-1.yml",
+      "access": "WRITER",
+      "lifecycle": "CURRENT_BOUNDED_MANUAL_UNTIL_2026-10-01",
+      "trigger": "workflow_dispatch",
+      "authority": "config/pionex_validation_dataset_v0_1.json",
+      "evidence": "bounded Pionex-native validation dataset writes; 15,000 request ceiling; stop-exclusive Oct 1"
+    },
+    {
+      "workflow": ".github/workflows/pionex-validation-materialization-v0-2.yml",
+      "access": "COMPLETED_WRITER",
+      "lifecycle": "COMPLETED_MANUAL_EXECUTION",
+      "trigger": "workflow_dispatch with materialize mode",
+      "authority": "config/pionex_validation_materialization_v0_2.json; execution-authority receipt",
+      "evidence": "completion receipt records 682 uploaded objects; do not treat completion as recurring schedule permission"
+    },
+    {
+      "workflow": ".github/workflows/pre-window-readiness-v0-1.yml",
+      "access": "PRESENCE_CHECK_ONLY",
+      "lifecycle": "READINESS_GUARD",
+      "trigger": "workflow_dispatch",
+      "authority": "pre-window readiness contract",
+      "evidence": "checks whether named secrets exist; no provider or R2 API call"
+    },
+    {
+      "workflow": ".github/workflows/provider-equivalence-v0-10-render-metadata-capture.yml",
+      "access": "WRITE_CAPABLE_FAIL_CLOSED",
+      "lifecycle": "FROZEN_WINDOW_EXPIRED_2026-09-04",
+      "trigger": "frozen bounded schedule/validation events",
+      "authority": "V0.10 final atomic cutover config and receipt",
+      "evidence": "exact capture window ended; historical workflow remains validation-only"
+    },
+    {
+      "workflow": ".github/workflows/provider-equivalence-v0-12-successor-metadata-capture.yml",
+      "access": "WRITE_CAPABLE_FAIL_CLOSED",
+      "lifecycle": "EXPIRED_2026-09-12",
+      "trigger": "expired bounded schedule",
+      "authority": "config/provider_equivalence_v0_12_successor_metadata_capture_v0_1.json",
+      "evidence": "frozen declaration is non-effective outside its window"
+    },
+    {
+      "workflow": ".github/workflows/research-signal-layer-v0-2.yml",
+      "access": "WRITER",
+      "lifecycle": "CURRENT_DAILY_SCHEDULE",
+      "trigger": "daily schedule + workflow_dispatch",
+      "authority": "config/research_signal_layer_v0_2.json",
+      "evidence": "public research evidence R2 publish; max 2.5 MB planned write and fresh headroom checks"
+    },
+    {
+      "workflow": ".github/workflows/research-signal-quality-v0-1.yml",
+      "access": "READ_ONLY",
+      "lifecycle": "CURRENT_READ_ONLY_QUALITY",
+      "trigger": "daily schedule + workflow_dispatch",
+      "authority": "config/research_signal_quality_v0_1.json",
+      "evidence": "reads prior lineage/evidence; no R2 write"
+    }
+  ]
+}
