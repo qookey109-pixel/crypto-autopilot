@@ -1,0 +1,93 @@
+{
+  "schema": "qookey-market-regime-pionex-breadth-universe-v0.1",
+  "status": "PREPARED_CANDIDATE_MEMBERSHIP_ONLY_COVERAGE_UNVERIFIED",
+  "evidence_basis_parent_main_sha": "2bded2b8ba6d42cb89a33d2dafd3160cb8687a76",
+  "is_latest_main_claim": false,
+  "membership_derivation": {
+    "rule": "INTERSECTION_OF_CURATED_CLOUD_PAPER_CRYPTO_POOL_EX_BTC_ETH_WITH_PIONEX_VALIDATION_DATASET_FULL_INTRADAY_OR_MULTISCALE_RESEARCH_PROFILES_AND_CRYPTO_CLASS",
+    "curated_pool": {
+      "path": "config/crypto_universe_v0_1.json",
+      "blob_sha": "574911c6f4e08e7d063e9722a50e9de2f4db6e18"
+    },
+    "profile_and_classification": {
+      "path": "config/pionex_validation_dataset_v0_1.json",
+      "blob_sha": "7dbca1f2ed5faca46dbfea9557765bfb1bb96dfe"
+    },
+    "regime_contract": {
+      "path": "config/market_regime_breadth_research_v0_1.json",
+      "blob_sha": "c87fa9efbfadcbfcb3c96ad1101a8f31482c77da"
+    },
+    "selected_at_utc": "2026-09-28",
+    "selection_uses_returns_or_provider_payloads": false
+  },
+  "membership": {
+    "provider": "PIONEX_PUBLIC",
+    "instruments": [
+      "AAVE_USDT_PERP",
+      "ADA_USDT_PERP",
+      "APT_USDT_PERP",
+      "ARB_USDT_PERP",
+      "AVAX_USDT_PERP",
+      "BCH_USDT_PERP",
+      "BNB_USDT_PERP",
+      "CRV_USDT_PERP",
+      "DOGE_USDT_PERP",
+      "DOT_USDT_PERP",
+      "HYPE_USDT_PERP",
+      "INJ_USDT_PERP",
+      "LINK_USDT_PERP",
+      "LTC_USDT_PERP",
+      "NEAR_USDT_PERP",
+      "PEPE_USDT_PERP",
+      "SHIB_USDT_PERP",
+      "SOL_USDT_PERP",
+      "SUI_USDT_PERP",
+      "TRX_USDT_PERP",
+      "UNI_USDT_PERP",
+      "XLM_USDT_PERP",
+      "XRP_USDT_PERP"
+    ],
+    "count": 23,
+    "excluded": [
+      "BTC_USDT_PERP",
+      "ETH_USDT_PERP"
+    ],
+    "fixed_membership": true,
+    "interval_candidates": [
+      "4H",
+      "1D"
+    ],
+    "minimum_assets": 20,
+    "weighting": "EQUAL_WEIGHT"
+  },
+  "coverage": {
+    "partition_profile_intersection_count": 23,
+    "exact_partition_completeness": "NOT_VERIFIED",
+    "aligned_timestamp_grid": "NOT_VERIFIED",
+    "recent_freshness": "NOT_VERIFIED",
+    "r2_partition_receipts_read": false,
+    "raw_candles_read": false,
+    "retrospective_use_authorized": false,
+    "forward_only_after_separate_authority": true,
+    "missing_or_incomplete_member_policy": "REGIME_UNAVAILABLE_NO_MEMBER_DROPPING"
+  },
+  "authority": {
+    "provider_fetch_authorized": false,
+    "r2_read_authorized": false,
+    "r2_write_authorized": false,
+    "holdout_access_authorized": false,
+    "production_regime_gate_change_authorized": false,
+    "strategy_change_authorized": false,
+    "model_promotion_authorized": false,
+    "real_money_orders_authorized": false,
+    "live_trading_authorized": false,
+    "workflow_schedule_authorized": false
+  },
+  "next_gates": [
+    "versioned bounded R2 metadata/read authority before inspecting allowlisted partition receipts",
+    "prove all 23 markets have complete contiguous 4H and/or 1D bars on one exact grid",
+    "freeze the selected interval and availability/freshness timestamps before any regime evaluation",
+    "budget scheduled Pionex refresh requests and shared-account R2/D1 usage",
+    "preserve this exact membership; any missing member makes breadth unavailable rather than shrinking the set"
+  ]
+}
