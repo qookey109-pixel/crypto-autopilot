@@ -30,15 +30,11 @@ def contains_d1_access_reference(contents: str) -> bool:
     return D1_ACCESS_REF.search(contents) is not None
 
 
-
 D1_REST_SOURCE_MARKER = re.compile(
-    r"api\\.cloudflare\\.com/client/v4/accounts/"
-    r"|/d1/(?:database|databases)(?:/|\\b)"
-    r"|\\bclass\\s+CloudflareD1QueryClient\\b",
+    r"api\.cloudflare\.com/client/v4/accounts/"
+    r"|/d1/(?:database|databases)(?:/|\b)"
+    r"|\bclass\s+CloudflareD1QueryClient\b",
     re.IGNORECASE,
-)
-D1_REST_CLIENT_PATH = (
-    "src/crypto_autopilot/paper/cloud_budget_ledger_v0_1.py"
 )
 D1_QUERY_GUARD_ORDER = (
     "self._usage_guard.reserve_query()",
