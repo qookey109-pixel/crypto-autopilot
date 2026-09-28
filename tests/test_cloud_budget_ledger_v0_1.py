@@ -161,6 +161,18 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
                 snapshot=snapshot(class_a_month=18),
             )
 
+    def test_storage_hard_stop_includes_other_slot_reservations(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        ledger.reserve_slot(slot_id="slot-1", run_id="run-1", now_ms=NOW, snapshot=snapshot())
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
+            ledger.reserve_slot(
+                slot_id="slot-2",
+                run_id="run-2",
+                now_ms=NOW + 1,
+                snapshot=snapshot(storage_bytes=81),
+            )
+
     def test_missing_incomplete_or_stale_account_evidence_blocks_before_io(self):
         client = SQLiteQueryClient()
         ledger = self.make_ledger(client)
