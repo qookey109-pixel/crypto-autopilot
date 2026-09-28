@@ -258,7 +258,7 @@ class CloudPaperCompositionTests(unittest.TestCase):
         client, store, accesses = FakeClient(), MemoryStore(), []
 
         class RejectStaleEvidence:
-            def reserve_query(self):
+            def validate_evidence(self):
                 accesses.append("d1-evidence")
                 raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_STALE")
 
