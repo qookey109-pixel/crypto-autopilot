@@ -66,6 +66,8 @@ TD-007, large refactors, new research and Pionex failure-report redesign are out
 
 User approved implementation of the complete cloud simulation loop on September 27. Track the five batches in [Cloud Paper delivery](research/status/cloud-paper-delivery-v0-1.json): contract, public-market adapter, persistent paper loop, controlled activation, and dashboard. [Loop V0.1](config/cloud_paper_loop_v0_1.json) fixes 10,000 USD virtual initial equity and a 15-minute target cadence. Execution remains disabled until implementation, cloud CI, zero-cost evidence and controlled main acceptance are recorded. The production strategy registry starts empty; no synthetic or rejected strategy may create a production position. Missing strategy evidence produces NO_TRADE, not an invented trade.
 
+PR #549 merged at `439054a940950b9bd564a1c93026e206f0b55b84` adds a prepare-only D1 atomic slot-reservation adapter, SQL migration, and synthetic CI coverage. It does not provision D1, create credentials, call Pionex/R2, or enable a workflow. Shared-account R2 usage evidence, complete coverage of unrelated account writers, separate D1 free-tier quota evidence, and controlled main acceptance are still missing; activation remains disabled.
+
 The documentation/UI delivery PRs #532/#534 are merged and #533 is closed after evidence integration. Their delivery is separate from the new product loop, which is not complete or scheduled yet. No seven-day observation or October 1 extra manual audit is reinstated.
 
 ## Current work, in order
