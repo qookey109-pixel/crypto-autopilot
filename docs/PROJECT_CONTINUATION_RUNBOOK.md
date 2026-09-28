@@ -1,23 +1,25 @@
 # 專案接續與排程手冊
 
-更新：2026-09-28。適用任何能讀取 Repository 與 GitHub metadata 的模型.
+更新：2026-09-29。適用任何能讀取 Repository 與 GitHub metadata 的模型.
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
-## Cloud Paper 短期交付狀態 — 2026-09-28（PR #600 合併後）
+## Cloud Paper 短期交付狀態 — 2026-09-29（PR #603 合併後）
 
-本次文件同步前 main：`3dd8be803f5e7bfda26cd14bdbe5aaae507b338c`；PR #599/#600 均已合併。短期範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)，狀態機見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。
+本次文件更新前 main：`4c50af897a451c5cf537e549a8563497b9b5fbc9`；PR #603 exact head `e3d7fee4520d8b91d0a9ef81057f21cb3cace0bf` 已合併，查核時 open PR = 0。短期範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)，狀態機見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。
 
 - #590/#595：成功保存及 readback 後 settlement；相同用量 settlement 可冪等重送，不確定結果保留完整 reservation。
 - #599：新增預設關閉的 verified-result recovery audit，讀 D1 reservation、驗證 immutable R2 result/report，然後記錄 D1 recovery audit receipt；reservation 維持完整，不 settlement、不釋放額度。#600 加入 result pointer slot identity 與 `COMMITTED` 狀態檢查。
-- #599/#600 的 Python 3.12／3.13、workflow-static、CodeQL、dependency-security checks 通過；post-merge main `3dd8be803f5e7bfda26cd14bdbe5aaae507b338c` 的 Python 3.12／3.13、V0.10 Freeze Guard、CodeQL、Dependency/SBOM 通過，workflow-static skipped（workflow 未變更）。原失敗 run 保留為歷史證據。
-- 未完成：account-wide D1 rows-read/write shared reservation、Recovery/retry 成本納入 shared envelope、可信 account-wide D1/R2 usage freshness、全 writer coverage、FREE-ONLY capacity proof、D1 provisioning/runner binding、正式受控 main acceptance。execution workflow／自然 Cloud Paper schedule 尚未建立；`activation.enabled=false`。
-- PR #592 的 96 × 2 × 4,000 = 768,000 rows/day 只代表一般 reservation／settlement 兩 query 的 SQLite query-plan 上界；非 production measurement，且不含 #599 recovery audit、重試及其他 writers。
-- 最近已驗證 Pages production build/deploy/browser 是 run [36414262259](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36414262259)（SHA `9753c6b3`）；#599/#600 沒有 dashboard 改動或新 deployment。
+- #603 新增 per-UTC-day shared D1 rows reservation；每個受 guard 保護的 query 先原子預留 admission statement 與目標 query 的 rows 上限。每日最多 384 次 query reservation，政策最大 envelope 為 3,072,000 rows read／7,680 rows written。這涵蓋經同一 client 的 reservation、settlement、recovery/retry query 次數，但不證明所有 account writers 都使用該 client。
+- PR-head CI：Python 3.12／3.13、Ruff、R2/預算相關檢查、CodeQL、Dependency/SBOM 通過。合併後 main `4c50af897a451c5cf537e549a8563497b9b5fbc9`：Python 3.12／3.13、V0.10 Freeze Guard、CodeQL、Dependency/SBOM 通過，workflow-static skipped（workflow 未變更）。SQLite 為合成測試，不是 Cloudflare production D1 的用量量測。
+- 未完成：跨 runner storage-growth 預留、具 freshness watermark 的帳戶級 D1/R2 用量來源、全 D1 writers coverage、FREE-ONLY 容量證明、D1 provisioning/runner binding、正式受控 main acceptance。execution workflow／自然 Cloud Paper schedule 尚未建立；`activation.enabled=false`。
+- PR #603 migration 僅預備，未套用；沒有 D1、R2 或 provider production request。
+- 最近已驗證 Pages production build/deploy/browser 是 run [36414262259](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36414262259)（SHA `9753c6b3`）；#603 無 dashboard 改動或新 deployment。
 - Core100 bootstrap [run 36110721415](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415) 已唯一一次完成：report `PASS / CORE100_FINGERPRINT_V0_2_BASELINE_PUBLISHED`、quality `REJECT`、zero provider requests、holdout 未存取、immutable objects／latest pointer readback 成功。一次性 authority 已消耗，不得 rerun。
-- 模型仍 `REJECT)、production registry 空、macro regime `REGIME_UNAVAILABLE`；正常正式結果仍是 `NO_TRADE`。固定界線為 0 USD、PAPER／LIVE-PAPER ONLY、holdout/source switch/promotion/real-money trading 關閉。不得因程式接線完成而 provisioning、呼叫 D1/R2/provider 或啟用 runtime。
+- 模型仍 `REJECT`、production registry 空、macro regime `REGIME_UNAVAILABLE`；正常正式結果仍是 `NO_TRADE`。固定界線為 0 USD、PAPER／LIVE-PAPER ONLY、holdout/source switch/promotion/real-money trading 關閉。不得因程式接線完成而 provisioning、呼叫 D1/R2/provider 或啟用 runtime。
 
-下一批：設計並驗證納入 reservation、settlement、recovery audit 與 retry 成本的 account-wide D1 rows budget；再取得有 freshness watermark 的正式用量來源及全 writers 覆蓋。免費容量未證明前不進行受控 main acceptance 或啟用 schedule。
+下一批：加入共享 storage-growth 預留，再取得可信且及時的帳戶用量來源，確認所有 writers 的接線並核算 D1/R2 headroom；符合 FREE-ONLY 與 authority 條件前不套用 migration、不做正式受控驗收、不啟用 schedule。
+
 ## 1. 固定入口
 
 | 問題 | 主要入口 |
@@ -180,7 +182,7 @@ PR / merge / deployment / natural schedule：各自狀態
 - 驗收：兩組 source run ID／attempt、main／head、兩個 job 結果、產生的 draft PR 或 NO_CHANGE 摘要；人工檢查 generated-block-only diff。
 - 停止：main 前進、衝突、人工編輯、來源不可信、缺權限／資料、CI 失敗時轉 CLOUD-02；不得自動擴權。
 - 交付：完成／等待／未知分列。CI、merge、維護自然執行、研究結果分開。
-- 下一步：CLOUD-01 自然驗收已完成；維持既有 Health / Maintenance 行為，不再補跑驗收。下一個固定檢查點是 2026-09-27 的 Pionex bounded observability 與 Weekly Training 自然 schedule。Core100 V0.2 一次性 bootstrap 已完成且模型品質保持 `REJECT`；禁止 rerun、放寬門檻、推論 promotion 或 source switch。Auto-merge 仍只對逐 PR、通過 exact head/base、必要 review／CI 與 authority boundary 的交付使用。
+- 下一步：本段 2026-09-27 Pionex／Weekly Training 排程是歷史檢查點，不能當作目前待辦或補跑歷史 slot。現在的 Cloud Paper 交付狀態與下一批以本手冊頂端的 PR #603 checkpoint 為準；Core100 V0.2 一次性 bootstrap 已完成、品質保持 `REJECT`，禁止 rerun、放寬門檻、推論 promotion 或 source switch。Auto-merge 僅用於逐 PR 核對 exact head/base、必要 review／CI 與 authority boundary 後的交付。
 
 ### CLOUD-02 — 異常與程式缺陷交接
 
