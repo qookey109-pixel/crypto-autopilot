@@ -34,6 +34,21 @@ def bars():
     ]
 
 
+class FakeReservationLedger:
+    def __init__(self, events=None, *, reject=False):
+        self.events = events if events is not None else []
+        self.reject = reject
+        self.reservations = []
+        self.slots = set()
+
+    def reserve_slot(self, *, slot_id, run_id, now_ms, snapshot):
+        self.events.append("reservation")
+        if self.reject or slot_id in self.slots:
+            raise BudgetBlocked("BLOCKED_BUDGET_RESERVATION_REJECTED")
+        self.slots.add(slot_id)
+        self.reservations.append((slot_id, run_id, now_ms, snapshot))
+
+
 class FakeClient:
     def __init__(self):
         self.calls = []
@@ -152,11 +167,25 @@ def make_budget_guard(policy=CloudBudgetPolicy()):
     )
 
 
-def composition(client, store, registry=REGISTRY, guard=None, accesses=None):
+def composition(
+    client, store, registry=REGISTRY, guard=None, accesses=None,
+    reservation_ledger="default", d1_usage_guard="default",
+):
     guard = guard or make_budget_guard()
     if getattr(store, "budget_guard", None) is None:
         store.budget_guard = guard
     accesses = accesses if accesses is not None else []
+    ledger = (
+        FakeReservationLedger(accesses)
+        if reservation_ledger == "default" else reservation_ledger
+    )
+    def default_d1_usage_guard(tick_ms):
+        accesses.append("d1-evidence")
+
+    usage_guard = (
+        default_d1_usage_guard
+        if d1_usage_guard == "default" else d1_usage_guard
+    )
     return CloudPaperNoTradeComposition(
         client=client,
         store=store,
@@ -165,6 +194,8 @@ def composition(client, store, registry=REGISTRY, guard=None, accesses=None):
         paper_policy=LivePaperPolicy(),
         budget_guard=guard,
         before_external=lambda: accesses.append("guard"),
+        reservation_ledger=ledger,
+        d1_usage_guard=usage_guard,
     )
 
 
@@ -187,7 +218,10 @@ class CloudPaperCompositionTests(unittest.TestCase):
         with self.assertRaisesRegex(
             CloudPaperCompositionBlocked, "PRODUCTION_STRATEGY_AUTHORITY_UNAVAILABLE",
         ):
-            runtime.run_slot(tick_ms=NOW, previous_slot=None, activation_enabled=True)
+            runtime.run_slot(
+                tick_ms=NOW, previous_slot=None, activation_enabled=True,
+                run_id="run-test",
+            )
         self.assertEqual(client.calls, [])
         self.assertEqual(store.calls, [])
         self.assertEqual(accesses, [])
@@ -202,18 +236,89 @@ class CloudPaperCompositionTests(unittest.TestCase):
         self.assertEqual(client.calls, [])
         self.assertEqual(store.calls, [])
 
+    def test_missing_d1_budget_evidence_or_ledger_blocks_before_any_access(self):
+        client, store, accesses = FakeClient(), MemoryStore(), []
+        runtime = composition(
+            client, store, accesses=accesses, reservation_ledger=None,
+        )
+        with self.assertRaisesRegex(
+            CloudPaperCompositionBlocked, "D1_BUDGET_EVIDENCE_OR_LEDGER_MISSING",
+        ):
+            runtime.run_slot(
+                tick_ms=NOW, previous_slot=None, activation_enabled=True,
+                run_id="run-test",
+            )
+        self.assertEqual(client.calls, [])
+        self.assertEqual(store.calls, [])
+        self.assertEqual(accesses, [])
+
+    def test_d1_usage_evidence_gate_runs_before_atomic_slot_reservation(self):
+        client, store, accesses = FakeClient(), MemoryStore(), []
+        def reject_stale_evidence(tick_ms):
+            accesses.append("d1-evidence")
+            raise BudgetBlocked("D1_USAGE_EVIDENCE_STALE")
+        ledger = FakeReservationLedger(accesses)
+        runtime = composition(
+            client, store, accesses=accesses, reservation_ledger=ledger,
+            d1_usage_guard=reject_stale_evidence,
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "D1_USAGE_EVIDENCE_STALE"):
+            runtime.run_slot(
+                tick_ms=NOW, previous_slot=None, activation_enabled=True,
+                run_id="run-test",
+            )
+        self.assertEqual(accesses, ["guard", "d1-evidence"])
+        self.assertEqual(ledger.reservations, [])
+        self.assertEqual(client.calls, [])
+        self.assertEqual(store.calls, [])
+
+    def test_atomic_slot_reservation_precedes_provider_and_r2(self):
+        client, store, accesses = FakeClient(), MemoryStore(), []
+        ledger = FakeReservationLedger(accesses)
+        runtime = composition(
+            client, store, accesses=accesses, reservation_ledger=ledger,
+        )
+        runtime.run_slot(
+            tick_ms=NOW, previous_slot=None, activation_enabled=True,
+            run_id="run-test",
+        )
+        self.assertEqual(accesses[:3], ["guard", "d1-evidence", "reservation"])
+        self.assertEqual(len(ledger.reservations), 1)
+        slot, run_id, now_ms, snapshot = ledger.reservations[0]
+        self.assertEqual(run_id, "run-test")
+        self.assertEqual(now_ms, NOW)
+        self.assertIs(snapshot, runtime.budget_guard.snapshot)
+        self.assertTrue(slot.isdigit())
+        self.assertLess(accesses.index("reservation"), accesses.index("guard", 1))
+
+    def test_rejected_atomic_reservation_prevents_provider_and_r2(self):
+        client, store, accesses = FakeClient(), MemoryStore(), []
+        ledger = FakeReservationLedger(accesses, reject=True)
+        runtime = composition(
+            client, store, accesses=accesses, reservation_ledger=ledger,
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
+            runtime.run_slot(
+                tick_ms=NOW, previous_slot=None, activation_enabled=True,
+                run_id="run-test",
+            )
+        self.assertEqual(accesses, ["guard", "d1-evidence", "reservation"])
+        self.assertEqual(client.calls, [])
+        self.assertEqual(store.calls, [])
+
     def test_provider_limit_blocks_before_the_excess_market_request(self):
         client, accesses = FakeClient(), []
         guard = make_budget_guard(CloudBudgetPolicy(provider_per_run=3))
         runtime = composition(client, MemoryStore(), guard=guard, accesses=accesses)
         with self.assertRaisesRegex(BudgetBlocked, "PROVIDER_RUN_LIMIT"):
-            runtime.run_slot(tick_ms=NOW, previous_slot=None, activation_enabled=True)
+            runtime.run_slot(tick_ms=NOW, previous_slot=None, activation_enabled=True, run_id="run-test")
         self.assertEqual(len(client.calls), 3)
 
     def test_enabled_empty_registry_composes_to_audited_no_trade(self):
         client, store, accesses = FakeClient(), MemoryStore(), []
         result = composition(client, store, accesses=accesses).run_slot(
             tick_ms=NOW, previous_slot=None, activation_enabled=True,
+            run_id="run-test",
         )
         self.assertEqual(result["state"], "NO_TRADE")
         self.assertEqual(result["reason_codes"], [
