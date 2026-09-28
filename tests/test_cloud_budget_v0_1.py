@@ -73,6 +73,30 @@ class CloudBudgetGuardTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "CLASS_A_DAILY_LIMIT"):
             guard.reserve_r2_class_a()
 
+    def test_monthly_limit_includes_reservations_from_this_run(self):
+        cases = (
+            ("A", "class_a_month", 750_000, "CLASS_A_MONTHLY_LIMIT"),
+            ("B", "class_b_month", 7_500_000, "CLASS_B_MONTHLY_LIMIT"),
+        )
+        for operation, field, ceiling, reason in cases:
+            with self.subTest(operation=operation):
+                guard = CloudBudgetGuard(
+                    snapshot=snapshot(**{field: ceiling - 1}),
+                    now_ms=NOW,
+                    policy=CloudBudgetPolicy(
+                        r2_class_a_per_run=10,
+                        r2_class_b_per_run=10,
+                    ),
+                )
+                if operation == "A":
+                    guard.reserve_r2_class_a()
+                    reserve_again = guard.reserve_r2_class_a
+                else:
+                    guard.reserve_r2_class_b()
+                    reserve_again = guard.reserve_r2_class_b
+                with self.assertRaisesRegex(BudgetBlocked, reason):
+                    reserve_again()
+
     def test_rolling_31_day_limit_blocks(self):
         guard = CloudBudgetGuard(
             snapshot=snapshot(class_b_31_days=380_928), now_ms=NOW
