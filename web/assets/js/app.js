@@ -928,7 +928,7 @@ function renderCloudPaperLoop(data) {
     && data.market?.provider === "PIONEX_PUBLIC"
     && data.market?.pionex_public_market_data_api_key_required === false
     && data.market?.unavailable_fields?.includes("ALIGNED_BREADTH")
-    && data.market?.breadth_coverage?.status === "PREPARED_CANDIDATE_MEMBERSHIP_ONLY_COVERAGE_UNVERIFIED"
+    && data.market?.breadth_coverage?.membership_state === "PREPARED_CANDIDATE_MEMBERSHIP_ONLY_COVERAGE_UNVERIFIED"
     && data.market?.breadth_coverage?.coverage_verified === false
     && data.model_quality === "REJECT"
     && data.budget?.account_wide_usage_evidence === "MISSING"
