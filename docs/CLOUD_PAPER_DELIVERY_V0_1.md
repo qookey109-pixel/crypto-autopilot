@@ -32,6 +32,12 @@ The additive `BudgetedR2Store` adapter provides the interface used by `R2PaperRu
 
 This is still adapter support, not production wiring. The Cloud Paper workflow, Cloudflare usage collector, atomic account-wide reservation ledger, and complete coverage of unrelated account writers are absent. Shared-account usage evidence remains missing; no deployment, controlled main acceptance, provider/R2 operation, or natural schedule is authorized by this change.
 
+## Atomic D1 reservation ledger (prepare only)
+
+The branch adds a D1-backed atomic slot reservation adapter and a prepare-only SQL migration. It reserves the full per-run envelope once before provider/R2 access, accounts for unsettled and settled reservations made after the snapshot coverage boundary, and settles only measured usage. An unknown write/readback outcome remains reserved and requires review; it is not retried or released automatically.
+
+This is implementation groundwork only. It does not provision or migrate a production database, create secrets, collect shared-account R2 usage, cover unrelated account writers, call Pionex, access R2, or enable an Actions workflow. A complete account-wide reservation inventory and independently verified current usage evidence are still required before the account can be treated as covered. Any D1 free-tier quota is a separate usage boundary and must also be shown to remain within the project’s 0 USD policy before activation. The pending_* values supplied alongside a snapshot must represent reservations outside this D1 ledger only; ledger reservations are aggregated from D1 itself.
+
 ## Delivery status (2026-09-28)
 
 The contract, bounded Pionex market adapter and persistent slot coordinator are merged. GitHub CI covers both the production-safe empty-registry `NO_TRADE` path and a separate synthetic full lifecycle (risk admission, paper entry, target exit, account update and next slot). Synthetic fixtures are never registered as production strategies.
