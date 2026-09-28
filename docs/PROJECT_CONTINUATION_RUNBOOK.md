@@ -6,14 +6,16 @@
 
 ## Cloud Paper 短期交付狀態 — 2026-09-28
 
-查核基準：[PR #587 合併後 main `2154a1201059ef16a650c9bb9d52e757ccbcc196`](https://github.com/qookey109-pixel/crypto-autopilot/commit/2154a1201059ef16a650c9bb9d52e757ccbcc196)。短期範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)，狀態機見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。開始新工作仍要重讀最新 main。
+查核基準：[PR #590 合併後 main `e3f94cd4b2d5a7262cc76382b93ae27316d44395`](https://github.com/qookey109-pixel/crypto-autopilot/commit/e3f94cd4b2d5a7262cc76382b93ae27316d44395)。這是本次文件更新前的精確基準。短期範圍見 [Cloud Paper short-term delivery](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)，狀態機見 [cloud-paper-delivery-v0-1.json](../research/status/cloud-paper-delivery-v0-1.json)。
 
-- 完成：主循環與市場 adapter、empty-registry no-trade composition、合成完整循環測試、Dashboard 空狀態與 Pages 桌機／手機驗證；PR #579 共用行情/R2 run-scoped guard；PR #585 D1 evidence/slot reservation composition interface；PR #587 concrete D1 evidence guard、逐 query REST client gate 與合成 CI。
-- 本批將成功 Paper result readback 後的 D1 slot settlement 接入 composition；執行失敗或 settlement 結果不確定時保留完整 reservation。故障 settlement recovery 尚未接線，D1 query rows-read/write 預留仍是 instance-local，未與跨 runner slot ledger 合併。未完成：production D1 evidence source、D1/R2 全 writer coverage、D1 provisioning/production runner binding、96-slot D1 容量證明及正式受控 main acceptance。Execution workflow 與自然排程不存在；`config/cloud_paper_loop_v0_1.json` 的 `activation.enabled` 必須保持 false。
-- PR #587 checks：head Python 3.12/3.13、workflow-static、CodeQL、dependency-security 全通過；post-merge Python 3.12/3.13、Freeze Guard、CodeQL、dependency-security 通過，workflow-static 因 workflow 未改變而 skipped。沒有 D1/R2/provider 存取；這不是正式用量或 runtime acceptance。
-- 下一個工程工作：完成跨 runner D1 rows budget reservation 與 settlement recovery，並以合成 CI 驗證成功結算、失敗保留及不確定結果。Cloudflare D1 Analytics 是 account-wide daily metrics 候選，尚無證據符合 60 秒 freshness gate。只有證明 96 slots/day 可在 FREE-ONLY 上限運作、帳戶級證據及所有 writer coverage 都齊備後，才考慮正式受控驗收。不得 provisioning／呼叫 D1、讀寫 R2、呼叫行情 provider、開 schedule 或啟用 runtime.
-- 固定邊界：`0 USD/month`、PAPER／LIVE-PAPER ONLY、holdout 關閉、source switch 關閉、promotion 關閉、real-money／live trading 關閉。模型品質仍為 `REJECT`。自然排程驗收不能由手動執行代替。
-- PR [#578](https://github.com/qookey109-pixel/crypto-autopilot/pull/578) 是舊 base `e80d2d27` 的 maintenance draft，先與 current main reconciliation，不直接合併。
+- PR #590 成功 settlement 已接在 Paper result 完整保存與 readback 後；運行失敗或 settlement 結果不明時保留完整 reservation。PR checks 及合併後 main 的 Python 3.12／3.13、CodeQL、Freeze Guard、dependency-security、Pages build／deploy／browser-production 均通過；workflow-static 因 workflow 未變更而 skipped。
+- 行情／R2 run-scoped guard、D1 per-query evidence gate、跨執行 slot reservation primitive 與成功 settlement 已合併；合成完整循環與 no-trade 驗收為 PASS。合成 CI 不等於正式帳戶用量或 runtime acceptance。
+- 未完成：D1 rows-read/write 的跨執行 budget reservation、settlement recovery、可信 account-wide D1/R2 用量與 freshness watermark、所有 D1/R2 writers 覆蓋、96 slots/day FREE-ONLY 容量證明、D1 provisioning/runner binding、正式受控 main acceptance。execution workflow 與自然排程仍不存在；`config/cloud_paper_loop_v0_1.json` 的 `activation.enabled` 必須保持 false。
+- 策略品質仍為 `REJECT`、production registry 為空、macro regime 為 `REGIME_UNAVAILABLE`。CMC global context 只到 proposal，沒有授權或 API 呼叫；不得用替代資料讓 regime 變成可用。
+- 唯一開放 PR [#578](https://github.com/qookey109-pixel/crypto-autopilot/pull/578) 是舊 base `e80d2d27` 的 maintenance draft，先 reconciliation，不直接合併。
+- 固定界線：`0 USD/month`、PAPER／LIVE-PAPER ONLY、holdout／source switch／promotion／real-money trading 關閉。不得 provisioning／呼叫 D1、讀寫 R2、呼叫行情 provider、開 schedule 或啟用 runtime，直到版本化 authority、免費額度證據、writer coverage 與受控驗收條件都成立。
+
+下一個工程批次：先從 D1 reservation SQL 的實際查詢形狀建立可證明的 row-read 上界，再把跨執行 D1 用量預留、成功結算及失敗恢復做成單一可測 contract。不得只調低 `25,000 rows/query` 讓每日容量算式看似通過。
 
 ## 1. 固定入口
 
