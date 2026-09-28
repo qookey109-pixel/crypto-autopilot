@@ -21,27 +21,11 @@
 | Global context | CMC 與指標映射僅 proposal | 未授權、未呼叫；`REGIME_UNAVAILABLE` 維持 fail-closed |
 | 排程與策略資格 | 現有研究排程持續依各自 authority | Cloud Paper 沒有正式排程；模型 `REJECT`、production registry 空，正式循環只能安全 `NO_TRADE` |
 
-PR #611 在 main `600bff79145908f9785427a66689c2f90322dfcf` 的 readiness 報告為缺少 read-only credential；未發出 Cloudflare request，亦未消耗一次性 audit authority。PR #612 合併為 main `df932f863354fa0047e0833ed29163e8e47f0c3b`：PR CI 通過；main CI、CodeQL、Dependency/SBOM、Freeze Guard 通過；Pages build 成功、deploy/browser skipped。主分支為唯一 authority。CI、Pages、帳戶用量證據、受控 runtime acceptance 及自然排程驗收彼此獨立。
+PR #611（以及後續文件同步 PR）在 main `600bff79145908f9785427a66689c2f90322dfcf` 的 readiness 報告為缺少 read-only credential；未發出 Cloudflare request，亦未消耗一次性 audit authority。PR #612 合併為 main `df932f863354fa0047e0833ed29163e8e47f0c3b`：PR CI 通過；main CI、CodeQL、Dependency/SBOM、Freeze Guard 通過；Pages build 成功、deploy/browser skipped。主分支為唯一 authority。CI、Pages、帳戶用量證據、受控 runtime acceptance 及自然排程驗收彼此獨立。
 
 設定入口：GitHub Repository Settings → Secrets and variables → Actions。需要 `CLOUDFLARE_ACCOUNT_ID` variable 和 `CLOUDFLARE_READONLY_API_TOKEN` secret；勿貼進聊天。設定後先跑零網路 readiness；未得 `READY` 不執行一次性 audit。
 
-## 本輪目標
-
-完成一個**可保存、可恢復、可追溯、看得懂**的雲端模擬循環：
-
-**公開行情 → 候選 → 策略資格與風控 → 模擬交易或拒絕 → 保存 → 報告 → Dashboard。**
-
-沒有合格策略時，正常輸出 `NO_TRADE` 與原因。正式環境不得使用測試策略或被拒絕模型製造交易。
-
-## 執行原則
-
-- 開始每批前重新解析最新 `main`、開放 PR、目前狀態及當前版本化契約。
-- 沿用已完成模組與驗收證據，只補足尚未打通的缺口。
-- 每批必要 GitHub 雲端 CI 通過後，依既有授權合併並回讀 main。
-- 前置條件未完成時，精確記錄阻塞；可獨立完成的工作繼續。
-- 不以固定日曆等待作為本輪完成條件。
-
-
+undefined
 ## 2026-09-27／28 自然排程旁證
 
 - Pionex [run 36309712506](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36309712506)：`REVIEW_REQUIRED`，catalog diff `PASS`、新增／移除皆為 0；保留安全分類結果。
