@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "b73164908b6d541670566e18e18613424ea52138",
+  "evidence_basis_parent_main_sha": "3a5f02d01be8ed30510c4ce1a96d742ccda161eb",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -17,7 +17,7 @@
     "cash_genesis": "IMPLEMENTED_AND_SYNTHETIC_CI_VERIFIED",
     "ledger_resolution": "MERGED_AND_POST_MERGE_CI_VERIFIED_BOUNDED_READS",
     "decision_reason_codes": "MERGED_PR_CI_AND_POST_MERGE_CI_PASSED",
-    "no_trade_composition": "IMPLEMENTATION_PENDING_CI_NOT_ACTIVATED"
+    "no_trade_composition": "MERGED_PR_AND_POST_MERGE_CI_VERIFIED_NOT_ACTIVATED"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING",
@@ -25,7 +25,8 @@
     "complete_account_wide_reservation_ledger": "D1_SLOT_PRIMITIVE_MERGED_BUT_NOT_PROVISIONED_OR_WIRED; UNRELATED_ACCOUNT_WRITERS_UNCOVERED",
     "controlled_main_acceptance": "NOT_RUN",
     "d1_free_tier_usage_evidence": "MISSING",
-    "genesis_empty_ledger_proof": "ENFORCED_BY_LEDGER_RESOLVER; CONTROLLED_ACCEPTANCE_NOT_RUN"
+    "genesis_empty_ledger_proof": "ENFORCED_BY_LEDGER_RESOLVER; CONTROLLED_ACCEPTANCE_NOT_RUN",
+    "production_entrypoint_workflow": "NOT_WIRED; NO_CLOUD_PAPER_WORKFLOW_OR_NATURAL_SCHEDULE"
   },
   "synthetic_full_cycle_ci": "PASS",
   "natural_schedule_acceptance": "NOT_ESTABLISHED",
