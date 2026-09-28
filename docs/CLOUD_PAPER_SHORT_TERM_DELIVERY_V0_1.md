@@ -136,3 +136,29 @@ PR [#579](https://github.com/qookey109-pixel/crypto-autopilot/pull/579) 將 Pion
 接下來尚需建立可信的帳戶級 D1 usage evidence source，以及涵蓋所有 D1 writers 的跨 runner/workflow atomic reservation、settlement 與 failure recovery。現有 guard 的 reservation 只在單一 instance 累計；Cloudflare D1 client 尚未綁定 production runner，D1 尚未 provisioning，R2 account-wide usage/headroom 和完整 writer coverage 也未證明。
 
 因此 P0 預算與保存批次仍未完成，不啟用 runtime、不做受控 main acceptance。下一批先用 GitHub CI 合成驗證 D1 usage evidence provider contract、跨執行 reservation/settlement/recovery 與 composition wiring；只有完成獨立 account-wide FREE-ONLY evidence 和所有 writer coverage 後，才可另行進行任何 production D1/R2 驗收。不得以合成證據取代正式帳戶用量資料。
+## 10. D1／R2 預算可行性查核 — 2026-09-28
+
+### D1 用量來源與 freshness
+
+Cloudflare 官方提供 D1 Analytics GraphQL datasets，可查 accountTag 範圍內的 rows read、rows written 與 database storage；metrics 保留 31 天。官方示例按日期彙總，文件未承諾資料會在目前契約要求的 60 秒 freshness window 內更新，也沒有在此契約中提供可直接視為即時帳戶快照的 watermark。因此 GraphQL Analytics 是**可信來源候選**，目前不是可直接注入 `D1UsageSnapshot` 的 production evidence source。整合前須證明彙總邊界、更新延遲、所有 D1 database 覆蓋及 freshness watermark；未知一律阻止存取。
+
+- [Cloudflare D1 metrics and analytics](https://developers.cloudflare.com/d1/observability/metrics-analytics/)
+- [Cloudflare D1 billing analytics](https://developers.cloudflare.com/d1/observability/billing/)
+- [Cloudflare D1 query response metadata](https://developers.cloudflare.com/api/resources/d1/subresources/database/methods/query/)
+
+D1 query API 的 `meta.rows_read`／`meta.rows_written` 是單次查詢執行後回報的精確計數，可用於雲端量測 query 成本；它本身不是執行前的保證，不能替代 pre-access reservation。
+
+### 查詢容量推導
+
+目前 nominal schedule 為 96 slots／UTC day。目標完整循環每 slot 至少有 D1 reservation 與 settlement 兩次查詢，即 192 queries／day。沿用目前每次 query 預留上界 25,000 rows read，保守 envelope 為 **4,800,000 rows read／day**，高於專案 D1 safety ceiling **4,000,000 rows／day**。這是 guard 上界乘以目標查詢數，不是實測用量；但足以證明目前上界不能作為 96-slot 啟用的容量證據。現有 composition 尚未呼叫 settlement，故不能用它目前只有 reservation 的成本推稱完整預留／結算已可運行。
+
+R2 的契約上界也需保留共享餘量：2 MiB × 96 slots × 31 days = **6.24 GB／31 days**，對 8 GB 專案 hard stop 僅留下 **1.76 GB** 給其他 writers；Class A 預留為 380,928／31 days，仍須與全帳戶其他 writers 合併核算。這些都是既有 per-slot envelope 的推導，不是實際使用量。
+
+### 啟用前的必過條件
+
+1. 用實際 SQL／索引與 D1 query metadata 建立每種 query 的有界 rows-read／rows-written 預留；預留操作本身的成本也要入帳。不可只把 25,000 改小來讓算式通過。
+2. 將每 slot reservation、所有 D1 writer 的共享預留、成功 settlement 與失敗保留／恢復放進同一個原子且可稽核的方案；未確認副作用時不得釋放保留額度。
+3. 取得具 freshness watermark 的帳戶級 baseline，證明 D1/R2 全 writer coverage 及保留給本專案的 headroom；合成 fixture 只驗證邏輯，不能當成帳戶證據。
+4. 以以上證據重算 96 slots/day 是否仍符合 0 USD safety ceiling，再進行正式受控循環。若不能證明容量，保持 `activation.enabled=false`，不要用手動 dispatch 或降低 guard 上界假裝完成。
+
+這項查核補充了第 9 節的下一個工程工作，不改寫任何 frozen receipt、既有預算 authority 或 runtime 權限。
