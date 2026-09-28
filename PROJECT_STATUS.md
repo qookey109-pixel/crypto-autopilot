@@ -10,7 +10,7 @@ The new authority is limited to a single account subscriptions GET with a separa
 
 Cloud Paper activation remains false. Production strategy registry is empty, Core100 quality is `REJECT`, macro context is `REGIME_UNAVAILABLE`, D1 is unprovisioned, and migrations are prepare-only. No Cloud Paper execution workflow, natural schedule, or controlled main acceptance exists. Account-wide usage freshness, external writer coverage, billing records, and D1 storage calibration remain open. FREE-ONLY / 0 USD, PAPER/LIVE-PAPER only; holdout, source switch, promotion, and real-money trading remain closed.
 
-Updated: 2026-09-29 (current Cloud Paper checkpoint below; historical stage notes retain their dated evidence).
+Updated: 2026-09-29 (the checkpoint above is current; later sections retain dated historical evidence).
 
 ## Historical Cloud Paper checkpoint — 2026-09-29 (superseded by current checkpoint)
 
