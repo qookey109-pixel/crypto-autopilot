@@ -11,6 +11,7 @@ from crypto_autopilot.paper.cloud_candidate_adapter_v0_1 import (
     validate_strategy_registry,
 )
 from crypto_autopilot.paper.cloud_genesis_v0_1 import initialize_cloud_paper_state
+from crypto_autopilot.paper.live_v0_1 import LivePaperMarketFrame
 from crypto_autopilot.paper.cloud_loop_v0_1 import run_cloud_step
 from crypto_autopilot.paper.run_store_v0_1 import PaperRunObjectAlreadyExistsError
 from crypto_autopilot.risk import plan_position_size
@@ -224,8 +225,14 @@ class CloudPaperCandidateAdapterTests(unittest.TestCase):
         store = MemoryStore()
 
         class CandidateFeed:
-            def fetch_frame(self, *args, **kwargs):
-                raise AssertionError("first-tick entry does not need an old frame")
+            def fetch_frame(self, symbol, *, tick_time_ms, since_ms):
+                return LivePaperMarketFrame(
+                    provider="PIONEX_PUBLIC", symbol=symbol,
+                    time_ms=tick_time_ms, source_time_ms=tick_time_ms,
+                    open=100.0, high=100.2, low=99.8, close=100.0,
+                    mark_price=100.0, available_notional_usd=4_000.0,
+                    provider_request_count=0, source_trade_count=0,
+                )
 
         def candidate_supplier(report, paper_state):
             selected = select_qualified_candidates(
