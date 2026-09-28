@@ -294,6 +294,7 @@ def _require_single_run() -> None:
 def execute(output: Path) -> int:
     report: dict[str, Any]
     observed = datetime.now(UTC)
+    cloudflare_requests_performed = 0
     try:
         token = os.environ.get("CLOUDFLARE_READONLY_API_TOKEN")
         account = os.environ.get("CLOUDFLARE_ACCOUNT_ID")
@@ -310,6 +311,7 @@ def execute(output: Path) -> int:
             "endTime": end.isoformat().replace("+00:00", "Z"),
         }
         body = json.dumps({"query": QUERY, "variables": variables}).encode()
+        cloudflare_requests_performed = 1
         payload = _request_json(
             "https://api.cloudflare.com/client/v4/graphql",
             headers={
@@ -329,7 +331,7 @@ def execute(output: Path) -> int:
             "head_sha": os.environ.get("GITHUB_SHA"),
             "event": "workflow_dispatch",
         }
-        report["cloudflare_http_requests_performed"] = 1
+        report["cloudflare_http_requests_performed"] = cloudflare_requests_performed
     except AuditError as exc:
         report = {
             "schema": "qookey-cloud-paper-usage-audit-report-v0.1",
@@ -337,16 +339,7 @@ def execute(output: Path) -> int:
             "status": "REVIEW_REQUIRED",
             "observed_at_utc": observed.isoformat(),
             "reason_code": str(exc),
-            "cloudflare_http_requests_performed": 0 if str(exc) in {
-                "READ_ONLY_CLOUDFLARE_CREDENTIALS_MISSING",
-                "MAIN_BRANCH_REQUIRED",
-                "RERUN_FORBIDDEN",
-                "GITHUB_RUN_METADATA_MISSING",
-                "WORKFLOW_HISTORY_UNAVAILABLE",
-                "WORKFLOW_HISTORY_AMBIGUOUS",
-                "CURRENT_RUN_NOT_IN_HISTORY",
-                "ONE_TIME_AUTHORITY_ALREADY_CONSUMED",
-            } else None,
+            "cloudflare_http_requests_performed": cloudflare_requests_performed,
             "account_identifiers_persisted": False,
             "raw_response_persisted": False,
             "zero_cost_conclusion": "UNKNOWN",
