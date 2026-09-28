@@ -210,6 +210,30 @@ def latest_committed_slot(
             raise CloudLoopReviewRequired("LEDGER_CHAIN_MISMATCH")
     return latest_slot
 
+def decision_reason_codes(
+    *, market: Mapping[str, object], registrations: Sequence[object],
+    candidates: Sequence[object],
+) -> tuple[str, ...]:
+    """Summarize why a slot did or did not produce eligible paper candidates."""
+    if candidates:
+        return ("QUALIFIED_CANDIDATES",)
+    reasons: list[str] = []
+    if market.get("market_status") == "REVIEW_REQUIRED":
+        reasons.append("MARKET_INPUT_REVIEW_REQUIRED")
+    context_status = market.get("context_status")
+    if context_status != "AVAILABLE":
+        reasons.append(
+            "REGIME_UNAVAILABLE"
+            if context_status == "REGIME_UNAVAILABLE"
+            else "MARKET_CONTEXT_UNAVAILABLE"
+        )
+    if not registrations:
+        reasons.append("NO_ELIGIBLE_STRATEGY")
+    if not reasons:
+        reasons.append("NO_QUALIFIED_CANDIDATE")
+    return tuple(reasons)
+
+
 def run_cloud_step(
     *, tick_ms: int, previous_slot: str | None, store: PaperRunStoreLike,
     feed: LivePaperMarketFeed, market_supplier: Callable[[], Mapping[str, object]],
@@ -304,7 +328,12 @@ def run_cloud_step(
             "status": "KNOWN",
         },
         "account": checkpoint["account_snapshot"],
-        "reason": ("NO_ELIGIBLE_STRATEGY" if not candidates else "QUALIFIED_CANDIDATES"),
+        "reason": decision_reason_codes(
+            market=market, registrations=registrations, candidates=candidates,
+        )[0],
+        "reason_codes": list(decision_reason_codes(
+            market=market, registrations=registrations, candidates=candidates,
+        )),
         "authority": {"paper_only": True, "real_money_orders": False,
                       "holdout_access": False, "source_switch": False,
                       "model_promotion": False},
