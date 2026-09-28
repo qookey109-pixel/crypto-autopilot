@@ -5,6 +5,7 @@ import unittest
 from scripts.validate_cloud_paper_r2_writer_inventory import (
     contains_d1_access_reference,
     validate_d1_source_boundary,
+    find_d1_rest_source_paths,
 )
 
 
@@ -26,6 +27,11 @@ class D1WorkflowInventoryTests(unittest.TestCase):
             validate_d1_source_boundary({path: source}, path),
             [path],
         )
+
+    def test_ignores_non_d1_cloudflare_account_endpoint(self) -> None:
+        path = "scripts/cloud_paper_billing_evidence_v0_1.py"
+        source = 'url = "https://api.cloudflare.com/client/v4/accounts/{account_id}/subscriptions"'
+        self.assertEqual(find_d1_rest_source_paths({path: source}), set())
 
     def test_rejects_unlisted_direct_d1_rest_source(self) -> None:
         path = "src/crypto_autopilot/paper/cloud_budget_ledger_v0_1.py"
