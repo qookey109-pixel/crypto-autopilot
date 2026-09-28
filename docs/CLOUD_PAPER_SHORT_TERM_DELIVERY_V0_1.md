@@ -1,18 +1,19 @@
 # Crypto Autopilot 短期交付目標
 
 - 文件日期：2026-09-29
+- 最新證據基準：PR #616 已合併，main `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`；文件只記錄已查核證據，不宣稱後續 main SHA。
 - Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pixel/crypto-autopilot)
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
 - 證據基準：PR #614 已合併至 main `abda84a45de66dc214be40ce05ee0c2ccb79e415`；本文件只記錄該基準的驗收，不宣稱其後 main SHA。
 - 狀態：Cloud Paper 持續實作，activation disabled。PR #614 已接通資格門控 adapter，但正式策略 registry 仍空。
 
-## 保存上限與耗盡政策 — engineering guard implementation
+## 保存上限與耗盡政策 — PR #616 merged
 
 - Versioned policy: `config/cloud_paper_storage_policy_v0_1.json`; it defines limits only and grants no activation, provisioning, schedule, or data-access authority.
 - Existing guard limits are formalized: 256 KiB per report/object, 2 MiB per run, 192 MiB/day at 96 slots, and a theoretical 6,241,124,352 bytes per 31 days.
 - The guard exposes a warning at 6.4 GB (80% of the 8 GB project hard stop) and blocks writes whose projected storage reaches 8 GB. Stale, incomplete, or unknown account-wide evidence still blocks before external access.
 - Retention is indefinite and append-only. Automatic or manual deletion is not authorized; partial writes retain evidence and require `REVIEW_REQUIRED`.
-- These limits are a project policy envelope, not production account usage evidence or a capacity guarantee. Account-wide usage freshness, all-writer coverage, D1 calibration and production acceptance remain open.
+- PR #616 merged to main `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`; post-merge CI run `36478324594`, Dependency/SBOM `36478324445`, and Freeze Guard `36478324502` passed. CodeQL [36478324500](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324500) passed. These limits are a project policy envelope, not production account usage evidence or a capacity guarantee. Account-wide usage freshness, all-writer coverage, D1 calibration and production acceptance remain open.
 
 ## 最新驗收證據狀態 — PR #614 合併後
 
@@ -23,7 +24,7 @@
 | Provider／R2 guard | Shared run-scoped guard 與 R2 adapter hooks 已合併 | 帳戶級用量、freshness 與所有 writer coverage 未證明 |
 | D1 ledger | #599/#600 recovery audit；#603 rows reservation；#605 storage-growth reservation | migrations prepare-only；D1 未 provision/bind；usage freshness、全 writer coverage、儲存校準與 FREE-ONLY headroom 未證明 |
 | 帳戶用量 audit | #611 bounded Analytics audit workflow 與零網路 readiness 已合併 | readiness [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) 為 `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`；Cloudflare requests=0；一次性 audit 未執行、權限未消耗 |
-| R2 容量保護 | 現有 8 GB hard stop 在寫入前 fail closed | 正式用量證據未驗證；報告大小、保留、警示及容量政策待完成；沒有刪除權限 |
+| R2 容量保護 | PR #616 定義 256 KiB/object、2 MiB/run、192 MiB/day、6,241,124,352 theoretical bytes/31 days；guard 在 6.4 GB 回報 WARNING，projected 8 GB 起 fail closed | 正式用量、freshness 與全 writer coverage 未驗證；政策不授權刪除 |
 | Dashboard | 既有 Pages production 有桌機／手機驗證 | 本批未改 dashboard；目前沒有 production Cloud Paper runtime 報告可投影 |
 | 排程與運作驗收 | 合成完整循環 CI 已通過 | 沒有正式 execution workflow 或自然 Paper schedule；controlled main acceptance 未執行 |
 

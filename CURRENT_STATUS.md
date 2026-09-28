@@ -1,5 +1,18 @@
 # Current Operations Status
 
+## Cloud Paper delivery checkpoint — main `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`
+
+Updated 2026-09-29 from live GitHub. This is the current Cloud Paper checkpoint; the later #614 section below remains a historical snapshot.
+
+- PR [#615](https://github.com/qookey109-pixel/crypto-autopilot/pull/615) synchronized Cloud Paper status after the candidate adapter. It merged as `d302b3ce1a6969864881c2a15a64f05e7da4ecf2`; its post-merge CI, CodeQL, Dependency/SBOM, Freeze Guard, and Pages build succeeded. Pages deploy/browser jobs were skipped because this was a documentation-only change.
+- PR [#616](https://github.com/qookey109-pixel/crypto-autopilot/pull/616) added the storage-capacity policy and warning guard; it merged as `c0041d89a58b2f8c5a0e27341d2365691eafa5e3`. PR-head Python 3.12/3.13, Ruff, workflow-static, CodeQL and Dependency/SBOM passed. Main CI [36478324594](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324594), Dependency/SBOM [36478324445](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324445) and Freeze Guard [36478324502](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324502) passed. CodeQL [36478324500](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36478324500) passed.
+- Storage policy: maximum 256 KiB/object, 2 MiB/run, 192 MiB/day at 96 slots, theoretical 6,241,124,352 bytes/31 days; warning at 6.4 GB and hard stop before a write reaches 8 GB. Evidence retention stays indefinite and append-only; deletion is not authorized.
+- These are project ceilings and synthetic guard checks, not Cloudflare account usage evidence. Production account usage/freshness and all-writer reservation coverage remain unverified.
+- Cloud Paper remains inactive: no execution workflow or natural schedule; controlled main acceptance has not run; D1 migrations remain prepare-only and D1 is not provisioned. The production strategy registry is empty and Core100 quality is `REJECT`; positive fills are CI fixtures only.
+- Account-usage audit readiness run [36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643) remains `BLOCKED_MISSING_READ_ONLY_CREDENTIAL`, with zero Cloudflare requests; the one-time audit authority is unconsumed.
+- Next gate: configure `CLOUDFLARE_ACCOUNT_ID` as a GitHub Actions variable and `CLOUDFLARE_READONLY_API_TOKEN` as a GitHub Actions secret, then run only zero-network readiness. Dispatch the one-time audit only after readiness is `READY`; do not activate Paper until all budget, D1, controlled-acceptance and authority gates pass.
+- Keep FREE-ONLY / 0 USD, PAPER/LIVE-PAPER only, and holdout, source switch, promotion, real-money orders and live trading closed.
+
 ## Cloud Paper current checkpoint — PR #614 merged
 
 - Evidence basis: main `abda84a45de66dc214be40ce05ee0c2ccb79e415` after PR #614; re-resolve live main before acting. PR #614 is merged and its delivery branch was deleted.
