@@ -14,7 +14,8 @@
     "budget_guard": "PRIMITIVE_IMPLEMENTED_NOT_WIRED",
     "r2_adapter_budget_hooks": "IMPLEMENTED_NOT_CONFIGURED",
     "d1_reservation_ledger": "PRIMITIVE_IMPLEMENTED_AND_MERGED_NOT_PROVISIONED_OR_WIRED",
-    "cash_genesis": "IMPLEMENTED_AND_SYNTHETIC_CI_VERIFIED"
+    "cash_genesis": "IMPLEMENTED_AND_SYNTHETIC_CI_VERIFIED",
+    "ledger_resolution": "IMPLEMENTED_IN_CLOUD_LOOP_CORE_PENDING_CI_AND_ACCEPTANCE"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING",
@@ -22,7 +23,7 @@
     "complete_account_wide_reservation_ledger": "D1_SLOT_PRIMITIVE_MERGED_BUT_NOT_PROVISIONED_OR_WIRED; UNRELATED_ACCOUNT_WRITERS_UNCOVERED",
     "controlled_main_acceptance": "NOT_RUN",
     "d1_free_tier_usage_evidence": "MISSING",
-    "genesis_empty_ledger_proof": "NOT_PRODUCTION_WIRED"
+    "genesis_empty_ledger_proof": "IMPLEMENTED_IN_CLOUD_LOOP_CORE_PENDING_CI"
   },
   "synthetic_full_cycle_ci": "PASS",
   "natural_schedule_acceptance": "NOT_ESTABLISHED",

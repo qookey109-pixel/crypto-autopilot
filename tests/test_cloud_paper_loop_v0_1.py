@@ -27,6 +27,12 @@ class MemoryStore:
     def get_json(self, kind, object_id):
         return self.objects.get((kind, object_id))
 
+    def list_json_ids(self, kind):
+        return tuple(sorted(
+            object_id for (stored_kind, object_id) in self.objects
+            if stored_kind == kind
+        ))
+
     def put_json(self, kind, object_id, payload):
         key = (kind, object_id)
         if key in self.objects:
@@ -201,10 +207,70 @@ class CloudPaperLoopTests(unittest.TestCase):
                 before_external=lambda: None,
             )
 
+    def test_genesis_rejects_orphan_paper_state_before_market(self):
+        store = MemoryStore()
+        store.put_json("live-state", "orphan-state", {"state_id": "orphan-state"})
+        called = []
+        with self.assertRaisesRegex(CloudLoopReviewRequired, "GENESIS_LEDGER_NOT_EMPTY"):
+            run_cloud_step(
+                tick_ms=420000, previous_slot=None, store=store,
+                feed=NeverCalledFeed(),
+                market_supplier=lambda: called.append(True) or {},
+                candidate_supplier=lambda market, state: [],
+                strategy_registry=REGISTRY, before_external=lambda: None,
+            )
+        self.assertEqual(called, [])
+
+    def test_orphan_state_in_nonempty_ledger_blocks_before_market(self):
+        store = MemoryStore()
+        step(store, 420000, None)
+        store.put_json("live-state", "orphan-state", {"state_id": "orphan-state"})
+        called = []
+        with self.assertRaisesRegex(
+            CloudLoopReviewRequired, "LEDGER_STATE_RESULT_COVERAGE_MISMATCH"
+        ):
+            run_cloud_step(
+                tick_ms=1320000, previous_slot="0", store=store,
+                feed=NeverCalledFeed(),
+                market_supplier=lambda: called.append(True) or {},
+                candidate_supplier=lambda market, state: [],
+                strategy_registry=REGISTRY, before_external=lambda: None,
+            )
+        self.assertEqual(called, [])
+
+    def test_latest_committed_slot_is_required_after_restart(self):
+        store = MemoryStore()
+        step(store, 420000, None)
+        called = []
+        with self.assertRaisesRegex(CloudLoopReviewRequired, "PREVIOUS_SLOT_REQUIRED"):
+            run_cloud_step(
+                tick_ms=1320000, previous_slot=None, store=store,
+                feed=NeverCalledFeed(),
+                market_supplier=lambda: called.append(True) or {},
+                candidate_supplier=lambda market, state: [],
+                strategy_registry=REGISTRY, before_external=lambda: None,
+            )
+        self.assertEqual(called, [])
+
+    def test_stale_predecessor_cannot_skip_latest_commit(self):
+        store = MemoryStore()
+        step(store, 420000, None)
+        step(store, 1320000, "0")
+        called = []
+        with self.assertRaisesRegex(CloudLoopReviewRequired, "PREVIOUS_SLOT_MISMATCH"):
+            run_cloud_step(
+                tick_ms=2220000, previous_slot="0", store=store,
+                feed=NeverCalledFeed(),
+                market_supplier=lambda: called.append(True) or {},
+                candidate_supplier=lambda market, state: [],
+                strategy_registry=REGISTRY, before_external=lambda: None,
+            )
+        self.assertEqual(called, [])
+
     def test_missing_prior_commit_stops_before_market(self):
         store = MemoryStore()
         called = []
-        with self.assertRaisesRegex(CloudLoopReviewRequired, "PREVIOUS_RESULT"):
+        with self.assertRaisesRegex(CloudLoopReviewRequired, "PREVIOUS_SLOT_MISMATCH"):
             run_cloud_step(
                 tick_ms=1320000, previous_slot="0", store=store,
                 feed=NeverCalledFeed(),

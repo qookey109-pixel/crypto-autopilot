@@ -116,6 +116,100 @@ def committed_report(store: PaperRunStoreLike, slot: str) -> dict[str, object] |
     return report
 
 
+def latest_committed_slot(
+    store: PaperRunStoreLike, *, current_slot: str,
+    before_external: Callable[[], None],
+) -> str | None:
+    """Resolve the latest commit with bounded reads and complete namespace coverage.
+
+    Genesis is accepted only when slot, claim, run-step, and state namespaces
+    are empty. Non-empty history is checked by complete object listings, exact
+    coverage counts, a verified latest report, and its verified parent step.
+    """
+    list_ids = getattr(store, "list_json_ids", None)
+    if not callable(list_ids):
+        raise CloudLoopReviewRequired("COMPLETE_LEDGER_SCAN_UNAVAILABLE")
+
+    # The store adapter must reserve each page before its R2 list request.
+    before_external()
+    result_ids = tuple(list_ids("cloud-result"))
+    before_external()
+    claim_ids = tuple(list_ids("cloud-slot"))
+    before_external()
+    step_ids = tuple(list_ids("live-run-step"))
+    before_external()
+    state_ids = tuple(list_ids("live-state"))
+
+    def valid_slot_id(value: object) -> bool:
+        return (
+            isinstance(value, str) and value.isdigit() and len(value) <= 20
+            and str(int(value)) == value
+        )
+
+    if any(not valid_slot_id(value) for value in (*result_ids, *claim_ids)):
+        raise CloudLoopReviewRequired("LEDGER_SLOT_ID_INVALID")
+    if any(not isinstance(value, str) or not value for value in (*step_ids, *state_ids)):
+        raise CloudLoopReviewRequired("LEDGER_OBJECT_ID_INVALID")
+
+    result_slots = set(result_ids)
+    if not result_slots:
+        if claim_ids or step_ids or state_ids:
+            raise CloudLoopReviewRequired("GENESIS_LEDGER_NOT_EMPTY")
+        return None
+    if set(claim_ids) != result_slots:
+        raise CloudLoopReviewRequired("LEDGER_CLAIM_RESULT_COVERAGE_MISMATCH")
+    if any(int(value) >= int(current_slot) for value in result_slots):
+        raise CloudLoopReviewRequired("LEDGER_CONTAINS_CURRENT_OR_FUTURE_SLOT")
+    if len(step_ids) != len(result_slots):
+        raise CloudLoopReviewRequired("LEDGER_STEP_RESULT_COVERAGE_MISMATCH")
+    if len(state_ids) != len(result_slots) + 1:
+        raise CloudLoopReviewRequired("LEDGER_STATE_RESULT_COVERAGE_MISMATCH")
+
+    latest_slot = max(result_slots, key=int)
+    before_external()
+    latest = committed_report(store, latest_slot)
+    if latest is None:
+        raise CloudLoopReviewRequired("LEDGER_COMMITTED_RESULT_MISSING")
+    coordinator = latest.get("coordinator")
+    step = coordinator.get("run_step") if isinstance(coordinator, Mapping) else None
+    if not isinstance(step, Mapping):
+        raise CloudLoopReviewRequired("LEDGER_STEP_MISSING")
+
+    sequence = step.get("sequence")
+    step_id = step.get("step_id")
+    previous_step_id = step.get("previous_step_id")
+    previous_state_id = step.get("previous_state_id")
+    next_state_id = step.get("next_state_id")
+    if sequence != len(result_slots):
+        raise CloudLoopReviewRequired("LEDGER_SEQUENCE_GAP")
+    if not isinstance(step_id, str) or step_id not in step_ids:
+        raise CloudLoopReviewRequired("LEDGER_STEP_ID_MISSING")
+    if not isinstance(previous_state_id, str) or previous_state_id not in state_ids:
+        raise CloudLoopReviewRequired("LEDGER_PREVIOUS_STATE_MISSING")
+    if not isinstance(next_state_id, str) or next_state_id not in state_ids:
+        raise CloudLoopReviewRequired("LEDGER_NEXT_STATE_MISSING")
+    if sequence == 1:
+        if previous_step_id is not None:
+            raise CloudLoopReviewRequired("LEDGER_GENESIS_LINK_INVALID")
+    else:
+        if not isinstance(previous_step_id, str) or previous_step_id not in step_ids:
+            raise CloudLoopReviewRequired("LEDGER_PREVIOUS_STEP_MISSING")
+        before_external()
+        previous_step = store.get_json("live-run-step", previous_step_id)
+        if previous_step is None:
+            raise CloudLoopReviewRequired("LEDGER_PREVIOUS_STEP_READBACK_MISSING")
+        try:
+            verify_live_paper_run_step(previous_step)
+        except ValueError:
+            raise CloudLoopReviewRequired("LEDGER_PREVIOUS_STEP_INVALID") from None
+        if (
+            previous_step.get("sequence") != sequence - 1
+            or previous_step.get("next_state_id") != previous_state_id
+            or previous_step.get("run_id") != step.get("run_id")
+        ):
+            raise CloudLoopReviewRequired("LEDGER_CHAIN_MISMATCH")
+    return latest_slot
+
 def run_cloud_step(
     *, tick_ms: int, previous_slot: str | None, store: PaperRunStoreLike,
     feed: LivePaperMarketFeed, market_supplier: Callable[[], Mapping[str, object]],
@@ -126,8 +220,9 @@ def run_cloud_step(
 ) -> dict[str, object]:
     """One claimed slot, with exact prior-result chaining and immutable readback.
 
-    Caller must discover the verified prior slot from the complete append-only
-    ledger, enforce budget/activation and use a continuity-checking public feed.
+    The complete append-only ledger is scanned and verified before choosing
+    genesis or chaining the prior step. Caller still enforces activation/budget
+    and supplies a continuity-checking public feed.
     The callbacks also allow cloud CI to exercise the full positive path without
     putting test strategy evidence in a production registry.
     """
@@ -142,11 +237,22 @@ def run_cloud_step(
     if prior_result is not None:
         return {"state": "REPLAYED", "slot_id": slot, "report": prior_result,
                 "provider_requests_performed": 0}
+    latest_slot = latest_committed_slot(
+        store, current_slot=slot, before_external=before_external,
+    )
+    if previous_slot is not None and (
+        not isinstance(previous_slot, str) or not previous_slot.isdigit()
+        or str(int(previous_slot)) != previous_slot
+    ):
+        raise CloudLoopReviewRequired("INVALID_PREVIOUS_SLOT")
+    if previous_slot != latest_slot:
+        reason = ("PREVIOUS_SLOT_REQUIRED"
+                  if latest_slot is not None and previous_slot is None
+                  else "PREVIOUS_SLOT_MISMATCH")
+        raise CloudLoopReviewRequired(reason)
     previous = None
-    if previous_slot is not None:
-        if not previous_slot.isdigit() or int(previous_slot) >= int(slot):
-            raise CloudLoopReviewRequired("INVALID_PREVIOUS_SLOT")
-        old = committed_report(store, previous_slot)
+    if latest_slot is not None:
+        old = committed_report(store, latest_slot)
         if old is None:
             raise CloudLoopReviewRequired("PREVIOUS_RESULT_MISSING")
         previous = old["coordinator"]["run_step"]
