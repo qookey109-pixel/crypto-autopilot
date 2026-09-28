@@ -77,15 +77,16 @@ def _timestamp(value: object) -> datetime:
     if not isinstance(value, str):
         raise AuditError("METRIC_TIMESTAMP_MISSING")
     try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        parsed_date = date.fromisoformat(value)
     except ValueError:
         try:
-            parsed = datetime.combine(date.fromisoformat(value), datetime.min.time(), UTC)
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
         except ValueError:
             raise AuditError("METRIC_TIMESTAMP_INVALID") from None
-    if parsed.tzinfo is None:
-        raise AuditError("METRIC_TIMESTAMP_TIMEZONE_MISSING")
-    return parsed.astimezone(UTC)
+        if parsed.tzinfo is None:
+            raise AuditError("METRIC_TIMESTAMP_TIMEZONE_MISSING")
+        return parsed.astimezone(UTC)
+    return datetime.combine(parsed_date, datetime.min.time(), UTC)
 
 
 def _account_data(payload: object) -> dict[str, Any]:
