@@ -293,6 +293,29 @@ class CloudPaperCompositionTests(unittest.TestCase):
         self.assertTrue(slot.isdigit())
         self.assertLess(accesses.index("reservation"), accesses.index("guard", 1))
 
+    def test_duplicate_slot_rejected_before_provider_or_r2_replay(self):
+        client, store, accesses = FakeClient(), MemoryStore(), []
+        ledger = FakeReservationLedger(accesses)
+        runtime = composition(
+            client, store, accesses=accesses, reservation_ledger=ledger,
+        )
+        runtime.run_slot(
+            tick_ms=NOW, previous_slot=None, activation_enabled=True,
+            run_id="run-first",
+        )
+        provider_calls = len(client.calls)
+        store_calls = len(store.calls)
+
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
+            runtime.run_slot(
+                tick_ms=NOW, previous_slot=None, activation_enabled=True,
+                run_id="run-replay",
+            )
+
+        self.assertEqual(len(ledger.reservations), 1)
+        self.assertEqual(len(client.calls), provider_calls)
+        self.assertEqual(len(store.calls), store_calls)
+
     def test_rejected_atomic_reservation_prevents_provider_and_r2(self):
         client, store, accesses = FakeClient(), MemoryStore(), []
         ledger = FakeReservationLedger(accesses, reject=True)
