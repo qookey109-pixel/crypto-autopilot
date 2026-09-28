@@ -31,7 +31,7 @@
   },
   "output_binding": [
     "Pionex provider",
-    "same as_of_ms",
+    "candidate as_of_ms equals the matching evidence last_bar_ms; report as_of_ms is the capture time",
     "market evidence SHA-256",
     "router match SHA-256",
     "qualification receipt SHA-256",
