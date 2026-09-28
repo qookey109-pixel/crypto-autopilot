@@ -10,11 +10,11 @@ Updated: 2026-09-28. This is the single human entrypoint for the current project
 - PR #587 exact head `4bf7b27a438d571b8306d005bd828369a62b9e80` 的 Python 3.12、Python 3.13、workflow-static、CodeQL、dependency-security 全通過。合併後 main 的 Python 3.12／3.13、CodeQL、Freeze Guard、dependency-security 全通過；workflow-static 因 workflow 未變更而 skipped。沒有啟動 Pages deploy/browser-production。
 - 合成測試驗證 D1 evidence 缺漏、不完整、過期、未來時間、格式錯誤、每日讀寫額度與 storage hard stop；D1 guard 拒絕時不建立 HTTP opener。合成測試不讀取 Cloudflare 帳戶資料。
 - Cloud Paper 仍 `activation.enabled=false`。模型品質 `REJECT`、production strategy registry 為空、macro regime `REGIME_UNAVAILABLE`。帳戶級 D1 用量來源、跨 runner/workflow 的原子 D1 預留與全 writer 覆蓋、D1 使用量 settlement／失敗恢復、production provisioning/binding、帳戶級 R2 用量證據、正式 main 受控驗收均未完成；execution workflow 與自然排程未建立。
-- PR #587 的 query guard 需要外部注入 account-wide evidence，預留只在 guard instance 內累計；不能當成跨執行共享 ledger，也不能證明真正免費額度。storage_growth_per_query_bytes 是保守專案預留值，不是量測出的 row/index 大小。
+- PR #587 的 query guard 需要外部注入 account-wide evidence，D1 query 預留只在 guard instance 內累計，不能當成跨執行 D1 rows ledger。PR #590 將成功 slot settlement 接在 Paper 完整寫入與 readback 後；任何執行或 settlement 失敗都保留 reservation，但未確認 settlement 的自動 recovery 尚未接線。這不代表 96 slots/day 已符合 D1 預算。storage_growth_per_query_bytes 是保守專案預留值，不是量測出的 row/index 大小。
 - 本輪沒有執行 provider、R2、D1、training、holdout 或排程 runtime，也沒有新增資料存取或交易 authority。CI 通過不代表策略有效或可交易。
 - 開放中的 PR [#578](https://github.com/qookey109-pixel/crypto-autopilot/pull/578) 仍以舊 base `e80d2d27` 為基礎；須先與 current main reconciliation，不直接合併。
 
-下一步：完成 D1 account-wide usage evidence 的可信來源與跨 workflow 原子預留／settlement／失敗恢復設計及合成 CI；同步盤點 R2 全 writer headroom。production adapter、受控 main acceptance 或排程都須等帳戶級零費用證據與完整 reservation coverage，`activation.enabled` 持續為 `false`。
+下一步：完成跨執行 D1 rows budget reservation 與 settlement recovery，再核實 account-wide usage freshness 和 D1/R2 全 writer headroom。受控 main acceptance、production adapter 或排程都須等零費用證據、完整 reservation coverage 和 96-slot 容量證明；`activation.enabled` 持續為 `false`。
 
 ## Live Cloud Paper checkpoint — 2026-09-28
 
