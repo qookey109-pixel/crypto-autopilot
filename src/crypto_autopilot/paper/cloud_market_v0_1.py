@@ -193,12 +193,71 @@ def analyze_capture(
         ))
         for decision in opportunities.selected
     ]
+    selected_symbols = {decision.symbol for decision in opportunities.selected}
+    decisions_by_symbol = {
+        decision.symbol: decision for decision in opportunities.evaluated
+    }
+    routes_by_symbol = {
+        str(route["symbol"]): route for route in routes
+        if isinstance(route.get("symbol"), str)
+    }
+    decision_trace: list[dict[str, object]] = []
+    for symbol in capture.symbols:
+        opportunity = decisions_by_symbol.get(symbol)
+        route = routes_by_symbol.get(symbol)
+        if symbol in capture.rejected:
+            input_status = "REJECTED"
+            input_reasons = [capture.rejected[symbol]]
+        elif symbol not in evidence:
+            input_status = "TECHNICAL_NOT_READY"
+            input_reasons = ["TECHNICAL_EVIDENCE_UNAVAILABLE"]
+        else:
+            input_status = "ANALYZED"
+            input_reasons = []
+
+        if opportunities.status == "REGIME_UNAVAILABLE":
+            opportunity_status = "NOT_EVALUATED_REGIME_UNAVAILABLE"
+            route_status = "NOT_EVALUATED_REGIME_UNAVAILABLE"
+            decision_reasons = ["REGIME_UNAVAILABLE"]
+        elif opportunity is None:
+            opportunity_status = "NOT_EVALUATED"
+            route_status = "NOT_EVALUATED"
+            decision_reasons = ["OPPORTUNITY_DECISION_UNAVAILABLE"]
+        else:
+            opportunity_status = (
+                "SELECTED" if symbol in selected_symbols
+                else "ELIGIBLE_NOT_SELECTED_BY_LIMIT" if opportunity.eligible
+                else "ATTENTION_GATE_REJECTED"
+            )
+            route_status = (
+                "NOT_EVALUATED_NOT_SELECTED"
+                if symbol not in selected_symbols
+                else "ROUTE_MATCHED" if route is not None
+                else "NO_ROUTE_MATCH"
+            )
+            decision_reasons = list(opportunity.reasons)
+            if route is not None:
+                decision_reasons.extend(route.get("reasons", []))
+
+        decision_trace.append({
+            "symbol": symbol,
+            "input_status": input_status,
+            "input_reasons": input_reasons,
+            "opportunity_status": opportunity_status,
+            "opportunity_decision": asdict(opportunity) if opportunity else None,
+            "strategy_route_status": route_status,
+            "strategy_route": route,
+            "execution_selection_status": "NOT_PERFORMED_BY_MARKET_ADAPTER",
+            "reason_codes": list(dict.fromkeys(input_reasons + decision_reasons)),
+        })
+
     return {
         "schema": "qookey-cloud-paper-market-report-v0.1",
         "provider": "PIONEX_PUBLIC", "as_of_ms": capture.as_of_ms,
         "market_status": "REVIEW_REQUIRED" if capture.rejected else "CAPTURED",
         "opportunity_status": opportunities.status,
         "opportunities": asdict(opportunities), "routes": routes,
+        "decision_trace": decision_trace,
         "market_evidence": evidence, "rejected": dict(capture.rejected),
         "requests_attempted": capture.requests_attempted,
         "context_status": "AVAILABLE" if regime is not None else "REGIME_UNAVAILABLE",
