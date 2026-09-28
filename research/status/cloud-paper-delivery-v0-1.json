@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "3a5f02d01be8ed30510c4ce1a96d742ccda161eb",
+  "evidence_basis_parent_main_sha": "c32d5abca28a566c62a4904703f6f46ea9b9c78a",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -17,7 +17,8 @@
     "cash_genesis": "IMPLEMENTED_AND_SYNTHETIC_CI_VERIFIED",
     "ledger_resolution": "MERGED_AND_POST_MERGE_CI_VERIFIED_BOUNDED_READS",
     "decision_reason_codes": "MERGED_PR_CI_AND_POST_MERGE_CI_PASSED",
-    "no_trade_composition": "MERGED_PR_AND_POST_MERGE_CI_VERIFIED_NOT_ACTIVATED"
+    "no_trade_composition": "MERGED_PR_AND_POST_MERGE_CI_VERIFIED_NOT_ACTIVATED",
+    "market_decision_trace": "MERGED_PR_AND_POST_MERGE_CI_VERIFIED_REPORT_ONLY"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING",
