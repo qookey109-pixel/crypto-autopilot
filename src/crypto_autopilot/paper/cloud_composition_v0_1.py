@@ -15,9 +15,14 @@ from crypto_autopilot.paper.cloud_budget_v0_1 import (
     CloudBudgetGuard,
     R2UsageSnapshot,
 )
-from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import SlotUsage
+from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
+    D1SlotReservation,
+    SlotUsage,
+)
 from crypto_autopilot.paper.cloud_loop_v0_1 import (
     CompleteTapePionexFeed,
+    committed_report,
+    digest,
     run_cloud_step,
     slot_id,
 )
@@ -47,6 +52,15 @@ class BudgetSlotReservationLedger(Protocol):
         self, *, slot_id: str, completed_at_ms: int, usage: SlotUsage,
     ) -> None:
         """Settle an exactly observed completed slot or retain its reservation."""
+
+    def get_slot_reservation(self, *, slot_id: str) -> D1SlotReservation | None:
+        """Read the existing reservation without releasing its envelope."""
+
+    def record_verified_result_recovery(
+        self, *, slot_id: str, run_id: str, report_id: str,
+        recovered_at_ms: int,
+    ) -> None:
+        """Record verified completion while retaining the full reservation."""
 
 
 class D1UsageBudgetGate(Protocol):
@@ -112,6 +126,72 @@ class CloudPaperNoTradeComposition:
     def _reserve_provider_request(self) -> None:
         self.before_external()
         self.budget_guard.reserve_provider_request()
+
+    def recover_completed_slot(
+        self, *,
+        slot: str,
+        recovery_enabled: bool = False,
+    ) -> dict[str, object]:
+        """Verify a completed immutable result after restart, keeping full reserve.
+
+        This path is disabled by default. It never reruns a slot, calls a provider,
+        rewrites R2, or releases unused budget. A verified result gets an audit
+        receipt in D1; missing or conflicting evidence leaves the reservation
+        untouched for review.
+        """
+        if type(recovery_enabled) is not bool:
+            raise CloudPaperCompositionBlocked("RECOVERY_FLAG_INVALID")
+        if not recovery_enabled:
+            return {
+                "state": "DISABLED",
+                "reason": "SETTLEMENT_RECOVERY_NOT_AUTHORIZED",
+                "slot_id": slot,
+            }
+        if not isinstance(slot, str) or not slot.isdigit() or str(int(slot)) != slot:
+            raise CloudPaperCompositionBlocked("RECOVERY_SLOT_INVALID")
+        if self.reservation_ledger is None or self.d1_usage_guard is None:
+            raise CloudPaperCompositionBlocked("D1_BUDGET_EVIDENCE_OR_LEDGER_MISSING")
+
+        self.before_external()
+        self.d1_usage_guard.validate_evidence()
+        reservation = self.reservation_ledger.get_slot_reservation(slot_id=slot)
+        if reservation is None:
+            return {"state": "NOT_FOUND", "slot_id": slot}
+        if reservation.state == "SETTLED":
+            return {"state": "ALREADY_SETTLED", "slot_id": slot}
+        if reservation.state != "RESERVED":
+            raise CloudPaperCompositionBlocked("RECOVERY_RESERVATION_STATE_INVALID")
+
+        report = committed_report(
+            self.store, slot, before_external=self.before_external,
+        )
+        if report is None:
+            raise CloudPaperCompositionBlocked("RECOVERY_RESULT_MISSING")
+        if report.get("state") not in {"COMMITTED", "NO_TRADE"}:
+            raise CloudPaperCompositionBlocked("RECOVERY_RESULT_NOT_COMPLETE")
+        coordinator = report.get("coordinator")
+        step = coordinator.get("run_step") if isinstance(coordinator, Mapping) else None
+        report_run_id = step.get("run_id") if isinstance(step, Mapping) else None
+        if report_run_id != reservation.run_id:
+            raise CloudPaperCompositionBlocked("RECOVERY_RUN_ID_MISMATCH")
+
+        report_id = digest(report)
+        self.before_external()
+        self.d1_usage_guard.validate_evidence()
+        self.reservation_ledger.record_verified_result_recovery(
+            slot_id=slot,
+            run_id=reservation.run_id,
+            report_id=report_id,
+            recovered_at_ms=self.completion_clock_ms(),
+        )
+        return {
+            "state": "RECOVERED_RESERVED_FULL",
+            "slot_id": slot,
+            "run_id": reservation.run_id,
+            "report_id": report_id,
+            "budget_released": False,
+            "r2_writes_performed": 0,
+        }
 
     def run_slot(
         self, *,
