@@ -2,7 +2,7 @@
 
 - 文件日期：2026-09-29
 - 最新文件同步：PR #625 合併至 main `5efdc045690b320aed47a68e5ff52f0119f912a0`；文件更新未改 runtime 或 authority。
-- PR #625 is documentation-only: it merged the status update to main `5efdc045690b320aed47a68e5ff52f0119f912a0`. Post-merge CI [36489202470](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36489202470), CodeQL [36489202296](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36489202296), Dependency/SBOM [36489202158](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36489202158), and Freeze Guard [36489202435](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36489202435) succeeded. Pages run [36489202281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36489202281) built successfully; deploy and production-browser jobs were skipped for the documentation-only change, and workflow-static was skipped because no workflow changed.
+- PR #625 合併至 main `5efdc045690b320aed47a68e5ff52f0119f912a0`，未改 runtime 或 authority。CI、CodeQL、Dependency/SBOM、Freeze Guard 均成功；Pages build 成功，deploy 與 browser-production 因文件變更而跳過；workflow-static 因未改 workflow 而跳過。
 - Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pixel/crypto-autopilot)
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
 - 歷史證據基準：PR #614 合併至 main `abda84a45de66dc214be40ce05ee0c2ccb79e415`；PR #618 Dashboard 部署證據維持獨立記錄。
