@@ -2,18 +2,19 @@
 
 Updated: 2026-09-28. This is the single human entrypoint for the current project checkpoint.
 
-## Cloud Paper current checkpoint — after PR #581
+## Cloud Paper current checkpoint — after PR #585
 
-查核基準：`main=39c9e8cb7b5ae98b3951fbad7e71ff6be814a8e5`（2026-09-28）。本節為目前摘要；下方較早的逐 PR 記錄仍是歷史證據。
+查核基準：`main=9fbe37f622d716d3492444c87c09eac3147ee0a0`（2026-09-28）。本節為目前摘要；下方較早的逐 PR 記錄仍是歷史證據。
 
-- [短期交付目標](docs/CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md) 與機器狀態已同步；PR [#581](https://github.com/qookey109-pixel/crypto-autopilot/pull/581) 合併。PR [#579](https://github.com/qookey109-pixel/crypto-autopilot/pull/579) 已將 Pionex 請求及 R2 adapter 接到同一 run-scoped budget guard。
-- PR #581 head 的 Python 3.12／3.13、workflow-static、CodeQL、dependency-security 全通過。合併後 main 的 Python 3.12／3.13、CodeQL、Freeze Guard、dependency-security 通過；workflow-static 因工作流未變更而 skipped。dependency-security 首次遇到 PyPI 503，保留原始失敗後只重跑失敗 job，重跑成功。
-- 合成完整循環 CI 為 PASS，含正向模擬成交／出場、正常 `NO_TRADE`、重播與重啟、行情缺口拒絕、provider 預算阻擋等測試。最近一次 Pages production browser 驗證為 run [36385444044](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36385444044)，桌機／手機 14/14；後續 #579 與 #581 未修改 Dashboard UI。
-- Cloud Paper 仍 `activation.enabled=false`。策略 registry 為空、模型品質 `REJECT`、macro regime `REGIME_UNAVAILABLE`。帳戶級 R2 用量證據、所有帳戶 writer 的 reservation coverage、D1 用量證據與 D1 ledger provisioning／wiring、正式 main 受控驗收仍未完成；自然排程也未建立。
+- [短期交付目標](docs/CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md) 為交付範圍與驗收清單；PR [#581](https://github.com/qookey109-pixel/crypto-autopilot/pull/581) 同步機器狀態，PR [#585](https://github.com/qookey109-pixel/crypto-autopilot/pull/585) 將 composition 接上必需的 per-slot 原子預留介面。PR [#579](https://github.com/qookey109-pixel/crypto-autopilot/pull/579) 已將 Pionex 請求及 R2 adapter 接到同一 run-scoped budget guard。
+- PR #585 exact head 的 Python 3.12／3.13、workflow-static、CodeQL、dependency-security 全通過。合併後 main 的 Python 3.12／3.13、CodeQL、Freeze Guard、dependency-security 通過；workflow-static 因 workflow 未變更而 skipped。合成測試覆蓋缺少 D1 證據／ledger、預留拒絕與重複 slot 在 provider/R2 前停止。
+- 合成完整循環 CI 為 PASS，含正向模擬成交／出場、正常 `NO_TRADE`、重播與重啟、行情缺口拒絕、provider 預算阻擋等測試。最近一次 Pages production browser 驗證為 run [36414198068](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36414198068)，合併 #583 時 desktop/mobile browser 成功；後續 #584 與 #585 未修改 Dashboard UI。
+- Cloud Paper 仍 `activation.enabled=false`。策略 registry 為空、模型品質 `REJECT`、macro regime `REGIME_UNAVAILABLE`。帳戶級 R2 用量證據、所有帳戶 writer 的 reservation coverage、實際 D1 用量證據、D1 provisioning／production adapter 綁定／settlement、正式 main 受控驗收仍未完成；自然排程也未建立。
+- PR #585 僅接上可注入的預留介面與 D1 證據閘門；沒有 production D1 client 或用量快照來源接入。這是合成 CI 證據，不是正式帳戶級零費用證據。
 - 本輪沒有執行 provider、R2、D1、training、holdout 或排程 runtime；沒有新增 authority。不得將 CI 成功解讀成策略有效或交易授權。
 - 開放中的 PR #578 是舊 base `e80d2d27` 的 maintenance draft；不要直接合併，先把它的文件快照與目前 main 證據 reconciliation。
 
-下一個工程批次：在 GitHub CI 以合成用量資料補齊 D1 reservation ledger 與 Cloud Paper composition 的接線／失敗恢復驗收；生產 D1/R2 使用仍須等帳戶級免費額度證據與完整 writer 覆蓋，且啟用設定保持關閉。
+下一個工程批次：完成 concrete D1 usage-evidence guard、Cloudflare D1 adapter 綁定與 reservation settlement／failure recovery 的合成驗收；正式 D1/R2 使用仍需帳戶級免費額度證據與完整 writer 覆蓋，且啟用設定保持關閉。
 
 ## Live Cloud Paper checkpoint — 2026-09-28
 
