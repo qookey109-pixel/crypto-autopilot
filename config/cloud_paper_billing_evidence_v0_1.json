@@ -1,0 +1,44 @@
+{
+  "schema": "qookey-cloud-paper-billing-evidence-v0.1",
+  "authority_status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "purpose": "One-time read-only snapshot of account subscription plan, state and listed price for Cloud Paper zero-cost review.",
+  "execution": {
+    "trigger": "workflow_dispatch_on_main_only",
+    "maximum_workflow_runs": 1,
+    "maximum_attempts": 1,
+    "maximum_cloudflare_http_requests": 1,
+    "maximum_github_history_requests": 1,
+    "timeout_seconds": 20,
+    "retry_count": 0,
+    "pagination": false,
+    "history_check": "One Actions workflow-runs metadata request; prior or ambiguous runs fail closed."
+  },
+  "query": {
+    "method": "GET",
+    "endpoint": "https://api.cloudflare.com/client/v4/accounts/{account_id}/subscriptions",
+    "page": 1,
+    "per_page": 20,
+    "required_token_permission": "Account Billing Read",
+    "persist_subscription_ids": false,
+    "persist_account_id": false,
+    "persist_raw_response": false
+  },
+  "allowed_operations": [
+    "One read-only Cloudflare account subscription request.",
+    "One GitHub Actions run-history check.",
+    "Secret-free report artifact and Actions summary."
+  ],
+  "forbidden_operations": [
+    "Invoice, payment method, billing profile or member access.",
+    "Any create, update, delete, purchase, plan change, or subscription mutation.",
+    "D1 SQL, D1 provisioning/migrations, R2 object access, provider requests, or market data.",
+    "Training, holdout access, strategy promotion, trading, or schedule activation.",
+    "Retries, pagination, additional Cloudflare calls, or reruns."
+  ],
+  "report_semantics": {
+    "complete_subscription_snapshot": "READY_FOR_BILLING_REVIEW",
+    "incomplete_or_ambiguous_response": "REVIEW_REQUIRED",
+    "zero_cost_conclusion": "NOT_PROVEN_BY_SUBSCRIPTION_SNAPSHOT",
+    "activation": "REMAINS_DISABLED"
+  }
+}

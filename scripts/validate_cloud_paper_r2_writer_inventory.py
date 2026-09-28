@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github" / "workflows"
 INVENTORY = ROOT / "research" / "status" / "cloud-paper-r2-writer-inventory-v0-1.json"
 SECRET_REF = re.compile(
-    r"\$\{\{[^}]*\bsecrets\.(?:CLOUDFLARE_ACCOUNT_ID|R2_[A-Z0-9_]+)\b",
+    r"\$\{\{[^}]*\bsecrets\.(?:CLOUDFLARE_ACCOUNT_ID|CLOUDFLARE_BILLING_READONLY_API_TOKEN|R2_[A-Z0-9_]+)\b",
     re.IGNORECASE,
 )
 
@@ -31,7 +31,7 @@ def contains_d1_access_reference(contents: str) -> bool:
 
 
 D1_REST_SOURCE_MARKER = re.compile(
-    r"api\.cloudflare\.com/client/v4/accounts/"
+    r"api\.cloudflare\.com/client/v4/accounts/[^/\\s]+/d1/(?:database|databases)(?:/|\\b)"
     r"|/d1/(?:database|databases)(?:/|\b)"
     r"|\bclass\s+CloudflareD1QueryClient\b",
     re.IGNORECASE,
