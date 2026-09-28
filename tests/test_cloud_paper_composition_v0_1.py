@@ -181,7 +181,7 @@ def composition(
     )
 
     class FakeD1UsageGuard:
-        def reserve_query(self):
+        def validate_evidence(self):
             accesses.append("d1-evidence")
 
     usage_guard = (
