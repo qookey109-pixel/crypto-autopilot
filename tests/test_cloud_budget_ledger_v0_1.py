@@ -112,7 +112,7 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
         return D1CloudBudgetLedger(
             client,
             policy=policy(**policy_changes),
-            limits=D1LedgerLimits(max_rows_read_per_request=4_000),
+            limits=D1LedgerLimits(max_evidence_age_ms=7_200_000, max_rows_read_per_request=4_000),
         )
 
     def test_slot_reservation_is_atomic_and_daily_budget_is_shared(self):
@@ -123,16 +123,16 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
         third_ms = NOW + 2 * SLOT_MS
         ledger.reserve_slot(
             slot_id=paper_slot_id(first_ms), run_id="run-1",
-            now_ms=first_ms, snapshot=snapshot(at_ms=first_ms),
+            now_ms=first_ms, snapshot=snapshot(),
         )
         ledger.reserve_slot(
             slot_id=paper_slot_id(second_ms), run_id="run-2",
-            now_ms=second_ms, snapshot=snapshot(at_ms=second_ms),
+            now_ms=second_ms, snapshot=snapshot(),
         )
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
             ledger.reserve_slot(
                 slot_id=paper_slot_id(third_ms), run_id="run-3",
-                now_ms=third_ms, snapshot=snapshot(at_ms=third_ms),
+                now_ms=third_ms, snapshot=snapshot(),
             )
         count = client.connection.execute(
             "SELECT reservation_count FROM cloud_paper_budget_meta WHERE singleton = 1"
@@ -217,7 +217,7 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
             ledger.reserve_slot(
                 slot_id=paper_slot_id(next_ms), run_id="run-2",
-                now_ms=next_ms, snapshot=snapshot(at_ms=next_ms, class_a_day=2),
+                now_ms=next_ms, snapshot=snapshot(class_a_day=2),
             )
 
     def test_monthly_headroom_includes_other_slot_reservations(self):
@@ -231,7 +231,7 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
             ledger.reserve_slot(
                 slot_id=paper_slot_id(next_ms), run_id="run-2",
-                now_ms=next_ms, snapshot=snapshot(at_ms=next_ms, class_a_month=18),
+                now_ms=next_ms, snapshot=snapshot(class_a_month=18),
             )
 
     def test_storage_hard_stop_includes_other_slot_reservations(self):
@@ -246,7 +246,7 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
             ledger.reserve_slot(
                 slot_id=paper_slot_id(next_ms), run_id="run-2",
                 now_ms=next_ms,
-                snapshot=snapshot(at_ms=next_ms, storage_bytes=81),
+                snapshot=snapshot(storage_bytes=81),
             )
 
     def test_missing_incomplete_or_stale_account_evidence_blocks_before_io(self):
@@ -255,7 +255,7 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
         cases = (
             snapshot(account_wide=False),
             snapshot(reservation_coverage_complete=False),
-            snapshot(measured_through_ms=NOW - 51_000),
+            snapshot(measured_through_ms=NOW - 7_200_000),
         )
         for index, evidence in enumerate(cases):
             with self.subTest(index=index):
@@ -294,7 +294,7 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
                     slot_id=paper_slot_id(now_ms),
                     run_id=f"run-{index}",
                     now_ms=now_ms,
-                    snapshot=snapshot(at_ms=now_ms),
+                    snapshot=snapshot(),
                 )
             except BudgetBlocked:
                 return False
