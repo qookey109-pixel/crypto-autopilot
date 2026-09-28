@@ -122,9 +122,11 @@ class R2BudgetHookTests(unittest.TestCase):
             policy=CloudBudgetPolicy(r2_class_a_per_run=0),
         )
         client = FakeClient()
-        run_store = R2PaperRunStore(
-            store(client, [], before_external=guard.reserve)
+        budgeted = BudgetedR2Store(
+            client=client, bucket="fixture-bucket", budget_guard=guard,
         )
+        run_store = R2PaperRunStore(budgeted)
+        self.assertIs(run_store.store.budget_guard, guard)
 
         with self.assertRaisesRegex(BudgetBlocked, "CLASS_A_RUN_LIMIT"):
             run_store.put_json_if_absent(

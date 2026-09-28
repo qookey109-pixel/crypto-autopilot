@@ -10,6 +10,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 
+from crypto_autopilot.paper.cloud_budget_v0_1 import CloudBudgetGuard
 from crypto_autopilot.paper.cloud_loop_v0_1 import (
     CompleteTapePionexFeed,
     run_cloud_step,
@@ -31,8 +32,8 @@ class CloudPaperCompositionBlocked(RuntimeError):
 class CloudPaperNoTradeComposition:
     """Compose Pionex scan, opportunity analysis, and a fail-closed paper step.
 
-    The caller supplies an R2-backed store wrapped with per-request budget
-    reservations, a fresh-budget callback, and the existing versioned policy.
+    The caller supplies an R2-backed store bound to the same reservation guard,
+    a fresh-budget callback, and the existing versioned policy.
     Tests may inject deterministic fakes; this class contains no network or
     credential construction.
     """
@@ -42,15 +43,22 @@ class CloudPaperNoTradeComposition:
     strategy_registry: Mapping[str, object]
     allowed_base_assets: frozenset[str]
     paper_policy: LivePaperPolicy
-    reserve_provider_request: Callable[[], None]
+    budget_guard: CloudBudgetGuard
     before_external: Callable[[], None]
     run_name: str = "cloud-paper-v0-1"
 
     def __post_init__(self) -> None:
         if not self.allowed_base_assets:
             raise ValueError("governed base-asset allowlist is required")
-        if not callable(self.reserve_provider_request) or not callable(self.before_external):
-            raise ValueError("budget and external-access guards are required")
+        if not isinstance(self.budget_guard, CloudBudgetGuard):
+            raise ValueError("a cloud budget guard is required")
+        if not callable(self.before_external):
+            raise ValueError("an external-access guard is required")
+        store_guard = getattr(self.store, "budget_guard", None)
+        if store_guard is None:
+            store_guard = getattr(getattr(self.store, "store", None), "budget_guard", None)
+        if store_guard is not self.budget_guard:
+            raise CloudPaperCompositionBlocked("R2_BUDGET_GUARD_NOT_BOUND")
         if not isinstance(self.run_name, str) or not self.run_name:
             raise ValueError("run_name is required")
 
@@ -67,6 +75,10 @@ class CloudPaperNoTradeComposition:
             raise CloudPaperCompositionBlocked(
                 "PRODUCTION_STRATEGY_AUTHORITY_UNAVAILABLE"
             )
+
+    def _reserve_provider_request(self) -> None:
+        self.before_external()
+        self.budget_guard.reserve_provider_request()
 
     def run_slot(
         self, *, tick_ms: int, previous_slot: str | None,
@@ -94,7 +106,7 @@ class CloudPaperNoTradeComposition:
                 self.client,
                 as_of_ms=tick_ms,
                 allowed_base_assets=self.allowed_base_assets,
-                before_request=self.reserve_provider_request,
+                before_request=self._reserve_provider_request,
             )
             report = analyze_capture(
                 capture, allowed_base_assets=self.allowed_base_assets,

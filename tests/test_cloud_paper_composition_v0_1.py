@@ -5,6 +5,12 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 
 from crypto_autopilot.models import BookTicker, Candle, MarketTicker
+from crypto_autopilot.paper.cloud_budget_v0_1 import (
+    BudgetBlocked,
+    CloudBudgetGuard,
+    CloudBudgetPolicy,
+    R2UsageSnapshot,
+)
 from crypto_autopilot.paper.cloud_composition_v0_1 import (
     CloudPaperCompositionBlocked,
     CloudPaperNoTradeComposition,
@@ -69,15 +75,22 @@ class Receipt:
 
 
 class MemoryStore:
-    def __init__(self):
+    def __init__(self, budget_guard=None):
         self.objects = {}
         self.calls = []
+        self.budget_guard = budget_guard
+
+    def _reserve(self, operation, new_bytes=0):
+        if self.budget_guard is not None:
+            self.budget_guard.reserve(operation, new_bytes)
 
     def get_json(self, kind, object_id):
+        self._reserve("R2_CLASS_B")
         self.calls.append(("get", kind, object_id))
         return self.objects.get((kind, object_id))
 
     def list_json_ids(self, kind):
+        self._reserve("R2_CLASS_A")
         self.calls.append(("list", kind))
         return tuple(sorted(
             object_id for (stored_kind, object_id) in self.objects
@@ -85,6 +98,7 @@ class MemoryStore:
         ))
 
     def put_json(self, kind, object_id, payload):
+        self._reserve("R2_CLASS_A")
         self.calls.append(("put", kind, object_id))
         key = (kind, object_id)
         if key in self.objects:
@@ -95,6 +109,7 @@ class MemoryStore:
         return Receipt(False)
 
     def put_json_if_absent(self, kind, object_id, payload):
+        self._reserve("R2_CLASS_A")
         self.calls.append(("put_if_absent", kind, object_id))
         key = (kind, object_id)
         if key in self.objects:
@@ -114,8 +129,33 @@ REGISTRY = {
 }
 
 
-def composition(client, store, registry=REGISTRY, permits=None, accesses=None):
-    permits = permits if permits is not None else []
+def make_budget_guard(policy=CloudBudgetPolicy()):
+    now_ms = NOW
+    return CloudBudgetGuard(
+        snapshot=R2UsageSnapshot(
+            account_wide=True,
+            reservation_coverage_complete=True,
+            observed_at_ms=now_ms,
+            measured_through_ms=now_ms,
+            storage_bytes=0,
+            class_a_month=0,
+            class_b_month=0,
+            class_a_31_days=0,
+            class_b_31_days=0,
+            class_a_day=0,
+            class_b_day=0,
+            provider_requests_day=0,
+            new_bytes_day=0,
+        ),
+        clock_ms=lambda: now_ms,
+        policy=policy,
+    )
+
+
+def composition(client, store, registry=REGISTRY, guard=None, accesses=None):
+    guard = guard or make_budget_guard()
+    if getattr(store, "budget_guard", None) is None:
+        store.budget_guard = guard
     accesses = accesses if accesses is not None else []
     return CloudPaperNoTradeComposition(
         client=client,
@@ -123,28 +163,27 @@ def composition(client, store, registry=REGISTRY, permits=None, accesses=None):
         strategy_registry=registry,
         allowed_base_assets=frozenset({"BTC"}),
         paper_policy=LivePaperPolicy(),
-        reserve_provider_request=lambda: permits.append("PIONEX_PUBLIC"),
+        budget_guard=guard,
         before_external=lambda: accesses.append("guard"),
     )
 
 
 class CloudPaperCompositionTests(unittest.TestCase):
     def test_disabled_is_side_effect_free(self):
-        client, store, permits, accesses = FakeClient(), MemoryStore(), [], []
-        result = composition(client, store, permits=permits, accesses=accesses).run_slot(
+        client, store, accesses = FakeClient(), MemoryStore(), []
+        result = composition(client, store, accesses=accesses).run_slot(
             tick_ms=NOW, previous_slot=None,
         )
         self.assertEqual(result["state"], "DISABLED")
         self.assertEqual(result["reason"], "ACTIVATION_DISABLED")
         self.assertEqual(client.calls, [])
         self.assertEqual(store.calls, [])
-        self.assertEqual(permits, [])
         self.assertEqual(accesses, [])
 
     def test_nonempty_registry_fails_before_external_access(self):
-        client, store, permits, accesses = FakeClient(), MemoryStore(), [], []
+        client, store, accesses = FakeClient(), MemoryStore(), []
         registry = {**REGISTRY, "status": "READY", "strategies": [{"strategy_id": "x"}]}
-        runtime = composition(client, store, registry, permits, accesses)
+        runtime = composition(client, store, registry, accesses=accesses)
         with self.assertRaisesRegex(
             CloudPaperCompositionBlocked, "PRODUCTION_STRATEGY_AUTHORITY_UNAVAILABLE",
         ):
@@ -154,9 +193,27 @@ class CloudPaperCompositionTests(unittest.TestCase):
         self.assertEqual(permits, [])
         self.assertEqual(accesses, [])
 
+    def test_mismatched_r2_guard_fails_before_any_external_access(self):
+        client = FakeClient()
+        store = MemoryStore(budget_guard=make_budget_guard())
+        with self.assertRaisesRegex(
+            CloudPaperCompositionBlocked, "R2_BUDGET_GUARD_NOT_BOUND",
+        ):
+            composition(client, store, guard=make_budget_guard())
+        self.assertEqual(client.calls, [])
+        self.assertEqual(store.calls, [])
+
+    def test_provider_limit_blocks_before_the_excess_market_request(self):
+        client, accesses = FakeClient(), []
+        guard = make_budget_guard(CloudBudgetPolicy(provider_per_run=3))
+        runtime = composition(client, MemoryStore(), guard=guard, accesses=accesses)
+        with self.assertRaisesRegex(BudgetBlocked, "PROVIDER_RUN_LIMIT"):
+            runtime.run_slot(tick_ms=NOW, previous_slot=None, activation_enabled=True)
+        self.assertEqual(len(client.calls), 3)
+
     def test_enabled_empty_registry_composes_to_audited_no_trade(self):
-        client, store, permits, accesses = FakeClient(), MemoryStore(), [], []
-        result = composition(client, store, permits=permits, accesses=accesses).run_slot(
+        client, store, accesses = FakeClient(), MemoryStore(), []
+        result = composition(client, store, accesses=accesses).run_slot(
             tick_ms=NOW, previous_slot=None, activation_enabled=True,
         )
         self.assertEqual(result["state"], "NO_TRADE")
@@ -166,7 +223,7 @@ class CloudPaperCompositionTests(unittest.TestCase):
         self.assertEqual(result["market"]["provider"], "PIONEX_PUBLIC")
         self.assertEqual(result["market"]["candidate_specs"], [])
         self.assertEqual(result["operation_counts"]["provider_requests"], 4)
-        self.assertEqual(len(permits), 4)
+        self.assertEqual(len(client.calls), 4)
         self.assertTrue(store.calls)
         self.assertTrue(accesses)
         self.assertTrue(any(kind == "cloud-report" for kind, _ in store.objects))
