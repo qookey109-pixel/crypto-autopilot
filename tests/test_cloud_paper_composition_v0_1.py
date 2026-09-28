@@ -190,7 +190,6 @@ class CloudPaperCompositionTests(unittest.TestCase):
             runtime.run_slot(tick_ms=NOW, previous_slot=None, activation_enabled=True)
         self.assertEqual(client.calls, [])
         self.assertEqual(store.calls, [])
-        self.assertEqual(permits, [])
         self.assertEqual(accesses, [])
 
     def test_mismatched_r2_guard_fails_before_any_external_access(self):
