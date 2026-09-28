@@ -264,6 +264,9 @@ test("cloud paper dashboard shows inactive state without inventing account evide
   await expect(page.locator("#cloud-paper-candidates")).toHaveText("NO_TRADE · 空策略登錄");
   await expect(page.locator("#cloud-paper-regime")).toHaveText("REGIME_UNAVAILABLE · 等待資料來源授權");
   await expect(page.locator("#cloud-paper-account")).toHaveText("尚未初始化");
-  await expect(page.locator("#cloud-paper-budget")).toHaveText("BLOCKED · 等待額度閘門");
+  await expect(page.locator("#cloud-paper-budget")).toHaveText("BLOCKED · 預約接線與用量證據待補");
+  await expect(page.locator("#cloud-paper-trace-status")).toHaveText("尚無正式循環報告");
+  await expect(page.locator("#cloud-paper-trace-detail")).toContainText("最新正式 run 為 NOT_RUN");
   await expect(page.locator(".cloud-paper-panel")).toContainText("API key");
+  await expect(page.locator(".cloud-paper-panel")).toContainText("D1 原語尚未佈署");
 });

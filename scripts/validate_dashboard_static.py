@@ -17,6 +17,7 @@ RESEARCH_EVIDENCE_SCHEMA = ROOT / "data" / "research-evidence.schema.json"
 ALTERNATIVE_ASSETS = ROOT / "data" / "alternative-assets.json"
 HISTORY_PROGRESS = ROOT / "data" / "history-progress.json"
 CLOUD_RUNS = ROOT / "data" / "cloud-runs.json"
+CLOUD_PAPER_LOOP = ROOT / "data" / "cloud-paper-loop.json"
 ZEC_COMPLETION_RECEIPT = Path("research/receipts/2026-09-21-zec-v0-3-development-completion-v0-1.json")
 REQUIRED = (
     ROOT / "index.html",
@@ -34,6 +35,7 @@ REQUIRED = (
     ALTERNATIVE_ASSETS,
     HISTORY_PROGRESS,
     CLOUD_RUNS,
+    CLOUD_PAPER_LOOP,
     ROOT / "_headers",
 )
 
@@ -84,6 +86,8 @@ REQUIRED_ZH_HANT_LABELS = (
     "研究結果不等於正式准入",
     "股票代幣、ETF 與金屬資料池",
     "網站只顯示安全摘要",
+    "最近一次逐市場決策軌跡",
+    "尚無正式循環報告",
 )
 
 
@@ -108,6 +112,48 @@ def main() -> int:
     for phrase in FORBIDDEN_RUNTIME_PHRASES:
         if phrase in combined:
             raise RuntimeError(f"dashboard contains forbidden live/concurrent execution phrase: {phrase}")
+
+    cloud_paper = json.loads(CLOUD_PAPER_LOOP.read_text(encoding="utf-8"))
+    if cloud_paper.get("schema") != "qookey-cloud-paper-dashboard-v0.1":
+        raise RuntimeError("Cloud Paper dashboard projection schema changed")
+    if cloud_paper.get("authority") is not False:
+        raise RuntimeError("Cloud Paper dashboard projection must remain non-authoritative")
+    if (cloud_paper.get("activation") or {}).get("enabled") is not False:
+        raise RuntimeError("Cloud Paper dashboard fixture must remain inactive")
+    latest_cloud_run = cloud_paper.get("latest_run") or {}
+    if latest_cloud_run.get("status") != "NOT_RUN":
+        raise RuntimeError("checked-in Cloud Paper projection must not invent a formal run")
+    if latest_cloud_run.get("decision_trace_status") != "NOT_AVAILABLE_NO_OFFICIAL_RUN":
+        raise RuntimeError("Cloud Paper trace must remain unavailable without an official run")
+    if (cloud_paper.get("strategy") or {}).get("registry_status") != "EMPTY_NO_ELIGIBLE_STRATEGIES":
+        raise RuntimeError("Cloud Paper strategy registry fixture changed")
+    if cloud_paper.get("model_quality") != "REJECT":
+        raise RuntimeError("Cloud Paper model quality must remain REJECT")
+    cloud_budget = cloud_paper.get("budget") or {}
+    if cloud_budget.get("monthly_budget_usd") != 0:
+        raise RuntimeError("Cloud Paper monthly budget must remain zero")
+    if cloud_budget.get("account_wide_usage_evidence") != "MISSING":
+        raise RuntimeError("Cloud Paper shared-account usage evidence must remain missing")
+    if cloud_budget.get("reservation_guard") != "R2_ADAPTER_HOOKS_IMPLEMENTED_CLOUD_LOOP_NOT_WIRED":
+        raise RuntimeError("Cloud Paper reservation wiring status changed")
+    if cloud_budget.get("d1_reservation_ledger") != "PRIMITIVE_PREPARED_NOT_PROVISIONED_OR_WIRED":
+        raise RuntimeError("Cloud Paper D1 reservation ledger status changed")
+    if cloud_budget.get("d1_free_tier_usage_evidence") != "MISSING":
+        raise RuntimeError("Cloud Paper D1 free-tier evidence must remain missing")
+    production = cloud_paper.get("production") or {}
+    if production.get("entrypoint_workflow") != "NOT_WIRED":
+        raise RuntimeError("Cloud Paper production entrypoint must remain not wired")
+    if production.get("natural_schedule") != "NOT_CONFIGURED":
+        raise RuntimeError("Cloud Paper natural schedule must remain unconfigured")
+    cloud_boundary = cloud_paper.get("boundary") or {}
+    if cloud_boundary.get("paper_only") is not True or any(
+        cloud_boundary.get(key) is not False
+        for key in (
+            "real_money_orders", "live_trading", "holdout_access",
+            "source_switch", "model_promotion",
+        )
+    ):
+        raise RuntimeError("Cloud Paper dashboard safety boundary changed")
 
     data = json.loads((ROOT / "data" / "dashboard.json").read_text(encoding="utf-8"))
     strategy_projection = json.loads((ROOT / "data" / "strategy.json").read_text(encoding="utf-8"))
