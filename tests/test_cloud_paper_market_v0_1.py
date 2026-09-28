@@ -68,6 +68,20 @@ class CloudMarketTests(unittest.TestCase):
         self.assertEqual(report["candidate_specs"], [])
         self.assertFalse(report["execution_selection_performed"])
         self.assertEqual(report["market_evidence"]["BTC_USDT_PERP"]["bar_count"], 240)
+        self.assertEqual(len(report["decision_trace"]), 1)
+        trace = report["decision_trace"][0]
+        self.assertEqual(trace["symbol"], "BTC_USDT_PERP")
+        self.assertEqual(trace["input_status"], "ANALYZED")
+        self.assertEqual(
+            trace["opportunity_status"], "NOT_EVALUATED_REGIME_UNAVAILABLE",
+        )
+        self.assertEqual(
+            trace["strategy_route_status"], "NOT_EVALUATED_REGIME_UNAVAILABLE",
+        )
+        self.assertEqual(
+            trace["execution_selection_status"], "NOT_PERFORMED_BY_MARKET_ADAPTER",
+        )
+        self.assertEqual(trace["reason_codes"], ["REGIME_UNAVAILABLE"])
 
     def test_budget_rejection_precedes_provider(self):
         client = Client()
