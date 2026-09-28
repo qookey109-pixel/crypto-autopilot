@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-28",
-  "evidence_basis_parent_main_sha": "cfa47a3c5747766535a5bad0ac0815a423735455",
+  "evidence_basis_parent_main_sha": "ceb298226234c0d92202ba944b6ee3da3862ca01",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -18,12 +18,13 @@
     "ledger_resolution": "MERGED_AND_POST_MERGE_CI_VERIFIED_BOUNDED_READS",
     "decision_reason_codes": "MERGED_PR_CI_AND_POST_MERGE_CI_PASSED",
     "no_trade_composition": "MERGED_PR_AND_POST_MERGE_CI_VERIFIED_NOT_ACTIVATED",
-    "market_decision_trace": "MERGED_PR_AND_POST_MERGE_CI_VERIFIED_REPORT_ONLY"
+    "market_decision_trace": "MERGED_PR_AND_POST_MERGE_CI_VERIFIED_REPORT_ONLY",
+    "r2_writer_inventory": "CLASSIFIED_AND_REQUIRED_CI_GUARDED"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "MISSING",
     "per_external_access_reservation_guard": "R2_ADAPTER_HOOKS_IMPLEMENTED_CLOUD_LOOP_NOT_WIRED",
-    "complete_account_wide_reservation_ledger": "D1_SLOT_PRIMITIVE_MERGED_BUT_NOT_PROVISIONED_OR_WIRED; UNRELATED_ACCOUNT_WRITERS_UNCOVERED",
+    "complete_account_wide_reservation_ledger": "STATIC_INVENTORY_CLASSIFIED; D1_LEDGER_NOT_PROVISIONED_OR_WIRED; SHARED_RESERVATION_COVERAGE_AND_USAGE_EVIDENCE_NOT_PROVEN",
     "controlled_main_acceptance": "NOT_RUN",
     "d1_free_tier_usage_evidence": "MISSING",
     "genesis_empty_ledger_proof": "ENFORCED_BY_LEDGER_RESOLVER; CONTROLLED_ACCEPTANCE_NOT_RUN",
@@ -47,5 +48,6 @@
       "mobile-chromium"
     ],
     "inactive_state_assertion": "PASS"
-  }
+  },
+  "r2_writer_inventory": "research/status/cloud-paper-r2-writer-inventory-v0-1.json"
 }
