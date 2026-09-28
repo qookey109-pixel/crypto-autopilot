@@ -1,16 +1,16 @@
 {
   "schema": "qookey-cloud-paper-r2-writer-inventory-v0.1",
   "updated_date": "2026-09-29",
-  "evidence_basis_main_sha": "600bff79145908f9785427a66689c2f90322dfcf",
+  "evidence_basis_main_sha": "0d135a6ca67a72f5071d295293477ba6196e249b",
   "is_latest_main_claim": false,
   "scan": {
-    "workflow_file_count": 87,
-    "workflows_with_r2_or_cloudflare_secret_references": 17,
+    "workflow_file_count": 89,
+    "workflows_with_r2_or_cloudflare_secret_references": 19,
     "scanner_contract": "scripts/validate_cloud_paper_r2_writer_inventory.py",
     "exact_reference_scan": true,
     "values_or_secret_contents_read": false,
     "workflow_count_before_nonaccess_preflight": 84,
-    "note": "At PR #611 head, two manual Cloud Paper audit workflows were added. The readiness workflow performs no network access; the one-time usage audit reads account-wide D1/R2 analytics via one Cloudflare GraphQL query and performs no object or SQL access. Neither workflow references R2 write credentials.",
+    "note": "At this inventory update, the one-time D1/R2 usage audit remains unrun and account readiness was previously blocked by missing read-only credentials. The billing-readiness workflow checks token presence only and performs zero network calls; the one-time billing audit performs one read-only subscriptions GET and records listed plan/state/price metadata without identifiers. Neither audit accesses D1 SQL or R2 objects. The subscription snapshot does not prove invoice totals, account-wide external writer coverage, or zero cost.",
     "d1_access_marker_scan": "scripts/validate_cloud_paper_r2_writer_inventory.py"
   },
   "account_wide_reservation_coverage": {
@@ -51,6 +51,22 @@
       "trigger": "schedule + workflow_dispatch + guarded authority push",
       "authority": "config/core100_training_fingerprint_v0_2_successor_v0_1.json; consumed one-shot bootstrap receipt",
       "evidence": "NO_CHANGE/SKIPPED assert zero R2 writes; only valid changed-fingerprint training can publish"
+    },
+    {
+      "workflow": ".github/workflows/cloud-paper-billing-evidence-readiness-v0-1.yml",
+      "access": "PRESENCE_CHECK_ONLY",
+      "lifecycle": "READINESS_GUARD",
+      "trigger": "workflow_dispatch",
+      "authority": "config/cloud_paper_billing_evidence_v0_1.json",
+      "evidence": "Checks account ID and Billing Read token presence only; zero network calls and does not consume the one-time authority."
+    },
+    {
+      "workflow": ".github/workflows/cloud-paper-billing-evidence-v0-1.yml",
+      "access": "READ_ONLY",
+      "lifecycle": "ONE_TIME_SUBSCRIPTION_SNAPSHOT",
+      "trigger": "workflow_dispatch",
+      "authority": "config/cloud_paper_billing_evidence_v0_1.json",
+      "evidence": "One Billing Read GET of the account subscriptions page; no invoice, payment, plan-change, D1, R2, or provider operations."
     },
     {
       "workflow": ".github/workflows/context-forward-capture-execution-v0-1.yml",
