@@ -1,8 +1,18 @@
 # Project Status
 
+Updated: 2026-09-29. Repository main is the current authority.
+
+## Cloud Paper checkpoint — PR #630 merged
+
+Evidence-basis parent main: `e2e4a911b1fa62c35c6e16a3eb4850e68d23f090`; this stored SHA is not a latest-main claim. PR [#630](https://github.com/qookey109-pixel/crypto-autopilot/pull/630) merged a one-time read-only subscription snapshot contract and workflow. PR-head CI [36496143905](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496143905), CodeQL [36496143925](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496143925), Dependency/SBOM [36496143898](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496143898), and retired-workflow guard [36496143862](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496143862) passed. Post-merge main CI [36496372548](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496372548), CodeQL [36496372401](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496372401), Dependency/SBOM [36496372521](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496372521), and Freeze Guard [36496372302](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36496372302) passed. Main-push workflow-static was skipped because it is PR-only.
+
+The new authority is limited to a single account subscriptions GET with a separate Account Billing Read token. The zero-network readiness workflow must report `READY` before its one-time audit is used; no Cloudflare request has been made, and the audit remains unconsumed. Its subscription prices do not prove invoice totals or zero cost. The earlier D1/R2 usage audit is separate and remains unconsumed; its latest known readiness was blocked by missing credentials.
+
+Cloud Paper activation remains false. Production strategy registry is empty, Core100 quality is `REJECT`, macro context is `REGIME_UNAVAILABLE`, D1 is unprovisioned, and migrations are prepare-only. No Cloud Paper execution workflow, natural schedule, or controlled main acceptance exists. Account-wide usage freshness, external writer coverage, billing records, and D1 storage calibration remain open. FREE-ONLY / 0 USD, PAPER/LIVE-PAPER only; holdout, source switch, promotion, and real-money trading remain closed.
+
 Updated: 2026-09-29 (current Cloud Paper checkpoint below; historical stage notes retain their dated evidence).
 
-## Cloud Paper delivery checkpoint — 2026-09-29
+## Historical Cloud Paper checkpoint — 2026-09-29 (superseded by current checkpoint)
 
 Product-code evidence basis remains PR #622 merged to main `cb22d3c3905a079eb754f0fab6d917923512f624`. Documentation/status PRs #623–#626 subsequently merged; current main is `9d897b6d4fb7f7c783170c4c3bbf7bcbc4ca1e08`, with no open PRs at this checkpoint. These documentation PRs changed no runtime or authority. PR #624's main CI [36488331170](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36488331170) passed Python 3.12/3.13; CodeQL [36488331191](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36488331191), Dependency/SBOM [36488331181](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36488331181), and Freeze Guard [36488331166](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36488331166) passed. Workflow-static was skipped because no workflow changed.
 
