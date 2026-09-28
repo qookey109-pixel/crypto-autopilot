@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-r2-writer-inventory-v0.1",
   "updated_date": "2026-09-29",
-  "evidence_basis_main_sha": "4456dffe2d9440529a3c84221a2c1fb27b186513",
+  "evidence_basis_main_sha": "600bff79145908f9785427a66689c2f90322dfcf",
   "is_latest_main_claim": false,
   "scan": {
     "workflow_file_count": 87,
@@ -167,6 +167,17 @@
     "validated_in_pr_head": "446b8e8b9351f9e23337de7f575f9356662cb07d",
     "pull_request": 611,
     "pr_ci_status": "PASS",
-    "post_merge_ci_status": "NOT_RUN"
+    "post_merge_ci_status": "MAIN_600BFF7_CI_CODEQL_DEPENDENCY_FREEZE_SUCCESS; WORKFLOW_STATIC_NOT_APPLICABLE_TO_PUSH; PR611_HEAD_CI_PASS",
+    "post_merge_ci_evidence": {
+      "main_sha": "600bff79145908f9785427a66689c2f90322dfcf",
+      "ci_run_id": 36470768386,
+      "freeze_guard_run_id": 36470768445,
+      "codeql_run_id": 36470768329,
+      "dependency_security_run_id": 36470768305,
+      "workflow_static": "NOT_TRIGGERED_ON_PUSH; PR_HEAD_CHECK_PASSED",
+      "readiness_run_id": 36471242643,
+      "readiness_state": "BLOCKED_MISSING_READ_ONLY_CREDENTIAL",
+      "cloudflare_requests_performed": 0
+    }
   }
 }
