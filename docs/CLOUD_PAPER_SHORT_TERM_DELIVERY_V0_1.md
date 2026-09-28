@@ -1,7 +1,8 @@
 # Crypto Autopilot 短期交付目標
 
 - 文件日期：2026-09-29
-- 最新產品／CI 證據基準：PR #622 已合併至 main `cb22d3c3905a079eb754f0fab6d917923512f624`。狀態文件 PR #623、CI 驗收矩陣 PR #624 合併後 main 為 `9527d2c618240426db8d557505e9c024309bb6b1`；兩者均未改 runtime 或 authority。
+- 最新文件同步：PR #625 合併至 main `5efdc045690b320aed47a68e5ff52f0119f912a0`；文件更新未改 runtime 或 authority。
+- PR #625 合併至 main `5efdc045690b320aed47a68e5ff52f0119f912a0`，未改 runtime 或 authority。CI、CodeQL、Dependency/SBOM、Freeze Guard 均成功；Pages build 成功，deploy 與 browser-production 因文件變更而跳過；workflow-static 因未改 workflow 而跳過。
 - Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pixel/crypto-autopilot)
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
 - 歷史證據基準：PR #614 合併至 main `abda84a45de66dc214be40ce05ee0c2ccb79e415`；PR #618 Dashboard 部署證據維持獨立記錄。
