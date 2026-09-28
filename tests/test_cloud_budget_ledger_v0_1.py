@@ -212,6 +212,46 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
                 now_ms=third_ms, snapshot=snapshot(),
             )
 
+    def test_identical_settlement_retry_is_idempotent_but_mismatch_is_rejected(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        slot = paper_slot_id(NOW)
+        ledger.reserve_slot(
+            slot_id=slot, run_id="run-1", now_ms=NOW, snapshot=snapshot(),
+        )
+        usage = SlotUsage(provider_requests=1, class_a=1, class_b=1, new_bytes=1)
+
+        ledger.settle_slot(
+            slot_id=slot, completed_at_ms=NOW + 1, usage=usage,
+        )
+        # The first D1 statement may commit even if its response is lost.
+        # Replaying the exact verified usage must not turn that success into
+        # REVIEW_REQUIRED or change the settled counters.
+        ledger.settle_slot(
+            slot_id=slot, completed_at_ms=NOW + 2, usage=usage,
+        )
+
+        settled = client.connection.execute(
+            "SELECT state, actual_provider_requests, actual_class_a, "
+            "actual_class_b, actual_new_bytes "
+            "FROM cloud_paper_budget_reservations WHERE slot_id = ?",
+            (slot,),
+        ).fetchone()
+        self.assertEqual(
+            tuple(settled),
+            ("SETTLED", 1, 1, 1, 1),
+        )
+        with self.assertRaisesRegex(
+            BudgetBlocked, "BLOCKED_BUDGET_SETTLEMENT_REVIEW_REQUIRED"
+        ):
+            ledger.settle_slot(
+                slot_id=slot,
+                completed_at_ms=NOW + 3,
+                usage=SlotUsage(
+                    provider_requests=1, class_a=2, class_b=1, new_bytes=1,
+                ),
+            )
+
     def test_unsettled_slot_keeps_the_full_reservation(self):
         client = SQLiteQueryClient()
         ledger = self.make_ledger(client)
