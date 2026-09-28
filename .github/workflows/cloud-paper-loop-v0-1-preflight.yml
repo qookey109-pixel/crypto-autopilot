@@ -1,0 +1,58 @@
+name: Cloud Paper Loop V0.1 Non-Access Preflight
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloud-paper-loop-v0-1-preflight
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Emit non-access Cloud Paper readiness report
+        run: |
+          python scripts/preflight_cloud_paper_loop_v0_1.py \
+            --output cloud-paper-preflight/report.json
+
+      - name: Assert no runtime or persistence access
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("cloud-paper-preflight/report.json").read_text())
+          assert report["status"] == "DISABLED"
+          assert report["mode"] == "NON_ACCESS_PREFLIGHT_ONLY"
+          access = report["external_access"]
+          assert access["provider_requests_performed"] == 0
+          assert access["r2_access_performed"] is False
+          assert access["d1_access_performed"] is False
+          assert access["training_performed"] is False
+          assert access["holdout_accessed"] is False
+          PY
+
+      - name: Upload secret-free preflight report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: cloud-paper-nonaccess-preflight-${{ github.run_id }}-${{ github.run_attempt }}
+          path: cloud-paper-preflight/report.json
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Remove ephemeral report
+        if: always()
+        run: rm -rf -- cloud-paper-preflight
