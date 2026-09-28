@@ -13,7 +13,7 @@ Technical features, opportunity scoring and strategy routing reuse the existing 
 ## Discovered integration blockers
 1. The existing required macro regime needs canonical TOTAL3, BTC dominance and aligned breadth. The official Pionex public market endpoint list covers exchange market data and does not list these global market-cap metrics. A Pionex API key grants access to authenticated account/API scopes; it does not add global metrics to Pionex market data. The prior CoinPaprika one-shot authority expired on September 19 and does not authorize a new schedule. Missing context remains REGIME_UNAVAILABLE; no fake neutral snapshot or weakened regime gate is allowed.
 2. The production strategy registry is empty and Core100 remains REJECT. A research ranking is not execution eligibility.
-3. Existing checkpoint creation assumes a preceding account advance; new cash-only genesis must not fabricate a trade.
+3. Cash-only genesis is implemented in `src/crypto_autopilot/paper/cloud_genesis_v0_1.py`. GitHub CI verifies deterministic 10,000 USD cash, zero positions/trades, zero provider requests, and zero persistence writes during genesis. `run_cloud_step` accepts `previous_slot=None`; the production caller must prove from the complete append-only ledger that no account records exist before choosing this path. That production proof remains part of composition wiring and controlled acceptance.
 4. Shared-account R2 allowance evidence and implementation-bound activation are required before enabling the proposed cron.
 
 These are explicit product dependencies, not reasons to reinstate the cancelled seven-day/October 1 manual audits. Engineering integration tests use synthetic inputs only on GitHub CI; they must never be presented as production strategy evidence.
