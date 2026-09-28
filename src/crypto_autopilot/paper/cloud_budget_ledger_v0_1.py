@@ -9,6 +9,7 @@ import json
 import os
 import re
 import threading
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Protocol
@@ -176,11 +177,16 @@ class D1UsageGuard:
         self._reserved_storage_bytes = 0
         self._lock = threading.Lock()
 
+    def validate_evidence(self) -> None:
+        """Check current evidence without consuming a query reservation."""
+        with self._lock:
+            self._validate_evidence_at(self.clock_ms())
+
     def reserve_query(self) -> None:
         """Reserve one conservative query envelope before its external request."""
         with self._lock:
             now_ms = self.clock_ms()
-            self._validate_evidence(now_ms)
+            self._validate_evidence_at(now_ms)
             p, s = self.policy, self.snapshot
             if (
                 self._reserved_reads_day + p.rows_read_per_query
@@ -202,7 +208,7 @@ class D1UsageGuard:
             self._reserved_writes_day += p.rows_written_per_query
             self._reserved_storage_bytes += p.storage_growth_per_query_bytes
 
-    def _validate_evidence(self, now_ms: int) -> None:
+    def _validate_evidence_at(self, now_ms: int) -> None:
         s, p = self.snapshot, self.policy
         policy_values = (
             p.max_evidence_age_ms,
@@ -243,6 +249,13 @@ class D1UsageGuard:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_STALE")
 
 
+class D1QueryUsageBudgetGate(Protocol):
+    """Budget gate required by every external D1 query."""
+
+    def reserve_query(self) -> None:
+        """Reserve a conservative D1 request envelope or fail closed."""
+
+
 class _NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         raise D1LedgerUnavailable("D1_LEDGER_REDIRECT_REJECTED")
@@ -257,6 +270,7 @@ class CloudflareD1QueryClient:
         api_token: str,
         account_id: str,
         database_id: str,
+        usage_guard: D1QueryUsageBudgetGate,
         timeout_seconds: float = 10.0,
     ) -> None:
         if not api_token or any(ch in api_token for ch in "\r\n"):
@@ -265,11 +279,14 @@ class CloudflareD1QueryClient:
             raise D1LedgerUnavailable("D1_LEDGER_ACCOUNT_ID_INVALID")
         if not DATABASE_ID_RE.fullmatch(database_id):
             raise D1LedgerUnavailable("D1_LEDGER_DATABASE_ID_INVALID")
+        if not callable(getattr(usage_guard, "reserve_query", None)):
+            raise D1LedgerUnavailable("D1_LEDGER_USAGE_GUARD_MISSING")
         if not 0 < timeout_seconds <= 10:
             raise D1LedgerUnavailable("D1_LEDGER_TIMEOUT_INVALID")
         self._api_token = api_token
         self._account_id = account_id
         self._database_id = database_id
+        self._usage_guard = usage_guard
         self._timeout_seconds = timeout_seconds
 
     @classmethod
@@ -288,6 +305,7 @@ class CloudflareD1QueryClient:
             raise D1LedgerUnavailable("D1_LEDGER_QUERY_INVALID")
         if len(params) > 100:
             raise D1LedgerUnavailable("D1_LEDGER_PARAMETER_LIMIT")
+        self._usage_guard.reserve_query()
         payload = json.dumps(
             {"sql": sql, "params": [str(value) for value in params]},
             separators=(",", ":"),
