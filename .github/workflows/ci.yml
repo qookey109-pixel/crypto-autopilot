@@ -97,6 +97,12 @@ jobs:
       - name: Validate Cloud Paper R2 writer inventory (Python 3.12 only)
         if: ${{ matrix.python-version == '3.12' }}
         run: python scripts/validate_cloud_paper_r2_writer_inventory.py
+      - name: Verify Cloud Paper non-access preflight (Python 3.12 only)
+        if: ${{ matrix.python-version == '3.12' }}
+        run: |
+          python scripts/preflight_cloud_paper_loop_v0_1.py --output cloud-paper-preflight/report.json
+          python -c "import json; r=json.load(open('cloud-paper-preflight/report.json')); assert r['status'] == 'DISABLED' and r['external_access']['provider_requests_performed'] == 0 and r['external_access']['r2_access_performed'] is False and r['external_access']['d1_access_performed'] is False"
+          rm -rf -- cloud-paper-preflight
       - name: Unit test runner compatibility (Python 3.12 only)
         if: ${{ matrix.python-version == '3.12' }}
         run: python -m unittest discover -s tests -v
