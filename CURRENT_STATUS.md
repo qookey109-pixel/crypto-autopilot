@@ -18,7 +18,7 @@ Updated: 2026-09-29. This is the single human entrypoint for the current project
 - Cloud Paper `activation.enabled=false`；execution workflow／自然模擬排程／正式受控 main acceptance 均未啟用。維持 0 USD、PAPER／LIVE-PAPER ONLY、holdout/source switch/promotion/real-money trading 關閉。
 - 一次性 Core100 bootstrap [run 36110721415](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415) 已完成一次，報告 `PASS / CORE100_FINGERPRINT_V0_2_BASELINE_PUBLISHED`、model quality `REJECT`；3 個 immutable objects 與 latest pointer 完成 SHA-256 readback，零 provider requests、未碰 holdout。授權已消耗，禁止 rerun。
 
-下一步：取得可證明覆蓋範圍與 freshness 的帳戶級 D1/R2 usage source，盤點本 Repository 與帳戶內所有 D1 writers，核對 16 KiB/statement storage-growth envelope，並用正式 query metadata 校準實際讀寫／儲存。再按 96 slots、settlement、recovery/retry 重算 D1/R2 容量；證據通過前不套 migration、不 provision、不做受控 acceptance、不啟用排程。
+下一步：先取得可證明覆蓋範圍與 freshness 的帳戶級 D1/R2 usage source，盤點 Repository 與帳戶內所有 D1 writers，核對 16 KiB/statement storage-growth envelope，並用正式 query metadata 校準實際讀寫／儲存；按 96 slots、settlement、recovery/retry 重算 D1/R2 容量。平行完成資格門控的 production candidate adapter，讓 empty registry `NO_TRADE` 與測試限定的正向交易路徑都經相同 orchestration 驗收；定義 append-only R2 的容量警戒和 hard-stop 行為。所有證據通過前不套 migration、不 provision、不做受控 acceptance、不啟用排程。
 ## Live Cloud Paper checkpoint — 2026-09-28
 
 Evidence basis before this documentation update: `main=77138c1b1ce7c4b99555c6c5f35eaf66dd82c26a`; this is the reviewed parent for the global-context source decision map, not a latest-main claim after this update.
