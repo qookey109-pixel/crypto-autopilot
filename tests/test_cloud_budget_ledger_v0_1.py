@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sqlite3
 import threading
+from unittest.mock import patch
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -10,6 +11,10 @@ from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
     D1CloudBudgetLedger,
     D1LedgerLimits,
     D1QueryResult,
+    D1UsageGuard,
+    CloudflareD1QueryClient,
+    D1UsagePolicy,
+    D1UsageSnapshot,
     SlotUsage,
 )
 from crypto_autopilot.paper.cloud_budget_v0_1 import (
@@ -227,6 +232,101 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
             "SELECT reservation_count FROM cloud_paper_budget_meta WHERE singleton = 1"
         ).fetchone()[0]
         self.assertEqual(count, 2)
+
+
+class D1UsageGuardTests(unittest.TestCase):
+    def make_guard(self, *, snapshot_changes=None, policy_changes=None, clock_ms=NOW):
+        from dataclasses import replace
+
+        evidence = D1UsageSnapshot(
+            account_wide=True,
+            reservation_coverage_complete=True,
+            observed_at_ms=NOW,
+            measured_through_ms=NOW,
+            rows_read_day=0,
+            rows_written_day=0,
+            storage_bytes=0,
+        )
+        limits = D1UsagePolicy(
+            rows_read_per_day=200,
+            rows_written_per_day=20,
+            storage_bytes_total=50_000,
+            rows_read_per_query=100,
+            rows_written_per_query=2,
+            storage_growth_per_query_bytes=10,
+        )
+        if snapshot_changes:
+            evidence = replace(evidence, **snapshot_changes)
+        if policy_changes:
+            limits = replace(limits, **policy_changes)
+        return D1UsageGuard(
+            snapshot=evidence,
+            clock_ms=lambda: clock_ms,
+            policy=limits,
+        )
+
+    def test_query_reservations_accumulate_within_guard(self):
+        guard = self.make_guard()
+        guard.reserve_query()
+        guard.reserve_query()
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_ROWS_READ_DAILY_LIMIT"):
+            guard.reserve_query()
+
+    def test_missing_incomplete_stale_and_future_evidence_fail_closed(self):
+        cases = (
+            ({"account_wide": False}, NOW, "BLOCKED_D1_USAGE_EVIDENCE_INCOMPLETE"),
+            (
+                {"reservation_coverage_complete": False},
+                NOW,
+                "BLOCKED_D1_USAGE_EVIDENCE_INCOMPLETE",
+            ),
+            ({"measured_through_ms": NOW - 50_001}, NOW, "BLOCKED_D1_USAGE_EVIDENCE_STALE"),
+            ({"observed_at_ms": NOW + 1}, NOW, "BLOCKED_D1_USAGE_EVIDENCE_FROM_FUTURE"),
+            ({"rows_read_day": True}, NOW, "BLOCKED_D1_USAGE_EVIDENCE_UNKNOWN"),
+        )
+        for evidence, current, reason in cases:
+            with self.subTest(reason=reason):
+                guard = self.make_guard(snapshot_changes=evidence, clock_ms=current)
+                with self.assertRaisesRegex(BudgetBlocked, reason):
+                    guard.reserve_query()
+                self.assertEqual(guard._reserved_reads_day, 0)
+
+    def test_daily_write_and_storage_headroom_stop_before_reservation(self):
+        guard = self.make_guard(snapshot_changes={"rows_written_day": 19})
+        with self.assertRaisesRegex(
+            BudgetBlocked, "BLOCKED_D1_ROWS_WRITTEN_DAILY_LIMIT"
+        ):
+            guard.reserve_query()
+        self.assertEqual(guard._reserved_writes_day, 0)
+
+        guard = self.make_guard(snapshot_changes={"storage_bytes": 49_991})
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_STORAGE_HARD_STOP"):
+            guard.reserve_query()
+        self.assertEqual(guard._reserved_storage_bytes, 0)
+
+
+    def test_cloudflare_client_reserves_usage_before_http_request(self):
+        class RejectingGuard:
+            def reserve_query(self):
+                raise BudgetBlocked("BLOCKED_D1_ROWS_READ_DAILY_LIMIT")
+
+        client = CloudflareD1QueryClient(
+            api_token="test-token",
+            account_id="a" * 32,
+            database_id="00000000-0000-0000-0000-000000000001",
+            usage_guard=RejectingGuard(),
+        )
+        with patch("crypto_autopilot.paper.cloud_budget_ledger_v0_1.build_opener") as opener:
+            with self.assertRaisesRegex(
+                BudgetBlocked, "BLOCKED_D1_ROWS_READ_DAILY_LIMIT"
+            ):
+                client.query("SELECT 1", ())
+        opener.assert_not_called()
+
+    def test_invalid_policy_fails_closed(self):
+        guard = self.make_guard(policy_changes={"request_timeout_reserve_ms": 60_000})
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_USAGE_POLICY_INVALID"):
+            guard.reserve_query()
 
 
 if __name__ == "__main__":

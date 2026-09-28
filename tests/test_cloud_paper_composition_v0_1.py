@@ -180,11 +180,12 @@ def composition(
         if reservation_ledger == "default" else reservation_ledger
     )
 
-    def default_d1_usage_guard(tick_ms):
-        accesses.append("d1-evidence")
+    class FakeD1UsageGuard:
+        def validate_evidence(self):
+            accesses.append("d1-evidence")
 
     usage_guard = (
-        default_d1_usage_guard
+        FakeD1UsageGuard()
         if d1_usage_guard == "default" else d1_usage_guard
     )
     return CloudPaperNoTradeComposition(
@@ -256,15 +257,18 @@ class CloudPaperCompositionTests(unittest.TestCase):
     def test_d1_usage_evidence_gate_runs_before_atomic_slot_reservation(self):
         client, store, accesses = FakeClient(), MemoryStore(), []
 
-        def reject_stale_evidence(tick_ms):
-            accesses.append("d1-evidence")
-            raise BudgetBlocked("D1_USAGE_EVIDENCE_STALE")
+        class RejectStaleEvidence:
+            def validate_evidence(self):
+                accesses.append("d1-evidence")
+                raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_STALE")
+
+        reject_stale_evidence = RejectStaleEvidence()
         ledger = FakeReservationLedger(accesses)
         runtime = composition(
             client, store, accesses=accesses, reservation_ledger=ledger,
             d1_usage_guard=reject_stale_evidence,
         )
-        with self.assertRaisesRegex(BudgetBlocked, "D1_USAGE_EVIDENCE_STALE"):
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_USAGE_EVIDENCE_STALE"):
             runtime.run_slot(
                 tick_ms=NOW, previous_slot=None, activation_enabled=True,
                 run_id="run-test",
