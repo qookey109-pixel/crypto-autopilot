@@ -5,6 +5,22 @@
 - 文件定位：交付範圍與驗收清單；不授予新的 runtime 或資料存取權限。
 - 狀態：計畫文件。各批狀態以最新 main、PR checks 與版本化證據為準。
 
+## 最新驗收證據狀態 — 2026-09-28
+
+以下是證據分層；下方 `[ ]` 是**完整交付門檻**，不代表相關工程或合成測試完全沒有完成。
+
+| 項目 | 工程／合成證據 | 正式產品狀態 |
+|---|---|---|
+| 行情、候選、Paper loop、保存 | 已合併；完整循環 CI 與 empty-registry `NO_TRADE` 合成路徑通過 | 尚無正式 execution workflow 或受控 main run |
+| Provider／R2 guard | 共用 run-scoped guard 與 adapter hooks 已合併；合成檢查通過 | 帳戶級用量、freshness、全 writer coverage 未證明 |
+| D1 ledger | slot reservation 與成功結果 readback 後 settlement 已合併；失敗保留 reservation | D1 未 provision／bind；rows budget 仍未跨 query/run 協調；settlement recovery 未完成 |
+| 端到端正向路徑 | machine status 記錄 synthetic full-cycle CI `PASS` | 不能推論模型資格、策略獲利或可產生正式交易 |
+| Dashboard | main Pages build、deploy、browser-production 已驗證 | Cloud Paper runtime 未啟用，網站尚無正式循環報告可投影 |
+| Global context | CMC candidate 與指標映射僅 proposal | 未授權、未呼叫；`REGIME_UNAVAILABLE` 維持預期 fail-closed 狀態 |
+| 排程與交易資格 | 不適用 | 排程尚未建立；模型 `REJECT`、production strategy registry 為空，因此正式只可 `NO_TRADE` |
+
+查核基準：PR [#590](https://github.com/qookey109-pixel/crypto-autopilot/pull/590) 合併後 main `e3f94cd4b2d5a7262cc76382b93ae27316d44395`；合併後 Python 3.12／3.13、CodeQL、Freeze Guard、依賴安全、Pages build／deploy／browser-production 通過。這些結果不替代帳戶用量證據、受控 runtime acceptance 或自然排程驗收。
+
 ## 1. 本輪目標
 
 完成一個**可保存、可恢復、可追溯、看得懂**的雲端模擬循環：
