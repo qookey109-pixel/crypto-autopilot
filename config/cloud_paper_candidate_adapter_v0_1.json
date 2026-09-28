@@ -1,6 +1,6 @@
 {
   "schema": "qookey-cloud-paper-candidate-adapter-v0.1",
-  "status": "PREPARED_INTERFACE_ONLY",
+  "status": "QUALIFICATION_INTERFACE_NO_RUNTIME_AUTHORITY",
   "purpose": "Bind already-produced strategy outputs to a current versioned paper qualification and current Pionex market/router evidence; do not implement or select strategies.",
   "source": "config/cloud_paper_strategy_registry_v0_1.json plus same-slot cloud market report candidate_specs",
   "candidate_limit": 5,
@@ -37,7 +37,8 @@
     "qualification receipt SHA-256",
     "strategy implementation SHA-256",
     "LONG direction",
-    "entry/stop/target and risk plan consistency"
+    "entry/stop/target and risk plan consistency",
+    "risk-plan equity must match current verified paper account equity"
   ],
   "invalid_output": "REVIEW_REQUIRED; reject the entire candidate basket without ranking or partial selection",
   "production_registry_current_status": "EMPTY_NO_ELIGIBLE_STRATEGIES",
