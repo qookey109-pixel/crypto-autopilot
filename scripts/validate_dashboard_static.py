@@ -132,21 +132,32 @@ def main() -> int:
     cloud_budget = cloud_paper.get("budget") or {}
     if cloud_budget.get("monthly_budget_usd") != 0:
         raise RuntimeError("Cloud Paper monthly budget must remain zero")
-    if cloud_budget.get("account_wide_usage_evidence") != "MISSING":
-        raise RuntimeError("Cloud Paper shared-account usage evidence must remain missing")
+    if cloud_budget.get("account_wide_usage_evidence") != "REVIEW_REQUIRED_V0_2_DATASET_COVERAGE_INCOMPLETE":
+        raise RuntimeError("Cloud Paper usage evidence must reflect the V0.2 review-required report")
+    usage_audit = cloud_budget.get("usage_audit_evidence") or {}
+    if usage_audit.get("run_id") != 36584465739 or usage_audit.get("reason_code") != "DATASET_COVERAGE_INCOMPLETE":
+        raise RuntimeError("Cloud Paper usage audit provenance is missing or changed")
+    if usage_audit.get("r2_operations_state") != "LIMIT_REACHED" or usage_audit.get("r2_operations_group_count") != 10_000:
+        raise RuntimeError("Cloud Paper R2 operations limit evidence changed")
+    if usage_audit.get("r2_storage_state") != "PRESENT" or usage_audit.get("r2_storage_group_count") != 1_297:
+        raise RuntimeError("Cloud Paper R2 storage group evidence changed")
+    if usage_audit.get("account_wide_cost") != "UNKNOWN" or usage_audit.get("storage_headroom") != "UNKNOWN":
+        raise RuntimeError("partial usage evidence must not prove cost or headroom")
+    if cloud_budget.get("account_wide_writer_coverage") != "UNKNOWN":
+        raise RuntimeError("account-wide writer coverage must remain unknown")
     if cloud_budget.get("reservation_guard") != "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED":
         raise RuntimeError("Cloud Paper provider/R2 guard projection changed")
     if cloud_budget.get("d1_reservation_ledger") != "SHARED_LEDGER_CODE_PREPARED_MIGRATIONS_NOT_APPLIED_D1_NOT_PROVISIONED":
         raise RuntimeError("Cloud Paper D1 reservation ledger status changed")
-    if cloud_budget.get("d1_free_tier_usage_evidence") != "MISSING":
-        raise RuntimeError("Cloud Paper D1 free-tier evidence must remain missing")
+    if cloud_budget.get("d1_free_tier_usage_evidence") != "UNKNOWN_EMPTY_UNVERIFIED":
+        raise RuntimeError("Cloud Paper D1 empty result must remain unverified")
     capacity = cloud_budget.get("storage_capacity") or {}
-    if capacity.get("state") != "USAGE_UNKNOWN_BLOCKED":
-        raise RuntimeError("Cloud Paper storage usage must remain blocked while unknown")
+    if capacity.get("state") != "USAGE_PARTIAL_BLOCKED":
+        raise RuntimeError("Cloud Paper storage usage must remain blocked with partial evidence")
     if capacity.get("measured_storage_bytes") is not None:
         raise RuntimeError("unknown Cloud Paper storage usage must remain null, not zero")
-    if capacity.get("usage_evidence") != "MISSING_NOT_ZERO":
-        raise RuntimeError("Cloud Paper storage usage evidence semantics changed")
+    if capacity.get("usage_evidence") != "PARTIAL_R2_EVIDENCE_NOT_ZERO_OR_COMPLETE":
+        raise RuntimeError("Cloud Paper storage evidence must remain partial and nonzero-unproven")
     if capacity.get("report_object_max_bytes") != 262_144:
         raise RuntimeError("Cloud Paper per-object storage ceiling changed")
     if capacity.get("per_run_growth_max_bytes") != 2_097_152:
