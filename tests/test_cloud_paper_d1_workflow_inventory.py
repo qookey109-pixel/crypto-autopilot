@@ -83,6 +83,16 @@ class D1WorkflowInventoryTests(unittest.TestCase):
             )
         )
 
+    def test_detects_successor_usage_audit_entrypoint(self) -> None:
+        self.assertTrue(contains_d1_access_reference(
+            "python -m scripts.cloud_paper_usage_audit_v0_2 --output report.json"
+        ))
+
+    def test_ignores_successor_zero_network_readiness(self) -> None:
+        self.assertFalse(contains_d1_access_reference(
+            "python -m scripts.cloud_paper_usage_audit_v0_2 --readiness"
+        ))
+
     def test_detects_d1_analytics_dataset(self) -> None:
         self.assertTrue(
             contains_d1_access_reference("dataset: d1AnalyticsAdaptiveGroups")
