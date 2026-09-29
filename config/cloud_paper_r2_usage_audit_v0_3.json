@@ -1,0 +1,64 @@
+{
+  "schema": "qookey-cloud-paper-r2-usage-audit-v0.3",
+  "authority_status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "supersedes_execution_only": "config/cloud_paper_usage_audit_v0_2.json",
+  "purpose": "One-time account-wide R2 usage diagnostic using a lower-cardinality operations aggregation after V0.2 reached the 10000-group cap.",
+  "execution": {
+    "trigger": "workflow_dispatch_on_protected_main_only",
+    "maximum_workflow_runs": 1,
+    "maximum_attempts": 1,
+    "maximum_cloudflare_http_requests": 1,
+    "maximum_graphql_requests": 1,
+    "maximum_github_history_requests": 1,
+    "timeout_seconds": 20,
+    "retry_count": 0,
+    "pagination": false,
+    "history_check": "One Actions workflow-runs metadata request; prior or ambiguous V0.3 runs fail closed.",
+    "readiness": "Separate repeatable zero-network V0.3 readiness must report READY on current main.",
+    "account_id_source": "CLOUDFLARE_ACCOUNT_ID Secret; require nonempty equality with the same-named Variable before network access.",
+    "maximum_response_bytes": 33554432,
+    "redirects": "REJECT_NO_FOLLOW"
+  },
+  "query": {
+    "endpoint": "https://api.cloudflare.com/client/v4/graphql",
+    "account_scope": "accountTag_only_no_bucket_filter",
+    "window_days": 30,
+    "datasets": {
+      "r2_operations": {
+        "name": "r2OperationsAdaptiveGroups",
+        "dimensions": ["actionType"],
+        "maximum_groups": 100
+      },
+      "r2_storage": {
+        "name": "r2StorageAdaptiveGroups",
+        "dimensions": ["bucketName", "datetime"],
+        "maximum_groups": 10000,
+        "aggregate": "latest returned snapshot per bucket, names held in memory only"
+      }
+    },
+    "persist_raw_response": false,
+    "persist_account_id": false,
+    "persist_bucket_names": false
+  },
+  "result_semantics": {
+    "both_datasets_present_and_storage_fresh": "READY_FOR_REVIEW",
+    "empty_missing_invalid_capped_or_stale": "REVIEW_REQUIRED",
+    "operations_freshness": "UNKNOWN_QUERY_OMITS_DATETIME_DIMENSION",
+    "bucket_inventory_completeness": "UNKNOWN_NOT_PROVEN_BY_ANALYTICS_ALONE",
+    "d1_inventory_and_usage": "UNKNOWN_NOT_QUERIED",
+    "billing_and_zero_cost": "UNKNOWN_NOT_QUERIED",
+    "budget_activation": "NOT_AUTHORIZED_BY_THIS_AUDIT",
+    "cloud_paper_activation": "REMAINS_DISABLED"
+  },
+  "forbidden_operations": [
+    "Rerun V0.1, V0.2, or V0.3; retry or paginate Cloudflare requests.",
+    "List, read, write, or delete R2 objects; use S3 credentials.",
+    "D1 inventory, SQL, migration, provisioning, or writes.",
+    "Provider calls, market data, holdout, training, promotion, trading, or schedule activation.",
+    "Infer account-wide free headroom, every external writer, or zero cost from this R2-only analytics response."
+  ],
+  "source_urls": [
+    "https://developers.cloudflare.com/r2/platform/metrics-analytics/",
+    "https://developers.cloudflare.com/analytics/graphql-api/"
+  ]
+}
