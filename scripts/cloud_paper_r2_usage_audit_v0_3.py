@@ -21,7 +21,7 @@ MAX_RESPONSE_BYTES = 33_554_432
 REPORT_SCHEMA = "qookey-cloud-paper-r2-usage-report-v0.3"
 
 QUERY = """
-query CloudPaperR2UsageAudit($accountTag: string!, $startTime: Time, $endTime: Time) {
+query CloudPaperR2UsageAudit($accountTag: String!, $startTime: Time, $endTime: Time) {
   viewer {
     accounts(filter: { accountTag: $accountTag }) {
       r2Operations: r2OperationsAdaptiveGroups(
