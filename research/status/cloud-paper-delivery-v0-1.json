@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-29",
-  "evidence_basis_parent_main_sha": "f46cba365bd6e43f2c1389b376dda75776178d53",
+  "evidence_basis_parent_main_sha": "c3096a61b025bd995e6f4fa0e9cea963e302b533",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -493,5 +493,30 @@
     "zero_cost_conclusion": "UNKNOWN",
     "activation": "REMAINS_DISABLED",
     "one_time_authority": "CONSUMED_DO_NOT_RERUN"
+  },
+  "latest_usage_readiness_recovery": {
+    "first_integration_run_id": 36578030997,
+    "first_integration_result": "FAILED_MISSING_CHECKOUT_ZERO_CLOUDFLARE_REQUESTS",
+    "fix_pr": 638,
+    "verified_run_id": 36578765856,
+    "verified_run_attempt": 1,
+    "verified_main_sha": "c3096a61b025bd995e6f4fa0e9cea963e302b533",
+    "state": "READY_CONFIGURATION_PRESENT_ONLY",
+    "account_id_variable_present": true,
+    "read_only_token_secret_present": true,
+    "cloudflare_requests_performed": 0,
+    "api_permission_state": "NOT_CHECKED_NO_NETWORK",
+    "usage_evidence_state": "NOT_CHECKED_BY_READINESS",
+    "budget_activation_state": "NOT_AUTHORIZED_BY_READINESS",
+    "one_time_usage_audit_v0_1": "CONSUMED_DO_NOT_RERUN"
+  },
+  "latest_maintenance_cleanup": {
+    "natural_health_run_id": 36574961612,
+    "maintenance_run_id": 36575038880,
+    "inspect": "SUCCESS",
+    "propose": "MAIN_CHANGED",
+    "stale_draft_pr": 633,
+    "stale_draft_disposition": "CLOSED_UNMERGED_BRANCH_DELETED",
+    "natural_maintenance_acceptance": "NOT_COUNTED"
   }
 }
