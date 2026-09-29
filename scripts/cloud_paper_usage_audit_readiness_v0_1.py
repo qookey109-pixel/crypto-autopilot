@@ -5,10 +5,8 @@ import json
 import os
 
 
-def classify_configuration(account_id: str | None, token: str | None) -> dict[str, object]:
+def classify_configuration(account_present: bool, token_present: bool) -> dict[str, object]:
     """Check configuration presence only; never inspect or report credential values."""
-    account_present = bool(account_id)
-    token_present = bool(token)
     if account_present and token_present:
         state = "READY"
         reason = "CONFIGURATION_PRESENT"
@@ -37,8 +35,8 @@ def classify_configuration(account_id: str | None, token: str | None) -> dict[st
 
 def main() -> None:
     print(json.dumps(classify_configuration(
-        os.environ.get("CF_ACCOUNT_ID"),
-        os.environ.get("CF_READONLY_TOKEN"),
+        os.environ.get("CF_ACCOUNT_ID_PRESENT") == "true",
+        os.environ.get("CF_READONLY_TOKEN_PRESENT") == "true",
     ), sort_keys=True))
 
 
