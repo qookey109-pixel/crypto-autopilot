@@ -1,5 +1,12 @@
 # GitHub Actions operating map
 
+## Cloud Paper V0.2 manual diagnostics (2026-09-29)
+
+- [Usage Audit Readiness V0.2](../.github/workflows/cloud-paper-usage-audit-readiness-v0-2.yml) is repeatable, manual, and zero-network. It checks only configuration presence and Account ID Secret/Variable parity through booleans. `READY` does not prove API access, usage, billing, or activation.
+- [One-Time Usage Audit V0.2](../.github/workflows/cloud-paper-usage-audit-v0-2.yml) is manual-only and may run once from protected `main` after fresh V0.2 readiness. It performs at most one read-only GraphQL request, reports per-dataset completeness, and never accesses D1 SQL or R2 objects. Any first attempt consumes this V0.2 authority; V0.1 is already consumed.
+- Neither workflow is a schedule or Cloud Paper activation. Apply the [V0.2 contract](../config/cloud_paper_usage_audit_v0_2.json) and [protocol](CLOUD_PAPER_USAGE_AUDIT_V0_2.md) before dispatch.
+
+
 Navigation snapshot: 2026-09-23, observed against main `87ad32fd8f29a0c34bbf61ad11694fe4ef29df51`. Resolve main and Actions live before acting. This map is not execution authority and does not add schedules, dispatches or provider/R2 permissions.
 
 For the separate Codex check cadence, shared evidence fields and model handoff procedure, see the [continuation runbook](PROJECT_CONTINUATION_RUNBOOK.md).
