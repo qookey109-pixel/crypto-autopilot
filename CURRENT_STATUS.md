@@ -1,5 +1,10 @@
 # Current Operations Status
 
+## Cloud Paper R2 Usage Audit V0.3 — prepared, not dispatched (2026-09-29)
+
+V0.2 result evidence remains immutable: run 36584465739 returned `REVIEW_REQUIRED / DATASET_COVERAGE_INCOMPLETE` after one Cloudflare GraphQL request; its artifact is 11041290995. This delivery branch prepares a separate V0.3 contract with R2 operations grouped by action type, bounded storage aggregation, synthetic coverage, and a zero-network readiness workflow. It is not merged and has not made network requests. If merged, run fresh readiness first; a first V0.3 dispatch consumes the one-time authority even on failure. Never rerun V0.1/V0.2. R2-only analytics cannot prove invoice cost, D1 use, complete bucket inventory, external writers, or headroom. Cloud Paper stays disabled; FREE-ONLY / 0 USD, PAPER/LIVE-PAPER only.
+
+
 ## Cloud Paper Usage Audit V0.2 result (2026-09-29)
 
 Evidence-basis parent main: `21d37a44c6f3c5bba340908705488a05e7a5f7c7`; resolve live `main` before further action. `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
