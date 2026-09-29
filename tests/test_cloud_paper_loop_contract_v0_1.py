@@ -4,6 +4,7 @@ from pathlib import Path
 import unittest
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import CloudBudgetPolicy
+from crypto_autopilot.paper.cloud_loop_v0_1 import MAXIMUM_START_DELAY_MS
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -14,6 +15,10 @@ class CloudPaperLoopContractTests(unittest.TestCase):
         self.assertFalse(policy["activation"]["enabled"])
         self.assertEqual(policy["schedule"]["cron_utc"], "7,22,37,52 * * * *")
         self.assertEqual(policy["schedule"]["maximum_slots_per_utc_day"], 96)
+        self.assertEqual(
+            policy["schedule"]["stale_start_max_seconds"] * 1000,
+            MAXIMUM_START_DELAY_MS,
+        )
         self.assertEqual(policy["account"]["initial_equity_usd"], 10000)
         self.assertEqual(policy["budget"]["monthly_budget_usd"], 0)
         self.assertEqual(policy["budget"]["provider_requests_per_run"], 3 + 5 + 2 * 5)

@@ -192,7 +192,7 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "SLOT_ID_INVALID"):
             ledger.reserve_slot(
                 slot_id=paper_slot_id(NOW), run_id="run-off-schedule",
-                now_ms=NOW + 1, snapshot=snapshot(),
+                now_ms=NOW + 600001, snapshot=snapshot(at_ms=NOW + 600001),
             )
         self.assertEqual(
             client.connection.execute(
@@ -200,6 +200,45 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
             ).fetchone()[0],
             0,
         )
+
+    def test_delayed_reservation_uses_actual_clock_and_unique_canonical_slot(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client, max_evidence_age_ms=60000)
+        started = NOW + 120000
+        slot = paper_slot_id(NOW)
+        ledger.reserve_slot(
+            slot_id=slot, run_id="delayed", now_ms=started,
+            snapshot=snapshot(at_ms=started),
+        )
+        row = client.connection.execute(
+            "SELECT slot_id, reserved_at_ms, measured_through_ms "
+            "FROM cloud_paper_budget_reservations",
+        ).fetchone()
+        self.assertEqual(tuple(row), (slot, started, started))
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
+            ledger.reserve_slot(
+                slot_id=slot, run_id="duplicate", now_ms=started + 1,
+                snapshot=snapshot(at_ms=started + 1),
+            )
+
+    def test_delayed_reservation_preserves_future_stale_and_slot_guards(self):
+        cases = (
+            (NOW + 120000, snapshot(), "EVIDENCE_STALE"),
+            (NOW + 120000, snapshot(at_ms=NOW + 120001), "EVIDENCE_FROM_FUTURE"),
+            (NOW - 1, snapshot(at_ms=NOW - 1), "SLOT_ID_INVALID"),
+            (NOW + 600001, snapshot(at_ms=NOW + 600001), "SLOT_ID_INVALID"),
+            (NOW + SLOT_MS, snapshot(at_ms=NOW + SLOT_MS), "SLOT_ID_INVALID"),
+        )
+        for started, evidence, reason in cases:
+            with self.subTest(started=started, reason=reason):
+                client = SQLiteQueryClient()
+                ledger = self.make_ledger(client, max_evidence_age_ms=60000)
+                with self.assertRaisesRegex(BudgetBlocked, reason):
+                    ledger.reserve_slot(
+                        slot_id=paper_slot_id(NOW), run_id="invalid",
+                        now_ms=started, snapshot=evidence,
+                    )
+                self.assertEqual(client.query_plans, [])
 
     def test_bounded_d1_read_envelope_fits_96_slot_two_query_ceiling(self):
         per_query = D1UsagePolicy().rows_read_per_query

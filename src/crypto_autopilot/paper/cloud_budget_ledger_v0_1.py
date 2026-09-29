@@ -16,7 +16,11 @@ from typing import Protocol
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
-from crypto_autopilot.paper.cloud_loop_v0_1 import slot_id as canonical_cloud_slot_id
+from crypto_autopilot.paper.cloud_loop_v0_1 import (
+    SLOT_MS,
+    SLOT_OFFSET_MS,
+    validate_slot_start,
+)
 from crypto_autopilot.paper.cloud_budget_v0_1 import (
     BudgetBlocked,
     CloudBudgetPolicy,
@@ -816,12 +820,20 @@ class D1CloudBudgetLedger:
         now_ms: int,
         snapshot: R2UsageSnapshot,
     ) -> None:
-        if not slot_id or len(slot_id) > 80 or not run_id or len(run_id) > 100:
+        if (
+            not isinstance(slot_id, str) or not slot_id.isascii()
+            or not slot_id.isdigit() or len(slot_id) > 20
+            or str(int(slot_id)) != slot_id
+            or not isinstance(run_id, str) or not run_id or len(run_id) > 100
+        ):
             raise BudgetBlocked("BLOCKED_BUDGET_SLOT_ID_INVALID")
         if type(now_ms) is not int or now_ms < 0:
             raise BudgetBlocked("BLOCKED_BUDGET_CLOCK_INVALID")
         try:
-            expected_slot_id = canonical_cloud_slot_id(now_ms)
+            expected_slot_id = validate_slot_start(
+                scheduled_at_ms=int(slot_id) * SLOT_MS + SLOT_OFFSET_MS,
+                started_at_ms=now_ms,
+            )
         except ValueError:
             raise BudgetBlocked("BLOCKED_BUDGET_SLOT_ID_INVALID") from None
         if slot_id != expected_slot_id:
