@@ -1,0 +1,59 @@
+{
+  "schema": "qookey-cloud-paper-usage-audit-v0.2-result-receipt",
+  "frozen_at_utc": "2026-09-29T14:41:00Z",
+  "source": {
+    "repository": "qookey109-pixel/crypto-autopilot",
+    "workflow": ".github/workflows/cloud-paper-usage-audit-v0-2.yml",
+    "run_id": 36584465739,
+    "run_attempt": 1,
+    "event": "workflow_dispatch",
+    "head_sha": "21d37a44c6f3c5bba340908705488a05e7a5f7c7",
+    "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36584465739",
+    "conclusion": "failure",
+    "job": "audit",
+    "report_step": "success",
+    "artifact_step": "success",
+    "artifact_id": 11041290995,
+    "artifact_name": "cloud-paper-usage-audit-v0-2-36584465739-1",
+    "artifact_digest": "sha256:9ece6ff0a937f930d1137b2539052833bb5d94960dff8c1e50cce4cdbdadc258",
+    "artifact_retention_until_utc": "2026-10-06T14:41:00Z"
+  },
+  "report": {
+    "status": "REVIEW_REQUIRED",
+    "reason_code": "DATASET_COVERAGE_INCOMPLETE",
+    "cloudflare_http_requests_performed": 1,
+    "window_start_utc": "2026-08-30T14:40:55.124299+00:00",
+    "window_end_utc": "2026-09-29T14:40:55.124299+00:00",
+    "observed_at_utc": "2026-09-29T14:41:00.239158+00:00",
+    "dataset_group_counts": {
+      "d1Rows": 0,
+      "d1Storage": 0,
+      "r2Operations": 10000,
+      "r2Storage": 1297
+    },
+    "dataset_states": {
+      "d1Rows": "EMPTY_UNVERIFIED",
+      "d1Storage": "EMPTY_UNVERIFIED",
+      "r2Operations": "LIMIT_REACHED",
+      "r2Storage": "PRESENT"
+    },
+    "account_identifiers_persisted": false,
+    "database_or_bucket_names_persisted": false,
+    "raw_response_persisted": false,
+    "zero_cost_conclusion": "UNKNOWN",
+    "activation": "REMAINS_DISABLED"
+  },
+  "interpretation": {
+    "d1_empty_is_zero_usage_proof": false,
+    "d1_account_wide_provisioning_state": "UNKNOWN",
+    "r2_operations_complete": false,
+    "r2_storage_aggregate_bytes": "NOT_REPORTED_ON_INCOMPLETE_DATASET",
+    "account_wide_cost": "UNKNOWN",
+    "shared_account_writer_coverage": "UNKNOWN_NOT_PROVEN",
+    "cloud_paper_activation": "DISABLED",
+    "v0_1_run_consumed": "36558934727",
+    "v0_2_run_consumed": true,
+    "v0_2_rerun_authorized": false
+  },
+  "next_step": "Use a separately versioned, bounded successor to query R2 operations grouped by action type only, and independently resolve D1 account inventory and billing/charge evidence. Preserve V0.1 and V0.2 results."
+}
