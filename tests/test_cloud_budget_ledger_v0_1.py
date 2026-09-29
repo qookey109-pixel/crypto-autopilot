@@ -221,6 +221,31 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
                 snapshot=snapshot(at_ms=started + 1),
             )
 
+    def test_delayed_cross_midnight_reservation_uses_actual_day_budget(self):
+        day_start = (NOW // 86400000 + 1) * 86400000
+        scheduled = day_start - 8 * 60000
+        started = day_start + 60000
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client, r2_class_a_per_day=2)
+        evidence = snapshot(at_ms=started)
+        ledger.reserve_slot(
+            slot_id=paper_slot_id(scheduled), run_id="delayed-prior-day",
+            now_ms=started, snapshot=evidence,
+        )
+        # The prior day's delayed slot already consumed today's envelope.
+        next_start = day_start + SLOT_OFFSET_MS
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_REJECTED"):
+            ledger.reserve_slot(
+                slot_id=paper_slot_id(next_start), run_id="same-actual-day",
+                now_ms=next_start, snapshot=evidence,
+            )
+        self.assertEqual(
+            client.connection.execute(
+                "SELECT COUNT(*) FROM cloud_paper_budget_reservations"
+            ).fetchone()[0],
+            1,
+        )
+
     def test_delayed_reservation_preserves_future_stale_and_slot_guards(self):
         cases = (
             (NOW + 120000, snapshot(), "EVIDENCE_STALE"),

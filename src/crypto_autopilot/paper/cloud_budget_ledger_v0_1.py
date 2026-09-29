@@ -230,8 +230,8 @@ class D1UsagePolicy:
     rows_read_per_day: int = 4_000_000
     rows_written_per_day: int = 75_000
     storage_bytes_total: int = 4_000_000_000
-    # At most 31 * 96 = 2,976 canonical Paper slots are scanned; reserve
-    # 1,024 additional rows for query/index/metadata overhead and fail closed
+    # Include start jitter and inclusive endpoints: at most 2,977 slots; reserve
+    # 1,023 additional rows for query/index/metadata overhead and fail closed
     # when Cloudflare reports more than this bound.
     rows_read_per_query: int = 4_000
     rows_written_per_query: int = 10
