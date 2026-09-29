@@ -17,6 +17,7 @@ from crypto_autopilot.paper.run_coordinator_v0_1 import (
 
 SLOT_MS = 900_000
 SLOT_OFFSET_MS = 420_000
+MAXIMUM_START_DELAY_MS = 600_000
 
 
 class CloudLoopReviewRequired(ValueError):
@@ -47,6 +48,8 @@ class CompleteTapePionexFeed:
         book = self.client.get_order_book(symbol, limit=self.policy.order_book_depth_limit)
         self.before_request()
         trades = self.client.get_recent_trades(symbol, limit=500)
+        if not trades:
+            raise CloudLoopReviewRequired("TRADE_TAPE_EMPTY_UNPROVEN")
         if len(trades) >= 500:
             raise CloudLoopReviewRequired("TRADE_TAPE_PAGE_SATURATED")
         if any(t.symbol != symbol or not t.trade_id or t.price <= 0
@@ -55,7 +58,7 @@ class CompleteTapePionexFeed:
         if len({t.trade_id for t in trades}) != len(trades):
             raise CloudLoopReviewRequired("TRADE_TAPE_DUPLICATE")
         causal = [t for t in trades if since_ms < t.time_ms <= tick_time_ms]
-        if trades and min(t.time_ms for t in trades) > since_ms:
+        if min(t.time_ms for t in trades) > since_ms:
             raise CloudLoopReviewRequired("TRADE_TAPE_GAP_UNPROVEN")
         if not book.bids or not book.asks:
             raise CloudLoopReviewRequired("EMPTY_ORDER_BOOK")
@@ -88,6 +91,16 @@ def slot_id(tick_ms: int) -> str:
     if tick_ms % SLOT_MS != SLOT_OFFSET_MS:
         raise CloudLoopReviewRequired("OFF_SCHEDULE_TICK")
     return str((tick_ms - SLOT_OFFSET_MS) // SLOT_MS)
+
+
+def validate_slot_start(*, scheduled_at_ms: int, started_at_ms: int) -> str:
+    """Bind a real start to one canonical slot without rounding or backfill."""
+    slot = slot_id(scheduled_at_ms)
+    if type(started_at_ms) is not int or started_at_ms < scheduled_at_ms:
+        raise CloudLoopReviewRequired("INVALID_SLOT_START")
+    if started_at_ms - scheduled_at_ms > MAXIMUM_START_DELAY_MS:
+        raise CloudLoopReviewRequired("STALE_SLOT_START")
+    return slot
 
 
 def committed_report(
@@ -262,6 +275,7 @@ def run_cloud_step(
     strategy_registry: Mapping[str, object],
     before_external: Callable[[], None],
     run_name: str = "cloud-paper-v0-1",
+    scheduled_at_ms: int | None = None,
 ) -> dict[str, object]:
     """One claimed slot, with exact prior-result chaining and immutable readback.
 
@@ -271,7 +285,11 @@ def run_cloud_step(
     The callbacks also allow cloud CI to exercise the full positive path without
     putting test strategy evidence in a production registry.
     """
-    slot = slot_id(tick_ms)
+    # tick_ms is the actual observation/lifecycle clock. The optional schedule
+    # timestamp identifies the immutable slot only; old exact-tick callers retain
+    # their existing behavior. Never round a delayed historical slot forward.
+    scheduled_at_ms = tick_ms if scheduled_at_ms is None else scheduled_at_ms
+    slot = validate_slot_start(scheduled_at_ms=scheduled_at_ms, started_at_ms=tick_ms)
     if strategy_registry.get("schema") != "qookey-cloud-paper-strategy-registry-v0.1":
         raise CloudLoopReviewRequired("INVALID_STRATEGY_REGISTRY")
     registrations = strategy_registry.get("strategies")
@@ -306,7 +324,8 @@ def run_cloud_step(
     verify_live_paper_state(state)
     before_external()
     store.put_json_if_absent("cloud-slot", slot, {
-        "slot_id": slot, "tick_ms": tick_ms, "previous_slot": previous_slot,
+        "slot_id": slot, "tick_ms": tick_ms, "scheduled_at_ms": scheduled_at_ms,
+        "previous_slot": previous_slot,
         "previous_state_id": state["state_id"], "run_name": run_name,
     })
     # An unsealed claim is never taken over, even if the request is identical.
@@ -356,6 +375,7 @@ def run_cloud_step(
             else "COMMITTED" if candidates or state["active_session"] else "NO_TRADE"
         ),
         "slot_id": slot, "previous_slot": previous_slot, "tick_ms": tick_ms,
+        "scheduled_at_ms": scheduled_at_ms,
         "market": market, "candidate_count": len(candidates),
         "coordinator": report,
         "operation_counts": {

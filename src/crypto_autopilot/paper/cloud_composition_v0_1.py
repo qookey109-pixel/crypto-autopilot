@@ -29,7 +29,7 @@ from crypto_autopilot.paper.cloud_loop_v0_1 import (
     committed_report,
     digest,
     run_cloud_step,
-    slot_id,
+    validate_slot_start,
 )
 from crypto_autopilot.paper.cloud_market_v0_1 import (
     PublicMarketClient,
@@ -216,8 +216,13 @@ class CloudPaperNoTradeComposition:
         previous_slot: str | None,
         activation_enabled: bool = False,
         run_id: str | None = None,
+        scheduled_at_ms: int | None = None,
     ) -> dict[str, object]:
-        """Run one explicitly enabled no-trade slot; default is side-effect free."""
+        """Run a slot using actual tick_ms for market, lifecycle and budget time.
+
+        scheduled_at_ms identifies its canonical slot; delayed starts must pass
+        it explicitly. Omission retains exact-tick compatibility. Default is off.
+        """
         if type(activation_enabled) is not bool:
             raise CloudPaperCompositionBlocked("ACTIVATION_FLAG_INVALID")
         if not activation_enabled:
@@ -240,7 +245,10 @@ class CloudPaperNoTradeComposition:
             )
         if not isinstance(run_id, str) or not run_id or len(run_id) > 100:
             raise CloudPaperCompositionBlocked("RUN_ID_INVALID")
-        slot = slot_id(tick_ms)
+        scheduled_at_ms = tick_ms if scheduled_at_ms is None else scheduled_at_ms
+        slot = validate_slot_start(
+            scheduled_at_ms=scheduled_at_ms, started_at_ms=tick_ms,
+        )
         # D1 itself is an external access: require fresh account-wide D1 usage
         # evidence, then atomically reserve the R2/provider envelope before any
         # provider or R2 request. The disabled-by-default path never gets here.
@@ -275,6 +283,7 @@ class CloudPaperNoTradeComposition:
         )
         result = run_cloud_step(
             tick_ms=tick_ms,
+            scheduled_at_ms=scheduled_at_ms,
             previous_slot=previous_slot,
             store=self.store,
             feed=feed,

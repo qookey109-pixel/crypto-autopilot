@@ -9,6 +9,7 @@ from crypto_autopilot.paper.cloud_loop_v0_1 import (
     CompleteTapePionexFeed,
     run_cloud_step,
     slot_id,
+    validate_slot_start,
 )
 from crypto_autopilot.paper.live_v0_1 import LivePaperMarketFrame, LivePaperPolicy
 from crypto_autopilot.risk import plan_position_size
@@ -150,6 +151,31 @@ class CloudPaperLoopTests(unittest.TestCase):
         self.assertEqual(first["state"], "COMMITTED")
         self.assertEqual(first["account"]["open_position_count"], 1)
 
+        # An empty tape during an active position must leave the prior account
+        # and result intact, retaining the failed slot claim for review.
+        failed_store = MemoryStore()
+        failed_store.objects = dict(store.objects)
+        prior_objects = dict(failed_store.objects)
+        with self.assertRaisesRegex(CloudLoopReviewRequired, "TRADE_TAPE_EMPTY_UNPROVEN"):
+            run_cloud_step(
+                tick_ms=1320000, previous_slot="0", store=failed_store,
+                feed=CompleteTapePionexFeed(
+                    client=TapeClient([]), policy=LivePaperPolicy(),
+                    before_request=lambda: None,
+                ),
+                market_supplier=lambda: {"provider_requests_performed": 0},
+                candidate_supplier=lambda market, state: (),
+                strategy_registry=registry, before_external=lambda: None,
+            )
+        for key, value in prior_objects.items():
+            self.assertEqual(failed_store.objects[key], value)
+        self.assertIn(("cloud-slot", "1"), failed_store.objects)
+        self.assertNotIn(("cloud-result", "1"), failed_store.objects)
+        self.assertEqual(
+            {key for key in failed_store.objects if key[0] == "live-state"},
+            {key for key in prior_objects if key[0] == "live-state"},
+        )
+
         second = run_cloud_step(
             tick_ms=1320000, previous_slot="0", store=store, feed=Frames(),
             market_supplier=lambda: {"context_status": "REGIME_UNAVAILABLE",
@@ -177,6 +203,43 @@ class CloudPaperLoopTests(unittest.TestCase):
         self.assertEqual(slot_id(1320000), "1")
         with self.assertRaisesRegex(CloudLoopReviewRequired, "OFF_SCHEDULE"):
             slot_id(420001)
+
+    def test_delayed_start_keeps_slot_identity_and_uses_actual_lifecycle_time(self):
+        store = MemoryStore()
+        def delayed_step(tick):
+            return run_cloud_step(
+                tick_ms=tick, scheduled_at_ms=420000, previous_slot=None,
+                store=store, feed=NeverCalledFeed(),
+                market_supplier=lambda: {"provider_requests_performed": 0},
+                candidate_supplier=lambda market, state: (),
+                strategy_registry=REGISTRY, before_external=lambda: None,
+            )
+        first = delayed_step(540000)
+        self.assertEqual(first["slot_id"], "0")
+        self.assertEqual(first["scheduled_at_ms"], 420000)
+        self.assertEqual(first["tick_ms"], 540000)
+        self.assertEqual(first["coordinator"]["run_step"]["tick_time_ms"], 540000)
+        objects = dict(store.objects)
+        replay = delayed_step(550000)
+        self.assertEqual(replay["state"], "REPLAYED")
+        self.assertEqual(replay["report"], first)
+        self.assertEqual(store.objects, objects)
+
+    def test_slot_start_bounds_preserve_canonical_timestamp_validation(self):
+        for delay in (0, 1, 120000, 600000):
+            self.assertEqual(
+                validate_slot_start(scheduled_at_ms=420000, started_at_ms=420000 + delay),
+                "0",
+            )
+        for start, reason in (
+            (419999, "INVALID_SLOT_START"), (True, "INVALID_SLOT_START"),
+            (420000.0, "INVALID_SLOT_START"), (1020001, "STALE_SLOT_START"),
+        ):
+            with self.subTest(start=start):
+                with self.assertRaisesRegex(CloudLoopReviewRequired, reason):
+                    validate_slot_start(scheduled_at_ms=420000, started_at_ms=start)
+        with self.assertRaisesRegex(CloudLoopReviewRequired, "OFF_SCHEDULE_TICK"):
+            validate_slot_start(scheduled_at_ms=420001, started_at_ms=540000)
 
     def test_empty_registry_runs_audited_no_trade_and_restarts(self):
         store = MemoryStore()
@@ -333,6 +396,15 @@ class CompleteTapeFeedTests(unittest.TestCase):
         self.assertEqual(frame.source_trade_count, 1)
         self.assertEqual(frame.provider_request_count, 2)
         self.assertEqual(client.calls[1], ("trades", 500))
+
+    def test_empty_tape_cannot_infer_interval_from_order_book(self):
+        client = TapeClient([])
+        feed = CompleteTapePionexFeed(
+            client=client, policy=LivePaperPolicy(), before_request=lambda: None,
+        )
+        with self.assertRaisesRegex(CloudLoopReviewRequired, "TRADE_TAPE_EMPTY_UNPROVEN"):
+            feed.fetch_frame("BTC_USDT_PERP", tick_time_ms=TICK, since_ms=TICK-1000)
+        self.assertEqual(client.calls, ["book", ("trades", 500)])
 
     def test_gap_and_saturated_pages_fail_closed(self):
         for rows, reason in (

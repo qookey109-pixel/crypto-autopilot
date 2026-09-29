@@ -7,7 +7,7 @@ from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime
 from unittest.mock import patch
 
-from crypto_autopilot.features.market import OrderBookSnapshot
+from crypto_autopilot.features.market import OrderBookSnapshot, PublicTrade
 from crypto_autopilot.models import BookTicker, Candle, MarketTicker
 from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
     D1LedgerUnavailable,
@@ -191,8 +191,7 @@ REGISTRY = {
 }
 
 
-def make_budget_guard(policy=CloudBudgetPolicy()):
-    now_ms = NOW
+def make_budget_guard(policy=CloudBudgetPolicy(), *, now_ms=NOW):
     return CloudBudgetGuard(
         snapshot=R2UsageSnapshot(
             account_wide=True,
@@ -260,6 +259,56 @@ class CloudPaperCompositionTests(unittest.TestCase):
         self.assertEqual(client.calls, [])
         self.assertEqual(store.calls, [])
         self.assertEqual(accesses, [])
+
+    def test_delayed_slot_uses_fresh_actual_time_for_market_budget_and_state(self):
+        started_at = NOW + 120000
+
+        class DelayedClient(FakeClient):
+            def list_perpetual_book_tickers(self):
+                return [
+                    replace(book, timestamp_ms=started_at)
+                    for book in super().list_perpetual_book_tickers()
+                ]
+
+        client, store = DelayedClient(), MemoryStore()
+        ledger = FakeReservationLedger()
+        runtime = replace(
+            composition(
+                client, store, guard=make_budget_guard(now_ms=started_at),
+                reservation_ledger=ledger,
+            ),
+            completion_clock_ms=lambda: started_at + 1,
+        )
+        result = runtime.run_slot(
+            tick_ms=started_at, scheduled_at_ms=NOW, previous_slot=None,
+            activation_enabled=True, run_id="delayed-run",
+        )
+        self.assertEqual(result["state"], "NO_TRADE")
+        self.assertEqual(result["tick_ms"], started_at)
+        self.assertEqual(result["scheduled_at_ms"], NOW)
+        self.assertEqual(result["coordinator"]["run_step"]["tick_time_ms"], started_at)
+        self.assertEqual(result["slot_id"], str((NOW - 420000) // 900000))
+        self.assertEqual(ledger.reservations[0][2], started_at)
+        self.assertEqual(ledger.reservations[0][3].observed_at_ms, started_at)
+        self.assertEqual(ledger.settlements[0][1], started_at + 1)
+        self.assertNotEqual(result["market"]["market_status"], "REVIEW_REQUIRED")
+
+    def test_invalid_slot_starts_stop_before_any_external_access(self):
+        for tick, scheduled in (
+            (NOW - 1, NOW), (NOW + 600001, NOW),
+            (NOW + 900000, NOW), (NOW + 120000, NOW + 1),
+        ):
+            with self.subTest(tick=tick, scheduled=scheduled):
+                client, store, accesses = FakeClient(), MemoryStore(), []
+                runtime = composition(client, store, accesses=accesses)
+                with self.assertRaises(CloudLoopReviewRequired):
+                    runtime.run_slot(
+                        tick_ms=tick, scheduled_at_ms=scheduled,
+                        previous_slot=None, activation_enabled=True, run_id="invalid",
+                    )
+                self.assertEqual(client.calls, [])
+                self.assertEqual(store.calls, [])
+                self.assertEqual(accesses, [])
 
     def test_nonempty_registry_fails_before_external_access(self):
         client, store, accesses = FakeClient(), MemoryStore(), []
@@ -597,7 +646,18 @@ class CloudPaperCompositionTests(unittest.TestCase):
 
             def get_recent_trades(self, requested_symbol, *, limit):
                 self.calls.append(("trades", requested_symbol, limit))
-                return []
+                price = 340.05 if self.tick_ms == NOW else 346.05
+                # Explicit synthetic tape covers the candidate and prior tick;
+                # an empty list cannot prove interval continuity.
+                return [
+                    PublicTrade(
+                        symbol=requested_symbol, trade_id=f"{self.tick_ms}-{index}",
+                        price=price, size=1.0, side="BUY", time_ms=timestamp,
+                    )
+                    for index, timestamp in enumerate((
+                        NOW - 2 * HOUR_MS, self.tick_ms - 1,
+                    ))
+                ]
 
         client, store, accesses = MovingClient(), MemoryStore(), []
         base_analyze = analyze_capture
