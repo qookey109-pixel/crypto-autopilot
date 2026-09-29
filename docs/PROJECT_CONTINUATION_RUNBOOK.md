@@ -1,8 +1,15 @@
 # 專案接續與排程手冊
 
-## Cloud Paper R2 Usage Audit V0.3 — prepared, not dispatched (2026-09-29)
+## Cloud Paper R2 Usage Audit V0.3 result (2026-09-29)
 
-V0.2 run [36584465739](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36584465739) returned `REVIEW_REQUIRED / DATASET_COVERAGE_INCOMPLETE` after one Cloudflare GraphQL request; preserve its [artifact 11041290995](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36584465739/artifacts/11041290995). This branch prepares a separately versioned R2-only V0.3 audit. It is not merged and has made no network requests. After merge, run the V0.3 zero-network readiness check; only fresh `READY` permits the single dispatch. A first dispatch consumes V0.3 even if it fails; never rerun it. V0.3 cannot prove zero cost, D1 inventory/use, complete bucket inventory, all account writers, or headroom. Keep Cloud Paper disabled and preserve FREE-ONLY / 0 USD, PAPER/LIVE-PAPER only.
+Evidence-basis main: `2516a80c32fa04b9789bef379b108eb50c87fd49`; live Repository `main` remains the formal authority. `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
+
+- Zero-network readiness [run 36592944801](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36592944801) reported `READY`, with zero Cloudflare requests and boolean-only credential presence checks.
+- One-time R2-only audit [run 36593296360](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36593296360), attempt 1 on this main, completed successfully with `READY_FOR_REVIEW / R2_METRICS_CAPTURED_REVIEW_ONLY`; exactly one Cloudflare GraphQL request was accepted. Preserve [artifact 11045150561](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36593296360/artifacts/11045150561) (digest `sha256:581514f59892b84520e52ef463e00210e4175952cc0d54af7fda42b18c71c1be`) and [safe result receipt](../research/receipts/2026-09-29-cloud-paper-r2-usage-audit-v0-3-result.json).
+- Reported R2 operations: 6 groups / 125,309 requests / 30 days; freshness unknown. Storage: 1,298 groups; latest-per-returned-bucket summary covers one returned bucket with 16,304 objects and 616,541,780 total bytes; latest snapshot 2026-09-29 15:20 UTC.
+- V0.3 cannot establish D1 use, invoices or metered fees, zero cost, complete bucket inventory, all account writers, or storage headroom. The 8 GB value remains a configured ceiling, not an observed free-tier margin. V0.3's one-time authority is consumed; never rerun. Keep Cloud Paper disabled and FREE-ONLY / 0 USD, PAPER/LIVE-PAPER only.
+- Next gate: separately define least-privilege evidence for D1 and current billing, then prove account storage/writer coverage. No activation or runtime schedule change is authorized by this audit.
+
 
 
 ## Cloud Paper Usage Audit V0.2 result (2026-09-29)

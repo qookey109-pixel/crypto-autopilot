@@ -1,9 +1,14 @@
 # Project Status
 
-## Cloud Paper R2 Usage Audit V0.3 — prepared, not dispatched (2026-09-29)
+## Cloud Paper R2 Usage Audit V0.3 result (2026-09-29)
 
-V0.2 result remains immutable: run 36584465739 returned `REVIEW_REQUIRED / DATASET_COVERAGE_INCOMPLETE` after exactly one Cloudflare request. This delivery branch prepares a separately versioned R2-only V0.3 successor. It is not merged and has not made network requests. Fresh zero-network readiness must precede the one permitted V0.3 dispatch. A first dispatch consumes the authority even on failure; do not rerun V0.1/V0.2/V0.3. R2 analytics alone cannot prove zero cost, D1 usage, complete bucket inventory, all writers, or safe headroom. Cloud Paper remains disabled.
+Evidence-basis main: `2516a80c32fa04b9789bef379b108eb50c87fd49`; this records the audit authority and code SHA. `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
 
+- Zero-network readiness [run 36592944801](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36592944801) passed `READY` with Cloudflare requests=0 and boolean-only configuration checks.
+- One-time V0.3 [run 36593296360](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36593296360), attempt 1 on this main, succeeded at the workflow level and reported `READY_FOR_REVIEW / R2_METRICS_CAPTURED_REVIEW_ONLY` after exactly one accepted Cloudflare GraphQL request. [Artifact 11045150561](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36593296360/artifacts/11045150561) is 1,126 bytes with digest `sha256:581514f59892b84520e52ef463e00210e4175952cc0d54af7fda42b18c71c1be`; its safe result receipt is [here](research/receipts/2026-09-29-cloud-paper-r2-usage-audit-v0-3-result.json).
+- The 30-day R2 operations aggregation returned 6 action-type groups and 125,309 requests; freshness is unknown because the query omits datetime. R2 storage returned 1,298 groups. The latest-per-returned-bucket aggregate represents one returned bucket: 16,304 objects, 616,541,780 total bytes (612,538,247 payload + 4,003,533 metadata), zero uploads; latest snapshot 2026-09-29 15:20 UTC.
+- This is partial R2 analytics evidence only. D1, invoices/metered billing, zero cost, complete bucket inventory, shared writer coverage, and headroom remain unknown. The 8 GB ceiling is not a headroom measurement. V0.3 authority is consumed and must never be rerun. Cloud Paper remains disabled; FREE-ONLY / 0 USD and PAPER/LIVE-PAPER-only boundaries remain in force.
+- Next: prepare any further D1/billing/inventory evidence as a separate least-privilege, versioned stage; do not broaden the current read token or infer activation from this run.
 
 ## Cloud Paper Usage Audit V0.2 result (2026-09-29)
 

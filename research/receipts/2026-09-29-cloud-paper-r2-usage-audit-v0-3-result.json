@@ -1,0 +1,72 @@
+{
+  "schema": "qookey-cloud-paper-r2-usage-result-receipt-v0.3",
+  "authority": "config/cloud_paper_r2_usage_audit_v0_3.json",
+  "authority_consumed": true,
+  "workflow_run": {
+    "id": 36593296360,
+    "attempt": 1,
+    "event": "workflow_dispatch",
+    "head_sha": "2516a80c32fa04b9789bef379b108eb50c87fd49",
+    "conclusion": "success"
+  },
+  "readiness_run": {
+    "id": 36592944801,
+    "attempt": 1,
+    "head_sha": "2516a80c32fa04b9789bef379b108eb50c87fd49",
+    "state": "READY",
+    "cloudflare_requests_performed": 0
+  },
+  "report": {
+    "status": "READY_FOR_REVIEW",
+    "reason_code": "R2_METRICS_CAPTURED_REVIEW_ONLY",
+    "cloudflare_http_requests_performed": 1,
+    "cloudflare_api_permission_state": "REQUEST_ACCEPTED",
+    "raw_response_persisted": false,
+    "account_id_persisted": false,
+    "bucket_names_persisted": false
+  },
+  "artifact": {
+    "id": 11045150561,
+    "name": "cloud-paper-r2-usage-audit-v0-3-36593296360-1",
+    "size_bytes": 1126,
+    "sha256": "581514f59892b84520e52ef463e00210e4175952cc0d54af7fda42b18c71c1be",
+    "expires_at": "2026-10-06T15:50:57Z"
+  },
+  "coverage": {
+    "account_scope": "ACCOUNT_TAG_ONLY_NO_BUCKET_FILTER",
+    "operations_window_days": 30,
+    "r2_operations": {
+      "state": "PRESENT",
+      "group_count": 6,
+      "total_requests": 125309,
+      "dimensions": [
+        "actionType"
+      ],
+      "freshness": "UNKNOWN_QUERY_OMITS_DATETIME_DIMENSION"
+    },
+    "r2_storage": {
+      "state": "PRESENT",
+      "group_count": 1298,
+      "returned_bucket_group_count": 1,
+      "latest_snapshot_utc": "2026-09-29T15:20:00Z",
+      "snapshot_age_seconds": 1857,
+      "object_count": 16304,
+      "payload_bytes": 612538247,
+      "metadata_bytes": 4003533,
+      "total_bytes": 616541780,
+      "upload_count": 0
+    }
+  },
+  "unknowns": {
+    "billing_and_zero_cost": "UNKNOWN_NOT_QUERIED",
+    "d1_inventory_and_usage": "UNKNOWN_NOT_QUERIED",
+    "bucket_inventory_completeness": "UNKNOWN_NOT_PROVEN_BY_ANALYTICS_ALONE",
+    "shared_account_writer_coverage": "UNKNOWN_NOT_PROVEN",
+    "storage_headroom": "UNKNOWN_NOT_AUTHORIZED_BY_THIS_AUDIT"
+  },
+  "decisions": {
+    "budget_activation": "NOT_AUTHORIZED_BY_THIS_AUDIT",
+    "cloud_paper_activation": "REMAINS_DISABLED",
+    "rerun": "FORBIDDEN"
+  }
+}
