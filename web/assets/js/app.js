@@ -931,10 +931,17 @@ function renderCloudPaperLoop(data) {
     && data.market?.breadth_coverage?.membership_state === "PREPARED_CANDIDATE_MEMBERSHIP_ONLY_COVERAGE_UNVERIFIED"
     && data.market?.breadth_coverage?.coverage_verified === false
     && data.model_quality === "REJECT"
-    && data.budget?.account_wide_usage_evidence === "MISSING"
+    && data.budget?.account_wide_usage_evidence === "REVIEW_REQUIRED_V0_2_DATASET_COVERAGE_INCOMPLETE"
+    && data.budget?.usage_audit_evidence?.run_id === 36584465739
+    && data.budget?.usage_audit_evidence?.reason_code === "DATASET_COVERAGE_INCOMPLETE"
+    && data.budget?.usage_audit_evidence?.r2_operations_state === "LIMIT_REACHED"
+    && data.budget?.usage_audit_evidence?.r2_operations_group_count === 10000
+    && data.budget?.usage_audit_evidence?.r2_storage_group_count === 1297
     && data.budget?.reservation_guard === "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED"
     && data.budget?.d1_reservation_ledger === "SHARED_LEDGER_CODE_PREPARED_MIGRATIONS_NOT_APPLIED_D1_NOT_PROVISIONED"
-    && data.budget?.storage_capacity?.state === "USAGE_UNKNOWN_BLOCKED"
+    && data.budget?.storage_capacity?.state === "USAGE_PARTIAL_BLOCKED"
+    && data.budget?.storage_capacity?.usage_evidence === "PARTIAL_R2_EVIDENCE_NOT_ZERO_OR_COMPLETE"
+    && data.budget?.storage_capacity?.measured_storage_bytes === null
     && data.budget?.storage_capacity?.measured_storage_bytes === null
     && data.budget?.storage_capacity?.report_object_max_bytes === 262144
     && data.budget?.storage_capacity?.per_run_growth_max_bytes === 2097152
@@ -943,7 +950,7 @@ function renderCloudPaperLoop(data) {
     && data.budget?.storage_capacity?.warning_threshold_bytes === 6400000000
     && data.budget?.storage_capacity?.hard_stop_bytes === 8000000000
     && data.budget?.storage_capacity?.all_writer_coverage_proven === false
-    && data.budget?.d1_free_tier_usage_evidence === "MISSING"
+    && data.budget?.d1_free_tier_usage_evidence === "UNKNOWN_EMPTY_UNVERIFIED"
     && data.production?.entrypoint_workflow === "NOT_WIRED"
     && data.production?.natural_schedule === "NOT_CONFIGURED";
   if (!valid) {
@@ -969,7 +976,7 @@ function renderCloudPaperLoop(data) {
     status.className = "badge neutral";
   }
   if (detail) {
-    detail.textContent = "正式循環尚未啟用，沒有正式 run。共享 provider/R2 守門程式已實作，但 Cloud Paper runtime 尚未啟用；帳戶級用量、freshness 與所有 writer 覆蓋仍未驗證。D1 migrations 尚未套用且 D1 未 provision。策略登錄為空、模型品質為 REJECT，因此目前不會建立倉位。";
+    detail.textContent = "正式循環尚未啟用，沒有正式 run。V0.2 用量查核（run 36584465739）為 REVIEW_REQUIRED：R2 操作資料達 10,000 組上限，R2 storage 僅回傳 1,297 組；D1 空結果未驗證、總費用與安全額度仍未知。共享 provider/R2 守門程式已實作，但 Cloud Paper runtime 尚未啟用；所有 writer 覆蓋仍未驗證。D1 migrations 尚未套用且 D1 未 provision。策略登錄為空、模型品質為 REJECT，因此目前不會建立倉位。";
   }
   if (traceStatus) {
     traceStatus.textContent = "尚無正式循環報告";
@@ -983,8 +990,8 @@ function renderCloudPaperLoop(data) {
   set("#cloud-paper-regime", "REGIME_UNAVAILABLE · 缺 TOTAL3 / BTC dominance；23 市場 breadth 覆蓋未驗證");
   set("#cloud-paper-account", "尚未初始化");
   set("#cloud-paper-positions", "持倉與損益尚無正式證據");
-  set("#cloud-paper-budget", "BLOCKED_BUDGET · 帳戶級用量證據缺失");
-  set("#cloud-paper-storage-capacity", "實際用量未知 · 警示 6.4 GB · 硬停 8.0 GB");
+  set("#cloud-paper-budget", "BLOCKED_BUDGET · V0.2 部分用量證據待查");
+  set("#cloud-paper-storage-capacity", "實際 bytes/headroom 未知 · R2 1,297 組 · 硬停 8.0 GB");
 }
 
 async function loadData() {

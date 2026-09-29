@@ -1,5 +1,10 @@
 # GitHub Actions operating map
 
+## Cloud Paper R2 Usage Audit V0.3 (prepared; 2026-09-29)
+
+This version is still on a delivery branch and has not been dispatched. After merge, run [V0.3 readiness](../.github/workflows/cloud-paper-r2-usage-readiness-v0-3.yml) first; it uses zero Cloudflare requests. Only fresh `READY` on main allows one manual [V0.3 audit](../.github/workflows/cloud-paper-r2-usage-audit-v0-3.yml). First dispatch consumes the one-time authority, including failure. V0.3 queries R2 analytics only; it does not establish invoice cost, D1 inventory/use, complete bucket inventory, all writers, headroom, or activation. Keep runtime disabled.
+
+
 ## Cloud Paper V0.2 manual diagnostics (2026-09-29)
 
 - [Usage Audit Readiness V0.2](../.github/workflows/cloud-paper-usage-audit-readiness-v0-2.yml) is repeatable, manual, and zero-network. It checks only configuration presence and Account ID Secret/Variable parity through booleans. `READY` does not prove API access, usage, billing, or activation.
