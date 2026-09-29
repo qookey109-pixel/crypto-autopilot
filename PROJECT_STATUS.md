@@ -1,5 +1,14 @@
 # Project Status
 
+## Cloud Paper readiness and maintenance checkpoint (2026-09-29)
+
+Evidence-basis parent main: `c3096a61b025bd995e6f4fa0e9cea963e302b533`; resolve live `main` before any new action. `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
+
+- [PR #637](https://github.com/qookey109-pixel/crypto-autopilot/pull/637) separated Account ID Variable and read-only Token Secret presence from API permission, usage evidence, and budget activation. Its first controlled [readiness run #3](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36578030997) failed before any Cloudflare request because the new script had no checkout. That runner log rendered the Account ID variable; preserve the failure evidence without reproducing the value.
+- [PR #638](https://github.com/qookey109-pixel/crypto-autopilot/pull/638) added checkout and passes only boolean presence flags into the runner. Controlled [readiness run #4](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36578765856), attempt 1 on `c3096a6`, succeeded: `state=READY`, both configuration-presence flags true, Cloudflare requests 0, API permission `NOT_CHECKED_NO_NETWORK`, usage evidence `NOT_CHECKED_BY_READINESS`, budget activation `NOT_AUTHORIZED_BY_READINESS`. Its log shows presence booleans only. Post-merge CI, CodeQL, Dependency/SBOM and Freeze Guard passed.
+- Natural [Health run 36574961612](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36574961612) succeeded. Triggered [Maintenance run 36575038880](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36575038880) had inspect success and propose `MAIN_CHANGED` because old Draft [#633](https://github.com/qookey109-pixel/crypto-autopilot/pull/633) diverged from current main. #633 was closed without merge and its stale delivery branch deleted. This failed Maintenance attempt remains evidence; it is not a completed natural acceptance.
+- One-time Billing run 36513941565 and one-time Usage Audit run 36558934727 remain consumed. Usage Audit is still `REVIEW_REQUIRED / DATASET_EMPTY_UNVERIFIED`; account-wide zero cost and headroom are unproven. Cloud Paper activation and natural execution remain disabled. Prepare a separately versioned successor audit with per-dataset completeness before any further Cloudflare query.
+
 ## Latest Cloud Paper checkpoint — Usage Audit V0.1 result (2026-09-29)
 
 Reviewed parent main: `f46cba365bd6e43f2c1389b376dda75776178d53`; the SHA records the evidence basis, not the later main after this documentation update. `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
