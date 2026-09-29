@@ -110,6 +110,7 @@ def _base_report(observed: datetime, start: datetime, end: datetime) -> dict[str
             "d1_inventory_and_usage": "UNKNOWN_NOT_QUERIED",
             "billing_and_zero_cost": "UNKNOWN_NOT_QUERIED",
             "shared_account_writer_coverage": "UNKNOWN_NOT_PROVEN",
+        "cloudflare_api_permission_state": "NOT_CHECKED",
         },
         "r2": {
             "operations_total_requests": None,
@@ -303,7 +304,8 @@ def _require_single_run() -> None:
     except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
         raise AuditError("WORKFLOW_HISTORY_UNAVAILABLE") from None
     runs = history.get("workflow_runs") if isinstance(history, dict) else None
-    if not isinstance(runs, list) or history.get("total_count", 0) >= 100:
+    total_count = history.get("total_count") if isinstance(history, dict) else None
+    if not isinstance(runs, list) or type(total_count) is not int or total_count >= 100:
         raise AuditError("WORKFLOW_HISTORY_AMBIGUOUS")
     if not any(isinstance(item, dict) and str(item.get("id")) == run_id for item in runs):
         raise AuditError("CURRENT_RUN_NOT_IN_HISTORY")
@@ -346,8 +348,16 @@ def execute(output: Path) -> int:
             start_time=start,
             end_time=end,
         )
+        report["coverage"]["cloudflare_api_permission_state"] = (
+            "REQUEST_ACCEPTED" if not payload.get("errors") else "RESPONSE_RECEIVED_ERRORS"
+        )
     except AuditError as exc:
         report["reason_code"] = str(exc)
+        report["coverage"]["cloudflare_api_permission_state"] = (
+            "FORBIDDEN_OR_PERMISSION_INSUFFICIENT"
+            if str(exc) == "CLOUDFLARE_HTTP_403"
+            else ("REQUEST_FAILED_OR_PERMISSION_UNKNOWN" if requests else "NOT_ATTEMPTED")
+        )
     report["github"] = {
         "repository": os.environ.get("GITHUB_REPOSITORY"),
         "run_id": os.environ.get("GITHUB_RUN_ID"),
