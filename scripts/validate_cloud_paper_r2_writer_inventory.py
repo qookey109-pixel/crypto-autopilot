@@ -20,7 +20,7 @@ D1_ACCESS_REF = re.compile(
     r"|^\s*d1_databases\s*:"
     r"|/(?:accounts|zones)/[^\s\"']+/d1/(?:database|databases)(?:/|\b)"
     r"|\bd1(?:Analytics|Storage|Queries)AdaptiveGroups\b"
-    r"|\bcloud_paper_usage_audit_v0_1\.py\b",
+    r"|\bcloud_paper_usage_audit_v0_[12]\.py\b",
     re.IGNORECASE | re.MULTILINE,
 )
 
