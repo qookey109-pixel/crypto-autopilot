@@ -1,6 +1,5 @@
 {
   "schema": "qookey-cloud-paper-usage-audit-v0.2-result-receipt",
-  "frozen_at_utc": "2026-09-29T14:41:00Z",
   "source": {
     "repository": "qookey109-pixel/crypto-autopilot",
     "workflow": ".github/workflows/cloud-paper-usage-audit-v0-2.yml",
@@ -16,7 +15,8 @@
     "artifact_id": 11041290995,
     "artifact_name": "cloud-paper-usage-audit-v0-2-36584465739-1",
     "artifact_digest": "sha256:9ece6ff0a937f930d1137b2539052833bb5d94960dff8c1e50cce4cdbdadc258",
-    "artifact_retention_until_utc": "2026-10-06T14:41:00Z"
+    "artifact_retention_until_utc": "2026-10-06T14:41:00Z",
+    "artifact_created_at_utc": "2026-09-29T14:41:00Z"
   },
   "report": {
     "status": "REVIEW_REQUIRED",
