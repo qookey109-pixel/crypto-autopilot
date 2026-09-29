@@ -265,8 +265,8 @@ test("cloud paper dashboard shows inactive state without inventing account evide
   await expect(page.locator("#cloud-paper-regime")).toHaveText("REGIME_UNAVAILABLE · 缺 TOTAL3 / BTC dominance；23 市場 breadth 覆蓋未驗證");
   await expect(page.locator(".cloud-paper-panel")).toContainText("固定 23 市場 breadth 成員已準備，歷史覆蓋仍未驗證");
   await expect(page.locator("#cloud-paper-account")).toHaveText("尚未初始化");
-  await expect(page.locator("#cloud-paper-budget")).toHaveText("BLOCKED_BUDGET · 帳戶級用量證據缺失");
-  await expect(page.locator("#cloud-paper-storage-capacity")).toHaveText("實際用量未知 · 警示 6.4 GB · 硬停 8.0 GB");
+  await expect(page.locator("#cloud-paper-budget")).toHaveText("BLOCKED_BUDGET · V0.2 部分用量證據待查");
+  await expect(page.locator("#cloud-paper-storage-capacity")).toHaveText("實際 bytes/headroom 未知 · R2 1,297 組 · 硬停 8.0 GB");
   await expect(page.locator("#cloud-paper-trace-status")).toHaveText("尚無正式循環報告");
   await expect(page.locator("#cloud-paper-trace-detail")).toContainText("最新正式 run 為 NOT_RUN");
   await expect(page.locator(".cloud-paper-panel")).toContainText("API key");
