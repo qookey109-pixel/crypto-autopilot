@@ -15,7 +15,9 @@
     "retry_count": 0,
     "history_check": "One GitHub Actions workflow-runs metadata request; prior or ambiguous V0.2 runs fail closed.",
     "readiness": "Separate repeatable zero-network V0.2 workflow must report READY on current main before dispatch.",
-    "account_id_source": "GitHub Actions Secret CLOUDFLARE_ACCOUNT_ID; requires nonempty match with CLOUDFLARE_ACCOUNT_ID Variable before Cloudflare access."
+    "account_id_source": "GitHub Actions Secret CLOUDFLARE_ACCOUNT_ID; requires nonempty match with CLOUDFLARE_ACCOUNT_ID Variable before Cloudflare access.",
+    "maximum_response_bytes": 33554432,
+    "redirects": "REJECT_NO_FOLLOW"
   },
   "query": {
     "endpoint": "https://api.cloudflare.com/client/v4/graphql",
