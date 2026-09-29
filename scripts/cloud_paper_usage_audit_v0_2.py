@@ -19,7 +19,6 @@ from scripts.cloud_paper_usage_audit_v0_1 import (
     AuditError,
     GROUP_LIMIT,
     QUERY,
-    _request_json,
     summarize_usage,
 )
 
@@ -28,6 +27,34 @@ WORKFLOW_FILE = "cloud-paper-usage-audit-v0-2.yml"
 DATASETS = ("d1Rows", "d1Storage", "r2Operations", "r2Storage")
 REPORT_SCHEMA = "qookey-cloud-paper-usage-audit-report-v0.2"
 REQUEST_URL = "https://api.cloudflare.com/client/v4/graphql"
+
+MAX_RESPONSE_BYTES = 33_554_432
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def _cloudflare_json(*, headers: dict[str, str], body: bytes) -> dict[str, Any]:
+    request = urllib.request.Request(REQUEST_URL, data=body, headers=headers, method="POST")
+    opener = urllib.request.build_opener(_NoRedirect)
+    try:
+        with opener.open(request, timeout=20) as response:
+            raw = response.read(MAX_RESPONSE_BYTES + 1)
+    except urllib.error.HTTPError as exc:
+        raise AuditError(f"CLOUDFLARE_HTTP_{exc.code}") from None
+    except (urllib.error.URLError, TimeoutError, OSError):
+        raise AuditError("CLOUDFLARE_REQUEST_FAILED") from None
+    if len(raw) > MAX_RESPONSE_BYTES:
+        raise AuditError("CLOUDFLARE_RESPONSE_TOO_LARGE")
+    try:
+        parsed = json.loads(raw)
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        raise AuditError("CLOUDFLARE_RESPONSE_INVALID") from None
+    if not isinstance(parsed, dict):
+        raise AuditError("CLOUDFLARE_RESPONSE_INVALID")
+    return parsed
 
 
 def _base_report(observed_at: datetime, start: datetime, end: datetime) -> dict[str, Any]:
@@ -195,8 +222,7 @@ def execute(output: Path) -> int:
             "endTime": end.isoformat().replace("+00:00", "Z"),
         }
         requests = 1
-        payload = _request_json(
-            REQUEST_URL,
+        payload = _cloudflare_json(
             headers={
                 "Authorization": f"Bearer {token}",
                 "Content-Type": "application/json",
