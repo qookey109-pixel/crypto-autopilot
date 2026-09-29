@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import json
 import unittest
+from io import BytesIO
+from unittest.mock import MagicMock, patch
 from datetime import UTC, datetime, timedelta
 
-from scripts.cloud_paper_usage_audit_v0_2 import diagnose_usage, readiness
+from scripts.cloud_paper_usage_audit_v0_2 import (
+    AuditError, _NoRedirect, _cloudflare_json, diagnose_usage, readiness,
+)
 
 NOW = datetime(2026, 9, 29, 12, 0, tzinfo=UTC)
 START = NOW - timedelta(days=30)
@@ -96,6 +100,24 @@ class CloudPaperUsageAuditV02Tests(unittest.TestCase):
         self.assertEqual(report["status"], "REVIEW_REQUIRED")
         self.assertEqual(report["reason_code"], "STALE_DATASET")
         self.assertEqual(report["activation"], "REMAINS_DISABLED")
+
+    def test_cloudflare_request_is_single_and_bounded(self) -> None:
+        opener = MagicMock()
+        opener.open.return_value = BytesIO(b'{"data": {}}')
+        with patch("scripts.cloud_paper_usage_audit_v0_2.urllib.request.build_opener",
+                   return_value=opener):
+            self.assertEqual(_cloudflare_json(headers={}, body=b"{}"), {"data": {}})
+        opener.open.assert_called_once()
+        self.assertIsNone(_NoRedirect().redirect_request(None, None, 302, "", {}, "/again"))
+
+        opener.open.return_value = BytesIO(b"12345678901")
+        with (
+            patch("scripts.cloud_paper_usage_audit_v0_2.urllib.request.build_opener",
+                  return_value=opener),
+            patch("scripts.cloud_paper_usage_audit_v0_2.MAX_RESPONSE_BYTES", 10),
+        ):
+            with self.assertRaisesRegex(AuditError, "CLOUDFLARE_RESPONSE_TOO_LARGE"):
+                _cloudflare_json(headers={}, body=b"{}")
 
     def test_readiness_separates_missing_names_and_parity(self) -> None:
         cases = [
