@@ -1,5 +1,10 @@
 # 專案接續與排程手冊
 
+## Cloud Paper R2 Usage Audit V0.3 — prepared, not dispatched (2026-09-29)
+
+V0.2 run [36584465739](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36584465739) returned `REVIEW_REQUIRED / DATASET_COVERAGE_INCOMPLETE` after one Cloudflare GraphQL request; preserve its [artifact 11041290995](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36584465739/artifacts/11041290995). This branch prepares a separately versioned R2-only V0.3 audit. It is not merged and has made no network requests. After merge, run the V0.3 zero-network readiness check; only fresh `READY` permits the single dispatch. A first dispatch consumes V0.3 even if it fails; never rerun it. V0.3 cannot prove zero cost, D1 inventory/use, complete bucket inventory, all account writers, or headroom. Keep Cloud Paper disabled and preserve FREE-ONLY / 0 USD, PAPER/LIVE-PAPER only.
+
+
 ## Cloud Paper Usage Audit V0.2 result (2026-09-29)
 
 Evidence-basis parent main: `21d37a44c6f3c5bba340908705488a05e7a5f7c7`; resolve live `main` before further action. `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
