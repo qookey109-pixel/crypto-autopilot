@@ -1,22 +1,22 @@
 {
   "schema": "qookey-cloud-paper-r2-writer-inventory-v0.1",
   "updated_date": "2026-09-29",
-  "evidence_basis_main_sha": "0d135a6ca67a72f5071d295293477ba6196e249b",
+  "evidence_basis_main_sha": "b2f0a1e2b4129cff207f6b9c59d395ecc705aaab",
   "is_latest_main_claim": false,
   "scan": {
-    "workflow_file_count": 91,
-    "workflows_with_r2_or_cloudflare_secret_references": 21,
+    "workflow_file_count": 93,
+    "workflows_with_r2_or_cloudflare_secret_references": 23,
     "scanner_contract": "scripts/validate_cloud_paper_r2_writer_inventory.py",
     "exact_reference_scan": true,
     "values_or_secret_contents_read": false,
     "workflow_count_before_nonaccess_preflight": 84,
-    "note": "V0.1 Billing and Usage Audit runs are consumed. V0.2 readiness is zero-network and its one-time analytics diagnostic is not dispatched; neither workflow accesses D1 SQL or R2 objects. Analytics do not prove invoice totals, account-wide external writer coverage, or zero cost.",
+    "note": "V0.1 Billing and Usage Audit plus V0.2 Usage Audit are consumed. V0.3 R2 readiness is zero-network and its one-time R2 analytics diagnostic is prepared but not dispatched; no workflow listed here reads or writes R2 objects. Analytics do not prove invoice totals, D1 inventory, account-wide external writer coverage, or zero cost.",
     "d1_access_marker_scan": "scripts/validate_cloud_paper_r2_writer_inventory.py"
   },
   "account_wide_reservation_coverage": {
     "cloud_paper_d1_ledger": "NOT_PROVISIONED_OR_WIRED",
     "every_current_writer_reserves_through_shared_ledger": false,
-    "shared_account_r2_usage_evidence": "MISSING",
+    "shared_account_r2_usage_evidence": "V0_2_REVIEW_REQUIRED_V0_3_PREPARED_NOT_DISPATCHED",
     "conclusion": "INVENTORY_CLASSIFIED; ACCOUNT_WIDE_RESERVATION_COVERAGE_NOT_PROVEN"
   },
   "workflows": [
@@ -187,6 +187,22 @@
       "trigger": "daily schedule + workflow_dispatch",
       "authority": "config/research_signal_quality_v0_1.json",
       "evidence": "reads prior lineage/evidence; no R2 write"
+    },
+    {
+      "workflow": ".github/workflows/cloud-paper-r2-usage-readiness-v0-3.yml",
+      "access": "PRESENCE_AND_PARITY_CHECK_ONLY",
+      "lifecycle": "READINESS_GUARD",
+      "trigger": "workflow_dispatch",
+      "authority": "config/cloud_paper_r2_usage_audit_v0_3.json",
+      "evidence": "Boolean-only Account ID Secret/Variable parity and read-only token presence; zero Cloudflare requests and no R2 object access."
+    },
+    {
+      "workflow": ".github/workflows/cloud-paper-r2-usage-audit-v0-3.yml",
+      "access": "READ_ONLY",
+      "lifecycle": "ONE_TIME_R2_ANALYTICS_USAGE_DIAGNOSTIC",
+      "trigger": "workflow_dispatch",
+      "authority": "config/cloud_paper_r2_usage_audit_v0_3.json",
+      "evidence": "One account-wide R2 GraphQL analytics request after one workflow-history request; no raw response, account ID, bucket names, or R2 object access persisted."
     }
   ],
   "d1_access_workflows": {
