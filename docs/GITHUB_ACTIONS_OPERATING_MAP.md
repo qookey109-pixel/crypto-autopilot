@@ -1,16 +1,14 @@
 # GitHub Actions operating map
 
-## Cloud Paper R2 Usage Audit V0.3 (prepared; 2026-09-29)
+## Cloud Paper R2 Usage Audit V0.3 — consumed (2026-09-30)
 
-This version is still on a delivery branch and has not been dispatched. After merge, run [V0.3 readiness](../.github/workflows/cloud-paper-r2-usage-readiness-v0-3.yml) first; it uses zero Cloudflare requests. Only fresh `READY` on main allows one manual [V0.3 audit](../.github/workflows/cloud-paper-r2-usage-audit-v0-3.yml). First dispatch consumes the one-time authority, including failure. V0.3 queries R2 analytics only; it does not establish invoice cost, D1 inventory/use, complete bucket inventory, all writers, headroom, or activation. Keep runtime disabled.
+Zero-network [readiness run 36592944801](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36592944801) reported `READY`. One-time [audit run 36593296360](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36593296360), attempt 1 on `2516a80c32fa04b9789bef379b108eb50c87fd49`, reported `READY_FOR_REVIEW / R2_METRICS_CAPTURED_REVIEW_ONLY` after exactly one accepted Cloudflare GraphQL request. The V0.3 authority is consumed; **never dispatch or rerun it again**. Preserve the [result receipt](../research/receipts/2026-09-29-cloud-paper-r2-usage-audit-v0-3-result.json).
 
+The result is partial R2 analytics evidence. Billing/zero cost, D1 inventory/use, complete bucket inventory, shared-account writers, and headroom remain unproven. Cloud Paper activation and runtime scheduling remain disabled. Any further external evidence collection requires a separate versioned scope merged to main.
 
-## Cloud Paper V0.2 manual diagnostics (2026-09-29)
+## Cloud Paper V0.1 / V0.2 manual diagnostics — historical and consumed
 
-- [Usage Audit Readiness V0.2](../.github/workflows/cloud-paper-usage-audit-readiness-v0-2.yml) is repeatable, manual, and zero-network. It checks only configuration presence and Account ID Secret/Variable parity through booleans. `READY` does not prove API access, usage, billing, or activation.
-- [One-Time Usage Audit V0.2](../.github/workflows/cloud-paper-usage-audit-v0-2.yml) is manual-only and may run once from protected `main` after fresh V0.2 readiness. It performs at most one read-only GraphQL request, reports per-dataset completeness, and never accesses D1 SQL or R2 objects. Any first attempt consumes this V0.2 authority; V0.1 is already consumed.
-- Neither workflow is a schedule or Cloud Paper activation. Apply the [V0.2 contract](../config/cloud_paper_usage_audit_v0_2.json) and [protocol](CLOUD_PAPER_USAGE_AUDIT_V0_2.md) before dispatch.
-
+Billing V0.1 run `36513941565`, Usage Audit V0.1 run `36558934727`, and Usage Audit V0.2 run `36584465739` are consumed one-time executions. Keep their original success/failure reports. Do not dispatch or rerun them. Their zero-network readiness workflows do not renew execution authority. The [V0.2 protocol](CLOUD_PAPER_USAGE_AUDIT_V0_2.md) describes the historical contract, not a new permission to execute.
 
 Navigation snapshot: 2026-09-23, observed against main `87ad32fd8f29a0c34bbf61ad11694fe4ef29df51`. Resolve main and Actions live before acting. This map is not execution authority and does not add schedules, dispatches or provider/R2 permissions.
 
