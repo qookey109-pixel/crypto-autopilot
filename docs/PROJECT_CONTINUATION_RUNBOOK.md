@@ -1,8 +1,18 @@
 # 專案接續與排程手冊
 
+## Cloud Paper Usage Audit V0.2 result (2026-09-29)
+
+Evidence-basis parent main: `21d37a44c6f3c5bba340908705488a05e7a5f7c7`; resolve live `main` before further action. `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
+
+- Zero-network V0.2 readiness [run 36584082320](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36584082320), attempt 1 on that main, passed: Account ID Secret and Variable both present and matching, read-only token Secret present, Cloudflare requests 0. This proves configuration parity only.
+- One-time V0.2 [run 36584465739](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36584465739), attempt 1 on the same main, returned `REVIEW_REQUIRED / DATASET_COVERAGE_INCOMPLETE` after exactly one Cloudflare GraphQL request. Job summary and [artifact 11041290995](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36584465739/artifacts/11041290995) (digest `sha256:9ece6ff0a937f930d1137b2539052833bb5d94960dff8c1e50cce4cdbdadc258`) record: D1 rows `EMPTY_UNVERIFIED / 0`, D1 storage `EMPTY_UNVERIFIED / 0`, R2 operations `LIMIT_REACHED / 10000`, R2 storage `PRESENT / 1297` groups. Report upload succeeded despite the expected workflow failure.
+- The empty D1 datasets are **not** proof of zero D1 usage or no other D1 databases. R2 operations hit the query cap, so no complete operation total or storage-byte aggregate was reported. Account-wide cost, billing charges, external writers and safe headroom remain `UNKNOWN`. Cloud Paper activation, D1 provisioning, writes and natural execution remain disabled. Do not rerun V0.1 or V0.2; both one-time authorities are consumed.
+- Immutable safe [result receipt](../research/receipts/2026-09-29-cloud-paper-usage-audit-v0-2-result.json) preserves run/attempt/head/artifact identity and the bounded result. Next: design a separate query with R2 operations grouped only by action type, as in Cloudflare's [official R2 example](https://developers.cloudflare.com/r2/platform/metrics-analytics/), and separately prove D1 account inventory and actual billed charges before any activation claim.
+
+
 ## Cloud Paper Usage Audit V0.2 successor authority (2026-09-29)
 
-This change adds a separately versioned V0.2 successor to consumed V0.1. Its config, script, synthetic tests, zero-network readiness workflow, and one-time diagnostic workflow become executable authority only after protected-main merge. V0.2 has **not** been dispatched at this checkpoint. Run V0.2 readiness first; it requires Account ID Secret/Variable parity and read-only token presence without printing values or making Cloudflare requests. Only a fresh `READY` on current main permits one V0.2 dispatch. Any first dispatch consumes that authority, including a failure; never rerun V0.1 or V0.2.
+This change adds a separately versioned V0.2 successor to consumed V0.1. Its config, script, synthetic tests, zero-network readiness workflow, and one-time diagnostic workflow become executable authority only after protected-main merge. At that pre-run checkpoint V0.2 had **not** been dispatched; the later run is recorded above. Run V0.2 readiness first; it requires Account ID Secret/Variable parity and read-only token presence without printing values or making Cloudflare requests. Only a fresh `READY` on current main permits one V0.2 dispatch. Any first dispatch consumes that authority, including a failure; never rerun V0.1 or V0.2.
 
 V0.2 reports per-dataset state and group count for D1 rows/storage and R2 operations/storage. Empty remains `EMPTY_UNVERIFIED`, not zero usage. An HTTP or GraphQL error remains `REVIEW_REQUIRED`. Cloudflare analytics cannot prove invoice charges or all external writers, so `zero_cost_conclusion=UNKNOWN`, Cloud Paper activation, D1 provisioning, writes, and natural execution remain closed. See [V0.2 protocol](CLOUD_PAPER_USAGE_AUDIT_V0_2.md) and `config/cloud_paper_usage_audit_v0_2.json`. `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
 
