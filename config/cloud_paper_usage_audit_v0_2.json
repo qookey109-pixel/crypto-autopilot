@@ -1,0 +1,56 @@
+{
+  "schema": "qookey-cloud-paper-usage-audit-v0.2",
+  "authority_status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "supersedes_execution_only": "config/cloud_paper_usage_audit_v0_1.json",
+  "historical_v0_1_run": "36558934727",
+  "historical_v0_1_result": "REVIEW_REQUIRED_DATASET_EMPTY_UNVERIFIED",
+  "purpose": "One-time read-only diagnostic of which account-wide D1/R2 analytics datasets are empty, missing, stale, or capped; capture metrics only when complete.",
+  "execution": {
+    "trigger": "workflow_dispatch_on_protected_main_only",
+    "maximum_workflow_runs": 1,
+    "maximum_attempts": 1,
+    "maximum_cloudflare_http_requests": 1,
+    "maximum_graphql_requests": 1,
+    "timeout_seconds": 20,
+    "retry_count": 0,
+    "history_check": "One GitHub Actions workflow-runs metadata request; prior or ambiguous V0.2 runs fail closed.",
+    "readiness": "Separate repeatable zero-network V0.2 workflow must report READY on current main before dispatch.",
+    "account_id_source": "GitHub Actions Secret CLOUDFLARE_ACCOUNT_ID; requires nonempty match with CLOUDFLARE_ACCOUNT_ID Variable before Cloudflare access."
+  },
+  "query": {
+    "endpoint": "https://api.cloudflare.com/client/v4/graphql",
+    "account_scope": "accountTag_only_no_database_or_bucket_filter",
+    "window_days": 30,
+    "maximum_groups_per_dataset": 10000,
+    "datasets": [
+      "d1AnalyticsAdaptiveGroups",
+      "d1StorageAdaptiveGroups",
+      "r2OperationsAdaptiveGroups",
+      "r2StorageAdaptiveGroups"
+    ],
+    "persist_only_per_dataset_state_and_group_count_when_incomplete": true,
+    "persist_raw_response": false,
+    "persist_account_id": false,
+    "persist_database_or_bucket_names": false
+  },
+  "result_semantics": {
+    "all_datasets_present_fresh": "READY_FOR_REVIEW",
+    "any_empty_missing_invalid_capped_or_stale": "REVIEW_REQUIRED",
+    "empty_dataset": "EMPTY_UNVERIFIED_NOT_ZERO_USAGE",
+    "api_permission_or_request_error": "REVIEW_REQUIRED_WITH_SAFE_REASON_CODE",
+    "zero_cost": "UNKNOWN_REQUIRES_BILLING_EVIDENCE",
+    "activation": "REMAINS_DISABLED"
+  },
+  "forbidden_operations": [
+    "Rerun V0.1 or V0.2, retry or paginate Cloudflare requests.",
+    "R2 listing, object access, writes, deletes, or S3 credentials.",
+    "D1 SQL, migration, provisioning, or writes.",
+    "Provider calls, market data, holdout, training, promotion, trading, or schedule activation.",
+    "Inferring invoice amount, plan, or every external writer from analytics."
+  ],
+  "source_urls": [
+    "https://developers.cloudflare.com/analytics/graphql-api/",
+    "https://developers.cloudflare.com/d1/observability/metrics-analytics/",
+    "https://developers.cloudflare.com/r2/platform/metrics-analytics/"
+  ]
+}
