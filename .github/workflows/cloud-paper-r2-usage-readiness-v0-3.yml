@@ -1,0 +1,27 @@
+name: Cloud Paper R2 Usage Audit Readiness V0.3
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  readiness:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+      - name: Check configuration presence and Account ID parity without network
+        env:
+          ACCOUNT_ID_VARIABLE_PRESENT: ${{ vars.CLOUDFLARE_ACCOUNT_ID != '' }}
+          ACCOUNT_ID_SECRET_PRESENT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
+          READ_ONLY_TOKEN_SECRET_PRESENT: ${{ secrets.CLOUDFLARE_READONLY_API_TOKEN != '' }}
+          ACCOUNT_ID_PARITY_VERIFIED: ${{ secrets.CLOUDFLARE_ACCOUNT_ID != '' && vars.CLOUDFLARE_ACCOUNT_ID != '' && secrets.CLOUDFLARE_ACCOUNT_ID == vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: python -m scripts.cloud_paper_r2_usage_audit_v0_3 --readiness
