@@ -1,5 +1,12 @@
 # 專案接續與排程手冊
 
+## Cloud Paper Usage Audit V0.2 successor authority (2026-09-29)
+
+This change adds a separately versioned V0.2 successor to consumed V0.1. Its config, script, synthetic tests, zero-network readiness workflow, and one-time diagnostic workflow become executable authority only after protected-main merge. V0.2 has **not** been dispatched at this checkpoint. Run V0.2 readiness first; it requires Account ID Secret/Variable parity and read-only token presence without printing values or making Cloudflare requests. Only a fresh `READY` on current main permits one V0.2 dispatch. Any first dispatch consumes that authority, including a failure; never rerun V0.1 or V0.2.
+
+V0.2 reports per-dataset state and group count for D1 rows/storage and R2 operations/storage. Empty remains `EMPTY_UNVERIFIED`, not zero usage. An HTTP or GraphQL error remains `REVIEW_REQUIRED`. Cloudflare analytics cannot prove invoice charges or all external writers, so `zero_cost_conclusion=UNKNOWN`, Cloud Paper activation, D1 provisioning, writes, and natural execution remain closed. See [V0.2 protocol](docs/CLOUD_PAPER_USAGE_AUDIT_V0_2.md) and `config/cloud_paper_usage_audit_v0_2.json`. `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
+
+
 ## Cloud Paper readiness and maintenance checkpoint (2026-09-29)
 
 Evidence-basis parent main: `c3096a61b025bd995e6f4fa0e9cea963e302b533`; resolve live `main` before any new action. `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
