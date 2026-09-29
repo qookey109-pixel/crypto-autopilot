@@ -14,7 +14,7 @@ The live workflow passes the Account ID through the existing GitHub Actions **Se
 
 ## Bounded evidence
 
-The live workflow checks its own run history and attempt number, then allows at most one Cloudflare GraphQL POST, with no retry or pagination. It asks for the same 30-day account-wide D1 rows/storage and R2 operations/storage datasets as V0.1. It does not query an individual database or bucket.
+The live workflow checks its own run history and attempt number, then allows at most one Cloudflare GraphQL POST, with no retry, pagination, or redirect follow. Responses above 32 MiB fail closed. It asks for the same 30-day account-wide D1 rows/storage and R2 operations/storage datasets as V0.1. It does not query an individual database or bucket.
 
 The V0.2 report records each dataset's state and group count separately. `EMPTY_UNVERIFIED`, `MISSING_OR_INVALID`, `INVALID_ROW`, and `LIMIT_REACHED` all produce `REVIEW_REQUIRED`; an empty dataset never means zero usage. If all four datasets are present, the existing aggregate parser checks fields and freshness, and the report remains review-only. Raw GraphQL responses, Account ID, database IDs, bucket names, and credentials are excluded from the report. The artifact expires after seven days; preserve run URL, attempt, head SHA, safe reason, and digest in project status after review.
 
