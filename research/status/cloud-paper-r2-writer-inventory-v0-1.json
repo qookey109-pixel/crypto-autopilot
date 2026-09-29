@@ -4,13 +4,13 @@
   "evidence_basis_main_sha": "0d135a6ca67a72f5071d295293477ba6196e249b",
   "is_latest_main_claim": false,
   "scan": {
-    "workflow_file_count": 89,
-    "workflows_with_r2_or_cloudflare_secret_references": 19,
+    "workflow_file_count": 91,
+    "workflows_with_r2_or_cloudflare_secret_references": 21,
     "scanner_contract": "scripts/validate_cloud_paper_r2_writer_inventory.py",
     "exact_reference_scan": true,
     "values_or_secret_contents_read": false,
     "workflow_count_before_nonaccess_preflight": 84,
-    "note": "At this inventory update, the one-time D1/R2 usage audit remains unrun and account readiness was previously blocked by missing read-only credentials. The billing-readiness workflow checks token presence only and performs zero network calls; the one-time billing audit performs one read-only subscriptions GET and records listed plan/state/price metadata without identifiers. Neither audit accesses D1 SQL or R2 objects. The subscription snapshot does not prove invoice totals, account-wide external writer coverage, or zero cost.",
+    "note": "V0.1 Billing and Usage Audit runs are consumed. V0.2 readiness is zero-network and its one-time analytics diagnostic is not dispatched; neither workflow accesses D1 SQL or R2 objects. Analytics do not prove invoice totals, account-wide external writer coverage, or zero cost.",
     "d1_access_marker_scan": "scripts/validate_cloud_paper_r2_writer_inventory.py"
   },
   "account_wide_reservation_coverage": {
@@ -67,6 +67,22 @@
       "trigger": "workflow_dispatch",
       "authority": "config/cloud_paper_billing_evidence_v0_1.json",
       "evidence": "One Billing Read GET of the account subscriptions page; no invoice, payment, plan-change, D1, R2, or provider operations."
+    },
+    {
+      "workflow": ".github/workflows/cloud-paper-usage-audit-readiness-v0-2.yml",
+      "access": "PRESENCE_AND_PARITY_CHECK_ONLY",
+      "lifecycle": "READINESS_GUARD",
+      "trigger": "workflow_dispatch",
+      "authority": "config/cloud_paper_usage_audit_v0_2.json",
+      "evidence": "Boolean-only Account ID Secret/Variable parity and token presence; zero Cloudflare requests, no D1 SQL or R2 object access."
+    },
+    {
+      "workflow": ".github/workflows/cloud-paper-usage-audit-v0-2.yml",
+      "access": "READ_ONLY",
+      "lifecycle": "ONE_TIME_DATASET_COVERAGE_DIAGNOSTIC",
+      "trigger": "workflow_dispatch",
+      "authority": "config/cloud_paper_usage_audit_v0_2.json",
+      "evidence": "At most one account-wide GraphQL analytics POST after main, attempt, history, and parity gates; no D1 SQL or R2 object access."
     },
     {
       "workflow": ".github/workflows/context-forward-capture-execution-v0-1.yml",
@@ -174,12 +190,13 @@
     }
   ],
   "d1_access_workflows": {
-    "workflow_count": 1,
+    "workflow_count": 2,
     "workflow_paths": [
-      ".github/workflows/cloud-paper-usage-audit-v0-1.yml"
+      ".github/workflows/cloud-paper-usage-audit-v0-1.yml",
+      ".github/workflows/cloud-paper-usage-audit-v0-2.yml"
     ],
     "classification": "READ_ONLY_ACCOUNT_D1_R2_ANALYTICS_AUDIT",
-    "scope_note": "Detects workflow-level D1 marker references and account analytics datasets. The new workflow reads only account-wide analytics aggregates; it does not issue D1 SQL, inspect database rows, access R2 objects, or prove account-wide/external writer coverage.",
+    "scope_note": "Detects workflow-level D1 marker references and account analytics datasets. V0.1 is consumed; V0.2 is a one-time read-only dataset diagnostic. Neither issues D1 SQL, inspects database rows, accesses R2 objects, or proves external writer coverage.",
     "validated_in_pr_head": "446b8e8b9351f9e23337de7f575f9356662cb07d",
     "pull_request": 611,
     "pr_ci_status": "PASS",
