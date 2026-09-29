@@ -1,4 +1,21 @@
-## Live Cloud Paper checkpoint — 2026-09-29
+# 專案接續與排程手冊
+
+## Latest Cloud Paper checkpoint — Usage Audit V0.1 result (2026-09-29)
+
+Reviewed parent main: `f46cba365bd6e43f2c1389b376dda75776178d53`; the SHA records the evidence basis, not the later main after this documentation update. `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
+
+- **Billing:** readiness [run 36513736040](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513736040) reported `READY`, with zero Cloudflare requests. One-time subscription snapshot [run 36513941565](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513941565) succeeded; its secret-free report says one listed `r2_paid` subscription, state `Paid`, listed price total `USD 0.00`. It excludes invoices and metered charges; account-wide zero cost is **not proven**. Preserve run and report; do not rerun.
+- **Usage readiness:** [run 36558774279](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36558774279) succeeded on this main with `READY`, zero Cloudflare requests, `one_time_authority_consumed=false`, and `secret_values_printed=false`.
+- **One-time Usage Audit:** [run 36558934727](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36558934727), attempt 1 on main `f46cba365bd6e43f2c1389b376dda75776178d53`, completed with workflow failure because the report status is `REVIEW_REQUIRED`. It made exactly one Cloudflare GraphQL request. Secret-free artifact [cloud-paper-usage-audit-36558934727-1](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36558934727) (420 bytes, digest `sha256:99feaf49cbf2f77df719be926043c8287e5c537a95dc9e2236ef5d7c295e0561`) reports reason `DATASET_EMPTY_UNVERIFIED`, `zero_cost_conclusion=UNKNOWN`, `account_identifiers_persisted=false`, `raw_response_persisted=false`, and `activation=REMAINS_DISABLED`.
+- The report's safe reason code does not name which dataset was empty. The reviewed code checks D1 rows, D1 storage, R2 operations, and R2 storage, and returns the same reason if any one is empty; no dataset counts or raw response were retained. Thus the exact empty dataset is **UNKNOWN**. Preserve this failure and do not rerun V0.1; its one-time authority is consumed.
+- **Product state:** Cloud Paper remains disabled. The production strategy registry is empty, Core100 quality `REJECT`, macro regime `REGIME_UNAVAILABLE`, D1 unprovisioned, migrations prepare-only, and there is no production execution workflow or natural schedule. Usage and subscription snapshots do not satisfy zero-cost proof, measured headroom, controlled main acceptance, or activation authority.
+- **Next engineering step:** prepare a separately versioned successor audit/report that records per-dataset completeness and group counts while keeping account identifiers and raw responses out of artifacts. Validate it synthetically in cloud CI. Any future live query needs its own versioned authority merged to main and fresh readiness; do not rerun the consumed V0.1 workflow.
+
+Maintain `FREE-ONLY / 0 USD`, PAPER/LIVE-PAPER only, and all holdout, source-switch, promotion, real-money, live-trading, and automatic activation gates closed.
+
+---
+
+## Historical checkpoint before Usage Audit V0.1 (2026-09-29)
 
 This update was prepared against main `414cf9a0a3b60612f9d1e09d7c5d29d76b05455e`; the SHA is the reviewed parent, not a claim that it remains latest after this documentation change. Current formal authority remains live `main`. Execution mode: `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
 
@@ -12,13 +29,14 @@ Keep `FREE-ONLY / 0 USD`, PAPER/LIVE-PAPER only. Holdout, source switch, promoti
 
 ---
 
-# 專案接續與排程手冊
+## Status history
+
 
 更新：2026-09-29。適用任何能讀取 Repository 與 GitHub metadata 的模型。
 這是操作與交接規格；正式權限由即時 `main` 的版本化 config／receipt 決定。
 無法取得工具、來源或權限時，回報缺口，不能靠舊聊天補出成功結果。
 
-## Cloudflare cost evidence follow-up
+## Historical billing evidence setup (superseded)
 
 PR [#630](https://github.com/qookey109-pixel/crypto-autopilot/pull/630) merged a versioned, one-time, read-only Cloudflare subscriptions snapshot. Its contract is `config/cloud_paper_billing_evidence_v0_1.json`; the report covers plan/state/listed subscription prices only and cannot establish invoice totals or zero cost. The API has not been called.
 
