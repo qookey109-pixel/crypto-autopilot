@@ -1,3 +1,17 @@
+## Live Cloud Paper checkpoint — 2026-09-29
+
+This update was prepared against main `414cf9a0a3b60612f9d1e09d7c5d29d76b05455e`; the SHA is the reviewed parent, not a claim that it remains latest after this documentation change. Current formal authority remains live `main`. Execution mode: `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.
+
+- **Billing credential setup:** the repository Actions variable `CLOUDFLARE_ACCOUNT_ID` and read-only Billing token are configured according to the user-confirmed GitHub settings state. Billing readiness run [36513736040](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513736040) reported `READY`, zero Cloudflare requests, and no secret values printed.
+- **One-time Billing evidence:** run [36513941565](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513941565), attempt 1, succeeded on main `414cf9a0a3b60612f9d1e09d7c5d29d76b05455e`; artifact [cloud-paper-billing-evidence-36513941565-1](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513941565) records `READY_FOR_BILLING_REVIEW`, one listed subscription, and listed subscription price total `USD 0.00` (state `Paid`, rate plan `r2_paid`). The snapshot excludes invoices and all metered charges, so **account-wide zero cost is not proven**. Preserve this run; do not rerun the one-time workflow.
+- **Usage evidence:** the user has confirmed the separate read-only Usage token and Account ID variable are configured. The only known Usage Readiness result remains the earlier [run 36471242643](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36471242643), which predates that setup and reported `BLOCKED_MISSING_READ_ONLY_CREDENTIAL` with zero Cloudflare requests. It is stale for the current credential state; latest readiness still needs to be run. The one-time Usage Audit has no run in the reviewed Actions history and remains unconsumed. Run the zero-network [Usage Audit Readiness workflow](https://github.com/qookey109-pixel/crypto-autopilot/actions/workflows/cloud-paper-usage-audit-readiness-v0-1.yml); dispatch the one-time [Usage Audit](https://github.com/qookey109-pixel/crypto-autopilot/actions/workflows/cloud-paper-usage-audit-v0-1.yml) only if that fresh result is `READY`, then preserve its report and never rerun it.
+- **Product state:** Cloud Paper activation remains disabled. The production strategy registry is empty, Core100 quality is `REJECT`, macro regime is `REGIME_UNAVAILABLE`, D1 is unprovisioned and migrations remain prepare-only. There is no production execution workflow or natural schedule. Billing and usage snapshots alone do not satisfy budget proof, controlled main acceptance, or implementation-bound activation gates.
+- **Open documentation PR:** PR [#633](https://github.com/qookey109-pixel/crypto-autopilot/pull/633) contains a dated Cloud Maintenance snapshot and is not current Cloud Paper evidence; do not merge it as the current status. Its historical evidence must remain intact.
+
+Keep `FREE-ONLY / 0 USD`, PAPER/LIVE-PAPER only. Holdout, source switch, promotion, real-money orders, live trading and automatic activation remain closed.
+
+---
+
 # 專案接續與排程手冊
 
 更新：2026-09-29。適用任何能讀取 Repository 與 GitHub metadata 的模型。
