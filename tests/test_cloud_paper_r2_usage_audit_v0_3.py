@@ -92,8 +92,9 @@ class CloudPaperR2UsageAuditV03Tests(unittest.TestCase):
 
     def test_stale_latest_bucket_snapshot_requires_review(self):
         value = payload()
-        for row in value["data"]["viewer"]["accounts"][0]["r2Storage"]:
-            row["dimensions"]["datetime"] = "2026-09-20T00:00:00Z"
+        rows = value["data"]["viewer"]["accounts"][0]["r2Storage"]
+        value["data"]["viewer"]["accounts"][0]["r2Storage"] = [rows[0]]
+        value["data"]["viewer"]["accounts"][0]["r2Storage"][0]["dimensions"]["datetime"] = "2026-09-20T00:00:00Z"
         result = diagnose_r2(value, observed_at=NOW, start_time=START, end_time=NOW)
         self.assertEqual(result["status"], "REVIEW_REQUIRED")
         self.assertEqual(result["reason_code"], "R2_STORAGE_STALE")
