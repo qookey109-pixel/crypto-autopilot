@@ -4,7 +4,6 @@ import unittest
 from datetime import UTC, datetime, timedelta
 
 from scripts.cloud_paper_r2_usage_audit_v0_3 import (
-    AuditError,
     diagnose_r2,
     readiness,
 )
@@ -66,6 +65,7 @@ class CloudPaperR2UsageAuditV03Tests(unittest.TestCase):
         self.assertEqual(result["zero_cost_conclusion"], "UNKNOWN")
         self.assertEqual(result["budget_activation"], "NOT_AUTHORIZED_BY_THIS_AUDIT")
         self.assertEqual(result["coverage"]["d1_inventory_and_usage"], "UNKNOWN_NOT_QUERIED")
+        self.assertEqual(result["coverage"]["cloudflare_api_permission_state"], "NOT_CHECKED")
         encoded = str(result)
         self.assertNotIn("private-bucket-name", encoded)
         self.assertNotIn("GetObject", encoded)
