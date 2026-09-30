@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-30",
-  "evidence_basis_parent_main_sha": "50cfd7ec4a23ef159bdc02df7fd7cdd2e1da13e1",
+  "evidence_basis_parent_main_sha": "98a92e74e923273d436c29add3c8679000df614e",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -572,8 +572,8 @@
     "one_time_authority": "CONSUMED_DO_NOT_RERUN"
   },
   "current_repository_checkpoint": {
-    "main_sha": "50cfd7ec4a23ef159bdc02df7fd7cdd2e1da13e1",
-    "observed_at_utc": "2026-09-30T02:08:37Z",
+    "main_sha": "98a92e74e923273d436c29add3c8679000df614e",
+    "observed_at_utc": "2026-09-30T02:24:28Z",
     "open_pull_requests": [
       {
         "number": 644,
@@ -581,20 +581,65 @@
         "draft": true,
         "base_sha": "50cfd7ec4a23ef159bdc02df7fd7cdd2e1da13e1",
         "head_sha": "3785d4e91a65e7fa870b7c2e4520eb5c10adccb2",
-        "ci_state": "ACTION_REQUIRED_NOT_RUN",
-        "required_workflow_run_ids": [
-          36621187574,
-          36621187622,
-          36621187765,
-          36621187993,
-          36621188030
-        ]
+        "relation_to_current_main": "STALE_BASE_REQUIRES_RECONCILIATION",
+        "previous_checks": "ACTION_REQUIRED_NOT_RUN_OR_UNKNOWN",
+        "current_exact_head_checks": "NOT_REVERIFIED"
       }
     ],
+    "combined_status": "NO_CHECK_ENTRIES_RETURNED_NOT_VERIFIED",
     "activation_enabled": false,
     "production_cycle_status": "NOT_RUN",
     "model_quality": "REJECT",
     "production_strategy_registry": "EMPTY",
     "macro_regime": "REGIME_UNAVAILABLE"
+  },
+  "external_evidence_design": {
+    "status": "DOCUMENTED_DESIGN_ONLY_NO_CLOUDFLARE_REQUEST",
+    "r2_bucket_inventory": {
+      "endpoint": "GET /accounts/{account_id}/r2/buckets",
+      "permissions": [
+        "Workers R2 Storage Read"
+      ],
+      "jurisdictions": [
+        "default",
+        "eu",
+        "us",
+        "fedramp",
+        "fedramp-high"
+      ],
+      "per_page_max": 1000,
+      "proposed_page_cap_per_jurisdiction": 10,
+      "max_requests": 50,
+      "complete_only_if_no_cursor_and_all_jurisdictions_complete": true
+    },
+    "d1_inventory": {
+      "endpoint": "GET /accounts/{account_id}/d1/database",
+      "permissions": [
+        "D1 Read"
+      ],
+      "per_page_max": 10000,
+      "proposed_page_cap": 5,
+      "max_records": 50000,
+      "complete_only_if_total_count_reconciles": true
+    },
+    "analytics": {
+      "r2_max_days": 31,
+      "d1_retention_days": 31,
+      "freshness_60s_proven": false,
+      "not_zero_cost_proof": true
+    },
+    "billing": {
+      "account_usage_v2_endpoint": "GET /accounts/{account_id}/billable/usage",
+      "state": "ALPHA_RESTRICTED_COST_FIELDS_MAY_BE_ABSENT",
+      "max_days": 31,
+      "zero_cost_proof": false
+    },
+    "request_budget_design_only": {
+      "max_http_or_graphql_calls": 64,
+      "max_single_response_bytes": 1048576,
+      "max_artifact_bytes": 262144,
+      "retries": 0,
+      "authority": "NONE"
+    }
   }
 }

@@ -1,5 +1,15 @@
 # Current Operations Status
 
+## Live repository checkpoint — 2026-09-30 10:24 Asia/Taipei
+
+- GitHub `main`: `98a92e74e923273d436c29add3c8679000df614e`.
+- PR #644 `docs: refresh cloud maintenance evidence` remains open. Recorded head `3785d4e91a65e7fa870b7c2e4520eb5c10adccb2` and base `50cfd7ec4a23ef159bdc02df7fd7cdd2e1da13e1` predate current main. Its earlier `action_required` checks are not passing evidence. Reconcile from fresh generated state or close/recreate; do not merge as-is.
+- Current main combined status returned no check entries in this lookup. Post-merge CI is therefore `UNKNOWN_NOT_VERIFIED_HERE`, not PASS.
+- #645 is merged. Dashboard V0.3 projection remains deferred because the static validator requires V0.2; next Dashboard change must first add and validate dual V0.2/V0.3 compatibility.
+- Cloud Paper activation remains disabled; production cycle and natural schedule remain `NOT_RUN / NOT_ESTABLISHED`. Production registry empty, Core100 quality `REJECT`, macro `REGIME_UNAVAILABLE`.
+- Billing V0.1 and Usage V0.1/V0.2/R2 V0.3 audits are consumed; do not rerun. Zero cost and account-wide storage headroom remain `UNKNOWN`.
+- The current full engineering target and ordered backlog are in [`docs/CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md`](docs/CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md). This checkpoint grants no access or runtime authority.
+
 ## Cloud Paper R2 Usage Audit V0.3 result (2026-09-29)
 
 Evidence-basis main: `2516a80c32fa04b9789bef379b108eb50c87fd49`; the SHA identifies the audit code and authority, not this later documentation commit. Execution mode: `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`.

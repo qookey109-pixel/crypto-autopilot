@@ -1,47 +1,109 @@
-# Crypto Autopilot 短期交付目標
+# Crypto Autopilot — 完整模擬循環交付目標
 
-## 即時狀態與收斂目標 — 2026-09-30 10:08 Asia/Taipei
+## 即時查核與收斂目標 — 2026-09-30 10:24 Asia/Taipei
 
-本節是目前可執行目標與狀態的唯一入口；下方較早日期的「下一步」「readiness」及 audit 指示均為當時快照，只供追溯，不可照舊指示重跑。Repository 即時 authority 已重新解析：`main=50cfd7ec4a23ef159bdc02df7fd7cdd2e1da13e1`。
+Repository：[`qookey109-pixel/crypto-autopilot`](https://github.com/qookey109-pixel/crypto-autopilot)  
+正式 authority：GitHub `main`。本次即時解析的 main：`98a92e74e923273d436c29add3c8679000df614e`（commit: `docs: reconcile Cloud Paper goal and evidence`）。本段是新的目前狀態與可執行目標；其後日期較早的內容屬歷史證據，須依本段判斷是否仍可執行，禁止照抄已過時的 readiness／audit 指令。
 
-### 現況與問題清單
+### 掃描結論：目前到哪裡
 
-- 開放 PR：#644 `docs: refresh cloud maintenance evidence`，Draft，base 為目前 main，head `3785d4e91a65e7fa870b7c2e4520eb5c10adccb2`。其 CI、Pages、SBOM、CodeQL、Dashboard Snapshot 五個 workflow 均為 `action_required`，尚未實際執行；不能當作通過或合併。
-- Cloudflare Billing V0.1（run [36513941565](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513941565)）、Usage V0.1（[36558934727](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36558934727)）、Usage V0.2（[36584465739](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36584465739)）及 R2 Usage V0.3（[36593296360](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36593296360)，audit head `2516a80c32fa04b9789bef379b108eb50c87fd49`）的一次性授權均已消耗，禁止重跑。
-- V0.3 僅取得一個 Cloudflare GraphQL 回應：R2 operations 6 groups／125,309 requests；R2 storage 回傳 1 個 bucket 的 16,304 objects、616,541,780 bytes。operations 時間戳缺失；這不等於完整帳戶／完整 bucket 清單、所有 writer、可用 headroom 或零費用。
-- Billing V0.1 只讀到一筆 subscription 的列示價格 USD 0；未讀 invoices／metered charges，不能判定帳戶總成本為零。
-- D1 使用量、資料庫完整清單、實際 rows/storage 成長、freshness watermark 及外部 writers 未證明；D1 尚未 provision，migration 僅 prepare-only。
-- Cloud Paper production runtime 未啟用、正式交易 registry 為空、正式循環為 `NOT_RUN`；模型品質 `REJECT`，macro regime 為 `REGIME_UNAVAILABLE`。合成 CI 交易只證明工程路徑，不是正式策略或產品運作證據。
-- `web/data/cloud-paper-loop.json` 落後 V0.3，仍把 V0.2 寫成目前用量結果。首次嘗試同步投影後，PR #645 的 Python 3.12 Dashboard 靜態安全檢查、Dashboard Smoke、Zh-Hant Snapshot 與 Pages Traditional Chinese safety check 均因 `scripts/validate_dashboard_static.py` 硬性要求 V0.2 evidence 而失敗；其餘 workflow 當時仍執行中。故本 PR 保留已驗證的 V0.2 Dashboard 投影，下一批先擴充 validator／UI 相容性與回歸，再更新投影。短期交付文件亦含已過時「設定憑證後執行 readiness／一次性 audit」指示，容易導致違規重跑。#644 的五項 checks 還需 GitHub 帳戶持有人批准後才會執行。
+**產品工程核心已有相當完整的合成循環，但正式雲端 PAPER 產品尚未啟動。** 已合併行情 adapter、版本化策略資格介面、risk／portfolio／paper composition、共享預算 guard、D1 rows/storage reservation、恢復／重播防護、循環報告與 Dashboard 狀態投影。PR #622 的 CI 使用 test-only 合格 fixture 驗證入場、出場、帳戶延續、持久化和後續 `NO_TRADE`。這證明程式組合路徑，**不代表正式策略可交易或正式帳戶已保存／恢復成功**。
 
-### 完成目標
+目前產品狀態仍為：
 
-交付可保存、可恢復、可追溯且 Dashboard 說明清楚的 GitHub 雲端 PAPER 模擬循環：
+- Cloud Paper activation = `false`；production execution workflow、受控 main cycle 和自然 Paper schedule 均未建立／未驗收。
+- Production strategy registry = 空；Core100 model quality = `REJECT`；macro context = `REGIME_UNAVAILABLE`。正確行為是拒絕新倉並說明原因，不能拿測試策略填補。
+- D1 未 provision，migration 僅 prepare-only；正式 D1 query/storage 校準未做。
+- R2 V0.3 只有部分聚合：30 日 125,309 operations、6 groups，但沒有 operation timestamp；storage 只有一個回傳 bucket，616,541,780 bytes。沒有完整 bucket inventory／全 writer 覆蓋／最新 freshness／可用 headroom。
+- Billing V0.1 只見一筆 subscription 顯示 USD 0；並未核實完整 invoice、metered usage、credits／adjustments 和當期累積費用。全帳戶零費用結論仍是 `UNKNOWN`。
+- V0.1 Billing、Usage；V0.2 Usage；V0.3 R2 Usage 均是一回合授權且已消耗。不得 rerun，也不得用新版本包裝同一個失敗重試；新查詢須是不同、必要、可證明有資訊增益的 successor scope，先經版本化 authority 合併。
+- Dashboard 的 V0.2/V0.3 schema 相容性是近期已知阻塞：#645 初次同步投影觸發 validator 要求 V0.2 的安全檢查失敗，PR 最終保留舊投影，並未修好相容性。後續須先讓 validator／schema／UI 同時接受歷史 V0.2 和最新 V0.3，再更新投影。
+- #644「docs: refresh cloud maintenance evidence」仍為 open。記錄中的 head `3785d4e91a65e7fa870b7c2e4520eb5c10adccb2`、base `50cfd7ec4a23ef159bdc02df7fd7cdd2e1da13e1` 落後目前 main `98a92e7…`；舊 checks 為 `action_required`，即未跑／等待處理而非通過。不得直接合併；重新生成 snapshot 或關閉後重建，且重新比對所有文件避免舊內容覆蓋新狀態。
+- 目前對 main SHA `98a92e7…` 的 combined commit status 未回傳檢查項目；不據此宣稱 post-merge CI 已通過。以 GitHub Actions 中實際綁定該 SHA 的 run 為準。
 
-**已授權的公開行情 → 資料品質與候選 → 正式策略資格 → 風控 → 模擬成交或有原因的 `NO_TRADE` → 原子預留與持久化 → 中斷恢復 → 真實證據 Dashboard。**
+### 完成時的產品樣貌
 
-正式策略登錄目前允許為空；沒有合格策略時必須安全地 `NO_TRADE`。先完成工程與合成驗收，正式受控循環及自然排程另外驗收。任何成功 workflow、測試策略或手動 dispatch 都不能代替正式策略品質、自然排程或交易權限。
+交付可保存、可恢復、可追溯、可理解且在零費用邊界下 fail-closed 的 GitHub 雲端 PAPER 模擬循環：
 
-### 依序執行的收斂排程
+**已授權的公開市場資料 → 資料新鮮度／完整性 → 候選與逐項資格結果 → 正式策略授權 → 風控 → 模擬成交或具原因的 `NO_TRADE` → 同一共享額度下原子 claim／reservation → immutable 保存及回讀 → 中斷恢復 → Dashboard 投影。**
 
-| 順序 | 優先度 | 工作與交付 | 通過／停止條件 |
+完成版必須同時支援兩種合規結果：
+
+1. 有經核准且有有效 evidence 的策略：只以真實授權資料和正式策略輸出進行 PAPER 模擬，記錄費用模型、滑價、成交依據、退出原因和帳戶變化。
+2. 沒有候選、資料不合格、registry 空、策略不合格、風險超限或預算證據不足：不下新倉，輸出明確狀態、原因和證據時間；不得用成功的 workflow 狀態掩蓋 `NO_TRADE` 或阻塞。
+
+工程驗收、帳戶用量／費用驗收、正式受控循環、Dashboard 部署、自然排程驗收和策略品質結論要分開記錄，不互相替代。
+
+### 依序執行的工作排程
+
+| 順序 | 優先度 | 工作 | 完成標準／停止條件 |
 |---|---|---|---|
-| 0 | P0 | 收斂文件 authority：保留 #644 的 generated-only 範圍；依實際結果修正本目標、Current Status、runbook、狀態 JSON 與 Dashboard projection 的快照日期及 SHA。對已消耗 V0.1／V0.2／V0.3 與 Billing audit 加上醒目的「已消耗、禁止 rerun」索引。 | 每個可執行下一步都指向 current main 和未消耗的 versioned authority；歷史報告／frozen receipt 原樣保留。#644 所需 GitHub approval/checks 未完成前，不合併或宣稱通過。 |
-| 1 | P0 | 做雲端只讀預算與資料覆蓋缺口盤點，先設計 successors，不呼叫 Cloudflare：分開定義 R2 所有 bucket／operation／writer、D1 database／rows／storage、billing invoices／metered charges 所需端點、最小權限、時間範圍、請求數、輸出欄位、freshness watermark、遮蔽、artifact 上限及停止碼。 | 各缺口可由官方 API／Analytics 證據支持，且操作上限和 0 USD 免費額度判定方式明確。缺資料或 API 不提供時記 `UNKNOWN`，先不建立或 dispatch live query。每個新增 live query 需 successor authority 先合併 main，且只執行一次。 |
-| 2 | P0 | 核對並補強共享預算／保存的 runtime 接線：provider、D1、R2 每一個外部操作前都需同一 run-scoped 原子 reservation；涵蓋每日與帳期額度、全 writer headroom、重複 slot、並行、settlement、重啟與部分寫入。 | 零網路合成測試涵蓋成功、耗盡、過期、缺證據、競爭及失敗恢復；不把 mock snapshot 當帳戶校準。全帳戶證據不完整就保持 external access 前 fail closed。 |
-| 3 | P0 | 以現有 Pionex public market adapter／資格 adapter／risk／portfolio／paper core 建立完整循環；完成正向 test fixture 與無候選、空 registry、Core100 REJECT、壞行情、額度不足、重播及恢復路徑。報告包含 source/time、候選與拒絕原因、strategy evidence、slot/run/state IDs、帳戶變化和 I/O 次數。 | Python 3.12／3.13、Ruff、治理及 relevant cloud CI 於 exact PR head 通過。正式 registry 不因測試而改動；不得以替代 provider 補缺。 |
-| 4 | P1 | 先讓 `scripts/validate_dashboard_static.py`、Dashboard data contract、Zh-Hant snapshot 與 UI 同時相容 V0.2 歷史和 V0.3 最新證據，再更新 Dashboard projection。清楚區分 `NOT_RUN`、`NO_TRADE`、資料不足、故障、部分寫入、預算未知／阻擋。未知金額、容量、帳戶與持倉維持 null/UNKNOWN。 | 以 V0.2 舊 fixture 和 V0.3 新 fixture 分別通過 Python／Dashboard／Zh-Hant／Pages safety CI；後才更新 projection，且投影不冒充 authority。 |
-| 5 | P0 gate | 只有免費方案、fresh 帳戶級 D1/R2、完整 bucket/writer coverage、計量／帳單、reservation 校準都證明安全後，準備另一份 implementation-bound successor authority；再做一次受限 main PAPER acceptance，驗證帳戶初始資金只初始化一次、保存後回讀及零額度超用。 | 任一費用、freshness、writer、讀寫副作用未知即停止；不建立 D1、不寫 R2、不跑正式循環。不得將模型 REJECT 或空策略改成可交易。 |
-| 6 | P1 gate | 通過受控 acceptance 後才啟用有界自然 Paper schedule 與 Pages 證據投影。 | 首次 qualifying `event=schedule` run 的精確 SHA、slot、report、side effects、重複防護均核對；手動 run 不代替自然 run。 |
+| 0 | P0 即刻 | **修正 authority 與文件漂移。** 更新本目標、`CURRENT_STATUS.md`、狀態 JSON／runbook 的 main SHA、PR #644 狀態、一次性 audit 清單及 Dashboard V0.2/V0.3 阻塞。將舊的「設定 secret 後可跑一次性 audit」段落明確標成歷史；不可刪改凍結證據。 | 所有首頁／目前狀態皆指向 main `98a92e7…` 並對歷史留明確標示；#644 不覆蓋新版狀態；PR exact-head checks 綠燈。 |
+| 1 | P0 規格先行 | **補足只讀帳戶用量、容量與帳務證據設計。** 僅查閱官方 API 文件，不呼叫 Cloudflare。把 R2 bucket inventory、R2/D1 analytics、D1 inventory、帳務 usage/history/invoice 各自拆成 endpoints、最小權限、資料邊界、次數上限、回應大小、時間窗及欄位 allowlist。 | successor 規格可指出哪些值是觀測、哪些仍不可證明；freshness 不足、API 權限不足、欄位缺失或覆蓋不全一律 `UNKNOWN`，不能得出零費用或啟用結論。 |
+| 2 | P0 後端 | **檢查共享預算與持久化安全。** 核對每個 provider/D1/R2 外部操作前均先使用同一 run-scoped 原子 reservation；整理自有 workflow inventory、寫入者清單、並行／重播／復原順序、部分寫入的人工處理。 | 零網路雲端測試涵蓋競爭、耗盡、stale snapshot、部分寫入、重啟、settlement；外部 writer 未完整盤點、freshness 不足或 reservation 自身成本未校準時，外部 I/O 前停止。 |
+| 3 | P0 循環驗收 | **完成現有循環缺漏。** 使用原 Pionex adapter，不引入未授權來源；驗證 closed bars → data gate → candidates → strategy registry → risk → paper → immutable result → read-back／restart recovery。補風險超限、來源故障、空 recent-trades、預算不足、部分寫入及審核原因的端到端報告。 | 使用 test-only fixtures 跑 GitHub CI；測試策略永不進 production registry。Python 3.12／3.13、Ruff、治理、workflow static 與適用檢查都在 exact PR head 通過。 |
+| 4 | P1 Dashboard | **修好 V0.2 歷史與 V0.3 最新 evidence 相容。** 檢查 `scripts/validate_dashboard_static.py`、Dashboard data contract、renderer、fixtures、繁中快照及 Pages workflow。先新增雙版本 fixture／回歸，後更新真實投影。 | V0.2 fixture、V0.3 fixture、缺欄位／null／未知／部分資料 fixture 都通過對應 CI。網站分辨 `NOT_RUN`、`NO_TRADE`、`DATA_INSUFFICIENT`、`SYSTEM_ERROR`、`REVIEW_REQUIRED`、`BLOCKED_BUDGET`；未知的費用、容量、持倉維持 null／UNKNOWN。 |
+| 5 | P0 外部證據 gate | **待規格和必要 authority 到 main 後，再逐一執行新的、各自限額的唯讀 successor query。** 每個 scope 先 zero-network readiness；外部 live query 一次且不得 retries；報告遮蔽識別資訊和原始 payload。 | 只在 endpoint 權限明確、免費額度可查、request／response caps 有 CI 證明且 versioned authority 已合併後執行。遇 API 不可用／回應不完整／同一 run 已 dispatch 即終止且保留結果，禁止 rerun。 |
+| 6 | P0 啟動 gate | **準備並執行一次有界的 main PAPER controlled acceptance。** 此項依賴帳戶級零費用／用量／容量／writer evidence、Dashboard 完成和目前合併 authority。驗證初始虛擬資金只建一次，持久化後讀回、下一輪可恢復，沒有額度超用／重複成交。 | 任何費用、用量 freshness、writer coverage、R2/D1 headroom、交易資格或保存狀態為 UNKNOWN 即保持停機。不 provision D1、不寫 R2、不做正式 cycle。 |
+| 7 | P1 自然運轉 gate | **Controlled acceptance 通過後再啟用有界 natural Paper schedule。** 同步 schedule inventory、GitHub Actions concurrency、Health／Dashboard 投影；明確 run timeout、單次／每日請求上限、錯過 slot 不補跑。 | 首個 `event=schedule` run 核對 SHA、slot、report、資料 timestamp、持久化讀回及 I/O 數；手動 dispatch 不替代自然執行。沒看到 qualifying natural run 就記「已配置、待首跑」，不得稱無人值守已驗收。 |
+| 8 | P2 結案整理 | **把證據同步到 README、Project Status、runbook、Operations map、Dashboard 與接續手冊。** 標出完成、blocked、unknown、未執行，保留失敗與 skipped runs，列出後續 owner action。 | 有單一清晰的 current-state 入口與可重現 run/artifact/commit 證據；CI、Pages、paper runtime、自然 schedule 和模型研究結果各自分開。 |
 
-### 固定安全界線
+### 雲端用量／帳務證據界線（新查核結果）
 
-- 雲端 GitHub／GitHub-hosted runner only；不讀寫本機 checkout、終端機或本機排程。
-- `FREE-ONLY / 0 USD per month`；不能證明零費用即不存取／不啟用。
-- `PAPER / LIVE-PAPER ONLY`；真實資金、真實訂單、實盤、自動 promotion、holdout、source switch 一律關閉。
-- Core100 品質 `REJECT`、production registry 空、macro `REGIME_UNAVAILABLE`；不調門檻、不用測試策略、不推論策略通過。
-- 不重跑 bootstrap、一次性 audit 或結果不明的外部副作用；不改 frozen receipts/configs，不輸出 secrets。
-- 保持現有排程，除非新的版本化 authority 通過；不得補跑歷史 slot，也不以等待日曆觀測取代可立即完成的工程工作。
+以下只界定後續可設計的證據來源；**未建立新憑證、未呼叫 Cloudflare API、未授權 live query**。
+
+- **R2 Analytics GraphQL：**官方資料集支援 operations／storage 聚合，最長查詢時間為 31 天，須以 `accountTag` 限定帳戶。聚合資料不是完整 bucket 清單，亦不能證明所有其他 workflow、外部 API token 或使用者寫入者。若回傳資料沒有足以符合既有 freshness gate 的時間戳，仍是 `FRESHNESS_UNKNOWN`。
+- **R2 bucket inventory REST：**`GET /accounts/{account_id}/r2/buckets`；需要 `Workers R2 Storage Read`（或更廣的 Write，不建議）。必須枚舉 `default`、`eu`、`us`、`fedramp`、`fedramp-high` 五個 jurisdiction；每頁最多 1,000，依 cursor 續查。新 successor 上限建議每 jurisdiction 最多 10 頁，故全 endpoint 最多 50 requests；任何 jurisdiction 未完整遍歷或仍有 cursor 即 `R2_BUCKET_PAGINATION_INCOMPLETE`，不得宣稱全帳戶 bucket inventory complete。只保留 bucket count、jurisdiction、storage class 和經必要最小化的非敏感識別；不列 object/key、不讀取 object。
+- **D1 inventory REST：**`GET /accounts/{account_id}/d1/database`；需要 `D1 Read`；API 每頁最多 10,000，回傳 total count/page metadata。新 successor 上限建議 5 pages、最多 50,000 records。超出上限、total_count 不一致、權限不足或非完整頁均輸出 `D1_INVENTORY_INCOMPLETE`。僅 inventory 不證明 rows/storage usage。
+- **D1/R2 usage GraphQL：**分別使用官方 D1／R2 analytics datasets，固定明確 UTC 期間（最多 31 天）、帳戶 tag、指標欄位 allowlist 和嚴格 response bytes 上限；不使用 bucket/database 名稱維度時不得推論逐資源完整度。只觀測 aggregate，不寫入。官方文件沒有確認每個 dataset 都能提供 ≤60 秒 freshness，因此不能假設滿足專案現行 freshness gate。
+- **Billing usage API：**官方列出 `GET /accounts/{account_id}/billable/usage` V2 Alpha / Restricted，日期範圍最多 31 天，也明示包含免費額度內的 meter usage；但目前文件指出 cost/pricing 欄位在 billing integration 完成前可能缺席。故此 endpoint 是用量候選，單獨不足以證明總費用為零。V1 為 Alpha/Deprecated，不當首選。
+- **Billing history／invoice：**官方 REST 文件列出 account billing history 與 unpaid invoice API，但必須另外驗證所需 permission、分頁與期間完整性、歷史 invoice/adjustment/credit/correction 覆蓋，以及 current-cycle 未結算 usage。只有 subscriptions 的列示價格 USD 0、沒有 unpaid invoices 或 analytics usage 均不足以單獨證明總成本 USD 0。若官方 API 或目前 token 權限不能形成完整可核對集合，保留 `BILLING_COVERAGE_UNKNOWN`，改由帳戶持有人核對 Cloudflare 帳單頁面，不擴權。
+- **不可混淆的時間概念：**API response time、資料最新 bucket/day、Cloudflare ingestion/update watermark、invoice billing period 和目前計算時間需分欄記錄；不能把 run 啟動時間當來源資料 freshness。
+- **請求與資料上限建議：**新帳戶 evidence successor 每次不超過 64 個 HTTP/GraphQL 呼叫（R2 inventory 50 + D1 inventory 5 + analytics 1 + billing usage 1 + history/invoice candidate 最多 7）；單一 response 建議 ≤1 MiB、artifact ≤256 KiB、不留 raw response／token／帳戶識別值。每個候選 endpoint 的具體日期窗口、分頁與 request upper-bound 必須在 config、程式與 synthetic CI 三方一致；超過即中止、不 retry、不自動切換 endpoint。這是待審設計上限，尚非 authority。
+- **費用 gate：**免費額度應按 Cloudflare 帳戶實際 plan、目前週期、服務別 meter、R2 storage/operations/egress、D1 rows/storage、Workers/Pages/其他已啟用產品、全部共同 writers 與延遲 invoice 一起核算。任何用量、項目、帳務覆蓋或 watermark 未知即 `ZERO_COST_NOT_PROVEN`。
+
+### 問題與停止碼索引
+
+| 問題 | 顯示／記錄狀態 | 允許的下一步 |
+|---|---|---|
+| #644 base 落後 main、舊檢查 action_required | `STALE_MAIN / CHECKS_NOT_RUN_OR_UNKNOWN` | 新生成 docs snapshot 後新分支／PR；舊 PR 不覆蓋、不合併 |
+| 一次性 audit 已 dispatch | `CONSUMED_DO_NOT_RERUN` | 保存 artifact／receipt；僅在資訊缺口明確、範圍不同時設計 successor |
+| Bucket／D1 pagination 被 cap 擋住 | `*_PAGINATION_INCOMPLETE` | 保持 unknown；先評估是否需要新 authority，不自動加 cap 或重試 |
+| 缺時間戳、timestamp 超 freshness | `FRESHNESS_UNKNOWN`／`FRESHNESS_EXPIRED` | 禁止使用該快照作 reservation/headroom 證據 |
+| Billing usage V2 無 cost 欄位 | `BILLING_COST_FIELDS_ABSENT` | 不推論零費用；查經核准的帳單證據來源 |
+| token 權限／Analytics schema/API 變化 | `PERMISSION_BLOCKED`／`SCHEMA_REVIEW_REQUIRED` | 零後續 request，保留 sanitized 診斷 |
+| Cloud Paper 預算、來源或策略資格未知 | `BLOCKED_BUDGET`／`DATA_INSUFFICIENT`／`STRATEGY_NOT_ELIGIBLE` | 不下新倉、不啟動 runtime |
+| reservation/persistence 部分寫入或狀態衝突 | `REVIEW_REQUIRED` | 保留 claim、ledger 和 artifact；人工核對，不自動 replay I/O |
+
+### 固定完成與安全條件
+
+- 執行環境：`CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`；不讀寫或依賴本機 checkout、shell、terminal 或本機 schedule。
+- 雲端方案：`FREE-ONLY / 0 USD per month`。零費用證據不完整時不可存取／部署或啟用 runtime；不升級、不加付款方式作 fallback。
+- 交易範圍：`PAPER / LIVE-PAPER ONLY`；real-money orders 與 live trading 關閉。
+- Holdout = `FROZEN_UNOPENED`；`source_switch_authorized=false`；promotion=false；不調 Core100 門檻。
+- Core100 = `REJECT`；正式策略 registry 空；macro context = `REGIME_UNAVAILABLE`。
+- frozen authorities、reports、artifacts、receipts 不修改；已消耗的一次性 audit/bootstrap 不重跑；不輸出／索取 secret values。
+- 不以手動 workflow_dispatch 冒充自然 schedule；不補跑歷史 slot；不因「workflow SUCCESS」就宣稱交易策略有效。
+- 新 provider、D1/R2 存取、帳務 audit、正式 loop 和 schedule 各需當前 main 上清楚版本化授權；文件、issue、PR 草稿和計畫不授予執行權。
+
+### 本目標結案定義
+
+1. **工程整合 PASS：**端到端合成有交易／無交易／拒絕／保存回讀／重播／恢復測試全通過必要 CI。
+2. **文件與 Dashboard PASS：**狀態 schema 及 UI 可顯示舊／新 evidence 和所有 UNKNOWN，不虛構零值；Pages 部署驗證通過（僅網站變更需部署）。
+3. **FREE-ONLY evidence PASS：**合併後、另有版本化授權的 live read-only evidence 完整覆蓋使用量、帳務、全 bucket/database、freshness、共同 writer 與足夠 headroom；若官方來源不能證明，標示未達成本 gate，不能宣稱已啟用。
+4. **受控 PAPER acceptance PASS：**只有在上述條件和正式策略 authority 都允許時才跑；驗證初始化一次、paper position lifecycle、immutable save/read-back/recovery 和 budget/request upper bounds。
+5. **自然運作 PASS：**schedule workflow 已授權並啟用，至少一個 qualifying 自然 run 核對完成；否則僅為「已配置、待首跑」。
+6. **策略研究結論獨立：**Core100 的 `REJECT` 不阻擋 NO_TRADE 工程完成；不代表目標要求交易或獲利，也不藉此改為 PASS。
+
+> 這份目標是工程排序與驗收條件，不是 Cloudflare live query、資源建立、付費、排程啟用、策略 promotion 或交易授權。
+
+## 目前狀態索引
+
+- 最新 GitHub main：`98a92e74e923273d436c29add3c8679000df614e`（2026-09-30 查核）。
+- #644：仍 open；現有記錄的 head/base 已落後 main，舊 checks 不視為通過，須重新核實或重建。
+- #645：已合併至上述 main；該 PR 首次 V0.3 dashboard projection 嘗試失敗，最終合併版本保留 V0.2 投影，因此相容性問題仍待修。
+- 本文件版本不授予任何新的 Cloudflare API 呼叫或 runtime authority。
+
 
 ---
 
