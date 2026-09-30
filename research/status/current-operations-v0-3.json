@@ -4,10 +4,10 @@
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
-    "parent_main_sha": "9ffe30c8f0ab28bc3b2a95ae19de6938ed613dae",
+    "parent_main_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
     "semantics": "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
     "is_latest_main_claim": false,
-    "source_merge_pr": 427
+    "source_merge_pr": 654
   },
   "mode": "PAPER_AND_LIVE_PAPER_ONLY",
   "core100": {
@@ -132,7 +132,7 @@
       "contract": "config/cloud_project_maintenance_v0_1.json",
       "receipt": "research/receipts/2026-09-25-cloud-project-maintenance-v0-1.json",
       "effective_condition": "REVIEWED_MAIN_MERGE",
-      "acceptance": "WAITING_TWO_NATURAL_RUNS",
+      "acceptance": "LATEST_NATURAL_HEALTH_36676258650_MAINTENANCE_36676302904_INSPECT_SUCCESS_PROPOSE_OBSERVATION_CHANGED_SAFE_STOP; NOT_NO_CHANGE_ACCEPTANCE",
       "local_work": "EXCLUDED_BY_USER",
       "model_required": false,
       "automatic_merge": false
@@ -157,10 +157,11 @@
       "diagnostics": 42,
       "protected": 18,
       "cleanup_candidates": 24,
-      "blocking": false
+      "blocking": false,
+      "classification": "NONBLOCKING_CI_VISIBILITY"
     }
   },
-  "next_decision": "COST_FRESHNESS_STORAGE_AND_LEDGER_FEASIBILITY_THEN_PRODUCTION_WIRING",
+  "next_decision": "SYNCHRONIZE_CURRENT_STATE_THEN_COST_FRESHNESS_STORAGE_AND_LEDGER_FEASIBILITY; DO_NOT_REPEAT_CONSUMED_AUDITS",
   "notes": [
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
     "Older September 13 present-tense summaries reporting Core100 8/10 and Training SKIPPED are historical and superseded for current operations.",
@@ -295,19 +296,28 @@
     "next_step": "SEPARATELY_VERSION_D1_BILLING_AND_STORAGE_WRITER_COVERAGE_EVIDENCE_BEFORE_ACTIVATION"
   },
   "live_repository_checkpoint": {
-    "evidence_basis_main_sha": "095aba2c80b9ad710523875b1f45381646e61b75",
-    "observed_at_utc": "2026-09-30T05:53:15Z",
+    "evidence_basis_main_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
+    "observed_at_utc": "2026-09-30T07:06:00Z",
     "is_latest_main_claim": false,
     "open_pull_requests": [],
-    "ci_run_id": 36667740375,
+    "ci_run_id": 36681001425,
     "ci": "SUCCESS",
     "python_3_12": "SUCCESS",
     "python_3_13": "SUCCESS",
-    "workflow_static": "SKIPPED_MAIN_EVENT",
+    "workflow_static": "SKIPPED_NO_WORKFLOW_CHANGE",
+    "codeql_run_id": 36681001327,
+    "codeql": "SUCCESS",
+    "dependency_sbom_run_id": 36681001359,
+    "dependency_sbom": "SUCCESS",
+    "freeze_guard_run_id": 36681001474,
+    "freeze_guard": "SUCCESS",
     "cloud_paper_activation": false,
+    "d1_provisioned": false,
     "production_cycle_status": "NOT_RUN",
     "usage_receipt": "research/receipts/2026-09-29-cloud-paper-r2-usage-audit-v0-3-result.json",
     "usage_evidence": "PARTIAL_V0_3_ZERO_COST_AND_HEADROOM_UNKNOWN",
-    "next_work": "COST_FRESHNESS_STORAGE_AND_LEDGER_FEASIBILITY_THEN_PRODUCTION_WIRING"
+    "latest_maintenance_run_id": 36676302904,
+    "latest_maintenance_propose": "OBSERVATION_CHANGED",
+    "next_work": "SYNCHRONIZE_STATUS_THEN_COST_FRESHNESS_STORAGE_AND_LEDGER_FEASIBILITY"
   }
 }
