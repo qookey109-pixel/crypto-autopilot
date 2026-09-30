@@ -12,7 +12,7 @@ from crypto_autopilot.paper.live_v0_1 import LivePaperMarketFrame, LivePaperPoli
 from crypto_autopilot.paper.run_claim_v0_1 import LivePaperRunClaimPolicy
 from crypto_autopilot.paper.run_coordinator_v0_1 import (
     LivePaperRunCoordinatorPolicy, PaperRunStoreLike,
-    coordinate_live_paper_run_step, verify_live_paper_run_step,
+    coordinate_live_paper_run_step, read_live_paper_run_step_tick,
 )
 
 SLOT_MS = 900_000
@@ -119,7 +119,8 @@ def _report_step(
         if not isinstance(embedded, Mapping):
             raise CloudLoopReviewRequired("RESULT_STEP_MISSING")
         try:
-            step_id = verify_live_paper_run_step(embedded)
+            read_live_paper_run_step_tick(store, embedded, before_external=before_external)
+            step_id = str(embedded["step_id"])
         except ValueError:
             raise CloudLoopReviewRequired("RESULT_STEP_INVALID") from None
     elif schema == "qookey-cloud-paper-loop-report-v0.2":
@@ -138,7 +139,8 @@ def _report_step(
     if persisted is None:
         raise CloudLoopReviewRequired("RESULT_STEP_PERSISTENCE_MISSING")
     try:
-        verified = verify_live_paper_run_step(persisted)
+        read_live_paper_run_step_tick(store, persisted, before_external=before_external)
+        verified = str(persisted["step_id"])
     except ValueError:
         raise CloudLoopReviewRequired("RESULT_STEP_PERSISTENCE_INVALID") from None
     if verified != step_id or persisted.get("step_id") != step_id:
@@ -261,7 +263,9 @@ def latest_committed_slot(
         if previous_step is None:
             raise CloudLoopReviewRequired("LEDGER_PREVIOUS_STEP_READBACK_MISSING")
         try:
-            verify_live_paper_run_step(previous_step)
+            read_live_paper_run_step_tick(
+                store, previous_step, before_external=before_external,
+            )
         except ValueError:
             raise CloudLoopReviewRequired("LEDGER_PREVIOUS_STEP_INVALID") from None
         if (
@@ -399,10 +403,15 @@ def run_cloud_step(
         feed=feed, store=store,
         initial_state=state if previous is None else None,
         previous_step=previous,
-        policy=LivePaperRunCoordinatorPolicy(run_slot_claim_required=True),
+        policy=LivePaperRunCoordinatorPolicy(
+            run_slot_claim_required=True, compact_tick_reference=True,
+        ),
         claim_policy=LivePaperRunClaimPolicy(),
     )
-    next_state = report["run_step"]["tick_report"]["next_state"]
+    tick = read_live_paper_run_step_tick(
+        store, report["run_step"], before_external=before_external,
+    )
+    next_state = tick["next_state"]
     checkpoint = next_state["checkpoint_report"]
     reasons = decision_reason_codes(
         market=market, registrations=registrations, candidates=candidates,
