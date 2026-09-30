@@ -255,9 +255,14 @@ class CloudPaperLoopTests(unittest.TestCase):
         store = MemoryStore()
         step(store, 420000, None)
         pointer = store.objects[("cloud-result", "0")]
-        report = store.objects[("cloud-report", pointer["report_id"])]
+        old_report_id = pointer["report_id"]
+        report = dict(store.objects[("cloud-report", old_report_id)])
+        report["coordinator"] = dict(report["coordinator"])
         report["coordinator"]["step_id"] = "wrong-step-id"
-        pointer["report_id"] = digest(report)
+        new_report_id = digest(report)
+        del store.objects[("cloud-report", old_report_id)]
+        store.objects[("cloud-report", new_report_id)] = report
+        pointer["report_id"] = new_report_id
         with self.assertRaisesRegex(CloudLoopReviewRequired, "RESULT_STEP_PERSISTENCE_MISSING"):
             committed_report(store, "0")
 
