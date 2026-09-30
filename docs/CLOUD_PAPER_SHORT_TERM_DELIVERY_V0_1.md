@@ -111,7 +111,7 @@ Repository：[`qookey109-pixel/crypto-autopilot`](https://github.com/qookey109-p
 完整交付仍要求正式循環、持久化回讀、首次自然排程及 Dashboard 證據。安全停用或文件 CI 綠燈只能記為受阻／工程準備完成，不算完整自動循環交付。
 
 
-## 二、本次確認的現況
+## 二、截至 c9e220c 的歷史現況（後續狀態見最新查核）
 
 - 即時 main：`c9e220cb6f2191e6fb0dd50a5918a62971360e8e`；目前沒有 open PR。
 - PR #654「D1 usage evidence before each query」已合併。PR head `2117448a00edf599d08c8d6fb27596ba9cf0a0ab`；PR CI #36680835582、CodeQL #36680835575、Dependency/SBOM #36680835567 成功。合併後 main CI #36681001425、Freeze Guard #36681001474、Dependency/SBOM #36681001359、CodeQL #36681001327 均成功。修正會在 shared admission 前檢查證據、成功預留後再檢查 freshness/UTC 日，避免過期或換日後查目標資料；無效時保留既有 reservation 並停止目標 query。
