@@ -41,8 +41,8 @@ D1_QUERY_GUARD_ORDER = (
     "if self._shared_rows_guard is None:",
     "self._usage_guard.validate_evidence()",
     "self._shared_rows_guard.reserve_query(",
-    "self._usage_guard.validate_evidence()",
     "self._shared_rows_guard.validate_evidence(",
+    "self._usage_guard.validate_evidence()",
     "result = self._request(sql, params)",
 )
 

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import sqlite3
-from datetime import UTC, datetime
 import threading
+from datetime import UTC, datetime
 from unittest.mock import patch
 import unittest
 from concurrent.futures import ThreadPoolExecutor
@@ -611,9 +611,6 @@ class D1UsageGuardTests(unittest.TestCase):
             guard.reserve_query()
 
 
-
-
-
 class D1ClientFreshnessTests(unittest.TestCase):
     def make_client(self, *, start_ms: int, after_admission_ms: int):
         clock = [start_ms]
@@ -716,7 +713,6 @@ class D1ClientFreshnessTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_USAGE_PERIOD_MISMATCH"):
             guard.validate_evidence()
         self.assertEqual(guard._reserved_reads_day, 0)
-
 
 class D1SharedRowsBudgetGuardTests(unittest.TestCase):
     def make_snapshot(self, **changes):

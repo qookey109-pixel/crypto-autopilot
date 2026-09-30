@@ -533,10 +533,10 @@ class CloudflareD1QueryClient:
         self._shared_rows_guard.reserve_query(
             execute=self._request, snapshot=snapshot, now_ms=clock_ms(),
         )
-        self._usage_guard.validate_evidence()
         self._shared_rows_guard.validate_evidence(
             snapshot=snapshot, now_ms=clock_ms(),
         )
+        self._usage_guard.validate_evidence()
         result = self._request(sql, params)
         if (
             result.rows_read > self._shared_rows_guard.policy.max_rows_read_per_query
