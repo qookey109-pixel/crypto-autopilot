@@ -23,6 +23,76 @@ Repository：[`qookey109-pixel/crypto-autopilot`](https://github.com/qookey109-p
 6. Dashboard 綁定正式 report identity，清楚分辨正常不交易、資料不足、系統故障、檢視中及未啟用；未知資產、損益、用量與 headroom 顯示 UNKNOWN/null 而非 0。完成 Pages deploy 後做 desktop/mobile production browser 驗證。
 7. 目前每批有 exact base/head/diff、必要 review、CI 和治理 checks；合併後確認 live main、適用 checks、部署與分支清理。文件、機器索引與程式狀態同步，舊收據和 frozen evidence 原樣保留。
 
+
+## 本輪目標修訂：即時行情、最小必要保存與多種公開擷取方式 — 2026-09-30
+
+查核基準 main：`921239d173f7e3ef548ef3354fc8b430cbbe37ef`；open PR=0。#655/#656 文件同步與 Maintenance 結果分類已合併，不重列為未完成的第一批。本節更新工程目標與來源評估，不變更任何 frozen 契約、依賴、runtime、資料來源或排程權限。既有 Cloud Paper activation=false；正式入口、D1 建立與受控循環仍待完成。
+
+### 1. 保存目標：即時取用，保留能恢復與說明決策的最小證據
+
+日常循環按需取得公開行情與必要的近期已收盤 K 線；預設在雲端 runner 記憶體內使用後釋放。研究用歷史資料與日常模擬帳戶分開管理，不要求每輪下載或持續擴張歷史資料庫。
+
+| 類別 | 目標保存方式 | 不可省略的條件 |
+|---|---|---|
+| 最新報價、深度、未用於決策的行情 | 當輪暫存，預設不長期保存原始回應 | 記錄必要來源、資料時間、品質結果；被用於成交或決策的部分依下一列處理 |
+| 近期已收盤 K 線與指標暖機資料 | 按需、有上限取得；不每輪重複持久化整段資料 | 驗證完整區間、收盤、連續性、時區與 holdout 邊界；無法再次取得不能假設可重現 |
+| 實際決策／模擬成交所依據的資料 | 保存規範化的最小輸入切片、指標值、資格與風控結果、來源／程式／設定版本 | 必須足以驗證宣稱的決策或成交；hash 只能校驗已有內容，不能取代已丟棄資料或宣稱完整重播 |
+| 模擬帳戶、持倉、成交、費用、損益 | 持久化，保持不可變事件與已驗證狀態鏈 | 重啟延續帳戶；平台沒有本專案的虛擬帳戶，不能向平台重新取得 |
+| slot claim、預算 reservation／settlement、恢復紀錄 | 持久化必要狀態，完整性檢查與回讀保留 | 不因節省儲存而破壞原子性、防重或部分寫入辨識 |
+| 回測／訓練歷史與已驗證成果 | 獨立研究資料範圍；按版本追溯 | 既有 frozen 資料與收據保留，不因本目標自動刪除；未來清理另立保存規則 |
+| Dashboard 衍生資料 | 精簡投影，引用正式報告 identity | 不複製全部行情；未知值不能顯示成 0 |
+
+策略穩定後，日常執行可以不依賴大型研究歷史庫，但仍需策略的暖機資料、持倉事件證據與驗證紀錄。行情不完整時停止推進持倉，不能用目前價格推測離線期間的觸價順序、成交或損益。
+
+正式修改保存格式前，先列出現有每種寫入物件、reader、恢復依賴及是否 frozen。不得直接刪欄位；必要時新增 successor schema，驗證新舊報告相容。2 MiB/run 是目前預算上限，不是每輪必須寫滿或必須保留全部行情。節省量需以新舊報告實測比較，不能先聲稱已降低用量。
+
+### 2. 資料取得不限定 API，但依用途與證據選擇
+
+公開 API 不一定需要 API key；網頁上的資料也可能來自公開 JSON 介面。取得方式和資料供應者是兩個不同維度，同一平台改用另一端點或 HTML 仍須審查契約，不能自動繞過原有來源限制。
+
+| 方式 | 適合用途 | 採用前必要查核 |
+|---|---|---|
+| 官方公開 API／公開 JSON／CSV／RSS | 結構化行情、資料下載、公告 | 文件與端點、欄位、資料時間、覆蓋、限速、存取條件、免費用量 |
+| 公開靜態 HTML 擷取 | 平台公告、規格、公開表格；行情用途另驗 | 固定欄位映射、symbol／market type／單位、頁面延遲、完整性、版面變動 |
+| 雲端 headless browser | 必須 JavaScript 渲染且無合適結構化來源的公開頁面 | timeout、頁數、子請求、資源下載與 runner 成本；只能擷取明確欄位 |
+| WebSocket | 未來需要串流的獨立候選 | 斷線、序號、補齊與持續運行成本；本次不引入常駐服務 |
+
+優先保留已驗證且符合用途的 adapter；網頁／瀏覽器是明確評估的候選，不是故障時自動 fallback。研究及展示擷取通過，不代表符合策略或成交的精度與完整性要求。只抓當輪所需頁面，不做全站 crawl。
+
+每個候選來源必須登記：用途、provider、URL/端點、取得方法、parser 版本、symbol 映射、時區、source timestamp、retrieved_at、單位與精度、資料區間／分頁完整性、更新延遲、請求與位元組上限、存取條件、可保存範圍，以及停止原因。來源時間缺漏維持 UNKNOWN，不用查詢時間冒充。價格、缺失欄位及失敗回應不得由 LLM 猜測或補零。
+
+使用允許的公開存取方式；遇到登入、付費牆、CAPTCHA、403/429 或來源限制，記錄受阻並停止。此計畫不採用反偵測、代理輪換或繞過限制來維持執行，也不放寬 provider/source-switch 邊界。瀏覽器的子請求與依賴成本仍納入共享預算；開源工具並不自動等於零執行成本。
+
+### 3. AI Resource Hub 參考結果
+
+資源庫入口：[AI Resource Hub](https://qookey109-pixel.github.io/ai-resource-hub/)。本次網站抓取工具無法讀取首頁，改讀同專案的 [resources.json](https://github.com/qookey109-pixel/ai-resource-hub/blob/main/data/resources.json)，並查閱以下上游文件／程式。目錄是候選索引，不是資料品質或免費額度保證。
+
+| 資源 | 本專案可借鏡的部分 | 本輪採用決定 |
+|---|---|---|
+| [Scrapling](https://github.com/D4Vinci/Scrapling) | Python parser／明確 selector、靜態與動態擷取分層 | 靜態公開頁面擷取候選；不先新增依賴。交易欄位不得靠 adaptive selector 靜默換欄位，版面漂移應拒絕 |
+| [Playwright MCP](https://github.com/microsoft/playwright-mcp) | 結構化頁面檢視與瀏覽器操作 | 研究動態頁面與驗證擷取欄位的參考；正式排程若需要瀏覽器，優先沿用既有 Playwright 能力，不新增 LLM/MCP 常駐服務 |
+| [Fincept Terminal](https://github.com/Fincept-Corporation/FinceptTerminal) | 多格式 parser、欄位映射、來源與輸出正規化 | 借鏡接口分層，不整套導入、不複製程式碼；依賴或代碼採用前再審查授權 |
+| [Firecrawl MCP](https://github.com/firecrawl/firecrawl-mcp-server) | 網頁擷取／結構化結果的接口設計 | 研究候選；託管方案有限額與額外依賴，零費用與正式行情用途未驗證，不接入 runtime |
+| [Public APIs](https://github.com/public-apis/public-apis)、[free-for.dev](https://github.com/ripienaar/free-for-dev) | 搜尋來源和免費服務的索引 | 逐個回到服務官方文件確認，不把清單標籤當免費或可用證據 |
+
+實際程式查閱：
+- Fincept [FeedScraper.cpp](https://github.com/Fincept-Corporation/FinceptTerminal/blob/main/fincept-qt/src/services/feeds/FeedScraper.cpp) 支援 JSON/CSV/XML/RSS 類欄位映射，可借鏡 parser 與統一輸出的分離；其中缺少時間時補現在時間的展示行為，不適用本專案 source freshness。
+- Fincept [fii_dii_scraper.py](https://github.com/Fincept-Corporation/FinceptTerminal/blob/main/fincept-qt/scripts/fii_dii_scraper.py) 是特定股票市場資料擷取範例，不是 Pionex adapter。其缺值轉 0、錯誤回空陣列的處理不可照搬；本專案需要區分失敗、缺值、完整空結果與有效 0。
+- 上述工具尚未對 Pionex 行情相容性作實測；本批沒有執行平台爬取、安裝、來源切換或新增雲端排程。
+
+### 4. 納入主線的下一批工作與完成標準
+
+1. **最小保存盤點（P0）：** 列每個物件的用途、reader、恢復依賴、目前位元組／操作數與可精簡項；明確保留必要決策輸入與狀態。依現有程式與合成 fixture 開始，不新增外部存取。
+2. **來源與方法矩陣（P1，可與 P0 獨立準備）：** 優先一個真正缺資料的指標／公開頁面，核對原始來源、時間、完整性與成本。結果為可提出具體 adapter 或明確不適用，不湊來源、不重寫已完成 client。
+3. **小批保存實作與雲端驗收（P0）：** 針對盤點結果改最少物件；新舊 schema 相容、重播、重啟、部分寫入、決策追溯通過；列出修改前後實測，不削減保護性讀寫。
+4. **重算完整循環成本（P0）：** 將行情擷取、瀏覽器子請求（若採用）、預算帳本、寫入、回讀、恢復與儲存增長一併計入。成本查核仍須解決完整 inventory/writer/freshness，不能因少存行情就跳過。
+5. **正式接線與啟用：** 依既有順序完成 successor authority、受控 main acceptance、首次自然 schedule、Dashboard。任何新增來源或保存契約須先完成必要版本化授權；此目標文檔不授予外部執行權。
+
+目標回歸項目：缺 source timestamp、locale／單位錯誤、不同市場同名 symbol、頁面漂移、部分表格／分頁、未收盤 K 線、403/429／來源不可用，以及最小保存後仍能恢復與說明決策。以合成 fixture 在 GitHub CI 驗證；即時外部驗收另依有界授權執行。
+
+完整交付仍要求正式循環、持久化回讀、首次自然排程及 Dashboard 證據。安全停用或文件 CI 綠燈只能記為受阻／工程準備完成，不算完整自動循環交付。
+
+
 ## 二、本次確認的現況
 
 - 即時 main：`c9e220cb6f2191e6fb0dd50a5918a62971360e8e`；目前沒有 open PR。
@@ -58,7 +128,7 @@ Repository：[`qookey109-pixel/crypto-autopilot`](https://github.com/qookey109-p
 
 | 順序 | 優先度 | 工作批次 | 驗收、停止條件與產物 |
 |---|---|---|---|
-| 1 | P0，現在 | **狀態與目標同步 PR（目前批次）**：本目標、CURRENT_STATUS、PROJECT_STATUS、machine delivery/operations checkpoint 同步至 main `c9e220c`；登記 #654 及新 CI；清楚區分已完成、blocked、NOT_RUN 與歷史。 | PR diff 只改現況入口與本目標；JSON parse/static validator、必要 docs CI 通過；精確 head/base/checks 核對後合併並回讀 main。不可改 frozen receipts/config。 |
+| 1 | 已完成 #655/#656 | **狀態與目標同步 PR（保留當時交付範圍）**：本目標、CURRENT_STATUS、PROJECT_STATUS、machine delivery/operations checkpoint 同步至 main `c9e220c`；登記 #654 及新 CI；清楚區分已完成、blocked、NOT_RUN 與歷史。 | PR diff 只改現況入口與本目標；JSON parse/static validator、必要 docs CI 通過；精確 head/base/checks 核對後合併並回讀 main。不可改 frozen receipts/config。 |
 | 2 | P0，緊接 | **單次可行性決策：cost/freshness/inventory/writer coverage/storage-growth。** 只用已保存 evidence 與官方文件/API 欄位契約設計，不執行重複或未授權 Cloudflare query。把每個必要量列為 source、permission、range、freshness、上限、writer coverage、盲區。 | 產出明確 `READY_TO_PROPOSE_SUCCESSOR_AUTHORITY` 或 `COST_GATE_BLOCKED`；若官方能力不可能達到 gate，直接列出需由使用者/服務端提供的非秘密證據，不製作無效重複 audit。 |
 | 3 | P0，可平行準備 | **预算與 persistence 守門核對。** 驗證 provider/D1/R2 每個 target I/O 的 reserve→request→settle、post-admission freshness、UTC rollover、共享 slot concurrency、duplicate replay、partial write recovery、ledger growth 與硬停。#654 D1 二次 freshness guard 已完成，針對性回歸以其合併證據為準。 | 雲端 CI 覆蓋所有已識別 repository writers；unknown/stale/over-budget 時外部 requests=0；同 slot 最多一位勝者；partial write 不釋放 reservation。帳戶外 writers 未證實須維持 UNKNOWN。 |
 | 4 | P0，依賴第 2、3 項 | **建立 successor authority 與受控 PAPER acceptance。** 只有資料路徑/費用/headroom 可證明符合 FREE-ONLY，才提出新版本 config/receipt 並 merge；每項外部操作前確認精確版本 authority。最小執行一次正式 main non-access preflight，再經獨立 gate 授權執行受控 paper cycle。 | 報告列 exact main/run/attempt/slot/source/artifact/read-write counts/state IDs。registry 為空或模型 REJECT 時只能零新倉並記原因；成功 workflow 不代表交易有效。任何出現付費、未知預算、部分寫入、錯誤來源時停止並保留報告。 |
@@ -94,7 +164,7 @@ Repository：[`qookey109-pixel/crypto-autopilot`](https://github.com/qookey109-p
 只有在以下證據齊全後，才能標為「雲端模擬循環已完成」：
 
 1. live main 的目標和狀態入口一致、必要 CI 全綠。
-2. 0 USD 的帳戶使用、免費額度、所有已知 writers、可用容量與 freshness 有可審核證據；每一項 UNKNOWN 已被證據消除或明確改成安全不啟用的產品終態。
+2. 0 USD 的帳戶使用、免費額度、所有已知 writers、可用容量與 freshness 有可審核證據；啟用所需的每一項 UNKNOWN 已被證據消除；若只能安全不啟用，應列受阻，不算完整循環完成。
 3. versioned budget/persistence authority 及實際 workflow 的外部 I/O 順序一致。
 4. controlled main PAPER acceptance 與最少一個可追溯正式結果；不合格時可驗證地零倉/不交易。
 5. 若要宣稱自動運作，首個自然 schedule run 的輸入、slot、報告、狀態回讀均成立；否則只可稱「已配置、待首次自然觸發」。
