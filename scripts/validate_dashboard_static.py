@@ -91,11 +91,13 @@ REQUIRED_ZH_HANT_LABELS = (
 )
 
 
-def validate_cloud_paper_usage_evidence(budget: dict[str, Any]) -> str:
+def validate_cloud_paper_usage_evidence(budget: dict[str, object]) -> str:
     """Accept preserved V0.2 or current V0.3 evidence without promoting either."""
     if budget.get("monthly_budget_usd") != 0:
         raise RuntimeError("Cloud Paper monthly budget must remain zero")
-    evidence = _require_object(budget.get("usage_audit_evidence"), "usage audit evidence")
+    evidence = budget.get("usage_audit_evidence")
+    if not isinstance(evidence, dict):
+        raise RuntimeError("Cloud Paper usage audit evidence must be an object")
     authority = evidence.get("authority")
 
     if authority == "cloud_paper_usage_audit_v0_2":
