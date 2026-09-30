@@ -91,9 +91,6 @@ Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pix
 ---
 
 > 下方以分隔線後的資料為先前查核紀錄與 frozen/歷史 evidence，保持原文，不代表最新狀態。新增紀錄附於文末；不要改寫歷史收據或把舊 SHA 證據升格為 current-main evidence。
----
-
-> 下方以分隔線後的資料為先前查核紀錄與 frozen/歷史 evidence，保持原文，不代表最新狀態。新增紀錄附於文末；不要改寫歷史收據或把舊 SHA 證據升格為 current-main evidence。
 
 ---
 
