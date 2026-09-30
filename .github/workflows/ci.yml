@@ -108,6 +108,17 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Full test suite (pytest)
         run: python -m pytest tests -q
+      - name: Measure synthetic Cloud Paper storage (Python 3.12 only)
+        if: ${{ matrix.python-version == '3.12' }}
+        run: python scripts/measure_cloud_paper_storage_v0_1.py --output cloud-paper-storage-profile/report.json
+      - name: Upload synthetic Cloud Paper storage profile
+        if: ${{ matrix.python-version == '3.12' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4
+        with:
+          name: cloud-paper-storage-profile-${{ github.run_id }}-${{ github.run_attempt }}
+          path: cloud-paper-storage-profile/report.json
+          retention-days: 30
+          if-no-files-found: error
       - name: R2 cost and budget gate
         run: python scripts/check_r2_budget.py
       - name: Observed Binance R2 budget gate
