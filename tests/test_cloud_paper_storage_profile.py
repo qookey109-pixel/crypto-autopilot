@@ -20,6 +20,18 @@ class StorageProfileTests(unittest.TestCase):
         self.assertEqual(report["object_count"], 1)
         self.assertNotIn("message", report["by_kind"]["state"])
 
+    def test_compact_report_fixture_reduces_canonical_storage_against_frozen_profile(self):
+        scenario = profile.SCENARIOS[1]
+        result = profile.profile_scenario(*scenario)
+        storage = result["stores"][0]["final_storage"]
+        # PR #658 artifact 11094147043 measured the same 3-slot fixture at
+        # 206,181 total bytes and 70,352 cloud-report bytes before compaction.
+        self.assertLess(storage["canonical_json_bytes"], 206181)
+        self.assertLess(
+            storage["by_kind"]["cloud-report"]["canonical_json_bytes"],
+            70352,
+        )
+
     def test_existing_fixture_still_passes_and_measurement_is_deterministic(self):
         scenario = profile.SCENARIOS[0]
         first = profile.profile_scenario(*scenario)
