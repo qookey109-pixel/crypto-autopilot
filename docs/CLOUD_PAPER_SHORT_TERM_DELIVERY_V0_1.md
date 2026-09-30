@@ -1,6 +1,24 @@
 # Crypto Autopilot — 完整雲端模擬產品交付目標
+## Storage profile result — 2026-09-30 19:52 Asia/Taipei
 
-## 最新進度掃描與收斂計畫 — 2026-09-30 15:06 Asia/Taipei
+Evidence basis: post-PR #658 main `7424ccfbaf0362f588410de037e593f0105745a0`; no open PRs at that checkpoint. The synthetic storage profiler is implemented in `scripts/measure_cloud_paper_storage_v0_1.py`, run by existing GitHub CI and uploaded as artifact [11094147043](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36710655801/artifacts/11094147043). PR #658 head `75e766a534e29b89be1ab96dce860964bfe66ef8) is merged.
+
+| Existing synthetic fixture | Final objects | Canonical JSON bytes |
+|---|---:|---:|
+| no-trade | 10 | 33,433 |
+| entry → exit → next no-trade (3 slots) | 26 | 206,181 |
+| replay/restart | 18 | 59,327 |
+| verified recovery | 10 | 33,433 |
+| failed settlement | 10 | 33,433 |
+
+The three-slot entry/exit fixture assigns 70,352 bytes to `cloud-report`, 48,778 to `live-run-step`, 40,714 to `live-tick`, and 39,310 to `live-state` (199,154 bytes combined). Treat these as high-size inspection candidates, not proven duplicates: the next step is a writer/reader/recovery lineage inventory before any schema change. Synthetic store calls do not represent actual R2 operations. The report excludes service metadata, external writers and D1; gzip is an estimate only. It establishes no production savings, account headroom, zero-cost conclusion or activation permission.
+
+PR #658 PR checks passed: CI #36710655801, CodeQL #36710655868, Dependency/SBOM #36710655876. Post-merge main CI #36710934061, Freeze Guard #36710934128, CodeQL #36710934055 and Dependency/SBOM #36710933979 passed; workflow-static skipped on push and Pages did not run because no site files changed.
+
+Next: map canonical writers/readers and recovery requirements for those four object kinds; design a backward-compatible minimal reference/schema change only where replacement is proven; compare baseline and revised profile on the same fixtures. Production cost evidence, D1 provisioning, controlled PAPER acceptance, natural schedule, and dashboard runtime projection remain separate incomplete gates.
+
+
+## 歷史進度基準 — 2026-09-30 15:06 Asia/Taipei
 
 Repository：[`qookey109-pixel/crypto-autopilot`](https://github.com/qookey109-pixel/crypto-autopilot)  
 查核基準：`main=c9e220cb6f2191e6fb0dd50a5918a62971360e8e`；查核時 open PR = 0。Repository main 是正式 authority；此節記錄本次查核的 basis，不宣稱此文件合併後仍是最新 main。以下計畫按依賴順序連續執行，小批 PR、雲端 CI、合併後回讀 main；卡在外部證據時先完成不依賴它的工作，不以手動 run 代替自然排程證據，也不把未知標成通過。
