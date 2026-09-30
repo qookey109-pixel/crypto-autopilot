@@ -32,6 +32,32 @@ class StorageProfileTests(unittest.TestCase):
             70352,
         )
 
+
+    def test_step_reference_compares_matching_fixtures_and_preserves_object_counts(self):
+        for scenario in profile.SCENARIOS:
+            with self.subTest(scenario=scenario[0]):
+                old = profile.profile_scenario(*scenario, compact_tick_reference=False)
+                new = profile.profile_scenario(*scenario)
+                self.assertEqual(old["fixture"], new["fixture"])
+                self.assertEqual(old["fixture_assertions"], new["fixture_assertions"])
+                for old_store, new_store in zip(old["stores"], new["stores"], strict=True):
+                    old_storage = old_store["final_storage"]
+                    new_storage = new_store["final_storage"]
+                    self.assertEqual(old_storage["object_count"], new_storage["object_count"])
+                    self.assertLess(
+                        new_storage["canonical_json_bytes"], old_storage["canonical_json_bytes"],
+                    )
+                    self.assertLess(
+                        new_storage["by_kind"]["live-run-step"]["canonical_json_bytes"],
+                        old_storage["by_kind"]["live-run-step"]["canonical_json_bytes"],
+                    )
+                    self.assertEqual(
+                        old_storage["by_kind"]["live-tick"], new_storage["by_kind"]["live-tick"],
+                    )
+                    self.assertEqual(
+                        old_storage["by_kind"]["live-state"], new_storage["by_kind"]["live-state"],
+                    )
+
     def test_existing_fixture_still_passes_and_measurement_is_deterministic(self):
         scenario = profile.SCENARIOS[0]
         first = profile.profile_scenario(*scenario)
