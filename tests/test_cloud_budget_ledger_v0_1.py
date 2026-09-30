@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sqlite3
 import threading
+from datetime import UTC, datetime
 from unittest.mock import patch
 import unittest
 from concurrent.futures import ThreadPoolExecutor
@@ -15,6 +16,7 @@ from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
     D1UsageGuard,
     D1SharedRowsBudgetGuard,
     D1SharedRowsBudgetPolicy,
+    D1_SHARED_ROWS_RESERVATION_SQL,
     CloudflareD1QueryClient,
     D1UsagePolicy,
     D1UsageSnapshot,
@@ -587,6 +589,9 @@ class D1UsageGuardTests(unittest.TestCase):
             def reserve_query(self):
                 raise BudgetBlocked("BLOCKED_D1_ROWS_READ_DAILY_LIMIT")
 
+            def validate_evidence(self):
+                return None
+
         client = CloudflareD1QueryClient(
             api_token="test-token",
             account_id="a" * 32,
@@ -606,6 +611,108 @@ class D1UsageGuardTests(unittest.TestCase):
             guard.reserve_query()
 
 
+class D1ClientFreshnessTests(unittest.TestCase):
+    def make_client(self, *, start_ms: int, after_admission_ms: int):
+        clock = [start_ms]
+        evidence = D1UsageSnapshot(
+            account_wide=True,
+            reservation_coverage_complete=True,
+            observed_at_ms=start_ms,
+            measured_through_ms=start_ms,
+            rows_read_day=0,
+            rows_written_day=0,
+            storage_bytes=0,
+        )
+        usage_guard = D1UsageGuard(
+            snapshot=evidence,
+            clock_ms=lambda: clock[0],
+        )
+        shared = D1SharedRowsBudgetGuard()
+        sqlite = SQLiteQueryClient()
+        calls: list[str] = []
+        client = CloudflareD1QueryClient(
+            api_token="test-token",
+            account_id="a" * 32,
+            database_id="00000000-0000-0000-0000-000000000001",
+            usage_guard=usage_guard,
+            shared_rows_guard=shared,
+        )
+
+        def request(sql: str, params: tuple[object, ...]) -> D1QueryResult:
+            if sql == D1_SHARED_ROWS_RESERVATION_SQL:
+                calls.append("admission")
+                result = sqlite.query(sql, params)
+                clock[0] += after_admission_ms
+                return result
+            calls.append("target")
+            return D1QueryResult((), rows_read=0, rows_written=0)
+
+        client._request = request
+        return client, usage_guard, sqlite, calls, clock
+
+
+    def test_slow_shared_admission_rechecks_freshness_before_target_request(self):
+        client, usage_guard, sqlite, calls, _ = self.make_client(
+            start_ms=NOW, after_admission_ms=50_001,
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_USAGE_EVIDENCE_STALE"):
+            client.query("SELECT 1", ())
+        self.assertEqual(calls, ["admission"])
+        self.assertEqual(usage_guard._reserved_reads_day, 4_000)
+        count = sqlite.connection.execute(
+            "SELECT reservation_count FROM cloud_paper_d1_daily_rows_budget",
+        ).fetchone()[0]
+        self.assertEqual(count, 1)
+
+
+    def test_freshness_boundary_at_max_age_minus_timeout_reserve_is_accepted(self):
+        client, _, sqlite, calls, _ = self.make_client(
+            start_ms=NOW, after_admission_ms=50_000,
+        )
+        client.query("SELECT 1", ())
+        self.assertEqual(calls, ["admission", "target"])
+        count = sqlite.connection.execute(
+            "SELECT reservation_count FROM cloud_paper_d1_daily_rows_budget",
+        ).fetchone()[0]
+        self.assertEqual(count, 1)
+
+
+    def test_utc_day_change_after_admission_keeps_reservation_and_skips_target(self):
+        utc_day_start = NOW // 86_400_000 * 86_400_000
+        just_before_midnight = utc_day_start + 86_400_000 - 1_000
+        client, _, sqlite, calls, _ = self.make_client(
+            start_ms=just_before_midnight, after_admission_ms=2_000,
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_USAGE_PERIOD_MISMATCH"):
+            client.query("SELECT 1", ())
+        self.assertEqual(calls, ["admission"])
+        row = sqlite.connection.execute(
+            "SELECT utc_day, reservation_count FROM cloud_paper_d1_daily_rows_budget",
+        ).fetchone()
+        expected_day = datetime.fromtimestamp(
+            just_before_midnight / 1000, tz=UTC,
+        ).date().isoformat()
+        self.assertEqual(tuple(row), (expected_day, 1))
+
+
+    def test_usage_guard_rejects_previous_utc_day_even_when_recent(self):
+        utc_day_start = NOW // 86_400_000 * 86_400_000
+        previous_ms = utc_day_start - 1_000
+        guard = D1UsageGuard(
+            snapshot=D1UsageSnapshot(
+                account_wide=True,
+                reservation_coverage_complete=True,
+                observed_at_ms=previous_ms,
+                measured_through_ms=previous_ms,
+                rows_read_day=0,
+                rows_written_day=0,
+                storage_bytes=0,
+            ),
+            clock_ms=lambda: utc_day_start + 1_000,
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_USAGE_PERIOD_MISMATCH"):
+            guard.validate_evidence()
+        self.assertEqual(guard._reserved_reads_day, 0)
 
 class D1SharedRowsBudgetGuardTests(unittest.TestCase):
     def make_snapshot(self, **changes):
@@ -768,6 +875,23 @@ class D1SharedRowsBudgetGuardTests(unittest.TestCase):
             "FROM cloud_paper_d1_daily_rows_budget",
         ).fetchone()
         self.assertEqual(tuple(row), (20, 1))
+
+
+    def test_shared_evidence_validation_rejects_previous_utc_day_before_query(self):
+        utc_day_start = NOW // 86_400_000 * 86_400_000
+        previous_ms = utc_day_start - 1_000
+        current_ms = utc_day_start + 1_000
+        guard = D1SharedRowsBudgetGuard()
+        evidence = self.make_snapshot(
+            observed_at_ms=previous_ms,
+            measured_through_ms=previous_ms,
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_D1_USAGE_PERIOD_MISMATCH"):
+            guard.reserve_query(
+                execute=lambda *_: self.fail("shared reservation must not be sent"),
+                snapshot=evidence,
+                now_ms=current_ms,
+            )
 
 
 if __name__ == "__main__":

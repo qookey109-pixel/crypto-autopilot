@@ -39,7 +39,10 @@ D1_REST_SOURCE_MARKER = re.compile(
 D1_QUERY_GUARD_ORDER = (
     "self._usage_guard.reserve_query()",
     "if self._shared_rows_guard is None:",
+    "self._usage_guard.validate_evidence()",
     "self._shared_rows_guard.reserve_query(",
+    "self._shared_rows_guard.validate_evidence(",
+    "self._usage_guard.validate_evidence()",
     "result = self._request(sql, params)",
 )
 
@@ -68,9 +71,14 @@ def validate_d1_source_boundary(
     if query_start < 0 or query_end < 0:
         raise RuntimeError("D1 REST client query boundary is missing")
     query_body = contents[query_start:query_end]
-    positions = [query_body.find(marker) for marker in D1_QUERY_GUARD_ORDER]
-    if any(position < 0 for position in positions) or positions != sorted(positions):
-        raise RuntimeError("D1 REST client budget guards are missing or out of order")
+    positions = []
+    cursor = 0
+    for marker in D1_QUERY_GUARD_ORDER:
+        position = query_body.find(marker, cursor)
+        if position < 0:
+            raise RuntimeError("D1 REST client budget guards are missing or out of order")
+        positions.append(position)
+        cursor = position + len(marker)
     return sorted(paths)
 
 def main() -> int:

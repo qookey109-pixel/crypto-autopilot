@@ -18,7 +18,10 @@ class D1WorkflowInventoryTests(unittest.TestCase):
         self._usage_guard.reserve_query()
         if self._shared_rows_guard is None:
             raise BudgetBlocked()
+        self._usage_guard.validate_evidence()
         self._shared_rows_guard.reserve_query(
+        self._shared_rows_guard.validate_evidence(
+        self._usage_guard.validate_evidence()
             result = self._request(sql, params)
     def _request(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
         return D1QueryResult()
@@ -27,6 +30,24 @@ class D1WorkflowInventoryTests(unittest.TestCase):
             validate_d1_source_boundary({path: source}, path),
             [path],
         )
+
+    def test_rejects_missing_post_admission_freshness_recheck(self) -> None:
+        path = "src/crypto_autopilot/paper/cloud_budget_ledger_v0_1.py"
+        source = """class CloudflareD1QueryClient:
+    def query(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
+        self._usage_guard.reserve_query()
+        if self._shared_rows_guard is None:
+            raise BudgetBlocked()
+        self._usage_guard.validate_evidence()
+        self._shared_rows_guard.reserve_query(
+        self._shared_rows_guard.validate_evidence(
+            result = self._request(sql, params)
+    def _request(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
+        return D1QueryResult()
+"""
+        with self.assertRaisesRegex(RuntimeError, "guards are missing"):
+            validate_d1_source_boundary({path: source}, path)
+
 
     def test_ignores_non_d1_cloudflare_account_endpoint(self) -> None:
         path = "scripts/cloud_paper_billing_evidence_v0_1.py"

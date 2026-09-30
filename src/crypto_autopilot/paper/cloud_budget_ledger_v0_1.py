@@ -238,6 +238,10 @@ class D1UsagePolicy:
     storage_growth_per_query_bytes: int = 16_384
 
 
+def _utc_day_for_timestamp_ms(timestamp_ms: int) -> str:
+    return datetime.fromtimestamp(timestamp_ms / 1000, tz=UTC).date().isoformat()
+
+
 class D1UsageGuard:
     """Fail closed on stale/incomplete account usage before reserving a query.
 
@@ -330,6 +334,12 @@ class D1UsageGuard:
         coverage_age = now_ms - s.measured_through_ms
         if observed_age < 0 or coverage_age < 0:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_FROM_FUTURE")
+        current_utc_day = _utc_day_for_timestamp_ms(now_ms)
+        if (
+            _utc_day_for_timestamp_ms(s.observed_at_ms) != current_utc_day
+            or _utc_day_for_timestamp_ms(s.measured_through_ms) != current_utc_day
+        ):
+            raise BudgetBlocked("BLOCKED_D1_USAGE_PERIOD_MISMATCH")
         usable_age = p.max_evidence_age_ms - p.request_timeout_reserve_ms
         if max(observed_age, coverage_age) > usable_age:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_STALE")
@@ -364,11 +374,8 @@ class D1SharedRowsBudgetGuard:
     ) -> None:
         self.policy = policy
 
-    def reserve_query(
-        self, *,
-        execute: Callable[[str, tuple[object, ...]], D1QueryResult],
-        snapshot: D1UsageSnapshot,
-        now_ms: int,
+    def validate_evidence(
+        self, *, snapshot: D1UsageSnapshot, now_ms: int,
     ) -> None:
         p = self.policy
         values = (
@@ -400,6 +407,22 @@ class D1SharedRowsBudgetGuard:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_FROM_FUTURE")
         if max(age, coverage_age) > p.max_evidence_age_ms - p.request_timeout_reserve_ms:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_STALE")
+
+        current_utc_day = _utc_day_for_timestamp_ms(now_ms)
+        if (
+            _utc_day_for_timestamp_ms(snapshot.observed_at_ms) != current_utc_day
+            or _utc_day_for_timestamp_ms(snapshot.measured_through_ms) != current_utc_day
+        ):
+            raise BudgetBlocked("BLOCKED_D1_USAGE_PERIOD_MISMATCH")
+
+    def reserve_query(
+        self, *,
+        execute: Callable[[str, tuple[object, ...]], D1QueryResult],
+        snapshot: D1UsageSnapshot,
+        now_ms: int,
+    ) -> None:
+        self.validate_evidence(snapshot=snapshot, now_ms=now_ms)
+        p = self.policy
 
         baseline_read = snapshot.rows_read_day + snapshot.pending_rows_read_day
         baseline_written = snapshot.rows_written_day + snapshot.pending_rows_written_day
@@ -437,6 +460,9 @@ class D1QueryUsageBudgetGate(Protocol):
     def reserve_query(self) -> None:
         """Reserve a conservative D1 request envelope or fail closed."""
 
+    def validate_evidence(self) -> None:
+        """Revalidate the evidence without consuming another reservation."""
+
 
 class _NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
@@ -463,6 +489,8 @@ class CloudflareD1QueryClient:
         if not DATABASE_ID_RE.fullmatch(database_id):
             raise D1LedgerUnavailable("D1_LEDGER_DATABASE_ID_INVALID")
         if not callable(getattr(usage_guard, "reserve_query", None)):
+            raise D1LedgerUnavailable("D1_LEDGER_USAGE_GUARD_MISSING")
+        if not callable(getattr(usage_guard, "validate_evidence", None)):
             raise D1LedgerUnavailable("D1_LEDGER_USAGE_GUARD_MISSING")
         if not 0 < timeout_seconds <= 10:
             raise D1LedgerUnavailable("D1_LEDGER_TIMEOUT_INVALID")
@@ -501,9 +529,14 @@ class CloudflareD1QueryClient:
         clock_ms = getattr(self._usage_guard, "clock_ms", None)
         if not isinstance(snapshot, D1UsageSnapshot) or not callable(clock_ms):
             raise BudgetBlocked("BLOCKED_D1_SHARED_ROWS_EVIDENCE_MISSING")
+        self._usage_guard.validate_evidence()
         self._shared_rows_guard.reserve_query(
             execute=self._request, snapshot=snapshot, now_ms=clock_ms(),
         )
+        self._shared_rows_guard.validate_evidence(
+            snapshot=snapshot, now_ms=clock_ms(),
+        )
+        self._usage_guard.validate_evidence()
         result = self._request(sql, params)
         if (
             result.rows_read > self._shared_rows_guard.policy.max_rows_read_per_query
