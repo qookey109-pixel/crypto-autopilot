@@ -4,6 +4,8 @@
 
 Basis parent main `bb2290ac1aa0cad1237ec2269be679211bf2bb5f`. New contract: [Coordinator V0.3](../config/live_paper_run_coordinator_v0_3.json); [prepared receipt](../research/receipts/2026-09-30-live-paper-step-reference-v0-2-prepared.json). PR checks and merge evidence must be verified separately.
 
+Frozen Coordinator/Recovery V0.1 files and the original eight-file slot-claim binding remain byte-exact. Prepared successors `run_coordinator_v0_3.py` and `run_recovery_v0_2.py` reuse unchanged legacy helpers while independently verifying the new storage format. The new prepared receipt binds the successor implementation and integration; the first failed PR CI remains historical evidence.
+
 New step records use schema `qookey-live-paper-run-step-report-v0.2`, a versioned step identity, `tick_id` and the complete canonical `tick_report_sha256`; they omit inline `tick_report`. The independent live-tick and live-state objects are retained. The shared resolver validates the tick identity, digest, timestamp, state links and authority before replay, continuation, recovery or result sealing. Legacy embedded steps and loop reports remain readable; same committed requests replay their original stored schema. No migration, deletion or historical rewrite occurs.
 
 The profiler compares the same asserted fixtures with the legacy embedded-step writer and compact-reference writer in one CI execution. It records objects, bytes and interface reads, including additional evidence reads; no R2 savings or account headroom claim follows from that synthetic measurement. Regression covers mixed-schema continuation, stale schema identity, changed tick content, missing tick, partial tick write, seal-only recovery and stopping before market access.

@@ -15,7 +15,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from crypto_autopilot.paper.run_store_v0_1 import _canonical_bytes
-from crypto_autopilot.paper.run_coordinator_v0_1 import LivePaperRunCoordinatorPolicy
+from crypto_autopilot.paper.run_coordinator_v0_3 import LivePaperRunCoordinatorPolicy
 
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIOS = (

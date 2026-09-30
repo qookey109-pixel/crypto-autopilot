@@ -1,145 +1,30 @@
+"""Audit both run-step formats without changing frozen recovery V0.1."""
 from __future__ import annotations
 
-import hashlib
-import json
 from collections.abc import Mapping
-from dataclasses import dataclass
-from typing import Protocol
 
-from crypto_autopilot.paper.live_v0_1 import (
-    live_paper_tick_report_id_from_mapping,
-    verify_live_paper_state,
-)
-from crypto_autopilot.paper.run_claim_v0_1 import (
-    live_paper_run_slot_id,
-    verify_live_paper_run_claim,
-)
+from crypto_autopilot.paper.live_v0_1 import verify_live_paper_state
+from crypto_autopilot.paper.run_claim_v0_1 import live_paper_run_slot_id
 from crypto_autopilot.paper.run_coordinator_v0_1 import (
     build_live_paper_run_result,
     verify_live_paper_run_header,
     verify_live_paper_run_result,
+)
+from crypto_autopilot.paper.run_coordinator_v0_3 import (
+    read_live_paper_run_step_tick,
     verify_live_paper_run_step,
 )
+from crypto_autopilot.paper.run_recovery_v0_1 import (
+    LivePaperRunRecoveryPolicy,
+    PaperRunRecoveryStore,
+    _authority,
+    _orphan_ticks_after_terminal_state,
+    _required_store_object,
+    _scan_target_claims,
+    _scan_target_results,
+    _sha256,
+)
 from crypto_autopilot.paper.run_store_v0_1 import run_store_receipt_evidence
-
-
-class PaperRunRecoveryStore(Protocol):
-    def get_json(
-        self,
-        kind: str,
-        object_id: str,
-    ) -> dict[str, object] | None: ...
-
-    def put_json(
-        self,
-        kind: str,
-        object_id: str,
-        payload: Mapping[str, object],
-    ) -> object: ...
-
-    def list_json_ids(self, kind: str) -> tuple[str, ...]: ...
-
-
-@dataclass(frozen=True, slots=True)
-class LivePaperRunRecoveryPolicy:
-    require_verified_run_header: bool = True
-    require_contiguous_step_chain: bool = True
-    require_persisted_state_evidence: bool = True
-    require_persisted_tick_evidence: bool = True
-    allow_missing_result_seal_repair: bool = True
-    result_seal_repair_only: bool = True
-    provider_access_authorized: bool = False
-    live_market_data_access_authorized: bool = False
-    account_state_mutation_authorized: bool = False
-    step_state_tick_rewrite_authorized: bool = False
-    automatic_schedule_authorized: bool = False
-    private_exchange_api_authorized: bool = False
-    holdout_access_authorized: bool = False
-    real_money_order_authorized: bool = False
-    live_real_trading_authorized: bool = False
-
-    def __post_init__(self) -> None:
-        flags = (
-            self.require_verified_run_header,
-            self.require_contiguous_step_chain,
-            self.require_persisted_state_evidence,
-            self.require_persisted_tick_evidence,
-            self.allow_missing_result_seal_repair,
-            self.result_seal_repair_only,
-            self.provider_access_authorized,
-            self.live_market_data_access_authorized,
-            self.account_state_mutation_authorized,
-            self.step_state_tick_rewrite_authorized,
-            self.automatic_schedule_authorized,
-            self.private_exchange_api_authorized,
-            self.holdout_access_authorized,
-            self.real_money_order_authorized,
-            self.live_real_trading_authorized,
-        )
-        if any(not isinstance(value, bool) for value in flags):
-            raise ValueError("Live Paper Run Recovery policy flags must be booleans")
-        if not all(flags[:6]):
-            raise ValueError(
-                "Live Paper Run Recovery V0.1 requires strict verification and "
-                "result-seal-only repair"
-            )
-        if any(flags[6:]):
-            raise ValueError(
-                "Live Paper Run Recovery V0.1 cannot access providers or mutate "
-                "trading/account evidence"
-            )
-
-
-def _canonicalize(value: object) -> object:
-    if isinstance(value, Mapping):
-        return {
-            str(key): _canonicalize(item)
-            for key, item in sorted(value.items())
-        }
-    if isinstance(value, (list, tuple)):
-        return [_canonicalize(item) for item in value]
-    return value
-
-
-def _sha256(value: object) -> str:
-    encoded = json.dumps(
-        _canonicalize(value),
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=True,
-    )
-    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
-
-
-def _required_store_object(
-    store: PaperRunRecoveryStore,
-    kind: str,
-    object_id: str,
-) -> dict[str, object]:
-    payload = store.get_json(kind, object_id)
-    if payload is None:
-        raise ValueError(f"missing {kind} object: {object_id}")
-    if not isinstance(payload, dict):
-        raise ValueError(f"{kind} object must be a JSON object")
-    return payload
-
-
-def _authority() -> dict[str, object]:
-    return {
-        "audit_and_result_seal_repair_only": True,
-        "run_slot_claim_audit_authorized": True,
-        "claim_takeover_authorized": False,
-        "automatic_retry_after_claim_conflict_authorized": False,
-        "provider_access_authorized": False,
-        "live_market_data_access_authorized": False,
-        "account_state_mutation_authorized": False,
-        "step_state_tick_rewrite_authorized": False,
-        "automatic_schedule_authorized": False,
-        "private_exchange_api_authorized": False,
-        "holdout_access_authorized": False,
-        "real_money_order_authorized": False,
-        "live_real_trading_authorized": False,
-    }
 
 
 def _validate_step_evidence(
@@ -147,9 +32,7 @@ def _validate_step_evidence(
     store: PaperRunRecoveryStore,
     step: Mapping[str, object],
 ) -> tuple[str, str, str]:
-    step_id = verify_live_paper_run_step(step)
-    if step.get("step_id") != step_id:
-        raise ValueError("stored live paper run step id mismatch")
+    read_live_paper_run_step_tick(store, step)
 
     previous_state_id = step.get("previous_state_id")
     next_state_id = step.get("next_state_id")
@@ -177,17 +60,7 @@ def _validate_step_evidence(
     if verify_live_paper_state(next_state) != next_state_id:
         raise ValueError("persisted next live state id mismatch")
 
-    tick = _required_store_object(store, "live-tick", tick_id)
-    if live_paper_tick_report_id_from_mapping(tick) != tick_id:
-        raise ValueError("persisted live tick id mismatch")
-    embedded_tick = step.get("tick_report")
-    if not isinstance(embedded_tick, Mapping):
-        raise ValueError("stored run step embedded tick is required")
-    if _canonicalize(tick) != _canonicalize(embedded_tick):
-        raise ValueError("persisted live tick differs from run-step tick evidence")
-
     return previous_state_id, next_state_id, tick_id
-
 
 def _scan_target_steps(
     *,
@@ -201,7 +74,11 @@ def _scan_target_steps(
         if payload is None or payload.get("run_id") != run_id:
             continue
         try:
-            verified = verify_live_paper_run_step(payload)
+            if payload.get("schema") == "qookey-live-paper-run-step-report-v0.1":
+                verified = verify_live_paper_run_step(payload)
+            else:
+                read_live_paper_run_step_tick(store, payload)
+                verified = str(payload["step_id"])
         except ValueError as error:
             issues.append(f"invalid_step:{object_id}:{error}")
             continue
@@ -219,91 +96,6 @@ def _scan_target_steps(
             continue
         by_sequence[sequence] = payload
     return by_sequence, issues
-
-
-def _scan_target_results(
-    *,
-    store: PaperRunRecoveryStore,
-    run_id: str,
-) -> tuple[dict[str, dict[str, object]], list[str]]:
-    by_request: dict[str, dict[str, object]] = {}
-    issues: list[str] = []
-    for object_id in store.list_json_ids("live-run-result"):
-        payload = store.get_json("live-run-result", object_id)
-        if payload is None or payload.get("run_id") != run_id:
-            continue
-        try:
-            step_id, verified_run_id, _ = verify_live_paper_run_result(
-                payload,
-                request_id=object_id,
-            )
-        except ValueError as error:
-            issues.append(f"invalid_result:{object_id}:{error}")
-            continue
-        if verified_run_id != run_id:
-            issues.append(f"result_run_mismatch:{object_id}")
-            continue
-        if payload.get("request_id") != object_id:
-            issues.append(f"result_object_id_mismatch:{object_id}")
-            continue
-        if object_id in by_request:
-            issues.append(f"duplicate_result_request:{object_id}")
-            continue
-        row = dict(payload)
-        row["_verified_step_id"] = step_id
-        by_request[object_id] = row
-    return by_request, issues
-
-
-def _scan_target_claims(
-    *,
-    store: PaperRunRecoveryStore,
-    run_id: str,
-) -> tuple[dict[str, dict[str, object]], list[str]]:
-    by_slot: dict[str, dict[str, object]] = {}
-    issues: list[str] = []
-    for object_id in store.list_json_ids("live-run-claim"):
-        payload = store.get_json("live-run-claim", object_id)
-        if payload is None or payload.get("run_id") != run_id:
-            continue
-        try:
-            slot_id = verify_live_paper_run_claim(payload)
-        except ValueError as error:
-            issues.append(f"invalid_claim:{object_id}:{error}")
-            continue
-        if slot_id != object_id or payload.get("slot_id") != object_id:
-            issues.append(f"claim_object_id_mismatch:{object_id}")
-            continue
-        if object_id in by_slot:
-            issues.append(f"duplicate_claim_slot:{object_id}")
-            continue
-        by_slot[object_id] = dict(payload)
-    return by_slot, issues
-
-
-def _orphan_ticks_after_terminal_state(
-    *,
-    store: PaperRunRecoveryStore,
-    known_tick_ids: set[str],
-    terminal_state_id: str,
-) -> tuple[str, ...]:
-    orphan_ids: list[str] = []
-    for object_id in store.list_json_ids("live-tick"):
-        if object_id in known_tick_ids:
-            continue
-        payload = store.get_json("live-tick", object_id)
-        if payload is None:
-            continue
-        if payload.get("previous_state_id") != terminal_state_id:
-            continue
-        try:
-            verified = live_paper_tick_report_id_from_mapping(payload)
-        except ValueError:
-            continue
-        if verified == object_id and payload.get("tick_id") == object_id:
-            orphan_ids.append(object_id)
-    return tuple(sorted(orphan_ids))
-
 
 def reconcile_live_paper_run(
     *,
@@ -601,37 +393,3 @@ def reconcile_live_paper_run(
         "live-paper-run-recovery-v0-1-" + _sha256(report)
     )
     return report
-
-
-def live_paper_run_recovery_policy_from_config(
-    payload: Mapping[str, object],
-) -> LivePaperRunRecoveryPolicy:
-    if payload.get("schema") != "qookey-live-paper-run-recovery-v0.1":
-        raise ValueError("unsupported live paper run recovery config")
-    policy = payload.get("policy")
-    if not isinstance(policy, Mapping):
-        raise ValueError("live paper run recovery policy object is required")
-    keys = (
-        "require_verified_run_header",
-        "require_contiguous_step_chain",
-        "require_persisted_state_evidence",
-        "require_persisted_tick_evidence",
-        "allow_missing_result_seal_repair",
-        "result_seal_repair_only",
-        "provider_access_authorized",
-        "live_market_data_access_authorized",
-        "account_state_mutation_authorized",
-        "step_state_tick_rewrite_authorized",
-        "automatic_schedule_authorized",
-        "private_exchange_api_authorized",
-        "holdout_access_authorized",
-        "real_money_order_authorized",
-        "live_real_trading_authorized",
-    )
-    values: dict[str, bool] = {}
-    for key in keys:
-        value = policy.get(key)
-        if not isinstance(value, bool):
-            raise ValueError(f"policy.{key} must be a JSON boolean")
-        values[key] = value
-    return LivePaperRunRecoveryPolicy(**values)

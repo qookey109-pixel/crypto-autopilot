@@ -20,7 +20,6 @@ from crypto_autopilot.paper.live_v0_1 import (
 from crypto_autopilot.paper.run_claim_v0_1 import build_live_paper_run_claim
 from crypto_autopilot.paper.run_coordinator_v0_1 import (
     coordinate_live_paper_run_step,
-    LivePaperRunCoordinatorPolicy,
 )
 from crypto_autopilot.paper.run_recovery_v0_1 import (
     LivePaperRunRecoveryPolicy,
@@ -198,7 +197,6 @@ class LivePaperRunRecoveryV01Tests(unittest.TestCase):
         root: Path,
         *,
         tick_time_ms: int = 5_000,
-        compact_tick_reference: bool = False,
     ) -> tuple[LocalPaperRunStore, dict[str, object], dict[str, object], dict[str, object]]:
         state, spec = _bootstrap_state()
         store = LocalPaperRunStore(root)
@@ -209,62 +207,8 @@ class LivePaperRunRecoveryV01Tests(unittest.TestCase):
             feed=_Feed(tick_time_ms),
             store=store,
             initial_state=state,
-            policy=LivePaperRunCoordinatorPolicy(compact_tick_reference=compact_tick_reference),
         )
         return store, state, spec, report
-
-
-    def test_compact_step_repairs_only_missing_seal_and_replays_without_provider(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp).resolve()
-            store, state, spec, committed = self._committed_run(
-                root, compact_tick_reference=True,
-            )
-            step = committed["run_step"]
-            before = {kind: store.list_json_ids(kind)
-                      for kind in ("live-state", "live-tick", "live-run-step")}
-            _delete_object(root, "live-run-result", step["request_id"])
-            audit = reconcile_live_paper_run(run_id=committed["run_id"], store=store)
-            self.assertEqual(audit["state"], "MISSING_RESULT_SEALS_REPAIRABLE")
-            repaired = reconcile_live_paper_run(
-                run_id=committed["run_id"], store=store, repair_missing_result_seals=True,
-            )
-            self.assertEqual(repaired["state"], "MISSING_RESULT_SEALS_REPAIRED")
-            self.assertEqual(repaired["result_seal_writes_performed"], 1)
-            self.assertEqual(before, {kind: store.list_json_ids(kind) for kind in before})
-            self.assertEqual(repaired["provider_requests_performed"], 0)
-            feed = _Feed(5_000)
-            replay = coordinate_live_paper_run_step(
-                run_name="recovery-fixture", tick_time_ms=5_000,
-                candidate_specs=(spec,), feed=feed, store=store, initial_state=state,
-                policy=LivePaperRunCoordinatorPolicy(compact_tick_reference=True),
-            )
-            self.assertEqual(replay["step_id"], committed["step_id"])
-            self.assertEqual(feed.calls, 0)
-
-    def test_compact_step_missing_tick_blocks_repair_replay_and_continuation(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp).resolve()
-            store, state, spec, committed = self._committed_run(
-                root, compact_tick_reference=True,
-            )
-            step = committed["run_step"]
-            _delete_object(root, "live-run-result", step["request_id"])
-            _delete_object(root, "live-tick", step["tick_id"])
-            recovery = reconcile_live_paper_run(
-                run_id=committed["run_id"], store=store, repair_missing_result_seals=True,
-            )
-            self.assertEqual(recovery["state"], "REVIEW_REQUIRED")
-            self.assertEqual(recovery["result_seal_writes_performed"], 0)
-            self.assertIsNone(store.get_json("live-run-result", step["request_id"]))
-            feed = _Feed(6_000)
-            with self.assertRaisesRegex(ValueError, "persisted live tick is missing"):
-                coordinate_live_paper_run_step(
-                    run_name="recovery-fixture", tick_time_ms=6_000,
-                    candidate_specs=(), feed=feed, store=store, previous_step=step,
-                )
-            self.assertEqual(feed.calls, 0)
-            self.assertEqual(state["state_id"], step["previous_state_id"])
 
     def test_consistent_run_audits_without_writes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

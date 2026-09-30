@@ -10,7 +10,7 @@ from crypto_autopilot.paper.live_v0_1 import LivePaperMarketFeed, verify_live_pa
 from crypto_autopilot.exchanges.pionex_public import PionexPublicClient
 from crypto_autopilot.paper.live_v0_1 import LivePaperMarketFrame, LivePaperPolicy
 from crypto_autopilot.paper.run_claim_v0_1 import LivePaperRunClaimPolicy
-from crypto_autopilot.paper.run_coordinator_v0_1 import (
+from crypto_autopilot.paper.run_coordinator_v0_3 import (
     LivePaperRunCoordinatorPolicy, PaperRunStoreLike,
     coordinate_live_paper_run_step, read_live_paper_run_step_tick,
 )

@@ -1,7 +1,8 @@
 ## Cloud Paper 保存精簡 V0.2 step reference — 2026-09-30
 
 本批準備基準為 GitHub parent main `bb2290ac1aa0cad1237ec2269be679211bf2bb5f`；此 SHA 是查核基準，合併後須重新解析 main，不宣稱永久最新 head。
-新 step schema 以 `tick_id` 和完整 canonical `tick_report_sha256` 引用獨立 tick。Coordinator、Cloud Paper reader、replay、continuation 與 recovery 共用證據驗證；結果 seal 寫入前先回讀 step/tick。舊 V0.1 embedded step 與舊 loop reports 保留讀取，不遷移或刪改歷史物件。
+新 step schema 以 `tick_id` 和完整 canonical `tick_report_sha256` 引用獨立 tick。Successor Coordinator V0.3、Cloud Paper reader、replay、continuation 與 Recovery V0.2 共用證據驗證；結果 seal 寫入前先回讀 step/tick。舊 V0.1 embedded step 與舊 loop reports 保留讀取，不遷移或刪改歷史物件。
+舊 slot-claim 收據綁定的 coordinator／recovery V0.1 來源與手動流程保持 byte-exact；新來源另由本次 prepared receipt 綁定。第一個 PR head 的 CI 失敗紀錄保留，修復後須重新核對 exact-head 檢查。
 合成 CI 比較相同入場／出場／不交易、重播／重啟、恢復與結算失敗 fixture 的物件數、bytes 和 store-interface 讀取數。檢查狀態以本批 PR exact head 為準；這不是 production R2 用量或零費用證據。
 [新 storage contract](config/live_paper_run_coordinator_v0_3.json) 與 [prepared receipt](research/receipts/2026-09-30-live-paper-step-reference-v0-2-prepared.json) 不授予外部執行權限。
 Cloud Paper 仍 disabled／NOT_RUN／NOT_WIRED／NOT_CONFIGURED；D1 未 provision、registry 空、Core100 REJECT。帳戶級零費用、freshness、writer coverage 與 headroom 尚未證明。

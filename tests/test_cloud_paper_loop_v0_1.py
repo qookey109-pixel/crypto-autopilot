@@ -18,7 +18,7 @@ from crypto_autopilot.paper.cloud_loop_v0_1 import (
 from crypto_autopilot.paper.live_v0_1 import LivePaperMarketFrame, LivePaperPolicy
 from crypto_autopilot.risk import plan_position_size
 from crypto_autopilot.paper.run_store_v0_1 import PaperRunObjectAlreadyExistsError
-from crypto_autopilot.paper.run_coordinator_v0_1 import LivePaperRunCoordinatorPolicy
+from crypto_autopilot.paper.run_coordinator_v0_3 import LivePaperRunCoordinatorPolicy
 
 
 @dataclass

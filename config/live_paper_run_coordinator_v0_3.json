@@ -66,5 +66,10 @@
     "d1_access_authorized": false,
     "r2_access_authorized": false,
     "budget_authority_changed": false
+  },
+  "implementation": {
+    "coordinator": "src/crypto_autopilot/paper/run_coordinator_v0_3.py",
+    "recovery": "src/crypto_autopilot/paper/run_recovery_v0_2.py",
+    "frozen_predecessor_modules_preserved": true
   }
 }

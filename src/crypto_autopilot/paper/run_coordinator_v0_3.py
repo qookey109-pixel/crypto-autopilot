@@ -1,8 +1,7 @@
+"""Prepared compact run-step successor; legacy claim-bound code stays frozen."""
 from __future__ import annotations
 
-import hashlib
-import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Protocol
 
@@ -17,228 +16,38 @@ from crypto_autopilot.paper.run_claim_v0_1 import (
     LivePaperRunClaimPolicy,
     acquire_live_paper_run_claim,
 )
+from crypto_autopilot.paper.run_coordinator_v0_1 import (
+    LivePaperRunCoordinatorPolicy as LegacyCoordinatorPolicy,
+    PaperRunStoreLike,
+    _canonicalize,
+    _committed_result,
+    _coordinator_authority,
+    _receipt,
+    _request_id,
+    _run_header,
+    _run_id,
+    _sha256,
+    _validate_run_name,
+    _verify_committed_result,
+    _verify_coordinator_authority,
+    verify_live_paper_run_header,
+)
 from crypto_autopilot.paper.run_store_v0_1 import run_store_receipt_evidence
 
 
-class PaperRunStoreLike(Protocol):
-    def put_json(
-        self,
-        kind: str,
-        object_id: str,
-        payload: Mapping[str, object],
-    ) -> object: ...
-
-    def get_json(
-        self,
-        kind: str,
-        object_id: str,
-    ) -> dict[str, object] | None: ...
-
-    def put_json_if_absent(
-        self,
-        kind: str,
-        object_id: str,
-        payload: Mapping[str, object],
-    ) -> object: ...
-
+class PaperRunReadStoreLike(Protocol):
+    def get_json(self, kind: str, object_id: str) -> dict[str, object] | None: ...
 
 @dataclass(frozen=True, slots=True)
-class LivePaperRunCoordinatorPolicy:
-    """Append-only persistent coordination around the existing Live Paper tick."""
+class LivePaperRunCoordinatorPolicy(LegacyCoordinatorPolicy):
+    """Successor storage policy; predecessor authority gates remain binding."""
 
-    require_persistent_store: bool = True
-    persist_run_header: bool = True
-    persist_states: bool = True
-    persist_tick_reports: bool = True
-    persist_run_steps: bool = True
-    committed_request_replay_authorized: bool = True
-    run_slot_claim_required: bool = False
-    claim_conflict_auto_retry_authorized: bool = False
-    automatic_schedule_authorized: bool = False
-    automatic_candidate_generation_authorized: bool = False
-    scorecard_auto_selection_authorized: bool = False
-    private_exchange_api_authorized: bool = False
-    holdout_access_authorized: bool = False
-    real_money_order_authorized: bool = False
-    live_real_trading_authorized: bool = False
+    compact_tick_reference: bool = False
 
     def __post_init__(self) -> None:
-        flags = (
-            self.require_persistent_store,
-            self.persist_run_header,
-            self.persist_states,
-            self.persist_tick_reports,
-            self.persist_run_steps,
-            self.committed_request_replay_authorized,
-            self.run_slot_claim_required,
-            self.claim_conflict_auto_retry_authorized,
-            self.automatic_schedule_authorized,
-            self.automatic_candidate_generation_authorized,
-            self.scorecard_auto_selection_authorized,
-            self.private_exchange_api_authorized,
-            self.holdout_access_authorized,
-            self.real_money_order_authorized,
-            self.live_real_trading_authorized,
-        )
-        if any(not isinstance(value, bool) for value in flags):
-            raise ValueError("Live Paper Run Coordinator policy flags must be booleans")
-        if not all(flags[:6]):
-            raise ValueError(
-                "Live Paper Run Coordinator requires persistent append-only evidence"
-            )
-        if self.claim_conflict_auto_retry_authorized:
-            raise ValueError(
-                "Live Paper Run Coordinator cannot auto-retry a run-slot claim conflict"
-            )
-        if any(flags[8:]):
-            raise ValueError(
-                "Live Paper Run Coordinator cannot authorize scheduling, "
-                "automatic candidate selection or real trading"
-            )
-
-
-def _canonicalize(value: object) -> object:
-    if isinstance(value, Mapping):
-        return {
-            str(key): _canonicalize(item)
-            for key, item in sorted(value.items())
-        }
-    if isinstance(value, (list, tuple)):
-        return [_canonicalize(item) for item in value]
-    return value
-
-
-def _canonical_bytes(value: object) -> bytes:
-    return json.dumps(
-        _canonicalize(value),
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=True,
-    ).encode("utf-8")
-
-
-def _sha256(value: object) -> str:
-    return hashlib.sha256(_canonical_bytes(value)).hexdigest()
-
-
-def _validate_run_name(run_name: str) -> str:
-    clean = run_name.strip()
-    if not clean:
-        raise ValueError("live paper run_name is required")
-    if len(clean) > 128:
-        raise ValueError("live paper run_name is too long")
-    if any(ord(character) < 32 for character in clean):
-        raise ValueError("live paper run_name cannot contain control characters")
-    return clean
-
-
-def _run_id(run_name: str, initial_state_id: str) -> str:
-    payload = {
-        "schema": "qookey-live-paper-run-id-v0.1",
-        "run_name": run_name,
-        "initial_state_id": initial_state_id,
-    }
-    return f"live-paper-run-v0-1-{_sha256(payload)}"
-
-
-def _run_header(
-    *,
-    run_name: str,
-    initial_state_id: str,
-) -> dict[str, object]:
-    run_id = _run_id(run_name, initial_state_id)
-    return {
-        "schema": "qookey-live-paper-run-header-v0.1",
-        "run_id": run_id,
-        "run_name": run_name,
-        "initial_state_id": initial_state_id,
-        "mode": "LIVE_PAPER_SIMULATION",
-        "authority": {
-            "append_only_run_ledger": True,
-            "public_live_market_data_authorized": True,
-            "live_paper_simulation_authorized": True,
-            "paper_state_persistence_authorized": True,
-            "automatic_schedule_authorized": False,
-            "automatic_candidate_generation_authorized": False,
-            "scorecard_auto_selection_authorized": False,
-            "private_exchange_api_authorized": False,
-            "holdout_access_authorized": False,
-            "real_money_order_authorized": False,
-            "live_real_trading_authorized": False,
-        },
-    }
-
-
-def verify_live_paper_run_header(payload: Mapping[str, object]) -> str:
-    if payload.get("schema") != "qookey-live-paper-run-header-v0.1":
-        raise ValueError("unsupported live paper run header schema")
-    run_id = payload.get("run_id")
-    run_name = payload.get("run_name")
-    initial_state_id = payload.get("initial_state_id")
-    if not isinstance(run_id, str) or not run_id:
-        raise ValueError("live paper run header run_id is required")
-    if not isinstance(run_name, str):
-        raise ValueError("live paper run header run_name is required")
-    clean_name = _validate_run_name(run_name)
-    if not isinstance(initial_state_id, str) or not initial_state_id:
-        raise ValueError("live paper run header initial_state_id is required")
-    if payload.get("mode") != "LIVE_PAPER_SIMULATION":
-        raise ValueError("live paper run header mode is invalid")
-    _verify_coordinator_authority(payload.get("authority"), header=True)
-    expected = _run_id(clean_name, initial_state_id)
-    if run_id != expected:
-        raise ValueError("live paper run header id mismatch")
-    return expected
-
-
-def _verify_coordinator_authority(
-    payload: object,
-    *,
-    header: bool = False,
-) -> None:
-    if not isinstance(payload, Mapping):
-        raise ValueError("live paper coordinator authority object is required")
-    if header and payload.get("append_only_run_ledger") is not True:
-        raise ValueError("live paper run header must be append-only")
-    for key in (
-        "public_live_market_data_authorized",
-        "live_paper_simulation_authorized",
-        "paper_state_persistence_authorized",
-    ):
-        if payload.get(key) is not True:
-            raise ValueError(f"live paper coordinator authority missing: {key}")
-    for key in (
-        "automatic_schedule_authorized",
-        "automatic_candidate_generation_authorized",
-        "scorecard_auto_selection_authorized",
-        "private_exchange_api_authorized",
-        "holdout_access_authorized",
-        "real_money_order_authorized",
-        "live_real_trading_authorized",
-    ):
-        if payload.get(key) is not False:
-            raise ValueError(f"live paper coordinator authority must remain closed: {key}")
-
-
-def _request_id(
-    *,
-    run_id: str,
-    sequence: int,
-    previous_step_id: str | None,
-    previous_state_id: str,
-    tick_time_ms: int,
-    candidate_specs: Sequence[object],
-) -> str:
-    payload = {
-        "schema": "qookey-live-paper-run-request-id-v0.1",
-        "run_id": run_id,
-        "sequence": sequence,
-        "previous_step_id": previous_step_id,
-        "previous_state_id": previous_state_id,
-        "tick_time_ms": tick_time_ms,
-        "candidate_specs_sha256": _sha256(candidate_specs),
-    }
-    return f"live-paper-run-request-v0-1-{_sha256(payload)}"
+        LegacyCoordinatorPolicy.__post_init__(self)
+        if not isinstance(self.compact_tick_reference, bool):
+            raise ValueError("compact_tick_reference must be boolean")
 
 
 def _step_id(
@@ -251,9 +60,11 @@ def _step_id(
     tick_id: str,
     next_state_id: str,
     tick_report_sha256: str,
+    compact_tick_reference: bool = False,
 ) -> str:
+    version = "0.2" if compact_tick_reference else "0.1"
     payload = {
-        "schema": "qookey-live-paper-run-step-id-v0.1",
+        "schema": f"qookey-live-paper-run-step-id-v{version}",
         "run_id": run_id,
         "sequence": sequence,
         "previous_step_id": previous_step_id,
@@ -263,11 +74,19 @@ def _step_id(
         "next_state_id": next_state_id,
         "tick_report_sha256": tick_report_sha256,
     }
-    return f"live-paper-run-step-v0-1-{_sha256(payload)}"
+    version_tag = version.replace(".", "-")
+    return f"live-paper-run-step-v{version_tag}-{_sha256(payload)}"
 
-
-def verify_live_paper_run_step(payload: Mapping[str, object]) -> str:
-    if payload.get("schema") != "qookey-live-paper-run-step-report-v0.1":
+def verify_live_paper_run_step(
+    payload: Mapping[str, object],
+    *,
+    tick_report: Mapping[str, object] | None = None,
+) -> str:
+    schema = payload.get("schema")
+    if schema not in {
+        "qookey-live-paper-run-step-report-v0.1",
+        "qookey-live-paper-run-step-report-v0.2",
+    }:
         raise ValueError("unsupported live paper run step schema")
     if payload.get("state") != "LIVE_PAPER_RUN_STEP_COMMITTED":
         raise ValueError("live paper run step is not committed")
@@ -309,9 +128,20 @@ def verify_live_paper_run_step(payload: Mapping[str, object]) -> str:
     elif not isinstance(previous_step_id, str) or not previous_step_id:
         raise ValueError("continued live paper run step requires previous_step_id")
 
-    tick_report = payload.get("tick_report")
+    if schema == "qookey-live-paper-run-step-report-v0.1":
+        embedded_tick = payload.get("tick_report")
+        if not isinstance(embedded_tick, Mapping):
+            raise ValueError("live paper run step tick_report is required")
+        if tick_report is not None and _canonicalize(tick_report) != _canonicalize(embedded_tick):
+            raise ValueError("persisted live tick differs from run-step tick evidence")
+        tick_report = embedded_tick
+    else:
+        if "tick_report" in payload:
+            raise ValueError("compact live paper run step cannot embed tick_report")
+        if tick_report is None:
+            raise ValueError("compact live paper run step requires persisted tick evidence")
     if not isinstance(tick_report, Mapping):
-        raise ValueError("live paper run step tick_report is required")
+        raise ValueError("live paper run step tick evidence must be an object")
     recomputed_tick_id = live_paper_tick_report_id_from_mapping(tick_report)
     if recomputed_tick_id != tick_id or tick_report.get("tick_id") != tick_id:
         raise ValueError("live paper run step tick id mismatch")
@@ -374,99 +204,32 @@ def verify_live_paper_run_step(payload: Mapping[str, object]) -> str:
         tick_id=tick_id,
         next_state_id=next_state_id,
         tick_report_sha256=tick_report_sha256,
+        compact_tick_reference=schema == "qookey-live-paper-run-step-report-v0.2",
     )
     if step_id != expected_step:
         raise ValueError("live paper run step id mismatch")
     return expected_step
 
-
-def _committed_result(
+def read_live_paper_run_step_tick(
+    store: PaperRunReadStoreLike,
+    step: Mapping[str, object],
     *,
-    request_id: str,
-    step_id: str,
-    run_id: str,
-    sequence: int,
+    before_external: Callable[[], None] | None = None,
 ) -> dict[str, object]:
-    return {
-        "schema": "qookey-live-paper-run-request-result-v0.1",
-        "request_id": request_id,
-        "step_id": step_id,
-        "run_id": run_id,
-        "sequence": sequence,
-        "state": "COMMITTED",
-        "authority": {
-            "append_only_result_pointer": True,
-            "execution_authority": False,
-            "real_money_order_authorized": False,
-            "live_real_trading_authorized": False,
-        },
-    }
-
-
-def _verify_committed_result(
-    payload: Mapping[str, object],
-    *,
-    request_id: str,
-) -> tuple[str, str, int]:
-    if payload.get("schema") != "qookey-live-paper-run-request-result-v0.1":
-        raise ValueError("unsupported live paper run result schema")
-    if payload.get("state") != "COMMITTED":
-        raise ValueError("live paper run result is not committed")
-    if payload.get("request_id") != request_id:
-        raise ValueError("live paper run result request id mismatch")
-    step_id = payload.get("step_id")
-    run_id = payload.get("run_id")
-    sequence = payload.get("sequence")
-    if not isinstance(step_id, str) or not step_id:
-        raise ValueError("live paper run result step_id is required")
-    if not isinstance(run_id, str) or not run_id:
-        raise ValueError("live paper run result run_id is required")
-    if not isinstance(sequence, int) or isinstance(sequence, bool) or sequence < 1:
-        raise ValueError("live paper run result sequence is invalid")
-    authority = payload.get("authority")
-    if not isinstance(authority, Mapping):
-        raise ValueError("live paper run result authority is required")
-    if authority.get("append_only_result_pointer") is not True:
-        raise ValueError("live paper run result must remain append-only")
-    if authority.get("execution_authority") is not False:
-        raise ValueError("live paper run result cannot grant execution authority")
-    if authority.get("real_money_order_authorized") is not False:
-        raise ValueError("live paper run result cannot grant real-money authority")
-    if authority.get("live_real_trading_authorized") is not False:
-        raise ValueError("live paper run result cannot grant real trading authority")
-    return step_id, run_id, sequence
-
-
-
-def build_live_paper_run_result(
-    *,
-    request_id: str,
-    step_id: str,
-    run_id: str,
-    sequence: int,
-) -> dict[str, object]:
-    """Build the canonical immutable request-result seal for one committed step."""
-
-    return _committed_result(
-        request_id=request_id,
-        step_id=step_id,
-        run_id=run_id,
-        sequence=sequence,
-    )
-
-
-def verify_live_paper_run_result(
-    payload: Mapping[str, object],
-    *,
-    request_id: str,
-) -> tuple[str, str, int]:
-    """Validate one serialized committed request-result seal."""
-
-    return _verify_committed_result(payload, request_id=request_id)
-
+    """Resolve and verify independent tick evidence for either step schema."""
+    tick_id = step.get("tick_id")
+    if not isinstance(tick_id, str) or not tick_id:
+        raise ValueError("live paper run step tick_id is required")
+    if before_external is not None:
+        before_external()
+    tick = _store_get(store, "live-tick", tick_id)
+    if tick is None:
+        raise ValueError("persisted live tick is missing")
+    verify_live_paper_run_step(step, tick_report=tick)
+    return tick
 
 def _store_get(
-    store: PaperRunStoreLike,
+    store: PaperRunReadStoreLike,
     kind: str,
     object_id: str,
 ) -> dict[str, object] | None:
@@ -474,16 +237,6 @@ def _store_get(
     if payload is not None and not isinstance(payload, dict):
         raise ValueError("paper run store get_json must return object/null")
     return payload
-
-
-def _receipt(
-    store: PaperRunStoreLike,
-    kind: str,
-    object_id: str,
-    payload: Mapping[str, object],
-) -> object:
-    return store.put_json(kind, object_id, payload)
-
 
 def coordinate_live_paper_run_step(
     *,
@@ -528,18 +281,14 @@ def coordinate_live_paper_run_step(
         sequence = 1
         previous_step_id: str | None = None
     else:
-        verified_previous_step_id = verify_live_paper_run_step(previous_step)
-        if previous_step.get("step_id") != verified_previous_step_id:
-            raise ValueError("previous live paper run step id mismatch")
+        previous_tick = read_live_paper_run_step_tick(store, previous_step)
+        verified_previous_step_id = str(previous_step["step_id"])
         if previous_step.get("run_name") != clean_name:
             raise ValueError("previous live paper run step belongs to another run name")
         run_id = str(previous_step["run_id"])
         initial_state_id = str(previous_step["initial_state_id"])
         sequence = int(previous_step["sequence"]) + 1
         previous_step_id = verified_previous_step_id
-        previous_tick = previous_step.get("tick_report")
-        if not isinstance(previous_tick, Mapping):
-            raise ValueError("previous live paper run step tick report is required")
         embedded_state = previous_tick.get("next_state")
         if not isinstance(embedded_state, Mapping):
             raise ValueError("previous live paper run step next state is required")
@@ -581,8 +330,16 @@ def coordinate_live_paper_run_step(
         stored_step = _store_get(store, "live-run-step", step_id)
         if stored_step is None:
             raise ValueError("committed live paper request references missing run step")
-        if verify_live_paper_run_step(stored_step) != step_id:
+        stored_tick = read_live_paper_run_step_tick(store, stored_step)
+        if stored_step.get("step_id") != step_id:
             raise ValueError("committed live paper run step failed verification")
+        stored_state = _store_get(store, "live-state", str(stored_step["next_state_id"]))
+        if (
+            stored_state is None
+            or verify_live_paper_state(stored_state) != stored_step["next_state_id"]
+            or _canonicalize(stored_state) != _canonicalize(stored_tick.get("next_state"))
+        ):
+            raise ValueError("committed live paper next state evidence mismatch")
         if stored_step.get("request_id") != request_id:
             raise ValueError("committed live paper run step request lineage mismatch")
         if stored_step.get("run_id") != run_id:
@@ -660,9 +417,14 @@ def coordinate_live_paper_run_step(
         tick_id=tick_id,
         next_state_id=next_state_id,
         tick_report_sha256=tick_report_sha256,
+        compact_tick_reference=policy.compact_tick_reference,
     )
     step: dict[str, object] = {
-        "schema": "qookey-live-paper-run-step-report-v0.1",
+        "schema": (
+            "qookey-live-paper-run-step-report-v0.2"
+            if policy.compact_tick_reference
+            else "qookey-live-paper-run-step-report-v0.1"
+        ),
         "step_id": step_id,
         "state": "LIVE_PAPER_RUN_STEP_COMMITTED",
         "run_id": run_id,
@@ -678,7 +440,6 @@ def coordinate_live_paper_run_step(
         "candidate_specs_sha256": _sha256(canonical_candidates),
         "candidate_specs": canonical_candidates,
         "tick_report_sha256": tick_report_sha256,
-        "tick_report": _canonicalize(tick_report),
         "authority": _coordinator_authority(
             claim_required=policy.run_slot_claim_required
         ),
@@ -689,12 +450,18 @@ def coordinate_live_paper_run_step(
             "A crash before request-result sealing may require operator review before retry if provider evidence changed.",
         ],
     }
-    if verify_live_paper_run_step(step) != step_id:
+    if not policy.compact_tick_reference:
+        step["tick_report"] = _canonicalize(tick_report)
+    if verify_live_paper_run_step(step, tick_report=tick_report) != step_id:
         raise ValueError("generated live paper run step failed verification")
 
     receipts.append(_receipt(store, "live-state", next_state_id, next_state))
     receipts.append(_receipt(store, "live-tick", tick_id, tick_report))
     receipts.append(_receipt(store, "live-run-step", step_id, step))
+    persisted_step = _store_get(store, "live-run-step", step_id)
+    if persisted_step is None or _canonicalize(persisted_step) != _canonicalize(step):
+        raise ValueError("generated live paper run step readback mismatch")
+    read_live_paper_run_step_tick(store, persisted_step)
 
     result = _committed_result(
         request_id=request_id,
@@ -729,25 +496,6 @@ def coordinate_live_paper_run_step(
         ),
     }
 
-
-def _coordinator_authority(*, claim_required: bool = False) -> dict[str, object]:
-    return {
-        "public_live_market_data_authorized": True,
-        "live_paper_simulation_authorized": True,
-        "paper_state_persistence_authorized": True,
-        "append_only_run_ledger": True,
-        "paper_run_slot_claim_authorized": claim_required,
-        "claim_conflict_auto_retry_authorized": False,
-        "automatic_schedule_authorized": False,
-        "automatic_candidate_generation_authorized": False,
-        "scorecard_auto_selection_authorized": False,
-        "private_exchange_api_authorized": False,
-        "holdout_access_authorized": False,
-        "real_money_order_authorized": False,
-        "live_real_trading_authorized": False,
-    }
-
-
 def live_paper_run_coordinator_policy_from_config(
     payload: Mapping[str, object],
 ) -> LivePaperRunCoordinatorPolicy:
@@ -755,6 +503,7 @@ def live_paper_run_coordinator_policy_from_config(
     if schema not in {
         "qookey-live-paper-run-coordinator-v0.1",
         "qookey-live-paper-run-coordinator-v0.2",
+        "qookey-live-paper-run-coordinator-v0.3",
     }:
         raise ValueError("unsupported live paper run coordinator config")
     policy = payload.get("policy")
@@ -789,42 +538,9 @@ def live_paper_run_coordinator_policy_from_config(
         if not isinstance(value, bool):
             raise ValueError(f"policy.{key} must be a JSON boolean")
         values[key] = value
+    if schema == "qookey-live-paper-run-coordinator-v0.3":
+        compact = policy.get("compact_tick_reference")
+        if compact is not True:
+            raise ValueError("Coordinator V0.3 requires compact_tick_reference=true")
+        values["compact_tick_reference"] = compact
     return LivePaperRunCoordinatorPolicy(**values)
-
-
-def live_paper_run_coordinator_input_from_dict(
-    payload: Mapping[str, object],
-) -> tuple[str, int, tuple[object, ...], Mapping[str, object] | None, str | None]:
-    if payload.get("schema") != "qookey-live-paper-run-coordinator-input-v0.1":
-        raise ValueError("unsupported live paper run coordinator input schema")
-    run_name = payload.get("run_name")
-    tick_time_ms = payload.get("tick_time_ms")
-    candidate_specs = payload.get("candidate_specs")
-    initial_state = payload.get("initial_state")
-    previous_step_id = payload.get("previous_step_id")
-    if not isinstance(run_name, str):
-        raise ValueError("run_name is required")
-    _validate_run_name(run_name)
-    if (
-        not isinstance(tick_time_ms, int)
-        or isinstance(tick_time_ms, bool)
-        or tick_time_ms < 0
-    ):
-        raise ValueError("tick_time_ms must be non-negative integer")
-    if not isinstance(candidate_specs, list):
-        raise ValueError("candidate_specs must be an array")
-    if initial_state is not None and not isinstance(initial_state, Mapping):
-        raise ValueError("initial_state must be object/null")
-    if previous_step_id is not None and (
-        not isinstance(previous_step_id, str) or not previous_step_id
-    ):
-        raise ValueError("previous_step_id must be string/null")
-    if (initial_state is None) == (previous_step_id is None):
-        raise ValueError("provide exactly one of initial_state / previous_step_id")
-    return (
-        run_name,
-        tick_time_ms,
-        tuple(candidate_specs),
-        initial_state,
-        previous_step_id,
-    )
