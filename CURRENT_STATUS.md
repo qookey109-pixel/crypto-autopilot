@@ -1,3 +1,18 @@
+## 即時 Cloud Paper／文件同步檢查點 — 2026-09-30 10:50 Asia/Taipei
+
+Evidence basis：main `31831113d6997779ee18fe8ee4d5eb67390855a2`（PR #647 合併提交）。以下是該 SHA 的查核快照，不宣稱更新文件合併後的 main SHA 或 checks。
+
+- PR [#647](https://github.com/qookey109-pixel/crypto-autopilot/pull/647) 已合併。PR head `7b957c496782ad2f46aa08c436b6766c0816ecff` 的 CI run [36660991269](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36660991269)、CodeQL [36660991267](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36660991267)、Dependency/SBOM [36660991326](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36660991326) 均成功。對 merge SHA 的 combined status 未回傳 entries；post-merge 狀態為 `UNKNOWN_NOT_VERIFIED`。
+- PR [#644](https://github.com/qookey109-pixel/crypto-autopilot/pull/644) 已關閉且未合併。其 head `3785d4e91a65e7fa870b7c2e4520eb5c10adccb2` 基於 `50cfd7ec4a23ef159bdc02df7fd7cdd2e1da13e1`，落後 main；CI、Dashboard snapshot、SBOM、CodeQL、Pages 的 exact-head runs 均為 `action_required`，不能當作通過。變更是過時的自動維護快照，保留 PR 歷史、不把它覆蓋到 main。
+- Cloud Maintenance run [36648016165](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36648016165)：inspect／propose 成功；propose log 為 `NO_CHANGE`、`commits_created=0`，資料基準 SHA 是 `50cfd7e`。這證明該舊基準無文件變更，**不算最新 main 的自然驗收**。
+- Pages run [36648016160](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36648016160) 的 build、deploy、production browser 成功，head 也是 `50cfd7e`。故它是可用的舊版部署證據，不是 PR #647 之後的新部署；PR #647 僅文件變更。
+- Health run [36620936304](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36620936304) 成功，artifact [11057933924](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36620936304) 保留；其證據 head 為 `50cfd7e`。Cloud Paper activation 仍 `false`，正式循環／自然 Paper schedule `NOT_RUN / NOT_ESTABLISHED`；正式策略 registry 空、Core100 `REJECT`、macro `REGIME_UNAVAILABLE`。
+- Billing V0.1、Usage V0.1／V0.2、R2 Usage V0.3 一次性權限均已消耗，不可重跑。帳戶零費用、D1 用量、完整 R2 bucket/writer 覆蓋與 headroom 仍 `UNKNOWN`。不呼叫 Cloudflare、不 provision／write、不訓練、不改排程。
+
+接續順序：先合併本次狀態同步並回讀 main；之後完成預算可行性與資料缺口決策、Dashboard V0.2/V0.3 相容、共享預算／恢復及完整雲端 CI，達標後才評估新的版本化外部證據及受控 PAPER gate。Pionex observability 現行 authority 的到期時間是 2026-10-01 08:00 台北；到期前後均不得自動延長或補跑歷史 slot。
+
+---
+
 # Current Operations Status
 
 ## Live repository checkpoint — 2026-09-30 10:24 Asia/Taipei
