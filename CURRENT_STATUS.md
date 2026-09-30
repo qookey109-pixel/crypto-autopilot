@@ -1,3 +1,13 @@
+## Cloud Paper 最新查核 — 2026-09-30（#662 合併後）
+
+正式 authority：GitHub `main=919941f2f8d8db77b0bc8372727de46d8406867f`；目前 open PR = 0。這是 #662 文件同步合併後的即時 main；下方較早 SHA 的查核紀錄保留為歷史快照，不是目前 head。
+
+- #661 的 Cloud Paper V0.2 compact report 已合併；三-slot 合成 fixture 為 26 objects、157,367 canonical JSON bytes，相較 #658 基準減少 48,814 bytes（約 23.7%）。這是序列化 profile，不是實際 R2 用量、費用或帳戶 headroom。
+- #662 已同步狀態與保存 lineage 文件。Cloud Paper 仍停用、正式循環 NOT_RUN、入口 NOT_WIRED、自然 schedule NOT_CONFIGURED；D1 未 provision、正式策略 registry 為空、Core100 品質 REJECT。
+- 零費用、帳戶用量新鮮度、所有 writers 覆蓋及 D1/R2 headroom 尚未證明；已消耗的一次性 Billing／Usage／bootstrap authority 不重跑。沒有 provider、D1、R2 呼叫，沒有啟用執行或排程。
+- 下一個工程切片：評估以獨立 `live-tick` 引用取代 `live-run-step` 內重複 tick payload，完整保留舊格式讀取、hash lineage、continuation、recovery、replay 與部分寫入 fail-closed；另核對資料缺口及公開來源官方條款。
+- 維持 CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER、0 USD、PAPER/LIVE-PAPER ONLY；holdout、source switch、promotion、真實下單與 live trading 維持關閉。
+
 ## Cloud Paper 最新查核 — 2026-09-30 20:44 Asia/Taipei
 
 查核基準：GitHub `main=4b12f0c9ad508e09d712320111f2e12423b69aca`；open PR = 0。以下為工程／合成證據；Cloud Paper 仍未啟用。
