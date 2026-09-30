@@ -22,7 +22,7 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         current = self.current
 
         self.assertEqual(payload["schema"], "qookey-current-operations-v0.3")
-        self.assertEqual(payload["updated_date"], "2026-09-22")
+        self.assertEqual(payload["updated_date"], "2026-09-30")
         self.assertEqual(payload["repository_authority"], "RESOLVE_MAIN_LIVE_AT_READ_TIME")
         self.assertEqual(payload["mode"], "PAPER_AND_LIVE_PAPER_ONLY")
 
@@ -189,18 +189,23 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             self.current,
         )
 
-    def test_open_pr_triage_pointer_is_current(self) -> None:
+    def test_current_scan_separates_historical_pr_triage(self) -> None:
         control = self.payload["control_plane"]
         self.assertEqual(
             control["open_pr_triage"],
             "research/status/open-pr-triage-v0-5.json",
         )
-        self.assertEqual(control["open_pr_count"], 6)
+        self.assertEqual(control["open_pr_count"], 0)
         self.assertEqual(
             control["open_pr_numbers"],
-            [326, 327, 328, 329, 330, 331],
+            [],
         )
-        self.assertIn("SIX_DEPENDABOT_OPEN", control["open_pr_triage_state"])
+        self.assertIn("ZERO_OPEN_PRS", control["open_pr_triage_state"])
+        self.assertEqual(control["historical_open_pr_triage"]["open_pr_count"], 6)
+        self.assertEqual(control["historical_open_pr_triage"]["open_pr_numbers"], [326, 327, 328, 329, 330, 331])
+        self.assertFalse(self.payload["live_repository_checkpoint"]["is_latest_main_claim"])
+        self.assertEqual(control["current_type_visibility"]["diagnostics"], 42)
+        self.assertFalse(control["current_type_visibility"]["blocking"])
 
     def test_type_debt_baseline_pointer_is_nonblocking(self) -> None:
         control = self.payload["control_plane"]

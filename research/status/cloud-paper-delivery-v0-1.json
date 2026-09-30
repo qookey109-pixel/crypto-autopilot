@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-30",
-  "evidence_basis_parent_main_sha": "31831113d6997779ee18fe8ee4d5eb67390855a2",
+  "evidence_basis_parent_main_sha": "095aba2c80b9ad710523875b1f45381646e61b75",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -36,7 +36,7 @@
     "composition_positive_cycle": "PR622_MERGED_MAIN_CB22D3C; PR_HEAD_PYTHON_312_313_WORKFLOW_STATIC_CODEQL_DEPENDENCY_SBOM_PASS; POST_MERGE_CI_CODEQL_DEPENDENCY_SBOM_FREEZE_GUARD_PASS; SYNTHETIC_TEST_ONLY; NO_RUNTIME_AUTHORITY",
     "engineering_ci_acceptance_matrix": "PASS_ON_PR622_AND_POST_MERGE_PR624_MAIN_CI_36488331170; POSITIVE_NO_TRADE_REJECT_STALE_DATA_BUDGET_REPLAY_CONCURRENCY_RECOVERY_PARTIAL_SETTLEMENT; SYNTHETIC_ONLY",
     "d1_source_boundary_guard": "PR628_MERGED; EXACT_HEAD_3E2C67B; PR_HEAD_CI_CODEQL_DEPENDENCY_PASS; POST_MERGE_CI_CODEQL_DEPENDENCY_FREEZE_GUARD_PASS; REPOSITORY_SOURCE_ONLY; EXTERNAL_ACCOUNT_WRITERS_UNPROVEN",
-    "cloudflare_billing_snapshot": "PR630_MERGED; ONE_READ_ONLY_GET_AUTHORITY; READINESS_RUN_36497596228_BLOCKED_MISSING_BILLING_READ_ONLY_CREDENTIAL; ZERO_CLOUDFLARE_REQUESTS; AUDIT_UNCONSUMED",
+    "cloudflare_billing_snapshot": "ONE_TIME_RUN_36513941565_CONSUMED; SUBSCRIPTION_LIST_PRICE_USD_0_NOT_METERED_CHARGES; ZERO_COST_UNKNOWN; DO_NOT_RERUN",
     "cloudflare_usage_audit_v0_3": {
       "run_id": 36593296360,
       "attempt": 1,
@@ -54,7 +54,9 @@
       "zero_cost": "UNKNOWN",
       "headroom": "UNKNOWN",
       "audit_head_sha": "2516a80c32fa04b9789bef379b108eb50c87fd49"
-    }
+    },
+    "historical_cloudflare_billing_snapshot": "PR630_MERGED; ONE_READ_ONLY_GET_AUTHORITY; READINESS_RUN_36497596228_BLOCKED_MISSING_BILLING_READ_ONLY_CREDENTIAL; ZERO_CLOUDFLARE_REQUESTS; AUDIT_UNCONSUMED",
+    "dashboard_usage_evidence": "V0_2_V0_3_PROJECTION_IDENTITY_AND_UNKNOWN_GATES_IMPLEMENTED; CLOUD_CI_AND_NEW_DEPLOYMENT_PENDING"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "R2 V0.3 run 36593296360 is partial: one returned bucket (616541780 bytes) and 6 operation groups / 125309 requests with no operation timestamp; complete bucket inventory, all writers, freshness and headroom remain UNKNOWN; V0.3 one-time authority consumed; do not rerun.",
@@ -501,7 +503,7 @@
     "status": "READY_FOR_REVIEW",
     "reason_code": "R2_METRICS_CAPTURED_REVIEW_ONLY",
     "cloudflare_http_requests_performed": 1,
-    "artifact_name": "cloud-paper-r2-usage-audit-36593296360-1",
+    "artifact_name": "cloud-paper-r2-usage-audit-v0-3-36593296360-1",
     "artifact_id": 11045150561,
     "artifact_size_bytes": 1126,
     "artifact_digest": "sha256:581514f59892b84520e52ef463e00210e4175952cc0d54af7fda42b18c71c1be",
@@ -574,15 +576,20 @@
     "one_time_authority": "CONSUMED_DO_NOT_RERUN"
   },
   "current_repository_checkpoint": {
-    "main_sha": "31831113d6997779ee18fe8ee4d5eb67390855a2",
-    "observed_at_utc": "2026-09-30T02:50:55Z",
+    "evidence_basis_main_sha": "095aba2c80b9ad710523875b1f45381646e61b75",
+    "observed_at_utc": "2026-09-30T05:53:15Z",
+    "is_latest_main_claim": false,
     "open_pull_requests": [],
-    "combined_status": "PR_647_HEAD_CHECKS_SUCCESS; POST_MERGE_MAIN_STATUS_NO_ENTRIES_UNKNOWN",
-    "activation_enabled": false,
+    "ci_run_id": 36667740375,
+    "ci": "SUCCESS",
+    "python_3_12": "SUCCESS",
+    "python_3_13": "SUCCESS",
+    "workflow_static": "SKIPPED_MAIN_EVENT",
+    "cloud_paper_activation": false,
     "production_cycle_status": "NOT_RUN",
-    "model_quality": "REJECT",
-    "production_strategy_registry": "EMPTY",
-    "macro_regime": "REGIME_UNAVAILABLE"
+    "usage_receipt": "research/receipts/2026-09-29-cloud-paper-r2-usage-audit-v0-3-result.json",
+    "usage_evidence": "PARTIAL_V0_3_ZERO_COST_AND_HEADROOM_UNKNOWN",
+    "next_work": "COST_FRESHNESS_STORAGE_AND_LEDGER_FEASIBILITY_THEN_PRODUCTION_WIRING"
   },
   "external_evidence_design": {
     "status": "DOCUMENTED_DESIGN_ONLY_NO_CLOUDFLARE_REQUEST",
@@ -632,5 +639,16 @@
       "retries": 0,
       "authority": "NONE"
     }
+  },
+  "historical_current_repository_checkpoint": {
+    "main_sha": "31831113d6997779ee18fe8ee4d5eb67390855a2",
+    "observed_at_utc": "2026-09-30T02:50:55Z",
+    "open_pull_requests": [],
+    "combined_status": "PR_647_HEAD_CHECKS_SUCCESS; POST_MERGE_MAIN_STATUS_NO_ENTRIES_UNKNOWN",
+    "activation_enabled": false,
+    "production_cycle_status": "NOT_RUN",
+    "model_quality": "REJECT",
+    "production_strategy_registry": "EMPTY",
+    "macro_regime": "REGIME_UNAVAILABLE"
   }
 }

@@ -265,11 +265,192 @@ test("cloud paper dashboard shows inactive state without inventing account evide
   await expect(page.locator("#cloud-paper-regime")).toHaveText("REGIME_UNAVAILABLE · 缺 TOTAL3 / BTC dominance；23 市場 breadth 覆蓋未驗證");
   await expect(page.locator(".cloud-paper-panel")).toContainText("固定 23 市場 breadth 成員已準備，歷史覆蓋仍未驗證");
   await expect(page.locator("#cloud-paper-account")).toHaveText("尚未初始化");
-  await expect(page.locator("#cloud-paper-budget")).toHaveText("BLOCKED_BUDGET · V0.2 部分用量證據待查");
-  await expect(page.locator("#cloud-paper-storage-capacity")).toHaveText("實際 bytes/headroom 未知 · R2 1,297 組 · 硬停 8.0 GB");
+  await expect(page.locator("#cloud-paper-budget")).toHaveText("BLOCKED_BUDGET · V0.3 部分用量證據待查");
+  await expect(page.locator("#cloud-paper-storage-capacity")).toHaveText("部分觀測 616,541,780 bytes（1 bucket）· 完整用量/headroom 未知 · 硬停 8.0 GB");
   await expect(page.locator("#cloud-paper-trace-status")).toHaveText("尚無正式循環報告");
   await expect(page.locator("#cloud-paper-trace-detail")).toContainText("最新正式 run 為 NOT_RUN");
   await expect(page.locator(".cloud-paper-panel")).toContainText("API key");
   await expect(page.locator(".cloud-paper-panel")).toContainText("D1 migrations 尚未套用且 D1 未 provision");
   await expect(page.locator(".cloud-paper-panel")).toContainText("未知值不顯示成 0");
 });
+
+const cloudPaperProjection = require("../../web/data/cloud-paper-loop.json");
+const legacyCloudPaperProjection = {
+  "schema": "qookey-cloud-paper-dashboard-v0.1",
+  "authority": false,
+  "mode": "PAPER_AND_LIVE_PAPER_ONLY",
+  "evidence_basis_main_sha": "b2f0a1e2b4129cff207f6b9c59d395ecc705aaab",
+  "observed_at_utc": "2026-09-29T14:41:00.239158Z",
+  "activation": {
+    "enabled": false,
+    "status": "BLOCKED"
+  },
+  "latest_run": {
+    "status": "NOT_RUN",
+    "run_id": null,
+    "attempt": null,
+    "head_sha": null,
+    "report_status": null,
+    "report_artifact": null,
+    "decision_trace_status": "NOT_AVAILABLE_NO_OFFICIAL_RUN"
+  },
+  "strategy": {
+    "registry_status": "EMPTY_NO_ELIGIBLE_STRATEGIES",
+    "eligible_count": 0,
+    "empty_registry_result": "NO_TRADE",
+    "runtime_result": "NOT_RUN_NO_FORMAL_NO_TRADE_RESULT"
+  },
+  "market": {
+    "provider": "PIONEX_PUBLIC",
+    "macro_regime": "REGIME_UNAVAILABLE",
+    "unavailable_fields": [
+      "TOTAL3",
+      "BTC_DOMINANCE",
+      "ALIGNED_BREADTH"
+    ],
+    "provider_fallback": false,
+    "pionex_public_market_data_api_key_required": false,
+    "breadth_coverage": {
+      "candidate_market_count": 23,
+      "minimum_required_market_count": 20,
+      "membership_state": "PREPARED_CANDIDATE_MEMBERSHIP_ONLY_COVERAGE_UNVERIFIED",
+      "coverage_verified": false
+    }
+  },
+  "account": {
+    "initialized": false,
+    "planned_initial_equity_usd": 10000,
+    "confirmed_equity_usd": null,
+    "open_position_count": null,
+    "realized_pnl_usd": null,
+    "unrealized_pnl_usd": null
+  },
+  "budget": {
+    "monthly_budget_usd": 0,
+    "account_wide_usage_evidence": "REVIEW_REQUIRED_V0_2_DATASET_COVERAGE_INCOMPLETE",
+    "reservation_guard": "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED",
+    "state": "BLOCKED_BUDGET",
+    "d1_reservation_ledger": "SHARED_LEDGER_CODE_PREPARED_MIGRATIONS_NOT_APPLIED_D1_NOT_PROVISIONED",
+    "d1_free_tier_usage_evidence": "UNKNOWN_EMPTY_UNVERIFIED",
+    "d1_storage_growth_bytes_per_statement": 16384,
+    "d1_storage_growth_policy_bytes_per_utc_day": 12582912,
+    "storage_capacity": {
+      "state": "USAGE_PARTIAL_BLOCKED",
+      "measured_storage_bytes": null,
+      "usage_evidence": "PARTIAL_R2_EVIDENCE_NOT_ZERO_OR_COMPLETE",
+      "report_object_max_bytes": 262144,
+      "per_run_growth_max_bytes": 2097152,
+      "per_utc_day_growth_max_bytes": 201326592,
+      "max_31_day_growth_bytes": 6241124352,
+      "warning_threshold_bytes": 6400000000,
+      "hard_stop_bytes": 8000000000,
+      "all_writer_coverage_proven": false
+    },
+    "usage_audit_evidence": {
+      "authority": "cloud_paper_usage_audit_v0_2",
+      "status": "REVIEW_REQUIRED",
+      "reason_code": "DATASET_COVERAGE_INCOMPLETE",
+      "run_id": 36584465739,
+      "attempt": 1,
+      "run_head_sha": "21d37a44c6f3c5bba340908705488a05e7a5f7c7",
+      "artifact_id": 11041290995,
+      "artifact_name": "cloud-paper-usage-audit-v0-2-36584465739-1",
+      "artifact_sha256": "9ece6ff0a937f930d1137b2539052833bb5d94960dff8c1e50cce4cdbdadc258",
+      "cloudflare_requests": 1,
+      "d1_rows_state": "EMPTY_UNVERIFIED",
+      "d1_storage_state": "EMPTY_UNVERIFIED",
+      "r2_operations_state": "LIMIT_REACHED",
+      "r2_operations_group_count": 10000,
+      "r2_storage_state": "PRESENT",
+      "r2_storage_group_count": 1297,
+      "account_wide_cost": "UNKNOWN",
+      "complete_storage_byte_aggregate": "UNKNOWN",
+      "shared_writer_coverage": "UNKNOWN",
+      "storage_headroom": "UNKNOWN",
+      "conclusion": "R2 analytics are partial; zero cost and FREE-tier headroom are not established."
+    },
+    "zero_cost_conclusion": "UNKNOWN",
+    "account_wide_writer_coverage": "UNKNOWN"
+  },
+  "model_quality": "REJECT",
+  "boundary": {
+    "paper_only": true,
+    "real_money_orders": false,
+    "live_trading": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false
+  },
+  "production": {
+    "entrypoint_workflow": "NOT_WIRED",
+    "natural_schedule": "NOT_CONFIGURED"
+  }
+};
+
+test("cloud paper V0.3 separates projection time, source time and partial bytes", async ({ page, baseURL }) => {
+  await page.goto(baseURL, { waitUntil: "networkidle" });
+  await expect(page.locator("#cloud-paper-detail")).toContainText("125,309");
+  await expect(page.locator("#cloud-paper-detail")).toContainText("D1 未查詢");
+  await expect(page.locator("#cloud-paper-evidence-observed")).toContainText(cloudPaperProjection.observed_at_utc);
+  await expect(page.locator("#cloud-paper-evidence-snapshot")).toContainText("2026-09-29T15:20:00Z");
+  await expect(page.locator("#cloud-paper-evidence-snapshot")).toContainText("freshness 未知");
+  await expect(page.locator("#cloud-paper-evidence-run")).toHaveAttribute("href",
+    "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36593296360/artifacts/11045150561");
+});
+
+test("reviewed V0.2 historical projection remains readable", async ({ page, baseURL }) => {
+  await page.route("**/data/cloud-paper-loop.json", route => route.fulfill({
+    status: 200, contentType: "application/json", body: JSON.stringify(legacyCloudPaperProjection),
+  }));
+  await page.goto(baseURL, { waitUntil: "networkidle" });
+  await expect(page.locator("#cloud-paper-status")).toHaveText("已實作 · 尚未啟用");
+  await expect(page.locator("#cloud-paper-budget")).toHaveText("BLOCKED_BUDGET · V0.2 部分用量證據待查");
+  await expect(page.locator("#cloud-paper-detail")).toContainText("10,000 組上限");
+  await expect(page.locator("#cloud-paper-evidence-run")).toHaveAttribute("href",
+    "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36584465739/artifacts/11041290995");
+});
+
+for (const [name, mutate] of [
+  ["run identity", data => { data.budget.usage_audit_evidence.run_id += 1; }],
+  ["artifact identity", data => { data.budget.usage_audit_evidence.artifact_name = "wrong"; }],
+  ["artifact digest", data => { data.budget.usage_audit_evidence.artifact_sha256 = "0".repeat(64); }],
+  ["attempt boolean", data => { data.budget.usage_audit_evidence.attempt = true; }],
+  ["false PASS", data => { data.budget.usage_audit_evidence.status = "PASS"; }],
+  ["false cost", data => { data.budget.zero_cost_conclusion = "PASS"; }],
+  ["partial promoted to full", data => { data.budget.storage_capacity.measured_storage_bytes = 616541780; }],
+  ["unknown account shown zero", data => { data.account.confirmed_equity_usd = 0; }],
+  ["live flag", data => { data.boundary.live_trading = true; }],
+  ["missing capacity", data => { delete data.budget.storage_capacity; }],
+]) {
+  test(`cloud paper rejects ${name} and clears evidence after refresh`, async ({ page, baseURL }) => {
+    await page.goto(baseURL, { waitUntil: "networkidle" });
+    await expect(page.locator("#cloud-paper-evidence-run")).toBeVisible();
+    const data = structuredClone(cloudPaperProjection);
+    mutate(data);
+    await page.route("**/data/cloud-paper-loop.json", route => route.fulfill({
+      status: 200, contentType: "application/json", body: JSON.stringify(data),
+    }));
+    await page.locator("#refresh-button").click();
+    await expect(page.locator("#cloud-paper-status")).toHaveText("無法核實");
+    await expect(page.locator("#cloud-paper-account")).toHaveText("未核實");
+    await expect(page.locator("#cloud-paper-evidence-run")).toBeHidden();
+    await expect(page.locator("#cloud-paper-evidence-run")).not.toHaveAttribute("href");
+    await expect(page.locator("#cloud-paper-evidence-snapshot")).toHaveText("來源資料時間：未核實");
+    await expect(page.locator("#refresh-button")).toBeEnabled();
+  });
+}
+
+for (const [name, status, body] of [
+  ["missing page", 404, "{}"],
+  ["null projection", 200, "null"],
+]) {
+  test(`cloud paper ${name} stays unknown`, async ({ page, baseURL }) => {
+    await page.route("**/data/cloud-paper-loop.json", route => route.fulfill({
+      status, contentType: "application/json", body,
+    }));
+    await page.goto(baseURL, { waitUntil: "networkidle" });
+    await expect(page.locator("#cloud-paper-status")).toHaveText("無法核實");
+    await expect(page.locator("#cloud-paper-storage-capacity")).toHaveText("用量未知 · 不顯示為 0");
+    await expect(page.locator("#cloud-paper-evidence-run")).toBeHidden();
+  });
+}

@@ -23,6 +23,10 @@ Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pix
 - 每輪記錄 run／attempt／head／slot／state、實際讀寫次數、候選及原因、帳戶、持倉、損益、來源與 evidence 時間。完成交易提供研究統計，不自動調參、改資格或 promotion。
 - 正式工程交付、受控 main 驗收、首次自然 schedule、Pages 部署及策略品質分別記錄；任何一項成功不代替其他項目。
 
+### Dashboard 接線交付批次
+
+本批工程新增 V0.2/V0.3 身分與 UNKNOWN 校驗、來源時間分欄、錯誤投影與 refresh 回歸，同步 current/machine/delivery 索引。正式啟用維持關閉；本批 CI 與部署待實際結果核對。通過後直接進入第 2 批成本/freshness/保存期限/ledger 可行性決策，不再獨立整理文件。
+
 ### 二、本次確認的實際進度
 
 | 範圍 | 已確認狀態 | 尚未完成 |
