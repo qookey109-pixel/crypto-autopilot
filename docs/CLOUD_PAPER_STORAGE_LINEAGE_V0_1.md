@@ -1,5 +1,21 @@
 # Cloud Paper 保存 lineage 查核 — 2026-09-30
 
+## V0.2 compact report follow-up — PR #661 merged 2026-09-30
+
+Evidence basis: parent main `4ce6bbfbb3e8507c9273fb538568d316d156157b`; merge commit/main `4b12f0c9ad508e09d712320111f2e12423b69aca`; PR head `ebf812426dffb0e600fdcb2dcabf05e3f3642be6`. PR #661 passed Python 3.12/3.13, Ruff, workflow-static, CodeQL and Dependency/SBOM. Post-merge main CI #36716389946, CodeQL #36716389968, Dependency/SBOM #36716389930 and Freeze Guard #36716390111 passed; Pages was not triggered.
+
+The new `qookey-cloud-paper-loop-report-v0.2` stores a `step_id` reference rather than duplicating the full `coordinator.run_step`. Reader logic still accepts V0.1 embedded reports and verifies the referenced immutable step, state, and result seal. No previous object was migrated, deleted, or rewritten.
+
+Matched synthetic three-slot entry/exit/next-no-trade fixture:
+- V0.1 baseline: 26 objects, 206,181 canonical JSON bytes; cloud-report 70,352 bytes.
+- V0.2: 26 objects, 157,367 canonical JSON bytes; cloud-report 21,538 bytes.
+- Difference: 48,814 bytes (about 23.7%) in this synthetic serialization profile only; not production R2 usage, request count, or fee savings.
+
+The first lineage item (external report → coordinator step payload) is complete as a prepared storage-schema change. The next candidate is step → tick reference, which must preserve V0.1/V0.2 reads, recovery verification, digest lineage, complete ledger coverage, replay/restart and partial-write diagnosis. Do not remove the embedded tick or state payload until those readers and recovery paths are proven equivalent.
+
+Cloud Paper remains disabled; D1 is unprovisioned; no provider, D1 or R2 call and no schedule/runtime activation occurred. Account-wide zero cost, freshness, all-writer coverage and headroom remain unproven. Synthetic results do not authorize production savings claims or activation.
+
+
 查核基準：GitHub `main=bcdbecf48d2c38f2f999aa054115253b9a816f92`。本文件根據該 SHA 的 writer、reader、recovery 程式與既有合成 profile 整理。沒有呼叫 provider、D1 或 R2；沒有改變 activation、預算或排程 authority。
 
 ## 已量測的高佔比物件
