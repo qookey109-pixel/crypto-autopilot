@@ -153,6 +153,10 @@ def main():
             storage = store["final_storage"]
             print(f'{scenario["scenario"]}[{index}]: {storage["object_count"]} objects, '
                   f'{storage["canonical_json_bytes"]} canonical JSON bytes')
+            for kind, metrics in sorted(storage["by_kind"].items()):
+                print(f'  {kind}: {metrics["objects"]} objects, '
+                      f'{metrics["canonical_json_bytes"]} canonical JSON bytes, '
+                      f'{metrics["largest_object_bytes"]} largest object bytes')
 
 
 if __name__ == "__main__":
