@@ -1,0 +1,35 @@
+{
+  "schema": "qookey-cloud-paper-report-v0.2",
+  "status": "PREPARED_STORAGE_SCHEMA_ONLY_NO_RUNTIME_AUTHORITY",
+  "supersedes": "qookey-cloud-paper-loop-report-v0.1",
+  "purpose": "Reduce duplicate coordinator-step payload in newly written Cloud Paper reports while retaining immutable step, state, tick, seal, and result-pointer verification.",
+  "stored_report": {
+    "schema": "qookey-cloud-paper-loop-report-v0.2",
+    "coordinator_step": "REFERENCE_BY_LIVE_RUN_STEP_ID",
+    "inline_run_step": false,
+    "result_pointer_digest": "SHA256_OF_CANONICAL_STORED_REPORT"
+  },
+  "reader_compatibility": {
+    "read_v0_1_embedded_step": true,
+    "read_v0_2_step_reference": true,
+    "missing_or_mismatched_reference": "REVIEW_REQUIRED",
+    "rewrite_existing_v0_1_objects": false
+  },
+  "runtime": {
+    "activation_enabled": false,
+    "schedule_enabled": false,
+    "provider_access_authorized": false,
+    "d1_access_authorized": false,
+    "r2_access_authorized": false,
+    "budget_authority_changed": false
+  },
+  "trading": {
+    "paper_only": true,
+    "live_paper_only": true,
+    "real_money_orders": false,
+    "live_trading": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false
+  }
+}
