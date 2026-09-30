@@ -91,6 +91,59 @@ REQUIRED_ZH_HANT_LABELS = (
 )
 
 
+def validate_cloud_paper_usage_evidence(budget: dict[str, Any]) -> str:
+    """Accept preserved V0.2 or current V0.3 evidence without promoting either."""
+    if budget.get("monthly_budget_usd") != 0:
+        raise RuntimeError("Cloud Paper monthly budget must remain zero")
+    evidence = _require_object(budget.get("usage_audit_evidence"), "usage audit evidence")
+    authority = evidence.get("authority")
+
+    if authority == "cloud_paper_usage_audit_v0_2":
+        expected_budget_state = "REVIEW_REQUIRED_V0_2_DATASET_COVERAGE_INCOMPLETE"
+        expected_fields = {
+            "status": "REVIEW_REQUIRED",
+            "run_id": 36584465739,
+            "reason_code": "DATASET_COVERAGE_INCOMPLETE",
+            "r2_operations_state": "LIMIT_REACHED",
+            "r2_operations_group_count": 10_000,
+            "r2_storage_state": "PRESENT",
+            "r2_storage_group_count": 1_297,
+        }
+        version = "V0.2"
+    elif authority == "cloud-paper-r2-usage-audit-v0.3":
+        expected_budget_state = "REVIEW_REQUIRED_V0_3_R2_METRICS_PARTIAL"
+        expected_fields = {
+            "status": "READY_FOR_REVIEW",
+            "run_id": 36593296360,
+            "reason_code": "R2_METRICS_CAPTURED_REVIEW_ONLY",
+            "r2_operations_state": "PRESENT",
+            "r2_operations_group_count": 6,
+            "r2_operations_request_total_30d": 125_309,
+            "r2_operations_timestamp": "OMITTED_FRESHNESS_UNKNOWN",
+            "r2_storage_state": "PRESENT",
+            "r2_storage_group_count": 1_298,
+            "r2_storage_returned_bucket_count": 1,
+            "r2_storage_objects": 16_304,
+            "r2_total_bytes": 616_541_780,
+            "r2_storage_snapshot_at_utc": "2026-09-29T15:20:00Z",
+        }
+        version = "V0.3"
+    else:
+        raise RuntimeError("unsupported Cloud Paper usage evidence authority")
+
+    if budget.get("account_wide_usage_evidence") != expected_budget_state:
+        raise RuntimeError(f"Cloud Paper usage status does not match {version} evidence")
+    for key, expected in expected_fields.items():
+        if evidence.get(key) != expected:
+            raise RuntimeError(f"Cloud Paper {version} usage evidence changed: {key}")
+    for key in ("account_wide_cost", "storage_headroom", "shared_writer_coverage"):
+        if evidence.get(key) != "UNKNOWN":
+            raise RuntimeError(f"partial usage evidence must keep {key} unknown")
+    if evidence.get("cloudflare_requests") != 1:
+        raise RuntimeError("Cloud Paper usage audit request count changed")
+    return version
+
+
 def main() -> int:
     missing = [str(path) for path in REQUIRED if not path.is_file()]
     if missing:
@@ -132,17 +185,8 @@ def main() -> int:
     cloud_budget = cloud_paper.get("budget") or {}
     if cloud_budget.get("monthly_budget_usd") != 0:
         raise RuntimeError("Cloud Paper monthly budget must remain zero")
-    if cloud_budget.get("account_wide_usage_evidence") != "REVIEW_REQUIRED_V0_2_DATASET_COVERAGE_INCOMPLETE":
-        raise RuntimeError("Cloud Paper usage evidence must reflect the V0.2 review-required report")
     usage_audit = cloud_budget.get("usage_audit_evidence") or {}
-    if usage_audit.get("run_id") != 36584465739 or usage_audit.get("reason_code") != "DATASET_COVERAGE_INCOMPLETE":
-        raise RuntimeError("Cloud Paper usage audit provenance is missing or changed")
-    if usage_audit.get("r2_operations_state") != "LIMIT_REACHED" or usage_audit.get("r2_operations_group_count") != 10_000:
-        raise RuntimeError("Cloud Paper R2 operations limit evidence changed")
-    if usage_audit.get("r2_storage_state") != "PRESENT" or usage_audit.get("r2_storage_group_count") != 1_297:
-        raise RuntimeError("Cloud Paper R2 storage group evidence changed")
-    if usage_audit.get("account_wide_cost") != "UNKNOWN" or usage_audit.get("storage_headroom") != "UNKNOWN":
-        raise RuntimeError("partial usage evidence must not prove cost or headroom")
+    validate_cloud_paper_usage_evidence(cloud_budget)
     if cloud_budget.get("account_wide_writer_coverage") != "UNKNOWN":
         raise RuntimeError("account-wide writer coverage must remain unknown")
     if cloud_budget.get("reservation_guard") != "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED":
