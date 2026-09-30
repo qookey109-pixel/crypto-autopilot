@@ -1,79 +1,84 @@
 # Crypto Autopilot — 完整模擬循環交付目標
 
-## 即時進度掃描與完整收斂目標 — 2026-09-30 10:36 Asia/Taipei
+## 即時進度掃描、待解問題與依序收斂目標 — 2026-09-30 10:57 Asia/Taipei
 
 Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pixel/crypto-autopilot)  
-正式 authority：GitHub `main`。本次 live main：`ddb5543626b3a53ce0b4efbb105066e081e7069e`（`docs: publish complete Cloud Paper delivery goal (#646)`）。每次後續執行仍須重查 SHA、PR、Actions；此快照不是永久最新值。
+正式 authority：GitHub main。此次 live main：d81b3a1aa676d8f63f6fc15f74d31445afcc77c4（docs: synchronize Cloud Paper status and operations）。目前 open PR：0。此為時間戳快照；每次接續仍先重查 main SHA、open PR、exact-head checks 與最新 Actions。
 
-### 目前進度
+### 專案完成目標
 
-**主要模組與合成端到端驗證已完成，正式雲端 PAPER 產品尚未啟動。** 已合併的成果包括：
+交付一個雲端、零月費、PAPER-only 的完整模擬循環：
 
-- 版本化 Cloud Paper loop 契約、Pionex 公開行情 adapter、受治理市場候選、策略資格 gate，以及 risk／portfolio／paper composition。
-- provider／R2／D1 預算 reservation、原子 slot claim、重播與並行保護、部分結算保留、受限恢復審核、不可變結果與回讀介面。
-- 空策略 registry 的 `NO_TRADE`，以及 test-only 策略 fixture 的入場、出場、帳戶延續、保存、下一輪不交易雲端 CI。
-- Dashboard 狀態投影和先前 Pages／browser 驗證；這些不等於正式 PAPER runtime 證據。
-- Cloudflare 帳務／用量查核的有限結果與版本化收據；失敗和部分結果均保留。
+**已授權公開行情 → 來源／時間／完整度檢查 → 最多五個受治理候選 → 正式策略資格 → 風控與組合檢查 → 模擬成交或有明確原因的 NO_TRADE → 預算 reservation／slot claim → 不可變保存與回讀 → 重啟恢復 → Dashboard 真實呈現。**
 
-正式 activation 仍是 `false`；沒有 qualifying controlled main cycle 或 Cloud Paper 自然 schedule 驗收。Production strategy registry 空、Core100 品質 `REJECT`、macro context `REGIME_UNAVAILABLE`。正式無合格策略時，正確結果就是 `NO_TRADE`，不能用測試策略、放寬門檻或切換來源製造交易。
+策略 registry 可以為空。模型 REJECT、資料不足、來源不可用、預算未知或風險不符時，系統必須安全地不交易並保留原因；不可用測試策略、放寬門檻、補值或未授權來源製造交易。虛擬帳戶 USD 10,000 只初始化一次。工程合成策略僅供 CI。
 
-### 全面掃描的問題與風險
+### 本次完整進度掃描
 
-1. **帳戶費用與容量未知。** Billing V0.1 的訂閱標價 USD 0 不包括完整 invoice／metered charges；R2 V0.3 僅部分聚合，operations 沒有可用 freshness timestamp，storage 僅代表一個回傳 bucket。D1 inventory/use、完整 R2 bucket inventory、全部共同 writers、帳務期間完整性與實際 headroom 仍 UNKNOWN。政策 8 GB 是硬停線，不是剩餘容量證明。
-2. **一回合權限已消耗。** Billing V0.1、Usage V0.1／V0.2、R2 Usage V0.3 均不得 rerun，也不得換版本名稱重做同一個失敗查詢。後續只能在明確資訊增益、最小權限及新版本 authority 下提出不同 scope。
-3. **60 秒 freshness gate 尚未有來源支持。** 現行契約要求外部存取前 freshness／headroom snapshot 不超過 60 秒；現有 Cloudflare analytics 未證明提供此水位。不能以 workflow 啟動時間當資料新鮮度；無可驗證新鮮來源就停在 `BLOCKED_BUDGET`。
-4. **行情與宏觀欄位有缺口。** loop 限 Pionex governed markets 和已收盤 K 線；macro unavailable。TOTAL3、BTC dominance、跨資產 breadth 須逐項確認必要性及 Pionex 是否提供。未有授權來源、免費額度和 freshness 證據前，保持 unavailable；不可接 Binance 或其他 provider fallback。
-5. **正式保存與恢復尚未實測。** D1 未 provision、migration prepare-only；production D1/R2 讀寫、容量校準、實際中斷恢復都未驗收。Append-only 長期容量及 reservation ledger 自身成長也未驗證。
-6. **Dashboard 的新舊 schema 相容性未完成。** V0.3 usage 結果存在，但 Dashboard validator／projection 曾要求 V0.2，因而保留舊投影。先做 V0.2/V0.3 雙版本相容，再投影真實最新狀態；未知不得呈現成 0 或 PASS。
-7. **狀態漂移與過時 PR。** PR #644 仍 OPEN／Draft；head `3785d4e91a65e7fa870b7c2e4520eb5c10adccb2`、base `50cfd7ec4a23ef159bdc02df7fd7cdd2e1da13e1` 均落後 main，`mergeable=false`；不可直接合併。最新 main combined status 查詢未回傳 check entries，post-merge CI 本次標為 `UNKNOWN_NOT_VERIFIED`。目前沒有其他 open PR 搜尋結果。
-8. **不同驗收被混為一談的風險。** Synthetic CI、main CI、Pages、帳戶成本、PAPER runtime、自然 schedule 和模型品質分屬不同 gate，任何一項成功都不能代替其他 gate。
+**已完成：**
+- 版本化 Cloud Paper loop 契約、Pionex 公開行情 adapter、受治理市場候選、策略資格 gate，以及既有 risk／portfolio／paper composition。
+- 雲端合成 CI 已覆蓋 test-only 入場／出場、帳戶延續、空 registry NO_TRADE、資料／風控拒絕、slot 重複／並行、reservation、部分寫入審核與受限恢復；不代表 production run 已通過。
+- PR #644 過時文件 PR 已關閉且未合併，保留其 action_required 歷史證據。
+- PR #647 完成交付目標文件；PR #648 同步 CURRENT_STATUS、runbook、Operations map 與機器狀態。#648 已合併至本次 main d81b3a1。
+- PR #648 exact-head CI run 36661805558、CodeQL 36661805587、Dependency/SBOM 36661805549、Dashboard authority snapshot 36661805532、Pages PR build 36661805537 均成功；Pages deploy/browser 因文件變更跳過。這些是 PR-head 檢查，不是 d81b3a1 的 post-merge checks。對 d81b3a1 查詢未回傳 PR workflow entries，因此 post-merge 狀態仍 UNKNOWN_NOT_VERIFIED。
+- Cloud Maintenance run 36648016165 的 inspect/propose 成功，結果 NO_CHANGE、commits_created=0；但它與自然 Health 證據基於舊 SHA 50cfd7e，不能算 current-main 或兩次自然驗收。Pages run 36648016160 build/deploy/browser 成功，同樣是舊 SHA 50cfd7e 的部署證據。
 
-### 完成時的產品樣貌
+**正式產品仍未啟動：**
+- Cloud Paper activation=false；production cycle NOT_RUN；Cloud Paper natural schedule NOT_ESTABLISHED。
+- 帳戶總費用、D1 使用量、全帳戶 R2 bucket/headroom、全部共同 writer 覆蓋均 UNKNOWN。R2 Usage V0.3 的 30 日 operations 聚合為 125,309，但沒有可用 freshness timestamp；storage 回傳只有一個 bucket，16,304 objects、616,541,780 bytes，不能代表全帳戶。
+- Billing V0.1、Usage V0.1/V0.2、R2 Usage V0.3 均屬已消耗的一次性查核；不可 rerun 或改名重做。既有 readiness 若只查設定、零 Cloudflare requests，不等於已取得費用／用量證據。
+- 60 秒用量／headroom freshness gate 沒有已驗證資料水位支持。CloudBudgetGuard 只是接收 caller 提供的 snapshot 並檢查／計數，並未自行取得帳戶用量或提供跨 run 的持久 reservation ledger。無 fresh account-wide snapshot 與完整 reservation coverage 時必須在外部 I/O 前 BLOCKED_BUDGET。
+- D1 migration 仍 prepare-only，production D1/R2 讀寫與中斷恢復未驗收；append-only 儲存長期成長／容量尚未實測。
+- Cloud Paper 使用的總體 regime 欄位仍 unavailable。Pionex 不提供 TOTAL3／BTC dominance；替代來源 CMC 有免費額度候選，但方法等價、授權／金融用途、儲存及展示許可未通過。Pionex breadth 的 23 市場仍是 membership proposal，完整性、時間對齊與新鮮度未驗證。不得切換來源或縮小 universe 來湊資料。
+- production 策略 registry 空，Core100 品質 REJECT；正式合法結果可為 NO_TRADE。沒有交易權或 promotion。
+- Dashboard 對 V0.3 usage evidence 的雙版本 projection 尚未完成；UNKNOWN／部分資料不得呈現成 0 或 PASS。既有 Pages 成功屬較舊 SHA；#648 文件 PR 的 deploy/browser 為 skipped。
+- Pionex bounded observability 的到期保護仍依當前 authority；到期不得自動延長或補跑。此排程與 Cloud Paper activation 是兩個不同工作流與 gate。
 
-**已授權公開行情 → 來源／時間／完整度 gate → 最多五個受治理候選 → 正式策略資格 → 風控與 portfolio gate → PAPER 模擬成交或具原因的 `NO_TRADE` → 共用預算 reservation 和原子 slot claim → immutable 保存及回讀 → 中斷恢復 → Dashboard 真實投影。**
+### 依序執行的工作清單
 
-產品需同時正確處理：
-- 有正式授權且證據有效的策略：只使用正式策略明確的 entry／stop／target 做 PAPER 模擬，記錄成交依據、費用與滑價、退出原因、帳戶變化。
-- 無候選、資料失效／不足、macro unavailable、registry 空、model REJECT、風險超限、預算不足或保存衝突：不開新倉，記錄狀態、原因、run／slot／state 和來源水位。
-- 初始虛擬資金 USD 10,000 只建一次；重播／重啟不得重複初始化、成交或寫入。
-- 合成策略只在雲端 CI，永不進 production registry。
+按依賴連續交付；可獨立完成的合成工程工作不必等待外部費用證據。任何外部存取、資源建立／寫入或 schedule 啟用前，必須已有相符的版本化 authority merged to main。
 
-### 依序排程與完成標準
-
-採依賴式連續交付，前一 gate 未過就停止其依賴工作；不等固定觀測日、不補跑歷史 slot。
-
-| 順序 | 優先度 | 工作 | 完成標準／停止條件 |
+| 次序 | 狀態／優先度 | 工作與改善 | 完成標準及停線 |
 |---|---|---|---|
-| 0 | P0 立即 | **校正 authority 與文件。** 以 live main 為準確認 #646 post-merge checks；比對 #644 精確差異，將 stale snapshot 關閉／重建；同步本目標、CURRENT_STATUS、狀態 JSON、runbook、Operations map。歷史 evidence 僅加歷史標示，不改 frozen receipt。 | current summary 使用正確 evidence SHA，區分 latest main 和 evidence parent；#644 不可覆蓋新狀態；必要 CI 通過。無法查證的 main checks 寫 UNKNOWN。 |
-| 1 | P0 | **確認零費用及 headroom 是否能被完整證明。** 只做官方 API 欄位、coverage、最小權限及現有 receipt 規格分析；不呼叫 Cloudflare、不建 token。拆解 billing/invoice、D1 inventory/use、五個 R2 jurisdiction inventory、R2/D1 analytics、全部 writers、水位、分頁、bytes 與操作次數。 | 每項附來源、期間與缺口；判定 60 秒 freshness 是否可達。若官方資料／權限無法證明總成本或 headroom，就保持 activation disabled，不新增 live-read authority。 |
-| 2 | P0 | **收斂行情欄位與來源決策。** 列出 loop 必要欄位的定義、Pionex endpoint、免費上限、來源時間、連續性、時間對齊與 CI fixture；裁定 TOTAL3、BTC dominance、breadth 的必要性。 | 僅用已授權 Pionex 公開來源。缺資料就 unavailable／NO_TRADE；不得換源、補值、拼接或降低策略門檻。 |
-| 3 | P0 | **修復 Dashboard V0.2/V0.3 相容與可理解性。** 改 validator/schema/fixtures/renderer/繁中快照/browser tests，再更新 current projection。 | 舊新版本、缺欄、null、部分結果和 UNKNOWN 測試通過；可分辨 `NOT_RUN`、`NO_TRADE`、`DATA_INSUFFICIENT`、`SYSTEM_ERROR`、`REVIEW_REQUIRED`、`BLOCKED_BUDGET`，不把未知畫成 0。 |
-| 4 | P0 | **補完共享預算與保存安全證明。** 核對每個 provider/D1/R2 I/O 前的共用 atomic reservation/settlement、所有 repository writers、並行／重播／stale slot、ledger 成長及 append-only 容量。只有成本 gate 後才考慮 D1 migration。 | 雲端合成 CI 覆蓋預算耗盡、競爭一勝、過期水位、部分寫入、重啟、相同／不同 settlement replay 和 ledger 自身成長；未知 writer、budget 或 recovery 狀態即在 I/O 前停止。 |
-| 5 | P0 | **完成端到端雲端 CI 矩陣並補缺。** closed bars → data gate → candidates → eligibility → risk → paper → immutable result → read-back/restart recovery。 | 涵蓋成交與正常 NO_TRADE、空 registry、REJECT model、資料不足／故障、風控拒絕、budget block、重複 slot、並行、部分寫入、恢復。Python 3.12/3.13、Ruff、governance/frozen guard、workflow static 和適用安全檢查通過；synthetic input 不進 production。 |
-| 6 | P0 外部證據 gate | **在資訊增益明確時準備不同 scope 的 successor read-only authority。** 已消耗 audit 不重做；先零網路 readiness 與 synthetic validation，再合併 versioned authority，才可做一次 live query。 | 明列最小權限、總 request/page/response cap、secret-free report、無 retry/fallback；一次 dispatch 即消耗，失敗保留原因不 rerun；此項不寫 D1/R2、不啟用 runtime。 |
-| 7 | P0 | **受控 main PAPER acceptance。** 只有成本／容量／來源／策略 gate 全部可證明，且新的 activation authority 已合併後，才執行一次 bounded cycle。 | 驗證 $10,000 genesis 一次、slot idempotency、正式資料及資格或合法 NO_TRADE、reservation、寫入回讀與 restart；任何關鍵值 UNKNOWN/BLOCKED 就不 provision、不寫入、不啟用。 |
-| 8 | P1 | **自然 PAPER schedule。** controlled acceptance 通過後才啟用；同步 cron、timeout、每日上限、concurrency、Health／Operations／Dashboard inventory。 | 查到真正 event=schedule run 並核對 SHA、slot、attempt、report、行情時間、I/O、保存回讀與帳戶延續。手動 run 不能替代；尚無自然 run 就標示「已配置、待首跑」。 |
-| 9 | P1/P2 | **文件與營運結案。** 同步 README、PROJECT_STATUS、CURRENT_STATUS、runbook、Operations map、Dashboard 和 handoff，列明 done/blocked/unknown/not run。 | 一個 current-state 入口連到 commit/run/report/artifact；保留失敗和 skipped evidence。工程 CI、成本、runtime、自然 schedule、Pages/browser、研究品質分開結論。 |
+| 0 | DONE — P0 | **狀態與 authority 文件校正。** #644 已關閉；#648 已同步 4 份狀態文件並合併。 | 本文件更新後再以 PR CI 驗證；明確區分 PR checks、post-merge checks、舊 SHA evidence、自然排程及 production runtime。保留下方歷史資料原文。 |
+| 1 | NEXT — P0 | **Dashboard evidence schema 收斂。** 完成 Cloudflare Usage V0.2/V0.3 相容投影、validator、fixtures、繁中 snapshot 與 browser regression。 | V0.2/V0.3、欄位缺漏、null、partial、UNKNOWN 均有測試；NOT_RUN、NO_TRADE、DATA_INSUFFICIENT、SYSTEM_ERROR、REVIEW_REQUIRED、BLOCKED_BUDGET 清楚分辨；未知不顯示為 0/PASS。合併後按變更類型驗證 Pages；不得偽造當前 usage。 |
+| 2 | P0 | **預算 gate 的可執行性與 reservation 缺口。** 僅做程式／契約／合成 CI 分析，修整每次 I/O 前 reservation、跨 run 原子共用、失敗保留、重播與 ledger 自身容量的證明。 | 同 slot 競爭單一勝者；每個 provider/D1/R2 I/O 前都有可追溯保留；相同 settlement replay 不重複計數、不同 settlement REVIEW_REQUIRED；預算或 snapshot stale/incomplete 就零外部呼叫。沒有 production usage 就不得宣稱校準或 activation-ready。 |
+| 3 | P0 | **零費用與資源容量證據決策。** 先列官方來源、涵蓋期間、分頁上限、request/response cap、權限、freshness watermark、全部 writer 邊界及盲點；不呼叫 Cloudflare、不重跑已消耗 audit。 | billing、R2、D1 和其他可能計量服務要能互相對帳，且 account-wide usage、headroom、共同 writer coverage 可證；否則明確標示 COST_GATE_BLOCKED 並維持 activation=false。需要新證據時先提出不同且最小權限 successor authority，未合併不得 dispatch。 |
+| 4 | P0 | **市場資料需求定案。** 以現有契約列出每個必要欄位及來源、資料時間、對齊、連續性、請求預算。裁定 TOTAL3、BTC dominance、aligned breadth 是硬 gate 還是非必要展示欄位。 | 只可使用已授權的來源。CMC 目前受方法／金融用途授權／儲存展示 gate 阻擋；Pionex 23 市場 breadth 尚未通過完整性驗證。無合格來源時欄位保持 unavailable 並按契約 NO_TRADE，不 fallback、不拼接、不調低門檻。 |
+| 5 | P0 | **完整雲端合成 CI 與治理檢查。** 把 data gate → candidates → eligibility → risk → paper → persistence → readback/recovery 當單一可追溯驗收矩陣；補未覆蓋的額度耗盡、資料時間錯位、未知 writer、帳戶初始化競爭與 durable reservation 失敗案例。 | 成功和拒絕／無交易路徑均有 report/assertions；Python 3.12/3.13、Ruff、freeze/governance、workflow static（如適用）、CodeQL、Dependency/SBOM 全部符合定位。僅使用合成 provider/strategies，不觸碰 production secrets 或外部服務。 |
+| 6 | P0 外部權限 gate | **提出 successor read-only evidence scope。** 僅在 phase 3 能證明明確資訊增益時準備；禁止重做已消耗 audit。 | authority 必須定義最小 permissions、endpoint allowlist、最大 calls/pages/bytes、零 retry/fallback、artifact 去識別、一次 dispatch 即消耗及失敗保留方式。合併本身不等於執行許可；每次 live query 仍須由其明確 scope 授權。 |
+| 7 | P0 外部依賴 gate | **Production D1/R2 與 controlled PAPER cycle。** 只有成本、容量、來源、策略資格、durable budget/persistence 都通過且新版本 authority 已合併才進入。 | 明確 provision／migration authority 後，驗證一次 $10,000 genesis、合格正式策略或合法 NO_TRADE、slot idempotency、immutable writes/readback、斷點恢復與真實請求數。任何 UNKNOWN/BLOCKED 就不 provision、不寫、不啟動。 |
+| 8 | P1 外部依賴 gate | **Cloud Paper 自然 schedule。** controlled main acceptance 通過後，才由新 authority 啟用既定有界排程。 | 真正 event=schedule run 具 SHA、slot、attempt、fresh行情、I/O、保存 readback、帳戶延續與報告；手動 run 不能替代自然 run。無 qualifying run 即保持 NOT_ESTABLISHED。 |
+| 9 | P1 | **網站、維運與結案同步。** 更新 README/PROJECT_STATUS/CURRENT_STATUS/runbook/Operations map/status JSON/Dashboard projection/Handoff。 | 一個 current-state 入口連結 exact SHA、PR、checks、run、artifact；明列 DONE、BLOCKED、UNKNOWN、NOT_RUN；CI、Pages/browser、費用、runtime、自然 schedule 與模型研究結果分開結論。 |
 
-### 下一個工作及安全停止點
+### 建議改善優先序
 
-立刻從順序 0 開始：確認 #646 的雲端檢查、處理 #644 stale snapshot、同步狀態文件。啟用產品的阻擋仍為費用／使用量／headroom／writers、D1、60 秒 freshness、水位、正式策略資格、production persistence/recovery 和 controlled cycle。解除前保持 Cloud Paper disabled；NO_TRADE／BLOCKED 是合規結果。
+1. **立即可做：**Dashboard V0.2/V0.3 dual-read 相容及不確定狀態呈現；這是目前最清楚、可在無 Cloudflare 存取下完成的小型工程切片。
+2. **並行只做程式／synthetic：**強化 durable reservation/settlement 與 persistence/recovery 測試，先列出真實 caller / writer inventory；CI 的 repo workflow 靜態掃描不等於 account-wide writer completeness。
+3. **先做決策、不可 dispatch：**帳務、usage、D1/R2 inventory、freshness 與費用如何完整對帳；現有 evidence 與 60 秒 gate 不匹配，不能用增加重試或降低 freshness 門檻解決。
+4. **保持安全缺資料狀態：**TOTAL3／BTC dominance／breadth 的來源與授權。不可因想讓 regime 可用就把 CMC 候選視為合格、以 Pionex API key 代替、切換 Binance，或更動 frozen research 定義。
+5. **最後才外部整合：**D1/R2 provision/write、controlled main cycle、schedule enable、production Dashboard projection。需各自版本化權限和前置 PASS。
+6. **非阻擋項：**型別清理、一般 UI polish、大模組重構、額外策略研究與自然 schedule 調頻；主路徑前不搶先做。
 
-### 固定界線與結案條件
+### 本目標的驗收與停止規則
 
-- `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`；不讀寫或依賴本機 checkout、終端機或本機排程。
-- `FREE-ONLY / 0 USD per month`；不升級、不新增付款方式作 fallback。
-- `PAPER / LIVE-PAPER ONLY`；真實訂單與 live trading 關閉；holdout FROZEN_UNOPENED、source switch=false、promotion=false。
-- 不修改 frozen authority，不重跑任何已消耗一次性 audit/bootstrap，不輸出或索取 secret 值。
-- 新 Cloudflare 存取、D1/R2 provision/write、runtime、排程、promotion 和交易權限都需各自有效的 versioned authority；本目標、文件、PR、CI PASS 或合併授權本身都不授權。
-- **工程 PASS：**有交易測試與合法無交易／拒絕／重播／恢復雲端 CI 全通過。
-- **成本 PASS：**帳務、usage、水位、所有 writers、真實 headroom 和容量可證明；否則明確結案為 cost-gate blocked，保持停用。
-- **受控循環 PASS：**正式 authority 下驗證 genesis、idempotency、保存讀回和恢復。
-- **Dashboard PASS：**V0.2/V0.3 相容，真實狀態與 UNKNOWN 正確投影，必要 Pages/browser checks 成功。
-- **自然運作 PASS：**至少一個 qualifying schedule run；否則只稱「已配置、待首跑」。
-- 策略品質獨立：Core100 REJECT 不阻擋合法 NO_TRADE 工程，也不構成可交易或獲利證據。
+- **工程驗收：**雲端 synthetic CI 驗證有交易 fixture、正常 NO_TRADE、資料／風控拒絕、額度攔截、slot 競爭、重播、部分寫入與恢復；不代表 production runtime 驗收。
+- **成本驗收：**費用、所有計量項、account-wide 用量、真實 headroom、usage watermark 與全部 writer coverage 可核對；任一未知即 COST_GATE_BLOCKED，停用外部 runtime。
+- **受控 PAPER 驗收：**新的明確 authority 下，單次 main execution 證明 account genesis、行情報告、策略資格或 NO_TRADE、reserve、保存回讀與恢復。
+- **Dashboard 驗收：**雙版本 evidence 與未知狀態保真；實際 Pages deploy/browser 證據必須對應合併後需要驗證的 SHA。
+- **自然運作驗收：**至少一個符合 authority 的 event=schedule run 完整核對；否則只可稱「排程已配置／待首跑」。
+- **策略品質獨立：**Core100 REJECT 不阻擋合法 NO_TRADE 工程，也不構成策略有效、可獲利或交易權限。
+- 不改 frozen authority/receipt，不重跑任何已消耗的一次性 audit/bootstrap，不為補證據而補跑歷史 slot，不輸出／索取 secret value。
+- 維持 CLOUD_ONLY、LOCAL_FILES_EXCLUDED_BY_USER、FREE-ONLY/0 USD、PAPER/LIVE-PAPER ONLY、holdout FROZEN_UNOPENED、source_switch=false、promotion=false、真實訂單/live trading 關閉。
+- 本文件、PR、CI PASS、使用者合併授權或 readiness PASS 均不自動授予 Cloudflare access、付費、D1/R2 寫入、runtime/schedule、holdout、source switch、promotion 或交易權。
 
-> 本目標定義交付範圍與順序，不授予 Cloudflare API、credentials、D1/R2 寫入、付費、schedule enable、holdout、source switch、promotion 或交易權限。
+### 當前唯一下一步
+
+先完成 **phase 1：Dashboard V0.2/V0.3 雙版本投影相容**，同批以 synthetic fixtures 覆蓋 partial/null/UNKNOWN，提交小型 PR 並驗證雲端 CI。預算 snapshot 的來源不符合 60 秒 freshness 且 Cloud Paper 尚未啟用，所以不觸發任何 Cloudflare 或 production storage 操作。
+
+---
+
+> 下方以分隔線後的資料為先前查核紀錄與 frozen/歷史 evidence，保持原文，不代表最新狀態。新增紀錄附於文末；不要改寫歷史收據或把舊 SHA 證據升格為 current-main evidence。
 
 ---
 
