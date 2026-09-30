@@ -1,5 +1,50 @@
 # Crypto Autopilot 短期交付目標
 
+## 即時狀態與收斂目標 — 2026-09-30 10:08 Asia/Taipei
+
+本節是目前可執行目標與狀態的唯一入口；下方較早日期的「下一步」「readiness」及 audit 指示均為當時快照，只供追溯，不可照舊指示重跑。Repository 即時 authority 已重新解析：`main=50cfd7ec4a23ef159bdc02df7fd7cdd2e1da13e1`。
+
+### 現況與問題清單
+
+- 開放 PR：#644 `docs: refresh cloud maintenance evidence`，Draft，base 為目前 main，head `3785d4e91a65e7fa870b7c2e4520eb5c10adccb2`。其 CI、Pages、SBOM、CodeQL、Dashboard Snapshot 五個 workflow 均為 `action_required`，尚未實際執行；不能當作通過或合併。
+- Cloudflare Billing V0.1（run [36513941565](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513941565)）、Usage V0.1（[36558934727](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36558934727)）、Usage V0.2（[36584465739](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36584465739)）及 R2 Usage V0.3（[36593296360](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36593296360)，audit head `2516a80c32fa04b9789bef379b108eb50c87fd49`）的一次性授權均已消耗，禁止重跑。
+- V0.3 僅取得一個 Cloudflare GraphQL 回應：R2 operations 6 groups／125,309 requests；R2 storage 回傳 1 個 bucket 的 16,304 objects、616,541,780 bytes。operations 時間戳缺失；這不等於完整帳戶／完整 bucket 清單、所有 writer、可用 headroom 或零費用。
+- Billing V0.1 只讀到一筆 subscription 的列示價格 USD 0；未讀 invoices／metered charges，不能判定帳戶總成本為零。
+- D1 使用量、資料庫完整清單、實際 rows/storage 成長、freshness watermark 及外部 writers 未證明；D1 尚未 provision，migration 僅 prepare-only。
+- Cloud Paper production runtime 未啟用、正式交易 registry 為空、正式循環為 `NOT_RUN`；模型品質 `REJECT`，macro regime 為 `REGIME_UNAVAILABLE`。合成 CI 交易只證明工程路徑，不是正式策略或產品運作證據。
+- `web/data/cloud-paper-loop.json` 落後 V0.3，仍把 V0.2 寫成目前用量結果。短期交付文件亦含已過時「設定憑證後執行 readiness／一次性 audit」指示，容易導致違規重跑。#644 的五項 checks 還需 GitHub 帳戶持有人批准後才會執行。
+
+### 完成目標
+
+交付可保存、可恢復、可追溯且 Dashboard 說明清楚的 GitHub 雲端 PAPER 模擬循環：
+
+**已授權的公開行情 → 資料品質與候選 → 正式策略資格 → 風控 → 模擬成交或有原因的 `NO_TRADE` → 原子預留與持久化 → 中斷恢復 → 真實證據 Dashboard。**
+
+正式策略登錄目前允許為空；沒有合格策略時必須安全地 `NO_TRADE`。先完成工程與合成驗收，正式受控循環及自然排程另外驗收。任何成功 workflow、測試策略或手動 dispatch 都不能代替正式策略品質、自然排程或交易權限。
+
+### 依序執行的收斂排程
+
+| 順序 | 優先度 | 工作與交付 | 通過／停止條件 |
+|---|---|---|---|
+| 0 | P0 | 收斂文件 authority：保留 #644 的 generated-only 範圍；依實際結果修正本目標、Current Status、runbook、狀態 JSON 與 Dashboard projection 的快照日期及 SHA。對已消耗 V0.1／V0.2／V0.3 與 Billing audit 加上醒目的「已消耗、禁止 rerun」索引。 | 每個可執行下一步都指向 current main 和未消耗的 versioned authority；歷史報告／frozen receipt 原樣保留。#644 所需 GitHub approval/checks 未完成前，不合併或宣稱通過。 |
+| 1 | P0 | 做雲端只讀預算與資料覆蓋缺口盤點，先設計 successors，不呼叫 Cloudflare：分開定義 R2 所有 bucket／operation／writer、D1 database／rows／storage、billing invoices／metered charges 所需端點、最小權限、時間範圍、請求數、輸出欄位、freshness watermark、遮蔽、artifact 上限及停止碼。 | 各缺口可由官方 API／Analytics 證據支持，且操作上限和 0 USD 免費額度判定方式明確。缺資料或 API 不提供時記 `UNKNOWN`，先不建立或 dispatch live query。每個新增 live query 需 successor authority 先合併 main，且只執行一次。 |
+| 2 | P0 | 核對並補強共享預算／保存的 runtime 接線：provider、D1、R2 每一個外部操作前都需同一 run-scoped 原子 reservation；涵蓋每日與帳期額度、全 writer headroom、重複 slot、並行、settlement、重啟與部分寫入。 | 零網路合成測試涵蓋成功、耗盡、過期、缺證據、競爭及失敗恢復；不把 mock snapshot 當帳戶校準。全帳戶證據不完整就保持 external access 前 fail closed。 |
+| 3 | P0 | 以現有 Pionex public market adapter／資格 adapter／risk／portfolio／paper core 建立完整循環；完成正向 test fixture 與無候選、空 registry、Core100 REJECT、壞行情、額度不足、重播及恢復路徑。報告包含 source/time、候選與拒絕原因、strategy evidence、slot/run/state IDs、帳戶變化和 I/O 次數。 | Python 3.12／3.13、Ruff、治理及 relevant cloud CI 於 exact PR head 通過。正式 registry 不因測試而改動；不得以替代 provider 補缺。 |
+| 4 | P1 | 修正 Dashboard projection 與說明：同步 V0.3 部分用量結果；清楚區分 `NOT_RUN`、`NO_TRADE`、資料不足、故障、部分寫入、預算未知／阻擋。未知金額、容量、帳戶與持倉維持 null/UNKNOWN。 | JSON/CI 驗證通過；Pages build/deploy/browser-production 只在有網站變更時核對；投影不冒充 authority。 |
+| 5 | P0 gate | 只有免費方案、fresh 帳戶級 D1/R2、完整 bucket/writer coverage、計量／帳單、reservation 校準都證明安全後，準備另一份 implementation-bound successor authority；再做一次受限 main PAPER acceptance，驗證帳戶初始資金只初始化一次、保存後回讀及零額度超用。 | 任一費用、freshness、writer、讀寫副作用未知即停止；不建立 D1、不寫 R2、不跑正式循環。不得將模型 REJECT 或空策略改成可交易。 |
+| 6 | P1 gate | 通過受控 acceptance 後才啟用有界自然 Paper schedule 與 Pages 證據投影。 | 首次 qualifying `event=schedule` run 的精確 SHA、slot、report、side effects、重複防護均核對；手動 run 不代替自然 run。 |
+
+### 固定安全界線
+
+- 雲端 GitHub／GitHub-hosted runner only；不讀寫本機 checkout、終端機或本機排程。
+- `FREE-ONLY / 0 USD per month`；不能證明零費用即不存取／不啟用。
+- `PAPER / LIVE-PAPER ONLY`；真實資金、真實訂單、實盤、自動 promotion、holdout、source switch 一律關閉。
+- Core100 品質 `REJECT`、production registry 空、macro `REGIME_UNAVAILABLE`；不調門檻、不用測試策略、不推論策略通過。
+- 不重跑 bootstrap、一次性 audit 或結果不明的外部副作用；不改 frozen receipts/configs，不輸出 secrets。
+- 保持現有排程，除非新的版本化 authority 通過；不得補跑歷史 slot，也不以等待日曆觀測取代可立即完成的工程工作。
+
+---
+
 - 文件日期：2026-09-29
 - 本次文件查核基準：parent main `798a23753d9008a0f01d66d6b2296f5c4734f3c5`；此文件不授予 runtime 或資料存取權限。
 - PR #628 exact head `3e2c67b0848eb541c43f54a47f7c6edb267a5632` 的 CI [36493558502](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493558502)、CodeQL [36493558486](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493558486)、Dependency/SBOM [36493558471](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493558471) 通過；main CI [36493744676](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493744676)、CodeQL [36493744613](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493744613)、Dependency/SBOM [36493744586](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493744586)、Freeze Guard [36493744563](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36493744563) 均成功。此 PR 未改網站，Pages 未觸發。
