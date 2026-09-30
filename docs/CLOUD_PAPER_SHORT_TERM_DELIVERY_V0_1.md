@@ -1,3 +1,13 @@
+## Current checkpoint — 2026-09-30 (#662 merged)
+
+Live authority: GitHub `main=919941f2f8d8db77b0bc8372727de46d8406867f`; open PRs = 0. Earlier evidence blocks retain their original SHA as historical checkpoints.
+
+- #661 completed the first compatible storage minimization: V0.2 loop reports reference the persisted step by `step_id`, while legacy V0.1 reports remain readable. The matched synthetic profile decreased from 206,181 to 157,367 canonical JSON bytes (~23.7%); this is not production R2 or fee evidence.
+- #662 synchronized current status and storage-lineage documentation. No provider, D1, or R2 call occurred; Cloud Paper remains disabled and no natural simulation schedule is configured.
+- Remaining gates: fresh account-wide usage and zero-cost evidence, full writer coverage, D1/R2 headroom, formal entrypoint, production registry qualification, and controlled main PAPER acceptance. Core100 remains REJECT.
+- Next storage slice: evaluate compact `live-run-step` references to independent `live-tick` evidence with legacy reader, digest, continuation, recovery, replay, and partial-write regression coverage. Independently reconcile missing market fields with compliant official public sources and terms.
+- Preserve CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER, 0 USD/month, PAPER/LIVE-PAPER ONLY; do not reopen holdout, source switch, promotion, real trading, or consumed one-time audits.
+
 # Crypto Autopilot — 完整雲端模擬產品交付目標
 
 ## Current checkpoint — 2026-09-30 20:44 Asia/Taipei
