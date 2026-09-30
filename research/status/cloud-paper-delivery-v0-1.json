@@ -548,7 +548,6 @@
     "inspect": "SUCCESS",
     "propose": "OBSERVATION_CHANGED",
     "proposal_status": "BLOCKED_OBSERVATION_CHANGED",
-    "commits_created": 0,
     "current_main_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
     "classification": "SAFE_STOP_NOT_NO_CHANGE_OR_PASS"
   },
