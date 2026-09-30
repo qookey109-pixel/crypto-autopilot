@@ -2,8 +2,8 @@
   "schema": "qookey-cloud-paper-dashboard-v0.1",
   "authority": false,
   "mode": "PAPER_AND_LIVE_PAPER_ONLY",
-  "evidence_basis_main_sha": "50cfd7ec4a23ef159bdc02df7fd7cdd2e1da13e1",
-  "observed_at_utc": "2026-09-30T02:08:37Z",
+  "evidence_basis_main_sha": "b2f0a1e2b4129cff207f6b9c59d395ecc705aaab",
+  "observed_at_utc": "2026-09-29T14:41:00.239158Z",
   "activation": {
     "enabled": false,
     "status": "BLOCKED"
@@ -50,17 +50,17 @@
   },
   "budget": {
     "monthly_budget_usd": 0,
-    "account_wide_usage_evidence": "REVIEW_REQUIRED_V0_3_PARTIAL_R2; D1_BILLING_ALL_BUCKETS_AND_WRITERS_UNKNOWN",
+    "account_wide_usage_evidence": "REVIEW_REQUIRED_V0_2_DATASET_COVERAGE_INCOMPLETE",
     "reservation_guard": "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED",
     "state": "BLOCKED_BUDGET",
     "d1_reservation_ledger": "SHARED_LEDGER_CODE_PREPARED_MIGRATIONS_NOT_APPLIED_D1_NOT_PROVISIONED",
-    "d1_free_tier_usage_evidence": "UNKNOWN_NOT_QUERIED",
+    "d1_free_tier_usage_evidence": "UNKNOWN_EMPTY_UNVERIFIED",
     "d1_storage_growth_bytes_per_statement": 16384,
     "d1_storage_growth_policy_bytes_per_utc_day": 12582912,
     "storage_capacity": {
       "state": "USAGE_PARTIAL_BLOCKED",
       "measured_storage_bytes": null,
-      "usage_evidence": "PARTIAL_V0_3_ONE_RETURNED_BUCKET_616541780_BYTES; ACCOUNT_TOTAL_AND_HEADROOM_UNKNOWN",
+      "usage_evidence": "PARTIAL_R2_EVIDENCE_NOT_ZERO_OR_COMPLETE",
       "report_object_max_bytes": 262144,
       "per_run_growth_max_bytes": 2097152,
       "per_utc_day_growth_max_bytes": 201326592,
@@ -70,36 +70,6 @@
       "all_writer_coverage_proven": false
     },
     "usage_audit_evidence": {
-      "authority": "cloud_paper_r2_usage_audit_v0_3",
-      "status": "READY_FOR_REVIEW",
-      "reason_code": "R2_METRICS_CAPTURED_REVIEW_ONLY",
-      "run_id": 36593296360,
-      "attempt": 1,
-      "run_head_sha": "2516a80c32fa04b9789bef379b108eb50c87fd49",
-      "artifact_id": 11045150561,
-      "artifact_name": "cloud-paper-r2-usage-audit-36593296360-1",
-      "artifact_sha256": "581514f59892b84520e52ef463e00210e4175952cc0d54af7fda42b18c71c1be",
-      "cloudflare_requests": 1,
-      "r2_operations_group_count": 6,
-      "r2_operations_request_total_30d": 125309,
-      "r2_operations_timestamp": "OMITTED_FRESHNESS_UNKNOWN",
-      "r2_storage_returned_group_count": 1298,
-      "r2_storage_returned_bucket_count": 1,
-      "r2_storage_objects": 16304,
-      "r2_storage_bytes": 616541780,
-      "d1_state": "UNKNOWN_NOT_QUERIED",
-      "billing_invoice_state": "UNKNOWN_NOT_QUERIED",
-      "complete_storage_byte_aggregate": "UNKNOWN",
-      "all_bucket_inventory": "UNKNOWN",
-      "shared_writer_coverage": "UNKNOWN",
-      "storage_headroom": "UNKNOWN",
-      "account_wide_cost": "UNKNOWN",
-      "authority_state": "CONSUMED_DO_NOT_RERUN",
-      "conclusion": "Partial one-bucket R2 evidence only; account-wide cost, D1 use, complete bucket inventory, writers, and FREE-only headroom are not established."
-    },
-    "zero_cost_conclusion": "UNKNOWN",
-    "account_wide_writer_coverage": "UNKNOWN",
-    "usage_audit_evidence_v0_2": {
       "authority": "cloud_paper_usage_audit_v0_2",
       "status": "REVIEW_REQUIRED",
       "reason_code": "DATASET_COVERAGE_INCOMPLETE",
@@ -121,7 +91,9 @@
       "shared_writer_coverage": "UNKNOWN",
       "storage_headroom": "UNKNOWN",
       "conclusion": "R2 analytics are partial; zero cost and FREE-tier headroom are not established."
-    }
+    },
+    "zero_cost_conclusion": "UNKNOWN",
+    "account_wide_writer_coverage": "UNKNOWN"
   },
   "model_quality": "REJECT",
   "boundary": {
