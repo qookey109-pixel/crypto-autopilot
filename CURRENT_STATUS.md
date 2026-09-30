@@ -1,3 +1,14 @@
+## Cloud Paper 最新查核 — 2026-09-30 19:52 Asia/Taipei
+
+查核基準：PR #658 合併後 main `7424ccfbaf0362f588410de037e593f0105745a0`；當時 open PR = 0。以下合成量測不代表 production/R2 用量，亦未啟用 Cloud Paper。
+
+- PR [#658](https://github.com/qookey109-pixel/crypto-autopilot/pull/658) 加入既有合成 fixture 的保存量測與 CI artifact。PR head `75e766a534e29b89be1ab96dce860964bfe66ef8)；PR CI #36710655801、CodeQL #36710655868、Dependency/SBOM #36710655876 成功。合併 main `7424ccfbaf0362f588410de037e593f0105745a0) 的 CI #36710934061、Freeze Guard #36710934128、CodeQL #36710934055、Dependency/SBOM #36710933979 成功；workflow-static 因 main push 而 skipped。Pages 未觸發，因本批未改網站檔案。
+- CI artifact [11094147043](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36710655801/artifacts/11094147043)，名稱 `cloud-paper-storage-profile-36710655801-1`，2,671 bytes。每個 fixture 皆通過既有斷言；報告標示 `SYNTHETIC_ENGINEERING_ONLY)、provider/R2/D1 requests=0。
+- 合成不交易／恢復／結算失敗各為 10 objects、33,433 canonical JSON bytes；重播／重啟為 18 objects、59,327 bytes；合成入場→出場→下一輪不交易為 26 objects、206,181 bytes（3 個 slot）。後者按類別：cloud-report 70,352 bytes、live-run-step 48,778、live-tick 40,714、live-state 39,310；合計 199,154 bytes，屬優先檢查的高佔比類別。這只是大小 profile；尚未證明內容可互相替代，也未確認所有 production readers／恢復契約。
+- 上述 byte 數由現有記憶體測試 store 的實際 canonical JSON 序列化計算；不含 R2 metadata、外部 writers、D1、服務端條件寫入檢查或真實帳戶 headroom。gzip 僅估算，不能當作已壓縮或節費。不得據此推算已降低 production 儲存量。
+- 下一步：盤點四大類物件的 writers、readers、immutable/hash lineage 與 restart/partial-write dependencies；先證明可用引用取代重複 payload，再做版本相容的最小保存修正及同一 CI 前後比較。Cloud Paper activation=false、正式循環 NOT_RUN、entrypoint NOT_WIRED、natural schedule NOT_CONFIGURED；D1 未 provision、registry 空、Core100 品質仍為 REJECT。零費用與全帳戶 headroom 仍須以獨立 evidence 證明。
+- 維持 CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER、0 USD、PAPER/LIVE-PAPER ONLY；holdout、source switch、promotion、真實下單與 live trading 維持關閉。不得重跑已消耗的一次性 Billing/Usage/bootstrap authority，也不得改寫 frozen evidence。
+
 ## Cloud Paper 最新查核 — 2026-09-30 15:06 Asia/Taipei
 
 查核 basis main：`c9e220cb6f2191e6fb0dd50a5918a62971360e8e`；open PR = 0。此為文件修改前的 live GitHub snapshot，合併後 SHA 需重新讀取。
