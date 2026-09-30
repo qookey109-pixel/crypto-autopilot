@@ -51,7 +51,7 @@ def summarize_objects(objects):
         "object_count": sum(row["objects"] for row in kinds.values()),
         "canonical_json_bytes": sum(row["canonical_json_bytes"] for row in kinds.values()),
         "by_kind": kinds,
-        "compression_note": "OFFLINE_ESTIMATE_ONLY; no stored format was changed",
+        "compression_note": "OFFLINE_ESTIMATE_ONLY; canonical JSON is the stored representation",
     }
 
 
