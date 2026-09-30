@@ -15,6 +15,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from crypto_autopilot.paper.run_store_v0_1 import _canonical_bytes
+from crypto_autopilot.paper.run_coordinator_v0_1 import LivePaperRunCoordinatorPolicy
 
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIOS = (
@@ -55,7 +56,9 @@ def summarize_objects(objects):
     }
 
 
-def profile_scenario(name, module_name, class_name, method_name):
+def profile_scenario(
+    name, module_name, class_name, method_name, *, compact_tick_reference=True,
+):
     path = ROOT / "tests" / f"{module_name}.py"
     spec = importlib.util.spec_from_file_location(f"storage_profile_{module_name}", path)
     if spec is None or spec.loader is None:
@@ -100,7 +103,18 @@ def profile_scenario(name, module_name, class_name, method_name):
                 return receipt
 
         result = unittest.TestResult()
-        with patch.object(module, "MemoryStore", RecordingStore):
+        def coordinator_policy(**kwargs):
+            return LivePaperRunCoordinatorPolicy(
+                **{**kwargs, "compact_tick_reference": compact_tick_reference},
+            )
+
+        with (
+            patch.object(module, "MemoryStore", RecordingStore),
+            patch(
+                "crypto_autopilot.paper.cloud_loop_v0_1.LivePaperRunCoordinatorPolicy",
+                side_effect=coordinator_policy,
+            ),
+        ):
             getattr(module, class_name)(method_name).run(result)
         if not result.wasSuccessful() or result.skipped or result.testsRun != 1:
             raise ValueError(f"asserted synthetic fixture failed: {name}: {result.errors + result.failures}")
@@ -126,6 +140,16 @@ def build_report():
         "schema": "qookey-cloud-paper-synthetic-storage-profile-v0.1",
         "evidence_type": "SYNTHETIC_ENGINEERING_ONLY",
         "scenarios": [profile_scenario(*scenario) for scenario in SCENARIOS],
+        "step_reference_comparison": [
+            {
+                "scenario": scenario[0],
+                "legacy_embedded_tick": profile_scenario(
+                    *scenario, compact_tick_reference=False,
+                ),
+                "compact_tick_reference": profile_scenario(*scenario),
+            }
+            for scenario in SCENARIOS
+        ],
         "external_access": {
             "provider_requests": 0, "r2_requests": 0, "d1_requests": 0,
             "credential_construction": False,
@@ -157,6 +181,17 @@ def main():
                 print(f'  {kind}: {metrics["objects"]} objects, '
                       f'{metrics["canonical_json_bytes"]} canonical JSON bytes, '
                       f'{metrics["largest_object_bytes"]} largest object bytes')
+
+    for comparison in report["step_reference_comparison"]:
+        old = comparison["legacy_embedded_tick"]["stores"][0]
+        new = comparison["compact_tick_reference"]["stores"][0]
+        print(
+            f'{comparison["scenario"]} matched step comparison: '
+            f'{old["final_storage"]["canonical_json_bytes"]} -> '
+            f'{new["final_storage"]["canonical_json_bytes"]} canonical JSON bytes; '
+            f'get_json {old["interface_calls"].get("get_json", 0)} -> '
+            f'{new["interface_calls"].get("get_json", 0)}'
+        )
 
 
 if __name__ == "__main__":
