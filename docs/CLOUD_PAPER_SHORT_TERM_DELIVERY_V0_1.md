@@ -1,92 +1,90 @@
 # Crypto Autopilot — 完整模擬循環交付目標
 
-## 即時進度掃描、問題統整與依序收斂計畫 — 2026-09-30 11:10 Asia/Taipei
+## 即時進度掃描、問題統整與依序收斂計畫 — 2026-09-30 11:44 Asia/Taipei
 
 Repository：[qookey109-pixel/crypto-autopilot](https://github.com/qookey109-pixel/crypto-autopilot)  
-正式 authority：GitHub `main`。本次查核 main：`c8d0475360e968d518109d7201a34a6dc3d295ab`（`docs: refresh Cloud Paper delivery goal`）；查核時 open PR = 0。PR-head、push、Pages、自然排程與正式 Paper runtime 證據分開判讀。
+正式 authority：GitHub `main`。重新查核 main 為 `554da12ecb8a242e4f0f0e880b5affae10a75009`（`docs: refresh complete Cloud Paper delivery goal (#650)`）；open PR = 0。PR #650 已合併。本文件的歷史段落只作舊快照，以下為本次 live scan 的 current view。
 
 ### 專案完成目標
 
-交付一個可在免費雲端條件下受控運作、資料可追溯且可恢復的 **PAPER 模擬產品**：
+交付一個遵守 `FREE-ONLY / 0 USD per month` 的雲端 PAPER 模擬產品，能完成並留存可追溯循環：
 
-**已授權公開行情 → 來源／時間／完整度檢查 → 最多五個受治理候選 → 正式策略資格 → 風控與組合檢查 → 模擬成交，或記錄有明確原因的 `NO_TRADE` → 預算保留與 slot claim → 不可變保存、回讀與中斷恢復 → Dashboard 呈現可追溯結果。**
+**已授權公開行情 → 來源、時間與完整度檢查 → 最多五個受治理候選 → 正式策略資格檢查 → risk／portfolio gate → 模擬生命週期；或輸出有原因碼的 `NO_TRADE` → 共享預算及 slot reservation → append-only 保存、回讀與中斷恢復 → Dashboard 投影可核對結果。**
 
-正式策略 registry 可以為空。模型為 `REJECT`、行情／來源不足、風控不符或預算未知時，正確結果是安全拒絕或 `NO_TRADE`，不可用 CI 測試策略、放寬門檻、補值或未授權來源製造正式交易。虛擬帳戶 USD 10,000 僅能初始化一次。策略表現研究和工程循環驗收分開。
+工程驗收可以使用隔離合成行情和 test-only 策略證據，證明有交易及拒絕路徑；production 不得使用測試策略或被拒絕模型製造交易。正式 registry 可空，當前模型品質 `REJECT` 時，正確結果是 `NO_TRADE`。完成此工程產品不等於模型獲利、promotion 或 real trading。
 
-### 即時進度掃描
+### 本次掃描確認的進度
 
-查核來源包括即時 main/ref、open PR 搜尋、最近 Actions runs、`PROJECT_STATUS.md`、`CURRENT_STATUS.md`、README、Operations map、現行本目標及未合併分支差異。
+**已在 main 的工程基礎**
+- Cloud Paper loop、Pionex 公開行情 adapter、受治理市場候選、strategy eligibility、risk／portfolio／paper composition 和報告契約已存在。
+- 合成 CI 已涵蓋 test-only cycle、空 registry／無策略 `NO_TRADE`、拒絕路徑、slot 重複／競爭、reservation、部分寫入與受限恢復等情境。
+- **共享 reservation ledger 程式碼已存在：**`src/crypto_autopilot/paper/cloud_budget_ledger_v0_1.py` 提供 D1-backed atomic reservation／settlement；`cloud_composition_v0_1.py` 透過 ledger 與 D1 usage gate 接線，並要求外部呼叫前檢查。這是程式與合成測試能力，**不是 D1 已建立、正式憑證已接通或 production ledger 已經運作的證據**。
+- PR #650 合併後 main 的 CI [36663768880](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36663768880)、CodeQL [36663768935](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36663768935)、Dependency/SBOM [36663768831](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36663768831)、Freeze Guard [36663768871](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36663768871) 均為成功。
+- Cloud Paper loop config 已定義每小時第 7、22、37、52 分鐘的 15 分鐘 slot、10 分鐘 timeout、共用 persistence concurrency group、禁止補跑及每日 96 slots 上限；**這只是版本化配置，不代表 workflow 已啟用或 schedule 已驗收**。
+- Repo open PR = 0；PR #650 分支已交付。另有未合併 branch `codex/dashboard-cloud-paper-usage-v03`，對 current main **ahead 3 / behind 1**，僅改靜態 validator 與 JSON projection，沒有 JS renderer、完整測試或 PR／CI；保留作候選，不視為交付，不覆蓋其歷史。
 
-**已完成的工程基礎**
-- 版本化 Cloud Paper loop 契約、Pionex 公開行情 adapter、受治理市場候選、策略資格 gate，以及 risk／portfolio／paper composition 已存在於 main。
-- 雲端 synthetic CI 已有 test-only 入場／出場、帳戶延續、空 registry `NO_TRADE`、資料與風控拒絕、slot 重複／競爭、reservation、部分寫入審核與受限 recovery 證據。這證明合成路徑，不等於正式 runtime 已執行。
-- #647/#648/#649 的狀態及目標文件變更已合併；main `c8d0475` 的 push CI [36662486206](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36662486206)、CodeQL [36662486200](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36662486200)、Dependency/SBOM [36662486162](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36662486162)、Freeze Guard [36662486223](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36662486223) 均成功。這些是 main push checks；若某個 PR 的 Pages 工作流未觸發，不能解讀為部署成功。
-- 目前沒有 open PR。舊 #644 已關閉未合併，過時檢查不算 PASS。
+**目前仍未完成的產品工作**
+- Cloud Paper activation 仍 `false`；production cycle `NOT_RUN`；Cloud Paper 自然 schedule `NOT_ESTABLISHED`；D1 migrations 仍是 prepare-only，無 production D1/R2 provisioning 或正式寫入／恢復證據。
+- 正式 strategy registry 空、Core100 品質 `REJECT`、macro context `REGIME_UNAVAILABLE`。不以此為由繞過資格 gate；工程正向交易只可在 test fixture。
+- Billing V0.1、Usage V0.1／V0.2、R2 Usage V0.3 的一次性 evidence authority 均已消耗；不得 rerun 或換 workflow 名稱重取同範圍資料。
+- R2 Usage V0.3 [run 36593296360](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36593296360) 是部分證據：30 日 operations 125,309 requests／6 個 action-type groups，但無來源 timestamp；storage 最新資料只涵蓋 1 個 returned bucket，16,304 objects、616,541,780 bytes，snapshot 為 2026-09-29 15:20 UTC。D1 usage、完整 buckets/databases、所有共同 writers、invoice／metered charges、帳戶零費用、來源 freshness 與可用 headroom 仍 `UNKNOWN`。8 GB 是政策硬上限，不是實測 headroom。
+- 已有的 reservation ledger 尚未部署到 production；目前缺的是 D1 account-wide usage gate 的實際證據、D1 資源／schema 可用性、Ledger 本身的容量／費用可行性、真實 R2 budget binding 和雲端 recovery，而不是「缺少 ledger 程式碼」。
+- `CURRENT_STATUS.md` 頂端仍指向較舊 SHA `31831113`；`PROJECT_STATUS.md` 有 V0.3 的 audit 結果，但未統一 current-main checkpoint。需在一次同步中修正入口及索引，保留下面全部舊快照。
+- 最新自然 Research Automation Health [run 36647972971](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36647972971) 成功，但執行基準仍是舊 SHA `50cfd7e`；截至本次 live scan 沒有 qualifying Cloud Paper natural cycle。Health 或手動 dispatch 都不能替代 Paper schedule acceptance。
+- Pionex bounded observability 是另一個獨立 authority；到期查核時點為 2026-10-01 08:00 台北。不可自動延長、補跑歷史 slot，且該查核不替代 Cloud Paper acceptance。
 
-**尚未交付的產品狀態**
-- Cloud Paper `activation=false`；正式 cycle `NOT_RUN`；Cloud Paper 自然排程 `NOT_ESTABLISHED`。
-- production strategy registry 空、Core100 品質 `REJECT`、macro context `REGIME_UNAVAILABLE`。系統可以安全地輸出 `NO_TRADE`，但不得宣稱策略已有效或已獲利。
-- Billing V0.1、Usage V0.1/V0.2、R2 Usage V0.3 均為已消耗的一次性 evidence authority，禁止重跑或以新 workflow 名稱重取同範圍資料。
-- 最新 R2 V0.3 是部分觀測：30 日 operations 共 125,309 requests、無資料 freshness timestamp；storage 聚合僅代表一個 returned bucket，16,304 objects、616,541,780 bytes，觀測時間 2026-09-29 15:20 UTC。D1 使用量、完整 bucket inventory、全部 writers、invoice/metered cost、零費用與真實 headroom 均 `UNKNOWN`。8 GB 專案上限是政策值，不是已測 headroom。
-- 現有 60 秒 budget freshness gate 尚無已驗證來源能保證水位。CloudBudgetGuard 使用 caller 提供的 snapshot，未提供跨 run 的持久原子 reservation ledger；freshness、reservation coverage 不足時必須在任何外部 I/O 前 fail closed。
-- D1 migration 為 prepare-only；production D1/R2 尚未 provision／讀寫，append-only 長期容量與恢復尚未由真實雲端驗收。
-- regime 欄位仍有資料來源缺口：Pionex 不提供 TOTAL3／BTC dominance；CMC 候選的等價性、授權、金融用途與儲存／展示許可未通過；Pionex breadth 23 市場仍待 membership、完整度、時間對齊和 freshness 驗證。不得自動換源、拼接或縮小 universe 來湊資料。
-- 最近查到的自然排程中有 Research Automation Health 成功紀錄，但沒有 qualifying Cloud Paper 自然 Paper cycle。手動 dispatch 不能替代自然 schedule。
-- 專案目標的文件入口曾被重複同步；`CURRENT_STATUS.md`／Operations map 的頂端快照比目前 main 舊。文件狀態需於本次目標更新合併後依同一 current SHA 收斂，歷史紀錄維持原樣。
-- 遠端分支 `codex/dashboard-cloud-paper-usage-v03` 比 main ahead 3 commits、behind 0，僅修改靜態 validator 與 `web/data/cloud-paper-loop.json`，尚無 PR，沒有前端更新、測試與 CI 驗收。此分支是未驗收候選變更，不得列為已完成；先審查後再補齊或另作決定，不覆寫分支或直接納入 main。
-- Pionex bounded observability expiry 是獨立於 Cloud Paper 啟動的現行權限時點；2026-10-01 08:00 台北到期查核依當時 authority 執行，不自動延期、不補跑歷史 slot，也不以其觀測取代 Paper acceptance。
+### 問題統整
 
-### 問題與改善摘要
-
-1. **狀態文件漂移：**頂端 checkpoint 仍包含舊 main、PR 和 pending 敘述。應有一份 current checkpoint 指向同一 SHA；舊快照留作歷史，不改寫。
-2. **Dashboard 契約落後：**validator／UI 對 V0.2/V0.3 使用量證據沒有一致雙版本支援，可能拒絕新證據或顯示舊內容。Partial、null、UNKNOWN 不可投影成零或 PASS。
-3. **預算與持久性缺口：**單次 caller snapshot 不足以保證跨 workflow/run 原子化預算。reservation、settlement、slot claim、ledger 容量、失敗和重播語義需端到端可證。
-4. **零費用無證據閉環：**現有 Billing/R2 結果無法核對所有計費 meter、D1、整個帳戶的 resources/writers 與 headroom。需要先決定可靠證據來源和費用 gate 的可證明範圍；資料不足就保持 blocked。
-5. **市場 regime 資料缺口：**欄位定義、硬性 gate、來源權限及時間對齊未收斂。不可把候選 API 或未授權來源視為可用。
-6. **正式受控與自然執行不存在：**尚無正式 D1/R2 state、受控 main Paper cycle 或 Cloud Paper 自然排程。需先過成本、來源、策略資格、資料持續性與版本化權限 gate。
-7. **未合併分支沒有交付閉環：**V0.3 Dashboard 候選停在 validator/data，需完成 UI、fixture/test、雲端 CI，再根據結果決定是否合併。
+1. **current status 入口落後：**README 指向的 CURRENT_STATUS 與現有 Operations／machine index 沒有共同 current-main checkpoint，容易讓新接手者把舊 SHA 當現況。
+2. **Dashboard V0.3 相容性未交付：**main 尚需從 exact current state 驗證 validator、JS projection、繁中 snapshot 和 browser assertion 是否一致。未合併 branch 落後一個 commit，只有其中兩層變更。
+3. **Production 與合成驗收混淆風險：**D1 ledger、composition、synthetic CI 已準備，但 D1/R2 沒有 production usage/headroom 證據與受控 cycle。
+4. **零費用／headroom 無法證明：**現有 Cloudflare reports 不涵蓋所有 meters、D1、全資源與共同 writers，也沒有可信 freshness watermark；不能由已列 subscription 價格或部分 analytics 推論 `0 USD`。
+5. **Regime 資料不足：**TOTAL3／BTC dominance 不由 Pionex 提供；CMC、breadth 等候選尚未證明定義等價、授權、時間對齊、完整度與 freshness。保持 unavailable，不切 source、不拼資料、不縮小 universe。
+6. **正式自然循環尚不存在：**配置已有 slot 規則，但 production authority、controlled main acceptance、自然 schedule run 和 Dashboard readback 均未形成完整證據鏈。
+7. **文件曾重複散落：**目標與狀態多次分開更新。後續僅允許一次有明確停止點的 current status sync；之後每個工程 PR 只帶必要的相鄰文件，避免再開獨立整理批次。
 
 ### 依序排程與完成標準
 
-工作按依賴連續推進，不用固定等待期拖延可獨立的合成工程。失敗先在同一批修正並保留證據。任何 Cloudflare live query、資源建立／寫入或排程啟用，必須有範圍吻合且已合併 main 的獨立版本化 authority；使用者的合併授權不替代該 authority。
+立即連續交付，工程切片不等固定日曆觀測期。雲端外部操作必須由範圍吻合、已合併 main 的版本化 authority 授權；PR 合併授權、文件、readiness PASS 均不能代替 Cloudflare 資源／API／schedule authority。
 
-| 順序 | 優先度 | 工作 | 完成標準／停線 |
+| 順序 | 優先度 | 工作 | 完成標準與停止條件 |
 |---|---|---|---|
-| 0 | P0，立即 | **目標與 current status 收斂。** 更新本目標，接著同步 `CURRENT_STATUS.md`、`PROJECT_STATUS.md`、Operations map 與機器狀態索引。 | 全部指向同一查核 SHA；open PR、最新 workflow、post-merge checks、舊證據、自然排程和 runtime 分開。凍結／歷史證據只追加新快照，不改舊內容。 |
-| 1 | P0，下一個工程切片 | **完成 Dashboard V0.2/V0.3 雙版本相容。** 先審查既有 remote branch，決定如何保留其 validator/data 工作；完成 JS projection、static validator、synthetic fixtures、繁中 snapshot、browser regression。 | V0.2、V0.3、null、partial、缺欄位、錯 run/artifact、UNKNOWN 有測例；unknown 不顯示 0/PASS；Dashboard 顯示 evidence run/time/basis 並保持 activation disabled。CI、CodeQL、SBOM 和適用的 Pages build/deploy/browser 依 exact SHA 驗證。 |
-| 2 | P0 | **補 durable shared budget/reservation。** 將 run-scoped guard 缺口列成可驗收契約，收斂所有授權 provider/D1/R2 I/O 前的 reservation、原子 slot claim、settlement 和 immutable ledger。 | 同一 slot 競爭僅一方成功；外部 I/O 前預留可追溯；相同 settlement replay 冪等、衝突停為 `REVIEW_REQUIRED`；部分寫入保留證據；snapshot stale/incomplete、額度不足或未列 writer 時零外部呼叫。 |
-| 3 | P0 | **把恢復與容量納入同一 persistence 驗收。** 檢查 account genesis、ledger append、pointer 更新、讀回、restart replay、partial write 和 ledger 自身寫入預算。 | USD 10,000 初始化僅一次；append-only write 先過單 run/day/31-day 限額；競爭／中斷恢復可重現；不刪除或覆寫 frozen records。只有 synthetic 測試，尚不代表 production 容量已校準。 |
-| 4 | P0，決策 gate | **收斂帳務、用量、完整資源與 headroom 的證據方案。** 對每個必要 API/UI 來源記權限、資料期間、水位/延遲、分頁、request/response cap、費用 meter 覆蓋、blind spots。 | 逐項判定可證明／不能證明；零費用、D1/R2 usage、全部 bucket/database、共同 writers、freshness/headroom 均有可核對 evidence。無法完整證明時保留 `COST_GATE_BLOCKED`；不擴權、不重跑已消耗 audit、不自動 dispatch。 |
-| 5 | P0 | **收斂市場資料契約。** 列出候選、必要 regime/context 欄位、定義、來源與授權、資料時間、完整度、連續性和請求預算，判定每項是執行硬 gate 或非必要顯示。 | 只有已授權來源可餵入 Router；TOTAL3/BTC dominance/breadth 未通過即 unavailable，按版本化契約輸出 `DATA_INSUFFICIENT` 或 `NO_TRADE`。不 fallback、不拼接、不更改 frozen research scope。 |
-| 6 | P0 | **端到端合成 CI 收斂。** 對行情 → 候選 → eligibility → risk → paper lifecycle → reservation → immutable save/readback → restart/replay → Dashboard 建立單一矩陣。 | 覆蓋正向 test-only cycle、正常無策略 NO_TRADE、模型 REJECT、stale/gapped data、budget exhausted/unknown writer、slot race、partial write、restart、idempotency；Python 3.12/3.13、Ruff、freeze/governance、static、CodeQL、SBOM 按定位通過。不得連 production secrets 或外部服務。 |
-| 7 | P0 外部 gate | **若且僅若 phase 4 找到資訊增益，制定 successor evidence authority。** 已消耗 Billing V0.1/Usage V0.1/V0.2/R2 V0.3 永不重跑。 | 新 authority 要限定最小 read permissions、allowlisted endpoints、期限、calls/pages/bytes、零 retry/fallback、去識別輸出、one-shot/consumption、失敗語義；先 merge config/receipt/code/readiness，未符合 authority 不 dispatch。若官方證據不能證明成本或 headroom，停止在 blocked。 |
-| 8 | P0 外部 gate | **Production state 與一次性 controlled PAPER acceptance。** 只有 cost/headroom、來源、策略資格或合法 NO_TRADE、耐久 reservation/recovery 均通過，再經版本化授權。 | 在正式 main 執行一次；驗證 genesis 不重複、有限資料、預算、slot idempotency、paper open/exit/NO_TRADE、實際 read/write upper bound、保存回讀和恢復。任一 unknown/partial 即停止，不 provision/寫入。 |
-| 9 | P1 外部 gate | **受控成功後才啟用 Cloud Paper 自然排程。** 排程是 runtime authority，與研究 Health/Pionex observability schedule 分開。 | 新 authority 已 merged、concurrency group 共用、期限與 request/storage 上限明確；自然 `event=schedule` run 至少完整驗證一次，包含 SHA、slot、行情 freshness、候選／拒絕原因、budget、持倉延續、ledger 回讀與 Dashboard。手動 dispatch 不算自然驗收。 |
-| 10 | P1，結案 | **部署與交接收尾。** 對需要網站變更的 SHA 核對 Pages build/deploy/browser；同步 README、current status、Operations map、機器狀態、runbook。 | 提供明確 DONE/BLOCKED/UNKNOWN/NOT_RUN 表；工程 CI、Pages、成本、runtime、自然排程及模型研究獨立結論。保留可查的 PR/run/artifact/receipt，無未處理 open PR 或未核實分支狀態。 |
+| 1 | P0，現在 | **單次 current-status 收斂。** 同一個小型 PR 更新 `CURRENT_STATUS.md`、`PROJECT_STATUS.md`、GitHub Actions operating map 和 machine status index。 | 以最新查核 main 為基準，列 PR/run/schedule/runtime 各自證據；修正 D1 ledger 狀態；舊 SHA、舊 PR 和 frozen receipts 留歷史，不重寫。相關雲端 CI 通過並合併後即停止文件整理。 |
+| 2 | P0，下一工程批 | **完成 Dashboard 的 V0.2／V0.3 usage evidence 投影。** 先審查未合併 branch 的三個 commits，再從 current main 建立乾淨交付；補齊 validator、JS、資料 projection、繁中/browser regression 和 targeted test。 | V0.2/V0.3/partial/null/unknown/錯誤 run/artifact 均正確；UNKNOWN 不變 0/PASS；顯示 evidence basis/time 並保留 activation=false。雲端 CI、CodeQL、SBOM 和適用 Pages/browser checks exact SHA 成功。 |
+| 3 | P0 | **production D1/R2 budget binding 與 ledger 可行性。** 對現有 D1 ledger、usage guard、R2 budget guard、reservation 和 storage gate 做契約差距查核與 synthetic failure matrix。 | 證明 provider、D1 ledger、R2 store 每項寫入前都有額度與容量預留；競爭僅一個 slot 成功，settlement replay 冪等，partial/conflict 為 `REVIEW_REQUIRED`，stale／unknown／超限時外部呼叫數為零。不得重寫已存在的 ledger 或 claims；新差距才做小批次修正。 |
+| 4 | P0 | **保存／恢復與容量驗收收斂。** 涵蓋一次 genesis、append-only event、result 最後寫入、readback、restart/replay、部分寫入及 D1 ledger 長期增長。 | 虛擬 $10,000 僅初始化一次；slot 不補跑、不重複成交；預算涵蓋最多 96 slots/day 及既有單 run/day/31-day cap；所有不完整證據 fail closed。合成驗收通過不冒稱 production 容量校準。 |
+| 5 | P0，外部決策 gate | **判定能否取得完整成本、用量、inventory、writer 與 freshness 證據。** 先以官方 API／帳戶 UI 能力整理覆蓋矩陣，不取新 live data。 | 每個來源列最小 permission、時間範圍、分頁／request／bytes upper bound、freshness 與盲區。已消耗 audit 不重跑、不擴大現有 token；只有存在新的最小權限且能補足資訊的範圍才提新 versioned authority。無法證明即 `COST_GATE_BLOCKED`，不啟用。 |
+| 6 | P0 | **市場與策略輸入契約收斂。** 為必要欄位定義 provider、授權、timestamp、完整性、連續性、呼叫成本與硬性／顯示用途。 | Pionex governed crypto market 為執行來源；unsupported context 明確 `UNAVAILABLE`。未授權資料不能餵 Router；空 registry／REJECT 正常輸出 `NO_TRADE`。 |
+| 7 | P0 | **單一端到端 Cloud CI 矩陣。** 把目前已分散的 synthetic coverage 收斂為行情 → 候選 → 策略資格 → risk → paper → D1 reservation → R2 persistence/readback → restart → Dashboard。 | 有交易和無交易、REJECT、stale/gap、budget unknown/over-limit、slot race、partial write、replay/recovery 全有 evidence；Python 3.12/3.13、Ruff、治理/freeze、static、CodeQL、SBOM 遵循原定位。不得接 production secrets 或 Cloudflare。 |
+| 8 | P0 外部 gate | **若 phase 5 證明有資訊增益，才準備新 evidence authority。** | 新 config/receipt/code/readiness 先合併 main，限定 endpoint/permission/calls/pages/bytes/期限/無 retry 或 fallback/secret-free output/一次性消耗。失敗保留 evidence；不得執行未授權 Cloudflare query 或資源操作。 |
+| 9 | P0 外部 gate | **一次受控正式 PAPER main acceptance。** 須先有零成本／headroom 可接受證據、D1 usage gate、production ledger/store readiness、有效市場資料或合法 NO_TRADE，以及獨立 versioned authorization。 | 精確 SHA 上驗證一次；檢查實際 provider/D1/R2 request/write 數、reserve/settle、slot claim、immutable commit/readback/recovery、帳戶延續及 Dashboard。任一 unknown、partial 或 authority mismatch 則停止，不 provision/write。 |
+| 10 | P1 外部 gate | **受控 acceptance 成功後才配置／啟用自然 Cloud Paper schedule。** | workflow 與 Live-Paper persistence 共用 concurrency、slot staleness/timeout/每日上限符合 config、禁止 backfill/rerun；至少一個自然 `event=schedule` run 證明正式鏈路和 dashboard readback。手動 dispatch 不計。 |
+| 11 | P1 結案 | **部署與交接。** | 需網站更新的 SHA 有 Pages build/deploy/browser production evidence；狀態入口一致；open PR 清空；提供 DONE/BLOCKED/UNKNOWN/NOT_RUN 分類與明確未完成 gate。 |
 
-### 工作邊界與不要做的事
+### 固定邊界
 
-- 全程 `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`；不讀寫或依賴本機 checkout、shell、terminal 或本機排程。
-- `FREE-ONLY / 0 USD per month`；不升級、不加付款方式，也不以不明用量冒險啟用 runtime。
-- 僅 `PAPER / LIVE-PAPER`；real-money orders 與 live trading 維持關閉。
-- 一次性 Billing V0.1、Usage V0.1/V0.2、R2 V0.3、Core100 bootstrap 和其他已消耗 authority 不重跑。
-- frozen authority、receipt、artifact、holdout、Equivalence 門檻與歷史 evidence 不修改；新權限用新版本，不竄改舊證據。
-- holdout=`FROZEN_UNOPENED`、source switch=false、promotion=false、正式策略 registry 空／Core100 REJECT 狀態照實記錄；不降門檻、不要求每天交易、不輸出或索取 secret value。
-- 不建立或啟用 Cloud Paper schedule、D1/R2 provision/write 或新 Cloudflare query，除非對應版本化 authority 已合併。文件、PR、合併授權和 readiness PASS 均不等於 operation authority。
-- `WORKFLOW SUCCESS`、合成交易、舊 SHA 的 Pages success、手動 run 均不替代正式自然 Paper acceptance。
+- 全程 `CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER`；不依賴本機 checkout、終端機或本機排程。
+- 雲端支出上限 `0 USD/month`；不升級服務、不加付款方式，不以未知 headroom 試跑。
+- `PAPER / LIVE-PAPER ONLY`；real-money orders 與 live trading 關閉。
+- holdout=`FROZEN_UNOPENED`、source switch=false、promotion=false；Core100 quality 保持 `REJECT`。
+- 一次性 Billing V0.1、Usage V0.1/V0.2、R2 Usage V0.3、Core100 bootstrap 等 consumed authority 不重跑。
+- frozen configs／receipts／artifacts 不改寫；新增權限採新版本；不輸出或索取 secret value。
+- 不開新的排程、不 provision D1/R2、不寫 production state、不呼叫新 Cloudflare endpoint，除非具體 operation 的版本化 authority 已合併 main。
+- Workflow success、synthetic trade、Health schedule 或舊 SHA 的 Pages run 都不能替代正式 Paper natural acceptance；研究有效性另行判定。
 
 ### 結案判準
 
-1. **工程完整：**合成正向、NO_TRADE、拒絕、併發、額度、保存、回讀和恢復路徑通過 main CI。
-2. **產品呈現：**Dashboard 保留真實 run/schema/UNKNOWN，Pages 對需要部署的 current main SHA 驗證成功。
-3. **成本可證：**所有相關 meter、帳務期間、D1/R2 用量、全資源/writer coverage、新鮮度與 headroom 可核對；不能證明就明確標記 `COST_GATE_BLOCKED`，不宣稱零費用或開啟 runtime。
-4. **受控 Paper 完整：**有版本化 authority、合格來源或合法 NO_TRADE、固定 budget、單次 genesis、冪等 slot、immutable persistence/readback/recovery 的正式 main 證據。
-5. **自然運作已驗收：**符合 authority 的自然 schedule run 證明配置與 runtime 正常；沒有 qualifying run 時只能寫「已配置、待首跑」，不能結案為無人值守運作 PASS。
-6. **研究狀態獨立：**Core100 REJECT 不阻擋工程級 NO_TRADE 產品，但不代表模型通過、獲利或取得任何交易權。
+- 工程正向與 fail-closed `NO_TRADE` 路徑於雲端 CI 可重現。
+- 預算保留、slot idempotency、immutable save/readback/recovery 有完整可追溯報告。
+- Dashboard 和需要的 Pages production deploy 投影 current evidence，UNKNOWN/null 不失真。
+- 帳務、usage、resource/writer inventory、freshness、headroom 可核對且符合 `0 USD`；否則結案狀態明確為 `BLOCKED_COST_GATE`，不啟用。
+- 受控正式 PAPER cycle 和至少一次自然 schedule evidence 各自完成，或明確列為尚未完成；不可因 PR/CI 成功宣稱產品已上線。
+- 策略有效性、獲利、promotion 和 real trading 不在此工程完成定義中。
 
-### 本輪交付與下一步
+### 本輪交付與接續
 
-這次掃描的查核 SHA 為 `c8d0475360e968d518109d7201a34a6dc3d295ab`。本文件此次只更新目標與排序，不授予任何新外部執行權限。下一個實作切片為：**先收斂 current-status 文件，再完成 Dashboard V0.2/V0.3 投影；先檢查並收尾未合併分支 `codex/dashboard-cloud-paper-usage-v03`，不得將它算作完成。**
+本次 live scan main 為 `554da12ecb8a242e4f0f0e880b5affae10a75009`、open PR=0。main push checks [CI](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36663768880)、[CodeQL](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36663768935)、[Dependency/SBOM](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36663768831)、[Freeze Guard](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36663768871) 均成功。這次更新目標內容，不新增或啟用任何 runtime authority。下一個立即工作是：**以一次 PR 把 current status 索引同步到同一 main，再完成 Dashboard V0.3 投影；同時保留既有 D1 ledger 實作，將 production 未驗證列為真正缺口。**
+
 
 ---
 
