@@ -12,7 +12,7 @@
 - Billing V0.1 只讀到一筆 subscription 的列示價格 USD 0；未讀 invoices／metered charges，不能判定帳戶總成本為零。
 - D1 使用量、資料庫完整清單、實際 rows/storage 成長、freshness watermark 及外部 writers 未證明；D1 尚未 provision，migration 僅 prepare-only。
 - Cloud Paper production runtime 未啟用、正式交易 registry 為空、正式循環為 `NOT_RUN`；模型品質 `REJECT`，macro regime 為 `REGIME_UNAVAILABLE`。合成 CI 交易只證明工程路徑，不是正式策略或產品運作證據。
-- `web/data/cloud-paper-loop.json` 落後 V0.3，仍把 V0.2 寫成目前用量結果。短期交付文件亦含已過時「設定憑證後執行 readiness／一次性 audit」指示，容易導致違規重跑。#644 的五項 checks 還需 GitHub 帳戶持有人批准後才會執行。
+- `web/data/cloud-paper-loop.json` 落後 V0.3，仍把 V0.2 寫成目前用量結果。首次嘗試同步投影後，PR #645 的 Python 3.12 Dashboard 靜態安全檢查、Dashboard Smoke、Zh-Hant Snapshot 與 Pages Traditional Chinese safety check 均因 `scripts/validate_dashboard_static.py` 硬性要求 V0.2 evidence 而失敗；其餘 workflow 當時仍執行中。故本 PR 保留已驗證的 V0.2 Dashboard 投影，下一批先擴充 validator／UI 相容性與回歸，再更新投影。短期交付文件亦含已過時「設定憑證後執行 readiness／一次性 audit」指示，容易導致違規重跑。#644 的五項 checks 還需 GitHub 帳戶持有人批准後才會執行。
 
 ### 完成目標
 
@@ -30,7 +30,7 @@
 | 1 | P0 | 做雲端只讀預算與資料覆蓋缺口盤點，先設計 successors，不呼叫 Cloudflare：分開定義 R2 所有 bucket／operation／writer、D1 database／rows／storage、billing invoices／metered charges 所需端點、最小權限、時間範圍、請求數、輸出欄位、freshness watermark、遮蔽、artifact 上限及停止碼。 | 各缺口可由官方 API／Analytics 證據支持，且操作上限和 0 USD 免費額度判定方式明確。缺資料或 API 不提供時記 `UNKNOWN`，先不建立或 dispatch live query。每個新增 live query 需 successor authority 先合併 main，且只執行一次。 |
 | 2 | P0 | 核對並補強共享預算／保存的 runtime 接線：provider、D1、R2 每一個外部操作前都需同一 run-scoped 原子 reservation；涵蓋每日與帳期額度、全 writer headroom、重複 slot、並行、settlement、重啟與部分寫入。 | 零網路合成測試涵蓋成功、耗盡、過期、缺證據、競爭及失敗恢復；不把 mock snapshot 當帳戶校準。全帳戶證據不完整就保持 external access 前 fail closed。 |
 | 3 | P0 | 以現有 Pionex public market adapter／資格 adapter／risk／portfolio／paper core 建立完整循環；完成正向 test fixture 與無候選、空 registry、Core100 REJECT、壞行情、額度不足、重播及恢復路徑。報告包含 source/time、候選與拒絕原因、strategy evidence、slot/run/state IDs、帳戶變化和 I/O 次數。 | Python 3.12／3.13、Ruff、治理及 relevant cloud CI 於 exact PR head 通過。正式 registry 不因測試而改動；不得以替代 provider 補缺。 |
-| 4 | P1 | 修正 Dashboard projection 與說明：同步 V0.3 部分用量結果；清楚區分 `NOT_RUN`、`NO_TRADE`、資料不足、故障、部分寫入、預算未知／阻擋。未知金額、容量、帳戶與持倉維持 null/UNKNOWN。 | JSON/CI 驗證通過；Pages build/deploy/browser-production 只在有網站變更時核對；投影不冒充 authority。 |
+| 4 | P1 | 先讓 `scripts/validate_dashboard_static.py`、Dashboard data contract、Zh-Hant snapshot 與 UI 同時相容 V0.2 歷史和 V0.3 最新證據，再更新 Dashboard projection。清楚區分 `NOT_RUN`、`NO_TRADE`、資料不足、故障、部分寫入、預算未知／阻擋。未知金額、容量、帳戶與持倉維持 null/UNKNOWN。 | 以 V0.2 舊 fixture 和 V0.3 新 fixture 分別通過 Python／Dashboard／Zh-Hant／Pages safety CI；後才更新 projection，且投影不冒充 authority。 |
 | 5 | P0 gate | 只有免費方案、fresh 帳戶級 D1/R2、完整 bucket/writer coverage、計量／帳單、reservation 校準都證明安全後，準備另一份 implementation-bound successor authority；再做一次受限 main PAPER acceptance，驗證帳戶初始資金只初始化一次、保存後回讀及零額度超用。 | 任一費用、freshness、writer、讀寫副作用未知即停止；不建立 D1、不寫 R2、不跑正式循環。不得將模型 REJECT 或空策略改成可交易。 |
 | 6 | P1 gate | 通過受控 acceptance 後才啟用有界自然 Paper schedule 與 Pages 證據投影。 | 首次 qualifying `event=schedule` run 的精確 SHA、slot、report、side effects、重複防護均核對；手動 run 不代替自然 run。 |
 
