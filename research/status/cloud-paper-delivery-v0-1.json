@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-09-30",
-  "evidence_basis_parent_main_sha": "095aba2c80b9ad710523875b1f45381646e61b75",
+  "evidence_basis_parent_main_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -10,7 +10,7 @@
     "market_adapter": "MERGED",
     "paper_loop": "MERGED",
     "activation": "BLOCKED_BUDGET_EVIDENCE_AND_CONTROLLED_ACCEPTANCE",
-    "dashboard": "PR618_MERGED_AND_DEPLOYED; MAIN_PAGES_BUILD_DEPLOY_PASS; PRODUCTION_BROWSER_14_OF_14_DESKTOP_AND_MOBILE_PASS; DASHBOARD_ONLY_NOT_RUNTIME_ACCEPTANCE",
+    "dashboard": "PR653_MAIN_89DD07A_PAGES_RUN_36676578296_BUILD_DEPLOY_BROWSER_PRODUCTION_SUCCESS_42_DESKTOP_MOBILE_TESTS; DASHBOARD_ONLY_NOT_RUNTIME_ACCEPTANCE",
     "budget_guard": "SHARED_PROVIDER_AND_R2_RUN_SCOPED_GUARD_MERGED_PR579",
     "r2_adapter_budget_hooks": "SHARED_GUARD_INTEGRATED; PRODUCTION_USAGE_EVIDENCE_AND_FRESHNESS_SOURCE_NOT_CONFIGURED",
     "d1_reservation_ledger": "PR590_VERIFIED_RESULT_SETTLEMENT; PR595_EXACT_USAGE_SETTLEMENT_REPLAY; PR599_DISABLED_BY_DEFAULT_IMMUTABLE_RESULT_RECOVERY_AUDIT_RECEIPT_RETAINS_FULL_RESERVATION; PR600_RESULT_POINTER_SLOT_AND_COMMITTED_STATE_VALIDATION; NO_SETTLEMENT_RELEASE; D1_NOT_PROVISIONED; PR603_SHARED_D1_ROWS_RESERVATION_MERGED; PREPARE_ONLY_MIGRATION_NOT_APPLIED; PR605_SHARED_STORAGE_GROWTH_RESERVATION_MERGED; PREPARE_ONLY_MIGRATIONS_NOT_APPLIED",
@@ -21,7 +21,7 @@
     "market_decision_trace": "MERGED_PR_AND_POST_MERGE_CI_VERIFIED_REPORT_ONLY",
     "r2_writer_inventory": "CLASSIFIED_AND_REQUIRED_CI_GUARDED",
     "cloud_paper_nonaccess_preflight": "MERGED; MAIN_CI_PASS; MANUAL_NONACCESS_PREFLIGHT_PASS; REPORT_ARTIFACT_PRESERVED; NOT_PRODUCTION_ACCEPTANCE",
-    "d1_usage_evidence_guard": "MERGED_PR587; PER_QUERY_CLIENT_GATE_AND_COMPOSITION_PREFLIGHT; PR_AND_POST_MERGE_CI_PASS; SYNTHETIC_ONLY",
+    "d1_usage_evidence_guard": "PR654_MERGED_POST_ADMISSION_FRESHNESS_AND_UTC_DAY_REVALIDATION; PR_CI_AND_POST_MERGE_MAIN_CI_CODEQL_DEPENDENCY_FREEZE_GUARD_SUCCESS; SYNTHETIC_ONLY; D1_NOT_PROVISIONED",
     "d1_query_read_envelope": "PR592_MAX_4000_ROWS_PER_STATEMENT; PR603_MAX_384_QUERY_RESERVATIONS_PER_DAY_WITH_TWO_STATEMENTS_EACH; MAX_3072000_ROWS_READ_AND_7680_ROWS_WRITTEN; PR605_RESERVES_16384_BYTES_PER_ADMISSION_AND_TARGET_STATEMENT; MAX_12582912_BYTES_STORAGE_GROWTH_POLICY_ENVELOPE; SQLITE_SYNTHETIC_CI_ONLY_NOT_PRODUCTION_MEASUREMENT",
     "d1_slot_concurrency_test": "PR593_MERGED; SAME_CANONICAL_SLOT_CONCURRENCY_ONE_WINNER; STALE_SNAPSHOT_FUTURE_SLOT_REJECTED; PR_AND_POST_MERGE_PYTHON_312_313_PASS",
     "d1_settlement_retry": "PR595_MERGED; EXACT_SAME_USAGE_REPLAY_ACCEPTED; CHANGED_USAGE_REJECTED; PR_AND_POST_MERGE_PYTHON_312_313_PASS",
@@ -56,7 +56,7 @@
       "audit_head_sha": "2516a80c32fa04b9789bef379b108eb50c87fd49"
     },
     "historical_cloudflare_billing_snapshot": "PR630_MERGED; ONE_READ_ONLY_GET_AUTHORITY; READINESS_RUN_36497596228_BLOCKED_MISSING_BILLING_READ_ONLY_CREDENTIAL; ZERO_CLOUDFLARE_REQUESTS; AUDIT_UNCONSUMED",
-    "dashboard_usage_evidence": "V0_2_V0_3_PROJECTION_IDENTITY_AND_UNKNOWN_GATES_IMPLEMENTED; CLOUD_CI_AND_NEW_DEPLOYMENT_PENDING"
+    "dashboard_usage_evidence": "PR653_DEPLOYED_PRIOR_MAIN; NO_NEW_DEPLOYMENT_FROM_PR654_CODE_ONLY_CHANGE; LIVE_PAPER_REPORT_READBACK_PENDING"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "R2 V0.3 run 36593296360 is partial: one returned bucket (616541780 bytes) and 6 operation groups / 125309 requests with no operation timestamp; complete bucket inventory, all writers, freshness and headroom remain UNKNOWN; V0.3 one-time authority consumed; do not rerun.",
@@ -65,13 +65,14 @@
     "controlled_main_acceptance": "NOT_RUN",
     "d1_free_tier_usage_evidence": "UNKNOWN_NOT_QUERIED_BY_R2_V0_3; D1 database inventory, usage, storage, freshness watermark and all writers remain unproven; requires separately scoped successor authority before any query.",
     "genesis_empty_ledger_proof": "ENFORCED_BY_LEDGER_RESOLVER; CONTROLLED_ACCEPTANCE_NOT_RUN",
-    "production_entrypoint_workflow": "MANUAL_NON_ACCESS_PREFLIGHT_ONLY; EXECUTION_WORKFLOW_NOT_WIRED; NO_NATURAL_SCHEDULE",
+    "production_entrypoint_workflow": "MANUAL_NONACCESS_PREFLIGHT_ONLY; EXECUTION_WORKFLOW_NOT_WIRED; NO_NATURAL_SCHEDULE; D1_NOT_PROVISIONED",
     "settlement_recovery": "PR599_DISABLED_BY_DEFAULT_RECOVERY_AUDIT_VERIFIES_IMMUTABLE_R2_RESULT_REPORT_AND_WRITES_D1_AUDIT_RECEIPT_WHILE_RETAINING_FULL_RESERVATION; PR600_VALIDATES_RESULT_POINTER_SLOT_AND_COMMITTED_STATE; DOES_NOT_SETTLE_OR_RELEASE_BUDGET; PRODUCTION_RUNTIME_NOT_AUTHORIZED_OR_WIRED",
     "d1_storage_growth_calibration": "PR605_POLICY_RESERVES_16384_BYTES_PER_ADMISSION_AND_TARGET_STATEMENT; PR628_VERIFIES_REPOSITORY_GUARD_SEQUENCE; CLOUDFLARE_SIZE_AFTER_CALIBRATION_NOT_RUN; RESERVATION_LEDGER_SELF_GROWTH_AND_PRODUCTION_CALIBRATION_UNVERIFIED",
     "production_candidate_path": "PR614_QUALIFIED_ADAPTER_CONNECTED; PR622_SAME_COMPOSITION_TEST_FIXTURE_COVERS_ENTRY_EXIT_ACCOUNT_ADVANCEMENT_PERSISTENCE_NEXT_NO_TRADE; PRODUCTION_REGISTRY_EMPTY; CORE100_MODEL_QUALITY_REJECT; MACRO_REGIME_UNAVAILABLE; NO_PRODUCTION_STRATEGY_OR_EXECUTION_AUTHORITY",
     "long_term_storage": "PR616_POLICY_MERGED: 262144_BYTES_PER_OBJECT; 2097152_BYTES_PER_RUN; 201326592_BYTES_PER_DAY; 6241124352_THEORETICAL_BYTES_PER_31_DAYS; WARNING_AT_6400000000; HARD_STOP_AT_PROJECTED_8000000000; INDEFINITE_APPEND_ONLY; NO_DELETE_AUTHORITY. PRODUCTION_ACCOUNT_USAGE_FRESHNESS_AND_ALL_WRITER_COVERAGE_UNVERIFIED.",
     "cloudflare_account_usage_audit": "R2 V0.3 run 36593296360 READY_FOR_REVIEW / R2_METRICS_CAPTURED_REVIEW_ONLY; exactly one GraphQL request; partial one-bucket result only; zero cost and headroom UNKNOWN; authority consumed, do not rerun.",
-    "account_plan_and_billing": "PR630_SUBSCRIPTION_SNAPSHOT_AUTHORITY; BILLING_READINESS_RUN_36513736040_READY; ONE_TIME_BILLING_RUN_36513941565_SUCCESS; LISTED_SUBSCRIPTION_PRICE_TOTAL_USD_0; INVOICES_AND_METERED_CHARGES_NOT_QUERIED; ZERO_COST_NOT_PROVEN"
+    "account_plan_and_billing": "PR630_SUBSCRIPTION_SNAPSHOT_AUTHORITY; BILLING_READINESS_RUN_36513736040_READY; ONE_TIME_BILLING_RUN_36513941565_SUCCESS; LISTED_SUBSCRIPTION_PRICE_TOTAL_USD_0; INVOICES_AND_METERED_CHARGES_NOT_QUERIED; ZERO_COST_NOT_PROVEN",
+    "d1_usage_evidence_guard": "PR654_POST_ADMISSION_FRESHNESS_AND_UTC_DAY_RECHECK_MERGED_AND_SYNTHETICALLY_VERIFIED; PRODUCTION_D1_USAGE_SOURCE_AND_PROVISIONING_REMAIN_UNVERIFIED"
   },
   "synthetic_full_cycle_ci": "PASS_PR622_TEST_ONLY_QUALIFIED_ENTRY_EXIT_ACCOUNT_PERSISTENCE_NEXT_NO_TRADE_THROUGH_COMPOSITION",
   "natural_schedule_acceptance": "NOT_ESTABLISHED",
@@ -80,17 +81,16 @@
   "macro_regime": "REGIME_UNAVAILABLE",
   "local_work": "EXCLUDED_BY_USER",
   "dashboard_production_evidence": {
-    "main_sha": "6deabddd7f925b6d586b9565a9f6641105a2fd29",
-    "workflow_run_id": 36479940093,
+    "main_sha": "89dd07a26ebad0d780b009eb5051b16d53fe75e6",
+    "workflow_run_id": 36676578296,
     "build": "SUCCESS",
     "deploy": "SUCCESS",
     "browser_production": "SUCCESS",
-    "browser_tests_passed": 14,
+    "browser_tests_passed": 42,
     "browser_targets": [
       "desktop-chromium",
       "mobile-chromium"
     ],
-    "inactive_state_assertion": "PASS",
     "cloud_paper_execution": "NOT_RUN"
   },
   "r2_writer_inventory": "research/status/cloud-paper-r2-writer-inventory-v0-1.json",
@@ -396,35 +396,33 @@
     "runtime_authority_changed": false
   },
   "latest_repository_checkpoint": {
-    "evidence_basis_main_sha": "cb22d3c3905a079eb754f0fab6d917923512f624",
-    "pull_request": 622,
-    "pr_head_sha": "aac48898dfa4e69589c7c369a73a919b07b63c95",
-    "base_sha": "aeb80bbc8695f10a5e8708abed07acc2892f72b9",
-    "merge_sha": "cb22d3c3905a079eb754f0fab6d917923512f624",
-    "pr_checks": {
-      "ci_run_id": 36485693958,
-      "python_312": "SUCCESS",
-      "python_313": "SUCCESS",
-      "workflow_static": "SUCCESS",
-      "codeql_run_id": 36485693395,
-      "codeql": "SUCCESS",
-      "dependency_sbom_run_id": 36485693376,
-      "dependency_sbom": "SUCCESS"
-    },
-    "post_merge": {
-      "ci_run_id": 36485948145,
-      "ci": "SUCCESS",
-      "codeql_run_id": 36485948118,
-      "codeql": "SUCCESS",
-      "dependency_run_id": 36485948349,
-      "dependency": "SUCCESS",
-      "freeze_guard_run_id": 36485948205,
-      "freeze_guard": "SUCCESS",
-      "workflow_static": "SKIPPED_NO_WORKFLOW_CHANGE"
+    "evidence_basis_main_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
+    "pull_request": null,
+    "pr_merge_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
+    "observed_at_utc": "2026-09-30T07:06:00Z",
+    "open_pull_requests": [],
+    "pr_654": {
+      "head_sha": "2117448a00edf599d08c8d6fb27596ba9cf0a0ab",
+      "merged": true,
+      "pr_ci_run_id": 36680835582,
+      "codeql_run_id": 36680835575,
+      "dependency_sbom_run_id": 36680835567,
+      "post_merge_ci_run_id": 36681001425,
+      "freeze_guard_run_id": 36681001474,
+      "post_merge_dependency_run_id": 36681001359,
+      "post_merge_codeql_run_id": 36681001327,
+      "all_checks": "SUCCESS"
     },
     "activation_enabled": false,
-    "provider_r2_d1_runtime_access_performed": false,
-    "production_cycle_status": "NOT_RUN"
+    "d1_provisioned": false,
+    "production_cycle_status": "NOT_RUN",
+    "provider_cloudflare_runtime_access_performed": false,
+    "latest_natural_health_run_id": 36676258650,
+    "latest_maintenance_run_id": 36676302904,
+    "latest_maintenance_inspect": "SUCCESS",
+    "latest_maintenance_propose": "OBSERVATION_CHANGED",
+    "usage_evidence": "PARTIAL_V0_3_ZERO_COST_AND_HEADROOM_UNKNOWN",
+    "next_work": "SYNCHRONIZE_STATUS_THEN_COST_FRESHNESS_STORAGE_FEASIBILITY_NO_REPEAT_OF_CONSUMED_AUDITS"
   },
   "post_merge_storage_policy_evidence": {
     "pr_number": 616,
@@ -545,17 +543,14 @@
     "one_time_usage_audit_v0_1": "CONSUMED_DO_NOT_RERUN"
   },
   "latest_maintenance_cleanup": {
-    "natural_health_run_id": 36620936304,
-    "health_head_sha": "50cfd7ec4a23ef159bdc02df7fd7cdd2e1da13e1",
-    "maintenance_run_id": 36648016165,
-    "maintenance_snapshot_sha": "50cfd7ec4a23ef159bdc02df7fd7cdd2e1da13e1",
+    "natural_health_run_id": 36676258650,
+    "maintenance_run_id": 36676302904,
     "inspect": "SUCCESS",
-    "propose": "SUCCESS",
-    "proposal_status": "NO_CHANGE",
+    "propose": "OBSERVATION_CHANGED",
+    "proposal_status": "BLOCKED_OBSERVATION_CHANGED",
     "commits_created": 0,
-    "stale_draft_pr": 644,
-    "stale_draft_disposition": "CLOSED_UNMERGED_STALE_BASE_ACTION_REQUIRED_CHECKS",
-    "natural_maintenance_acceptance": "NO_CHANGE_ON_50CFD_NOT_CURRENT_MAIN_ACCEPTANCE"
+    "current_main_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
+    "classification": "SAFE_STOP_NOT_NO_CHANGE_OR_PASS"
   },
   "historical_cloudflare_usage_audit_v0_1": {
     "run_id": 36558934727,
@@ -576,20 +571,33 @@
     "one_time_authority": "CONSUMED_DO_NOT_RERUN"
   },
   "current_repository_checkpoint": {
-    "evidence_basis_main_sha": "095aba2c80b9ad710523875b1f45381646e61b75",
-    "observed_at_utc": "2026-09-30T05:53:15Z",
-    "is_latest_main_claim": false,
+    "evidence_basis_main_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
+    "pull_request": null,
+    "pr_merge_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
+    "observed_at_utc": "2026-09-30T07:06:00Z",
     "open_pull_requests": [],
-    "ci_run_id": 36667740375,
-    "ci": "SUCCESS",
-    "python_3_12": "SUCCESS",
-    "python_3_13": "SUCCESS",
-    "workflow_static": "SKIPPED_MAIN_EVENT",
-    "cloud_paper_activation": false,
+    "pr_654": {
+      "head_sha": "2117448a00edf599d08c8d6fb27596ba9cf0a0ab",
+      "merged": true,
+      "pr_ci_run_id": 36680835582,
+      "codeql_run_id": 36680835575,
+      "dependency_sbom_run_id": 36680835567,
+      "post_merge_ci_run_id": 36681001425,
+      "freeze_guard_run_id": 36681001474,
+      "post_merge_dependency_run_id": 36681001359,
+      "post_merge_codeql_run_id": 36681001327,
+      "all_checks": "SUCCESS"
+    },
+    "activation_enabled": false,
+    "d1_provisioned": false,
     "production_cycle_status": "NOT_RUN",
-    "usage_receipt": "research/receipts/2026-09-29-cloud-paper-r2-usage-audit-v0-3-result.json",
+    "provider_cloudflare_runtime_access_performed": false,
+    "latest_natural_health_run_id": 36676258650,
+    "latest_maintenance_run_id": 36676302904,
+    "latest_maintenance_inspect": "SUCCESS",
+    "latest_maintenance_propose": "OBSERVATION_CHANGED",
     "usage_evidence": "PARTIAL_V0_3_ZERO_COST_AND_HEADROOM_UNKNOWN",
-    "next_work": "COST_FRESHNESS_STORAGE_AND_LEDGER_FEASIBILITY_THEN_PRODUCTION_WIRING"
+    "next_work": "SYNCHRONIZE_STATUS_THEN_COST_FRESHNESS_STORAGE_FEASIBILITY_NO_REPEAT_OF_CONSUMED_AUDITS"
   },
   "external_evidence_design": {
     "status": "DOCUMENTED_DESIGN_ONLY_NO_CLOUDFLARE_REQUEST",

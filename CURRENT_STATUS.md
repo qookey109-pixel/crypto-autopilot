@@ -1,14 +1,17 @@
-## Cloud Paper 工程與狀態接線 — 2026-09-30
+## Cloud Paper 最新查核 — 2026-09-30 15:06 Asia/Taipei
 
-查核 basis main：`095aba2c80b9ad710523875b1f45381646e61b75`，時間：`2026-09-30T05:53:15Z`。此 SHA 是修改前的證據基準；合併後仍須重新解析 main。以下舊查核段落保留為歷史，不取代本節。
+查核 basis main：`c9e220cb6f2191e6fb0dd50a5918a62971360e8e`；open PR = 0。此為文件修改前的 live GitHub snapshot，合併後 SHA 需重新讀取。
 
-- 完整目標與執行順序已由 [PR #652](https://github.com/qookey109-pixel/crypto-autopilot/pull/652) 合併至 [交付目標](docs/CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)。本次查核 open PR = 0；#644 已關閉且未合併，舊六個 dependency PR 不再是目前清單。
-- basis main [CI 36667740375](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36667740375) Python 3.12/3.13 成功；3.13 為 1,855 tests / 996 subtests，required Ruff 成功。type visibility = 42 diagnostics（protected 18 / cleanup 24），nonblocking；261 / 33 為歷史基準。
-- 本批將 Dashboard JSON、前端 renderer、static validator 及回歸測試同步至 V0.3，保留 V0.2 讀取。完整 run/attempt/head/artifact/digest 必須一致；區分投影查核時間與來源快照，不把部分 bucket bytes 當完整帳戶用量。雲端 CI、合併及新部署須各自取得本批證據，不能沿用舊 Pages 當作本批部署成功。
-- V0.3 run **36593296360**：一個 returned bucket、16,304 objects、616,541,780 bytes；operations 125,309 次且 freshness UNKNOWN。D1、全帳戶 inventory/writers、費用與 headroom UNKNOWN。Billing 36513941565、Usage V0.1/V0.2、R2 Usage V0.3 及 bootstrap 已消耗，**禁止重跑**。
-- 正式 activation=false、cycle=NOT_RUN、entrypoint=NOT_WIRED、natural schedule=NOT_CONFIGURED；registry 空、模型 REJECT、market context REGIME_UNAVAILABLE。尚未執行不能稱為正式 NO_TRADE。
-- **下一批直接處理成本/freshness/保存增長與 ledger 自身費用可行性，再完成 budget/persistence/production 接線。** 不再另起獨立文件整理；外部查詢、provision、migration、寫入與 schedule 須先有精確新版本 authority 合併 main。七天等待與 10/1 額外人工時點不恢復，runtime expiry guard 保留。
-- 全程 CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER、0 USD、PAPER/LIVE-PAPER ONLY；holdout、source switch、promotion、實盤關閉。 frozen 證據保持原樣。
+- PR #654 已合併：D1 shared admission 後重查 freshness 與 UTC 日，無效證據保留 reservation 並停止 target query。PR checks：CI #36680835582、CodeQL #36680835575、Dependency/SBOM #36680835567；main checks：CI #36681001425、Freeze Guard #36681001474、Dependency/SBOM #36681001359、CodeQL #36681001327，均成功。D1 未 provision，尚無 production usage evidence。
+- Dashboard 最近部署仍由 main `89dd07a26ebad0d780b009eb5051b16d53fe75e6` 的 Pages run #36676578296（build/deploy/browser-production 成功；42 desktop/mobile tests）提供；本次 #654 沒改前端，故不冒稱 c9e220c 另有 Pages deploy。
+- 最新自然 Health #36676258650 成功；其 Maintenance #36676302904 inspect 成功、propose 因 `OBSERVATION_CHANGED` 安全停止。不可記為 NO_CHANGE/PASS，不可用 manual run 補算。
+- R2 V0.3 #36593296360 是已消耗的一次性 evidence：1 個 bucket、16,304 objects、616,541,780 bytes；30-day aggregation 125,309 requests，無 operation timestamp。完整 D1/R2 inventory、外部 writers、metered charges、freshness/headroom 與 zero-cost 仍 UNKNOWN。已消耗的 Billing、Usage V0.1/V0.2/V0.3、bootstrap 不得 rerun。
+- Cloud Paper activation=false、cycle=NOT_RUN、entrypoint=NOT_WIRED、natural schedule=NOT_CONFIGURED；registry 空、Core100 REJECT、macro regime unavailable。這些是未啟用，不是已執行 NO_TRADE。
+- 排程目標與優先序見 [完整交付目標](docs/CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)。本輪順序：先文件/索引同步；再用既有 evidence 和官方契約完成 cost/freshness/storage feasibility；其後才可制定 successor authority、受控 PAPER acceptance、自然 schedule 與 Dashboard read-back；型別整理最後且不阻塞。
+- GitHub open issues：#224 排程觀測（2026-09-05 更新，需檢查是否過時）；#111 FREE-ONLY 架構（需對照現行方案，issue 本身不是 authority）。
+- 全程 cloud-only、0 USD、PAPER/LIVE-PAPER；holdout/source switch/promotion/real trading 保持關閉。
+
+### Historical checkpoints (preserved below)
 
 ### 歷史查核紀錄（依原日期與 SHA 解讀）
 
