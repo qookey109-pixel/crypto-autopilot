@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import unittest
+import copy
+from unittest.mock import patch
 from dataclasses import asdict, dataclass
 
 from crypto_autopilot.features.market import OrderBookSnapshot, PublicTrade
@@ -16,6 +18,7 @@ from crypto_autopilot.paper.cloud_loop_v0_1 import (
 from crypto_autopilot.paper.live_v0_1 import LivePaperMarketFrame, LivePaperPolicy
 from crypto_autopilot.risk import plan_position_size
 from crypto_autopilot.paper.run_store_v0_1 import PaperRunObjectAlreadyExistsError
+from crypto_autopilot.paper.run_coordinator_v0_3 import LivePaperRunCoordinatorPolicy
 
 
 @dataclass
@@ -232,7 +235,11 @@ class CloudPaperLoopTests(unittest.TestCase):
 
     def test_committed_report_reads_legacy_v0_1_embedded_step(self):
         store = MemoryStore()
-        result = step(store, 420000, None)
+        with patch(
+            "crypto_autopilot.paper.cloud_loop_v0_1.LivePaperRunCoordinatorPolicy",
+            return_value=LivePaperRunCoordinatorPolicy(run_slot_claim_required=True),
+        ):
+            result = step(store, 420000, None)
         pointer = store.objects[("cloud-result", "0")]
         old_report_id = pointer["report_id"]
         compact = store.objects[("cloud-report", old_report_id)]
@@ -265,6 +272,63 @@ class CloudPaperLoopTests(unittest.TestCase):
         pointer["report_id"] = new_report_id
         with self.assertRaisesRegex(CloudLoopReviewRequired, "RESULT_STEP_PERSISTENCE_MISSING"):
             committed_report(store, "0")
+
+
+
+    def test_partial_tick_write_does_not_seal_or_retry_provider(self):
+        class DropsTickStore(MemoryStore):
+            def put_json(self, kind, object_id, payload):
+                if kind == "live-tick":
+                    return Receipt(False)
+                return super().put_json(kind, object_id, payload)
+        store = DropsTickStore()
+        with self.assertRaisesRegex(ValueError, "persisted live tick is missing"):
+            step(store, 420000, None)
+        self.assertEqual(store.list_json_ids("cloud-result"), ())
+        self.assertEqual(store.list_json_ids("live-run-result"), ())
+        self.assertEqual(store.list_json_ids("cloud-slot"), ("0",))
+        called = []
+        with self.assertRaisesRegex(CloudLoopReviewRequired, "GENESIS_LEDGER_NOT_EMPTY"):
+            run_cloud_step(
+                tick_ms=420000, previous_slot=None, store=store,
+                feed=NeverCalledFeed(),
+                market_supplier=lambda: called.append(True) or {},
+                candidate_supplier=lambda market, state: (),
+                strategy_registry=REGISTRY, before_external=lambda: None,
+            )
+        self.assertEqual(called, [])
+
+    def test_missing_or_tampered_compact_tick_blocks_replay_and_next_slot_before_market(self):
+        source = MemoryStore()
+        first = step(source, 420000, None)
+        step_id = first["coordinator"]["step_id"]
+        run_step = source.objects[("live-run-step", step_id)]
+        self.assertEqual(run_step["schema"], "qookey-live-paper-run-step-report-v0.2")
+        self.assertNotIn("tick_report", run_step)
+        tick_key = ("live-tick", run_step["tick_id"])
+        for failure in ("missing", "tampered"):
+            for tick, previous in ((420000, None), (1320000, "0")):
+                with self.subTest(failure=failure, tick=tick):
+                    store = MemoryStore()
+                    store.objects = copy.deepcopy(source.objects)
+                    if failure == "missing":
+                        del store.objects[tick_key]
+                    else:
+                        store.objects[tick_key]["limitations"].append("tampered")
+                    before = copy.deepcopy(store.objects)
+                    called = []
+                    with self.assertRaisesRegex(
+                        CloudLoopReviewRequired, "RESULT_STEP_PERSISTENCE_INVALID",
+                    ):
+                        run_cloud_step(
+                            tick_ms=tick, previous_slot=previous, store=store,
+                            feed=NeverCalledFeed(),
+                            market_supplier=lambda: called.append(True) or {},
+                            candidate_supplier=lambda market, state: (),
+                            strategy_registry=REGISTRY, before_external=lambda: None,
+                        )
+                    self.assertEqual(called, [])
+                    self.assertEqual(store.objects, before)
 
     def test_slot_start_bounds_preserve_canonical_timestamp_validation(self):
         for delay in (0, 1, 120000, 600000):

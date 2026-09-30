@@ -1,5 +1,18 @@
 # Cloud Paper 保存 lineage 查核 — 2026-09-30
 
+## V0.2 compact step follow-up — prepared 2026-09-30
+
+Basis parent main `bb2290ac1aa0cad1237ec2269be679211bf2bb5f`. New contract: [Coordinator V0.3](../config/live_paper_run_coordinator_v0_3.json); [prepared receipt](../research/receipts/2026-09-30-live-paper-step-reference-v0-2-prepared.json). PR checks and merge evidence must be verified separately.
+
+Frozen Coordinator/Recovery V0.1 files and the original eight-file slot-claim binding remain byte-exact. Prepared successors `run_coordinator_v0_3.py` and `run_recovery_v0_2.py` reuse unchanged legacy helpers while independently verifying the new storage format. The new prepared receipt binds the successor implementation and integration; the first failed PR CI remains historical evidence.
+
+New step records use schema `qookey-live-paper-run-step-report-v0.2`, a versioned step identity, `tick_id` and the complete canonical `tick_report_sha256`; they omit inline `tick_report`. The independent live-tick and live-state objects are retained. The shared resolver validates the tick identity, digest, timestamp, state links and authority before replay, continuation, recovery or result sealing. Legacy embedded steps and loop reports remain readable; same committed requests replay their original stored schema. No migration, deletion or historical rewrite occurs.
+
+The profiler compares the same asserted fixtures with the legacy embedded-step writer and compact-reference writer in one CI execution. It records objects, bytes and interface reads, including additional evidence reads; no R2 savings or account headroom claim follows from that synthetic measurement. Regression covers mixed-schema continuation, stale schema identity, changed tick content, missing tick, partial tick write, seal-only recovery and stopping before market access.
+
+Storage lineage items 1 (report → step) and 2 (step → tick) have implementation slices; item 2 remains subject to this PR's cloud CI. Next: assess state duplication only after stronger lineage proof, and reconcile required market fields plus account-wide budget evidence. Production entrypoint, activation, D1 provisioning and natural Paper schedule remain unavailable; all external gates remain effective.
+
+
 ## V0.2 compact report follow-up — PR #661 merged 2026-09-30
 
 Evidence basis: parent main `4ce6bbfbb3e8507c9273fb538568d316d156157b`; merge commit/main `4b12f0c9ad508e09d712320111f2e12423b69aca`; PR head `ebf812426dffb0e600fdcb2dcabf05e3f3642be6`. PR #661 passed Python 3.12/3.13, Ruff, workflow-static, CodeQL and Dependency/SBOM. Post-merge main CI #36716389946, CodeQL #36716389968, Dependency/SBOM #36716389930 and Freeze Guard #36716390111 passed; Pages was not triggered.

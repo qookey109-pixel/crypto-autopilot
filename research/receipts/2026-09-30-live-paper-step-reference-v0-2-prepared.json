@@ -1,0 +1,92 @@
+{
+  "schema": "qookey-live-paper-step-reference-prepared-v0.2",
+  "status_date": "2026-09-30",
+  "status": "PREPARED_STORAGE_SCHEMA_ONLY",
+  "evidence_basis": {
+    "parent_main_sha": "bb2290ac1aa0cad1237ec2269be679211bf2bb5f",
+    "is_latest_main_claim": false
+  },
+  "contract": "config/live_paper_run_coordinator_v0_3.json",
+  "change": {
+    "new_step_schema": "qookey-live-paper-run-step-report-v0.2",
+    "independent_tick_reference": "tick_id+tick_report_sha256",
+    "legacy_step_reader_retained": true,
+    "versioned_step_identity": true,
+    "write_readback_before_result_seal": true,
+    "prior_objects_migrated": false
+  },
+  "validation": {
+    "required": "PR_EXACT_HEAD_GITHUB_CLOUD_CI",
+    "production_verified": false,
+    "profile": "MATCHED_SYNTHETIC_FIXTURES_ONLY",
+    "initial_failed_run_id": 36723021920,
+    "failure_evidence_preserved": true
+  },
+  "runtime": {
+    "activation_enabled": false,
+    "schedule_enabled": false,
+    "provider_requests_performed": 0,
+    "d1_access_performed": false,
+    "r2_access_performed": false,
+    "budget_authority_changed": false
+  },
+  "boundaries": {
+    "cloud_only": true,
+    "local_files_excluded_by_user": true,
+    "monthly_budget_usd": 0,
+    "paper_only": true,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "training": false,
+    "real_money_orders": false,
+    "live_trading": false
+  },
+  "bound_files": [
+    {
+      "path": "config/live_paper_run_coordinator_v0_3.json",
+      "git_blob_sha": "3a90f91296ff6b1abe95bcd189a9530a8fe84731"
+    },
+    {
+      "path": "src/crypto_autopilot/paper/run_coordinator_v0_3.py",
+      "git_blob_sha": "87d13d580436f346ab33e996e85c33485ea6b704"
+    },
+    {
+      "path": "src/crypto_autopilot/paper/run_recovery_v0_2.py",
+      "git_blob_sha": "df9d0e809359b66e7eb5ff3d5daae47e9afba372"
+    },
+    {
+      "path": "src/crypto_autopilot/paper/cloud_loop_v0_1.py",
+      "git_blob_sha": "2dbfcefcd6efb3c79b25f10950a26a1f039ce3f0"
+    },
+    {
+      "path": "scripts/measure_cloud_paper_storage_v0_1.py",
+      "git_blob_sha": "959bcb2027c3107665ce86cd10bd125192e6b7a4"
+    },
+    {
+      "path": "tests/test_live_paper_run_coordinator_v0_3.py",
+      "git_blob_sha": "60d3a7bad1cdd388faf0da35bf925ed664965612"
+    },
+    {
+      "path": "tests/test_live_paper_run_recovery_v0_2.py",
+      "git_blob_sha": "eec9e604c7c12d9c4c0dcd330a9303e90d492cc8"
+    },
+    {
+      "path": "tests/test_cloud_paper_loop_v0_1.py",
+      "git_blob_sha": "c54856b0ed92c668128b3c40187444f935e6d133"
+    },
+    {
+      "path": "tests/test_cloud_paper_storage_profile.py",
+      "git_blob_sha": "1e8253ee72f857e60d8c12f95e495525f49e3dd5"
+    }
+  ],
+  "predecessor_binding": {
+    "receipt": "research/receipts/2026-09-22-live-paper-run-slot-claim-v0-1-prepared.json",
+    "all_eight_bound_files_preserved": true,
+    "manual_workflow_and_scripts_unchanged": true
+  },
+  "implementation": {
+    "coordinator": "src/crypto_autopilot/paper/run_coordinator_v0_3.py",
+    "recovery": "src/crypto_autopilot/paper/run_recovery_v0_2.py"
+  }
+}

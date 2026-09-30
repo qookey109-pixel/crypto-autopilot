@@ -1,6 +1,17 @@
-## Cloud Paper Current Checkpoint — 2026-09-30 (#662 merged)
+## Cloud Paper 保存精簡 V0.2 step reference — 2026-09-30
 
-Live authority: GitHub `main=919941f2f8d8db77b0bc8372727de46d8406867f`; open PRs = 0. This is the current head after the #662 documentation sync. Older checkpoint SHAs below remain historical snapshots.
+本批準備基準為 GitHub parent main `bb2290ac1aa0cad1237ec2269be679211bf2bb5f`；此 SHA 是查核基準，合併後須重新解析 main，不宣稱永久最新 head。
+新 step schema 以 `tick_id` 和完整 canonical `tick_report_sha256` 引用獨立 tick。Successor Coordinator V0.3、Cloud Paper reader、replay、continuation 與 Recovery V0.2 共用證據驗證；結果 seal 寫入前先回讀 step/tick。舊 V0.1 embedded step 與舊 loop reports 保留讀取，不遷移或刪改歷史物件。
+舊 slot-claim 收據綁定的 coordinator／recovery V0.1 來源與手動流程保持 byte-exact；新來源另由本次 prepared receipt 綁定。第一個 PR head 的 CI 失敗紀錄保留，修復後須重新核對 exact-head 檢查。
+合成 CI 比較相同入場／出場／不交易、重播／重啟、恢復與結算失敗 fixture 的物件數、bytes 和 store-interface 讀取數。檢查狀態以本批 PR exact head 為準；這不是 production R2 用量或零費用證據。
+[新 storage contract](config/live_paper_run_coordinator_v0_3.json) 與 [prepared receipt](research/receipts/2026-09-30-live-paper-step-reference-v0-2-prepared.json) 不授予外部執行權限。
+Cloud Paper 仍 disabled／NOT_RUN／NOT_WIRED／NOT_CONFIGURED；D1 未 provision、registry 空、Core100 REJECT。帳戶級零費用、freshness、writer coverage 與 headroom 尚未證明。
+下一步為核對策略所需資料與市場 adapter 的實際缺口，再收斂帳戶預算與正式入口。PR #664 是 maintenance snapshot 更新，查核時仍 Draft／WAITING_CI_APPROVAL，不能當成已通過或直接 merge。
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER、0 USD、PAPER/LIVE-PAPER ONLY；已消耗一次性 audits/bootstrap 不重跑，holdout/source switch/promotion/實盤維持關閉。
+
+## Cloud Paper Historical Checkpoint — 2026-09-30 (#662 merged)
+
+Historical evidence basis: GitHub `main=919941f2f8d8db77b0bc8372727de46d8406867f`; open PRs at that checkpoint = 0. This is the snapshot after #662, not a permanent latest-main claim. Resolve GitHub main at read time.
 
 - #661 delivered the prepared V0.2 compact loop-report reference. The matched synthetic three-slot profile is 26 objects and 157,367 canonical JSON bytes, 48,814 bytes (~23.7%) below the #658 baseline. This does not establish production R2 usage, charges, or account headroom.
 - #662 synchronized status and storage-lineage documentation. Cloud Paper remains disabled; production cycle NOT_RUN; entrypoint NOT_WIRED; natural schedule NOT_CONFIGURED; D1 unprovisioned; production strategy registry empty; Core100 quality REJECT.

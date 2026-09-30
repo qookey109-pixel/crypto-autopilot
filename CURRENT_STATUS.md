@@ -1,6 +1,17 @@
-## Cloud Paper 最新查核 — 2026-09-30（#662 合併後）
+## Cloud Paper 保存精簡 V0.2 step reference — 2026-09-30
 
-正式 authority：GitHub `main=919941f2f8d8db77b0bc8372727de46d8406867f`；目前 open PR = 0。這是 #662 文件同步合併後的即時 main；下方較早 SHA 的查核紀錄保留為歷史快照，不是目前 head。
+本批準備基準為 GitHub parent main `bb2290ac1aa0cad1237ec2269be679211bf2bb5f`；此 SHA 是查核基準，合併後須重新解析 main，不宣稱永久最新 head。
+新 step schema 以 `tick_id` 和完整 canonical `tick_report_sha256` 引用獨立 tick。Successor Coordinator V0.3、Cloud Paper reader、replay、continuation 與 Recovery V0.2 共用證據驗證；結果 seal 寫入前先回讀 step/tick。舊 V0.1 embedded step 與舊 loop reports 保留讀取，不遷移或刪改歷史物件。
+舊 slot-claim 收據綁定的 coordinator／recovery V0.1 來源與手動流程保持 byte-exact；新來源另由本次 prepared receipt 綁定。第一個 PR head 的 CI 失敗紀錄保留，修復後須重新核對 exact-head 檢查。
+合成 CI 比較相同入場／出場／不交易、重播／重啟、恢復與結算失敗 fixture 的物件數、bytes 和 store-interface 讀取數。檢查狀態以本批 PR exact head 為準；這不是 production R2 用量或零費用證據。
+[新 storage contract](config/live_paper_run_coordinator_v0_3.json) 與 [prepared receipt](research/receipts/2026-09-30-live-paper-step-reference-v0-2-prepared.json) 不授予外部執行權限。
+Cloud Paper 仍 disabled／NOT_RUN／NOT_WIRED／NOT_CONFIGURED；D1 未 provision、registry 空、Core100 REJECT。帳戶級零費用、freshness、writer coverage 與 headroom 尚未證明。
+下一步為核對策略所需資料與市場 adapter 的實際缺口，再收斂帳戶預算與正式入口。PR #664 是 maintenance snapshot 更新，查核時仍 Draft／WAITING_CI_APPROVAL，不能當成已通過或直接 merge。
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER、0 USD、PAPER/LIVE-PAPER ONLY；已消耗一次性 audits/bootstrap 不重跑，holdout/source switch/promotion/實盤維持關閉。
+
+## Cloud Paper 歷史查核 — 2026-09-30（#662 合併後）
+
+歷史查核基準：GitHub `main=919941f2f8d8db77b0bc8372727de46d8406867f`；當時 open PR = 0。這是 #662 文件同步合併後的快照；各查核 SHA 均是歷史證據，不是永久最新 head。
 
 - #661 的 Cloud Paper V0.2 compact report 已合併；三-slot 合成 fixture 為 26 objects、157,367 canonical JSON bytes，相較 #658 基準減少 48,814 bytes（約 23.7%）。這是序列化 profile，不是實際 R2 用量、費用或帳戶 headroom。
 - #662 已同步狀態與保存 lineage 文件。Cloud Paper 仍停用、正式循環 NOT_RUN、入口 NOT_WIRED、自然 schedule NOT_CONFIGURED；D1 未 provision、正式策略 registry 為空、Core100 品質 REJECT。
