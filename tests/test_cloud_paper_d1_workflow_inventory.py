@@ -21,7 +21,6 @@ class D1WorkflowInventoryTests(unittest.TestCase):
         self._usage_guard.validate_evidence()
         self._shared_rows_guard.reserve_query(
         self._shared_rows_guard.validate_evidence(
-        self._usage_guard.validate_evidence()
             result = self._request(sql, params)
     def _request(self, sql: str, params: tuple[object, ...]) -> D1QueryResult:
         return D1QueryResult()
