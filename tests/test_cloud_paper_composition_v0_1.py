@@ -286,7 +286,9 @@ class CloudPaperCompositionTests(unittest.TestCase):
         self.assertEqual(result["state"], "NO_TRADE")
         self.assertEqual(result["tick_ms"], started_at)
         self.assertEqual(result["scheduled_at_ms"], NOW)
-        self.assertEqual(result["coordinator"]["run_step"]["tick_time_ms"], started_at)
+        self.assertEqual(result["coordinator"]["step_id"],
+                         store.objects[("live-run-step", result["coordinator"]["step_id"])]["step_id"])
+        self.assertNotIn("run_step", result["coordinator"])
         self.assertEqual(result["slot_id"], str((NOW - 420000) // 900000))
         self.assertEqual(ledger.reservations[0][2], started_at)
         self.assertEqual(ledger.reservations[0][3].observed_at_ms, started_at)

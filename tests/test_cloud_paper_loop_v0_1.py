@@ -7,6 +7,8 @@ from crypto_autopilot.features.market import OrderBookSnapshot, PublicTrade
 from crypto_autopilot.paper.cloud_loop_v0_1 import (
     CloudLoopReviewRequired,
     CompleteTapePionexFeed,
+    committed_report,
+    digest,
     run_cloud_step,
     slot_id,
     validate_slot_start,
@@ -218,12 +220,51 @@ class CloudPaperLoopTests(unittest.TestCase):
         self.assertEqual(first["slot_id"], "0")
         self.assertEqual(first["scheduled_at_ms"], 420000)
         self.assertEqual(first["tick_ms"], 540000)
-        self.assertEqual(first["coordinator"]["run_step"]["tick_time_ms"], 540000)
+        self.assertNotIn("run_step", first["coordinator"])
+        self.assertEqual(first["schema"], "qookey-cloud-paper-loop-report-v0.2")
+        step_id = first["coordinator"]["step_id"]
+        self.assertEqual(store.objects[("live-run-step", step_id)]["tick_time_ms"], 540000)
         objects = dict(store.objects)
         replay = delayed_step(550000)
         self.assertEqual(replay["state"], "REPLAYED")
         self.assertEqual(replay["report"], first)
         self.assertEqual(store.objects, objects)
+
+    def test_committed_report_reads_legacy_v0_1_embedded_step(self):
+        store = MemoryStore()
+        result = step(store, 420000, None)
+        pointer = store.objects[("cloud-result", "0")]
+        old_report_id = pointer["report_id"]
+        compact = store.objects[("cloud-report", old_report_id)]
+        step_id = compact["coordinator"]["step_id"]
+        legacy = dict(compact)
+        legacy["schema"] = "qookey-cloud-paper-loop-report-v0.1"
+        legacy_coordinator = dict(compact["coordinator"])
+        legacy_coordinator["run_step"] = store.objects[("live-run-step", step_id)]
+        legacy["coordinator"] = legacy_coordinator
+        legacy_report_id = digest(legacy)
+
+        del store.objects[("cloud-report", old_report_id)]
+        store.objects[("cloud-report", legacy_report_id)] = legacy
+        pointer["report_id"] = legacy_report_id
+
+        self.assertEqual(committed_report(store, "0"), legacy)
+        self.assertEqual(result["state"], "NO_TRADE")
+
+    def test_compact_report_rejects_missing_or_mismatched_step_reference(self):
+        store = MemoryStore()
+        step(store, 420000, None)
+        pointer = store.objects[("cloud-result", "0")]
+        old_report_id = pointer["report_id"]
+        report = dict(store.objects[("cloud-report", old_report_id)])
+        report["coordinator"] = dict(report["coordinator"])
+        report["coordinator"]["step_id"] = "wrong-step-id"
+        new_report_id = digest(report)
+        del store.objects[("cloud-report", old_report_id)]
+        store.objects[("cloud-report", new_report_id)] = report
+        pointer["report_id"] = new_report_id
+        with self.assertRaisesRegex(CloudLoopReviewRequired, "RESULT_STEP_PERSISTENCE_MISSING"):
+            committed_report(store, "0")
 
     def test_slot_start_bounds_preserve_canonical_timestamp_validation(self):
         for delay in (0, 1, 120000, 600000):

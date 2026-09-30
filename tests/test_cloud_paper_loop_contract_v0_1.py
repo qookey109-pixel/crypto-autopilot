@@ -60,6 +60,35 @@ class CloudPaperLoopContractTests(unittest.TestCase):
                     "training", "strategy_parameter_changes"):
             self.assertIs(policy["authority"][key], False)
 
+    def test_compact_report_successor_is_storage_only_and_keeps_v0_1_reader(self):
+        successor = json.loads(
+            (ROOT / "config/cloud_paper_report_v0_2.json").read_text()
+        )
+        self.assertEqual(
+            successor["status"],
+            "PREPARED_STORAGE_SCHEMA_ONLY_NO_RUNTIME_AUTHORITY",
+        )
+        self.assertEqual(
+            successor["stored_report"]["schema"],
+            "qookey-cloud-paper-loop-report-v0.2",
+        )
+        self.assertTrue(successor["reader_compatibility"]["read_v0_1_embedded_step"])
+        self.assertFalse(successor["runtime"]["activation_enabled"])
+        for key in (
+            "provider_access_authorized",
+            "d1_access_authorized",
+            "r2_access_authorized",
+        ):
+            self.assertFalse(successor["runtime"][key])
+        for key in (
+            "real_money_orders",
+            "live_trading",
+            "holdout_access",
+            "source_switch",
+            "model_promotion",
+        ):
+            self.assertFalse(successor["trading"][key])
+
     def test_production_registry_has_no_fixture_or_rejected_strategy(self):
         registry = json.loads(
             (ROOT / "config/cloud_paper_strategy_registry_v0_1.json").read_text()
