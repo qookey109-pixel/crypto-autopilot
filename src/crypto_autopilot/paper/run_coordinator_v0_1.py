@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Protocol
 
@@ -20,7 +20,11 @@ from crypto_autopilot.paper.run_claim_v0_1 import (
 from crypto_autopilot.paper.run_store_v0_1 import run_store_receipt_evidence
 
 
-class PaperRunStoreLike(Protocol):
+class PaperRunReadStoreLike(Protocol):
+    def get_json(self, kind: str, object_id: str) -> dict[str, object] | None: ...
+
+
+class PaperRunStoreLike(PaperRunReadStoreLike, Protocol):
     def put_json(
         self,
         kind: str,
@@ -61,6 +65,7 @@ class LivePaperRunCoordinatorPolicy:
     holdout_access_authorized: bool = False
     real_money_order_authorized: bool = False
     live_real_trading_authorized: bool = False
+    compact_tick_reference: bool = False
 
     def __post_init__(self) -> None:
         flags = (
@@ -80,6 +85,8 @@ class LivePaperRunCoordinatorPolicy:
             self.real_money_order_authorized,
             self.live_real_trading_authorized,
         )
+        if not isinstance(self.compact_tick_reference, bool):
+            raise ValueError("compact_tick_reference must be boolean")
         if any(not isinstance(value, bool) for value in flags):
             raise ValueError("Live Paper Run Coordinator policy flags must be booleans")
         if not all(flags[:6]):
@@ -251,9 +258,11 @@ def _step_id(
     tick_id: str,
     next_state_id: str,
     tick_report_sha256: str,
+    compact_tick_reference: bool = False,
 ) -> str:
+    version = "0.2" if compact_tick_reference else "0.1"
     payload = {
-        "schema": "qookey-live-paper-run-step-id-v0.1",
+        "schema": f"qookey-live-paper-run-step-id-v{version}",
         "run_id": run_id,
         "sequence": sequence,
         "previous_step_id": previous_step_id,
@@ -263,11 +272,20 @@ def _step_id(
         "next_state_id": next_state_id,
         "tick_report_sha256": tick_report_sha256,
     }
-    return f"live-paper-run-step-v0-1-{_sha256(payload)}"
+    version_tag = version.replace(".", "-")
+    return f"live-paper-run-step-v{version_tag}-{_sha256(payload)}"
 
 
-def verify_live_paper_run_step(payload: Mapping[str, object]) -> str:
-    if payload.get("schema") != "qookey-live-paper-run-step-report-v0.1":
+def verify_live_paper_run_step(
+    payload: Mapping[str, object],
+    *,
+    tick_report: Mapping[str, object] | None = None,
+) -> str:
+    schema = payload.get("schema")
+    if schema not in {
+        "qookey-live-paper-run-step-report-v0.1",
+        "qookey-live-paper-run-step-report-v0.2",
+    }:
         raise ValueError("unsupported live paper run step schema")
     if payload.get("state") != "LIVE_PAPER_RUN_STEP_COMMITTED":
         raise ValueError("live paper run step is not committed")
@@ -309,9 +327,20 @@ def verify_live_paper_run_step(payload: Mapping[str, object]) -> str:
     elif not isinstance(previous_step_id, str) or not previous_step_id:
         raise ValueError("continued live paper run step requires previous_step_id")
 
-    tick_report = payload.get("tick_report")
+    if schema == "qookey-live-paper-run-step-report-v0.1":
+        embedded_tick = payload.get("tick_report")
+        if not isinstance(embedded_tick, Mapping):
+            raise ValueError("live paper run step tick_report is required")
+        if tick_report is not None and _canonicalize(tick_report) != _canonicalize(embedded_tick):
+            raise ValueError("persisted live tick differs from run-step tick evidence")
+        tick_report = embedded_tick
+    else:
+        if "tick_report" in payload:
+            raise ValueError("compact live paper run step cannot embed tick_report")
+        if tick_report is None:
+            raise ValueError("compact live paper run step requires persisted tick evidence")
     if not isinstance(tick_report, Mapping):
-        raise ValueError("live paper run step tick_report is required")
+        raise ValueError("live paper run step tick evidence must be an object")
     recomputed_tick_id = live_paper_tick_report_id_from_mapping(tick_report)
     if recomputed_tick_id != tick_id or tick_report.get("tick_id") != tick_id:
         raise ValueError("live paper run step tick id mismatch")
@@ -374,10 +403,30 @@ def verify_live_paper_run_step(payload: Mapping[str, object]) -> str:
         tick_id=tick_id,
         next_state_id=next_state_id,
         tick_report_sha256=tick_report_sha256,
+        compact_tick_reference=schema == "qookey-live-paper-run-step-report-v0.2",
     )
     if step_id != expected_step:
         raise ValueError("live paper run step id mismatch")
     return expected_step
+
+
+def read_live_paper_run_step_tick(
+    store: PaperRunReadStoreLike,
+    step: Mapping[str, object],
+    *,
+    before_external: Callable[[], None] | None = None,
+) -> dict[str, object]:
+    """Resolve and verify independent tick evidence for either step schema."""
+    tick_id = step.get("tick_id")
+    if not isinstance(tick_id, str) or not tick_id:
+        raise ValueError("live paper run step tick_id is required")
+    if before_external is not None:
+        before_external()
+    tick = _store_get(store, "live-tick", tick_id)
+    if tick is None:
+        raise ValueError("persisted live tick is missing")
+    verify_live_paper_run_step(step, tick_report=tick)
+    return tick
 
 
 def _committed_result(
@@ -466,7 +515,7 @@ def verify_live_paper_run_result(
 
 
 def _store_get(
-    store: PaperRunStoreLike,
+    store: PaperRunReadStoreLike,
     kind: str,
     object_id: str,
 ) -> dict[str, object] | None:
@@ -528,7 +577,8 @@ def coordinate_live_paper_run_step(
         sequence = 1
         previous_step_id: str | None = None
     else:
-        verified_previous_step_id = verify_live_paper_run_step(previous_step)
+        previous_tick = read_live_paper_run_step_tick(store, previous_step)
+        verified_previous_step_id = str(previous_step["step_id"])
         if previous_step.get("step_id") != verified_previous_step_id:
             raise ValueError("previous live paper run step id mismatch")
         if previous_step.get("run_name") != clean_name:
@@ -537,9 +587,6 @@ def coordinate_live_paper_run_step(
         initial_state_id = str(previous_step["initial_state_id"])
         sequence = int(previous_step["sequence"]) + 1
         previous_step_id = verified_previous_step_id
-        previous_tick = previous_step.get("tick_report")
-        if not isinstance(previous_tick, Mapping):
-            raise ValueError("previous live paper run step tick report is required")
         embedded_state = previous_tick.get("next_state")
         if not isinstance(embedded_state, Mapping):
             raise ValueError("previous live paper run step next state is required")
@@ -581,8 +628,16 @@ def coordinate_live_paper_run_step(
         stored_step = _store_get(store, "live-run-step", step_id)
         if stored_step is None:
             raise ValueError("committed live paper request references missing run step")
-        if verify_live_paper_run_step(stored_step) != step_id:
+        stored_tick = read_live_paper_run_step_tick(store, stored_step)
+        if stored_step.get("step_id") != step_id:
             raise ValueError("committed live paper run step failed verification")
+        stored_state = _store_get(store, "live-state", str(stored_step["next_state_id"]))
+        if (
+            stored_state is None
+            or verify_live_paper_state(stored_state) != stored_step["next_state_id"]
+            or _canonicalize(stored_state) != _canonicalize(stored_tick.get("next_state"))
+        ):
+            raise ValueError("committed live paper next state evidence mismatch")
         if stored_step.get("request_id") != request_id:
             raise ValueError("committed live paper run step request lineage mismatch")
         if stored_step.get("run_id") != run_id:
@@ -660,9 +715,14 @@ def coordinate_live_paper_run_step(
         tick_id=tick_id,
         next_state_id=next_state_id,
         tick_report_sha256=tick_report_sha256,
+        compact_tick_reference=policy.compact_tick_reference,
     )
     step: dict[str, object] = {
-        "schema": "qookey-live-paper-run-step-report-v0.1",
+        "schema": (
+            "qookey-live-paper-run-step-report-v0.2"
+            if policy.compact_tick_reference
+            else "qookey-live-paper-run-step-report-v0.1"
+        ),
         "step_id": step_id,
         "state": "LIVE_PAPER_RUN_STEP_COMMITTED",
         "run_id": run_id,
@@ -678,7 +738,6 @@ def coordinate_live_paper_run_step(
         "candidate_specs_sha256": _sha256(canonical_candidates),
         "candidate_specs": canonical_candidates,
         "tick_report_sha256": tick_report_sha256,
-        "tick_report": _canonicalize(tick_report),
         "authority": _coordinator_authority(
             claim_required=policy.run_slot_claim_required
         ),
@@ -689,12 +748,18 @@ def coordinate_live_paper_run_step(
             "A crash before request-result sealing may require operator review before retry if provider evidence changed.",
         ],
     }
-    if verify_live_paper_run_step(step) != step_id:
+    if not policy.compact_tick_reference:
+        step["tick_report"] = _canonicalize(tick_report)
+    if verify_live_paper_run_step(step, tick_report=tick_report) != step_id:
         raise ValueError("generated live paper run step failed verification")
 
     receipts.append(_receipt(store, "live-state", next_state_id, next_state))
     receipts.append(_receipt(store, "live-tick", tick_id, tick_report))
     receipts.append(_receipt(store, "live-run-step", step_id, step))
+    persisted_step = _store_get(store, "live-run-step", step_id)
+    if persisted_step is None or _canonicalize(persisted_step) != _canonicalize(step):
+        raise ValueError("generated live paper run step readback mismatch")
+    read_live_paper_run_step_tick(store, persisted_step)
 
     result = _committed_result(
         request_id=request_id,
@@ -755,6 +820,7 @@ def live_paper_run_coordinator_policy_from_config(
     if schema not in {
         "qookey-live-paper-run-coordinator-v0.1",
         "qookey-live-paper-run-coordinator-v0.2",
+        "qookey-live-paper-run-coordinator-v0.3",
     }:
         raise ValueError("unsupported live paper run coordinator config")
     policy = payload.get("policy")
@@ -789,6 +855,11 @@ def live_paper_run_coordinator_policy_from_config(
         if not isinstance(value, bool):
             raise ValueError(f"policy.{key} must be a JSON boolean")
         values[key] = value
+    if schema == "qookey-live-paper-run-coordinator-v0.3":
+        compact = policy.get("compact_tick_reference")
+        if compact is not True:
+            raise ValueError("Coordinator V0.3 requires compact_tick_reference=true")
+        values["compact_tick_reference"] = compact
     return LivePaperRunCoordinatorPolicy(**values)
 
 
