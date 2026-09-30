@@ -103,6 +103,53 @@ def validate_slot_start(*, scheduled_at_ms: int, started_at_ms: int) -> str:
     return slot
 
 
+def _report_step(
+    store: PaperRunStoreLike,
+    report: Mapping[str, object],
+    *,
+    before_external: Callable[[], None] | None = None,
+) -> dict[str, object]:
+    """Load the verified step referenced by either supported loop-report schema."""
+    coordinator = report.get("coordinator")
+    if not isinstance(coordinator, Mapping):
+        raise CloudLoopReviewRequired("RESULT_COORDINATOR_MISSING")
+    schema = report.get("schema")
+    if schema == "qookey-cloud-paper-loop-report-v0.1":
+        embedded = coordinator.get("run_step")
+        if not isinstance(embedded, Mapping):
+            raise CloudLoopReviewRequired("RESULT_STEP_MISSING")
+        try:
+            step_id = verify_live_paper_run_step(embedded)
+        except ValueError:
+            raise CloudLoopReviewRequired("RESULT_STEP_INVALID") from None
+    elif schema == "qookey-cloud-paper-loop-report-v0.2":
+        if "run_step" in coordinator:
+            raise CloudLoopReviewRequired("COMPACT_REPORT_EMBEDS_STEP")
+        step_id = coordinator.get("step_id")
+        if not isinstance(step_id, str) or not step_id:
+            raise CloudLoopReviewRequired("RESULT_STEP_REFERENCE_MISSING")
+        embedded = None
+    else:
+        raise CloudLoopReviewRequired("RESULT_REPORT_SCHEMA_UNSUPPORTED")
+
+    if before_external is not None:
+        before_external()
+    persisted = store.get_json("live-run-step", step_id)
+    if persisted is None:
+        raise CloudLoopReviewRequired("RESULT_STEP_PERSISTENCE_MISSING")
+    try:
+        verified = verify_live_paper_run_step(persisted)
+    except ValueError:
+        raise CloudLoopReviewRequired("RESULT_STEP_PERSISTENCE_INVALID") from None
+    if verified != step_id or persisted.get("step_id") != step_id:
+        raise CloudLoopReviewRequired("RESULT_STEP_REFERENCE_MISMATCH")
+    if embedded is not None and persisted != embedded:
+        raise CloudLoopReviewRequired("RESULT_STEP_PERSISTENCE_MISMATCH")
+    if schema == "qookey-cloud-paper-loop-report-v0.2" and coordinator.get("step_id") != step_id:
+        raise CloudLoopReviewRequired("RESULT_STEP_REFERENCE_MISMATCH")
+    return persisted
+
+
 def committed_report(
     store: PaperRunStoreLike,
     slot: str,
@@ -124,19 +171,12 @@ def committed_report(
         raise CloudLoopReviewRequired("RESULT_REPORT_MISMATCH")
     if report.get("slot_id") != slot:
         raise CloudLoopReviewRequired("RESULT_SLOT_MISMATCH")
-    coordinator = report.get("coordinator")
-    if not isinstance(coordinator, Mapping):
-        raise CloudLoopReviewRequired("RESULT_COORDINATOR_MISSING")
-    step = coordinator.get("run_step")
-    if not isinstance(step, Mapping):
-        raise CloudLoopReviewRequired("RESULT_STEP_MISSING")
-    verified = verify_live_paper_run_step(step)
-    persisted = get_json("live-run-step", verified)
+    step = _report_step(store, report, before_external=before_external)
     state = get_json("live-state", str(step["next_state_id"]))
-    if persisted != step or state is None or verify_live_paper_state(state) != step["next_state_id"]:
+    if state is None or verify_live_paper_state(state) != step["next_state_id"]:
         raise CloudLoopReviewRequired("RESULT_PERSISTENCE_MISMATCH")
     seal = get_json("live-run-result", str(step["request_id"]))
-    if seal is None or seal.get("step_id") != verified:
+    if seal is None or seal.get("step_id") != step["step_id"]:
         raise CloudLoopReviewRequired("COORDINATOR_SEAL_MISSING")
     return report
 
@@ -195,10 +235,7 @@ def latest_committed_slot(
     latest = committed_report(store, latest_slot)
     if latest is None:
         raise CloudLoopReviewRequired("LEDGER_COMMITTED_RESULT_MISSING")
-    coordinator = latest.get("coordinator")
-    step = coordinator.get("run_step") if isinstance(coordinator, Mapping) else None
-    if not isinstance(step, Mapping):
-        raise CloudLoopReviewRequired("LEDGER_STEP_MISSING")
+    step = _report_step(store, latest, before_external=before_external)
 
     sequence = step.get("sequence")
     step_id = step.get("step_id")
@@ -318,10 +355,14 @@ def run_cloud_step(
         old = committed_report(store, latest_slot)
         if old is None:
             raise CloudLoopReviewRequired("PREVIOUS_RESULT_MISSING")
-        previous = old["coordinator"]["run_step"]
-    state = (initialize_cloud_paper_state() if previous is None
-             else previous["tick_report"]["next_state"])
-    verify_live_paper_state(state)
+        previous = _report_step(store, old, before_external=before_external)
+    if previous is None:
+        state = initialize_cloud_paper_state()
+    else:
+        before_external()
+        state = store.get_json("live-state", str(previous["next_state_id"]))
+        if state is None or verify_live_paper_state(state) != previous["next_state_id"]:
+            raise CloudLoopReviewRequired("PREVIOUS_STATE_PERSISTENCE_MISMATCH")
     before_external()
     store.put_json_if_absent("cloud-slot", slot, {
         "slot_id": slot, "tick_ms": tick_ms, "scheduled_at_ms": scheduled_at_ms,
@@ -367,7 +408,7 @@ def run_cloud_step(
         market=market, registrations=registrations, candidates=candidates,
     )
     outcome = {
-        "schema": "qookey-cloud-paper-loop-report-v0.1",
+        "schema": "qookey-cloud-paper-loop-report-v0.2",
         "state": (
             "REVIEW_REQUIRED"
             if market.get("market_status") == "REVIEW_REQUIRED"
@@ -377,7 +418,10 @@ def run_cloud_step(
         "slot_id": slot, "previous_slot": previous_slot, "tick_ms": tick_ms,
         "scheduled_at_ms": scheduled_at_ms,
         "market": market, "candidate_count": len(candidates),
-        "coordinator": report,
+        # V0.2 stores the step once in live-run-step and references its verified
+        # content address here. V0.1 reports remain readable through _report_step.
+        "coordinator": {key: value for key, value in report.items()
+                        if key != "run_step"},
         "operation_counts": {
             "provider_requests": market_requests + int(report.get("provider_requests_performed", 0)),
             "r2_write_attempts": int(report.get("persistent_objects_created", 0)) + 3,
