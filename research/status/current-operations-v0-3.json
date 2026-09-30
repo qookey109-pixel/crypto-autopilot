@@ -4,10 +4,10 @@
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
-    "parent_main_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
+    "parent_main_sha": "9ffe30c8f0ab28bc3b2a95ae19de6938ed613dae",
     "semantics": "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
     "is_latest_main_claim": false,
-    "source_merge_pr": 654
+    "source_merge_pr": 427
   },
   "mode": "PAPER_AND_LIVE_PAPER_ONLY",
   "core100": {
