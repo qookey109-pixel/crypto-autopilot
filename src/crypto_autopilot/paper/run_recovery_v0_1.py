@@ -18,7 +18,7 @@ from crypto_autopilot.paper.run_coordinator_v0_1 import (
     build_live_paper_run_result,
     verify_live_paper_run_header,
     verify_live_paper_run_result,
-    verify_live_paper_run_step,
+    read_live_paper_run_step_tick,
 )
 from crypto_autopilot.paper.run_store_v0_1 import run_store_receipt_evidence
 
@@ -147,7 +147,8 @@ def _validate_step_evidence(
     store: PaperRunRecoveryStore,
     step: Mapping[str, object],
 ) -> tuple[str, str, str]:
-    step_id = verify_live_paper_run_step(step)
+    read_live_paper_run_step_tick(store, step)
+    step_id = str(step["step_id"])
     if step.get("step_id") != step_id:
         raise ValueError("stored live paper run step id mismatch")
 
@@ -177,15 +178,6 @@ def _validate_step_evidence(
     if verify_live_paper_state(next_state) != next_state_id:
         raise ValueError("persisted next live state id mismatch")
 
-    tick = _required_store_object(store, "live-tick", tick_id)
-    if live_paper_tick_report_id_from_mapping(tick) != tick_id:
-        raise ValueError("persisted live tick id mismatch")
-    embedded_tick = step.get("tick_report")
-    if not isinstance(embedded_tick, Mapping):
-        raise ValueError("stored run step embedded tick is required")
-    if _canonicalize(tick) != _canonicalize(embedded_tick):
-        raise ValueError("persisted live tick differs from run-step tick evidence")
-
     return previous_state_id, next_state_id, tick_id
 
 
@@ -201,7 +193,8 @@ def _scan_target_steps(
         if payload is None or payload.get("run_id") != run_id:
             continue
         try:
-            verified = verify_live_paper_run_step(payload)
+            read_live_paper_run_step_tick(store, payload)
+            verified = str(payload["step_id"])
         except ValueError as error:
             issues.append(f"invalid_step:{object_id}:{error}")
             continue
