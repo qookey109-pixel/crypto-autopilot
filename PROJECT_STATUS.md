@@ -1,3 +1,13 @@
+## Cloud Paper Current Checkpoint — 2026-09-30 (#662 merged)
+
+Live authority: GitHub `main=919941f2f8d8db77b0bc8372727de46d8406867f`; open PRs = 0. This is the current head after the #662 documentation sync. Older checkpoint SHAs below remain historical snapshots.
+
+- #661 delivered the prepared V0.2 compact loop-report reference. The matched synthetic three-slot profile is 26 objects and 157,367 canonical JSON bytes, 48,814 bytes (~23.7%) below the #658 baseline. This does not establish production R2 usage, charges, or account headroom.
+- #662 synchronized status and storage-lineage documentation. Cloud Paper remains disabled; production cycle NOT_RUN; entrypoint NOT_WIRED; natural schedule NOT_CONFIGURED; D1 unprovisioned; production strategy registry empty; Core100 quality REJECT.
+- Account-wide zero-cost evidence, usage freshness, complete writer coverage, and D1/R2 headroom remain unproven. Consumed one-time Billing/Usage/bootstrap authorities must not be rerun. No provider/D1/R2 access or runtime/schedule activation occurred.
+- Next: assess a compatible `live-run-step` to `live-tick` reference format, retaining old-schema reads, hash lineage, continuation, recovery, replay, and fail-closed partial-write diagnosis; verify public-data gaps and official source terms.
+- Boundaries remain CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER, 0 USD/month, PAPER/LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders, and live trading stay closed.
+
 ## Cloud Paper Current Checkpoint — 2026-09-30 20:44 Asia/Taipei
 
 Evidence basis: GitHub `main=4b12f0c9ad508e09d712320111f2e12423b69aca`; no open PRs. Cloud Paper remains disabled.
