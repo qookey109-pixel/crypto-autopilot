@@ -1,0 +1,43 @@
+{
+  "schema": "qookey-live-paper-step-reference-prepared-v0.2",
+  "status_date": "2026-09-30",
+  "status": "PREPARED_STORAGE_SCHEMA_ONLY",
+  "evidence_basis": {
+    "parent_main_sha": "bb2290ac1aa0cad1237ec2269be679211bf2bb5f",
+    "is_latest_main_claim": false
+  },
+  "contract": "config/live_paper_run_coordinator_v0_3.json",
+  "change": {
+    "new_step_schema": "qookey-live-paper-run-step-report-v0.2",
+    "independent_tick_reference": "tick_id+tick_report_sha256",
+    "legacy_step_reader_retained": true,
+    "versioned_step_identity": true,
+    "write_readback_before_result_seal": true,
+    "prior_objects_migrated": false
+  },
+  "validation": {
+    "required": "PR_EXACT_HEAD_GITHUB_CLOUD_CI",
+    "production_verified": false,
+    "profile": "MATCHED_SYNTHETIC_FIXTURES_ONLY"
+  },
+  "runtime": {
+    "activation_enabled": false,
+    "schedule_enabled": false,
+    "provider_requests_performed": 0,
+    "d1_access_performed": false,
+    "r2_access_performed": false,
+    "budget_authority_changed": false
+  },
+  "boundaries": {
+    "cloud_only": true,
+    "local_files_excluded_by_user": true,
+    "monthly_budget_usd": 0,
+    "paper_only": true,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "training": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
