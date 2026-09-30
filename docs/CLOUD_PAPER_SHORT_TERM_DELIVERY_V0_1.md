@@ -1,4 +1,17 @@
 # Crypto Autopilot — 完整雲端模擬產品交付目標
+
+## Current checkpoint — 2026-09-30 20:44 Asia/Taipei
+
+Evidence basis: GitHub main `4b12f0c9ad508e09d712320111f2e12423b69aca`; open PRs = 0. Cloud Paper remains disabled and no production cycle ran.
+
+- PR #660 completed the storage lineage inventory. PR [#661](https://github.com/qookey109-pixel/crypto-autopilot/pull/661) implemented the first compatible minimization: V0.2 reports reference the immutable persisted step by `step_id`; V0.1 embedded reports remain readable.
+- Exact-head PR CI passed Python 3.12/3.13, full tests, Ruff/workflow static, CodeQL and SBOM. Post-merge main CI [36716389946](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716389946), CodeQL [36716389968](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716389968), SBOM [36716389930](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716389930), and Freeze Guard [36716390111](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716390111) passed. Pages was not triggered; no website files changed.
+- The matched synthetic three-slot entry/exit/no-trade fixture is 26 objects in both versions; canonical JSON bytes fell from 206,181 to 157,367 (48,814 fewer; about 23.7%). The report aggregate fell from 70,352 to 21,538 bytes. [#658 baseline](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36710655801/artifacts/11094147043) and [#661 result](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716119165/artifacts/11095802879) are synthetic CI evidence only. They do not prove R2 savings, real charges, account-wide usage, or headroom.
+- No old objects were migrated or rewritten; #661 did not access a provider, D1 or R2 and did not enable a runtime or schedule.
+- Remaining P0 gates: fresh account-wide cost/usage evidence, data freshness and complete writer inventory, D1/R2 headroom proof, formal production entrypoint and controlled main PAPER acceptance. Billing/Usage one-time authorities are consumed and must not be rerun.
+- Next engineering slice: evaluate `live-run-step` → `live-tick` reference minimization while keeping old schema reads, recovery, digest lineage, idempotency and partial-write fail-closed behavior. In parallel, record actual missing strategy inputs and evaluate official public exchange API/JSON/CSV/HTML candidates one by one. Scraping is only a compliant public-source candidate; it cannot bypass authentication, limits, source-switch authority, or provider provenance.
+- AI Resource Hub is an engineering/catalog reference, not a market-data feed. Reuse only reviewed patterns (structured source metadata, health/freshness evidence, deterministic fallback and browser tests); do not import an entire app or treat catalog listings as a provider/free-tier approval.
+
 ## Storage profile result — 2026-09-30 19:52 Asia/Taipei
 
 Evidence basis: post-PR #658 main `7424ccfbaf0362f588410de037e593f0105745a0`; no open PRs at that checkpoint. The synthetic storage profiler is implemented in `scripts/measure_cloud_paper_storage_v0_1.py`, run by existing GitHub CI and uploaded as artifact [11094147043](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36710655801/artifacts/11094147043). PR #658 head `75e766a534e29b89be1ab96dce860964bfe66ef8) is merged.

@@ -1,3 +1,15 @@
+## Cloud Paper 最新查核 — 2026-09-30 20:44 Asia/Taipei
+
+查核基準：GitHub `main=4b12f0c9ad508e09d712320111f2e12423b69aca`；open PR = 0。以下為工程／合成證據；Cloud Paper 仍未啟用。
+
+- PR [#660](https://github.com/qookey109-pixel/crypto-autopilot/pull/660) 完成保存 lineage 盤點；PR [#661](https://github.com/qookey109-pixel/crypto-autopilot/pull/661) 合併 V0.2 compact report reference。#661 head `ebf812426dffb0e600fdcb2dcabf05e3f3642be6`，合併 main `4b12f0c9ad508e09d712320111f2e12423b69aca`。PR CI、CodeQL、Dependency/SBOM 全通過；main CI [36716389946](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716389946)、CodeQL [36716389968](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716389968)、Dependency/SBOM [36716389930](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716389930)、Freeze Guard [36716390111](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716390111) 均成功。main push 的 workflow-static skipped；Pages 未觸發，因本批未改網站檔案。
+- 合成三-slot「入場→出場→下一輪不交易」fixture 仍為 26 objects；canonical JSON 從 #658 的 206,181 bytes 降為 #661 的 157,367 bytes，少 48,814 bytes（約 23.7%）。其中 cloud-report 由 70,352 降為 21,538 bytes。CI profile artifact：[基準 #658](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36710655801/artifacts/11094147043)、[#661](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716119165/artifacts/11095802879)。
+- 這是相同合成 fixture 的序列化 bytes 比較，不等於實際 R2 使用量、request 數或費用，也未證明帳戶級 headroom。#661 CI 的政策預算 gate PASS 是 scripted projection，不是 Cloudflare account usage evidence。
+- 新報告以 `step_id` 引用已保存的 `live-run-step`；舊 V0.1 embedded report reader 仍受測試保護。沒有遷移或改寫舊物件，沒有 provider、D1、R2 存取、排程啟用或正式 PAPER cycle。
+- 目前 Cloud Paper activation=false、正式循環 NOT_RUN、正式入口 NOT_WIRED、自然 schedule NOT_CONFIGURED；D1 未 provision、正式 registry 空、Core100 品質 REJECT。零費用、帳戶用量新鮮度、全 writer 覆蓋與 headroom 仍未證明。
+- 下一階段：審查 `live-run-step`／`live-tick` 引用化是否能保留舊報告讀取、recovery、hash lineage 和部分寫入判斷；另整理資料來源缺口與官方公開資料取得方式。來源候選要先核對時間戳、完整性、條款及用量；不得把 Binance 證據標成 Pionex-native，亦不得使用網頁擷取繞過既有 provider/source-switch 邊界。
+- 維持 CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER、0 USD、PAPER/LIVE-PAPER ONLY；holdout、source switch、promotion、真實下單與 live trading 維持關閉。已消耗的一次性 Billing/Usage/bootstrap authority 不得重跑；frozen evidence 不得改寫。
+
 ## Cloud Paper 最新查核 — 2026-09-30 19:52 Asia/Taipei
 
 查核基準：PR #658 合併後 main `7424ccfbaf0362f588410de037e593f0105745a0`；當時 open PR = 0。以下合成量測不代表 production/R2 用量，亦未啟用 Cloud Paper。

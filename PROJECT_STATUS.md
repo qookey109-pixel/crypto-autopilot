@@ -1,3 +1,15 @@
+## Cloud Paper Current Checkpoint — 2026-09-30 20:44 Asia/Taipei
+
+Evidence basis: GitHub `main=4b12f0c9ad508e09d712320111f2e12423b69aca`; no open PRs. Cloud Paper remains disabled.
+
+- PR #660 completed the writer/reader/recovery lineage inventory. PR [#661](https://github.com/qookey109-pixel/crypto-autopilot/pull/661) merged the prepared V0.2 compact report reference at `ebf812426dffb0e600fdcb2dcabf05e3f3642be6`. PR Python 3.12/3.13, Ruff, workflow-static, CodeQL and Dependency/SBOM checks passed.
+- Post-merge main CI [36716389946](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716389946), CodeQL [36716389968](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716389968), Dependency/SBOM [36716389930](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716389930) and Freeze Guard [36716390111](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716390111) passed. Main-push workflow-static skipped; Pages did not run because no website files changed.
+- The same synthetic three-slot entry/exit/no-trade fixture decreased from 206,181 to 157,367 canonical JSON bytes (48,814 bytes / about 23.7% less); object count remains 26. The `cloud-report` aggregate decreased from 70,352 to 21,538 bytes. See [#658 baseline artifact](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36710655801/artifacts/11094147043) and [#661 profile artifact](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36716119165/artifacts/11095802879). These are synthetic serialized sizes, not production R2 usage, charges, or account headroom.
+- V0.2 reports reference the persisted `live-run-step` by `step_id`; legacy embedded V0.1 reports remain readable in tests. No production object migration, provider/D1/R2 call, runtime activation, or schedule change occurred.
+- Cloud Paper activation=false; production cycle NOT_RUN; entrypoint NOT_WIRED; natural schedule NOT_CONFIGURED; D1 unprovisioned; production registry empty; Core100 quality REJECT. Account-wide zero-cost, usage freshness, all-writer coverage, and headroom remain unproven.
+- Next work: assess safe `live-run-step` → `live-tick` reference minimization with legacy/recovery/hash/partial-write coverage, and reconcile missing public-data fields against official sources and acquisition terms. No Binance-to-Pionex relabeling or source-switch bypass.
+- Boundaries remain CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER, 0 USD, PAPER/LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading stay closed. Do not rerun consumed one-time Billing/Usage/bootstrap authorities or rewrite frozen evidence.
+
 ## Cloud Paper Current Checkpoint — 2026-09-30 19:52 Asia/Taipei
 
 Evidence basis：PR #658 合併後 main `7424ccfbaf0362f588410de037e593f0105745a0`；open PRs at checkpoint = 0. The synthetic profile below is not production/R2 usage, and Cloud Paper remains disabled.
