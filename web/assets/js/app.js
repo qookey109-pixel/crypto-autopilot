@@ -909,7 +909,85 @@ function renderCloudRuns(report) {
   }
 }
 
+function cloudPaperUsageVersion(budget) {
+  const contracts = {
+    "cloud_paper_usage_audit_v0_2": {
+      "version": "V0.2",
+      "budget_state": "REVIEW_REQUIRED_V0_2_DATASET_COVERAGE_INCOMPLETE",
+      "d1_state": "UNKNOWN_EMPTY_UNVERIFIED",
+      "fields": {
+        "authority": "cloud_paper_usage_audit_v0_2",
+        "status": "REVIEW_REQUIRED",
+        "reason_code": "DATASET_COVERAGE_INCOMPLETE",
+        "run_id": 36584465739,
+        "attempt": 1,
+        "run_head_sha": "21d37a44c6f3c5bba340908705488a05e7a5f7c7",
+        "artifact_id": 11041290995,
+        "artifact_name": "cloud-paper-usage-audit-v0-2-36584465739-1",
+        "artifact_sha256": "9ece6ff0a937f930d1137b2539052833bb5d94960dff8c1e50cce4cdbdadc258",
+        "cloudflare_requests": 1,
+        "d1_rows_state": "EMPTY_UNVERIFIED",
+        "d1_storage_state": "EMPTY_UNVERIFIED",
+        "r2_operations_state": "LIMIT_REACHED",
+        "r2_operations_group_count": 10000,
+        "r2_storage_state": "PRESENT",
+        "r2_storage_group_count": 1297,
+        "account_wide_cost": "UNKNOWN",
+        "complete_storage_byte_aggregate": "UNKNOWN",
+        "shared_writer_coverage": "UNKNOWN",
+        "storage_headroom": "UNKNOWN"
+      }
+    },
+    "cloud-paper-r2-usage-audit-v0.3": {
+      "version": "V0.3",
+      "budget_state": "REVIEW_REQUIRED_V0_3_R2_METRICS_PARTIAL",
+      "d1_state": "UNKNOWN_NOT_QUERIED_BY_V0_3",
+      "fields": {
+        "authority": "cloud-paper-r2-usage-audit-v0.3",
+        "status": "READY_FOR_REVIEW",
+        "reason_code": "R2_METRICS_CAPTURED_REVIEW_ONLY",
+        "run_id": 36593296360,
+        "attempt": 1,
+        "run_head_sha": "2516a80c32fa04b9789bef379b108eb50c87fd49",
+        "artifact_id": 11045150561,
+        "artifact_name": "cloud-paper-r2-usage-audit-v0-3-36593296360-1",
+        "artifact_sha256": "581514f59892b84520e52ef463e00210e4175952cc0d54af7fda42b18c71c1be",
+        "cloudflare_requests": 1,
+        "d1_rows_state": "NOT_QUERIED_IN_V0_3",
+        "d1_storage_state": "NOT_QUERIED_IN_V0_3",
+        "r2_operations_state": "PRESENT",
+        "r2_operations_group_count": 6,
+        "r2_operations_total_requests": 125309,
+        "r2_operations_freshness": "UNKNOWN_QUERY_OMITS_DATETIME_DIMENSION",
+        "r2_storage_state": "PRESENT",
+        "r2_storage_group_count": 1298,
+        "returned_bucket_group_count": 1,
+        "object_count": 16304,
+        "payload_bytes": 612538247,
+        "metadata_bytes": 4003533,
+        "total_bytes": 616541780,
+        "upload_count": 0,
+        "latest_snapshot_utc": "2026-09-29T15:20:00Z",
+        "account_wide_cost": "UNKNOWN",
+        "complete_storage_byte_aggregate": "UNKNOWN",
+        "shared_writer_coverage": "UNKNOWN",
+        "storage_headroom": "UNKNOWN"
+      }
+    }
+  };
+  const evidence = budget?.usage_audit_evidence;
+  const contract = evidence && Object.hasOwn(contracts, evidence.authority) ? contracts[evidence.authority] : null;
+  if (!contract || !Object.entries(contract.fields).every(([key, value]) => evidence[key] === value)) return null;
+  if (budget.monthly_budget_usd !== 0 || budget.state !== "BLOCKED_BUDGET"
+    || budget.account_wide_usage_evidence !== contract.budget_state
+    || budget.d1_free_tier_usage_evidence !== contract.d1_state
+    || budget.zero_cost_conclusion !== "UNKNOWN"
+    || budget.account_wide_writer_coverage !== "UNKNOWN") return null;
+  return contract.version;
+}
+
 function renderCloudPaperLoop(data) {
+  const usageVersion = cloudPaperUsageVersion(data?.budget);
   const status = document.querySelector("#cloud-paper-status");
   const detail = document.querySelector("#cloud-paper-detail");
   const traceStatus = document.querySelector("#cloud-paper-trace-status");
@@ -931,17 +1009,11 @@ function renderCloudPaperLoop(data) {
     && data.market?.breadth_coverage?.membership_state === "PREPARED_CANDIDATE_MEMBERSHIP_ONLY_COVERAGE_UNVERIFIED"
     && data.market?.breadth_coverage?.coverage_verified === false
     && data.model_quality === "REJECT"
-    && data.budget?.account_wide_usage_evidence === "REVIEW_REQUIRED_V0_2_DATASET_COVERAGE_INCOMPLETE"
-    && data.budget?.usage_audit_evidence?.run_id === 36584465739
-    && data.budget?.usage_audit_evidence?.reason_code === "DATASET_COVERAGE_INCOMPLETE"
-    && data.budget?.usage_audit_evidence?.r2_operations_state === "LIMIT_REACHED"
-    && data.budget?.usage_audit_evidence?.r2_operations_group_count === 10000
-    && data.budget?.usage_audit_evidence?.r2_storage_group_count === 1297
+    && usageVersion !== null
     && data.budget?.reservation_guard === "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED"
     && data.budget?.d1_reservation_ledger === "SHARED_LEDGER_CODE_PREPARED_MIGRATIONS_NOT_APPLIED_D1_NOT_PROVISIONED"
     && data.budget?.storage_capacity?.state === "USAGE_PARTIAL_BLOCKED"
     && data.budget?.storage_capacity?.usage_evidence === "PARTIAL_R2_EVIDENCE_NOT_ZERO_OR_COMPLETE"
-    && data.budget?.storage_capacity?.measured_storage_bytes === null
     && data.budget?.storage_capacity?.measured_storage_bytes === null
     && data.budget?.storage_capacity?.report_object_max_bytes === 262144
     && data.budget?.storage_capacity?.per_run_growth_max_bytes === 2097152
@@ -950,7 +1022,13 @@ function renderCloudPaperLoop(data) {
     && data.budget?.storage_capacity?.warning_threshold_bytes === 6400000000
     && data.budget?.storage_capacity?.hard_stop_bytes === 8000000000
     && data.budget?.storage_capacity?.all_writer_coverage_proven === false
-    && data.budget?.d1_free_tier_usage_evidence === "UNKNOWN_EMPTY_UNVERIFIED"
+    && data.account?.initialized === false
+    && data.account?.planned_initial_equity_usd === 10000
+    && ["confirmed_equity_usd", "open_position_count", "realized_pnl_usd", "unrealized_pnl_usd"].every(key => data.account[key] === null)
+    && data.boundary?.paper_only === true
+    && ["real_money_orders", "live_trading", "holdout_access", "source_switch", "model_promotion"].every(key => data.boundary[key] === false)
+    && /^[a-f0-9]{40}$/.test(data.evidence_basis_main_sha)
+    && typeof data.observed_at_utc === "string" && Number.isFinite(Date.parse(data.observed_at_utc))
     && data.production?.entrypoint_workflow === "NOT_WIRED"
     && data.production?.natural_schedule === "NOT_CONFIGURED";
   if (!valid) {
@@ -969,6 +1047,10 @@ function renderCloudPaperLoop(data) {
     set("#cloud-paper-positions", "未核實");
     set("#cloud-paper-budget", "BLOCKED_BUDGET · 無法核實");
     set("#cloud-paper-storage-capacity", "用量未知 · 不顯示為 0");
+    set("#cloud-paper-evidence-observed", "投影查核時間：未核實");
+    set("#cloud-paper-evidence-snapshot", "來源資料時間：未核實");
+    const link = document.querySelector("#cloud-paper-evidence-run");
+    if (link) { link.hidden = true; link.removeAttribute("href"); }
     return;
   }
   if (status) {
@@ -976,7 +1058,11 @@ function renderCloudPaperLoop(data) {
     status.className = "badge neutral";
   }
   if (detail) {
-    detail.textContent = "正式循環尚未啟用，沒有正式 run。V0.2 用量查核（run 36584465739）為 REVIEW_REQUIRED：R2 操作資料達 10,000 組上限，R2 storage 僅回傳 1,297 組；D1 空結果未驗證、總費用與安全額度仍未知。共享 provider/R2 守門程式已實作，但 Cloud Paper runtime 尚未啟用；所有 writer 覆蓋仍未驗證。D1 migrations 尚未套用且 D1 未 provision。策略登錄為空、模型品質為 REJECT，因此目前不會建立倉位。";
+    const evidence = data.budget.usage_audit_evidence;
+    const coverage = usageVersion === "V0.3"
+      ? "R2 30 天操作共 125,309 次，操作 freshness 未知；單一回傳 bucket 有 16,304 個物件、616,541,780 bytes，D1 未查詢。"
+      : "R2 操作資料達 10,000 組上限，storage 回傳 1,297 組；D1 空結果未驗證。";
+    detail.textContent = `正式循環尚未啟用，沒有正式 run。${usageVersion} 部分用量查核（run ${evidence.run_id} / attempt ${evidence.attempt} / SHA ${evidence.run_head_sha}）：${coverage} 完整帳戶用量、總費用、共同 writer 與安全額度仍未知。共享 provider/R2 守門程式已實作，但 runtime 尚未啟用。D1 migrations 尚未套用且 D1 未 provision。策略登錄為空、模型品質 REJECT，不會建立倉位；已消耗查核禁止重跑。`;
   }
   if (traceStatus) {
     traceStatus.textContent = "尚無正式循環報告";
@@ -990,8 +1076,21 @@ function renderCloudPaperLoop(data) {
   set("#cloud-paper-regime", "REGIME_UNAVAILABLE · 缺 TOTAL3 / BTC dominance；23 市場 breadth 覆蓋未驗證");
   set("#cloud-paper-account", "尚未初始化");
   set("#cloud-paper-positions", "持倉與損益尚無正式證據");
-  set("#cloud-paper-budget", "BLOCKED_BUDGET · V0.2 部分用量證據待查");
-  set("#cloud-paper-storage-capacity", "實際 bytes/headroom 未知 · R2 1,297 組 · 硬停 8.0 GB");
+  set("#cloud-paper-budget", `BLOCKED_BUDGET · ${usageVersion} 部分用量證據待查`);
+  set("#cloud-paper-storage-capacity", usageVersion === "V0.3"
+    ? "部分觀測 616,541,780 bytes（1 bucket）· 完整用量/headroom 未知 · 硬停 8.0 GB"
+    : "實際 bytes/headroom 未知 · R2 1,297 組 · 硬停 8.0 GB");
+  set("#cloud-paper-evidence-observed", `投影查核時間：${data.observed_at_utc} · basis ${data.evidence_basis_main_sha}`);
+  set("#cloud-paper-evidence-snapshot", usageVersion === "V0.3"
+    ? `來源儲存快照：${data.budget.usage_audit_evidence.latest_snapshot_utc} · 操作用量 freshness 未知`
+    : "來源資料：V0.2 不完整查核；不能證明 freshness");
+  const link = document.querySelector("#cloud-paper-evidence-run");
+  if (link) {
+    const evidence = data.budget.usage_audit_evidence;
+    link.href = `https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/${evidence.run_id}/artifacts/${evidence.artifact_id}`;
+    link.textContent = `查看 ${usageVersion} 用量證據 ↗`;
+    link.hidden = false;
+  }
 }
 
 async function loadData() {

@@ -1,6 +1,6 @@
 {
   "schema": "qookey-current-operations-v0.3",
-  "updated_date": "2026-09-22",
+  "updated_date": "2026-09-30",
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
@@ -109,10 +109,10 @@
   },
   "control_plane": {
     "current_truth_entrypoint": "CURRENT_STATUS.md",
-    "root_docs_projection": "CURRENT_OPERATIONS_CONVERGED_THROUGH_PR_426_TYPE_VISIBILITY_AND_PR_TRIAGE_V0_5",
+    "root_docs_projection": "CLOUD_PAPER_DASHBOARD_V0_3_AND_CURRENT_CHECKPOINT",
     "security_projection": "CONVERGED_BY_PR_322",
     "open_pr_triage": "research/status/open-pr-triage-v0-5.json",
-    "open_pr_triage_state": "REFRESHED_2026_09_22_SIX_DEPENDABOT_OPEN_OLD_ARCHITECTURE_PRS_CLOSED",
+    "open_pr_triage_state": "LIVE_CHECKPOINT_2026_09_30_ZERO_OPEN_PRS_OLD_TRIAGE_HISTORICAL",
     "automation_health_count_policy": "DERIVED_FROM_EXACT_REPOSITORY_SCHEDULE_INVENTORY",
     "dashboard_projection_policy": "HISTORICAL_AUTHORITY_OVERLAY_THEN_CURRENT_OPERATIONS_OVERLAY",
     "homepage_projection_policy": "CURRENT_OPERATIONS_MUST_OVERRIDE_DATED_SIMULATION_READINESS_FOR_PRESENT_TENSE_STATE",
@@ -124,17 +124,10 @@
     "research_signal_quality_state": "UPSTREAM_COMPLETION_CHAINED_WITH_EXACT_IMMUTABLE_RUN_DEDUP_AND_DAILY_FALLBACK",
     "dashboard_browser_validation_state": "PLAYWRIGHT_CHROMIUM_DESKTOP_MOBILE_PR_BUILD_PLUS_POST_DEPLOY_PRODUCTION_CHECK",
     "live_paper_slot_claim_state": "ACTIVE_MANUAL_COORDINATOR_FAIL_CLOSED_ATOMIC_CREATE_IF_ABSENT",
-    "open_pr_count": 6,
-    "open_pr_numbers": [
-      326,
-      327,
-      328,
-      329,
-      330,
-      331
-    ],
+    "open_pr_count": 0,
+    "open_pr_numbers": [],
     "type_debt_baseline": "research/status/type-debt-baseline-v0-1.json",
-    "type_debt_baseline_state": "NONBLOCKING_MYPY_261_ERRORS_49_FILES_DYNAMIC_OBJECT_NARROWING_FIRST",
+    "type_debt_baseline_state": "HISTORICAL_NONBLOCKING_MYPY_261_ERRORS_49_FILES",
     "cloud_maintenance": {
       "contract": "config/cloud_project_maintenance_v0_1.json",
       "receipt": "research/receipts/2026-09-25-cloud-project-maintenance-v0-1.json",
@@ -143,9 +136,31 @@
       "local_work": "EXCLUDED_BY_USER",
       "model_required": false,
       "automatic_merge": false
+    },
+    "historical_open_pr_triage": {
+      "path": "research/status/open-pr-triage-v0-5.json",
+      "state": "REFRESHED_2026_09_22_SIX_DEPENDABOT_OPEN_OLD_ARCHITECTURE_PRS_CLOSED",
+      "open_pr_count": 6,
+      "open_pr_numbers": [
+        326,
+        327,
+        328,
+        329,
+        330,
+        331
+      ]
+    },
+    "open_pr_triage_scope": "HISTORICAL_SEPTEMBER_22_USE_LIVE_REPOSITORY_CHECKPOINT",
+    "current_type_visibility": {
+      "run_id": 36667740375,
+      "head_sha": "095aba2c80b9ad710523875b1f45381646e61b75",
+      "diagnostics": 42,
+      "protected": 18,
+      "cleanup_candidates": 24,
+      "blocking": false
     }
   },
-  "next_decision": "REDUCE_NON_EXECUTION_TYPE_DEBT_AND_REVIEW_DEPENDENCY_PRS_WITHOUT_NEW_EXECUTION_AUTHORITY",
+  "next_decision": "COST_FRESHNESS_STORAGE_AND_LEDGER_FEASIBILITY_THEN_PRODUCTION_WIRING",
   "notes": [
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
     "Older September 13 present-tense summaries reporting Core100 8/10 and Training SKIPPED are historical and superseded for current operations.",
@@ -164,7 +179,7 @@
     "PR #421 merged Research Signal Quality upstream-completion chaining and exact immutable-run dedupe while preserving R2 exact-object read-only authority and the 10:47 Asia/Taipei fallback.",
     "PR #422 merged pinned Playwright Chromium validation for desktop and mobile against PR-built dashboard output, with production browser validation gated on a real GitHub Pages deploy.",
     "PR #423 merged deterministic Live Paper run-slot claims using atomic create-if-absent before provider access; unresolved claims fail closed to review and the coordinator remains manual workflow_dispatch only.",
-    "Open PR navigation was refreshed on 2026-09-22 in open-pr-triage-v0-5: only Dependabot PRs #326-#331 remain open; older architecture-generation and salvage PRs are closed historical references.",
+    "Historical September 22 PR navigation is preserved in historical_open_pr_triage; live_repository_checkpoint reports the reviewed current scan.",
     "PR #426 merged non-blocking mypy semantic type visibility on Python 3.13; the first baseline reported 261 type errors without failing CI or changing execution authority.",
     "Type Debt Baseline V0.1 records the post-PR-427 CI baseline: mypy 2.3.1 on Python 3.13 reports 261 errors across 49 files; 82.38% are arg-type/call-overload/attr-defined and remain non-blocking."
   ],
@@ -278,5 +293,21 @@
     "storage_headroom": "UNKNOWN_NOT_AUTHORIZED_BY_THIS_AUDIT",
     "cloud_paper_activation": "REMAINS_DISABLED",
     "next_step": "SEPARATELY_VERSION_D1_BILLING_AND_STORAGE_WRITER_COVERAGE_EVIDENCE_BEFORE_ACTIVATION"
+  },
+  "live_repository_checkpoint": {
+    "evidence_basis_main_sha": "095aba2c80b9ad710523875b1f45381646e61b75",
+    "observed_at_utc": "2026-09-30T05:53:15Z",
+    "is_latest_main_claim": false,
+    "open_pull_requests": [],
+    "ci_run_id": 36667740375,
+    "ci": "SUCCESS",
+    "python_3_12": "SUCCESS",
+    "python_3_13": "SUCCESS",
+    "workflow_static": "SKIPPED_MAIN_EVENT",
+    "cloud_paper_activation": false,
+    "production_cycle_status": "NOT_RUN",
+    "usage_receipt": "research/receipts/2026-09-29-cloud-paper-r2-usage-audit-v0-3-result.json",
+    "usage_evidence": "PARTIAL_V0_3_ZERO_COST_AND_HEADROOM_UNKNOWN",
+    "next_work": "COST_FRESHNESS_STORAGE_AND_LEDGER_FEASIBILITY_THEN_PRODUCTION_WIRING"
   }
 }

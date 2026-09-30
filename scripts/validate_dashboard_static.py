@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
+from typing import TypedDict
 
 
 ROOT = Path("web")
@@ -91,6 +92,109 @@ REQUIRED_ZH_HANT_LABELS = (
 )
 
 
+class CloudPaperUsageContract(TypedDict):
+    version: str
+    budget_state: str
+    d1_state: str
+    fields: dict[str, object]
+
+
+def validate_cloud_paper_usage_evidence(budget: dict[str, object]) -> str:
+    """Validate reviewed partial evidence; this never grants runtime authority."""
+    contracts: dict[str, CloudPaperUsageContract] = {
+        "cloud_paper_usage_audit_v0_2": {
+            "version": "V0.2",
+            "budget_state": "REVIEW_REQUIRED_V0_2_DATASET_COVERAGE_INCOMPLETE",
+            "d1_state": "UNKNOWN_EMPTY_UNVERIFIED",
+            "fields": {
+                "authority": "cloud_paper_usage_audit_v0_2",
+                "status": "REVIEW_REQUIRED",
+                "reason_code": "DATASET_COVERAGE_INCOMPLETE",
+                "run_id": 36584465739,
+                "attempt": 1,
+                "run_head_sha": "21d37a44c6f3c5bba340908705488a05e7a5f7c7",
+                "artifact_id": 11041290995,
+                "artifact_name": "cloud-paper-usage-audit-v0-2-36584465739-1",
+                "artifact_sha256": "9ece6ff0a937f930d1137b2539052833bb5d94960dff8c1e50cce4cdbdadc258",
+                "cloudflare_requests": 1,
+                "d1_rows_state": "EMPTY_UNVERIFIED",
+                "d1_storage_state": "EMPTY_UNVERIFIED",
+                "r2_operations_state": "LIMIT_REACHED",
+                "r2_operations_group_count": 10000,
+                "r2_storage_state": "PRESENT",
+                "r2_storage_group_count": 1297,
+                "account_wide_cost": "UNKNOWN",
+                "complete_storage_byte_aggregate": "UNKNOWN",
+                "shared_writer_coverage": "UNKNOWN",
+                "storage_headroom": "UNKNOWN"
+            }
+        },
+        "cloud-paper-r2-usage-audit-v0.3": {
+            "version": "V0.3",
+            "budget_state": "REVIEW_REQUIRED_V0_3_R2_METRICS_PARTIAL",
+            "d1_state": "UNKNOWN_NOT_QUERIED_BY_V0_3",
+            "fields": {
+                "authority": "cloud-paper-r2-usage-audit-v0.3",
+                "status": "READY_FOR_REVIEW",
+                "reason_code": "R2_METRICS_CAPTURED_REVIEW_ONLY",
+                "run_id": 36593296360,
+                "attempt": 1,
+                "run_head_sha": "2516a80c32fa04b9789bef379b108eb50c87fd49",
+                "artifact_id": 11045150561,
+                "artifact_name": "cloud-paper-r2-usage-audit-v0-3-36593296360-1",
+                "artifact_sha256": "581514f59892b84520e52ef463e00210e4175952cc0d54af7fda42b18c71c1be",
+                "cloudflare_requests": 1,
+                "d1_rows_state": "NOT_QUERIED_IN_V0_3",
+                "d1_storage_state": "NOT_QUERIED_IN_V0_3",
+                "r2_operations_state": "PRESENT",
+                "r2_operations_group_count": 6,
+                "r2_operations_total_requests": 125309,
+                "r2_operations_freshness": "UNKNOWN_QUERY_OMITS_DATETIME_DIMENSION",
+                "r2_storage_state": "PRESENT",
+                "r2_storage_group_count": 1298,
+                "returned_bucket_group_count": 1,
+                "object_count": 16304,
+                "payload_bytes": 612538247,
+                "metadata_bytes": 4003533,
+                "total_bytes": 616541780,
+                "upload_count": 0,
+                "latest_snapshot_utc": "2026-09-29T15:20:00Z",
+                "account_wide_cost": "UNKNOWN",
+                "complete_storage_byte_aggregate": "UNKNOWN",
+                "shared_writer_coverage": "UNKNOWN",
+                "storage_headroom": "UNKNOWN"
+            }
+        }
+    }
+    evidence = budget.get("usage_audit_evidence")
+    if not isinstance(evidence, dict):
+        raise RuntimeError("Cloud Paper usage evidence must be an object")
+    authority = evidence.get("authority")
+    if not isinstance(authority, str) or authority not in contracts:
+        raise RuntimeError("Cloud Paper usage authority is unsupported")
+    contract = contracts[authority]
+    for key, expected in contract["fields"].items():
+        if key not in evidence or type(evidence[key]) is not type(expected) or evidence[key] != expected:
+            raise RuntimeError(f"Cloud Paper usage evidence changed: {key}")
+    required = {
+        "monthly_budget_usd": 0,
+        "state": "BLOCKED_BUDGET",
+        "account_wide_usage_evidence": contract["budget_state"],
+        "d1_free_tier_usage_evidence": contract["d1_state"],
+        "zero_cost_conclusion": "UNKNOWN",
+        "account_wide_writer_coverage": "UNKNOWN",
+    }
+    for key, expected in required.items():
+        if key not in budget or type(budget[key]) is not type(expected) or budget[key] != expected:
+            raise RuntimeError(f"Cloud Paper budget evidence changed: {key}")
+    capacity = budget.get("storage_capacity")
+    if not isinstance(capacity, dict) or "measured_storage_bytes" not in capacity:
+        raise RuntimeError("Cloud Paper capacity evidence is missing")
+    if capacity["measured_storage_bytes"] is not None or capacity.get("all_writer_coverage_proven") is not False:
+        raise RuntimeError("partial storage observation cannot prove account-wide headroom")
+    return contract["version"]
+
+
 def main() -> int:
     missing = [str(path) for path in REQUIRED if not path.is_file()]
     if missing:
@@ -129,28 +233,19 @@ def main() -> int:
         raise RuntimeError("Cloud Paper strategy registry fixture changed")
     if cloud_paper.get("model_quality") != "REJECT":
         raise RuntimeError("Cloud Paper model quality must remain REJECT")
+    account = cloud_paper.get("account") or {}
+    if account.get("initialized") is not False or account.get("planned_initial_equity_usd") != 10000:
+        raise RuntimeError("Cloud Paper account must remain uninitialized")
+    if any(key not in account or account[key] is not None for key in (
+        "confirmed_equity_usd", "open_position_count", "realized_pnl_usd", "unrealized_pnl_usd",
+    )):
+        raise RuntimeError("Cloud Paper account values are unknown without a formal run")
     cloud_budget = cloud_paper.get("budget") or {}
-    if cloud_budget.get("monthly_budget_usd") != 0:
-        raise RuntimeError("Cloud Paper monthly budget must remain zero")
-    if cloud_budget.get("account_wide_usage_evidence") != "REVIEW_REQUIRED_V0_2_DATASET_COVERAGE_INCOMPLETE":
-        raise RuntimeError("Cloud Paper usage evidence must reflect the V0.2 review-required report")
-    usage_audit = cloud_budget.get("usage_audit_evidence") or {}
-    if usage_audit.get("run_id") != 36584465739 or usage_audit.get("reason_code") != "DATASET_COVERAGE_INCOMPLETE":
-        raise RuntimeError("Cloud Paper usage audit provenance is missing or changed")
-    if usage_audit.get("r2_operations_state") != "LIMIT_REACHED" or usage_audit.get("r2_operations_group_count") != 10_000:
-        raise RuntimeError("Cloud Paper R2 operations limit evidence changed")
-    if usage_audit.get("r2_storage_state") != "PRESENT" or usage_audit.get("r2_storage_group_count") != 1_297:
-        raise RuntimeError("Cloud Paper R2 storage group evidence changed")
-    if usage_audit.get("account_wide_cost") != "UNKNOWN" or usage_audit.get("storage_headroom") != "UNKNOWN":
-        raise RuntimeError("partial usage evidence must not prove cost or headroom")
-    if cloud_budget.get("account_wide_writer_coverage") != "UNKNOWN":
-        raise RuntimeError("account-wide writer coverage must remain unknown")
+    validate_cloud_paper_usage_evidence(cloud_budget)
     if cloud_budget.get("reservation_guard") != "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED":
         raise RuntimeError("Cloud Paper provider/R2 guard projection changed")
     if cloud_budget.get("d1_reservation_ledger") != "SHARED_LEDGER_CODE_PREPARED_MIGRATIONS_NOT_APPLIED_D1_NOT_PROVISIONED":
         raise RuntimeError("Cloud Paper D1 reservation ledger status changed")
-    if cloud_budget.get("d1_free_tier_usage_evidence") != "UNKNOWN_EMPTY_UNVERIFIED":
-        raise RuntimeError("Cloud Paper D1 empty result must remain unverified")
     capacity = cloud_budget.get("storage_capacity") or {}
     if capacity.get("state") != "USAGE_PARTIAL_BLOCKED":
         raise RuntimeError("Cloud Paper storage usage must remain blocked with partial evidence")

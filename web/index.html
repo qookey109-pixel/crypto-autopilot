@@ -58,8 +58,11 @@
           <article><p>最近循環</p><strong id="cloud-paper-last-run">—</strong><p>只接受正式雲端報告；CI fixture 不算正式循環。</p></article>
           <article><p>候選與總體狀態</p><strong id="cloud-paper-candidates">—</strong><p id="cloud-paper-regime">—</p></article>
           <article><p>虛擬帳戶</p><strong id="cloud-paper-account">—</strong><p id="cloud-paper-positions">—</p></article>
-          <article><p>執行與費用閘門</p><strong id="cloud-paper-budget">—</strong><p>實際帳戶用量尚未取得；未知值不顯示成 0。</p><p id="cloud-paper-storage-capacity">容量狀態讀取中。</p></article>
+          <article><p>執行與費用閘門</p><strong id="cloud-paper-budget">—</strong><p>已取得部分用量觀測；完整帳戶用量仍未知。未知值不顯示成 0。</p><p id="cloud-paper-storage-capacity">容量狀態讀取中。</p></article>
         </div>
+        <p id="cloud-paper-evidence-observed" class="muted">投影查核時間：讀取中。</p>
+        <p id="cloud-paper-evidence-snapshot" class="muted">來源資料時間：讀取中。</p>
+        <a id="cloud-paper-evidence-run" class="text-action" target="_blank" rel="noopener noreferrer" hidden>查看用量證據 ↗</a>
         <section class="cloud-paper-trace" aria-labelledby="cloud-paper-trace-heading">
           <div class="panel-header">
             <h4 id="cloud-paper-trace-heading">最近一次逐市場決策軌跡</h4>
@@ -175,6 +178,6 @@
     <section class="view" id="view-gates"><article class="panel"><div class="panel-header"><div><p class="card-kicker">FAIL-CLOSED</p><h3>全部專案安全閘門</h3></div><span class="badge danger">無真實交易路徑</span></div><div class="gate-grid" id="all-gates"></div></article></section>
     <footer class="site-footer"><p>這個網站是 Repository authority 的唯讀投影，不是 authority 本身。</p><span>QOOKEY / PAPER + LIVE-PAPER / REAL TRADING OFF</span></footer>
   </main>
-  <script src="./assets/js/app.js?v=current-truth-20260926-v2" defer></script>
+  <script src="./assets/js/app.js?v=cloud-paper-usage-v03" defer></script>
 </body>
 </html>
