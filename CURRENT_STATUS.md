@@ -1,14 +1,15 @@
-## Cloud Paper checkpoint before request-envelope correction — 2026-10-01
+## Live Cloud Paper checkpoint — 2026-10-01
 
-本次修正 PR 前基準：GitHub `main=cc140d46ba36f35846b91d0a7f1ccd400e6e8a40`；open PR = 0；PR #669–#675 已合併。重新依照正式市場 adapter 與 Live-Paper feed 對照呼叫公式後，發現舊 36 次／slot 估算漏掉每個 open position 的 order book 與 recent trades（兩次）；按既有最多五個 positions 的上界，完整直接來源循環應為 **46 次／slot、4,416 次／日、132,480 次／rolling 30 days**。固定共用資料及 23 市場 breadth 的最低下限為 26 次／slot，仍高於現有 18/run guard。此為設計算術，非 provider 配額或實際用量；Cloud Paper 繼續停用。
+GitHub main is `d51eb813c4ef043eb2f9d54f546504a98851df57`; open PRs = 0. PR [#676](https://github.com/qookey109-pixel/crypto-autopilot/pull/676) is merged.
 
-- Pionex 官方 rate limit 已補記為 10 requests/s/IP；這不是日／月 allowance、零費用證明或外部存取授權。日／月配額、shared account 使用及 request weights 仍未知。
-- 21 根 4H breadth、200 根 60M／15M 技術快照仍是程式推得的最低值；正式策略 registry 空、Core100 品質 REJECT，未來策略專屬輸入與 macro context 仍未驗證。
-- Cloud Paper 仍 disabled／NOT_RUN／NOT_WIRED／NOT_CONFIGURED；D1 未建立；帳戶級零費用、完整 writers、freshness 與 headroom 未證明。已消耗的一次性 Billing／Usage／bootstrap authority 不重跑。
-- 本修正只校正預算估算與防回歸測試，不改 18/run、1,728/day 現行上限，不做 provider／Cloudflare／R2／D1 存取，不啟用 runtime 或排程。
-- 下一步：先解決完整 request envelope 與零費用／quota evidence，再核准資料來源與正式入口；在 successor budget、來源、預算及 controlled acceptance 成立前，保持 Cloud Paper 停用。
+- Exact-head PR CI [36823734488](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36823734488) passed Python 3.12 and 3.13, Ruff, full test suite, workflow-static and budget/preflight checks. CodeQL [36823734537](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36823734537), Dependency/SBOM [36823734554](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36823734554), and Dashboard PR build/browser validation [36823734549](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36823734549) passed; the Dashboard run validated desktop and mobile. Merge-commit status is `UNKNOWN_NOT_VERIFIED`: the available combined-status query returned no entries and the workflow-run query is PR-event-only.
+- PR #676 corrected the inactive direct-source request estimate: 36 market-input calls plus up to 10 execution-frame calls (order book and recent trades for five positions) = **46 calls/slot, 4,416/day, 132,480/rolling 30 days**. These are design bounds, not allowance or observed usage. The 26-call shared-plus-breadth floor still exceeds the unchanged 18/run and 1,728/day limits.
+- Pionex's published 10 requests/second/IP ceiling does not establish daily/monthly allowance, endpoint weights, shared use, zero cost or access authority. Those remain unknown.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`; D1 unprovisioned, production strategy registry empty, Core100 quality `REJECT`. Account-wide cost/headroom, usage freshness and complete writer coverage are unproven. Consumed one-time Billing/Usage/bootstrap authorities must not be rerun.
+- #676 changed the inactive estimate and regression coverage only. It made no provider, Cloudflare, R2 or D1 access and enabled no runtime or schedule.
+- Next: resolve the full request/cost envelope and source eligibility, then prepare bounded successor authority and controlled PAPER acceptance. Keep Cloud Paper inactive until the required evidence and gates pass.
 
-CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER；0 USD；PAPER／LIVE-PAPER ONLY。holdout、source switch、promotion、真實下單與 live trading 維持關閉。
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
 
 ## Prior checkpoint — #665 compact storage merge (2026-10-01)
 

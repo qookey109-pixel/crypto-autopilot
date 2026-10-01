@@ -1,13 +1,15 @@
-## Checkpoint before request-envelope correction — 2026-10-01
+## Live checkpoint — 2026-10-01
 
-Pre-correction evidence basis: GitHub main `cc140d46ba36f35846b91d0a7f1ccd400e6e8a40`; open PRs = 0; PRs #669–#675 are merged. Reconciliation of the market adapter and Live-Paper feed shows that the prior 36-call estimate covered market inputs only and omitted up to 10 position-follow-up requests (order book and recent trades for each of five open positions). The corrected full direct-source envelope is **46 calls/slot, 4,416/day, 132,480/rolling 30 days**. The 26-call fixed shared-plus-breadth floor remains above the unchanged 18/run guard. These are design arithmetic, not provider allowance or observed usage.
+Evidence basis: GitHub main `d51eb813c4ef043eb2f9d54f546504a98851df57`; open PRs = 0. PR [#676](https://github.com/qookey109-pixel/crypto-autopilot/pull/676) is merged.
 
-- Pionex documents a 10 requests/second/IP rate ceiling; this does not establish daily/monthly allowance, zero cost, or access authorization.
-- Cloud Paper remains disabled; entrypoint NOT_WIRED, cycle NOT_RUN, natural schedule NOT_CONFIGURED, D1 unprovisioned, production registry empty, and Core100 REJECT. Account-wide zero-cost/headroom and writer coverage remain unproven.
-- This estimate correction does not change 18/run or 1,728/day, call any provider or Cloudflare service, or activate runtime/scheduling.
-- Next: resolve full request and cost envelope, source eligibility, then proceed to formal entrypoint and controlled PAPER acceptance only under a bounded successor authority.
+- Exact-head PR CI [36823734488](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36823734488) passed Python 3.12/3.13, Ruff, the full test suite, workflow-static and Cloud Paper budget/preflight checks. CodeQL [36823734537](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36823734537), Dependency/SBOM [36823734554](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36823734554), and Dashboard PR build/browser validation [36823734549](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36823734549) passed; desktop/mobile browser validation passed. Merge-commit status remains `UNKNOWN_NOT_VERIFIED` because the available combined-status query returned no entries; the available workflow-run query is limited to PR events.
+- The corrected inactive full direct-source envelope is 46 calls/slot, 4,416/day and 132,480/rolling 30 days: 36 market-input calls plus up to 10 existing position execution-frame calls. This is design arithmetic, not a provider allowance or observed use. The 26-call structural floor exceeds the unchanged 18/run and 1,728/day limits.
+- Pionex's published rate ceiling (10 requests/second/IP) does not establish daily/monthly allowance, endpoint weights, shared use, zero-cost evidence, or access authority.
+- Cloud Paper remains disabled; entrypoint `NOT_WIRED`, cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production registry empty and Core100 `REJECT`. Account-wide costs/headroom, usage freshness and complete writer coverage are unproven. Consumed one-time Billing/Usage/bootstrap authorities must not be rerun.
+- This PR changed only the inactive request estimate and regression coverage. It did not access providers, Cloudflare, R2 or D1 and did not activate runtime or scheduling.
+- Next: resolve full request/cost feasibility and eligible data sources, then continue the ordered delivery gates below. Keep all external execution disabled until successor authority and controlled acceptance are in place.
 
-CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders, and live trading remain closed.
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
 
 ## Historical checkpoint — 2026-09-30 (#662 merged)
 
