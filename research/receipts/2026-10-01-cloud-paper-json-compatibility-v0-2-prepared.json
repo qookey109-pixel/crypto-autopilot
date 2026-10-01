@@ -1,0 +1,51 @@
+{
+  "schema": "qookey-cloud-paper-json-compatibility-prepared-v0.2",
+  "status": "PREPARED_IMPLEMENTATION_ONLY",
+  "evidence_basis": {
+    "parent_main_sha": "a0f86649ac813523221d763e20d57fa55c25548b",
+    "is_latest_main_claim": false
+  },
+  "contract": "config/cloud_paper_loop_json_compatibility_v0_2.json",
+  "implementation": "src/crypto_autopilot/paper/cloud_loop_v0_2.py",
+  "frozen_predecessor": {
+    "path": "src/crypto_autopilot/paper/cloud_loop_v0_1.py",
+    "git_blob_sha": "2dbfcefcd6efb3c79b25f10950a26a1f039ce3f0",
+    "receipt": "research/receipts/2026-09-30-live-paper-step-reference-v0-2-prepared.json",
+    "rewritten": false
+  },
+  "bound_files": [
+    {
+      "path": "src/crypto_autopilot/paper/cloud_loop_v0_2.py",
+      "git_blob_sha": "d478c5a715b2032f40b8d13148a93f640c90f1f2"
+    },
+    {
+      "path": "config/cloud_paper_loop_json_compatibility_v0_2.json",
+      "git_blob_sha": "a1a030ca16603444a43a1296894b87da7d0385d0"
+    }
+  ],
+  "validation": {
+    "required": "EXACT_HEAD_GITHUB_CLOUD_CI",
+    "production_verified": false,
+    "discovery_run": 36873064864,
+    "frozen_binding_failure_run": 36873632991,
+    "failure_evidence_preserved": true
+  },
+  "runtime": {
+    "activation_enabled": false,
+    "schedule_enabled": false,
+    "provider_requests_performed": 0,
+    "r2_access_performed": false,
+    "d1_access_performed": false,
+    "budget_authority_changed": false
+  },
+  "boundaries": {
+    "cloud_only": true,
+    "local_files_excluded_by_user": true,
+    "monthly_budget_usd": 0,
+    "paper_only": true,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false
+  }
+}
