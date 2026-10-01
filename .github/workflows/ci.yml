@@ -119,6 +119,18 @@ jobs:
           path: cloud-paper-storage-profile/report.json
           retention-days: 30
           if-no-files-found: error
+      - name: Measure synthetic Cloud Paper R2 protocol (Python 3.12 only)
+        if: ${{ matrix.python-version == '3.12' }}
+        run: |
+          python scripts/measure_cloud_paper_r2_protocol_profile_v0_1.py > cloud-paper-r2-protocol-profile.json
+      - name: Upload synthetic Cloud Paper R2 protocol profile
+        if: ${{ matrix.python-version == '3.12' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4
+        with:
+          name: cloud-paper-r2-protocol-profile-${{ github.run_id }}-${{ github.run_attempt }}
+          path: cloud-paper-r2-protocol-profile.json
+          retention-days: 30
+          if-no-files-found: error
       - name: R2 cost and budget gate
         run: python scripts/check_r2_budget.py
       - name: Observed Binance R2 budget gate
