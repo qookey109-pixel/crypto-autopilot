@@ -35,6 +35,7 @@ class CloudPaperTransportBlocked(PionexAPIError):
 
 class _NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
+        fp.close()
         raise CloudPaperTransportBlocked("PIONEX_REDIRECT_REJECTED")
 
 
