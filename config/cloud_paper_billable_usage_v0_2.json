@@ -1,0 +1,49 @@
+{
+  "schema": "qookey-cloud-paper-billable-usage-v0.2",
+  "authority_status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "purpose": "One-time read-only diagnostic of account billable-usage rows; not a zero-cost or runtime-activation authority.",
+  "execution": {
+    "trigger": "workflow_dispatch_on_main_only",
+    "maximum_workflow_runs": 1,
+    "maximum_attempts": 1,
+    "maximum_github_history_requests": 1,
+    "maximum_cloudflare_http_requests": 1,
+    "timeout_seconds_per_request": 20,
+    "retry_count": 0,
+    "pagination": false,
+    "maximum_response_bytes": 1048576,
+    "maximum_report_rows": 500,
+    "history_check": "Require exactly this first-attempt dispatch as the only run of this workflow on main.",
+    "date_window": "UTC current calendar month start through current UTC date; one request, maximum 31 days."
+  },
+  "query": {
+    "method": "GET",
+    "endpoint": "https://api.cloudflare.com/client/v4/accounts/{account_id}/billable/usage",
+    "query_parameters": ["from", "to"],
+    "required_token_permission": "Account Billing Read",
+    "account_id_source": "CLOUDFLARE_ACCOUNT_ID repository variable",
+    "token_source": "CLOUDFLARE_BILLING_READONLY_API_TOKEN repository secret",
+    "persist_account_id": false,
+    "persist_billing_account_fields": false,
+    "persist_raw_response": false
+  },
+  "report_semantics": {
+    "valid_nonempty_rows": "READY_FOR_REVIEW",
+    "empty_invalid_or_over_limit": "REVIEW_REQUIRED",
+    "missing_cost_fields": "ZERO_COST_UNKNOWN",
+    "zero_cost_conclusion": "NEVER_PROVEN_BY_THIS_ALPHA_RESTRICTED_ENDPOINT",
+    "activation": "REMAINS_DISABLED"
+  },
+  "allowed_operations": [
+    "One GitHub Actions workflow-history metadata request.",
+    "One bounded read-only Cloudflare billable-usage request.",
+    "Secret-free summary and short-retention report artifact."
+  ],
+  "forbidden_operations": [
+    "Any rerun, retry, pagination, second Cloudflare request, or fallback endpoint.",
+    "Any R2 object, D1 database, provider, market-data, or account-inventory access.",
+    "Any inference that missing rows, missing cost fields, or an empty response means zero usage or zero cost.",
+    "Any provisioning, migration, budget activation, Cloud Paper execution, schedule activation, training, holdout access, promotion, or trading."
+  ],
+  "source": "https://developers.cloudflare.com/api/resources/billing/subresources/usage/methods/get_account_usage_v2/"
+}
