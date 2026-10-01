@@ -15,6 +15,8 @@ on:
       - "Research Signal Quality V0.1"
       - "Resource Hub Supply Chain V0.2"
       - "Live Paper Run Coordinator V0.1"
+      - "Cloud Paper Billing History V0.1"
+      - "Cloud Paper Billing History V0.2 Diagnostic"
     types: [completed]
   push:
     branches: [main]
