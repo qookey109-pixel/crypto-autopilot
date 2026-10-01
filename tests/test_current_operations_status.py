@@ -69,9 +69,7 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             "289dad5d29a59eb1139e4d1d7a862d10f7e5083e",
         )
         self.assertEqual(
-            payload["live_repository_checkpoint"][
-                "dashboard_pages_relation_to_source_merge_pr_681"
-            ],
+            payload["live_repository_checkpoint"]["dashboard_pages_result"],
             "BUILD_SUCCESS_DEPLOY_AND_PRODUCTION_BROWSER_SKIPPED_DOCS_ONLY",
         )
 
