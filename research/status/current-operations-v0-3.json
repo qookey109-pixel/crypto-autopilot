@@ -4,10 +4,10 @@
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
-    "parent_main_sha": "33496e31447fb0bd13743a9e72c8e7f7cd265e8f",
+    "parent_main_sha": "0a8161f1c101cb72c717ea4917a71a1c7da0541a",
     "semantics": "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
     "is_latest_main_claim": false,
-    "source_merge_pr": 678
+    "source_merge_pr": 681
   },
   "mode": "PAPER_AND_LIVE_PAPER_ONLY",
   "core100": {
@@ -112,7 +112,7 @@
     "root_docs_projection": "CLOUD_PAPER_DASHBOARD_V0_3_AND_CURRENT_CHECKPOINT",
     "security_projection": "CONVERGED_BY_PR_322",
     "open_pr_triage": "research/status/open-pr-triage-v0-5.json",
-    "open_pr_triage_state": "LIVE_CHECKPOINT_2026_09_30_ZERO_OPEN_PRS_OLD_TRIAGE_HISTORICAL",
+    "open_pr_triage_state": "LIVE_CHECKPOINT_2026_10_01_ONE_OPEN_STALE_DRAFT_PR_679; HISTORICAL_TRIAGE_REMAINS_HISTORICAL",
     "automation_health_count_policy": "DERIVED_FROM_EXACT_REPOSITORY_SCHEDULE_INVENTORY",
     "dashboard_projection_policy": "HISTORICAL_AUTHORITY_OVERLAY_THEN_CURRENT_OPERATIONS_OVERLAY",
     "homepage_projection_policy": "CURRENT_OPERATIONS_MUST_OVERRIDE_DATED_SIMULATION_READINESS_FOR_PRESENT_TENSE_STATE",
@@ -161,9 +161,10 @@
       "cleanup_candidates": 24,
       "blocking": false,
       "classification": "NONBLOCKING_CI_VISIBILITY"
-    }
+    },
+    "dashboard_pages_validation_state": "NO_PAGES_WORKFLOW_TRIGGERED_BY_PR_681_MERGE"
   },
-  "next_decision": "RECONCILE_STALE_MAINTENANCE_PR_679; COMPLETE_FRESH_ACCOUNT_WIDE_COST_USAGE_AND_STORAGE_EVIDENCE; KEEP_CLOUD_PAPER_DISABLED",
+  "next_decision": "RECONCILE_STALE_MAINTENANCE_PR_679; COMPLETE_ACCOUNT_WIDE_COST_USAGE_STORAGE_EVIDENCE_AND_SOURCE_ELIGIBILITY; KEEP_CLOUD_PAPER_DISABLED",
   "notes": [
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
     "Older September 13 present-tense summaries reporting Core100 8/10 and Training SKIPPED are historical and superseded for current operations.",
@@ -298,8 +299,8 @@
     "next_step": "SEPARATELY_VERSION_D1_BILLING_AND_STORAGE_WRITER_COVERAGE_EVIDENCE_BEFORE_ACTIVATION"
   },
   "live_repository_checkpoint": {
-    "evidence_basis_main_sha": "33496e31447fb0bd13743a9e72c8e7f7cd265e8f",
-    "observed_at_utc": "2026-10-01T07:00:15Z",
+    "evidence_basis_main_sha": "0a8161f1c101cb72c717ea4917a71a1c7da0541a",
+    "observed_at_utc": "2026-10-01T07:47:44Z",
     "is_latest_main_claim": false,
     "open_pull_requests": [
       {
@@ -311,16 +312,16 @@
         "note": "STALE_BASE_REQUIRES_RECONCILIATION"
       }
     ],
-    "ci_run_id": 36826949925,
+    "ci_run_id": 36831138428,
     "ci": "SUCCESS",
     "python_3_12": "SUCCESS",
     "python_3_13": "SUCCESS",
     "workflow_static": "SKIPPED_NO_WORKFLOW_CHANGE",
-    "codeql_run_id": 36826949885,
+    "codeql_run_id": 36831138421,
     "codeql": "SUCCESS",
-    "dependency_sbom_run_id": 36826950106,
+    "dependency_sbom_run_id": 36831138469,
     "dependency_sbom": "SUCCESS",
-    "freeze_guard_run_id": 36826949751,
+    "freeze_guard_run_id": 36831138502,
     "freeze_guard": "SUCCESS",
     "dashboard_pages_run_id": 36826949921,
     "dashboard_build": "SUCCESS",
@@ -336,7 +337,8 @@
     "billing_zero_cost_conclusion": "NOT_PROVEN_BY_SUBSCRIPTION_SNAPSHOT",
     "latest_maintenance_run_id": 36676302904,
     "latest_maintenance_propose": "OBSERVATION_CHANGED",
-    "next_work": "RECONCILE_STALE_MAINTENANCE_PR_679_THEN_COMPLETE_FRESH_ACCOUNT_WIDE_COST_USAGE_AND_STORAGE_EVIDENCE"
+    "next_work": "RECONCILE_STALE_MAINTENANCE_PR_679_THEN_COMPLETE_FRESH_ACCOUNT_WIDE_COST_USAGE_STORAGE_AND_SOURCE_ELIGIBILITY_EVIDENCE",
+    "dashboard_pages_relation_to_source_merge_pr_681": "NOT_TRIGGERED_NO_DASHBOARD_FILES_CHANGED"
   },
   "cloud_paper_billing_evidence": {
     "updated_date": "2026-10-01",
@@ -363,6 +365,24 @@
     ],
     "authority_consumed": true,
     "rerun_authorized": false,
+    "cloud_paper_activation": "REMAINS_DISABLED"
+  },
+  "cloud_paper_market_data_source_assessment": {
+    "updated_date": "2026-10-01",
+    "version": "V0.2",
+    "source": "CoinMarketCap Keyless Global Metrics",
+    "document": "docs/CLOUD_PAPER_MARKET_DATA_SOURCE_ASSESSMENT_V0_2.md",
+    "status": "ASSESSMENT_ONLY_NOT_APPROVED",
+    "external_market_endpoint_requests_performed": 0,
+    "cloudflare_api_requests_performed": 0,
+    "r2_access_performed": false,
+    "d1_access_performed": false,
+    "btc_excluded_altcoin_market_cap_matches_total3_excluding_btc_and_eth": false,
+    "keyless_request_allowance": "UNKNOWN_SHARED_IP_POOL",
+    "timestamp_and_metric_method_alignment": "UNRESOLVED",
+    "data_retention_terms": "UNRESOLVED",
+    "live_fetch_authorized": false,
+    "source_switch_authorized": false,
     "cloud_paper_activation": "REMAINS_DISABLED"
   }
 }
