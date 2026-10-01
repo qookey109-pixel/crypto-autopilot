@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-10-01",
-  "evidence_basis_parent_main_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
+  "evidence_basis_parent_main_sha": "0310d8ba31867b50672765b00f3651951d378583",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -75,7 +75,8 @@
       "one_time_authority": "CONSUMED_DO_NOT_RERUN",
       "zero_cost": "UNKNOWN",
       "cloud_paper_enabled": false
-    }
+    },
+    "cloudflare_billable_usage_v0_3": "PR692_MERGED_MAIN_0310D8BA; ONE_SHOT_READ_ONLY_V1_BILLABLE_USAGE_AUTHORITY; NOT_DISPATCHED; ZERO_CLOUDFLARE_REQUESTS; ZERO_COST_UNKNOWN"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "R2 V0.3 run 36593296360 is partial: one returned bucket (616541780 bytes) and 6 operation groups / 125309 requests with no operation timestamp; complete bucket inventory, all writers, freshness and headroom remain UNKNOWN; V0.3 one-time authority consumed; do not rerun.",
@@ -91,7 +92,8 @@
     "long_term_storage": "PR616_POLICY_MERGED: 262144_BYTES_PER_OBJECT; 2097152_BYTES_PER_RUN; 201326592_BYTES_PER_DAY; 6241124352_THEORETICAL_BYTES_PER_31_DAYS; WARNING_AT_6400000000; HARD_STOP_AT_PROJECTED_8000000000; INDEFINITE_APPEND_ONLY; NO_DELETE_AUTHORITY. PRODUCTION_ACCOUNT_USAGE_FRESHNESS_AND_ALL_WRITER_COVERAGE_UNVERIFIED.",
     "cloudflare_account_usage_audit": "R2 V0.3 run 36593296360 READY_FOR_REVIEW / R2_METRICS_CAPTURED_REVIEW_ONLY; exactly one GraphQL request; partial one-bucket result only; zero cost and headroom UNKNOWN; authority consumed, do not rerun.",
     "account_plan_and_billing": "PR630_SUBSCRIPTION_SNAPSHOT_AUTHORITY; BILLING_READINESS_RUN_36513736040_READY; ONE_TIME_BILLING_RUN_36513941565_SUCCESS; LISTED_SUBSCRIPTION_PRICE_TOTAL_USD_0; INVOICES_AND_METERED_CHARGES_NOT_QUERIED; ZERO_COST_NOT_PROVEN",
-    "d1_usage_evidence_guard": "PR654_POST_ADMISSION_FRESHNESS_AND_UTC_DAY_RECHECK_MERGED_AND_SYNTHETICALLY_VERIFIED; PRODUCTION_D1_USAGE_SOURCE_AND_PROVISIONING_REMAIN_UNVERIFIED"
+    "d1_usage_evidence_guard": "PR654_POST_ADMISSION_FRESHNESS_AND_UTC_DAY_RECHECK_MERGED_AND_SYNTHETICALLY_VERIFIED; PRODUCTION_D1_USAGE_SOURCE_AND_PROVISIONING_REMAIN_UNVERIFIED",
+    "cloudflare_billable_usage_v0_3": "PR692_MERGED_MAIN_0310D8BA; MANUAL_ONE_SHOT_NOT_DISPATCHED; ZERO_CLOUDFLARE_REQUESTS; MAY_REPORT_USAGE_BASED_CHARGES_ONLY; FIXED_FEES_ACCOUNT_COVERAGE_ALL_WRITERS_FRESHNESS_HEADROOM_AND_ZERO_TOTAL_COST_UNPROVEN"
   },
   "synthetic_full_cycle_ci": "PASS_PR622_TEST_ONLY_QUALIFIED_ENTRY_EXIT_ACCOUNT_PERSISTENCE_NEXT_NO_TRADE_THROUGH_COMPOSITION",
   "natural_schedule_acceptance": "NOT_ESTABLISHED",
@@ -415,44 +417,42 @@
     "runtime_authority_changed": false
   },
   "latest_repository_checkpoint": {
-    "evidence_basis_main_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
+    "evidence_basis_main_sha": "0310d8ba31867b50672765b00f3651951d378583",
     "pull_request": null,
-    "pr_merge_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
-    "observed_at_utc": "2026-10-01T09:44:13Z",
+    "pr_merge_sha": "0310d8ba31867b50672765b00f3651951d378583",
+    "observed_at_utc": "2026-10-01T10:11:25Z",
     "open_pull_requests": [],
-    "pr_654": {
-      "head_sha": "2117448a00edf599d08c8d6fb27596ba9cf0a0ab",
-      "merged": true,
-      "pr_ci_run_id": 36680835582,
-      "codeql_run_id": 36680835575,
-      "dependency_sbom_run_id": 36680835567,
-      "post_merge_ci_run_id": 36681001425,
-      "freeze_guard_run_id": 36681001474,
-      "post_merge_dependency_run_id": 36681001359,
-      "post_merge_codeql_run_id": 36681001327,
-      "all_checks": "SUCCESS"
-    },
     "activation_enabled": false,
     "d1_provisioned": false,
     "production_cycle_status": "NOT_RUN",
     "provider_cloudflare_runtime_access_performed": false,
-    "latest_natural_health_run_id": 36676258650,
-    "latest_maintenance_run_id": 36676302904,
-    "latest_maintenance_inspect": "SUCCESS",
-    "latest_maintenance_propose": "OBSERVATION_CHANGED",
-    "usage_evidence": "BILLABLE_USAGE_V0_2_HTTP_403; ROOT_CAUSE_ACCOUNT_WIDE_COST_FRESHNESS_ALL_WRITERS_AND_HEADROOM_UNKNOWN; ONE_TIME_AUTHORITY_CONSUMED_DO_NOT_RERUN",
-    "next_work": "SUSTAINABLE_FRESH_ACCOUNT_WIDE_BUDGET_AND_HEADROOM_EVIDENCE; FIELD_BY_FIELD_MARKET_SOURCE_QUALIFICATION; KEEP_RUNTIME_AND_SCHEDULE_DISABLED",
-    "pr_690": {
-      "head_sha": "b5dbfa5837c378ea61997a402d17d9d81ce24a82",
-      "merged": true,
-      "merge_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
-      "pr_ci_run_id": 36843908975,
-      "codeql_run_id": 36843909019,
-      "dependency_sbom_run_id": 36843909009,
-      "pr_checks": "SUCCESS",
-      "post_merge_main_checks": "UNKNOWN_NOT_INDEPENDENTLY_VERIFIED"
+    "billable_usage_v0_2": {
+      "run_id": 36839577708,
+      "run_attempt": 1,
+      "conclusion": "FAILURE",
+      "safe_error": "CLOUDFLARE_HTTP_403",
+      "root_cause": "UNKNOWN",
+      "authority": "CONSUMED_DO_NOT_RERUN"
     },
-    "market_data_assessment": "V0_3_MERGED; NO_APPROVED_TOTAL3_SOURCE; BTC_DOMINANCE_PARTIAL_UNAPPROVED_CANDIDATE; PIONEX_23_MARKET_BREADTH_AND_4H_15M_NOT_PRODUCTION_VERIFIED; SCRAPING_NOT_APPROVED"
+    "billable_usage_v0_3": {
+      "pr_number": 692,
+      "pr_head_sha": "19dcb484b013344ba433cbd2abca38fdf3d3a5de",
+      "merge_sha": "0310d8ba31867b50672765b00f3651951d378583",
+      "status": "MERGED_NOT_DISPATCHED",
+      "cloudflare_requests_performed": 0,
+      "one_shot_authority": true,
+      "zero_cost_conclusion": "UNKNOWN"
+    },
+    "post_merge_main_checks": {
+      "ci_run_id": 36847151342,
+      "ci": "SUCCESS",
+      "dependency_sbom_run_id": 36847151339,
+      "dependency_sbom": "SUCCESS",
+      "codeql_run_id": 36847151432,
+      "codeql": "SUCCESS",
+      "freeze_guard_run_id": 36847151394,
+      "freeze_guard": "SUCCESS"
+    }
   },
   "post_merge_storage_policy_evidence": {
     "pr_number": 616,
@@ -678,7 +678,11 @@
       "account_usage_v2_endpoint": "GET /accounts/{account_id}/billable/usage",
       "state": "ALPHA_RESTRICTED_COST_FIELDS_MAY_BE_ABSENT",
       "max_days": 31,
-      "zero_cost_proof": false
+      "zero_cost_proof": false,
+      "historical_v0_2_endpoint": "GET /accounts/{account_id}/billable/usage",
+      "historical_v0_2_state": "ALPHA_RESTRICTED_HTTP_403_RUN_36839577708_CONSUMED_ROOT_CAUSE_UNKNOWN_NO_RERUN",
+      "successor_v0_3_endpoint": "GET /accounts/{account_id}/billable-usage",
+      "successor_v0_3_state": "MERGED_MAIN_0310D8BA_ONE_SHOT_NOT_DISPATCHED_USAGE_BASED_ONLY_FIXED_FEES_EXCLUDED_ZERO_COST_UNPROVEN"
     },
     "request_budget_design_only": {
       "max_http_or_graphql_calls": 64,
@@ -698,5 +702,10 @@
     "model_quality": "REJECT",
     "production_strategy_registry": "EMPTY",
     "macro_regime": "REGIME_UNAVAILABLE"
+  },
+  "pending_documentation_sync": {
+    "pull_request": "TO_BE_CREATED_FROM_MAIN_0310D8BA",
+    "state": "PARENT_CHECKPOINT_ONLY_NOT_LATEST_MAIN",
+    "runtime_or_authority_changed": false
   }
 }
