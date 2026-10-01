@@ -1,0 +1,45 @@
+{
+  "schema": "qookey-cloudflare-shared-writer-admission-v0.1",
+  "status": "PREPARED_SYNTHETIC_VALIDATION_ONLY",
+  "activation_enabled": false,
+  "production_d1_provisioned": false,
+  "cloudflare_requests_authorized": false,
+  "account_identity": "INJECTED_AT_RUNTIME_NOT_STORED",
+  "reservation_identity": ["writer_id", "idempotency_key"],
+  "slot_id_is_global_unique": false,
+  "same_slot_different_writers_allowed": true,
+  "reservation_policy": {
+    "aggregate_scope": "ALL_REGISTERED_WRITERS_IN_SHARED_D1",
+    "daily_window": "UTC_CALENDAR_DAY",
+    "rolling_window_days": 31,
+    "reservation_is_conservative": true,
+    "ambiguous_or_replayed_operation": "DO_NOT_REPEAT_EXTERNAL_ACCESS",
+    "release_or_actual_usage_rebate": "NOT_SUPPORTED",
+    "sql_reservation": "SINGLE_INSERT_SELECT_WITH_ATOMIC_BUDGET_PREDICATES",
+    "external_usage_baseline": "MUST_BE_FRESH_AND_ACCOUNT_WIDE_BEFORE_CALL",
+    "d1_ledger_query_cost": "MUST_USE_EXISTING_SHARED_D1_ROWS_GUARD",
+    "retention_policy": "UNRESOLVED; ACTIVATION_BLOCKED"
+  },
+  "bounded_metrics": [
+    "provider_requests",
+    "r2_class_a",
+    "r2_class_b",
+    "r2_new_bytes",
+    "d1_queries",
+    "d1_storage_growth_bytes"
+  ],
+  "limits": "INJECTED_PER_CALL; NO_PRODUCTION_VALUES_APPROVED",
+  "required_before_activation": [
+    "owner_attested_complete_external_writer_inventory",
+    "fresh_account_wide_usage_and_headroom_evidence",
+    "approved_zero_cost_usage_envelopes",
+    "d1_free_tier_and_storage_calibration",
+    "bounded_reservation_retention_or_compaction_authority",
+    "integration_of_every_active_writer",
+    "controlled_paper_acceptance"
+  ],
+  "source_files": [
+    "src/crypto_autopilot/paper/shared_writer_admission_v0_1.py",
+    "migrations/cloudflare_shared_writer_admission_v0_1.sql"
+  ]
+}
