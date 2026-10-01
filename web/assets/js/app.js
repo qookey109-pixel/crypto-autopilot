@@ -986,8 +986,54 @@ function cloudPaperUsageVersion(budget) {
   return contract.version;
 }
 
+function cloudPaperBillingEvidenceIsValid(evidence) {
+  const subscription = evidence?.subscription_snapshot;
+  const planReview = subscription?.rate_plan_id_documentation_check;
+  const usage = evidence?.billable_usage_snapshot;
+  const expected = [
+    evidence?.authority === "cloud-paper-billing-evidence-v0.1",
+    subscription?.run_id === 36513941565,
+    subscription?.attempt === 1,
+    subscription?.observed_date === "2026-10-01",
+    subscription?.report_status === "READY_FOR_BILLING_REVIEW",
+    subscription?.rate_plan_id === "r2_paid",
+    subscription?.state === "Paid",
+    subscription?.listed_price_usd === 0,
+    subscription?.listed_subscription_price_total_usd === 0,
+    subscription?.invoices_included === false,
+    subscription?.metered_charges_included === false,
+    subscription?.complete_account_product_coverage === false,
+    subscription?.all_writers_established === false,
+    planReview?.classification === "UNMAPPED_DOCUMENTED_ENUM_REQUIRES_REVIEW",
+    planReview?.additional_cloudflare_request_performed === false,
+    usage?.run_id === 36852292356,
+    usage?.attempt === 1,
+    usage?.observed_at_utc === "2026-10-01T10:57:13.348117Z",
+    usage?.response_row_count === 42,
+    usage?.every_row_has_billed_cost_fields === true,
+    usage?.reported_billed_cost_total === 0,
+    usage?.currency === "USD",
+    usage?.fixed_subscription_charges_included === false,
+    usage?.daily_provider_data_may_lag === true,
+    usage?.complete_account_usage_coverage === "UNKNOWN_UNTIL_REVIEWED",
+    usage?.cloudflare_http_requests_performed === 1,
+    evidence?.total_cloudflare_http_requests === 2,
+    evidence?.account_wide_cost === "UNKNOWN",
+    evidence?.account_wide_writer_coverage === "UNKNOWN",
+    evidence?.writer_inventory_state === "INCOMPLETE_USER_EXPECTS_ADDITIONAL_SERVICES_LATER",
+    evidence?.zero_cost_conclusion === "NOT_PROVEN",
+    evidence?.authority_consumed === true,
+    evidence?.rerun_authorized === false,
+    evidence?.cloud_paper_activation === "REMAINS_DISABLED"
+  ];
+  return expected.every(Boolean)
+    && subscription?.run_url === "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513941565"
+    && usage?.run_url === "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36852292356";
+}
+
 function renderCloudPaperLoop(data) {
   const usageVersion = cloudPaperUsageVersion(data?.budget);
+  const billingEvidenceValid = cloudPaperBillingEvidenceIsValid(data?.billing_evidence);
   const status = document.querySelector("#cloud-paper-status");
   const detail = document.querySelector("#cloud-paper-detail");
   const traceStatus = document.querySelector("#cloud-paper-trace-status");
@@ -1010,6 +1056,7 @@ function renderCloudPaperLoop(data) {
     && data.market?.breadth_coverage?.coverage_verified === false
     && data.model_quality === "REJECT"
     && usageVersion !== null
+    && billingEvidenceValid
     && data.budget?.reservation_guard === "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED"
     && data.budget?.d1_reservation_ledger === "SHARED_LEDGER_CODE_PREPARED_MIGRATIONS_NOT_APPLIED_D1_NOT_PROVISIONED"
     && data.budget?.storage_capacity?.state === "USAGE_PARTIAL_BLOCKED"
@@ -1049,6 +1096,9 @@ function renderCloudPaperLoop(data) {
     set("#cloud-paper-storage-capacity", "用量未知 · 不顯示為 0");
     set("#cloud-paper-evidence-observed", "投影查核時間：未核實");
     set("#cloud-paper-evidence-snapshot", "來源資料時間：未核實");
+    set("#cloud-paper-billing-detail", "最新帳務快照缺失或契約不符；零費用與帳戶 writer 覆蓋仍未核實。");
+    const billingRunLinks = document.querySelectorAll("#cloud-paper-billing-run, #cloud-paper-usage-run");
+    billingRunLinks.forEach(link => { link.hidden = true; link.removeAttribute("href"); });
     const link = document.querySelector("#cloud-paper-evidence-run");
     if (link) { link.hidden = true; link.removeAttribute("href"); }
     return;
@@ -1084,6 +1134,21 @@ function renderCloudPaperLoop(data) {
   set("#cloud-paper-evidence-snapshot", usageVersion === "V0.3"
     ? `來源儲存快照：${data.budget.usage_audit_evidence.latest_snapshot_utc} · 操作用量 freshness 未知`
     : "來源資料：V0.2 不完整查核；不能證明 freshness");
+  const billingEvidence = data.billing_evidence;
+  const billing = billingEvidence.subscription_snapshot;
+  const usage = billingEvidence.billable_usage_snapshot;
+  set("#cloud-paper-billing-detail",
+    `帳單方案查核（${billing.observed_date}）：${billing.rate_plan_id} / ${billing.state}，顯示訂閱價格 ${billing.listed_subscription_price_total_usd} USD；此 rate-plan 標籤不在目前文件列舉中，須人工釐清。帳務用量（${usage.observed_at_utc}）：42 筆回報的用量成本合計 ${usage.reported_billed_cost_total.toFixed(2)} USD，但不含固定訂閱費，且完整帳戶覆蓋未知。零費用未證明；目前寫入者盤點不完整，預期未來會新增服務。`);
+  const billingRun = document.querySelector("#cloud-paper-billing-run");
+  if (billingRun) {
+    billingRun.href = billing.run_url;
+    billingRun.hidden = false;
+  }
+  const usageRun = document.querySelector("#cloud-paper-usage-run");
+  if (usageRun) {
+    usageRun.href = usage.run_url;
+    usageRun.hidden = false;
+  }
   const link = document.querySelector("#cloud-paper-evidence-run");
   if (link) {
     const evidence = data.budget.usage_audit_evidence;
