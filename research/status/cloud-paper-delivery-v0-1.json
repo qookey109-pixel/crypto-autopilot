@@ -502,7 +502,7 @@
   "production_cycle_status": "NOT_RUN",
   "latest_documentation_sync": {
     "pull_request": 701,
-    "parent_main_sha": "54c099254303512eba7f8f2b57dcd98124b17348",
+    "parent_main_sha": "068a09b99dd2fbd11f71a7eda4ab47db8223a5af",
     "pr_head_sha": "5607b73cc4c6e2a5987feb5eca84d80ca37c77f7",
     "merged_main_sha": "1a081ecbdec042353e647638e42aa181c5fd3911",
     "changed_runtime_or_authority": false,
@@ -529,10 +529,7 @@
     "post_merge_pages_run_id": 36850938800,
     "post_merge_pages_build": "SUCCESS",
     "post_merge_pages_deploy": "SUCCESS",
-    "post_merge_browser_production": "SUCCESS_DESKTOP_MOBILE",
-    "previous_verified_sync_pr": 701,
-    "current_status_sync_pr": 703,
-    "result": "PENDING_CHECKS"
+    "post_merge_browser_production": "SUCCESS_DESKTOP_MOBILE"
   },
   "engineering_ci_acceptance_matrix": {
     "evidence_code_commit": "cb22d3c3905a079eb754f0fab6d917923512f624",
@@ -744,5 +741,12 @@
     "model_quality": "REJECT",
     "production_strategy_registry": "EMPTY",
     "macro_regime": "REGIME_UNAVAILABLE"
+  },
+  "pending_documentation_sync_pr": {
+    "pull_request": 703,
+    "parent_main_sha": "54c099254303512eba7f8f2b57dcd98124b17348",
+    "head_sha": "9e43c7704f9b9dd2f3c23c1cd68127e66cd2afc8",
+    "state": "OPEN_CHECKS_IN_PROGRESS",
+    "changed_runtime_or_authority": false
   }
 }
