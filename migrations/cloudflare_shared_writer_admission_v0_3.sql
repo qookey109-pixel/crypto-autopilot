@@ -67,7 +67,11 @@ CREATE TABLE IF NOT EXISTS cloudflare_shared_writer_reservations_v0_3 (
     slot_id TEXT NOT NULL CHECK (length(slot_id) BETWEEN 6 AND 32),
     idempotency_key TEXT NOT NULL CHECK (idempotency_key = slot_id),
     slot_at_ms INTEGER NOT NULL CHECK (slot_at_ms > 0),
-    utc_day TEXT NOT NULL CHECK (length(utc_day) = 10),
+    utc_day TEXT NOT NULL CHECK (
+        length(utc_day) = 10
+        AND utc_day = date(CAST(reserved_at_ms / 1000 AS INTEGER), 'unixepoch')
+        AND date(CAST(reserved_at_ms / 1000 AS INTEGER), 'unixepoch') IS NOT NULL
+    ),
     reserved_at_ms INTEGER NOT NULL CHECK (reserved_at_ms >= 0),
     provider_requests INTEGER NOT NULL CHECK (provider_requests >= 0),
     r2_class_a INTEGER NOT NULL CHECK (r2_class_a >= 0),

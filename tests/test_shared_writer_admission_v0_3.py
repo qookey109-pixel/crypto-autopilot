@@ -66,13 +66,14 @@ class SharedWriterLifecycleTests(unittest.TestCase):
                 reserved_at_ms, provider_requests, r2_class_a, r2_class_b,
                 r2_new_bytes, d1_queries, d1_rows_read, d1_rows_written,
                 d1_storage_growth_bytes
-            ) VALUES (?, ?, ?, ?, '2026-10-02', ?, 1, 1, 0, 100, 2, 20, 7, 256)
+            ) VALUES (?, ?, ?, ?, date(CAST(? AS INTEGER) / 1000, 'unixepoch'), ?, 1, 1, 0, 100, 2, 20, 7, 256)
             """,
             (
                 writer_id,
                 f"slot:{slot_at_ms}",
                 f"slot:{slot_at_ms}",
                 slot_at_ms,
+                slot_at_ms if reserved_at_ms is None else reserved_at_ms,
                 slot_at_ms if reserved_at_ms is None else reserved_at_ms,
             ),
         )
@@ -112,13 +113,38 @@ class SharedWriterLifecycleTests(unittest.TestCase):
         with self.assertRaises(sqlite3.IntegrityError):
             self.reserve("project-a:writer", NOW_MS)
 
+    def test_daily_budget_key_must_match_reservation_utc_date(self) -> None:
+        self.configure()
+        self.register("project-a:writer")
+        with self.assertRaisesRegex(sqlite3.IntegrityError, "CHECK constraint failed"):
+            self.db.execute(
+                """
+                INSERT INTO cloudflare_shared_writer_reservations_v0_3 (
+                    writer_id, slot_id, idempotency_key, slot_at_ms, utc_day,
+                    reserved_at_ms, provider_requests, r2_class_a, r2_class_b,
+                    r2_new_bytes, d1_queries, d1_rows_read, d1_rows_written,
+                    d1_storage_growth_bytes
+                ) VALUES (?, ?, ?, ?, '1970-01-01', ?, 0, 0, 0, 0, 0, 0, 0, 0)
+                """,
+                (
+                    "project-a:writer",
+                    f"slot:{NOW_MS}",
+                    f"slot:{NOW_MS}",
+                    NOW_MS,
+                    NOW_MS,
+                ),
+            )
+
     def test_budget_aggregates_include_all_registered_writers(self) -> None:
         self.configure()
         self.register("project-a:writer")
         self.register("project-b:writer")
         self.reserve("project-a:writer", NOW_MS)
         self.reserve("project-b:writer", NOW_MS + 1)
-        daily = self.db.execute(DAILY_SHARED_AGGREGATE_SQL, ("2026-10-02",)).fetchone()
+        utc_day = self.db.execute(
+            "SELECT date(? / 1000, 'unixepoch')", (NOW_MS,)
+        ).fetchone()[0]
+        daily = self.db.execute(DAILY_SHARED_AGGREGATE_SQL, (utc_day,)).fetchone()
         rolling = self.db.execute(
             ROLLING_SHARED_AGGREGATE_SQL,
             (NOW_MS - 31 * DAY_MS, NOW_MS + 1),
