@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-10-01",
-  "evidence_basis_parent_main_sha": "068a09b99dd2fbd11f71a7eda4ab47db8223a5af",
+  "evidence_basis_parent_main_sha": "54c099254303512eba7f8f2b57dcd98124b17348",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -417,10 +417,10 @@
     "runtime_authority_changed": false
   },
   "latest_repository_checkpoint": {
-    "evidence_basis_main_sha": "0310d8ba31867b50672765b00f3651951d378583",
+    "evidence_basis_main_sha": "54c099254303512eba7f8f2b57dcd98124b17348",
     "pull_request": null,
-    "pr_merge_sha": "0310d8ba31867b50672765b00f3651951d378583",
-    "observed_at_utc": "2026-10-01T10:11:25Z",
+    "pr_merge_sha": "54c099254303512eba7f8f2b57dcd98124b17348",
+    "observed_at_utc": "2026-10-01T11:10:30Z",
     "open_pull_requests": [],
     "activation_enabled": false,
     "d1_provisioned": false,
@@ -435,23 +435,49 @@
       "authority": "CONSUMED_DO_NOT_RERUN"
     },
     "billable_usage_v0_3": {
-      "pr_number": 692,
-      "pr_head_sha": "19dcb484b013344ba433cbd2abca38fdf3d3a5de",
-      "merge_sha": "0310d8ba31867b50672765b00f3651951d378583",
-      "status": "MERGED_NOT_DISPATCHED",
-      "cloudflare_requests_performed": 0,
+      "run_id": 36852292356,
+      "run_attempt": 1,
+      "event": "workflow_dispatch",
+      "head_sha": "54c099254303512eba7f8f2b57dcd98124b17348",
+      "conclusion": "SUCCESS",
+      "report_status": "READY_FOR_REVIEW",
+      "reason_code": "USAGE_ROWS_CAPTURED_REVIEW_REQUIRED_FOR_SCOPE",
+      "authority": "CONSUMED_DO_NOT_RERUN",
       "one_shot_authority": true,
-      "zero_cost_conclusion": "UNKNOWN"
+      "cloudflare_http_requests_performed": 1,
+      "response_row_count": 42,
+      "all_rows_have_billed_cost": true,
+      "reported_billed_cost_total": 0,
+      "currency": "USD",
+      "query_scope": "CURRENT_BILLING_PERIOD_NO_DATE_FILTER",
+      "billing_period_start_utc": "2026-09-17T00:00:00Z",
+      "latest_returned_charge_period_end_utc": "2026-10-01T00:00:00Z",
+      "observed_at_utc": "2026-10-01T10:57:13.348117Z",
+      "artifact_id": 11156336210,
+      "artifact_name": "cloud-paper-billable-usage-v0-3-36852292356-1",
+      "artifact_size_bytes": 1325,
+      "artifact_expires_at": "2026-10-08T10:57:13Z",
+      "artifact_digest": "sha256:aafc0e4c58bdb8d25426a390c1d9689ce77324ef2c780d91e6fcc2f90c1bbcbf",
+      "account_identity_persisted": false,
+      "raw_response_persisted": false,
+      "fixed_subscription_charges_included": false,
+      "provider_refresh_cadence": "DAILY_PROVIDER_DATA_MAY_LAG",
+      "complete_account_usage_coverage": "UNKNOWN_UNTIL_REVIEWED",
+      "zero_cost_conclusion": "UNKNOWN",
+      "activation": "REMAINS_DISABLED",
+      "r2_d1_access_performed": false
     },
     "post_merge_main_checks": {
-      "ci_run_id": 36847151342,
+      "ci_run_id": 36851711972,
       "ci": "SUCCESS",
-      "dependency_sbom_run_id": 36847151339,
+      "dependency_sbom_run_id": 36851711909,
       "dependency_sbom": "SUCCESS",
-      "codeql_run_id": 36847151432,
+      "codeql_run_id": 36851711901,
       "codeql": "SUCCESS",
-      "freeze_guard_run_id": 36847151394,
-      "freeze_guard": "SUCCESS"
+      "freeze_guard_run_id": 36851711874,
+      "freeze_guard": "SUCCESS",
+      "pages_natural_run_id": 36853589288,
+      "pages_natural": "IN_PROGRESS_AT_OBSERVATION"
     }
   },
   "post_merge_storage_policy_evidence": {
@@ -715,5 +741,12 @@
     "model_quality": "REJECT",
     "production_strategy_registry": "EMPTY",
     "macro_regime": "REGIME_UNAVAILABLE"
+  },
+  "pending_documentation_sync_pr": {
+    "pull_request": 703,
+    "parent_main_sha": "54c099254303512eba7f8f2b57dcd98124b17348",
+    "head_sha": "9e43c7704f9b9dd2f3c23c1cd68127e66cd2afc8",
+    "state": "OPEN_CHECKS_IN_PROGRESS",
+    "changed_runtime_or_authority": false
   }
 }

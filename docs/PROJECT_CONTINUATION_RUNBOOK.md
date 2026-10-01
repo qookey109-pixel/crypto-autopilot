@@ -1,3 +1,24 @@
+## Latest Cloud Paper continuation checkpoint — 2026-10-01 19:10 Asia/Taipei
+
+Live evidence basis: GitHub `main=54c099254303512eba7f8f2b57dcd98124b17348`; live open PR search returned 0. PR #702 merged at this SHA. Post-merge main CI [36851711972](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711972), CodeQL [36851711901](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711901), Dependency/SBOM [36851711909](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711909), and V0.10 Freeze Guard [36851711874](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711874) succeeded. Pages natural run [36853589288](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36853589288) was still in progress at the checkpoint; it is not a completed delivery check.
+
+### Cloud Paper Billable Usage V0.3 — one-shot result
+
+- Run [36852292356](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36852292356), attempt 1, event `workflow_dispatch`, main SHA `54c099254303512eba7f8f2b57dcd98124b17348`, completed SUCCESS. The audit job, bounded capture, secret-free summary, artifact upload, and ephemeral-report cleanup all succeeded.
+- Result: `READY_FOR_REVIEW / USAGE_ROWS_CAPTURED_REVIEW_REQUIRED_FOR_SCOPE`; exactly 1 Cloudflare HTTP request; 42 response rows; returned usage-based billed-cost subtotal 0.0 USD; all returned rows had billed_cost. Query scope is current billing period without a date filter. Observation time `2026-10-01T10:57:13.348117Z`; billing period began `2026-09-17T00:00:00Z`, with returned rows through `2026-10-01T00:00:00Z`.
+- Preserve artifact [11156336210](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36852292356/artifacts/11156336210), 1,325 bytes, expires 2026-10-08, digest `sha256:aafc0e4c58bdb8d25426a390c1d9689ce77324ef2c780d91e6fcc2f90c1bbcbf`. The report states account identity and raw response were not persisted.
+- This endpoint/result does not establish complete account coverage, fixed subscription/invoice charges, all writers, D1 use, freshness (provider data may lag daily), R2/D1 headroom, or zero total project cost; `zero_cost_conclusion=UNKNOWN`. Do not call this FREE-ONLY approval. The one-shot authority is consumed; **do not rerun for any reason**. The workflow did not access R2/D1 or enable Cloud Paper.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, production cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production registry empty, Core100 quality `REJECT`.
+
+### Ordered next work
+
+1. Reconcile this run's usage-only evidence with existing subscription and R2 analytics snapshots without claiming total account costs, freshness, or headroom.
+2. Prepare a separately versioned sustainable account-wide cost/headroom evidence path: include current billing and fixed fees, R2/D1 inventories/usages, complete writer coverage, timestamps/freshness, per-operation request/read/write/byte ceilings, and the evidence ledger's own cost. No provider/R2/D1 query until the new exact authority and budget are merged.
+3. Continue field-by-field market-source qualification and retention-right review; missing or unapproved fields remain unavailable.
+4. Complete the storage growth/retention and end-to-end Cloud Paper gates. Runtime, controlled main cycle, and schedule stay disabled until budget, data, authority, persistence/recovery, and CI gates pass.
+
+CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Preserve this run/artifact and prior failures. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+
 ## Latest Cloud Paper continuation checkpoint — 2026-10-01 18:38 Asia/Taipei
 
 Live evidence basis: GitHub `main=068a09b99dd2fbd11f71a7eda4ab47db8223a5af`. Six open PRs are Dependabot updates #693–#698; verify each exact head, required checks and mergeability against current main before merging. PRs #699 and #700 are merged. PR #700 post-merge main CI [36848531615](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36848531615), CodeQL [36848531797](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36848531797), Dependency/SBOM [36848531664](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36848531664), and V0.10 Freeze Guard [36848531766](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36848531766) succeeded. PR #699 Pages build [36847992305](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36847992305) succeeded; deploy/browser-production were skipped for docs-only changes.
