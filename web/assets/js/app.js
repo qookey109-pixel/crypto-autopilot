@@ -866,6 +866,52 @@ function renderCloudRuns(report) {
       item.append(links);
       list.append(item);
     }
+    for (const row of report.diagnosticRuns || []) {
+      const latest = row?.latestRun || {};
+      const item = document.createElement("li");
+      item.className = "cloud-run-card";
+
+      const title = document.createElement("strong");
+      title.textContent = String(row?.title || "Cloud 診斷 workflow");
+      item.append(title);
+
+      const runId = Number.isInteger(latest.runId) ? `#${latest.runId}` : "尚無 run";
+      const attempt = Number.isInteger(latest.runAttempt) ? latest.runAttempt : "—";
+      const state = {
+        WORKFLOW_SUCCESS: "workflow 成功",
+        WORKFLOW_FAILED: "workflow 失敗",
+        RUNNING: "執行或排隊中",
+        CANCELLED: "已取消",
+        TIMED_OUT: "逾時",
+        SKIPPED: "已略過",
+        QUERY_FAILED: "GitHub 查詢失敗",
+        NO_RUN: "尚無可核實 run",
+        UNVERIFIED: "待核實"
+      }[latest.state] || "待核實";
+      const run = document.createElement("small");
+      run.textContent = `最新 GitHub 執行 ${runId} · attempt ${attempt} · ${state}`;
+      item.append(run);
+
+      const evidence = document.createElement("small");
+      evidence.textContent = `建立時間 ${latest.createdAtUtc ? formatTrustedTime(latest.createdAtUtc) : "尚未提供"} · 僅含 GitHub run metadata，不含帳務報告內容`;
+      item.append(evidence);
+
+      const links = document.createElement("span");
+      links.className = "cloud-run-links";
+      const safeRunUrl = typeof latest.sourceUrl === "string"
+        && /^https:\/\/github\.com\/qookey109-pixel\/crypto-autopilot\/actions\/runs\/[0-9]+$/.test(latest.sourceUrl);
+      if (safeRunUrl) {
+        const runLink = document.createElement("a");
+        runLink.textContent = "查看 workflow / 報告 ↗";
+        runLink.href = latest.sourceUrl;
+        runLink.target = "_blank";
+        runLink.rel = "noopener noreferrer";
+        links.append(runLink);
+      }
+      item.append(links);
+      list.append(item);
+    }
+
     if (!report.items.length) {
       const empty = document.createElement("li");
       empty.textContent = "目前沒有可核實的自動排程執行資料。";
