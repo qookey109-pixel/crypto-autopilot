@@ -1,5 +1,19 @@
 # Cloud Paper Loop delivery V0.1
 
+
+## Runtime adapter assembly (2026-10-02; implementation only)
+
+The prepared factory `src/crypto_autopilot/paper/cloud_runtime_v0_1.py` assembles the existing guarded R2 JSON store, shared-rows guarded D1 client, atomic slot ledger and Cloud Paper composition. Construction defaults off before environment access. When explicitly constructed under a future reviewed caller, both original R2/D1 snapshots must pass existing freshness and capacity checks before credentials or clients are touched. The same R2 guard is bound to the store and composition; the D1 usage guard and shared rows guard are required. The returned composition still defaults to disabled execution.
+
+The Cloud Paper public client reuses the unchanged Pionex parsers. It allows only six existing public endpoints at the fixed Pionex HTTPS host, makes one HTTP attempt without retry or redirect, accepts identity encoding only, caps a response at 1 MiB and timeout at 10 seconds, and rechecks evidence after pacing immediately before send. This closes the legacy `urlopen` redirect/request-count gap without changing historical provider or frozen source bindings. Errors expose fixed reason codes only.
+
+Cloud CI covers parser compatibility, redirect rejection, oversize/encoded responses, HTTP/JSON failures, stale evidence after pacing, and assembled synthetic no-trade persistence with duplicate-slot rejection. No real provider, R2 or D1 request is made. The config and prepared receipt grant no new access.
+
+PR #709 merged JSON-compatible report writing at parent main `bcbbb63bf6ee49c38bcdb34d8616d7312d7c1317`. PR CI [36874736113](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36874736113) passed both Python versions; full-cycle artifact 11168164335 has digest `sha256:cc6e772c9ff1c552cbe6bd4ac1bb39ef53d183687d214853de356ac83f7768c8`. Main CI [36875854735](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36875854735), CodeQL, Dependencies and Freeze Guard passed. Pages [36875854248](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36875854248) built; deploy/browser-production were skipped. This is engineering evidence, not a new production deployment or cycle.
+
+Execution workflow, sustainable account-wide budget evidence, production D1 provisioning, controlled main acceptance and natural schedule remain incomplete. Current registry stays empty; Core100 stays REJECT. CLOUD_ONLY / 0 USD / PAPER-LIVE-PAPER ONLY.
+
+
 CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER. Target: full public-market → opportunity → qualified strategy → risk → paper execution → persistent state → dashboard cycle.
 
 ## Completed contract

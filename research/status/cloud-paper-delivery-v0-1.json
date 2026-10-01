@@ -78,7 +78,7 @@
     },
     "cloudflare_billable_usage_v0_3": "PR692_MERGED; RUN_36852292356_ATTEMPT_1_SUCCESS; REPORT_READY_FOR_REVIEW_USAGE_ROWS_CAPTURED_REVIEW_REQUIRED_FOR_SCOPE; 1_HTTP_REQUEST; 42_ROWS; REPORTED_USAGE_BASED_COST_USD_0; AUTHORITY_CONSUMED_DO_NOT_RERUN; FIXED_FEES_FULL_ACCOUNT_COVERAGE_FRESHNESS_HEADROOM_AND_ZERO_TOTAL_COST_UNKNOWN",
     "r2_protocol_profile": "PR707_MERGED_MAIN_A0F86649; CI_36872126417_SUCCESS; INDEPENDENT_CALLBACK_BYTES_AND_BUDGET_DENIAL_VERIFIED; SYNTHETIC_ADAPTER_MICRO_SCENARIOS_ONLY; NO_PRODUCTION_USAGE_OR_HEADROOM_CLAIM",
-    "full_cycle_r2_profile": "PREPARED_IN_THIS_CHANGE; SAME_EXISTING_ASSERTED_NO_TRADE_ENTRY_EXIT_RECOVERY_AND_FAILED_SETTLEMENT_FIXTURES_WITH_REAL_R2_ADAPTERS_AND_IN_MEMORY_S3; CLOUD_CI_ACCEPTANCE_PENDING; NO_EXTERNAL_ACCESS"
+    "full_cycle_r2_profile": "PR709_MERGED; SYNTHETIC_REAL_ADAPTER_PROFILE_PASS_CI_36874736113; NO_PRODUCTION_HEADROOM_CLAIM"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "R2 V0.3 run 36593296360 is partial: one returned bucket (616541780 bytes) and 6 operation groups / 125309 requests with no operation timestamp; complete bucket inventory, all writers, freshness and headroom remain UNKNOWN; V0.3 one-time authority consumed; do not rerun.",
@@ -746,5 +746,79 @@
     "model_quality": "REJECT",
     "production_strategy_registry": "EMPTY",
     "macro_regime": "REGIME_UNAVAILABLE"
+  },
+  "runtime_adapter_assembly": {
+    "status": "PREPARED_IMPLEMENTATION_NOT_PRODUCTION_ACCEPTED",
+    "config": "config/cloud_paper_runtime_adapters_v0_1.json",
+    "receipt": "research/receipts/2026-10-02-cloud-paper-runtime-adapters-prepared.json",
+    "construction_default_enabled": false,
+    "execution_workflow_wired": false,
+    "provider_transport": "FIXED_HOST_6_PUBLIC_PATHS_NO_REDIRECT_NO_RETRY_1_MIB_10_SECOND_TIMEOUT_PRE_SEND_FRESHNESS",
+    "shared_guards": "R2_GUARD_BOUND_TO_STORE_AND_COMPOSITION; D1_USAGE_AND_SHARED_ROWS_GUARDS_REQUIRED",
+    "production_access_performed": false,
+    "activation_enabled": false,
+    "verified_code_head_sha": "5217f721a965b3e8c6c9dae4e9b2768e035865fb",
+    "cloud_ci_evidence": {
+      "ci_run_id": 36889324781,
+      "python_3_12": "SUCCESS_1919_TESTS_1305_SUBTESTS",
+      "python_3_13": "SUCCESS_1919_TESTS_1305_SUBTESTS",
+      "ruff": "SUCCESS",
+      "codeql_run_id": 36889324697,
+      "dependency_run_id": 36889324727,
+      "pages_pr_run_id": 36889324705,
+      "pages_pr_build_and_desktop_mobile": "SUCCESS",
+      "pages_deploy": "SKIPPED",
+      "pages_browser_production": "SKIPPED",
+      "scope": "SYNTHETIC_ENGINEERING_ONLY_NOT_PRODUCTION_ACCEPTANCE"
+    },
+    "historical_failed_ci": {
+      "run_id": 36889093205,
+      "reason": "NEW_TEST_RUFF_SYNTAX_ERROR_FIXED_BY_NEW_COMMIT_NOT_RERUN"
+    }
+  },
+  "json_compatibility_v0_2_evidence": {
+    "pull_request": 709,
+    "head_sha": "b5d30a803a6bee6cf1f538cd4536bf51c0ac292a",
+    "merged_main_sha": "bcbbb63bf6ee49c38bcdb34d8616d7312d7c1317",
+    "pr_ci_run_id": 36874736113,
+    "pr_ci": "PYTHON_3_12_AND_3_13_SUCCESS",
+    "post_merge_ci_run_id": 36875854735,
+    "post_merge_ci": "SUCCESS",
+    "post_merge_codeql": "SUCCESS",
+    "post_merge_dependencies": "SUCCESS",
+    "post_merge_freeze_guard": "SUCCESS",
+    "pages_build": "SUCCESS",
+    "pages_deploy": "SKIPPED",
+    "pages_browser_production": "SKIPPED",
+    "runtime_activation": false
+  },
+  "full_cycle_r2_profile": {
+    "status": "PASS_SYNTHETIC_REAL_ADAPTERS_NO_EXTERNAL_ACCESS",
+    "ci_run_id": 36874736113,
+    "head_sha": "b5d30a803a6bee6cf1f538cd4536bf51c0ac292a",
+    "artifact_id": 11168164335,
+    "artifact_digest": "sha256:cc6e772c9ff1c552cbe6bd4ac1bb39ef53d183687d214853de356ac83f7768c8",
+    "no_trade": {
+      "objects": 10,
+      "stored_bytes": 24176,
+      "get": 19,
+      "list": 4,
+      "put": 10
+    },
+    "entry_exit_no_trade_3_slots": {
+      "objects": 26,
+      "stored_bytes": 122929,
+      "get": 97,
+      "list": 12,
+      "put": 26
+    },
+    "production_cost_or_headroom_proven": false
+  },
+  "shared_account_operating_model": {
+    "user_clarification": "OTHER_PROJECTS_OR_SERVICES_MAY_BE_ADDED_LATER",
+    "dedicated_account_assumed": false,
+    "current_all_writer_inventory": "UNCONFIRMED",
+    "future_writer_policy": "REQUIRE_REGISTRATION_AND_SHARED_BUDGET_ADMISSION_BEFORE_ACCESS",
+    "all_writer_coverage_proven": false
   }
 }
