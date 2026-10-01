@@ -1,23 +1,22 @@
-## Latest Cloud Paper continuation checkpoint — 2026-10-01 19:10 Asia/Taipei
+## Latest Cloud Paper continuation checkpoint — 2026-10-02 01:06 Asia/Taipei
 
-Live evidence basis: GitHub `main=54c099254303512eba7f8f2b57dcd98124b17348`; live open PR search returned 0. PR #702 merged at this SHA. Post-merge main CI [36851711972](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711972), CodeQL [36851711901](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711901), Dependency/SBOM [36851711909](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711909), and V0.10 Freeze Guard [36851711874](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711874) succeeded. Pages natural run [36853589288](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36853589288) was still in progress at the checkpoint; it is not a completed delivery check.
+Live evidence basis: GitHub `main=94177124088dbce3ea37b7c4aa1c9b659ee6038c`; PR [#710](https://github.com/qookey109-pixel/crypto-autopilot/pull/710) merged. Exact-head CI [36890439873](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36890439873), CodeQL [36890439735](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36890439735), Dependency/SBOM [36890439850](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36890439850), and Pages PR build/browser [36890440008](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36890440008) succeeded, including desktop/mobile browser validation. PR deploy and production-browser were skipped. Post-merge main CI [36896406629](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406629), CodeQL [36896406634](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406634), Dependency/SBOM [36896406691](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406691), V0.10 Freeze Guard [36896406687](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406687), and Pages build [36896406707](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406707) succeeded. Post-merge deploy/browser were skipped; no fresh production deployment is claimed.
 
-### Cloud Paper Billable Usage V0.3 — one-shot result
+### Current state
 
-- Run [36852292356](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36852292356), attempt 1, event `workflow_dispatch`, main SHA `54c099254303512eba7f8f2b57dcd98124b17348`, completed SUCCESS. The audit job, bounded capture, secret-free summary, artifact upload, and ephemeral-report cleanup all succeeded.
-- Result: `READY_FOR_REVIEW / USAGE_ROWS_CAPTURED_REVIEW_REQUIRED_FOR_SCOPE`; exactly 1 Cloudflare HTTP request; 42 response rows; returned usage-based billed-cost subtotal 0.0 USD; all returned rows had billed_cost. Query scope is current billing period without a date filter. Observation time `2026-10-01T10:57:13.348117Z`; billing period began `2026-09-17T00:00:00Z`, with returned rows through `2026-10-01T00:00:00Z`.
-- Preserve artifact [11156336210](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36852292356/artifacts/11156336210), 1,325 bytes, expires 2026-10-08, digest `sha256:aafc0e4c58bdb8d25426a390c1d9689ce77324ef2c780d91e6fcc2f90c1bbcbf`. The report states account identity and raw response were not persisted.
-- This endpoint/result does not establish complete account coverage, fixed subscription/invoice charges, all writers, D1 use, freshness (provider data may lag daily), R2/D1 headroom, or zero total project cost; `zero_cost_conclusion=UNKNOWN`. Do not call this FREE-ONLY approval. The one-shot authority is consumed; **do not rerun for any reason**. The workflow did not access R2/D1 or enable Cloud Paper.
-- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, production cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production registry empty, Core100 quality `REJECT`.
+- PR #710 assembled the Cloud Paper runtime adapters and bounded public Pionex transport. Python 3.12/3.13 each passed 1,919 tests and 1,305 subtests. Synthetic tests do not prove production Cloudflare usage, cost, headroom, or a real cycle.
+- The user confirmed other projects/services may be added to the same Cloudflare account later. Do not assume a dedicated account. Current complete writer inventory remains unconfirmed; each future writer must register and participate in shared budget admission before access.
+- Cloud Paper remains disabled: execution workflow NOT_WIRED, production cycle NOT_RUN, natural schedule NOT_CONFIGURED, D1 unprovisioned, production strategy registry empty, Core100 REJECT, and market context incomplete. Full-account usage/cost/headroom remain UNKNOWN. Consumed one-shot audit/bootstrap authorities must never be rerun.
 
 ### Ordered next work
 
-1. Reconcile this run's usage-only evidence with existing subscription and R2 analytics snapshots without claiming total account costs, freshness, or headroom.
-2. Prepare a separately versioned sustainable account-wide cost/headroom evidence path: include current billing and fixed fees, R2/D1 inventories/usages, complete writer coverage, timestamps/freshness, per-operation request/read/write/byte ceilings, and the evidence ledger's own cost. No provider/R2/D1 query until the new exact authority and budget are merged.
-3. Continue field-by-field market-source qualification and retention-right review; missing or unapproved fields remain unavailable.
-4. Complete the storage growth/retention and end-to-end Cloud Paper gates. Runtime, controlled main cycle, and schedule stay disabled until budget, data, authority, persistence/recovery, and CI gates pass.
+1. Define a sustainable account-wide usage/headroom evidence and shared-writer admission method. Account for freshness, existing and future writers, fixed charges, R2/D1 scope, and the evidence method's own resource use. Keep evidence UNKNOWN until complete.
+2. Establish D1 readiness and the required free-tier/budget evidence without querying or provisioning before its authority is merged.
+3. Wire the guarded execution workflow using the merged adapters; cover report/account readback, duplicate slot, restart, partial write, and recovery fail-closed behavior.
+4. Run only a separately authorized controlled main PAPER acceptance after all external budget/data/authority gates are satisfied.
+5. Configure the natural schedule and dashboard evidence projection only after controlled acceptance. Verify first natural run separately.
 
-CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Preserve this run/artifact and prior failures. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Preserve frozen/failed evidence. Holdout, source switch, promotion, real-money orders and live trading remain closed.
 
 ## Latest Cloud Paper continuation checkpoint — 2026-10-01 18:38 Asia/Taipei
 

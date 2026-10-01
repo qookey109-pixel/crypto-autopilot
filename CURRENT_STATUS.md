@@ -1,3 +1,17 @@
+## Live checkpoint — 2026-10-02 01:10 Asia/Taipei
+
+Evidence basis: GitHub `main=94177124088dbce3ea37b7c4aa1c9b659ee6038c`. PR [#710](https://github.com/qookey109-pixel/crypto-autopilot/pull/710) merged at this SHA. Its CI, CodeQL, dependency, Pages build and desktop/mobile PR browser checks passed. Main CI [36896406629](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406629), CodeQL [36896406634](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406634), Dependency/SBOM [36896406691](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406691), V0.10 Freeze Guard [36896406687](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406687) and Pages build [36896406707](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406707) passed. Post-merge Pages deploy and production-browser were skipped; no new production deployment is claimed.
+
+- PR #710 adds guarded Cloud Paper adapters and bounded Pionex public transport. Exact PR CI passed 1,919 tests and 1,305 subtests on each of Python 3.12 and 3.13. This synthetic engineering evidence is not a production cycle.
+- Shared Cloudflare account clarification: other projects/services may be added later. The account is not assumed dedicated to this repository. The complete current writer list and account-wide cost/headroom remain UNKNOWN; future writers must register and use shared budget admission.
+- Cloud Paper remains disabled: runtime execution workflow NOT_WIRED, cycle NOT_RUN, natural schedule NOT_CONFIGURED, D1 unprovisioned, production strategy registry empty, Core100 quality REJECT and market fields incomplete. Consumed one-shot audits/bootstrap must not be rerun.
+- Seven PRs are open: draft #708 has a stale base, and Dependabot #693–#698 need exact-head/base/check reconciliation before merge.
+- The first documentation-sync CI [36897191065](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36897191065) found the machine status date was coupled to this page's first-line date. The follow-up aligns the machine status timestamp to 2026-10-02 while retaining its explicit historical evidence-basis semantics; the complete prior status text remains below.
+
+Next: establish sustainable account-wide cost/headroom and writer-admission evidence; then complete D1 readiness, guarded execution, controlled PAPER acceptance with persistence/recovery readback, and natural scheduling only after the required budget and data gates pass.
+
+CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+
 ## Live checkpoint — 2026-10-01 19:10 Asia/Taipei
 
 Evidence basis: GitHub `main=54c099254303512eba7f8f2b57dcd98124b17348`, reread from GitHub. Open PR search returned 0. PR #702 merged at this SHA. Post-merge main CI [36851711972](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711972), CodeQL [36851711901](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711901), Dependency/SBOM [36851711909](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711909), and V0.10 Freeze Guard [36851711874](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711874) succeeded. Dashboard Pages natural run [36853589288](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36853589288) was still in progress at this checkpoint and is not counted as a pass.
