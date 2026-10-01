@@ -403,7 +403,6 @@
     "latest_maintenance_run_id": 36676302904,
     "latest_maintenance_propose": "OBSERVATION_CHANGED",
     "next_work": "DESIGN_TEST_VERSIONED_D1_SHARED_LEDGER_LIFECYCLE_AND_COMPLETE_ACCOUNT_WRITER_COVERAGE_BEFORE_CLOUD_PAPER_ACTIVATION",
-    "dashboard_pages_relation_to_source_merge_pr_681": "NO_NEW_DEPLOY_DOCS_ONLY_PR_717_MERGE",
     "closed_unmerged_pull_requests": [
       {
         "number": 679,
@@ -415,7 +414,8 @@
         "closed_at_utc": "2026-10-01T08:15:20Z",
         "note": "STALE_GENERATED_SNAPSHOT_CLOSED_UNMERGED_HISTORICAL_EVIDENCE_PRESERVED"
       }
-    ]
+    ],
+    "dashboard_pages_result": "BUILD_SUCCESS_DEPLOY_AND_PRODUCTION_BROWSER_SKIPPED_DOCS_ONLY"
   },
   "cloud_paper_billing_evidence": {
     "updated_date": "2026-10-01",
