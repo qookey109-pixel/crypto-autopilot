@@ -1,4 +1,16 @@
-## Live checkpoint — 2026-10-01 16:15 Asia/Taipei
+## Live checkpoint — 2026-10-01 17:09 Asia/Taipei
+
+Evidence basis: the Cloudflare diagnostic ran on GitHub `main=7c6bb943f74aebb08fa927e30730e23845825609`; PR #686 later merged status at `fb6d35b6478989dc91de8ffcb096fa060a494db7`.
+
+- Run [36839577708](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36839577708), attempt 1, failed; one Cloudflare request returned `CLOUDFLARE_HTTP_403`. Cause remains `UNKNOWN`.
+- No report file or artifact was produced; the run and job log are the available evidence. The one-time authority is consumed. Do not rerun. Any further query needs a separately versioned successor authority.
+- This does not prove quota insufficiency or a particular token-scope issue. Account-wide usage, complete billing coverage, all writers, R2/D1 headroom, and zero-cost remain `UNKNOWN`.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production strategy registry empty, Core100 quality `REJECT`.
+- #686 exact-head Python 3.12/3.13, workflow-static, build, snapshot, CodeQL, and dependency checks passed; Pages deploy/browser checks were skipped for documentation-only changes.
+
+CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Preserve the failed run; no rerun.
+
+## Historical checkpoint — 2026-10-01 16:15 Asia/Taipei (superseded by later evidence)
 
 Evidence basis: GitHub `main=42f8c1cdad46107f5f8f720b9809a7ad71286815`, re-read at 2026-10-01T08:15:20Z before this documentation update. This is a parent snapshot, not a latest-main claim; resolve `main` live at read time.
 
@@ -9,6 +21,7 @@ Evidence basis: GitHub `main=42f8c1cdad46107f5f8f720b9809a7ad71286815`, re-read 
 - Next: prepare the smallest separately versioned, read-only successor evidence scope for the still-missing cost/usage dimensions, and finish field-by-field compliant market-source eligibility. Keep all external access disabled until its authority, freshness, free-tier boundary, and expected request/read/write envelope are explicit.
 
 CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; FREE-ONLY / 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, model promotion, real-money orders, live trading, and automatic Cloud Maintenance merge remain closed.
+
 
 
 ## Historical checkpoint — 2026-10-01 16:15 Asia/Taipei (superseded by later evidence)
