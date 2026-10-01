@@ -28,9 +28,9 @@ from crypto_autopilot.paper.cloud_loop_v0_1 import (
     CompleteTapePionexFeed,
     committed_report,
     digest,
-    run_cloud_step,
     validate_slot_start,
 )
+from crypto_autopilot.paper.cloud_loop_v0_2 import run_cloud_step
 from crypto_autopilot.paper.cloud_market_v0_1 import (
     PublicMarketClient,
     analyze_capture,
