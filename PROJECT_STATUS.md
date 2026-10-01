@@ -1,15 +1,15 @@
-## Live Cloud Paper checkpoint — 2026-10-01 18:11 Asia/Taipei
+## Live Cloud Paper checkpoint — 2026-10-01 18:38 Asia/Taipei
 
-Evidence basis: GitHub `main=0310d8ba31867b50672765b00f3651951d378583`, read after PR #692 merged. At that check there were no open PRs. PR #692 exact-head CI, Python 3.12/3.13, workflow-static, CodeQL, dependency/SBOM and retired-workflow checks passed. Post-merge main CI #36847151342, CodeQL #36847151432, Dependency/SBOM #36847151339 and V0.10 Freeze Guard #36847151394 also passed. The #692 delivery branch is deleted.
+Evidence basis: GitHub `main=068a09b99dd2fbd11f71a7eda4ab47db8223a5af`, reread from the default branch. Six open PRs are Dependabot updates #693–#698; recheck exact heads, checks and mergeability before merging. PRs #699 and #700 are merged and their delivery branches are deleted. PR #700 post-merge main CI #36848531615, CodeQL #36848531797, Dependency/SBOM #36848531664, and V0.10 Freeze Guard #36848531766 succeeded. PR #699 Pages build #36847992305 succeeded; deploy and browser-production were skipped for docs-only changes.
 
-- #692 introduced a separately versioned V0.3 read-only current-billing-period usage successor and merged it into main. The consumed V0.2 run [36839577708](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36839577708) returned HTTP 403 from the V2 Alpha/Restricted endpoint. The account-specific cause remains UNKNOWN; do not rerun V0.2.
-- V0.3 manual main workflow has not been dispatched and has made zero Cloudflare requests. The one-shot authority permits one run, one attempt, one GitHub workflow-history request and at most one Cloudflare GET. No retry, fallback, pagination, R2/D1, schedule or runtime activation is permitted. Preserve any failure and do not rerun.
-- The V0.3 result will cover usage-based charges only. Fixed-fee subscriptions, full account inventory, all writers, invoice totals, freshness, R2/D1 headroom and zero total project cost remain unproven.
+- Cloud Paper Billable Usage V0.3 has not been dispatched from main; no V0.3 run or Cloudflare request is evidenced in the current Actions inventory. Its one-time authority allows one run/attempt, one GitHub run-history request and at most one Cloudflare GET; no retry, redirect, pagination, fallback, R2/D1, schedule or runtime. V0.2 run [36839577708](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36839577708) failed with HTTP 403; cause remains UNKNOWN and it must not be rerun.
+- V0.3 covers usage-based charges only. Fixed-fee invoices, full account coverage, all writers, freshness, R2/D1 headroom and zero total project cost remain unproven.
 - Cloud Paper remains disabled: entrypoint `NOT_WIRED`, production cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production registry empty, Core100 quality `REJECT`.
+- Synthetic storage savings do not establish production R2 usage, cost, or headroom. Required market fields remain incomplete; no unapproved source or scraping path is enabled.
 
-Next: dispatch the [V0.3 workflow](https://github.com/qookey109-pixel/crypto-autopilot/actions/workflows/cloud-paper-billable-usage-v0-3.yml) once from main and review its report without rerun. Then design a sustainable, fresh, account-wide budget/headroom evidence path; do not equate this one snapshot with runtime authorization.
+Next: dispatch the [V0.3 workflow](https://github.com/qookey109-pixel/crypto-autopilot/actions/workflows/cloud-paper-billable-usage-v0-3.yml) from main once and inspect its complete evidence without rerun. Continue the remaining full-delivery gates only from verified evidence; keep provider/R2/D1 runtime access, controlled acceptance, and schedule disabled until separately authorized and proven.
 
-CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Preserve V0.2 failure and all frozen evidence. Holdout, source switch, promotion, real-money orders, and live trading remain closed.
 
 ## Live Cloud Paper checkpoint — 2026-10-01 17:44 Asia/Taipei
 
