@@ -1077,7 +1077,7 @@ function renderCloudPaperLoop(data) {
     && data.market?.breadth_coverage?.coverage_verified === false
     && data.model_quality === "REJECT"
     && usageVersion !== null
-    && billingEvidenceValid
+    && (billingEvidenceValid || data.billing_evidence === undefined)
     && data.budget?.reservation_guard === "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED"
     && data.budget?.d1_reservation_ledger === "SHARED_LEDGER_CODE_PREPARED_MIGRATIONS_NOT_APPLIED_D1_NOT_PROVISIONED"
     && data.budget?.storage_capacity?.state === "USAGE_PARTIAL_BLOCKED"
@@ -1156,19 +1156,26 @@ function renderCloudPaperLoop(data) {
     ? `來源儲存快照：${data.budget.usage_audit_evidence.latest_snapshot_utc} · 操作用量 freshness 未知`
     : "來源資料：V0.2 不完整查核；不能證明 freshness");
   const billingEvidence = data.billing_evidence;
-  const billing = billingEvidence.subscription_snapshot;
-  const usage = billingEvidence.billable_usage_snapshot;
-  set("#cloud-paper-billing-detail",
-    `帳單方案查核（${billing.observed_date}）：${billing.rate_plan_id} / ${billing.state}，顯示訂閱價格 ${billing.listed_subscription_price_total_usd} USD；此 rate-plan 標籤不在目前文件列舉中，須人工釐清。帳務用量（${usage.observed_at_utc}）：42 筆回報的用量成本合計 ${usage.reported_billed_cost_total.toFixed(2)} USD，但不含固定訂閱費，且完整帳戶覆蓋未知。零費用未證明；目前寫入者盤點不完整，預期未來會新增服務。`);
-  const billingRun = document.querySelector("#cloud-paper-billing-run");
-  if (billingRun) {
-    billingRun.href = billing.run_url;
-    billingRun.hidden = false;
-  }
-  const usageRun = document.querySelector("#cloud-paper-usage-run");
-  if (usageRun) {
-    usageRun.href = usage.run_url;
-    usageRun.hidden = false;
+  if (billingEvidenceValid) {
+    const billing = billingEvidence.subscription_snapshot;
+    const usage = billingEvidence.billable_usage_snapshot;
+    set("#cloud-paper-billing-detail",
+      `帳單方案查核（${billing.observed_date}）：${billing.rate_plan_id} / ${billing.state}，顯示訂閱價格 ${billing.listed_subscription_price_total_usd} USD；此 rate-plan 標籤不在目前文件列舉中，須人工釐清。帳務用量（${usage.observed_at_utc}）：42 筆回報的用量成本合計 ${usage.reported_billed_cost_total.toFixed(2)} USD，但不含固定訂閱費，且完整帳戶覆蓋未知。零費用未證明；目前寫入者盤點不完整，預期未來會新增服務。`);
+    const billingRun = document.querySelector("#cloud-paper-billing-run");
+    if (billingRun) {
+      billingRun.href = billing.run_url;
+      billingRun.hidden = false;
+    }
+    const usageRun = document.querySelector("#cloud-paper-usage-run");
+    if (usageRun) {
+      usageRun.href = usage.run_url;
+      usageRun.hidden = false;
+    }
+  } else {
+    set("#cloud-paper-billing-detail",
+      "此歷史投影未包含 Cloudflare 計費快照；費用及完整帳戶 writer 覆蓋仍未知。");
+    const billingRunLinks = document.querySelectorAll("#cloud-paper-billing-run, #cloud-paper-usage-run");
+    billingRunLinks.forEach(link => { link.hidden = true; link.removeAttribute("href"); });
   }
   const link = document.querySelector("#cloud-paper-evidence-run");
   if (link) {
