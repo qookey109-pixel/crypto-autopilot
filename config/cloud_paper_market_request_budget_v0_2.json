@@ -10,7 +10,8 @@
     "schedule_slots_per_day": 96,
     "candidate_limit": 5,
     "fixed_breadth_market_count": 23,
-    "provider_batch_klines_supported": false,
+    "provider_batch_klines_supported": null,
+    "call_formula_assumption": "One request per symbol and interval; batch support is unverified.",
     "cross_run_cache_available": false,
     "automatic_retries": 0,
     "missed_slots_backfilled": false
@@ -24,7 +25,8 @@
     "formula": "3 shared market calls + 23 fixed breadth klines + 5 candidate 60M klines + 5 candidate 15M klines",
     "maximum_calls_per_utc_day": 3456,
     "maximum_calls_per_rolling_30_days": 103680,
-    "provider_request_weight_per_call": null,
+    "pionex_kline_weight_per_request": 1,
+    "shared_market_endpoint_weights": null,
     "provider_rate_limit": null
   },
   "comparison_with_v0_1": {
@@ -39,10 +41,11 @@
     "market_context_interval": "4H",
     "setup_interval": "60M",
     "entry_interval": "15M",
-    "maximum_15m_bar_age_ms": 900000,
+    "proposed_15m_bar_age_limit_ms": 900000,
+    "15m_age_limit_status": "PROPOSAL_NOT_CURRENT_AUTHORITY",
     "current_schedule_offsets_minutes": [7, 22, 37, 52],
     "maximum_start_delay_ms": 600000,
-    "schedule_delay_can_exceed_15m_bar_age": true,
+    "schedule_delay_can_exceed_proposed_15m_bar_age_limit": true,
     "stale_or_incomplete_input": "REVIEW_REQUIRED_NO_NEW_ENTRY_NO_GUESSING"
   },
   "cache_and_storage": {
@@ -55,11 +58,12 @@
     "hash_is_not_a_replacement_for_discarded_raw_input": true
   },
   "unresolved_evidence": [
-    "Pionex account or endpoint request allowance and rate-limit weight",
+    "Pionex aggregate account request allowance and rate-limit capacity",
+    "Shared market endpoint weights and batch Kline support",
     "Whether the 23-market fixed breadth set is complete and continuously available",
     "Actual warmup bar counts for every strategy-required timeframe",
     "Shared account-wide request use by other provider workflows",
-    "Freshness tolerance and safe handling for a delayed 15M entry slot",
+    "Approved freshness tolerance and safe handling for delayed 15M entry slots",
     "D1/R2 costs if any cross-run cache is proposed",
     "TOTAL3 and BTC dominance source definition, terms, retention rights, and freshness"
   ],
