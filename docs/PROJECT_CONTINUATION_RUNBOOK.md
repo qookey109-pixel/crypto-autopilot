@@ -1,3 +1,23 @@
+## Latest Cloud Paper continuation checkpoint — 2026-10-01 18:11 Asia/Taipei
+
+Live evidence basis: GitHub `main=0310d8ba31867b50672765b00f3651951d378583`, read after PR #692 merged. Open PR count was zero at that check. PR #692 exact-head CI, Python 3.12/3.13, workflow-static, CodeQL, Dependency/SBOM and retired-workflow checks passed. Post-merge main CI [36847151342](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36847151342), Dependency/SBOM [36847151339](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36847151339), CodeQL [36847151432](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36847151432), and V0.10 Freeze Guard [36847151394](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36847151394) passed. No new Pages deployment was required or claimed.
+
+Current gates:
+- PR #692 merged Cloud Paper Billable Usage V0.3. Consumed V0.2 run [36839577708](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36839577708) returned HTTP 403; cause remains UNKNOWN and V0.2 must not rerun.
+- V0.3 uses the documented V1 `/billable-usage` route as a separately versioned, manual, one-shot successor. It is **NOT YET DISPATCHED**; no V0.3 Cloudflare request has occurred.
+- If dispatching V0.3, do it only from main, once. The contract allows one GitHub run-history request and at most one Cloudflare GET; no retries, reruns, redirects, pagination, fallback endpoint, R2/D1, schedule, or runtime activation. Preserve all error logs/artifacts and do not retry after any failure or ambiguous result.
+- V0.3 reports usage-based charges only; fixed subscription fees are excluded. Even a zero subtotal cannot prove zero total project cost. The run cannot prove all writers, invoice totals, complete account coverage, current R2/D1 headroom, or sustained freshness.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production registry empty, Core100 quality `REJECT`.
+
+Ordered next work:
+1. Run the one-time V0.3 workflow from [GitHub Actions](https://github.com/qookey109-pixel/crypto-autopilot/actions/workflows/cloud-paper-billable-usage-v0-3.yml) only once, then inspect final job, artifact, exact request count, returned billing period and report. If it is blocked or ambiguous, stop; never rerun.
+2. Reconcile its usage-based result with the earlier subscription snapshot and R2 analytics snapshot; keep fixed-fee invoices, complete writer coverage, freshness and D1 usage marked UNKNOWN where not measured.
+3. Design a separately versioned sustainable evidence path with refreshed timestamps, all current writers, per-operation budgets, and the evidence ledger's own cost. No implementation may bypass the FREE-ONLY hard stop.
+4. Continue required market-field qualification and storage-growth/retention review. Keep unapproved fields unavailable and preserve frozen/failed evidence.
+5. Only after budget and data gates are independently satisfied, continue controlled PAPER acceptance, then evaluate bounded scheduling and dashboard production evidence.
+
+Never infer runtime readiness, zero cost, market-source approval or strategy quality from a successful workflow alone. CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+
 ## Latest Cloud Paper continuation checkpoint — 2026-10-01 17:44 Asia/Taipei
 
 Live evidence basis: GitHub `main=ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a`; open PR search returned 0. PR [#690](https://github.com/qookey109-pixel/crypto-autopilot/pull/690) merged the read-only market-data source assessment V0.3. Its PR-head Python 3.12/3.13 CI, CodeQL and Dependency/SBOM passed; post-merge main checks were not independently verified.

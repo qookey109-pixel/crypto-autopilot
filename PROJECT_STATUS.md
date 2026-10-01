@@ -1,3 +1,16 @@
+## Live Cloud Paper checkpoint — 2026-10-01 18:11 Asia/Taipei
+
+Evidence basis: GitHub `main=0310d8ba31867b50672765b00f3651951d378583`, read after PR #692 merged. At that check there were no open PRs. PR #692 exact-head CI, Python 3.12/3.13, workflow-static, CodeQL, dependency/SBOM and retired-workflow checks passed. Post-merge main CI #36847151342, CodeQL #36847151432, Dependency/SBOM #36847151339 and V0.10 Freeze Guard #36847151394 also passed. The #692 delivery branch is deleted.
+
+- #692 introduced a separately versioned V0.3 read-only current-billing-period usage successor and merged it into main. The consumed V0.2 run [36839577708](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36839577708) returned HTTP 403 from the V2 Alpha/Restricted endpoint. The account-specific cause remains UNKNOWN; do not rerun V0.2.
+- V0.3 manual main workflow has not been dispatched and has made zero Cloudflare requests. The one-shot authority permits one run, one attempt, one GitHub workflow-history request and at most one Cloudflare GET. No retry, fallback, pagination, R2/D1, schedule or runtime activation is permitted. Preserve any failure and do not rerun.
+- The V0.3 result will cover usage-based charges only. Fixed-fee subscriptions, full account inventory, all writers, invoice totals, freshness, R2/D1 headroom and zero total project cost remain unproven.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, production cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production registry empty, Core100 quality `REJECT`.
+
+Next: dispatch the [V0.3 workflow](https://github.com/qookey109-pixel/crypto-autopilot/actions/workflows/cloud-paper-billable-usage-v0-3.yml) once from main and review its report without rerun. Then design a sustainable, fresh, account-wide budget/headroom evidence path; do not equate this one snapshot with runtime authorization.
+
+CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+
 ## Live Cloud Paper checkpoint — 2026-10-01 17:44 Asia/Taipei
 
 Evidence basis: GitHub `main=ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a`, latest commit observed at 2026-10-01T09:38:46Z; open PR search returned 0. Resolve main and PR state again before later work.
