@@ -3,6 +3,7 @@
 正式 authority：GitHub main `bbd3cccf2841219104cffef46ad2d5aa9ff87648`。先重新解析 main、open PR、最新自然 Health/Maintenance 與 Pages runs，再採取任何執行。
 
 - PR #665 已合併；其 frozen V0.1 coordinator/recovery 綁定保持 byte-exact，compact successor 以獨立 tick ID+完整摘要回讀。PR CI、main CI、CodeQL、SBOM、Freeze Guard 結果與合成量測見 [CURRENT_STATUS.md](../CURRENT_STATUS.md)。
+- PR [#667](https://github.com/qookey109-pixel/crypto-autopilot/pull/667) 已合併其[市場資料來源與預算缺口評估](CLOUD_PAPER_MARKET_DATA_SOURCE_ASSESSMENT_V0_1.md)。固定 23 市場 4H breadth、5 個候選各自 60M/15M 與 3 項市場請求合計估算為 36 requests/slot，超出既有 18 次 ceiling。這是設計估算；沒有 provider access、schedule 或 authority 變更。
 - 合成 fixture bytes：206,181（#658）→157,367（#661）→116,608（#665）；26 objects。這不是 R2 用量／帳單／headroom 或 runtime read cost 證據。
 - 已核對正式策略時間框為 market context 4H、setup 60M、entry 15M；目前 `cloud_market_v0_1.py` 只抓 60M，因此另兩個 frame 尚未接入。Pionex 官方 [Klines API](https://pionex-doc.gitbook.io/apidocs/restful/markets/get-klines) 列有 15M、60M、4H，單次 limit 上限 500；這證明端點支援，不等於本專案已驗證可用或已授權呼叫。Breadth 合約另要求固定 23 市場，membership coverage 仍未驗證；現有 capture 最多選 5 市場。TOTAL3／BTC dominance 仍缺具名、時間對齊、條款與費用可接受的來源。未做 provider request，source switch 與正式策略 gate 不變。
 - 過時維護 PR #664 已關閉，保留原始證據。自然 Health runs #36767233711、#36794986771 均成功；Maintenance runs #36767360524、#36795028849 的 inspect 成功、propose 因 `MAIN_CHANGED` 失敗。等待既有自然 Health → Maintenance 從 current main 建立新快照；不手動補算。
