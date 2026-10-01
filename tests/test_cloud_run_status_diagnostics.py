@@ -56,7 +56,7 @@ class DiagnosticRunProjectionTests(unittest.TestCase):
         self.assertIsNone(projected["runId"])
         self.assertIsNone(projected["sourceUrl"])
 
-    def test_query_errors_are_not_misreported_as_no_run(self) -> None:
+    def test_empty_run_list_is_reported_as_no_run(self) -> None:
         projected = project_diagnostic_run([], WORKFLOW)
         self.assertEqual(projected["state"], "NO_RUN")
 
