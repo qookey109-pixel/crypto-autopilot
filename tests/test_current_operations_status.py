@@ -32,10 +32,10 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
         )
         self.assertFalse(basis["is_latest_main_claim"])
-        self.assertEqual(basis["source_merge_pr"], 678)
+        self.assertEqual(basis["source_merge_pr"], 681)
         self.assertEqual(
             basis["parent_main_sha"],
-            "33496e31447fb0bd13743a9e72c8e7f7cd265e8f",
+            "0a8161f1c101cb72c717ea4917a71a1c7da0541a",
         )
         self.assertIn(basis["parent_main_sha"], current)
         self.assertIn("Resolve `main` live at read time", current)
@@ -50,6 +50,30 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         )
         self.assertTrue(billing["authority_consumed"])
         self.assertFalse(billing["rerun_authorized"])
+
+        assessment = payload["cloud_paper_market_data_source_assessment"]
+        self.assertEqual(assessment["status"], "ASSESSMENT_ONLY_NOT_APPROVED")
+        self.assertFalse(
+            assessment["btc_excluded_altcoin_market_cap_matches_total3_excluding_btc_and_eth"]
+        )
+        self.assertEqual(
+            assessment["keyless_request_allowance"], "UNKNOWN_SHARED_IP_POOL"
+        )
+        self.assertEqual(assessment["external_market_endpoint_requests_performed"], 0)
+        self.assertFalse(assessment["r2_access_performed"])
+        self.assertFalse(assessment["d1_access_performed"])
+        self.assertFalse(assessment["live_fetch_authorized"])
+        self.assertFalse(assessment["source_switch_authorized"])
+        self.assertEqual(
+            payload["live_repository_checkpoint"]["evidence_basis_main_sha"],
+            "0a8161f1c101cb72c717ea4917a71a1c7da0541a",
+        )
+        self.assertEqual(
+            payload["live_repository_checkpoint"][
+                "dashboard_pages_relation_to_source_merge_pr_681"
+            ],
+            "NOT_TRIGGERED_NO_DASHBOARD_FILES_CHANGED",
+        )
 
         core100 = payload["core100"]
         self.assertEqual(core100["history_status"], "COMPLETE")
@@ -209,7 +233,7 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         checkpoint_numbers = [row["number"] for row in checkpoint["open_pull_requests"]]
         self.assertEqual(control["open_pr_count"], len(checkpoint_numbers))
         self.assertEqual(control["open_pr_numbers"], checkpoint_numbers)
-        self.assertIn("ZERO_OPEN_PRS", control["open_pr_triage_state"])
+        self.assertIn("ONE_OPEN_STALE_DRAFT_PR_679", control["open_pr_triage_state"])
         self.assertEqual(control["historical_open_pr_triage"]["open_pr_count"], 6)
         self.assertEqual(control["historical_open_pr_triage"]["open_pr_numbers"], [326, 327, 328, 329, 330, 331])
         self.assertFalse(self.payload["live_repository_checkpoint"]["is_latest_main_claim"])
