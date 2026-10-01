@@ -116,6 +116,10 @@ def _snapshot(
             int(call.get("request_body_bytes", 0)) for call in calls
             if call["operation"] == "PUT"
         ),
+        "reserved_put_application_payload_bytes": sum(
+            int(call.get("request_body_bytes", 0)) for call in calls
+            if call["operation"] == "PUT"
+        ),
         "get_application_payload_bytes": sum(
             int(call.get("response_body_bytes", 0)) for call in calls
             if call["operation"] == "GET"
@@ -135,8 +139,6 @@ def build_report() -> dict[str, object]:
 
     def reserve(operation: str, size: int) -> None:
         reservations[operation] += 1
-        if operation == "R2_CLASS_A" and size > 0:
-            reservations["R2_PUT_APPLICATION_PAYLOAD_BYTES"] += size
 
     r2 = BudgetedR2Store(
         client=client,
