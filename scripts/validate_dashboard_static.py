@@ -782,6 +782,14 @@ def main() -> int:
         raise RuntimeError("dashboard emergency-template lineage missing")
 
     html = (ROOT / "index.html").read_text(encoding="utf-8")
+    for required_id in (
+        "cloud-paper-billing-detail",
+        "cloud-paper-billing-run",
+        "cloud-paper-usage-run",
+    ):
+        if f'id="{required_id}"' not in html:
+            raise RuntimeError(f"Cloud Paper billing projection element missing: {required_id}")
+
     if '<html lang="zh-Hant-TW">' not in html:
         raise RuntimeError("dashboard HTML must declare zh-Hant-TW")
     if '<a class="skip-link" href="#top">跳到主要內容</a>' not in html:
