@@ -397,7 +397,19 @@
     "production_cycle_status": "NOT_RUN",
     "latest_maintenance_run_id": 36676302904,
     "latest_maintenance_propose": "OBSERVATION_CHANGED",
-    "next_work": "OWNER_ATTEST_COMPLETE_CURRENT_AND_PLANNED_CLOUDFLARE_WRITER_INVENTORY_AND_COMPLETE_ACCOUNT_WIDE_COST_HEADROOM_EVIDENCE; PREPARE_SEPARATE_AUTHORITY_FOR_D1_METERING_AND_ATOMICITY_VALIDATION"
+    "next_work": "OWNER_ATTEST_COMPLETE_CURRENT_AND_PLANNED_CLOUDFLARE_WRITER_INVENTORY_AND_COMPLETE_ACCOUNT_WIDE_COST_HEADROOM_EVIDENCE; PREPARE_SEPARATE_AUTHORITY_FOR_D1_METERING_AND_ATOMICITY_VALIDATION",
+    "closed_unmerged_pull_requests": [
+      {
+        "number": 679,
+        "state": "CLOSED",
+        "merged": false,
+        "draft": true,
+        "head_sha": "23941beb06fc274d3a57b5a96cb70214a938067d",
+        "base_sha": "358be62e4239ffaeeae2e363e209f7ed278d692f",
+        "closed_at_utc": "2026-10-01T08:15:20Z",
+        "note": "STALE_GENERATED_SNAPSHOT_CLOSED_UNMERGED_HISTORICAL_EVIDENCE_PRESERVED"
+      }
+    ]
   },
   "cloud_paper_billing_evidence": {
     "updated_date": "2026-10-01",
