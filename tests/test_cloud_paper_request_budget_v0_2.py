@@ -60,7 +60,16 @@ def test_market_request_budget_is_inactive_and_does_not_expand_v01():
     assert proposal["assumptions"]["automatic_retries"] == 0
     assert proposal["assumptions"]["missed_slots_backfilled"] is False
     assert proposal["requests"]["shared_market_endpoint_weights"] is None
-    assert proposal["requests"]["provider_rate_limit"] is None
+    rate_limit = proposal["requests"]["provider_rate_limit"]
+    assert rate_limit["published_max_requests_per_second_per_ip"] == 10
+    assert rate_limit["scope"] == "ALL_ENDPOINTS_PER_IP"
+    assert rate_limit["daily_or_monthly_request_allowance"] == (
+        "UNKNOWN_NOT_DOCUMENTED_BY_REFERENCED_RATE_LIMIT_PAGE"
+    )
+    assert rate_limit["source_url"] == (
+        "https://pionex-doc.gitbook.io/apidocs/restful/general/rate-limit"
+    )
+    assert proposal["authority"]["provider_fetch_authorized"] is False
     assert proposal["freshness"]["15m_age_limit_status"] == (
         "PROPOSAL_NOT_CURRENT_AUTHORITY"
     )
