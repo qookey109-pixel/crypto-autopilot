@@ -1,0 +1,83 @@
+{
+  "schema": "qookey-cloud-paper-market-request-budget-v0.2",
+  "status": "PREPARED_REQUIREMENT_ENVELOPE_NOT_EXECUTION_AUTHORITY",
+  "evidence_basis": {
+    "main_sha": "3b58fce4a27d0c65fa17b011fea4946cd20077ee",
+    "assessment": "docs/CLOUD_PAPER_MARKET_DATA_SOURCE_ASSESSMENT_V0_1.md"
+  },
+  "purpose": "Quantify the direct Pionex public Kline request envelope for the existing 4H/60M/15M strategy inputs. This proposal does not prove provider capacity, account allowance, complete data availability, or zero-cost operation.",
+  "assumptions": {
+    "schedule_slots_per_day": 96,
+    "candidate_limit": 5,
+    "fixed_breadth_market_count": 23,
+    "provider_batch_klines_supported": null,
+    "call_formula_assumption": "One request per symbol and interval; batch support is unverified.",
+    "cross_run_cache_available": false,
+    "automatic_retries": 0,
+    "missed_slots_backfilled": false
+  },
+  "requests": {
+    "shared_market_calls_per_slot": 3,
+    "four_hour_breadth_calls_per_slot": 23,
+    "sixty_minute_candidate_calls_per_slot": 5,
+    "fifteen_minute_candidate_calls_per_slot": 5,
+    "total_calls_per_slot": 36,
+    "formula": "3 shared market calls + 23 fixed breadth klines + 5 candidate 60M klines + 5 candidate 15M klines",
+    "maximum_calls_per_utc_day": 3456,
+    "maximum_calls_per_rolling_30_days": 103680,
+    "pionex_kline_weight_per_request": 1,
+    "shared_market_endpoint_weights": null,
+    "provider_rate_limit": null
+  },
+  "comparison_with_v0_1": {
+    "existing_authorized_per_run_ceiling": 18,
+    "proposed_requirement_per_run": 36,
+    "existing_authorized_per_utc_day_ceiling": 1728,
+    "proposed_requirement_per_utc_day": 3456,
+    "fits_existing_contract": false,
+    "required_action": "A separately reviewed successor budget and complete shared-provider allowance evidence are required before any external request."
+  },
+  "freshness": {
+    "market_context_interval": "4H",
+    "setup_interval": "60M",
+    "entry_interval": "15M",
+    "proposed_15m_bar_age_limit_ms": 900000,
+    "15m_age_limit_status": "PROPOSAL_NOT_CURRENT_AUTHORITY",
+    "current_schedule_offsets_minutes": [7, 22, 37, 52],
+    "maximum_start_delay_ms": 600000,
+    "schedule_delay_can_exceed_proposed_15m_bar_age_limit": true,
+    "stale_or_incomplete_input": "REVIEW_REQUIRED_NO_NEW_ENTRY_NO_GUESSING"
+  },
+  "cache_and_storage": {
+    "cross_run_cache": "UNAVAILABLE_WITHOUT_SEPARATE_DURABLE_STATE",
+    "memory_cache_scope": "ONE_RUN_ONLY",
+    "durable_cache_authorized": false,
+    "durable_cache_read_write_cost_included": false,
+    "raw_unselected_market_data_persistence": false,
+    "decision_evidence_retention": "REQUIRES_SEPARATE_STORAGE_AND_ZERO_COST_BUDGET_PROOF",
+    "hash_is_not_a_replacement_for_discarded_raw_input": true
+  },
+  "unresolved_evidence": [
+    "Pionex aggregate account request allowance and rate-limit capacity",
+    "Shared market endpoint weights and batch Kline support",
+    "Whether the 23-market fixed breadth set is complete and continuously available",
+    "Actual warmup bar counts for every strategy-required timeframe",
+    "Shared account-wide request use by other provider workflows",
+    "Approved freshness tolerance and safe handling for delayed 15M entry slots",
+    "D1/R2 costs if any cross-run cache is proposed",
+    "TOTAL3 and BTC dominance source definition, terms, retention rights, and freshness"
+  ],
+  "authority": {
+    "provider_fetch_authorized": false,
+    "r2_access_authorized": false,
+    "d1_access_authorized": false,
+    "runtime_activation_authorized": false,
+    "schedule_activation_authorized": false,
+    "strategy_qualification_or_change_authorized": false,
+    "source_switch_authorized": false,
+    "holdout_access_authorized": false,
+    "model_promotion_authorized": false,
+    "real_money_orders_authorized": false,
+    "live_trading_authorized": false
+  }
+}
