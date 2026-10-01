@@ -161,6 +161,7 @@ class ProjectConvergenceV01Tests(unittest.TestCase):
             "paper_successor",
             "live_paper_run_coordinator",
             "live_paper_run_claim",
+            "cloud_paper_billable_usage_audit",
         ):
             self.assertTrue((ROOT / current[key]).is_file(), current[key])
 
