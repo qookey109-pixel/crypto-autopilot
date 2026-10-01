@@ -1,4 +1,19 @@
-## Live checkpoint — 2026-10-02 04:18 Asia/Taipei
+## Live Cloud Paper delivery checkpoint — 2026-10-02 05:46 Asia/Taipei
+
+Evidence basis: live `main=8acbb192c539077669514825883504a3ba31e153`, after status PR [#728](https://github.com/qookey109-pixel/crypto-autopilot/pull/728) merged. Main CI [36930438273](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36930438273), CodeQL [36930438335](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36930438335), Dependency/SBOM [36930438176](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36930438176), Dashboard build [36930438287](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36930438287), and V0.10 Freeze Guard [36930438279](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36930438279) succeeded. Dashboard deploy and production-browser were skipped because the change was documentation-only.
+
+- PR #727's bounded Billing History V0.1 authority is merged. The manual one-shot workflow has **not** been dispatched: no Cloudflare history request, report, or artifact has been observed. The authority remains unused; it permits one dispatch and no rerun.
+- Existing subscription and billable-usage snapshots still do not prove total account cost or 0 USD eligibility. The observed `r2_paid / Paid` plan label is outside the documented enum and remains `UNMAPPED_DOCUMENTED_ENUM_REQUIRES_REVIEW`; returned usage data is incomplete for fixed charges and account-wide scope.
+- The owner expects additional Cloudflare projects/services in the future. The repository workflow inventory is not an account-complete writer inventory. Require every new writer to register with the shared admission contract before its first write; unknown external writers continue to block account-wide cost/headroom claims.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 is unprovisioned, production strategy registry is empty, Core100 remains `REJECT`, and activation is disabled. The runtime composition and paper adapters are synthetic-CI implementation evidence only; there is no production execution workflow or natural Cloud Paper schedule.
+- Market input is still incomplete: canonical TOTAL3, BTC dominance, and aligned breadth are unresolved. A source assessment is not permission to fetch; no source switch or fallback is authorized.
+- Next gates: dispatch the billing-history workflow exactly once when available; review the report without claiming zero cost from it alone; establish complete writer, plan, fixed-charge, usage, and headroom evidence; then finish market/strategy eligibility and production D1/shared-budget wiring before controlled main acceptance. Do not provision or activate while any gate is unknown.
+
+CLOUD-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders, live trading, and natural Cloud Paper execution remain closed.
+
+---
+
+## Historical checkpoint — 2026-10-02 04:18 Asia/Taipei (superseded by post-#728 checkpoint)
 
 Evidence basis: GitHub `main=e4706d1f1b82c9b7a760f3dab3fc1d729e9ffe11`, after PR [#722](https://github.com/qookey109-pixel/crypto-autopilot/pull/722) merged. The post-merge Python 3.12/3.13 CI [36918505800](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36918505800), Pages build [36918505798](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36918505798), CodeQL [36918506053](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36918506053), Dependency/SBOM [36918506086](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36918506086), and V0.10 Freeze Guard [36918506034](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36918506034) succeeded. Workflow-static, Pages deploy and production-browser checks were skipped by change filters.
 
