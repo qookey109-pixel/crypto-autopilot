@@ -1,0 +1,40 @@
+{
+  "schema": "qookey-cloudflare-shared-writer-admission-v0.2",
+  "status": "PREPARED_SYNTHETIC_VALIDATION_ONLY",
+  "activation_enabled": false,
+  "production_d1_provisioned": false,
+  "cloudflare_requests_authorized": false,
+  "account_identity": "INJECTED_AT_RUNTIME_NOT_STORED",
+  "reservation_identity": [
+    "writer_id",
+    "idempotency_key"
+  ],
+  "reservation_policy": {
+    "aggregate_scope": "ALL_REGISTERED_WRITERS_IN_SHARED_D1",
+    "daily_window": "UTC_CALENDAR_DAY",
+    "rolling_window_days": 31,
+    "reservation_is_conservative": true,
+    "ambiguous_or_replayed_operation": "DO_NOT_REPEAT_EXTERNAL_ACCESS",
+    "release_or_actual_usage_rebate": "NOT_SUPPORTED",
+    "retention_policy": "MONOTONIC_CAPACITY_COUNTER_WITH_FAIL_CLOSED_HARD_STOP",
+    "compaction_or_deletion": "NOT_IMPLEMENTED; REQUIRES_SEPARATE_AUTHORITY",
+    "capacity_counter": "TRIGGER_INCREMENTED_IN_SAME_DATABASE_TRANSACTION",
+    "maximum_capacity_source": "SINGLE_DATABASE_POLICY_ROW; NULL_BLOCKS_ADMISSION"
+  },
+  "limits": "INJECTED_PER_CALL; NO_PRODUCTION_VALUES_APPROVED",
+  "required_before_activation": [
+    "owner_attested_complete_external_writer_inventory",
+    "fresh_account_wide_usage_and_headroom_evidence",
+    "approved_zero_cost_usage_envelopes",
+    "d1_free_tier_and_storage_calibration",
+    "approved_retained_reservation_capacity_in_shared_database_policy_row",
+    "separate_compaction_authority_before_capacity_exhaustion",
+    "integration_of_every_active_writer",
+    "controlled_paper_acceptance"
+  ],
+  "limitations": [
+    "Capacity bounds retained rows but does not provide indefinite operation; reaching the configured cap blocks new writers.",
+    "The capacity trigger adds one D1 row write per successful reservation and that write must be budgeted.",
+    "SQLite CI does not establish D1 transaction, trigger, or account-wide behavior."
+  ]
+}
