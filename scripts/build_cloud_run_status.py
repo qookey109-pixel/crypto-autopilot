@@ -26,6 +26,10 @@ EXPIRED_AUTHORITY_LINKS = {
         "config/provider_equivalence_v0_12_successor_metadata_window_v0_1.json",
 }
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+DIAGNOSTIC_WORKFLOWS = {
+    "cloud-paper-billing-history-v0-1.yml": "Cloud Paper Billing History V0.1",
+    "cloud-paper-billing-history-v0-2.yml": "Cloud Paper Billing History V0.2 Diagnostic",
+}
 
 
 def _load(path: Path) -> dict:
@@ -171,6 +175,60 @@ def project_run(runs: list[dict], workflow: str) -> dict:
     }
 
 
+
+def project_diagnostic_run(runs: list[dict], workflow: str) -> dict:
+    candidates = [
+        run for run in runs
+        if run.get("head_branch") == "main"
+        and run.get("event") == "workflow_dispatch"
+        and run.get("path") == f".github/workflows/{workflow}"
+        and run.get("head_repository", {}).get("full_name") == REPOSITORY
+        and type(run.get("id")) is int
+        and type(run.get("run_attempt")) is int
+        and SHA_RE.fullmatch(str(run.get("head_sha", "")))
+    ]
+    if not candidates:
+        return {
+            "state": "NO_RUN",
+            "runId": None,
+            "runAttempt": None,
+            "event": None,
+            "headSha": None,
+            "createdAtUtc": None,
+            "workflowConclusion": None,
+            "sourceUrl": None,
+        }
+
+    run = max(candidates, key=lambda row: row["id"])
+    state = "RUNNING"
+    if run.get("status") == "completed":
+        state = {
+            "success": "WORKFLOW_SUCCESS",
+            "failure": "WORKFLOW_FAILED",
+            "cancelled": "CANCELLED",
+            "timed_out": "TIMED_OUT",
+            "skipped": "SKIPPED",
+        }.get(run.get("conclusion"), "UNVERIFIED")
+    elif run.get("status") not in {
+        "queued", "in_progress", "waiting", "requested", "pending"
+    }:
+        state = "UNVERIFIED"
+
+    created = run.get("created_at")
+    if not isinstance(created, str):
+        created = None
+    return {
+        "state": state,
+        "runId": run["id"],
+        "runAttempt": run["run_attempt"],
+        "event": run["event"],
+        "headSha": run["head_sha"],
+        "createdAtUtc": created,
+        "workflowConclusion": run.get("conclusion"),
+        "sourceUrl": f"https://github.com/{REPOSITORY}/actions/runs/{run['id']}",
+    }
+
+
 def _parse_utc(value: object) -> datetime | None:
     if not isinstance(value, str) or not value:
         return None
@@ -262,6 +320,31 @@ def collect(fetch_json, *, now: datetime | None = None) -> dict:
         }
         items.append(item)
 
+    diagnostic_runs: list[dict] = []
+    for workflow, title in DIAGNOSTIC_WORKFLOWS.items():
+        try:
+            payload = fetch_json(
+                f"{API}/actions/workflows/{workflow}/runs"
+                "?branch=main&event=workflow_dispatch&per_page=20"
+            )
+            latest = project_diagnostic_run(payload.get("workflow_runs", []), workflow)
+        except Exception:
+            latest = {
+                "state": "QUERY_FAILED",
+                "runId": None,
+                "runAttempt": None,
+                "event": None,
+                "headSha": None,
+                "createdAtUtc": None,
+                "workflowConclusion": None,
+                "sourceUrl": None,
+            }
+        diagnostic_runs.append({
+            "workflow": workflow,
+            "title": title,
+            "latestRun": latest,
+        })
+
     window_states = [schedule_window_state(row, now=observed) for row in items]
     current = sum(state == "EFFECTIVE" for state in window_states)
     expired = sum(state == "EXPIRED" for state in window_states)
@@ -284,6 +367,7 @@ def collect(fetch_json, *, now: datetime | None = None) -> dict:
             "expiredFrozenCronDeclarationCount": frozen_expired,
         },
         "items": items,
+        "diagnosticRuns": diagnostic_runs,
         "safetyBoundary": {
             "providerReadsPerformed": False,
             "r2ReadsPerformed": False,

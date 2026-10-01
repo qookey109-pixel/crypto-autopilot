@@ -188,7 +188,9 @@ class CloudRunStatusTests(unittest.TestCase):
             fetch,
             now=datetime(2026, 9, 21, 5, 0, tzinfo=timezone.utc),
         )
-        self.assertEqual(len(calls), 8)
+        self.assertEqual(len(calls), 10)
+        self.assertTrue(any("cloud-paper-billing-history-v0-1.yml" in call for call in calls))
+        self.assertTrue(any("cloud-paper-billing-history-v0-2.yml" in call for call in calls))
         self.assertTrue(all(
             row["latestAutomaticRun"]["state"] == "QUERY_FAILED"
             for row in result["items"]
