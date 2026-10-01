@@ -18,7 +18,6 @@ from crypto_autopilot.paper.cloud_r2_store_v0_1 import (
 )
 from crypto_autopilot.paper.run_store_v0_1 import (
     R2PaperRunStore,
-    _canonical_bytes,
 )
 
 
