@@ -104,6 +104,7 @@ class _MemoryS3Client:
 def _snapshot(
     client: Any,
     reservations: Counter[str],
+    reservation_bytes: Counter[str],
     objects_before: int,
 ) -> dict[str, object]:
     calls = client.calls
@@ -115,10 +116,7 @@ def _snapshot(
             int(call.get("request_body_bytes", 0)) for call in calls
             if call["operation"] == "PUT"
         ),
-        "reserved_put_application_payload_bytes": sum(
-            int(call.get("request_body_bytes", 0)) for call in calls
-            if call["operation"] == "PUT"
-        ),
+        "reserved_put_application_payload_bytes": reservation_bytes["R2_CLASS_A"],
         "get_application_payload_bytes": sum(
             int(call.get("response_body_bytes", 0)) for call in calls
             if call["operation"] == "GET"
@@ -135,9 +133,11 @@ def _snapshot(
 def build_report() -> dict[str, object]:
     client = _MemoryS3Client()
     reservations: Counter[str] = Counter()
+    reservation_bytes: Counter[str] = Counter()
 
     def reserve(operation: str, size: int) -> None:
         reservations[operation] += 1
+        reservation_bytes[operation] += size
 
     r2 = BudgetedR2Store(
         client=client,
@@ -153,11 +153,12 @@ def build_report() -> dict[str, object]:
     store.put_json("state", "genesis", payload)
     scenarios.append({
         "scenario": "new_put_json",
-        **_snapshot(client, reservations, before_objects),
+        **_snapshot(client, reservations, reservation_bytes, before_objects),
     })
 
     before_calls = len(client.calls)
     before_reservations = reservations.copy()
+    before_reservation_bytes = reservation_bytes.copy()
     before_objects = len(client.objects)
     store.put_json("state", "genesis", payload)
     scenarios.append({
@@ -165,12 +166,14 @@ def build_report() -> dict[str, object]:
         **_snapshot(
             _CallSliceClient(client, before_calls),
             reservations - before_reservations,
+            reservation_bytes - before_reservation_bytes,
             before_objects,
         ),
     })
 
     before_calls = len(client.calls)
     before_reservations = reservations.copy()
+    before_reservation_bytes = reservation_bytes.copy()
     before_objects = len(client.objects)
     store.get_json("state", "genesis")
     scenarios.append({
@@ -178,12 +181,14 @@ def build_report() -> dict[str, object]:
         **_snapshot(
             _CallSliceClient(client, before_calls),
             reservations - before_reservations,
+            reservation_bytes - before_reservation_bytes,
             before_objects,
         ),
     })
 
     before_calls = len(client.calls)
     before_reservations = reservations.copy()
+    before_reservation_bytes = reservation_bytes.copy()
     before_objects = len(client.objects)
     store.list_json_ids("state")
     scenarios.append({
@@ -191,12 +196,14 @@ def build_report() -> dict[str, object]:
         **_snapshot(
             _CallSliceClient(client, before_calls),
             reservations - before_reservations,
+            reservation_bytes - before_reservation_bytes,
             before_objects,
         ),
     })
 
     before_calls = len(client.calls)
     before_reservations = reservations.copy()
+    before_reservation_bytes = reservation_bytes.copy()
     before_objects = len(client.objects)
     store.put_json_if_absent("claim", "slot-1", {"slot": "1"})
     scenarios.append({
@@ -204,12 +211,14 @@ def build_report() -> dict[str, object]:
         **_snapshot(
             _CallSliceClient(client, before_calls),
             reservations - before_reservations,
+            reservation_bytes - before_reservation_bytes,
             before_objects,
         ),
     })
 
     before_calls = len(client.calls)
     before_reservations = reservations.copy()
+    before_reservation_bytes = reservation_bytes.copy()
     before_objects = len(client.objects)
     for index in range(5):
         store.put_json_if_absent("paged", f"item-{index}", {"item": index})
@@ -219,6 +228,7 @@ def build_report() -> dict[str, object]:
         **_snapshot(
             _CallSliceClient(client, before_calls),
             reservations - before_reservations,
+            reservation_bytes - before_reservation_bytes,
             before_objects,
         ),
     })
