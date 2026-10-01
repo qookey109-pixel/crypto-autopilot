@@ -101,22 +101,32 @@ def validate_shared_account_writer_registry(
     if not isinstance(entries, list) or not isinstance(writers, list):
         raise RuntimeError("shared account writer registry arrays are missing")
 
-    current_paths = sorted(
-        entry["workflow"]
-        for entry in entries
-        if isinstance(entry, dict)
-        and entry.get("access") in CURRENT_WRITER_ACCESSES
-        and isinstance(entry.get("lifecycle"), str)
-        and entry["lifecycle"].startswith("CURRENT_")
-    )
-    registered_paths = [
-        entry.get("workflow") for entry in writers if isinstance(entry, dict)
-    ]
-    writer_ids = [
-        entry.get("writer_id") for entry in writers if isinstance(entry, dict)
-    ]
-    if len(registered_paths) != len(writers) or len(writer_ids) != len(writers):
-        raise RuntimeError("shared account writer registry entries are invalid")
+    current_paths: list[str] = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        workflow = entry.get("workflow")
+        lifecycle = entry.get("lifecycle")
+        if (
+            isinstance(workflow, str)
+            and entry.get("access") in CURRENT_WRITER_ACCESSES
+            and isinstance(lifecycle, str)
+            and lifecycle.startswith("CURRENT_")
+        ):
+            current_paths.append(workflow)
+    current_paths.sort()
+
+    registered_paths: list[str] = []
+    writer_ids: list[str] = []
+    for entry in writers:
+        if not isinstance(entry, dict):
+            raise RuntimeError("shared account writer registry entries are invalid")
+        workflow = entry.get("workflow")
+        writer_id = entry.get("writer_id")
+        if not isinstance(workflow, str) or not isinstance(writer_id, str):
+            raise RuntimeError("shared account writer registry entries are invalid")
+        registered_paths.append(workflow)
+        writer_ids.append(writer_id)
     if len(set(registered_paths)) != len(registered_paths):
         raise RuntimeError("shared account writer workflow paths must be unique")
     if len(set(writer_ids)) != len(writer_ids):
@@ -131,8 +141,7 @@ def validate_shared_account_writer_registry(
 
     for entry in writers:
         if (
-            not isinstance(entry.get("writer_id"), str)
-            or not entry["writer_id"]
+            not entry.get("writer_id")
             or entry.get("resource") not in {"R2", "D1"}
             or entry.get("registration_state")
             not in {"DECLARED_SHARED_ADMISSION_NOT_VERIFIED",
@@ -144,16 +153,23 @@ def validate_shared_account_writer_registry(
     gate = registry.get("production_gate")
     if not isinstance(external, dict) or not isinstance(gate, dict):
         raise RuntimeError("shared account external inventory or production gate is missing")
+    external_complete = external.get("complete")
+    external_state = external.get("state")
     if (
-        external.get("state") not in {"UNCONFIRMED", "ATTESTED"}
-        or type(external.get("complete")) is not bool
-        or (external.get("complete") and external.get("state") != "ATTESTED")
+        external_state not in {"UNCONFIRMED", "ATTESTED"}
+        or type(external_complete) is not bool
+        or (external_complete and external_state != "ATTESTED")
     ):
         raise RuntimeError("external writer inventory completeness is invalid")
-    if external.get("complete") and not external.get("attestation_receipt"):
-        raise RuntimeError("complete external inventory requires an attestation receipt")
+    if external_complete:
+        receipt = external.get("attestation_receipt")
+        if not isinstance(receipt, str) or not receipt:
+            raise RuntimeError("complete external inventory requires an attestation receipt")
+        receipt_path = (ROOT / receipt).resolve()
+        if ROOT.resolve() not in receipt_path.parents or not receipt_path.is_file():
+            raise RuntimeError("external writer attestation receipt is missing")
     if (
-        gate.get("account_wide_coverage_proven") is not external.get("complete")
+        gate.get("account_wide_coverage_proven") is not external_complete
         or type(gate.get("shared_admission_integrated_for_all_repository_writers"))
         is not bool
         or type(gate.get("d1_provisioned")) is not bool
