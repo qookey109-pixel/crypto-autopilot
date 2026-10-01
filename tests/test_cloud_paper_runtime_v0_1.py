@@ -220,10 +220,10 @@ class CloudPaperRuntimeAssemblyTests(unittest.TestCase):
         usage = runtime.budget_guard.attempted_usage()
         self.assertEqual(usage.provider_requests, provider_calls)
         self.assertEqual(usage.class_a_requests, sum(
-            call["operation"] in {"PUT", "LIST"} for call in sdk.calls,
+            call["operation"] in {"PUT", "LIST"} for call in sdk.calls
         ))
         self.assertEqual(usage.class_b_requests, sum(
-            call["operation"] == "GET" for call in sdk.calls,
+            call["operation"] == "GET" for call in sdk.calls
         ))
 
 
