@@ -6,6 +6,7 @@ The SQL may be exercised with SQLite fixtures in GitHub CI only.
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
@@ -52,6 +53,25 @@ FROM cloudflare_shared_writer_reservations_v0_3
 WHERE reserved_at_ms >= CAST(? AS INTEGER)
   AND reserved_at_ms <= CAST(? AS INTEGER)
 """
+
+READ_SLOT_RESERVATION_SQL = """
+SELECT writer_id, slot_id, idempotency_key, slot_at_ms, utc_day,
+       reserved_at_ms, provider_requests, r2_class_a, r2_class_b,
+       r2_new_bytes, d1_queries, d1_rows_read, d1_rows_written,
+       d1_storage_growth_bytes
+FROM cloudflare_shared_writer_reservations_v0_3
+WHERE writer_id = CAST(? AS TEXT)
+  AND slot_id = CAST(? AS TEXT)
+LIMIT 1
+"""
+
+RESERVATION_ENVELOPE_FIELDS = (
+    "writer_id", "slot_id", "idempotency_key", "slot_at_ms", "utc_day",
+    "reserved_at_ms", "provider_requests", "r2_class_a", "r2_class_b",
+    "r2_new_bytes", "d1_queries", "d1_rows_read", "d1_rows_written",
+    "d1_storage_growth_bytes",
+)
+
 
 READ_WRITER_WATERMARK_SQL = """
 SELECT retired_through_slot_at_ms, retired_reservation_count
@@ -116,6 +136,48 @@ def validate_fresh_slot(
         raise BudgetBlocked("BLOCKED_STALE_WRITER_SLOT")
     if identity.slot_at_ms > now_ms + max_future_skew_ms:
         raise BudgetBlocked("BLOCKED_FUTURE_WRITER_SLOT")
+
+
+
+def classify_reservation_replay(
+    identity: WriterSlotIdentity,
+    proposed_envelope: Mapping[str, object],
+    existing_envelope: Mapping[str, object] | None,
+    *,
+    now_ms: int,
+    max_slot_age_ms: int,
+    max_future_skew_ms: int,
+    retired_through_slot_at_ms: int | None,
+) -> str:
+    """Return an exact retained replay without repeating external access."""
+    identity.validate()
+    if set(proposed_envelope) != set(RESERVATION_ENVELOPE_FIELDS):
+        raise ValueError("WRITER_RESERVATION_ENVELOPE_FIELDS_INVALID")
+    if (
+        proposed_envelope["writer_id"] != identity.writer_id
+        or proposed_envelope["slot_id"] != identity.slot_id
+        or proposed_envelope["idempotency_key"] != identity.idempotency_key
+        or proposed_envelope["slot_at_ms"] != identity.slot_at_ms
+    ):
+        raise ValueError("WRITER_RESERVATION_ENVELOPE_IDENTITY_MISMATCH")
+    if existing_envelope is not None:
+        if set(existing_envelope) != set(RESERVATION_ENVELOPE_FIELDS):
+            raise BudgetBlocked("BLOCKED_IDEMPOTENCY_CONFLICT")
+        if all(
+            existing_envelope[field] == proposed_envelope[field]
+            for field in RESERVATION_ENVELOPE_FIELDS
+        ):
+            return "RETURN_EXISTING"
+        raise BudgetBlocked("BLOCKED_IDEMPOTENCY_CONFLICT")
+    validate_fresh_slot(
+        identity,
+        now_ms=now_ms,
+        max_slot_age_ms=max_slot_age_ms,
+        max_future_skew_ms=max_future_skew_ms,
+        retired_through_slot_at_ms=retired_through_slot_at_ms,
+    )
+    return "NEW"
+
 
 
 def minimum_reservation_rows_written() -> int:
