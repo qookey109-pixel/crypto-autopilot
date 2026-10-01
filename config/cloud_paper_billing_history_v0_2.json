@@ -1,0 +1,78 @@
+{
+  "schema": "qookey-cloud-paper-billing-history-v0.2",
+  "authority_status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "purpose": "One-time read-only successor snapshot that captures value-free pagination field presence/type diagnostics when the Cloudflare billing-history page contract fails, while retaining bounded redacted billing-history evidence.",
+  "supersedes": "No prior authority. The consumed V0.1 one-time authority remains immutable and must not be rerun.",
+  "execution": {
+    "trigger": "workflow_dispatch_on_main_only",
+    "maximum_workflow_runs": 1,
+    "maximum_attempts": 1,
+    "maximum_github_history_requests": 1,
+    "maximum_cloudflare_http_requests": 10,
+    "maximum_items": 1000,
+    "page_size": 100,
+    "maximum_response_bytes_per_request": 1048576,
+    "timeout_seconds_per_request": 20,
+    "retry_count": 0,
+    "redirects": false,
+    "history_check": "Require exactly one V0.2 diagnostic workflow run total; it must be this first-attempt main dispatch.",
+    "pagination": "Sequential pages only while documented V4 pagination metadata is valid; stop immediately on invalid metadata and report field presence/type only."
+  },
+  "query": {
+    "method": "GET",
+    "endpoint": "https://api.cloudflare.com/client/v4/accounts/{account_id}/billing/history",
+    "page": "1..bounded_page_count",
+    "per_page": 100,
+    "status_filter": null,
+    "required_token_permission": "Account Billing Read",
+    "account_id_source": "CLOUDFLARE_ACCOUNT_ID repository variable",
+    "token_source": "CLOUDFLARE_BILLING_READONLY_API_TOKEN repository secret",
+    "persist_account_identity": false,
+    "persist_item_ids": false,
+    "persist_invoice_ids_or_urls": false,
+    "persist_descriptions": false,
+    "persist_raw_response": false,
+    "persist_pagination_values_on_invalid_page": false,
+    "persist_only": [
+      "observation timestamp",
+      "page and result counts when validated",
+      "per-field pagination metadata presence, JSON type, and nonnegative-integer validity when invalid",
+      "occurred month in UTC",
+      "action, type, status and currency categories",
+      "amount and amount_to_pay"
+    ]
+  },
+  "report_semantics": {
+    "complete_bounded_history": "READY_FOR_BILLING_REVIEW",
+    "cap_or_page_metadata_incomplete": "REVIEW_REQUIRED",
+    "invalid_page_metadata": "REVIEW_REQUIRED_WITH_VALUE_FREE_FIELD_DIAGNOSTICS",
+    "request_or_parse_failure": "REVIEW_REQUIRED",
+    "zero_cost_conclusion": "NEVER_PROVEN_BY_BILLING_HISTORY_SNAPSHOT",
+    "activation": "REMAINS_DISABLED"
+  },
+  "allowed_operations": [
+    "One GitHub Actions workflow-history metadata request.",
+    "At most ten sequential read-only Cloudflare account billing-history requests.",
+    "Secret-free short-retention report artifact and Actions summary."
+  ],
+  "forbidden_operations": [
+    "Any rerun, retry, redirect following, fallback endpoint, status filtering, or request beyond the page/item cap.",
+    "Persisting raw response, account identity, item/invoice identifiers, hosted invoice URLs, descriptions, or invalid pagination values.",
+    "Invoice/payment-method/profile/member access beyond fields returned by the specified read-only history endpoint.",
+    "Any create, update, delete, purchase, plan change, D1/R2 access, provider access, training, holdout access, Cloud Paper execution, or schedule activation.",
+    "Any conclusion that this history snapshot alone proves zero total account/project cost or all current/future writers are covered."
+  ],
+  "boundaries": {
+    "monthly_budget_usd": 0,
+    "paper_only": true,
+    "cloud_paper_activation": false,
+    "provider_access": false,
+    "r2_access": false,
+    "d1_access": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}

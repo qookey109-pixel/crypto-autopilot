@@ -1,0 +1,14 @@
+{
+  "schema": "qookey-cloud-paper-billing-history-v0.2-diagnostic-receipt-v0.1",
+  "authority": "config/cloud_paper_billing_history_v0_2.json",
+  "status": "PREPARED_NOT_EXECUTED",
+  "observed_at_utc": "2026-10-02T00:00:00Z",
+  "scope": "One bounded read-only successor query, after this authority is merged to main.",
+  "reason": "V0.1 returned REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID but retained no field-level metadata. Official endpoint docs describe the standard page fields; this successor reports only presence/type/validity flags to diagnose contract/runtime divergence without retaining values.",
+  "frozen_evidence_mutated": false,
+  "cloudflare_requests_performed": 0,
+  "rerun_authorized": false,
+  "execute_only_after_protected_main_merge": true,
+  "zero_cost_conclusion": "UNKNOWN",
+  "cloud_paper_activation": false
+}
