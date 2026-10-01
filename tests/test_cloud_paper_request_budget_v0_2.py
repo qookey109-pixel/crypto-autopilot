@@ -33,6 +33,14 @@ def test_market_request_budget_is_inactive_and_does_not_expand_v01():
     )
     assert proposal["requests"]["pionex_kline_weight_per_request"] == 1
     assert kline_calls == 33
+    assert proposal["warmup"]["closed_bars_per_timeframe"] == {
+        "4H_breadth_per_market": 21,
+        "60M_candidate_technical": 200,
+        "15M_candidate_technical": 200,
+    }
+    assert proposal["warmup"]["maximum_closed_bars_requested_per_slot"] == (
+        23 * 21 + 5 * 200 + 5 * 200
+    )
     assert proposal["requests"]["total_calls_per_slot"] > (
         current["budget"]["provider_requests_per_run"]
     )
