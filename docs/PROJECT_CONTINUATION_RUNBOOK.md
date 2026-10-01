@@ -1,14 +1,14 @@
-## Cloud Paper 工程與狀態接線 — 2026-09-30
+## Cloud Paper 接續狀態 — 2026-10-01
 
-查核 basis main：`095aba2c80b9ad710523875b1f45381646e61b75`，時間：`2026-09-30T05:53:15Z`。此 SHA 是修改前的證據基準；合併後仍須重新解析 main。以下舊查核段落保留為歷史，不取代本節。
+正式 authority：GitHub main `bbd3cccf2841219104cffef46ad2d5aa9ff87648`。先重新解析 main、open PR、最新自然 Health/Maintenance 與 Pages runs，再採取任何執行。
 
-- 完整目標與執行順序已由 [PR #652](https://github.com/qookey109-pixel/crypto-autopilot/pull/652) 合併至 [交付目標](CLOUD_PAPER_SHORT_TERM_DELIVERY_V0_1.md)。本次查核 open PR = 0；#644 已關閉且未合併，舊六個 dependency PR 不再是目前清單。
-- basis main [CI 36667740375](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36667740375) Python 3.12/3.13 成功；3.13 為 1,855 tests / 996 subtests，required Ruff 成功。type visibility = 42 diagnostics（protected 18 / cleanup 24），nonblocking；261 / 33 為歷史基準。
-- 本批將 Dashboard JSON、前端 renderer、static validator 及回歸測試同步至 V0.3，保留 V0.2 讀取。完整 run/attempt/head/artifact/digest 必須一致；區分投影查核時間與來源快照，不把部分 bucket bytes 當完整帳戶用量。雲端 CI、合併及新部署須各自取得本批證據，不能沿用舊 Pages 當作本批部署成功。
-- V0.3 run **36593296360**：一個 returned bucket、16,304 objects、616,541,780 bytes；operations 125,309 次且 freshness UNKNOWN。D1、全帳戶 inventory/writers、費用與 headroom UNKNOWN。Billing 36513941565、Usage V0.1/V0.2、R2 Usage V0.3 及 bootstrap 已消耗，**禁止重跑**。
-- 正式 activation=false、cycle=NOT_RUN、entrypoint=NOT_WIRED、natural schedule=NOT_CONFIGURED；registry 空、模型 REJECT、market context REGIME_UNAVAILABLE。尚未執行不能稱為正式 NO_TRADE。
-- **下一批直接處理成本/freshness/保存增長與 ledger 自身費用可行性，再完成 budget/persistence/production 接線。** 不再另起獨立文件整理；外部查詢、provision、migration、寫入與 schedule 須先有精確新版本 authority 合併 main。七天等待與 10/1 額外人工時點不恢復，runtime expiry guard 保留。
-- 全程 CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER、0 USD、PAPER/LIVE-PAPER ONLY；holdout、source switch、promotion、實盤關閉。 frozen 證據保持原樣。
+- PR #665 已合併；其 frozen V0.1 coordinator/recovery 綁定保持 byte-exact，compact successor 以獨立 tick ID+完整摘要回讀。PR CI、main CI、CodeQL、SBOM、Freeze Guard 結果與合成量測見 [CURRENT_STATUS.md](../CURRENT_STATUS.md)。
+- 合成 fixture bytes：206,181（#658）→157,367（#661）→116,608（#665）；26 objects。這不是 R2 用量／帳單／headroom 或 runtime read cost 證據。
+- 已核對正式策略時間框為 market context 4H、setup 60M、entry 15M；目前 `cloud_market_v0_1.py` 只抓 60M，因此另兩個 frame 尚未接入。Pionex 官方 [Klines API](https://pionex-doc.gitbook.io/apidocs/restful/markets/get-klines) 列有 15M、60M、4H，單次 limit 上限 500；這證明端點支援，不等於本專案已驗證可用或已授權呼叫。Breadth 合約另要求固定 23 市場，membership coverage 仍未驗證；現有 capture 最多選 5 市場。TOTAL3／BTC dominance 仍缺具名、時間對齊、條款與費用可接受的來源。未做 provider request，source switch 與正式策略 gate 不變。
+- 過時維護 PR #664 已關閉，保留原始證據。自然 Health runs #36767233711、#36794986771 均成功；Maintenance runs #36767360524、#36795028849 的 inspect 成功、propose 因 `MAIN_CHANGED` 失敗。等待既有自然 Health → Maintenance 從 current main 建立新快照；不手動補算。
+- Cloud Paper 仍 disabled、cycle NOT_RUN、entrypoint NOT_WIRED、natural schedule NOT_CONFIGURED；D1 未 provision、registry 空、Core100 REJECT。帳戶級零費用與 headroom、全 writer inventory、用量資料時間/完整性、資料欄位缺口皆未完成。
+- 依序工作：①完成 freshness/全帳戶用量與 ledger 自身成本證據；②完成即時資料來源、interval、warmup、持倉期間完整性盤點；③接通一次初始化 10,000 USD PAPER 帳戶及正式循環，雲端 CI 驗證 NO_TRADE／成交／拒絕／重播／恢復；④通過 authority 與預算 gate 後才受控驗收及配置 schedule；⑤接上真實報告 Dashboard 並完成 production browser 驗證。
+- 已消耗的 Billing／Usage／bootstrap 一次性 authority 不重跑；CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER、0 USD、PAPER/LIVE-PAPER ONLY；holdout、source switch、promotion、real trading 關閉。
 
 ### 歷史查核紀錄（依原日期與 SHA 解讀）
 

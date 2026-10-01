@@ -1,13 +1,16 @@
-## Cloud Paper 保存精簡 V0.2 step reference — 2026-09-30
+## Cloud Paper — #665 保存精簡合併後狀態（2026-10-01）
 
-本批準備基準為 GitHub parent main `bb2290ac1aa0cad1237ec2269be679211bf2bb5f`；此 SHA 是查核基準，合併後須重新解析 main，不宣稱永久最新 head。
-新 step schema 以 `tick_id` 和完整 canonical `tick_report_sha256` 引用獨立 tick。Successor Coordinator V0.3、Cloud Paper reader、replay、continuation 與 Recovery V0.2 共用證據驗證；結果 seal 寫入前先回讀 step/tick。舊 V0.1 embedded step 與舊 loop reports 保留讀取，不遷移或刪改歷史物件。
-舊 slot-claim 收據綁定的 coordinator／recovery V0.1 來源與手動流程保持 byte-exact；新來源另由本次 prepared receipt 綁定。第一個 PR head 的 CI 失敗紀錄保留，修復後須重新核對 exact-head 檢查。
-合成 CI 比較相同入場／出場／不交易、重播／重啟、恢復與結算失敗 fixture 的物件數、bytes 和 store-interface 讀取數。檢查狀態以本批 PR exact head 為準；這不是 production R2 用量或零費用證據。
-[新 storage contract](config/live_paper_run_coordinator_v0_3.json) 與 [prepared receipt](research/receipts/2026-09-30-live-paper-step-reference-v0-2-prepared.json) 不授予外部執行權限。
-Cloud Paper 仍 disabled／NOT_RUN／NOT_WIRED／NOT_CONFIGURED；D1 未 provision、registry 空、Core100 REJECT。帳戶級零費用、freshness、writer coverage 與 headroom 尚未證明。
-下一步為核對策略所需資料與市場 adapter 的實際缺口，再收斂帳戶預算與正式入口。PR #664 是 maintenance snapshot 更新，查核時仍 Draft／WAITING_CI_APPROVAL，不能當成已通過或直接 merge。
-CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER、0 USD、PAPER/LIVE-PAPER ONLY；已消耗一次性 audits/bootstrap 不重跑，holdout/source switch/promotion/實盤維持關閉。
+查核基準 main：`bbd3cccf2841219104cffef46ad2d5aa9ff87648`。PR [#665](https://github.com/qookey109-pixel/crypto-autopilot/pull/665) 已合併；修復後 head `49e27a3257f9163c9c39e996b57ca850af273f9f`。PR CI [36726001018](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726001018)：Python 3.12／3.13 通過，Ruff 通過（1,638 tests），CodeQL [36726000835](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726000835)、SBOM [36726000872](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726000872) 通過。合併 main CI [36726499079](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499079) 的兩個 Python jobs 成功、workflow-static skipped；CodeQL [36726499004](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499004)、SBOM [36726499003](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499003)、Freeze Guard [36726499085](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499085) 成功。
+
+- #665 將 step tick evidence 改為以 ID 與完整摘要引用獨立 immutable tick；保留舊 frozen coordinator/recovery V0.1 及舊資料讀取，增加 V0.3/V0.2 successor。舊 tick 缺失時恢復診斷回歸亦已修復。
+- 同一合成 entry／exit／no-trade fixture：#661 為 157,367 bytes，#665 為 116,608 bytes，減少 40,759 bytes（約 25.9%）；相較 #658 的 206,181 bytes，累計減少約 43.4%。profile artifact：[run 36726001018](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726001018/artifacts/11101819985)。物件數仍為 26；介面讀取計數依 fixture 不變。這是合成 canonical JSON/store-interface 量測，不代表 R2 實際 bytes、費用或帳戶 headroom；successor verification 是否增加真實 R2 read/write 成本仍待 production-equivalent evidence。
+- Main push Pages [36726499028](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499028) 僅 build 成功，deploy/browser-production skipped；其後自然 Health 觸發 Pages [36795028772](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36795028772)，build、deploy、browser-production 均成功。
+- 自然 Health [36767233711](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36767233711) 與 [36794986771](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36794986771) 均成功；各自 Maintenance 的 inspect 成功、propose 因 `MAIN_CHANGED` 失敗：[36767360524](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36767360524)、[36795028849](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36795028849)。過時 PR #664 已關閉保留歷史；目前待下一次自然 Health → Maintenance 以 current main 產生新 evidence snapshot。
+- 已核對正式策略時間框為 market context 4H、setup 60M、entry 15M；目前 `cloud_market_v0_1.py` 只抓 60M，因此另兩個 frame 尚未接入。Pionex 官方 [Klines API](https://pionex-doc.gitbook.io/apidocs/restful/markets/get-klines) 列有 15M、60M、4H，單次 limit 上限 500；這證明端點支援，不等於本專案已驗證可用或已授權呼叫。Breadth 合約另要求固定 23 市場，membership coverage 仍未驗證；現有 capture 最多選 5 市場。TOTAL3／BTC dominance 仍缺具名、時間對齊、條款與費用可接受的來源。未做 provider request，source switch 與正式策略 gate 不變。
+- Cloud Paper 仍 disabled／NOT_RUN／NOT_WIRED／NOT_CONFIGURED；D1 未 provision、正式 registry 空、Core100 品質 REJECT。帳戶級費用、R2/D1完整 writer coverage、用量 freshness、headroom 與資料來源缺口仍未解決。一次性 Billing／Usage／bootstrap 不重跑；holdout、source switch、promotion、實盤保持關閉。
+- 下一步：完成可刷新且能涵蓋所有 writers 的零費用／額度證據與最小保存成本核算；逐欄確認策略所需即時資料、暖機及持倉期間事件完整性；再接通正式 PAPER 入口並用雲端 CI 驗證交易、不交易、拒絕、重播與恢復。達標前不啟用模擬排程。
+
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER；0 USD；PAPER／LIVE-PAPER ONLY。
 
 ## Cloud Paper Historical Checkpoint — 2026-09-30 (#662 merged)
 
