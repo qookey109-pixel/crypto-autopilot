@@ -1,0 +1,59 @@
+{
+  "schema": "qookey-cloud-paper-billable-usage-v0.3",
+  "authority_status": "AUTHORIZED_ON_PROTECTED_MAIN_MERGE",
+  "supersedes_for_new_execution_only": "cloud-paper-billable-usage-v0.2",
+  "purpose": "One-shot read-only current billing-period usage/cost diagnostic via the self-serve Billing Read endpoint; not a zero-cost or runtime-activation authority.",
+  "execution": {
+    "trigger": "workflow_dispatch_on_main_only",
+    "maximum_workflow_runs": 1,
+    "maximum_attempts": 1,
+    "maximum_github_history_requests": 1,
+    "maximum_cloudflare_http_requests": 1,
+    "timeout_seconds_per_request": 20,
+    "retry_count": 0,
+    "pagination": false,
+    "redirects": false,
+    "maximum_response_bytes": 1048576,
+    "maximum_report_rows": 500,
+    "history_check": "Require exactly this first-attempt dispatch as the only run of this V0.3 workflow on main.",
+    "query_window": "Current billing period; omit from/to so the provider applies its billing-cycle boundary."
+  },
+  "query": {
+    "method": "GET",
+    "endpoint": "https://api.cloudflare.com/client/v4/accounts/{account_id}/billable-usage",
+    "api_generation": "V1 self-serve billable usage route; do not use the V2 restricted /billable/usage path.",
+    "required_token_permission": "Account Billing Read",
+    "account_id_source": "CLOUDFLARE_ACCOUNT_ID repository variable",
+    "token_source": "CLOUDFLARE_BILLING_READONLY_API_TOKEN repository secret",
+    "persist_account_identity": false,
+    "persist_zone_identity": false,
+    "persist_raw_response": false,
+    "persist_only": [
+      "provider and observation timestamps",
+      "billing/charge period boundaries",
+      "service name and family",
+      "consumed quantity/unit",
+      "returned billed cost/currency"
+    ]
+  },
+  "report_semantics": {
+    "valid_nonempty_rows": "READY_FOR_REVIEW",
+    "empty_invalid_or_over_limit": "REVIEW_REQUIRED",
+    "missing_cost_fields": "ZERO_COST_UNKNOWN",
+    "zero_cost_conclusion": "NEVER_PROVEN_BY_USAGE_BASED_ENDPOINT; FIXED_SUBSCRIPTION_CHARGES_NOT_INCLUDED",
+    "provider_freshness": "DAILY_AND_POTENTIALLY_LAGGING",
+    "activation": "REMAINS_DISABLED"
+  },
+  "allowed_operations": [
+    "One GitHub Actions workflow-history metadata request.",
+    "One bounded read-only Cloudflare billable-usage request.",
+    "Secret-free summary and short-retention report artifact."
+  ],
+  "forbidden_operations": [
+    "Any rerun, retry, pagination, redirect following, fallback endpoint, or second Cloudflare request.",
+    "Any R2 object, D1 database, provider market-data, training, holdout, or account inventory access.",
+    "Any inference that missing rows, missing cost fields, or a zero usage subtotal means zero total project cost.",
+    "Any provisioning, migration, Cloud Paper execution, schedule activation, source switch, model promotion, or trading."
+  ],
+  "source": "https://developers.cloudflare.com/api/resources/billing/subresources/usage/methods/paygo/"
+}
