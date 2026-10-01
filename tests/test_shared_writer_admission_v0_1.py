@@ -8,8 +8,6 @@ from pathlib import Path
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
 from crypto_autopilot.paper.shared_writer_admission_v0_1 import (
-    READ_SHARED_WRITER_RESERVATION_SQL,
-    RESERVE_SHARED_WRITER_SQL,
     SharedWriterAdmissionLimits,
     SharedWriterReservation,
     reserve_shared_writer_envelope,
