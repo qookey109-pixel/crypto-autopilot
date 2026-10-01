@@ -1,6 +1,6 @@
-## Current checkpoint — #667 merged (2026-10-01)
+## Checkpoint at #667 merge (2026-10-01)
 
-Evidence basis: GitHub main `1549cc49e0e308a2cbf13a412e898a1028968468`; open PRs = 0. PR #666 and [#667](https://github.com/qookey109-pixel/crypto-autopilot/pull/667) are merged. Post-merge Python 3.12/3.13, CodeQL, Dependency/SBOM, and Freeze Guard passed; workflow-static was skipped because no workflow changed.
+Evidence basis at this checkpoint: GitHub main `1549cc49e0e308a2cbf13a412e898a1028968468`; open PRs at that checkpoint = 0. PR #666 and [#667](https://github.com/qookey109-pixel/crypto-autopilot/pull/667) are merged. Post-merge Python 3.12/3.13, CodeQL, Dependency/SBOM, and Freeze Guard passed; workflow-static was skipped because no workflow changed.
 
 - The new [market-data source and budget-gap assessment](CLOUD_PAPER_MARKET_DATA_SOURCE_ASSESSMENT_V0_1.md) records the 4H/60M/15M gap and estimates 36 requests/slot for 23-market 4H breadth, five candidates at 60M/15M, and three shared market calls. This exceeds the existing 18-request ceiling; it is a design estimate, not observed provider usage.
 - Pionex's documented intervals do not prove project capture completeness or quota. CoinGecko Demo is not approved because its terms may conflict with retaining decision evidence. No provider, Cloudflare usage, R2, or D1 access occurred.
