@@ -46,7 +46,7 @@ SELECT
     CAST(? AS TEXT), CAST(? AS TEXT), CAST(? AS TEXT), CAST(? AS TEXT),
     CAST(? AS INTEGER), CAST(? AS INTEGER), CAST(? AS INTEGER),
     CAST(? AS INTEGER), CAST(? AS INTEGER), CAST(? AS INTEGER),
-    CAST(? AS INTEGER)
+    CAST(? AS INTEGER), CAST(? AS INTEGER)
 FROM day_totals, rolling_totals, capacity
 WHERE day_totals.reservations < CAST(? AS INTEGER)
   AND capacity.retained_reservations < CAST(? AS INTEGER)

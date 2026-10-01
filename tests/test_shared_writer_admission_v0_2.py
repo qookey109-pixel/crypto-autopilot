@@ -103,7 +103,7 @@ class SharedWriterAdmissionTests(unittest.TestCase):
         )
         self.assertEqual((first, second), ("RESERVED", "RESERVED"))
         count = client.connection.execute(
-            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_1"
+            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_2"
         ).fetchone()[0]
         self.assertEqual(count, 2)
 
@@ -117,7 +117,7 @@ class SharedWriterAdmissionTests(unittest.TestCase):
             "RESERVED",
         )
         before = client.connection.execute(
-            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_1"
+            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_2"
         ).fetchone()[0]
         self.assertEqual(
             reserve_shared_writer_envelope(
@@ -126,7 +126,7 @@ class SharedWriterAdmissionTests(unittest.TestCase):
             "EXISTING_RESERVATION",
         )
         after = client.connection.execute(
-            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_1"
+            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_2"
         ).fetchone()[0]
         self.assertEqual((before, after), (1, 1))
 
@@ -231,7 +231,7 @@ class SharedWriterAdmissionTests(unittest.TestCase):
         self.assertEqual(results.count("RESERVED"), 4)
         self.assertEqual(results.count("BLOCKED"), 6)
         count = client.connection.execute(
-            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_1"
+            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_2"
         ).fetchone()[0]
         self.assertEqual(count, 4)
 
