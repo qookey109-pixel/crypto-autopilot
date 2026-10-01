@@ -1,3 +1,18 @@
+## Live repository checkpoint — 2026-10-02 06:41 Asia/Taipei
+
+Evidence basis: protected `main=01974f1c22ff24f33d0903a493085068b2736a5b`, after [PR #731](https://github.com/qookey109-pixel/crypto-autopilot/pull/731) merged.
+
+- Post-merge checks: Python 3.12/3.13 CI [36936078797](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36936078797), CodeQL [36936078787](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36936078787), Dependency/SBOM [36936079020](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36936079020), and V0.10 Freeze Guard [36936078794](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36936078794) succeeded. Pages [36936078804](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36936078804): build succeeded; deploy and production-browser were skipped by the push change filter. PR #731's Pages build/browser and full CI also succeeded before merge.
+- Billing History V0.1 run [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281), attempt 1, remains consumed and failed with `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`; do not rerun it.
+- PR #731 adds the separate V0.2 successor authority and value-free pagination diagnostics. The authority is now on main, but its workflow has zero runs and has made no Cloudflare request. A dispatch would retrieve account billing history and retain redacted billing fields in a seven-day GitHub Actions artifact; it is not dispatched pending explicit owner confirmation.
+- The owner expects additional Cloudflare projects/services may be added later. Their identities are not fully inventoried: external writer coverage remains `UNCONFIRMED`, incomplete, and unsuitable for account-wide zero-cost/headroom claims.
+- Cloud Paper remains disabled and not wired/run/scheduled; D1 is unprovisioned, production strategy registry is empty, and Core100 quality remains `REJECT`. Keep 0 USD, PAPER/LIVE-PAPER only; holdout, source switch, promotion, real-money orders and live trading remain closed.
+- Next engineering task: continue a non-Cloudflare-dependent vertical slice toward the cloud simulation product. Do not treat billing evidence preparation, CI success, or workflow configuration as cost proof or runtime activation.
+
+This entry supersedes the previously dated live checkpoint immediately below it; that checkpoint and all earlier evidence are retained as historical records.
+
+---
+
 ## Live Cloud Paper delivery checkpoint — 2026-10-02 05:54 Asia/Taipei
 
 Evidence: Billing History run [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281), attempt 1, dispatched from main SHA 0543815905d75aa26a188d2d9e861d4929e2570c. Final conclusion `failure`; uploaded report `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`. The report recorded exactly 1 Cloudflare HTTP request, `page_count_read=0`, `returned_row_count=0`, incomplete coverage, `zero_cost_conclusion=UNKNOWN`, and `cloud_paper_activation=REMAINS_DISABLED`. Artifact [11196466171](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281/artifacts/11196466171), SHA-256 `884a65a30f4a87c1e2b90f4b42ab07427b9e51baa3835ab24d7f3574b2505524`, expires 2026-10-08T21:54:37Z. The secret-free report persisted no account identity, item identifiers, invoice identifiers/URLs, descriptions, or raw response.
