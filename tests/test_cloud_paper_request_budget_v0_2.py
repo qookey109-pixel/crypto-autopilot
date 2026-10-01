@@ -41,6 +41,15 @@ def test_market_request_budget_is_inactive_and_does_not_expand_v01():
     assert proposal["warmup"]["maximum_closed_bars_requested_per_slot"] == (
         23 * 21 + 5 * 200 + 5 * 200
     )
+    assert proposal["requests"]["minimum_calls_with_shared_and_fixed_breadth_per_slot"] == (
+        proposal["requests"]["shared_market_calls_per_slot"]
+        + proposal["requests"]["four_hour_breadth_calls_per_slot"]
+    )
+    assert proposal["requests"]["minimum_exceeds_v0_1_run_ceiling"] is True
+    assert (
+        proposal["requests"]["minimum_calls_with_shared_and_fixed_breadth_per_slot"]
+        > current["budget"]["provider_requests_per_run"]
+    )
     assert proposal["requests"]["total_calls_per_slot"] > (
         current["budget"]["provider_requests_per_run"]
     )

@@ -1,6 +1,6 @@
 # Cloud Paper multi-timeframe request budget assessment V0.2
 
-Basis: GitHub main=00acb1f33745390759fe37b7202d5dc2f500bef8 (2026-10-01).
+Basis: GitHub main=3785314f832d0093b4553b6b94456c2e60943f08 (2026-10-01).
 
 This is a planning assessment and inactive requirement envelope. It does not authorize provider, R2, or D1 access; runtime activation; strategy qualification; or scheduling. The machine-readable proposal is config/cloud_paper_market_request_budget_v0_2.json.
 
@@ -18,7 +18,7 @@ For direct per-symbol candle requests, the upper-bound design is:
 | Up to five 15M candidates | 5 |
 | **Total** | **36** |
 
-At 96 nominal slots/day with no retries or backfill, that is 3,456 calls/day and 103,680 calls per rolling 30 days. The Kline portion contributes at most 33 weight units/slot, 3,168/day, and 95,040 per rolling 30 days under the one-request-per-symbol assumption. Weights for the three shared endpoints, account allowance, and observed shared usage remain unknown. These are arithmetic design bounds, not provider allowances or expected observed usage. The current V0.1 Cloud Paper budget permits 18 requests/run and 1,728/day, so the proposal does not fit it. The active guard must continue to block any request beyond its current limit.
+At 96 nominal slots/day with no retries or backfill, that is 3,456 calls/day and 103,680 calls per rolling 30 days. The Kline portion contributes at most 33 weight units/slot, 3,168/day, and 95,040 per rolling 30 days under the one-request-per-symbol assumption. Weights for the three shared endpoints, account allowance, and observed shared usage remain unknown. These are arithmetic design bounds, not provider allowances or expected observed usage. The current V0.1 Cloud Paper budget permits 18 requests/run and 1,728/day, so the proposal does not fit it. The active guard must continue to block any request beyond its current limit. A structural floor is even more restrictive: the three shared requests plus 23 fixed-breadth Klines already require 26 requests/slot before any 60M or 15M candidate Klines. Therefore reducing the candidate limit alone cannot make this direct-source design fit the existing 18-request/run guard. The viable paths are a separately verified and permitted aggregate breadth source, a newly reviewed breadth/cadence contract, or authoritative evidence for a different bounded design; simply raising the numeric ceiling is not evidence of FREE-ONLY feasibility.
 
 ## Code-derived warmup minima
 
@@ -46,7 +46,7 @@ Reusing 4H breadth across separate GitHub-hosted runs requires durable state; in
 
 ## Required evidence before any successor can execute
 
-1. Confirm the strategy families consume no warmup beyond the code-derived technical and regime minima.
+1. For any future qualified implementation, declare and validate per-timeframe inputs, warmup, alignment, and staleness; the current router's shared minima do not certify strategy-specific requirements.
 2. Establish fixed breadth membership, per-symbol coverage, closed-bar alignment, and missing-member behavior.
 3. Obtain authoritative provider allowance and rate-limit-capacity evidence, plus shared usage from all provider workflows. Public endpoint documentation alone does not establish these.
 4. Resolve schedule-to-15M freshness, including delayed starts, without admitting stale candles; record and authorize the chosen maximum age.

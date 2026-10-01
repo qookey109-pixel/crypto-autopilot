@@ -2,7 +2,7 @@
   "schema": "qookey-cloud-paper-market-request-budget-v0.2",
   "status": "PREPARED_REQUIREMENT_ENVELOPE_NOT_EXECUTION_AUTHORITY",
   "evidence_basis": {
-    "main_sha": "19a29e4b57e17821bf64c8cb01fb60c68b8f63c7",
+    "main_sha": "3785314f832d0093b4553b6b94456c2e60943f08",
     "assessment": "docs/CLOUD_PAPER_REQUEST_BUDGET_ASSESSMENT_V0_2.md"
   },
   "purpose": "Quantify the direct Pionex public Kline request envelope for the existing 4H/60M/15M strategy inputs. This proposal does not prove provider capacity, account allowance, complete data availability, or zero-cost operation.",
@@ -49,7 +49,10 @@
     "maximum_calls_per_rolling_30_days": 103680,
     "pionex_kline_weight_per_request": 1,
     "shared_market_endpoint_weights": null,
-    "provider_rate_limit": null
+    "provider_rate_limit": null,
+    "minimum_calls_with_shared_and_fixed_breadth_per_slot": 26,
+    "minimum_exceeds_v0_1_run_ceiling": true,
+    "feasibility_note": "3 shared market calls + 23 fixed breadth Kline calls = 26 requests before any candidate-timeframe candles; reducing candidate_limit alone cannot fit the current 18-request/run ceiling."
   },
   "comparison_with_v0_1": {
     "existing_authorized_per_run_ceiling": 18,
@@ -65,7 +68,12 @@
     "entry_interval": "15M",
     "proposed_15m_bar_age_limit_ms": 900000,
     "15m_age_limit_status": "PROPOSAL_NOT_CURRENT_AUTHORITY",
-    "current_schedule_offsets_minutes": [7, 22, 37, 52],
+    "current_schedule_offsets_minutes": [
+      7,
+      22,
+      37,
+      52
+    ],
     "maximum_start_delay_ms": 600000,
     "schedule_delay_can_exceed_proposed_15m_bar_age_limit": true,
     "stale_or_incomplete_input": "REVIEW_REQUIRED_NO_NEW_ENTRY_NO_GUESSING"
