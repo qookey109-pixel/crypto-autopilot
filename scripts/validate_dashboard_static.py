@@ -195,6 +195,73 @@ def validate_cloud_paper_usage_evidence(budget: dict[str, object]) -> str:
     return contract["version"]
 
 
+def validate_cloud_paper_billing_evidence(cloud_paper: dict[str, object]) -> None:
+    evidence = cloud_paper.get("billing_evidence")
+    if not isinstance(evidence, dict):
+        raise RuntimeError("Cloud Paper billing evidence must be an object")
+    expected = {
+        "updated_date": "2026-10-02",
+        "authority": "cloud-paper-billing-evidence-v0.1",
+        "subscription_snapshot": {
+            "run_id": 36513941565,
+            "attempt": 1,
+            "event": "workflow_dispatch",
+            "workflow_conclusion": "success",
+            "run_head_sha": "414cf9a0a3b60612f9d1e09d7c5d29d76b05455e",
+            "artifact_id": 11009764477,
+            "artifact_digest": "sha256:7a2d8c5dce415392614c90266ebc8e7625e40cc2e92a19bc457c8cd9fd7d3338",
+            "artifact_expires_at_utc": "2026-10-06T02:43:49Z",
+            "observed_date": "2026-10-01",
+            "report_status": "READY_FOR_BILLING_REVIEW",
+            "rate_plan_id": "r2_paid",
+            "state": "Paid",
+            "listed_price_usd": 0,
+            "listed_subscription_price_total_usd": 0,
+            "invoices_included": False,
+            "metered_charges_included": False,
+            "complete_account_product_coverage": False,
+            "all_writers_established": False,
+            "rate_plan_id_documentation_check": {
+                "classification": "UNMAPPED_DOCUMENTED_ENUM_REQUIRES_REVIEW",
+                "additional_cloudflare_request_performed": False,
+            },
+            "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513941565",
+        },
+        "billable_usage_snapshot": {
+            "run_id": 36852292356,
+            "attempt": 1,
+            "event": "workflow_dispatch",
+            "workflow_conclusion": "success",
+            "run_head_sha": "54c099254303512eba7f8f2b57dcd98124b17348",
+            "artifact_id": 11156336210,
+            "artifact_digest": "sha256:aafc0e4c58bdb8d25426a390c1d9689ce77324ef2c780d91e6fcc2f90c1bbcbf",
+            "observed_at_utc": "2026-10-01T10:57:13.348117Z",
+            "report_reason_code": "USAGE_ROWS_CAPTURED_REVIEW_REQUIRED_FOR_SCOPE",
+            "response_row_count": 42,
+            "every_row_has_billed_cost_fields": True,
+            "reported_billed_cost_total": 0,
+            "currency": "USD",
+            "fixed_subscription_charges_included": False,
+            "daily_provider_data_may_lag": True,
+            "complete_account_usage_coverage": "UNKNOWN_UNTIL_REVIEWED",
+            "cloudflare_http_requests_performed": 1,
+            "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36852292356",
+        },
+        "total_cloudflare_http_requests": 2,
+        "account_wide_cost": "UNKNOWN",
+        "account_wide_writer_coverage": "UNKNOWN",
+        "writer_inventory_state": "INCOMPLETE_USER_EXPECTS_ADDITIONAL_SERVICES_LATER",
+        "zero_cost_conclusion": "NOT_PROVEN",
+        "authority_consumed": True,
+        "rerun_authorized": False,
+        "cloud_paper_activation": "REMAINS_DISABLED",
+    }
+    if evidence != expected:
+        raise RuntimeError("Cloud Paper billing evidence changed or is incomplete")
+    if cloud_paper.get("billing_evidence") != evidence:
+        raise RuntimeError("Cloud Paper billing evidence is not stable")
+
+
 def main() -> int:
     missing = [str(path) for path in REQUIRED if not path.is_file()]
     if missing:
@@ -242,6 +309,7 @@ def main() -> int:
         raise RuntimeError("Cloud Paper account values are unknown without a formal run")
     cloud_budget = cloud_paper.get("budget") or {}
     validate_cloud_paper_usage_evidence(cloud_budget)
+    validate_cloud_paper_billing_evidence(cloud_paper)
     if cloud_budget.get("reservation_guard") != "PROVIDER_R2_GUARD_IMPLEMENTED_RUNTIME_NOT_ACTIVATED":
         raise RuntimeError("Cloud Paper provider/R2 guard projection changed")
     if cloud_budget.get("d1_reservation_ledger") != "SHARED_LEDGER_CODE_PREPARED_MIGRATIONS_NOT_APPLIED_D1_NOT_PROVISIONED":
@@ -714,6 +782,14 @@ def main() -> int:
         raise RuntimeError("dashboard emergency-template lineage missing")
 
     html = (ROOT / "index.html").read_text(encoding="utf-8")
+    for required_id in (
+        "cloud-paper-billing-detail",
+        "cloud-paper-billing-run",
+        "cloud-paper-usage-run",
+    ):
+        if f'id="{required_id}"' not in html:
+            raise RuntimeError(f"Cloud Paper billing projection element missing: {required_id}")
+
     if '<html lang="zh-Hant-TW">' not in html:
         raise RuntimeError("dashboard HTML must declare zh-Hant-TW")
     if '<a class="skip-link" href="#top">跳到主要內容</a>' not in html:
