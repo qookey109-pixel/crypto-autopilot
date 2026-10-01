@@ -309,14 +309,9 @@
     "next_step": "SEPARATELY_VERSION_D1_BILLING_AND_STORAGE_WRITER_COVERAGE_EVIDENCE_BEFORE_ACTIVATION"
   },
   "live_repository_checkpoint": {
-    "evidence_basis_main_sha": "ec05d61f0724b741ad4b49be800f0ff3ee0de202",
-    "observed_at_utc": "2026-10-01T21:32:26Z",
+    "evidence_basis_main_sha": "e4706d1f1b82c9b7a760f3dab3fc1d729e9ffe11",
+    "observed_at_utc": "2026-10-01T20:17:59Z",
     "is_latest_main_claim": false,
-    "merged_pr": {
-      "number": 727,
-      "head_sha": "9af2d06fdfe5dc4bee9369ef592b63fd3aca9d71",
-      "merge_commit_sha": "ec05d61f0724b741ad4b49be800f0ff3ee0de202"
-    },
     "open_pull_requests": [
       {
         "number": 708,
@@ -325,7 +320,7 @@
         "title": "docs: refresh cloud maintenance evidence",
         "base_sha": "a0f86649ac813523221d763e20d57fa55c25548b",
         "head_sha": "281b8def52202e5d075df2f78f6c5872fbc4426e",
-        "checks_summary": "NO_CHECK_RUNS_FOR_CURRENT_HEAD"
+        "mergeable": true
       },
       {
         "number": 693,
@@ -334,7 +329,7 @@
         "title": "chore(deps): bump botocore from 1.43.75 to 1.43.103",
         "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
         "head_sha": "582f097375b90dab659c76def22e8614c7fbd5d1",
-        "checks_summary": "PYTHON_3_12_3_13_AND_FREEZE_GUARD_FAILED"
+        "mergeable": false
       },
       {
         "number": 694,
@@ -343,7 +338,7 @@
         "title": "chore(deps): bump boto3 from 1.43.75 to 1.43.103",
         "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
         "head_sha": "7f5673542ee1326f55c682b1b8ebf0e33488c935",
-        "checks_summary": "PYTHON_3_12_3_13_FREEZE_GUARD_AND_DEPENDENCY_SECURITY_FAILED"
+        "mergeable": false
       },
       {
         "number": 695,
@@ -352,7 +347,7 @@
         "title": "chore(deps): bump ruff from 0.16.0 to 0.16.9",
         "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
         "head_sha": "0168fc933d0167e53677230945a81ae046338c40",
-        "checks_summary": "PYTHON_3_12_3_13_AND_FREEZE_GUARD_FAILED"
+        "mergeable": false
       },
       {
         "number": 696,
@@ -361,7 +356,7 @@
         "title": "chore(deps): bump github/codeql-action/analyze from 4.38.1 to 4.38.2",
         "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
         "head_sha": "e9b6dc2fcbc496aa5dd350c633e8b02f815c91d3",
-        "checks_summary": "CODEQL_FAILED"
+        "mergeable": false
       },
       {
         "number": 697,
@@ -370,7 +365,7 @@
         "title": "chore(deps): bump actions/setup-python from 6 to 7",
         "base_sha": "a0f86649ac813523221d763e20d57fa55c25548b",
         "head_sha": "d30f4b511aca81d72cd38fba7a4eddfcc48e12b0",
-        "checks_summary": "PYTHON_3_12_3_13_WORKFLOW_STATIC_AND_FREEZE_GUARD_FAILED"
+        "mergeable": false
       },
       {
         "number": 698,
@@ -379,32 +374,29 @@
         "title": "chore(deps): bump github/codeql-action/init from 4.38.1 to 4.38.2",
         "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
         "head_sha": "838d344b6a7eb280c34a759cd7bc627706ade43f",
-        "checks_summary": "CODEQL_FAILED"
+        "mergeable": false
       }
     ],
-    "ci_run_id": 36928500736,
+    "ci_run_id": 36918505800,
     "ci": "SUCCESS",
     "python_3_12": "SUCCESS",
     "python_3_13": "SUCCESS",
-    "workflow_static": "NOT_OBSERVED_FOR_THIS_HEAD",
-    "codeql_run_id": 36928500785,
+    "workflow_static": "SKIPPED_NO_WORKFLOW_CHANGE",
+    "codeql_run_id": 36918506053,
     "codeql": "SUCCESS",
-    "dependency_sbom_run_id": 36928500794,
+    "dependency_sbom_run_id": 36918506086,
     "dependency_sbom": "SUCCESS",
-    "freeze_guard_run_id": 36928500740,
+    "freeze_guard_run_id": 36918506034,
     "freeze_guard": "SUCCESS",
-    "dashboard_build": null,
-    "dashboard_deploy": "NOT_OBSERVED_FOR_THIS_HEAD",
-    "dashboard_browser_production": "NOT_OBSERVED_FOR_THIS_HEAD",
-    "dashboard_pages_result": "NO_PAGES_RUN_OBSERVED_FOR_THIS_HEAD",
+    "dashboard_build": "SUCCESS",
+    "dashboard_deploy": "SKIPPED_DOCS_ONLY",
+    "dashboard_browser_production": "SKIPPED_DOCS_ONLY",
+    "dashboard_pages_result": "BUILD_SUCCESS_DEPLOY_AND_BROWSER_SKIPPED_DOCS_ONLY",
     "cloud_paper_activation": false,
     "d1_provisioned": false,
     "production_cycle_status": "NOT_RUN",
-    "billing_history_workflow_run_observed": false,
-    "billing_history_cloudflare_requests": 0,
-    "billing_history_report": "NOT_AVAILABLE_NOT_DISPATCHED",
-    "cloud_paper_zero_cost": "NOT_PROVEN",
-    "cloudflare_writer_inventory": "INCOMPLETE_OWNER_EXPECTS_FUTURE_PROJECTS_SERVICES",
+    "latest_maintenance_run_id": 36676302904,
+    "latest_maintenance_propose": "OBSERVATION_CHANGED",
     "closed_unmerged_pull_requests": [
       {
         "number": 679,
@@ -417,7 +409,8 @@
         "note": "STALE_GENERATED_SNAPSHOT_CLOSED_UNMERGED_HISTORICAL_EVIDENCE_PRESERVED"
       }
     ],
-    "next_work": "ONE_AUTHORIZED_BILLING_HISTORY_DISPATCH_ON_MAIN_ONCE; THEN_REVIEW_PLAN_FIXED_CHARGES_TOTAL_COST_AND_WRITER_COVERAGE; KEEP_CLOUD_PAPER_DISABLED_UNTIL_ALL_GATES_PASS"
+    "next_work": "OWNER_CONFIRM_COMPLETE_CURRENT_AND_PLANNED_CLOUDFLARE_WRITER_INVENTORY; RESOLVE_R2_PAID_PLAN_LABEL_FIXED_CHARGES_COMPLETE_COST_AND_HEADROOM_COVERAGE; PREPARE_SEPARATE_D1_METERING_AND_ATOMICITY_AUTHORITY; KEEP_CLOUD_PAPER_DISABLED",
+    "dashboard_build_run_id": 36918505798
   },
   "cloud_paper_billing_evidence": {
     "updated_date": "2026-10-02",
@@ -543,5 +536,94 @@
     "zero_cost_conclusion": "UNKNOWN",
     "cloud_paper_activation": false,
     "note": "Dispatch once on main when UI/API dispatch is available; preserve failure or incomplete output and never rerun."
+  },
+  "post_pr_727_repository_checkpoint": {
+    "evidence_basis_main_sha": "ec05d61f0724b741ad4b49be800f0ff3ee0de202",
+    "observed_at_utc": "2026-10-01T21:32:26Z",
+    "is_latest_main_claim": false,
+    "merged_pr": {
+      "number": 727,
+      "head_sha": "9af2d06fdfe5dc4bee9369ef592b63fd3aca9d71",
+      "merge_commit_sha": "ec05d61f0724b741ad4b49be800f0ff3ee0de202"
+    },
+    "open_pull_requests": [
+      {
+        "number": 708,
+        "state": "OPEN",
+        "draft": true,
+        "head_sha": "281b8def52202e5d075df2f78f6c5872fbc4426e",
+        "base_sha": "a0f86649ac813523221d763e20d57fa55c25548b",
+        "checks_summary": "NO_CHECK_RUNS_FOR_CURRENT_HEAD"
+      },
+      {
+        "number": 693,
+        "state": "OPEN",
+        "draft": false,
+        "head_sha": "582f097375b90dab659c76def22e8614c7fbd5d1",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
+        "checks_summary": "PYTHON_3_12_3_13_AND_FREEZE_GUARD_FAILED"
+      },
+      {
+        "number": 694,
+        "state": "OPEN",
+        "draft": false,
+        "head_sha": "7f5673542ee1326f55c682b1b8ebf0e33488c935",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
+        "checks_summary": "PYTHON_3_12_3_13_FREEZE_GUARD_AND_DEPENDENCY_SECURITY_FAILED"
+      },
+      {
+        "number": 695,
+        "state": "OPEN",
+        "draft": false,
+        "head_sha": "0168fc933d0167e53677230945a81ae046338c40",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
+        "checks_summary": "PYTHON_3_12_3_13_AND_FREEZE_GUARD_FAILED"
+      },
+      {
+        "number": 696,
+        "state": "OPEN",
+        "draft": false,
+        "head_sha": "e9b6dc2fcbc496aa5dd350c633e8b02f815c91d3",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
+        "checks_summary": "CODEQL_FAILED"
+      },
+      {
+        "number": 697,
+        "state": "OPEN",
+        "draft": false,
+        "head_sha": "d30f4b511aca81d72cd38fba7a4eddfcc48e12b0",
+        "base_sha": "a0f86649ac813523221d763e20d57fa55c25548b",
+        "checks_summary": "PYTHON_3_12_3_13_WORKFLOW_STATIC_AND_FREEZE_GUARD_FAILED"
+      },
+      {
+        "number": 698,
+        "state": "OPEN",
+        "draft": false,
+        "head_sha": "838d344b6a7eb280c34a759cd7bc627706ade43f",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
+        "checks_summary": "CODEQL_FAILED"
+      }
+    ],
+    "ci_run_id": 36928500736,
+    "ci": "SUCCESS",
+    "python_3_12": "SUCCESS",
+    "python_3_13": "SUCCESS",
+    "workflow_static": "NOT_OBSERVED_FOR_THIS_HEAD",
+    "codeql_run_id": 36928500785,
+    "codeql": "SUCCESS",
+    "dependency_sbom_run_id": 36928500794,
+    "dependency_sbom": "SUCCESS",
+    "freeze_guard_run_id": 36928500740,
+    "freeze_guard": "SUCCESS",
+    "dashboard_pages_result": "NO_PAGES_RUN_OBSERVED_FOR_THIS_HEAD",
+    "cloud_paper_activation": false,
+    "d1_provisioned": false,
+    "production_cycle_status": "NOT_RUN",
+    "billing_history_workflow_run_observed": false,
+    "billing_history_cloudflare_requests": 0,
+    "billing_history_report": "NOT_AVAILABLE_NOT_DISPATCHED",
+    "cloud_paper_zero_cost": "NOT_PROVEN",
+    "cloudflare_writer_inventory": "INCOMPLETE_OWNER_EXPECTS_FUTURE_PROJECTS_SERVICES",
+    "next_work": "ONE_AUTHORIZED_BILLING_HISTORY_DISPATCH_ON_MAIN_ONCE; THEN_REVIEW_PLAN_FIXED_CHARGES_TOTAL_COST_AND_WRITER_COVERAGE; KEEP_CLOUD_PAPER_DISABLED_UNTIL_ALL_GATES_PASS"
   }
 }
