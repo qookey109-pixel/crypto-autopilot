@@ -1,3 +1,26 @@
+## Latest Cloud Paper continuation checkpoint — 2026-10-01 17:44 Asia/Taipei
+
+Live evidence basis: GitHub `main=ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a`; open PR search returned 0. PR [#690](https://github.com/qookey109-pixel/crypto-autopilot/pull/690) merged the read-only market-data source assessment V0.3. Its PR-head Python 3.12/3.13 CI, CodeQL and Dependency/SBOM passed; post-merge main checks were not independently verified.
+
+Current gates:
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production registry empty, Core100 quality `REJECT`.
+- The V0.2 Cloudflare billable-usage run #36839577708 failed once with HTTP 403 and no report/artifact. Root cause, account-wide cost, freshness, all-writer coverage and R2/D1 headroom remain unknown. One-time authority is consumed; do not rerun.
+- V0.3 market assessment: no approved TOTAL3 source; BTC dominance is an unapproved partial candidate; 23-market breadth and 4H/15M are not production-verified. Scraping requires source-specific terms, automation permission and data-retention review.
+- Matched synthetic storage savings do not prove production R2 bytes, charges, or headroom.
+
+Ordered next work:
+1. Define a separately versioned, sustainable, fresh account-wide usage/cost/headroom evidence path; include all writers and the evidence ledger's own cost. Do not replay consumed audits.
+2. Close each required market field's definition, source, permissions, timestamp alignment, coverage, freshness, parser version and request budget. Unapproved fields remain unavailable.
+3. Reconcile storage bytes, object counts, read/write cost, long-term growth and retention without deleting frozen or failed evidence.
+4. Only after these gates, continue controlled PAPER entrypoint acceptance, then bounded schedule and first-natural-run validation, then dashboard production verification.
+5. Keep status documents and machine state synchronized to live main; preserve old snapshots as historical evidence.
+
+Do not treat PR CI, manual runs, synthetic fixtures or a source assessment as production runtime, natural schedule, zero-cost, or strategy-quality acceptance.
+
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; FREE-ONLY / 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+
+---
+
 ## Cloud Paper 接續狀態 — #667 合併後（2026-10-01）
 
 查核基準：GitHub main `1549cc49e0e308a2cbf13a412e898a1028968468`；該查核點 open PR = 0。這是文件更新前的快照；每次接續先重新解析 main、open PR、最新自然 Health/Maintenance 與 Pages runs。
