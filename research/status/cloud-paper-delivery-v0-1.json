@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-10-01",
-  "evidence_basis_parent_main_sha": "0310d8ba31867b50672765b00f3651951d378583",
+  "evidence_basis_parent_main_sha": "011e20bd6f9b0f074ab50cebfceaf77440fa0274",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -475,22 +475,31 @@
   },
   "production_cycle_status": "NOT_RUN",
   "latest_documentation_sync": {
-    "pull_request": 690,
-    "pr_head_sha": "b5dbfa5837c378ea61997a402d17d9d81ce24a82",
-    "merged_main_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
+    "pull_request": 699,
+    "parent_main_sha": "0310d8ba31867b50672765b00f3651951d378583",
+    "pr_head_sha": "841bbea2f761fc72855791a3389f273aeb2b8b9f",
+    "merged_main_sha": "011e20bd6f9b0f074ab50cebfceaf77440fa0274",
     "changed_runtime_or_authority": false,
-    "pr_ci_run_id": 36843908975,
-    "pr_ci": "SUCCESS",
-    "python_3_12": "SUCCESS",
-    "python_3_13": "SUCCESS",
-    "codeql_run_id": 36843909019,
-    "codeql": "SUCCESS",
-    "dependency_sbom_run_id": 36843909009,
-    "dependency_sbom": "SUCCESS",
-    "post_merge_main_ci_run_id": null,
-    "post_merge_main_ci": "UNKNOWN_NOT_INDEPENDENTLY_VERIFIED",
-    "pages_run_id": null,
-    "pages_deploy": "NOT_TRIGGERED_DOCUMENTATION_ONLY"
+    "pr_python_3_12": "SUCCESS",
+    "pr_python_3_13": "SUCCESS",
+    "pr_workflow_static": "SUCCESS",
+    "pr_codeql": "SUCCESS",
+    "pr_dependency_sbom": "SUCCESS",
+    "pr_dashboard_build": "SUCCESS",
+    "pr_dashboard_deploy": "SKIPPED_DOCUMENTATION_ONLY",
+    "pr_browser_production": "SKIPPED_DOCUMENTATION_ONLY",
+    "post_merge_main_ci_run_id": 36847992256,
+    "post_merge_main_ci": "SUCCESS",
+    "post_merge_codeql_run_id": 36847992249,
+    "post_merge_codeql": "SUCCESS",
+    "post_merge_dependency_sbom_run_id": 36847992280,
+    "post_merge_dependency_sbom": "SUCCESS",
+    "post_merge_freeze_guard_run_id": 36847992298,
+    "post_merge_freeze_guard": "SUCCESS",
+    "post_merge_pages_run_id": 36847992305,
+    "post_merge_pages_build": "SUCCESS",
+    "post_merge_pages_deploy": "SKIPPED",
+    "post_merge_browser_production": "SKIPPED"
   },
   "engineering_ci_acceptance_matrix": {
     "evidence_code_commit": "cb22d3c3905a079eb754f0fab6d917923512f624",
@@ -702,10 +711,5 @@
     "model_quality": "REJECT",
     "production_strategy_registry": "EMPTY",
     "macro_regime": "REGIME_UNAVAILABLE"
-  },
-  "pending_documentation_sync": {
-    "pull_request": "TO_BE_CREATED_FROM_MAIN_0310D8BA",
-    "state": "PARENT_CHECKPOINT_ONLY_NOT_LATEST_MAIN",
-    "runtime_or_authority_changed": false
   }
 }
