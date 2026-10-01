@@ -172,7 +172,7 @@
     },
     "dashboard_pages_validation_state": "NO_PAGES_RUN_OBSERVED_FOR_PR_727_MAIN_HEAD"
   },
-  "next_decision": "Dispatch Cloud Paper Billing History V0.1 exactly once on main when available; then review report alongside existing subscription/usage evidence. Keep Cloud Paper disabled because 0 USD, complete account writer coverage, D1/capacity, data readiness, and production strategy qualification remain unproven.",
+  "next_decision": "Do not rerun Billing History V0.1. Preserve run 36931736281 and its artifact. Establish owner-attested current/planned Cloudflare writer coverage; investigate BILLING_HISTORY_PAGE_METADATA_INVALID from existing evidence or prepare a separately versioned successor authority without executing it. Keep Cloud Paper disabled until zero-cost, usage/headroom, data, production strategy and recovery gates pass.",
   "notes": [
     "Live checkpoint at parent main 42f8c1cdad46107f5f8f720b9809a7ad71286815: PR #679 stale generated snapshot closed unmerged at 2026-10-01T08:15:20Z; no open PRs. PR #665 persistence compatibility/recovery fixes are merged. This status update grants no provider, R2, D1, runtime, or schedule access.",
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
@@ -195,7 +195,8 @@
     "Historical September 22 PR navigation is preserved in historical_open_pr_triage; live_repository_checkpoint reports the reviewed current scan.",
     "PR #426 merged non-blocking mypy semantic type visibility on Python 3.13; the first baseline reported 261 type errors without failing CI or changing execution authority.",
     "Type Debt Baseline V0.1 records the post-PR-427 CI baseline: mypy 2.3.1 on Python 3.13 reports 261 errors across 49 files; 82.38% are arg-type/call-overload/attr-defined and remain non-blocking.",
-    "Live repository checkpoint refreshed from main 289dad5d29a59eb1139e4d1d7a862d10f7e5083e at 2026-10-01T18:58:48Z. Seven open PRs are recorded with exact heads and bases; all have a recorded base SHA different from the reviewed main and require reconciliation before merge. Main post-merge CI, CodeQL, Dependency/SBOM, Freeze Guard and Pages build succeeded; Pages deploy/browser jobs were skipped for documentation-only changes."
+    "Live repository checkpoint refreshed from main 289dad5d29a59eb1139e4d1d7a862d10f7e5083e at 2026-10-01T18:58:48Z. Seven open PRs are recorded with exact heads and bases; all have a recorded base SHA different from the reviewed main and require reconciliation before merge. Main post-merge CI, CodeQL, Dependency/SBOM, Freeze Guard and Pages build succeeded; Pages deploy/browser jobs were skipped for documentation-only changes.",
+    "Cloud Paper Billing History V0.1 run 36931736281, attempt 1 on main 0543815905d75aa26a188d2d9e861d4929e2570c, failed with REVIEW_REQUIRED/BILLING_HISTORY_PAGE_METADATA_INVALID after one Cloudflare request; page_count_read=0, returned_row_count=0, zero_cost_conclusion=UNKNOWN. Artifact 11196466171 sha256:884a65a30f4a87c1e2b90f4b42ab07427b9e51baa3835ab24d7f3574b2505524. One-time authority consumed; never rerun. Owner expects future Cloudflare projects/services, so account-wide writer coverage remains incomplete."
   ],
   "live_paper": {
     "status": "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY",
@@ -523,19 +524,33 @@
   },
   "cloud_paper_billing_history_v0_1": {
     "authority": "config/cloud_paper_billing_history_v0_1.json",
-    "status": "AUTHORIZED_ON_PROTECTED_MAIN_NOT_DISPATCHED",
+    "status": "REVIEW_REQUIRED_ONE_TIME_AUTHORITY_CONSUMED",
     "workflow": "Cloud Paper Billing History V0.1",
     "maximum_runs": 1,
     "maximum_attempts": 1,
-    "workflow_run_observed": false,
-    "cloudflare_http_requests_performed": 0,
-    "report_status": "NOT_AVAILABLE",
-    "artifact_id": null,
-    "one_time_authority_consumed": false,
+    "workflow_run_observed": true,
+    "cloudflare_http_requests_performed": 1,
+    "report_status": "REVIEW_REQUIRED",
+    "artifact_id": 11196466171,
+    "one_time_authority_consumed": true,
     "rerun_authorized": false,
     "zero_cost_conclusion": "UNKNOWN",
     "cloud_paper_activation": false,
-    "note": "Dispatch once on main when UI/API dispatch is available; preserve failure or incomplete output and never rerun."
+    "note": "One main workflow_dispatch; failure report uploaded. Do not rerun. One Cloudflare request; no valid page accepted. Zero cost UNKNOWN. Any further query needs a separately versioned successor authority merged to main first. Owner expects additional future Cloudflare writers; inventory remains incomplete.",
+    "workflow_run_id": 36931736281,
+    "workflow_run_attempt": 1,
+    "event": "workflow_dispatch",
+    "workflow_conclusion": "failure",
+    "run_head_sha": "0543815905d75aa26a188d2d9e861d4929e2570c",
+    "observed_at_utc": "2026-10-01T21:54:37.676331Z",
+    "reason_code": "BILLING_HISTORY_PAGE_METADATA_INVALID",
+    "page_size_requested": 100,
+    "page_count_read": 0,
+    "reported_total_count": null,
+    "returned_row_count": 0,
+    "complete_history_coverage": false,
+    "artifact_digest": "sha256:884a65a30f4a87c1e2b90f4b42ab07427b9e51baa3835ab24d7f3574b2505524",
+    "artifact_expires_at_utc": "2026-10-08T21:54:37Z"
   },
   "post_pr_727_repository_checkpoint": {
     "evidence_basis_main_sha": "ec05d61f0724b741ad4b49be800f0ff3ee0de202",

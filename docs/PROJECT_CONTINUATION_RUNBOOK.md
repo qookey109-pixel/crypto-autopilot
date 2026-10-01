@@ -1,4 +1,19 @@
-## Live repository checkpoint — 2026-10-02 05:32 Asia/Taipei
+## Live repository checkpoint — 2026-10-02 05:54 Asia/Taipei
+
+Evidence basis: the one-time Cloud Paper Billing History V0.1 run [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281), attempt 1, was dispatched from protected `main=0543815905d75aa26a188d2d9e861d4929e2570c`. The artifact report was uploaded successfully: artifact [11196466171](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281/artifacts/11196466171), SHA-256 `884a65a30f4a87c1e2b90f4b42ab07427b9e51baa3835ab24d7f3574b2505524`, expires 2026-10-08T21:54:37Z. This is the reviewed parent SHA for this checkpoint, not a claim about main after this documentation change.
+
+- Run conclusion: `failure`; report `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`. One Cloudflare HTTP request was performed; no valid page metadata was accepted (`page_count_read=0`, `returned_row_count=0`, coverage incomplete). No account identity, item IDs, invoice IDs/URLs, descriptions, or raw response were persisted.
+- `zero_cost_conclusion=UNKNOWN`; the run does not establish billing totals, free-tier eligibility, or complete account coverage. This one-time authority is consumed. Do not rerun it. Any further Cloudflare billing query requires a separately versioned successor authority merged to main before execution.
+- The owner expects additional Cloudflare projects/services to be added later. The repository writer inventory is not account-complete; unknown current or future writers block account-wide cost/headroom claims. Register each new writer with the shared admission contract before its first write.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 is unprovisioned, production strategy registry is empty, Core100 quality is `REJECT`, and activation remains disabled.
+- Seven PRs were open at this observation (#708 and #693–#698); their heads/bases require live reconciliation before merge. This status change does not modify them.
+- Next: preserve this failed-run evidence; design any needed parser/API-contract successor as prepare-only work, and continue non-Cloudflare work that does not depend on account cost evidence. Keep all Cloud Paper writes, D1 provisioning, and natural execution disabled until every gate is evidenced.
+
+CLOUD-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders, and live trading remain closed.
+
+---
+
+## Historical repository checkpoint — 2026-10-02 05:32 Asia/Taipei
 
 Evidence basis: live GitHub `main=ec05d61f0724b741ad4b49be800f0ff3ee0de202`, created by merged [PR #727](https://github.com/qookey109-pixel/crypto-autopilot/pull/727) (head `9af2d06fdfe5dc4bee9369ef592b63fd3aca9d71`). Post-merge main CI [36928500736](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36928500736), CodeQL [36928500785](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36928500785), Dependency/SBOM [36928500794](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36928500794), and V0.10 Freeze Guard [36928500740](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36928500740) succeeded. No Pages run was observed for this head. The current checkpoint below supersedes the 04:56 checkpoint; all earlier evidence remains historical and frozen.
 
