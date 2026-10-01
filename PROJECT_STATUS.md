@@ -1,3 +1,17 @@
+## Live Cloud Paper checkpoint — 2026-10-01 19:10 Asia/Taipei
+
+Evidence basis: GitHub `main=54c099254303512eba7f8f2b57dcd98124b17348`; open PR search returned 0. PR #702 merged at this SHA. Post-merge main CI [36851711972](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711972), CodeQL [36851711901](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711901), Dependency/SBOM [36851711909](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711909), and V0.10 Freeze Guard [36851711874](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36851711874) succeeded. Dashboard Pages natural run [36853589288](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36853589288) was still in progress at observation time.
+
+- The single authorized Cloud Paper Billable Usage V0.3 run [36852292356](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36852292356), attempt 1 on this main SHA, completed SUCCESS. Its one audit job and all capture/report/artifact/cleanup steps succeeded.
+- Report outcome is `READY_FOR_REVIEW / USAGE_ROWS_CAPTURED_REVIEW_REQUIRED_FOR_SCOPE`, not a zero-cost pass. It performed exactly one Cloudflare HTTP request and returned 42 usage rows; returned billed-cost subtotal is 0.0 USD and all returned rows include billed_cost. Scope: current billing period, no date filter. Observation: 2026-10-01 10:57:13 UTC; billing period starts 2026-09-17 00:00 UTC and returned rows extend through 2026-10-01 00:00 UTC.
+- Preserve [artifact 11156336210](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36852292356/artifacts/11156336210), 1,325 bytes, expires 2026-10-08, digest `sha256:aafc0e4c58bdb8d25426a390c1d9689ce77324ef2c780d91e6fcc2f90c1bbcbf`. Account identity and raw response were not persisted.
+- Returned-row usage does not establish full-account coverage, fixed fees/invoices, all writers, D1 use, current freshness (provider data may lag daily), R2/D1 headroom, or zero total project cost. These remain UNKNOWN. One-shot authority is consumed and must not be rerun; no R2/D1 operation or runtime activation occurred.
+- Cloud Paper stays disabled: `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 unprovisioned; production registry empty; Core100 `REJECT`; required market-data fields remain incomplete.
+
+Next: create a separately versioned sustainable, fresh, account-wide cost/headroom evidence design that accounts for fixed fees, all current writers, and the evidence ledger's own cost. Continue market-source qualification and the remaining end-to-end PAPER gates. Do not enable runtime or schedules until their budget, source, and execution authorities pass independently.
+
+CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders, and live trading remain closed.
+
 ## Live Cloud Paper checkpoint — 2026-10-01 18:38 Asia/Taipei
 
 Evidence basis: GitHub `main=068a09b99dd2fbd11f71a7eda4ab47db8223a5af`, reread from the default branch. Six open PRs are Dependabot updates #693–#698; recheck exact heads, checks and mergeability before merging. PRs #699 and #700 are merged and their delivery branches are deleted. PR #700 post-merge main CI #36848531615, CodeQL #36848531797, Dependency/SBOM #36848531664, and V0.10 Freeze Guard #36848531766 succeeded. PR #699 Pages build #36847992305 succeeded; deploy and browser-production were skipped for docs-only changes.
