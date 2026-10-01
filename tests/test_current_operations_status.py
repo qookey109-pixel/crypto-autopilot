@@ -233,7 +233,7 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         checkpoint_numbers = [row["number"] for row in checkpoint["open_pull_requests"]]
         self.assertEqual(control["open_pr_count"], len(checkpoint_numbers))
         self.assertEqual(control["open_pr_numbers"], checkpoint_numbers)
-        self.assertIn("ZERO_OPEN_PRS", control["open_pr_triage_state"])
+        self.assertIn("ONE_OPEN_STALE_DRAFT_PR_679", control["open_pr_triage_state"])
         self.assertEqual(control["historical_open_pr_triage"]["open_pr_count"], 6)
         self.assertEqual(control["historical_open_pr_triage"]["open_pr_numbers"], [326, 327, 328, 329, 330, 331])
         self.assertFalse(self.payload["live_repository_checkpoint"]["is_latest_main_claim"])
