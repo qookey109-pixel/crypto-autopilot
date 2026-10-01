@@ -1,6 +1,6 @@
 ## Live checkpoint — 2026-10-01
 
-Evidence basis: GitHub main was 0a8161f1c101cb72c717ea4917a71a1c7da0541a at 2026-10-01T07:47:44Z, after PR #681 merged and before this status-sync PR. This is a reviewed parent snapshot, is not** a latest-main claim, and does not include this status PR. Resolve main live at read time.
+Evidence basis: GitHub main was 0a8161f1c101cb72c717ea4917a71a1c7da0541a at 2026-10-01T07:47:44Z, after PR #681 merged and before this status-sync PR. This is a reviewed parent snapshot, is **not** a latest-main claim, and does not include this status PR. Resolve main live at read time.
 
 - PR [#681](https://github.com/qookey109-pixel/crypto-autopilot/pull/681) merged at 2026-10-01T07:34:46Z (merge commit 0a8161f1c101cb72c717ea4917a71a1c7da0541a). It adds only a read-only CMC Keyless source assessment. No live provider, Cloudflare, R2 or D1 access occurred; no runtime, budget, source-switch, strategy or schedule authority changed.
 - Main post-merge checks: CI [36831138428](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36831138428), CodeQL [36831138421](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36831138421), Dependency/SBOM [36831138469](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36831138469), and V0.10 Freeze Guard [36831138502](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36831138502) passed. Workflow-static was skipped on push. The available combined-status query had no entries. No Pages workflow was triggered by #681; this merge therefore does not establish a new deploy or browser-production result.
@@ -11,6 +11,7 @@ Evidence basis: GitHub main was 0a8161f1c101cb72c717ea4917a71a1c7da0541a at 2026
 - Next: reconcile stale #679; then complete account-wide cost/usage/storage evidence and source eligibility before any successor authority or controlled PAPER acceptance. No provider/R2/D1 operation or schedule should be enabled until its exact versioned gates are met.
 
 CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, automatic promotion, real-money orders and live trading remain closed.
+
 ## Historical checkpoint — 2026-09-30 (#662 merged)
 
 Historical evidence basis: GitHub `main=919941f2f8d8db77b0bc8372727de46d8406867f`; open PRs at that checkpoint = 0. Resolve main live; these earlier blocks retain their original SHA as historical checkpoints.
