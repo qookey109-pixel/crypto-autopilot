@@ -1,3 +1,18 @@
+## Live repository checkpoint — 2026-10-02 06:41 Asia/Taipei
+
+Evidence basis: protected `main=01974f1c22ff24f33d0903a493085068b2736a5b`, after [PR #731](https://github.com/qookey109-pixel/crypto-autopilot/pull/731) merged.
+
+- Post-merge checks: Python 3.12/3.13 CI [36936078797](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36936078797), CodeQL [36936078787](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36936078787), Dependency/SBOM [36936079020](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36936079020), and V0.10 Freeze Guard [36936078794](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36936078794) succeeded. Pages [36936078804](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36936078804): build succeeded; deploy and production-browser were skipped by the push change filter. PR #731's Pages build/browser and full CI also succeeded before merge.
+- Billing History V0.1 run [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281), attempt 1, remains consumed and failed with `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`; do not rerun it.
+- PR #731 adds the separate V0.2 successor authority and value-free pagination diagnostics. The authority is now on main, but its workflow has zero runs and has made no Cloudflare request. A dispatch would retrieve account billing history and retain redacted billing fields in a seven-day GitHub Actions artifact; it is not dispatched pending explicit owner confirmation.
+- The owner expects additional Cloudflare projects/services may be added later. Their identities are not fully inventoried: external writer coverage remains `UNCONFIRMED`, incomplete, and unsuitable for account-wide zero-cost/headroom claims.
+- Cloud Paper remains disabled and not wired/run/scheduled; D1 is unprovisioned, production strategy registry is empty, and Core100 quality remains `REJECT`. Keep 0 USD, PAPER/LIVE-PAPER only; holdout, source switch, promotion, real-money orders and live trading remain closed.
+- Next engineering task: continue a non-Cloudflare-dependent vertical slice toward the cloud simulation product. Do not treat billing evidence preparation, CI success, or workflow configuration as cost proof or runtime activation.
+
+This entry supersedes the previously dated live checkpoint immediately below it; that checkpoint and all earlier evidence are retained as historical records.
+
+---
+
 ## Live repository checkpoint — 2026-10-02 06:24 Asia/Taipei
 
 Evidence basis: GitHub `main=2de48f8cb8488304487b50abcaa2489b58f45c27`. This is the reviewed parent SHA; the diagnostic successor below is prepared on a short-lived delivery branch and has not been merged or executed.
