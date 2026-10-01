@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-10-01",
-  "evidence_basis_parent_main_sha": "e38b5c38d1eba2e4c0ba6cdf06673ad99bb242b4",
+  "evidence_basis_parent_main_sha": "45b9b6d02fbb0e1ed53992467330b13ba4dec138",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -76,7 +76,7 @@
       "zero_cost": "UNKNOWN",
       "cloud_paper_enabled": false
     },
-    "cloudflare_billable_usage_v0_3": "PR692_MERGED_MAIN_0310D8BA; ONE_SHOT_READ_ONLY_V1_BILLABLE_USAGE_AUTHORITY; NOT_DISPATCHED; ZERO_CLOUDFLARE_REQUESTS; ZERO_COST_UNKNOWN"
+    "cloudflare_billable_usage_v0_3": "PR692_MERGED; RUN_36852292356_ATTEMPT_1_SUCCESS; REPORT_READY_FOR_REVIEW_USAGE_ROWS_CAPTURED_REVIEW_REQUIRED_FOR_SCOPE; 1_HTTP_REQUEST; 42_ROWS; REPORTED_USAGE_BASED_COST_USD_0; AUTHORITY_CONSUMED_DO_NOT_RERUN; FIXED_FEES_FULL_ACCOUNT_COVERAGE_FRESHNESS_HEADROOM_AND_ZERO_TOTAL_COST_UNKNOWN"
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "R2 V0.3 run 36593296360 is partial: one returned bucket (616541780 bytes) and 6 operation groups / 125309 requests with no operation timestamp; complete bucket inventory, all writers, freshness and headroom remain UNKNOWN; V0.3 one-time authority consumed; do not rerun.",
@@ -417,10 +417,10 @@
     "runtime_authority_changed": false
   },
   "latest_repository_checkpoint": {
-    "evidence_basis_main_sha": "e38b5c38d1eba2e4c0ba6cdf06673ad99bb242b4",
-    "pull_request": 703,
-    "pr_merge_sha": "e38b5c38d1eba2e4c0ba6cdf06673ad99bb242b4",
-    "observed_at_utc": "2026-10-01T11:22:37Z",
+    "evidence_basis_main_sha": "45b9b6d02fbb0e1ed53992467330b13ba4dec138",
+    "pull_request": 705,
+    "pr_merge_sha": "45b9b6d02fbb0e1ed53992467330b13ba4dec138",
+    "observed_at_utc": "2026-10-01T11:43:42Z",
     "open_pull_requests": [],
     "activation_enabled": false,
     "d1_provisioned": false,
@@ -468,19 +468,15 @@
       "r2_d1_access_performed": false
     },
     "post_merge_main_checks": {
-      "ci_run_id": 36854563499,
+      "ci_run_id": 36857181263,
       "ci": "SUCCESS_PYTHON_3_12_AND_3_13",
       "workflow_static": "SKIPPED_DOCS_ONLY",
-      "dependency_sbom_run_id": 36854563535,
+      "dependency_sbom_run_id": 36857181155,
       "dependency_sbom": "SUCCESS",
-      "codeql_run_id": 36854563487,
+      "codeql_run_id": 36857181268,
       "codeql": "SUCCESS",
-      "freeze_guard_run_id": 36854563464,
-      "freeze_guard": "SUCCESS",
-      "pages_run_id": 36854563447,
-      "pages_build": "SUCCESS",
-      "pages_deploy": "SUCCESS",
-      "browser_production": "SUCCESS_DESKTOP_MOBILE"
+      "freeze_guard_run_id": 36857181180,
+      "freeze_guard": "SUCCESS"
     },
     "natural_pages_schedule": {
       "run_id": 36853589288,
@@ -513,43 +509,29 @@
   },
   "production_cycle_status": "NOT_RUN",
   "latest_documentation_sync": {
-    "pull_request": 703,
-    "parent_main_sha": "54c099254303512eba7f8f2b57dcd98124b17348",
-    "pr_head_sha": "f95d1fc5db65d9ae30f54eec14eb69b3536a85fc",
-    "merged_main_sha": "e38b5c38d1eba2e4c0ba6cdf06673ad99bb242b4",
+    "pull_request": 705,
+    "parent_main_sha": "4d5f8f00d2f6a67f5b5ff242f69d1cf032e98e6c",
+    "pr_head_sha": "9585c2ceba21669aa40fbd451739893ca11d824a",
+    "merged_main_sha": "45b9b6d02fbb0e1ed53992467330b13ba4dec138",
     "changed_runtime_or_authority": false,
+    "pr_ci_run_id": 36856965749,
     "pr_python_3_12": "SUCCESS",
     "pr_python_3_13": "SUCCESS",
     "pr_workflow_static": "SUCCESS",
-    "pr_ci_run_id": 36854194582,
-    "pr_validate_run_ids": [
-      36854194959,
-      36854194716,
-      36854194480,
-      36854194616
-    ],
-    "pr_codeql_run_id": 36854194561,
+    "pr_codeql_run_id": 36856965781,
     "pr_codeql": "SUCCESS",
-    "pr_dependency_run_id": 36854194479,
+    "pr_dependency_run_id": 36856965661,
     "pr_dependency": "SUCCESS",
-    "pr_dashboard_run_id": 36854194686,
-    "pr_dashboard_build": "SUCCESS",
-    "pr_dashboard_deploy": "SKIPPED_PULL_REQUEST",
-    "pr_browser_production": "SKIPPED_PULL_REQUEST",
-    "pr_freeze_guard": "SUCCESS",
-    "post_merge_main_ci_run_id": 36854563499,
+    "pr_freeze_guard": "NOT_PRESENT_ON_PR",
+    "post_merge_main_ci_run_id": 36857181263,
     "post_merge_main_ci": "SUCCESS_PYTHON_3_12_AND_3_13",
     "post_merge_workflow_static": "SKIPPED_DOCS_ONLY",
-    "post_merge_codeql_run_id": 36854563487,
+    "post_merge_codeql_run_id": 36857181268,
     "post_merge_codeql": "SUCCESS",
-    "post_merge_dependency_sbom_run_id": 36854563535,
+    "post_merge_dependency_sbom_run_id": 36857181155,
     "post_merge_dependency_sbom": "SUCCESS",
-    "post_merge_freeze_guard_run_id": 36854563464,
-    "post_merge_freeze_guard": "SUCCESS",
-    "post_merge_pages_run_id": 36854563447,
-    "post_merge_pages_build": "SUCCESS",
-    "post_merge_pages_deploy": "SUCCESS",
-    "post_merge_browser_production": "SUCCESS_DESKTOP_MOBILE"
+    "post_merge_freeze_guard_run_id": 36857181180,
+    "post_merge_freeze_guard": "SUCCESS"
   },
   "engineering_ci_acceptance_matrix": {
     "evidence_code_commit": "cb22d3c3905a079eb754f0fab6d917923512f624",
@@ -696,7 +678,8 @@
       "pr_checks": "SUCCESS",
       "post_merge_main_checks": "UNKNOWN_NOT_INDEPENDENTLY_VERIFIED"
     },
-    "market_data_assessment": "V0_3_MERGED; NO_APPROVED_TOTAL3_SOURCE; BTC_DOMINANCE_PARTIAL_UNAPPROVED_CANDIDATE; PIONEX_23_MARKET_BREADTH_AND_4H_15M_NOT_PRODUCTION_VERIFIED; SCRAPING_NOT_APPROVED"
+    "market_data_assessment": "V0_3_MERGED; NO_APPROVED_TOTAL3_SOURCE; BTC_DOMINANCE_PARTIAL_UNAPPROVED_CANDIDATE; PIONEX_23_MARKET_BREADTH_AND_4H_15M_NOT_PRODUCTION_VERIFIED; SCRAPING_NOT_APPROVED",
+    "snapshot_status": "HISTORICAL_SNAPSHOT_SUPERSEDED_BY_LATEST_REPOSITORY_CHECKPOINT"
   },
   "external_evidence_design": {
     "status": "DOCUMENTED_DESIGN_ONLY_NO_CLOUDFLARE_REQUEST",
@@ -741,7 +724,7 @@
       "historical_v0_2_endpoint": "GET /accounts/{account_id}/billable/usage",
       "historical_v0_2_state": "ALPHA_RESTRICTED_HTTP_403_RUN_36839577708_CONSUMED_ROOT_CAUSE_UNKNOWN_NO_RERUN",
       "successor_v0_3_endpoint": "GET /accounts/{account_id}/billable-usage",
-      "successor_v0_3_state": "MERGED_MAIN_0310D8BA_ONE_SHOT_NOT_DISPATCHED_USAGE_BASED_ONLY_FIXED_FEES_EXCLUDED_ZERO_COST_UNPROVEN"
+      "successor_v0_3_state": "RUN_36852292356_CONSUMED_SUCCESS_REVIEW_REQUIRED_FOR_SCOPE; 42_ROWS; 0_USD_USAGE_BASED_SUBTOTAL; FIXED_FEES_FULL_ACCOUNT_SCOPE_ZERO_TOTAL_COST_UNKNOWN; NO_RERUN"
     },
     "request_budget_design_only": {
       "max_http_or_graphql_calls": 64,
