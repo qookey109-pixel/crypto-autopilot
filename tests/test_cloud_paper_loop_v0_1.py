@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import unittest
 import copy
+import json
 from unittest.mock import patch
 from dataclasses import asdict, dataclass
 
@@ -202,6 +203,46 @@ class CloudPaperLoopTests(unittest.TestCase):
         self.assertEqual(third["state"], "NO_TRADE")
         self.assertEqual(third["coordinator"]["sequence"], 3)
         self.assertEqual(third["account"]["open_position_count"], 0)
+
+
+    def test_json_roundtrip_report_replays_and_rejects_changed_content(self):
+        class JsonStore(MemoryStore):
+            def get_json(self, kind, object_id):
+                value = super().get_json(kind, object_id)
+                return None if value is None else json.loads(json.dumps(value))
+
+        def execute(store):
+            return run_cloud_step(
+                tick_ms=420000, previous_slot=None, store=store,
+                feed=NeverCalledFeed(),
+                market_supplier=lambda: {
+                    "context_status": "REGIME_UNAVAILABLE",
+                    "provider_requests_performed": 0,
+                    "nested_evidence": {"levels": ((1, 2), (3, 4))},
+                },
+                candidate_supplier=lambda market, state: (),
+                strategy_registry=REGISTRY, before_external=lambda: None,
+            )
+
+        store = JsonStore()
+        first = execute(store)
+        self.assertEqual(first["market"]["nested_evidence"]["levels"], [[1, 2], [3, 4]])
+        before = copy.deepcopy(store.objects)
+        replay = execute(store)
+        self.assertEqual(replay["report"], first)
+        self.assertEqual(store.objects, before)
+
+        class ChangedReportStore(JsonStore):
+            def get_json(self, kind, object_id):
+                value = super().get_json(kind, object_id)
+                if kind == "cloud-report" and value is not None:
+                    value["market"]["nested_evidence"]["levels"][0][0] = 9
+                return value
+
+        changed = ChangedReportStore()
+        with self.assertRaisesRegex(CloudLoopReviewRequired, "REPORT_READBACK_MISMATCH"):
+            execute(changed)
+        self.assertEqual(changed.list_json_ids("cloud-result"), ())
 
     def test_only_quarter_hour_utc_slots_are_valid(self):
         self.assertEqual(slot_id(420000), "0")
