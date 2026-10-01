@@ -32,10 +32,10 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
         )
         self.assertFalse(basis["is_latest_main_claim"])
-        self.assertEqual(basis["source_merge_pr"], 681)
+        self.assertEqual(basis["source_merge_pr"], 682)
         self.assertEqual(
             basis["parent_main_sha"],
-            "0a8161f1c101cb72c717ea4917a71a1c7da0541a",
+            "42f8c1cdad46107f5f8f720b9809a7ad71286815",
         )
         self.assertIn(basis["parent_main_sha"], current)
         self.assertIn("Resolve `main` live at read time", current)
@@ -66,7 +66,7 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         self.assertFalse(assessment["source_switch_authorized"])
         self.assertEqual(
             payload["live_repository_checkpoint"]["evidence_basis_main_sha"],
-            "0a8161f1c101cb72c717ea4917a71a1c7da0541a",
+            "42f8c1cdad46107f5f8f720b9809a7ad71286815",
         )
         self.assertEqual(
             payload["live_repository_checkpoint"][
@@ -231,9 +231,12 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         )
         checkpoint = self.payload["live_repository_checkpoint"]
         checkpoint_numbers = [row["number"] for row in checkpoint["open_pull_requests"]]
+        self.assertEqual(checkpoint_numbers, [])
+        self.assertEqual(checkpoint["closed_unmerged_pull_requests"][0]["number"], 679)
+        self.assertFalse(checkpoint["closed_unmerged_pull_requests"][0]["merged"])
         self.assertEqual(control["open_pr_count"], len(checkpoint_numbers))
         self.assertEqual(control["open_pr_numbers"], checkpoint_numbers)
-        self.assertIn("ONE_OPEN_STALE_DRAFT_PR_679", control["open_pr_triage_state"])
+        self.assertIn("ZERO_OPEN_PRS_AFTER_PR_679_CLOSED_UNMERGED", control["open_pr_triage_state"])
         self.assertEqual(control["historical_open_pr_triage"]["open_pr_count"], 6)
         self.assertEqual(control["historical_open_pr_triage"]["open_pr_numbers"], [326, 327, 328, 329, 330, 331])
         self.assertFalse(self.payload["live_repository_checkpoint"]["is_latest_main_claim"])

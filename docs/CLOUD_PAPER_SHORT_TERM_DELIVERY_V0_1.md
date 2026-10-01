@@ -1,4 +1,16 @@
-## Live checkpoint — 2026-10-01
+## Live checkpoint — 2026-10-01 16:15 Asia/Taipei
+
+Evidence basis: GitHub `main=42f8c1cdad46107f5f8f720b9809a7ad71286815`, re-read at 2026-10-01T08:15:20Z before this documentation update. This is a parent snapshot, not a latest-main claim; resolve `main` live at read time.
+
+- PR [#682](https://github.com/qookey109-pixel/crypto-autopilot/pull/682) merged at `42f8c1cdad46107f5f8f720b9809a7ad71286815`; PR #679 was then closed unmerged at 2026-10-01T08:15:20Z because its generated evidence was based on stale main `358be62e4239ffaeeae2e363e209f7ed278d692f`. Its history is preserved; it was not merged or used to overwrite current status. Live open PR count at this checkpoint: 0.
+- PR #665 is already merged. Its old-schema compatibility and missing-tick recovery regression fixes are complete. Matched synthetic profile: 116,608 canonical JSON bytes vs 157,367 before this slice; this does not prove production R2 savings, cost, or headroom.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, production cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production strategy registry empty, and Core100 quality `REJECT`.
+- Account-wide cost/usage freshness, complete shared-writer coverage, current R2/D1 headroom and eligible strategy input sources remain unresolved. The previous one-time billing, usage, and bootstrap authorities remain consumed and must not be rerun. No provider, R2, or D1 access, migration, runtime activation, or schedule activation occurred in this reconciliation.
+- Next: prepare the smallest separately versioned, read-only successor evidence scope for the still-missing cost/usage dimensions, and finish field-by-field compliant market-source eligibility. Keep all external access disabled until its authority, freshness, free-tier boundary, and expected request/read/write envelope are explicit.
+
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; FREE-ONLY / 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, model promotion, real-money orders, live trading, and automatic Cloud Maintenance merge remain closed.
+
+## Prior checkpoint — 2026-10-01 (before PR #679 reconciliation)
 
 Evidence basis: GitHub main was 0a8161f1c101cb72c717ea4917a71a1c7da0541a at 2026-10-01T07:47:44Z, after PR #681 merged and before this status-sync PR. This is a reviewed parent snapshot, is **not** a latest-main claim, and does not include this status PR. Resolve main live at read time.
 
