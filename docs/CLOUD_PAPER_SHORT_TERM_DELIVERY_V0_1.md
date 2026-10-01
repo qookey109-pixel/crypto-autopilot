@@ -1,4 +1,17 @@
-## Live Cloud Paper delivery checkpoint — 2026-10-02 05:46 Asia/Taipei
+## Live Cloud Paper delivery checkpoint — 2026-10-02 05:54 Asia/Taipei
+
+Evidence: Billing History run [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281), attempt 1, dispatched from `main=0543815905d75aa26a188d2d9e861d4929e2570c). Final conclusion `failure`; uploaded report `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`. The report recorded exactly 1 Cloudflare HTTP request, `page_count_read=0`, `returned_row_count=0`, incomplete coverage, `zero_cost_conclusion=UNKNOWN`, and `cloud_paper_activation=REMAINS_DISABLED`. Artifact [11196466171](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281/artifacts/11196466171), SHA-256 `884a65a30f4a87c1e2b90f4b42ab07427b9e51baa3835ab24d7f3574b2505524`, expires 2026-10-08T21:54:37Z. The secret-free report persisted no account identity, item identifiers, invoice identifiers/URLs, descriptions, or raw response.
+
+- The one-time authority is consumed; **do not rerun**. Any further Cloudflare billing query needs a separately versioned successor authority merged to main before execution.
+- The owner expects additional Cloudflare projects/services later. Repository workflow inventory is not account-complete; unknown current/future writers block account-wide cost and headroom claims. Every new writer must register with shared admission before its first write.
+- This incomplete billing-history read proves neither zero total cost nor a quota shortage. Cloud Paper stays disabled; D1 is unprovisioned and no production cycle or natural schedule is configured. Production strategy registry is empty and Core100 quality remains `REJECT`.
+- Next: retain the failed report, investigate the API response contract using existing evidence or prepare-only code/tests, and establish owner-attested writer coverage. Do not make another Cloudflare request without a new merged authority.
+
+CLOUD-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders, and live trading remain closed.
+
+---
+
+## Historical Cloud Paper delivery checkpoint — 2026-10-02 05:46 Asia/Taipei
 
 Evidence basis: live `main=8acbb192c539077669514825883504a3ba31e153`, after status PR [#728](https://github.com/qookey109-pixel/crypto-autopilot/pull/728) merged. Main CI [36930438273](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36930438273), CodeQL [36930438335](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36930438335), Dependency/SBOM [36930438176](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36930438176), Dashboard build [36930438287](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36930438287), and V0.10 Freeze Guard [36930438279](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36930438279) succeeded. Dashboard deploy and production-browser were skipped because the change was documentation-only.
 
