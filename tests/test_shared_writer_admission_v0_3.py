@@ -6,6 +6,8 @@ from pathlib import Path
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
 from crypto_autopilot.paper.shared_writer_admission_v0_3 import (
+    DAILY_SHARED_AGGREGATE_SQL,
+    ROLLING_SHARED_AGGREGATE_SQL,
     WriterSlotIdentity,
     compaction_statement_params,
     minimum_compaction_rows_written,
@@ -100,6 +102,21 @@ class SharedWriterLifecycleTests(unittest.TestCase):
         self.assertEqual(self.retained_count(), 2)
         with self.assertRaises(sqlite3.IntegrityError):
             self.reserve("project-a:writer", NOW_MS)
+
+    def test_budget_aggregates_include_all_registered_writers(self) -> None:
+        self.configure()
+        self.register("project-a:writer")
+        self.register("project-b:writer")
+        self.reserve("project-a:writer", NOW_MS)
+        self.reserve("project-b:writer", NOW_MS + 1)
+        daily = self.db.execute(DAILY_SHARED_AGGREGATE_SQL, ("2026-10-02",)).fetchone()
+        rolling = self.db.execute(
+            ROLLING_SHARED_AGGREGATE_SQL,
+            (NOW_MS - 31 * DAY_MS, NOW_MS + 1),
+        ).fetchone()
+        self.assertEqual((daily["reservations"], daily["provider_requests"]), (2, 2))
+        self.assertEqual((daily["r2_class_a"], daily["d1_rows_written"]), (2, 14))
+        self.assertEqual((rolling["reservations"], rolling["r2_class_a"]), (2, 2))
 
     def test_capacity_is_released_only_by_triggered_retention_delete(self) -> None:
         self.configure(reservations=2)
