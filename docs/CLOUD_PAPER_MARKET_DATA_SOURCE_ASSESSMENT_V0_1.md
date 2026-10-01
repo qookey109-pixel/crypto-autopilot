@@ -78,3 +78,7 @@ CoinGecko 官方 pricing 頁目前列 Demo 為零費用、10,000 calls/month、1
 本評估沒有修改策略資格、權重、風控、frozen evidence、provider authority、source switch、Cloud Paper activation 或排程。
 
 **當前結論：** Pionex 可支援所需 K 線週期，但現行 adapter 與 18-request contract 還不能同時滿足固定 breadth 加候選多週期；全球 macro 欄位仍無可核准來源。先處理 request budget 與條款／來源判定，之後才能安全接線。
+
+## 2026-10-01 official rate-limit clarification
+
+Pionex's [official rate-limit documentation](https://pionex-doc.gitbook.io/apidocs/restful/general/rate-limit) states a maximum of 10 requests per second per IP across endpoints. Treat this as a published burst-rate ceiling, not as an aggregate daily/monthly allowance, a zero-cost guarantee, or authorization to fetch. Shared endpoint weights, complete breadth availability, quota/allowance beyond the rate limit, and account-wide use remain unknown. Any future authorized client must serialize and pace requests below the published ceiling, stop on HTTP 429, and must not automatically retry. The existing 18 requests/run and 1,728/day authority is unchanged; this correction does not authorize any external request.

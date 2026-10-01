@@ -49,7 +49,13 @@
     "maximum_calls_per_rolling_30_days": 103680,
     "pionex_kline_weight_per_request": 1,
     "shared_market_endpoint_weights": null,
-    "provider_rate_limit": null,
+    "provider_rate_limit": {
+      "published_max_requests_per_second_per_ip": 10,
+      "scope": "ALL_ENDPOINTS_PER_IP",
+      "enforcement_note": "Keep requests sequential and paced below the published per-IP ceiling; a provider 429 must stop the current bounded run without automatic retry.",
+      "daily_or_monthly_request_allowance": "UNKNOWN_NOT_DOCUMENTED_BY_REFERENCED_RATE_LIMIT_PAGE",
+      "source_url": "https://pionex-doc.gitbook.io/apidocs/restful/general/rate-limit"
+    },
     "minimum_calls_with_shared_and_fixed_breadth_per_slot": 26,
     "minimum_exceeds_v0_1_run_ceiling": true,
     "feasibility_note": "3 shared market calls + 23 fixed breadth Kline calls = 26 requests before any candidate-timeframe candles; reducing candidate_limit alone cannot fit the current 18-request/run ceiling."

@@ -55,3 +55,7 @@ Reusing 4H breadth across separate GitHub-hosted runs requires durable state; in
 7. Keep synthetic validation in GitHub CI only. No live provider access, R2/D1 access, migration, or schedule dispatch is part of this assessment.
 
 Until these items are evidenced under a reviewed successor authority, Cloud Paper remains inactive. The request envelope is a planning bound and not a change to V0.1's 18-request guard.
+
+## Published Pionex rate limit is distinct from project request budget
+
+Pionex's [official rate-limit documentation](https://pionex-doc.gitbook.io/apidocs/restful/general/rate-limit) documents at most 10 requests per second per IP across endpoints. This fills the previously unknown instantaneous-rate field only. It does not publish an aggregate daily/monthly request allowance on that page, and it does not establish free-tier usage, complete account capacity, or zero-cost operation. The proposed 36 calls/slot could be paced below that instantaneous ceiling in principle, but remains blocked by the current 18/run project contract and unresolved shared usage, allowance, data completeness, and storage-cost evidence. No provider request or budget change is authorized by this clarification.
