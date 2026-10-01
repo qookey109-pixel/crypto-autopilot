@@ -1,0 +1,54 @@
+{
+  "schema": "qookey-cloud-paper-runtime-adapters-v0.1",
+  "status": "PREPARED_IMPLEMENTATION_ONLY_NO_EXECUTION_AUTHORITY",
+  "implementation": "src/crypto_autopilot/paper/cloud_runtime_v0_1.py",
+  "provider_transport": "src/crypto_autopilot/paper/cloud_pionex_client_v0_1.py",
+  "transport": {
+    "provider": "PIONEX_PUBLIC",
+    "base_url": "https://api.pionex.com",
+    "allowed_paths": [
+      "/api/v1/common/symbols",
+      "/api/v1/market/tickers",
+      "/api/v1/market/bookTickers",
+      "/api/v1/market/klines",
+      "/api/v1/market/depth",
+      "/api/v1/market/trades"
+    ],
+    "http_attempts_per_reserved_call": 1,
+    "redirects": 0,
+    "retries": 0,
+    "maximum_response_bytes": 1048576,
+    "maximum_timeout_seconds": 10,
+    "maximum_requests_per_second": 3,
+    "freshness_recheck_after_pacing": true,
+    "parser_predecessor_unchanged": true
+  },
+  "assembly": {
+    "construction_default_enabled": false,
+    "composition_activation_default_enabled": false,
+    "r2_zero_retry_factory": true,
+    "d1_shared_rows_guard_required": true,
+    "r2_d1_freshness_required_before_client_construction": true,
+    "snapshot_timestamps_preserved": true,
+    "credentials_from_authorized_runner_environment_only": true,
+    "prefix": "paper-run-store/cloud-loop-v0.1"
+  },
+  "runtime": {
+    "workflow_wired": false,
+    "schedule_enabled": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "d1_access_authorized": false,
+    "d1_provisioned": false,
+    "activation_enabled": false
+  },
+  "boundaries": {
+    "monthly_budget_usd": 0,
+    "paper_only": true,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
