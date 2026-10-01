@@ -26,6 +26,13 @@ def test_market_request_budget_is_inactive_and_does_not_expand_v01():
     assert proposal["requests"]["maximum_calls_per_rolling_30_days"] == (
         proposal["requests"]["maximum_calls_per_utc_day"] * 30
     )
+    kline_calls = (
+        proposal["requests"]["four_hour_breadth_calls_per_slot"]
+        + proposal["requests"]["sixty_minute_candidate_calls_per_slot"]
+        + proposal["requests"]["fifteen_minute_candidate_calls_per_slot"]
+    )
+    assert proposal["requests"]["pionex_kline_weight_per_request"] == 1
+    assert kline_calls == 33
     assert proposal["requests"]["total_calls_per_slot"] > (
         current["budget"]["provider_requests_per_run"]
     )
@@ -35,9 +42,14 @@ def test_market_request_budget_is_inactive_and_does_not_expand_v01():
     assert proposal["comparison_with_v0_1"]["fits_existing_contract"] is False
     assert proposal["assumptions"]["automatic_retries"] == 0
     assert proposal["assumptions"]["missed_slots_backfilled"] is False
-    assert proposal["requests"]["provider_request_weight_per_call"] is None
+    assert proposal["requests"]["shared_market_endpoint_weights"] is None
     assert proposal["requests"]["provider_rate_limit"] is None
-    assert proposal["freshness"]["schedule_delay_can_exceed_15m_bar_age"] is True
+    assert proposal["freshness"]["15m_age_limit_status"] == (
+        "PROPOSAL_NOT_CURRENT_AUTHORITY"
+    )
+    assert proposal["freshness"][
+        "schedule_delay_can_exceed_proposed_15m_bar_age_limit"
+    ] is True
     assert proposal["cache_and_storage"]["durable_cache_authorized"] is False
 
     for key in (
