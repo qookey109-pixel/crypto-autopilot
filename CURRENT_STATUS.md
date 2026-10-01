@@ -1,11 +1,12 @@
-## Cloud Paper checkpoint at #667 merge — 2026-10-01
+## Cloud Paper checkpoint before status sync — 2026-10-01
 
-查核基準：GitHub `main=1549cc49e0e308a2cbf13a412e898a1028968468`；該查核點 open PR = 0。PR [#666](https://github.com/qookey109-pixel/crypto-autopilot/pull/666) 與 [#667](https://github.com/qookey109-pixel/crypto-autopilot/pull/667) 均已合併。PR #667 新增[市場資料來源與預算缺口評估](docs/CLOUD_PAPER_MARKET_DATA_SOURCE_ASSESSMENT_V0_1.md)。合併後 Python 3.12／3.13、CodeQL、Dependency/SBOM、Freeze Guard 通過；workflow-static 因未改 workflow 而 skipped。
+查核基準（本次文件同步前）：GitHub `main=05c71e360d4e79d6d418f17fa8ba22fa1eb4bf4a`，open PR = 0。PR [#669](https://github.com/qookey109-pixel/crypto-autopilot/pull/669)、[#670](https://github.com/qookey109-pixel/crypto-autopilot/pull/670)、[#671](https://github.com/qookey109-pixel/crypto-autopilot/pull/671) 均已合併。新增的預算、暖機與策略家族界線見[評估文件](docs/CLOUD_PAPER_REQUEST_BUDGET_ASSESSMENT_V0_2.md)。合併後 Python 3.12／3.13、CodeQL、Dependency/SBOM、Freeze Guard 通過；workflow-static 因沒有改 workflow 而 skipped。這三個 PR 都只做規劃／文件，沒有改執行權限。
 
-- 策略需求為 4H／60M／15M；現行 adapter 只抓 60M。若同時滿足固定 23 市場 4H breadth、5 個候選的 60M 與 15M，以及 3 項共用市場請求，估算 36 requests/slot，超出原有 18 次上限。這是設計上界，不是 provider 配額或實際用量。
-- Pionex 官方文件列有各 Klines intervals，但未驗證本專案正式 capture、coverage 或 provider quota。CoinGecko Demo 條款與決策證據保存有衝突風險；尚未核准或接入。沒有新 provider、R2/D1 或用量端點存取。
-- Cloud Paper 仍 disabled／NOT_RUN／NOT_WIRED／NOT_CONFIGURED；D1 未 provision、正式 registry 空、Core100 品質 REJECT。帳戶級零費用、完整 writer coverage、freshness 及 headroom 尚未證明。
-- 下一步：核算每輪、每日、月度請求與保存成本；定義多週期行情的 time-grid、warmup、breadth freshness 及預算 successor contract；再用 GitHub CI 的合成資料驗證。通過新版本 authority 與 budget gate 前，不啟用正式入口或排程。
+- 多週期設計上界為 36 requests/slot（3 個共用請求、23 個 breadth 市場、60M 與 15M 各最多 5 個候選），按每天 96 個 slot 計為 3,456/day、103,680/rolling 30 days，且假設零重試與不補跑。這超出未變更的 V0.1 上限 18/run、1,728/day；只是算術上界，不是 provider 配額或觀測用量。Provider allowance、共享用量及共用端點權重仍未知，超限時現有 guard 必須繼續阻擋。
+- 程式推得的最低需求為：每個 4H breadth 市場 21 根收盤 K 線，60M 與 15M 技術快照各 200 根；使用預設市場結構的路徑需 21 根。依目前候選上限合計為每 slot 2,483 個 candle points。研究 Router 六個家族共用 EMA200 完整技術快照與 ready regime；部分家族另用市場結構。這不代表未來合格正式策略的完整資料需求，因 production registry 目前是空的、無策略實作可逐項審核。
+- 排程延遲可能使 15M K 線超過提案中的 freshness 年齡；該限制尚非現行 authority。跨 hosted runs 共用 4H breadth 必須持久化，會增加讀寫、保存與恢復成本。本輪沒有呼叫 provider／Cloudflare／R2／D1，也沒有啟用 runtime 或排程。
+- Cloud Paper 仍為 disabled／NOT_RUN／NOT_WIRED／NOT_CONFIGURED；D1 未建立、正式策略 registry 為空、Core100 品質 REJECT、macro regime unavailable。帳戶級零費用、完整 writers、用量 freshness 與 headroom 未證明。已消耗的一次性 Billing／Usage／bootstrap authority 不可重跑。
+- 下一步：確認 TOTAL3／BTC dominance 與固定 breadth 的合規、時間對齊來源；取得權威 provider 配額與共享用量證據；補齊帳戶級 R2／D1 用量、費用及所有 writers 覆蓋。 successor authority、預算與受控驗收均未就緒前，Cloud Paper 保持停用。
 
 CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER；0 USD；PAPER／LIVE-PAPER ONLY。holdout、source switch、promotion、真實下單與 live trading 維持關閉。
 
