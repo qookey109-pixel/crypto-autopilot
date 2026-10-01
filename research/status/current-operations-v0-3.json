@@ -300,19 +300,10 @@
     "next_step": "SEPARATELY_VERSION_D1_BILLING_AND_STORAGE_WRITER_COVERAGE_EVIDENCE_BEFORE_ACTIVATION"
   },
   "live_repository_checkpoint": {
-    "evidence_basis_main_sha": "0a8161f1c101cb72c717ea4917a71a1c7da0541a",
-    "observed_at_utc": "2026-10-01T07:47:44Z",
+    "evidence_basis_main_sha": "42f8c1cdad46107f5f8f720b9809a7ad71286815",
+    "observed_at_utc": "2026-10-01T08:15:20Z",
     "is_latest_main_claim": false,
-    "open_pull_requests": [
-      {
-        "number": 679,
-        "state": "OPEN",
-        "draft": true,
-        "head_sha": "23941beb06fc274d3a57b5a96cb70214a938067d",
-        "base_sha": "358be62e4239ffaeeae2e363e209f7ed278d692f",
-        "note": "STALE_BASE_REQUIRES_RECONCILIATION"
-      }
-    ],
+    "open_pull_requests": [],
     "ci_run_id": 36831138428,
     "ci": "SUCCESS",
     "python_3_12": "SUCCESS",
@@ -339,7 +330,19 @@
     "latest_maintenance_run_id": 36676302904,
     "latest_maintenance_propose": "OBSERVATION_CHANGED",
     "next_work": "RECONCILE_STALE_MAINTENANCE_PR_679_THEN_COMPLETE_FRESH_ACCOUNT_WIDE_COST_USAGE_STORAGE_AND_SOURCE_ELIGIBILITY_EVIDENCE",
-    "dashboard_pages_relation_to_source_merge_pr_681": "NOT_TRIGGERED_NO_DASHBOARD_FILES_CHANGED"
+    "dashboard_pages_relation_to_source_merge_pr_681": "NOT_TRIGGERED_NO_DASHBOARD_FILES_CHANGED",
+    "closed_unmerged_pull_requests": [
+      {
+        "number": 679,
+        "state": "CLOSED",
+        "merged": false,
+        "draft": true,
+        "head_sha": "23941beb06fc274d3a57b5a96cb70214a938067d",
+        "base_sha": "358be62e4239ffaeeae2e363e209f7ed278d692f",
+        "closed_at_utc": "2026-10-01T08:15:20Z",
+        "note": "STALE_GENERATED_SNAPSHOT_CLOSED_UNMERGED_HISTORICAL_EVIDENCE_PRESERVED"
+      }
+    ]
   },
   "cloud_paper_billing_evidence": {
     "updated_date": "2026-10-01",
