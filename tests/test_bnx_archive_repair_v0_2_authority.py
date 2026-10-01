@@ -181,8 +181,8 @@ class BnxOneHourRepairAuthorityTests(unittest.TestCase):
             "os.environ", dict(ENV, GITHUB_EVENT_NAME="schedule")
         ), patch.object(
             wrapper.runner, "require_ephemeral_output", side_effect=lambda p: p
-        ), patch.object(wrapper.runner, "require_execution_window"), patch.object(
-            wrapper.runner, "load_contract", return_value="synthetic-recovery-sha"
+        ), patch.object(wrapper.repair_bundle, "require_clock"), patch.object(
+            wrapper.runner, "require_execution_window"
         ), patch.object(wrapper.runner, "create_store") as store:
             with self.assertRaises(bundle.RepairAuthorityError):
                 wrapper.runner.main()
