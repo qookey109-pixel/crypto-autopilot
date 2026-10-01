@@ -1,3 +1,18 @@
+## Live repository checkpoint — 2026-10-02 07:41 Asia/Taipei
+
+Evidence basis: reviewed parent `main=8b657c24255bc140f5420f4010e4955dcdca5c8c`; re-resolve protected `main` after this documentation change.
+
+- Main checks observed successful: Python 3.12/3.13 CI [36940683499](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36940683499), CodeQL [36940683513](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36940683513), Dependency/SBOM [36940683589](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36940683589), V0.10 Freeze Guard [36940683505](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36940683505). Pages [36940683500](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36940683500) build succeeded; deploy and production-browser were skipped by the change filter.
+- The temporary Ruff 0.16.9 update [PR #736](https://github.com/qookey109-pixel/crypto-autopilot/pull/736) was closed without merge. Its CI failed the frozen Core100 experiment-identity test and V0.12 critical-path guard after changing the CI constraints pin; no frozen file was edited. Do not retry the pin change without a separately versioned authority defining the frozen dependency/fingerprint boundary.
+- Seven other PRs remain open: stale Draft maintenance PR #708 and Dependabot #693–#698 with heads based on older main commits. None is implied ready; recheck exact diff, head/base, and current checks before any merge. In particular, do not merge stale evidence.
+- Billing History V0.1 run [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281), attempt 1, remains consumed with `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`; do not rerun. Billing History V0.2 is authorized on main but remains undispatched and has made no Cloudflare request. Any such dispatch remains a distinct one-time external billing read; wait for explicit owner confirmation.
+- The owner confirms additional Cloudflare projects/services may be added later. Repository writer entries are declared but shared admission is not verified; external writer coverage remains `UNCONFIRMED` and incomplete. Require registration before each new writer’s first cloud write. Account-wide cost/headroom is unproven.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 is unprovisioned, the production strategy registry is empty, Core100 quality remains `REJECT`, and natural scheduling is disabled. Keep Cloudflare writes and runtime activation disabled; preserve 0 USD and PAPER/LIVE-PAPER-only boundaries.
+
+This entry supersedes the following older live checkpoint. Historical reports and frozen evidence remain unchanged.
+
+---
+
 ## Live repository checkpoint — 2026-10-02 07:20 Asia/Taipei
 
 Evidence basis: protected `main=c54aaa82875c7373e68ec489b39cb8d91357840a`, after [PR #734](https://github.com/qookey109-pixel/crypto-autopilot/pull/734) merged.
