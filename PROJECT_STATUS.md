@@ -1,6 +1,20 @@
-## Live Cloud Paper checkpoint — 2026-10-01
+## Live Cloud Paper checkpoint — 2026-10-01 17:25 Asia/Taipei
 
-Evidence basis: GitHub main was 0a8161f1c101cb72c717ea4917a71a1c7da0541a at 2026-10-01T07:47:44Z, after PR #681 merged and before this status-sync PR. This is a reviewed parent snapshot, is **not** a latest-main claim, and does not include this status PR. Resolve main live at read time.
+Evidence basis: GitHub `main=3b97bc70c726b6aba05960f0cbd7dfcc1c236862`, re-read at 2026-10-01T09:25:12Z. This snapshot describes the verified parent at read time; resolve `main` live for later work.
+
+- PR [#688](https://github.com/qookey109-pixel/crypto-autopilot/pull/688) merged as `3b97bc70c726b6aba05960f0cbd7dfcc1c236862`; it removes one byte-identical duplicate historical checkpoint from `CURRENT_STATUS.md`. Post-merge Python 3.12/3.13, build, CodeQL, dependency-security, and V0.10 freeze checks passed. Workflow-static and Pages deploy/browser-production were skipped; this docs-only merge is not a new deployment or runtime acceptance.
+- There are **0 open PRs**. PR [#679](https://github.com/qookey109-pixel/crypto-autopilot/pull/679) was closed unmerged at 2026-10-01T08:15:20Z because its evidence used stale main; PR [#664](https://github.com/qookey109-pixel/crypto-autopilot/pull/664) was closed unmerged earlier. Keep both snapshots as historical evidence; neither is pending review or merge.
+- Cloudflare billable-usage run [36839577708](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36839577708), attempt 1, made one request and failed with `CLOUDFLARE_HTTP_403`; no report file or artifact exists. Root cause, account-wide cost, usage freshness, all-writer coverage, and R2/D1 headroom remain `UNKNOWN`. Its one-time authority is consumed; do not rerun.
+- Cloud Paper remains disabled: formal entrypoint `NOT_WIRED`, production cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production strategy registry empty, and Core100 quality `REJECT`.
+- Storage compaction #665 is verified only on matched synthetic fixtures (116,608 vs 157,367 canonical JSON bytes); it does not establish production R2 bytes, I/O, fees, or headroom.
+- Required market inputs remain incomplete: the Cloud Paper adapter consumes 60M candles only; required 4H/15M frames and full 23-market breadth coverage are not wired/verified. TOTAL3 and BTC-dominance sources remain unapproved. CMC Keyless V0.2 is assessment-only; no live provider call or source switch occurred.
+- Next: complete field-by-field compliant source eligibility and a sustainable, fresh account-wide budget/headroom evidence path under new versioned authority. Keep provider/R2/D1 access, controlled main acceptance, runtime and schedule disabled until those gates and current evidence pass.
+
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; FREE-ONLY / 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+
+## Historical Cloud Paper checkpoint — 2026-10-01 07:47 UTC (superseded by later main)
+
+Historical evidence basis: GitHub main was 0a8161f1c101cb72c717ea4917a71a1c7da0541a at 2026-10-01T07:47:44Z, after PR #681 merged and before this status-sync PR. This is a reviewed parent snapshot, not a latest-main claim. Resolve main live at read time.
 
 - PR [#681](https://github.com/qookey109-pixel/crypto-autopilot/pull/681) merged at 2026-10-01T07:34:46Z (merge commit 0a8161f1c101cb72c717ea4917a71a1c7da0541a). It adds only a read-only CMC Keyless source assessment. No live provider, Cloudflare, R2 or D1 access occurred; no runtime, budget, source-switch, strategy or schedule authority changed.
 - Main post-merge checks: CI [36831138428](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36831138428), CodeQL [36831138421](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36831138421), Dependency/SBOM [36831138469](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36831138469), and V0.10 Freeze Guard [36831138502](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36831138502) passed. Workflow-static was skipped on push. The available combined-status query had no entries. No Pages workflow was triggered by #681; this merge therefore does not establish a new deploy or browser-production result.
