@@ -1,4 +1,21 @@
-## Live checkpoint — 2026-10-02 01:10 Asia/Taipei
+## Live repository checkpoint — 2026-10-02 02:58 Asia/Taipei
+
+Evidence basis: GitHub `main=289dad5d29a59eb1139e4d1d7a862d10f7e5083e`, re-read before this checkpoint update. PR [#717](https://github.com/qookey109-pixel/crypto-autopilot/pull/717) merged the status synchronization at this SHA. Main CI [36909261482](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36909261482), CodeQL [36909261456](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36909261456), Dependency/SBOM [36909261531](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36909261531), V0.10 Freeze Guard [36909261490](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36909261490), and Pages build [36909261435](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36909261435) succeeded. Pages deploy and production-browser were skipped for this documentation-only merge.
+
+- Seven PRs are open: #708 (Draft; base `a0f86649`, head `281b8def`) and Dependabot #693–#698 (bases `cca6181f` or `a0f86649`; their recorded base SHA differs from current main). Do not merge them without reconciling exact diffs and checks against current main.
+- PR #717 synchronized the V0.2 shared-writer admission status. That contract remains synthetic/prepared only: D1 is unprovisioned, no writer uses the ledger, no compaction or production capacity policy exists, and reaching the configured cap must stop new admissions.
+- The user confirmed additional projects/services may later use the same Cloudflare account. The account is not assumed dedicated; external-writer inventory, account-wide usage/headroom and fixed charges remain UNKNOWN. Each writer must register and join shared admission before its first new cloud write.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; production strategy registry is empty, Core100 quality is `REJECT`, and required market inputs remain incomplete. No provider, R2, D1 or deployment request occurred in this checkpoint.
+
+The machine-readable operations snapshot retains its separately dated strategy and billing evidence basis; its live repository inventory is refreshed to this checkpoint. Historical receipts and failure records remain unchanged.
+
+Next: design and test a versioned D1 lifecycle that supports writer-scoped slot idempotency, account-wide budget aggregates, bounded retention, stale-replay rejection and the ledger's own query/write costs. Keep D1 and Cloud Paper disabled until account-wide writer coverage, budget/data gates and controlled PAPER acceptance are proven.
+
+CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+
+---
+
+## Historical checkpoint — 2026-10-02 01:10 Asia/Taipei (superseded by the repository checkpoint above)
 
 Evidence basis: GitHub `main=94177124088dbce3ea37b7c4aa1c9b659ee6038c`. PR [#710](https://github.com/qookey109-pixel/crypto-autopilot/pull/710) merged at this SHA. Its CI, CodeQL, dependency, Pages build and desktop/mobile PR browser checks passed. Main CI [36896406629](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406629), CodeQL [36896406634](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406634), Dependency/SBOM [36896406691](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406691), V0.10 Freeze Guard [36896406687](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406687) and Pages build [36896406707](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36896406707) passed. Post-merge Pages deploy and production-browser were skipped; no new production deployment is claimed.
 

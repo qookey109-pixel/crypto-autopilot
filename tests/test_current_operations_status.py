@@ -66,13 +66,11 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         self.assertFalse(assessment["source_switch_authorized"])
         self.assertEqual(
             payload["live_repository_checkpoint"]["evidence_basis_main_sha"],
-            "42f8c1cdad46107f5f8f720b9809a7ad71286815",
+            "289dad5d29a59eb1139e4d1d7a862d10f7e5083e",
         )
         self.assertEqual(
-            payload["live_repository_checkpoint"][
-                "dashboard_pages_relation_to_source_merge_pr_681"
-            ],
-            "NOT_TRIGGERED_NO_DASHBOARD_FILES_CHANGED",
+            payload["live_repository_checkpoint"]["dashboard_pages_result"],
+            "BUILD_SUCCESS_DEPLOY_AND_PRODUCTION_BROWSER_SKIPPED_DOCS_ONLY",
         )
 
         core100 = payload["core100"]
@@ -231,12 +229,12 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         )
         checkpoint = self.payload["live_repository_checkpoint"]
         checkpoint_numbers = [row["number"] for row in checkpoint["open_pull_requests"]]
-        self.assertEqual(checkpoint_numbers, [])
+        self.assertEqual(checkpoint_numbers, [708, 693, 694, 695, 696, 697, 698])
         self.assertEqual(checkpoint["closed_unmerged_pull_requests"][0]["number"], 679)
         self.assertFalse(checkpoint["closed_unmerged_pull_requests"][0]["merged"])
         self.assertEqual(control["open_pr_count"], len(checkpoint_numbers))
         self.assertEqual(control["open_pr_numbers"], checkpoint_numbers)
-        self.assertIn("ZERO_OPEN_PRS_AFTER_PR_679_CLOSED_UNMERGED", control["open_pr_triage_state"])
+        self.assertIn("SEVEN_OPEN_PRS_STALE_BASE_RECONCILIATION_REQUIRED", control["open_pr_triage_state"])
         self.assertEqual(control["historical_open_pr_triage"]["open_pr_count"], 6)
         self.assertEqual(control["historical_open_pr_triage"]["open_pr_numbers"], [326, 327, 328, 329, 330, 331])
         self.assertFalse(self.payload["live_repository_checkpoint"]["is_latest_main_claim"])
