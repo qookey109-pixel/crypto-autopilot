@@ -1,0 +1,116 @@
+{
+  "schema": "qookey-cloudflare-shared-writer-admission-v0.3",
+  "status": "PREPARED_SYNTHETIC_VALIDATION_ONLY",
+  "activation_enabled": false,
+  "production_d1_provisioned": false,
+  "cloudflare_requests_authorized": false,
+  "compatible_with_v0_2_database": false,
+  "migration_mode": "FRESH_SUCCESSOR_SCHEMA_ONLY; NO_PRODUCTION_MIGRATION_AUTHORIZED",
+  "account_identity": "INJECTED_AT_RUNTIME_NOT_STORED",
+  "external_writer_inventory": "INCOMPLETE_UNCONFIRMED",
+  "idempotency": {
+    "scope": [
+      "writer_id",
+      "slot_id"
+    ],
+    "canonical_slot_id": "slot:<slot_at_ms_decimal>",
+    "idempotency_key_must_equal_slot_id": true,
+    "one_aggregate_envelope_per_writer_slot": true,
+    "exact_replay_with_retained_row": "RETURN_EXISTING; NEVER_REPEAT_EXTERNAL_ACCESS",
+    "changed_payload_same_slot": "BLOCK_CONFLICT",
+    "slot_at_or_before_writer_retirement_watermark": "BLOCK_STALE_REPLAY",
+    "slot_outside_registered_freshness_window": "BLOCK_STALE_SLOT",
+    "watermark_retained_after_detail_compaction": true
+  },
+  "aggregate_budget": {
+    "scope": "ALL_REGISTERED_WRITERS_IN_THE_SHARED_DATABASE_AND_POLICY",
+    "daily_window": "UTC_CALENDAR_DAY",
+    "rolling_window_days": 31,
+    "reservation_is_conservative": true,
+    "reservation_release_or_rebate": "NOT_SUPPORTED",
+    "unknown_or_stale_account_usage": "BLOCK_BEFORE_EXTERNAL_ACCESS"
+  },
+  "retention": {
+    "detail_window_days": 31,
+    "cutoff_comparison": "reserved_at_ms < now_ms - 31_days",
+    "rolling_boundary": "inclusive_at_cutoff; do_not_delete_rows_at_or_after_cutoff",
+    "compaction_mode": "BOUNDED_DELETE_BATCH_WITH_SAME_STATEMENT_TRIGGERS",
+    "delete_batch_max": "INJECTED_FINITE_VALUE; NULL_BLOCKS",
+    "watermark": "PER_WRITER_MAX_PURGED_SLOT_AT_MS; MONOTONIC; NEVER_DELETE",
+    "retained_reservation_counter": "INCREMENT_ON_INSERT_AND_DECREMENT_ON_DELETE_IN_DATABASE_TRIGGERS",
+    "maximum_retained_reservations": "INJECTED_FINITE_VALUE; NULL_BLOCKS",
+    "maximum_lifetime_writer_identities": "INJECTED_FINITE_VALUE; NULL_BLOCKS",
+    "compaction_authority": "SEPARATE_VERSIONED_EXECUTION_AUTHORITY_REQUIRED",
+    "automatic_or_implicit_compaction": false
+  },
+  "cost_accounting": {
+    "production_values_approved": false,
+    "query_preflight_required": true,
+    "reserve_includes_this_ledger_and_compaction_statement": true,
+    "include_indexes_and_triggers": true,
+    "post_query_metadata_required": [
+      "rows_read",
+      "rows_written",
+      "size_after"
+    ],
+    "sqlite_is_not_cloudflare_d1_calibration": true,
+    "missing_or_exceeded_cost_envelope": "BLOCK_AND_PRESERVE_EVIDENCE",
+    "minimum_rows_written_per_insert_reservation": 7,
+    "minimum_rows_written_per_compacted_reservation": 8,
+    "note": "Static schema lower bounds only; production query upper bounds require exact D1 metadata and cannot be inferred from SQLite."
+  },
+  "limits": {
+    "production_values_approved": false,
+    "max_active_reservations": null,
+    "max_lifetime_writer_identities": null,
+    "max_compaction_rows": null,
+    "per_run_daily_rolling_budgets": null
+  },
+  "reviewed_official_d1_limits": {
+    "checked_at_utc": "2026-10-02",
+    "free_rows_read_per_utc_day": 5000000,
+    "free_rows_written_per_utc_day": 100000,
+    "over_daily_read_or_write_limit_behavior": "QUERIES_FAIL_UNTIL_00_00_UTC_RESET",
+    "references": [
+      "https://developers.cloudflare.com/d1/platform/pricing/",
+      "https://developers.cloudflare.com/d1/platform/limits/",
+      "https://developers.cloudflare.com/changelog/post/2026-09-01-d1-free-tier-limit-enforcement/",
+      "https://developers.cloudflare.com/d1/worker-api/d1-database/"
+    ],
+    "account_plan_and_actual_headroom": "UNKNOWN; MUST_REVALIDATE_BEFORE_ACTIVATION",
+    "free_storage_account_gb": 5,
+    "free_storage_per_database_mb": 500
+  },
+  "required_before_any_production_use": [
+    "owner_attested_complete_inventory_of_all_current_and_planned_account_writers",
+    "every_writer_registered_with_owner_attestation_and_existing_authority",
+    "fresh_account_wide_d1_and_r2_usage_and_storage_headroom",
+    "fixed_and_usage_based_cost_scope_reviewed_for_zero_usd",
+    "finite_approved_per_run_daily_rolling_and_storage_limits_below_current_free_plan_limits",
+    "D1_exact_query_metadata_calibration_for_reserve_insert_read_and_bounded_compaction",
+    "D1_trigger_and_single_statement_compaction_atomicity_verified_under_separate_authority",
+    "separate_versioned_compaction_execution_authority",
+    "all_active_writers_use_same_admission_and_idempotency_contract",
+    "controlled_paper_acceptance_after_strategy_and_market_data_gates"
+  ],
+  "boundaries": {
+    "provider_access": false,
+    "r2_access": false,
+    "d1_access": false,
+    "d1_provisioning": false,
+    "schedule_activation": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false,
+    "live_trading": false,
+    "monthly_budget_usd": 0
+  },
+  "limitations": [
+    "Repository CI proves deterministic logic and SQLite trigger behavior only, not Cloudflare D1 transaction semantics, query metering, account-wide usage, or concurrency.",
+    "External repositories and services cannot be discovered by this repository validator; owner-attested account inventory remains required.",
+    "Per-database and account-wide official free limits are plan documentation, not evidence of this account's actual plan or remaining headroom.",
+    "Watermarks and writer identities are deliberately retained; their maximum counts must be finite and included in storage headroom.",
+    "No V0.2 production database exists or is migrated by this prepared successor."
+  ]
+}
