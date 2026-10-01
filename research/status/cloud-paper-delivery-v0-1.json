@@ -57,7 +57,25 @@
     },
     "historical_cloudflare_billing_snapshot": "PR630_MERGED; ONE_READ_ONLY_GET_AUTHORITY; READINESS_RUN_36497596228_BLOCKED_MISSING_BILLING_READ_ONLY_CREDENTIAL; ZERO_CLOUDFLARE_REQUESTS; AUDIT_UNCONSUMED",
     "dashboard_usage_evidence": "PR653_DEPLOYED_PRIOR_MAIN; NO_NEW_DEPLOYMENT_FROM_PR654_CODE_ONLY_CHANGE; LIVE_PAPER_REPORT_READBACK_PENDING",
-    "cloudflare_billable_usage_v0_2": "RUN_36839577708_ATTEMPT_1_HTTP_403; ROOT_CAUSE_UNKNOWN; ONE_TIME_AUTHORITY_CONSUMED_DO_NOT_RERUN; ZERO_COST_AND_HEADROOM_UNKNOWN"
+    "cloudflare_billable_usage_v0_2": {
+      "run_id": 36839577708,
+      "attempt": 1,
+      "head_sha": "7c6bb943f74aebb08fa927e30730e23845825609",
+      "event": "workflow_dispatch",
+      "workflow_conclusion": "failure",
+      "job_id": 110295192832,
+      "job_conclusion": "failure",
+      "cloudflare_requests": 1,
+      "response_status": 403,
+      "reason_code": "CLOUDFLARE_HTTP_403",
+      "root_cause": "UNKNOWN",
+      "report_file_produced": false,
+      "artifact_count": 0,
+      "evidence": "ACTIONS_JOB_LOG_AND_RUN_SUMMARY_ONLY",
+      "one_time_authority": "CONSUMED_DO_NOT_RERUN",
+      "zero_cost": "UNKNOWN",
+      "cloud_paper_enabled": false
+    }
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "R2 V0.3 run 36593296360 is partial: one returned bucket (616541780 bytes) and 6 operation groups / 125309 requests with no operation timestamp; complete bucket inventory, all writers, freshness and headroom remain UNKNOWN; V0.3 one-time authority consumed; do not rerun.",
@@ -402,6 +420,28 @@
     "pr_merge_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
     "observed_at_utc": "2026-10-01T09:44:13Z",
     "open_pull_requests": [],
+    "pr_654": {
+      "head_sha": "2117448a00edf599d08c8d6fb27596ba9cf0a0ab",
+      "merged": true,
+      "pr_ci_run_id": 36680835582,
+      "codeql_run_id": 36680835575,
+      "dependency_sbom_run_id": 36680835567,
+      "post_merge_ci_run_id": 36681001425,
+      "freeze_guard_run_id": 36681001474,
+      "post_merge_dependency_run_id": 36681001359,
+      "post_merge_codeql_run_id": 36681001327,
+      "all_checks": "SUCCESS"
+    },
+    "activation_enabled": false,
+    "d1_provisioned": false,
+    "production_cycle_status": "NOT_RUN",
+    "provider_cloudflare_runtime_access_performed": false,
+    "latest_natural_health_run_id": 36676258650,
+    "latest_maintenance_run_id": 36676302904,
+    "latest_maintenance_inspect": "SUCCESS",
+    "latest_maintenance_propose": "OBSERVATION_CHANGED",
+    "usage_evidence": "BILLABLE_USAGE_V0_2_HTTP_403; ROOT_CAUSE_ACCOUNT_WIDE_COST_FRESHNESS_ALL_WRITERS_AND_HEADROOM_UNKNOWN; ONE_TIME_AUTHORITY_CONSUMED_DO_NOT_RERUN",
+    "next_work": "SUSTAINABLE_FRESH_ACCOUNT_WIDE_BUDGET_AND_HEADROOM_EVIDENCE; FIELD_BY_FIELD_MARKET_SOURCE_QUALIFICATION; KEEP_RUNTIME_AND_SCHEDULE_DISABLED",
     "pr_690": {
       "head_sha": "b5dbfa5837c378ea61997a402d17d9d81ce24a82",
       "merged": true,
@@ -412,13 +452,7 @@
       "pr_checks": "SUCCESS",
       "post_merge_main_checks": "UNKNOWN_NOT_INDEPENDENTLY_VERIFIED"
     },
-    "activation_enabled": false,
-    "d1_provisioned": false,
-    "production_cycle_status": "NOT_RUN",
-    "provider_cloudflare_runtime_access_performed": false,
-    "usage_evidence": "BILLABLE_USAGE_V0_2_HTTP_403; ROOT_CAUSE_ACCOUNT_WIDE_COST_FRESHNESS_ALL_WRITERS_AND_HEADROOM_UNKNOWN; ONE_TIME_AUTHORITY_CONSUMED_DO_NOT_RERUN",
-    "market_data_assessment": "V0_3_MERGED; NO_APPROVED_TOTAL3_SOURCE; BTC_DOMINANCE_PARTIAL_UNAPPROVED_CANDIDATE; PIONEX_23_MARKET_BREADTH_AND_4H_15M_NOT_PRODUCTION_VERIFIED; SCRAPING_NOT_APPROVED",
-    "next_work": "SUSTAINABLE_FRESH_ACCOUNT_WIDE_BUDGET_AND_HEADROOM_EVIDENCE; FIELD_BY_FIELD_MARKET_SOURCE_QUALIFICATION; KEEP_RUNTIME_AND_SCHEDULE_DISABLED"
+    "market_data_assessment": "V0_3_MERGED; NO_APPROVED_TOTAL3_SOURCE; BTC_DOMINANCE_PARTIAL_UNAPPROVED_CANDIDATE; PIONEX_23_MARKET_BREADTH_AND_4H_15M_NOT_PRODUCTION_VERIFIED; SCRAPING_NOT_APPROVED"
   },
   "post_merge_storage_policy_evidence": {
     "pr_number": 616,
@@ -571,6 +605,28 @@
     "pr_merge_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
     "observed_at_utc": "2026-10-01T09:44:13Z",
     "open_pull_requests": [],
+    "pr_654": {
+      "head_sha": "2117448a00edf599d08c8d6fb27596ba9cf0a0ab",
+      "merged": true,
+      "pr_ci_run_id": 36680835582,
+      "codeql_run_id": 36680835575,
+      "dependency_sbom_run_id": 36680835567,
+      "post_merge_ci_run_id": 36681001425,
+      "freeze_guard_run_id": 36681001474,
+      "post_merge_dependency_run_id": 36681001359,
+      "post_merge_codeql_run_id": 36681001327,
+      "all_checks": "SUCCESS"
+    },
+    "activation_enabled": false,
+    "d1_provisioned": false,
+    "production_cycle_status": "NOT_RUN",
+    "provider_cloudflare_runtime_access_performed": false,
+    "latest_natural_health_run_id": 36676258650,
+    "latest_maintenance_run_id": 36676302904,
+    "latest_maintenance_inspect": "SUCCESS",
+    "latest_maintenance_propose": "OBSERVATION_CHANGED",
+    "usage_evidence": "BILLABLE_USAGE_V0_2_HTTP_403; ROOT_CAUSE_ACCOUNT_WIDE_COST_FRESHNESS_ALL_WRITERS_AND_HEADROOM_UNKNOWN; ONE_TIME_AUTHORITY_CONSUMED_DO_NOT_RERUN",
+    "next_work": "SUSTAINABLE_FRESH_ACCOUNT_WIDE_BUDGET_AND_HEADROOM_EVIDENCE; FIELD_BY_FIELD_MARKET_SOURCE_QUALIFICATION; KEEP_RUNTIME_AND_SCHEDULE_DISABLED",
     "pr_690": {
       "head_sha": "b5dbfa5837c378ea61997a402d17d9d81ce24a82",
       "merged": true,
@@ -581,13 +637,7 @@
       "pr_checks": "SUCCESS",
       "post_merge_main_checks": "UNKNOWN_NOT_INDEPENDENTLY_VERIFIED"
     },
-    "activation_enabled": false,
-    "d1_provisioned": false,
-    "production_cycle_status": "NOT_RUN",
-    "provider_cloudflare_runtime_access_performed": false,
-    "usage_evidence": "BILLABLE_USAGE_V0_2_HTTP_403; ROOT_CAUSE_ACCOUNT_WIDE_COST_FRESHNESS_ALL_WRITERS_AND_HEADROOM_UNKNOWN; ONE_TIME_AUTHORITY_CONSUMED_DO_NOT_RERUN",
-    "market_data_assessment": "V0_3_MERGED; NO_APPROVED_TOTAL3_SOURCE; BTC_DOMINANCE_PARTIAL_UNAPPROVED_CANDIDATE; PIONEX_23_MARKET_BREADTH_AND_4H_15M_NOT_PRODUCTION_VERIFIED; SCRAPING_NOT_APPROVED",
-    "next_work": "SUSTAINABLE_FRESH_ACCOUNT_WIDE_BUDGET_AND_HEADROOM_EVIDENCE; FIELD_BY_FIELD_MARKET_SOURCE_QUALIFICATION; KEEP_RUNTIME_AND_SCHEDULE_DISABLED"
+    "market_data_assessment": "V0_3_MERGED; NO_APPROVED_TOTAL3_SOURCE; BTC_DOMINANCE_PARTIAL_UNAPPROVED_CANDIDATE; PIONEX_23_MARKET_BREADTH_AND_4H_15M_NOT_PRODUCTION_VERIFIED; SCRAPING_NOT_APPROVED"
   },
   "external_evidence_design": {
     "status": "DOCUMENTED_DESIGN_ONLY_NO_CLOUDFLARE_REQUEST",
