@@ -6,9 +6,12 @@ from pathlib import Path
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
 from crypto_autopilot.paper.shared_writer_admission_v0_3 import (
+    COMPACT_EXPIRED_RESERVATIONS_SQL,
     DAILY_SHARED_AGGREGATE_SQL,
+    READ_SLOT_RESERVATION_SQL,
     ROLLING_SHARED_AGGREGATE_SQL,
     WriterSlotIdentity,
+    classify_reservation_replay,
     compaction_statement_params,
     minimum_compaction_rows_written,
     minimum_reservation_rows_written,
@@ -161,19 +164,7 @@ class SharedWriterLifecycleTests(unittest.TestCase):
             reserved_rows_written=minimum_compaction_rows_written(1),
         )
         deleted = self.db.execute(
-            """
-            DELETE FROM cloudflare_shared_writer_reservations_v0_3
-            WHERE rowid IN (
-                SELECT rowid
-                FROM cloudflare_shared_writer_reservations_v0_3
-                     INDEXED BY cloudflare_shared_writer_time_v0_3_idx
-                WHERE reserved_at_ms < ?
-                ORDER BY reserved_at_ms, writer_id, slot_id
-                LIMIT ?
-            )
-            RETURNING writer_id, slot_id
-            """,
-            params,
+            COMPACT_EXPIRED_RESERVATIONS_SQL, params
         ).fetchall()
         self.assertEqual(len(deleted), 1)
         self.assertEqual(self.retained_count(), 2)
@@ -262,6 +253,66 @@ class SharedWriterLifecycleTests(unittest.TestCase):
                 max_slot_age_ms=60_000,
                 max_future_skew_ms=0,
                 retired_through_slot_at_ms=None,
+            )
+
+    def test_exact_retained_replay_returns_existing_without_freshness_rejection(self) -> None:
+        self.configure()
+        self.register("project-a:writer")
+        old_slot = NOW_MS - 32 * DAY_MS
+        self.reserve("project-a:writer", old_slot)
+        identity = WriterSlotIdentity(
+            writer_id="project-a:writer",
+            slot_id=f"slot:{old_slot}",
+            idempotency_key=f"slot:{old_slot}",
+            slot_at_ms=old_slot,
+        )
+        row = self.db.execute(
+            READ_SLOT_RESERVATION_SQL, (identity.writer_id, identity.slot_id)
+        ).fetchone()
+        proposed = dict(row)
+        self.assertEqual(
+            classify_reservation_replay(
+                identity, proposed, dict(row), now_ms=NOW_MS,
+                max_slot_age_ms=31 * DAY_MS, max_future_skew_ms=0,
+                retired_through_slot_at_ms=None,
+            ),
+            "RETURN_EXISTING",
+        )
+        changed = dict(proposed)
+        changed["d1_rows_written"] = int(changed["d1_rows_written"]) + 1
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_IDEMPOTENCY_CONFLICT"):
+            classify_reservation_replay(
+                identity, changed, dict(row), now_ms=NOW_MS,
+                max_slot_age_ms=31 * DAY_MS, max_future_skew_ms=0,
+                retired_through_slot_at_ms=None,
+            )
+
+    def test_missing_old_replay_is_rejected_after_compaction(self) -> None:
+        identity = WriterSlotIdentity(
+            writer_id="project-a:writer",
+            slot_id="slot:1000",
+            idempotency_key="slot:1000",
+            slot_at_ms=1000,
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_STALE_WRITER_SLOT"):
+            classify_reservation_replay(
+                identity, {
+                    "writer_id": identity.writer_id,
+                    "slot_id": identity.slot_id,
+                    "idempotency_key": identity.idempotency_key,
+                    "slot_at_ms": identity.slot_at_ms,
+                    "utc_day": "1970-01-01",
+                    "reserved_at_ms": 1000,
+                    "provider_requests": 0,
+                    "r2_class_a": 0,
+                    "r2_class_b": 0,
+                    "r2_new_bytes": 0,
+                    "d1_queries": 0,
+                    "d1_rows_read": 0,
+                    "d1_rows_written": 0,
+                    "d1_storage_growth_bytes": 0,
+                }, None, now_ms=NOW_MS, max_slot_age_ms=31 * DAY_MS,
+                max_future_skew_ms=0, retired_through_slot_at_ms=None,
             )
 
     def test_cost_floors_include_admission_compaction_trigger_and_index_rows(self) -> None:
