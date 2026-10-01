@@ -1,0 +1,49 @@
+{
+  "schema": "qookey-cloud-paper-runtime-adapters-prepared-receipt-v0.1",
+  "state": "PREPARED_IMPLEMENTATION_ONLY_NO_EXECUTION_AUTHORITY",
+  "evidence_basis": {
+    "parent_main_sha": "bcbbb63bf6ee49c38bcdb34d8616d7312d7c1317",
+    "date": "2026-10-02",
+    "environment": "GITHUB_CLOUD_ONLY",
+    "local_files_excluded_by_user": true
+  },
+  "source_bindings": [
+    {
+      "path": "src/crypto_autopilot/paper/cloud_pionex_client_v0_1.py",
+      "git_blob_sha": "97b60d5a338064d9fd11cd08574bc433f1c40de5"
+    },
+    {
+      "path": "src/crypto_autopilot/paper/cloud_runtime_v0_1.py",
+      "git_blob_sha": "b8b6b4bf590477492dde8d64424abb486bebdb95"
+    }
+  ],
+  "scope": [
+    "Reuse public Pionex parsers with a fixed-host no-redirect bounded-response transport.",
+    "Assemble guarded R2 store, shared-guard D1 client, ledger and composition without executing a slot.",
+    "Synthetic cloud CI only; source and tests do not prove production coverage or cost."
+  ],
+  "required_cloud_ci": [
+    "Python 3.12",
+    "Python 3.13",
+    "Ruff",
+    "all existing governance and frozen bindings",
+    "transport rejection and freshness tests",
+    "assembled synthetic no-trade persistence and duplicate-slot test"
+  ],
+  "runtime": {
+    "provider_requests_performed": 0,
+    "r2_access_performed": false,
+    "d1_access_performed": false,
+    "activation_enabled": false,
+    "schedule_enabled": false,
+    "production_strategies_added": 0
+  },
+  "remaining_requirements": [
+    "Independent current account-wide usage and all-writer evidence",
+    "D1 provisioning under separately merged scope",
+    "Reviewed main-bound execution workflow and controlled acceptance",
+    "Bounded natural schedule and production Dashboard evidence"
+  ],
+  "predecessors_modified": false,
+  "one_shot_audits_rerun": false
+}
