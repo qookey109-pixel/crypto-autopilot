@@ -234,7 +234,7 @@ def _request_json(url: str, *, token: str) -> dict[str, Any]:
     request = urllib.request.Request(url, headers={
         "Accept": "application/json",
         "Authorization": f"Bearer {token}",
-        "User-Agent": "crypto-autopilot-billing-history-audit/0.1",
+        "User-Agent": "crypto-autopilot-billing-history-audit/0.2",
     }, method="GET")
     opener = urllib.request.build_opener(_NoRedirect)
     try:
