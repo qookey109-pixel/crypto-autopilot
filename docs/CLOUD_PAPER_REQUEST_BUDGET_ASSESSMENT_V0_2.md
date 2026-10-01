@@ -1,6 +1,6 @@
 # Cloud Paper multi-timeframe request budget assessment V0.2
 
-Basis: GitHub main=19a29e4b57e17821bf64c8cb01fb60c68b8f63c7 (2026-10-01).
+Basis: GitHub main=00acb1f33745390759fe37b7202d5dc2f500bef8 (2026-10-01).
 
 This is a planning assessment and inactive requirement envelope. It does not authorize provider, R2, or D1 access; runtime activation; strategy qualification; or scheduling. The machine-readable proposal is config/cloud_paper_market_request_budget_v0_2.json.
 
@@ -30,7 +30,13 @@ The current implementation yields these mathematical lower bounds for complete a
 | 60M candidate technicals | 200 | Full ready_v0_2 includes EMA200; the first full snapshot is at index 199. |
 | 15M candidate technicals | 200 | Same full technical feature set and EMA200 dependency. |
 
-Market structure's default trailing 20-bar range also needs the current bar plus 20 preceding bars, or 21. Under the stated 23 breadth members and five candidates per candidate timeframe, the resulting lower-bound payload is 2,483 closed candles/slot (23×21 + 5×200 + 5×200). The documented one-request limit of up to 500 can fit each of these per-symbol windows in one request. This only shows the configured windows fit the documented endpoint limit; it does not establish endpoint availability, batch behavior, provider quota, or all strategy-specific dependencies. Additional strategy-family requirements remain unverified.
+Market structure's default trailing 20-bar range also needs the current bar plus 20 preceding bars, or 21. Under the stated 23 breadth members and five candidates per candidate timeframe, the resulting lower-bound payload is 2,483 closed candles/slot (23×21 + 5×200 + 5×200). The documented one-request limit of up to 500 can fit each of these per-symbol windows in one request. This only shows the configured windows fit the documented endpoint limit; it does not establish endpoint availability, batch behavior, provider quota, or all strategy-specific dependencies. Additional strategy-family requirements beyond the shared router gate remain unverified.
+
+### Strategy-family input boundary
+
+The current research-only router has six families: trend following, breakout, momentum, mean reversion, high-volatility trend, and low-volatility range. Every routed candidate is gated on an eligible opportunity, a full `TechnicalSnapshot.ready_v0_2`, and a ready, timestamp-aligned market regime. That technical snapshot includes the full shared indicator set, including EMA200, so 200 continuous closed bars is a code-derived lower bound for the current router input at each candidate timeframe. Families that call market-structure matching also need the aligned structure snapshot; its default previous-range inputs require 20 prior bars plus the current bar (21 total). This is consistent with, but does not prove more than, the minima above.
+
+This routing contract is research compatibility only. It does not define the signal-generation implementation, exact entry/exit history window, or paper qualification requirements for a future strategy. The production registry is currently empty, so there is no qualified implementation to inspect for those additional requirements. Do not treat 200 bars as a universal strategy guarantee or use the router's research match as execution eligibility. A future qualified strategy must declare its own per-timeframe inputs, warmup, alignment and staleness requirements, and pass them through a versioned validation receipt before any successor execution authority is considered.
 
 ## Freshness and caching
 
