@@ -239,12 +239,13 @@ class SharedWriterAdmissionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "WRITER_ID_INVALID"):
             reserve_shared_writer_envelope(
                 execute=client,
-                reservation(writer_id="Project A"),
+                reservation=reservation(writer_id="Project A"),
                 limits=limits(),
             )
         with self.assertRaisesRegex(ValueError, "WRITER_RESERVATION_ENVELOPE_INVALID"):
             reserve_shared_writer_envelope(
-                execute=client, reservation(provider_requests=-1),
+                execute=client,
+                reservation=reservation(provider_requests=-1),
                 limits=limits(),
             )
         self.assertEqual(client.query_count, 0)
@@ -253,8 +254,9 @@ class SharedWriterAdmissionTests(unittest.TestCase):
         client = SQLiteAdmissionClient()
         with self.assertRaisesRegex(ValueError, "SHARED_WRITER_LIMITS_INVALID"):
             reserve_shared_writer_envelope(
-                execute=client, reservation(),
-                limits(provider_requests_per_utc_day=0),
+                execute=client,
+                reservation=reservation(),
+                limits=limits(provider_requests_per_utc_day=0),
             )
         self.assertEqual(client.query_count, 0)
 
