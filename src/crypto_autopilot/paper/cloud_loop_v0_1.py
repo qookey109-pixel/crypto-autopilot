@@ -444,6 +444,12 @@ def run_cloud_step(
                       "holdout_access": False, "source_switch": False,
                       "model_promotion": False},
     }
+    # Compare the JSON representation that every persistent backend returns.
+    # Tuples in market/feature evidence serialize as arrays; normalization keeps
+    # the canonical content address unchanged while making readback equality exact.
+    outcome = json.loads(json.dumps(
+        outcome, sort_keys=True, separators=(",", ":"), allow_nan=False,
+    ))
     report_id = digest(outcome)
     before_external()
     store.put_json("cloud-report", report_id, outcome)
