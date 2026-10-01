@@ -1,3 +1,17 @@
+## Live repository checkpoint — 2026-10-02 07:11 Asia/Taipei
+
+Evidence basis: protected `main=2e9432f8348f014343d2a0d68cdbead890484a89`, after [PR #733](https://github.com/qookey109-pixel/crypto-autopilot/pull/733) merged.
+
+- PR #733 adds a non-authoritative Dashboard projection for the latest main-branch GitHub run metadata of Cloud Paper Billing History V0.1 and V0.2. The site displays run state, attempt, creation time, and a safe Actions link. It does not read artifacts, logs, billing response bodies, or Cloudflare/R2/D1.
+- Post-merge verification: Python 3.12/3.13 CI [36939088833](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36939088833), CodeQL [36939088846](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36939088846), Dependency/SBOM [36939088843](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36939088843), and V0.10 Freeze Guard [36939088818](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36939088818) succeeded. Pages [36939088878](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36939088878) build, deploy, and production-browser succeeded; workflow-static was skipped by its change filter.
+- Latest observed Billing History V0.1 run remains [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281), attempt 1, failed with `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`; it is consumed and must not be rerun. The Dashboard reports GitHub workflow metadata only; open the Actions run to inspect its retained report. Billing History V0.2 remains undispatched and has no Cloudflare request.
+- The owner expects additional Cloudflare projects/services later; writer identities and account-wide coverage remain incomplete. Zero total account cost/headroom is unproven. Keep all Cloudflare writes, D1 provisioning, and Cloud Paper activation disabled until applicable gates are evidenced.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 is unprovisioned, the production strategy registry is empty, Core100 quality remains `REJECT`, and natural Cloud Paper scheduling is disabled. Continue a non-Cloudflare-dependent vertical slice; do not treat Dashboard/CI success as cost proof or a trading result.
+
+This entry supersedes the immediately following checkpoint for present-tense status. Earlier records remain historical evidence.
+
+---
+
 ## Live repository checkpoint — 2026-10-02 06:41 Asia/Taipei
 
 Evidence basis: protected `main=01974f1c22ff24f33d0903a493085068b2736a5b`, after [PR #731](https://github.com/qookey109-pixel/crypto-autopilot/pull/731) merged.
