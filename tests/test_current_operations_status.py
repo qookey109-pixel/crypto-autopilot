@@ -22,7 +22,7 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         current = self.current
 
         self.assertEqual(payload["schema"], "qookey-current-operations-v0.3")
-        self.assertEqual(payload["updated_date"], "2026-09-30")
+        self.assertIn(payload["updated_date"], current.splitlines()[0])
         self.assertEqual(payload["repository_authority"], "RESOLVE_MAIN_LIVE_AT_READ_TIME")
         self.assertEqual(payload["mode"], "PAPER_AND_LIVE_PAPER_ONLY")
 
@@ -32,14 +32,24 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
         )
         self.assertFalse(basis["is_latest_main_claim"])
-        self.assertEqual(basis["source_merge_pr"], 427)
+        self.assertEqual(basis["source_merge_pr"], 678)
         self.assertEqual(
             basis["parent_main_sha"],
-            "9ffe30c8f0ab28bc3b2a95ae19de6938ed613dae",
+            "33496e31447fb0bd13743a9e72c8e7f7cd265e8f",
         )
         self.assertIn(basis["parent_main_sha"], current)
         self.assertIn("Resolve `main` live at read time", current)
         self.assertIn("not** a latest-main claim", current)
+
+        billing = payload["cloud_paper_billing_evidence"]
+        self.assertEqual(billing["run_id"], 36513941565)
+        self.assertEqual(billing["report_status"], "READY_FOR_BILLING_REVIEW")
+        self.assertEqual(
+            billing["zero_cost_conclusion"],
+            "NOT_PROVEN_BY_SUBSCRIPTION_SNAPSHOT",
+        )
+        self.assertTrue(billing["authority_consumed"])
+        self.assertFalse(billing["rerun_authorized"])
 
         core100 = payload["core100"]
         self.assertEqual(core100["history_status"], "COMPLETE")
@@ -195,11 +205,10 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             control["open_pr_triage"],
             "research/status/open-pr-triage-v0-5.json",
         )
-        self.assertEqual(control["open_pr_count"], 0)
-        self.assertEqual(
-            control["open_pr_numbers"],
-            [],
-        )
+        checkpoint = self.payload["live_repository_checkpoint"]
+        checkpoint_numbers = [row["number"] for row in checkpoint["open_pull_requests"]]
+        self.assertEqual(control["open_pr_count"], len(checkpoint_numbers))
+        self.assertEqual(control["open_pr_numbers"], checkpoint_numbers)
         self.assertIn("ZERO_OPEN_PRS", control["open_pr_triage_state"])
         self.assertEqual(control["historical_open_pr_triage"]["open_pr_count"], 6)
         self.assertEqual(control["historical_open_pr_triage"]["open_pr_numbers"], [326, 327, 328, 329, 330, 331])
