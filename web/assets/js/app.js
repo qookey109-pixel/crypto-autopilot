@@ -991,7 +991,16 @@ function cloudPaperBillingEvidenceIsValid(evidence) {
   const planReview = subscription?.rate_plan_id_documentation_check;
   const usage = evidence?.billable_usage_snapshot;
   const expected = [
+    evidence?.updated_date === "2026-10-02",
     evidence?.authority === "cloud-paper-billing-evidence-v0.1",
+    evidence?.total_cloudflare_http_requests === 2,
+    evidence?.account_wide_cost === "UNKNOWN",
+    evidence?.account_wide_writer_coverage === "UNKNOWN",
+    evidence?.writer_inventory_state === "INCOMPLETE_USER_EXPECTS_ADDITIONAL_SERVICES_LATER",
+    evidence?.zero_cost_conclusion === "NOT_PROVEN",
+    evidence?.authority_consumed === true,
+    evidence?.rerun_authorized === false,
+    evidence?.cloud_paper_activation === "REMAINS_DISABLED",
     subscription?.run_id === 36513941565,
     subscription?.event === "workflow_dispatch",
     subscription?.workflow_conclusion === "success",
@@ -1020,6 +1029,7 @@ function cloudPaperBillingEvidenceIsValid(evidence) {
     usage?.artifact_digest === "sha256:aafc0e4c58bdb8d25426a390c1d9689ce77324ef2c780d91e6fcc2f90c1bbcbf",
     usage?.attempt === 1,
     usage?.observed_at_utc === "2026-10-01T10:57:13.348117Z",
+    usage?.report_reason_code === "USAGE_ROWS_CAPTURED_REVIEW_REQUIRED_FOR_SCOPE",
     usage?.response_row_count === 42,
     usage?.every_row_has_billed_cost_fields === true,
     usage?.reported_billed_cost_total === 0,
