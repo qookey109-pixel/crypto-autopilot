@@ -50,6 +50,29 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         )
         self.assertTrue(billing["authority_consumed"])
         self.assertFalse(billing["rerun_authorized"])
+        subscription = billing["subscription_snapshot"]
+        self.assertEqual(subscription["rate_plan_id"], "r2_paid")
+        self.assertEqual(subscription["state"], "Paid")
+        self.assertEqual(subscription["listed_price_usd"], 0.0)
+        self.assertEqual(
+            subscription["zero_cost_conclusion"],
+            "NOT_PROVEN_BY_SUBSCRIPTION_SNAPSHOT",
+        )
+        self.assertTrue(subscription["authority_consumed"])
+        self.assertFalse(subscription["rerun_authorized"])
+
+        usage = payload["cloud_paper_billable_usage_v0_3"]
+        self.assertEqual(usage["run_id"], 36852292356)
+        self.assertEqual(usage["response_row_count"], 42)
+        self.assertEqual(usage["reported_billed_cost_total"], 0.0)
+        self.assertFalse(usage["fixed_subscription_charges_included"])
+        self.assertEqual(
+            usage["complete_account_usage_coverage"],
+            "UNKNOWN_UNTIL_REVIEWED",
+        )
+        self.assertIn("ADDITIONAL_SERVICES_LATER", usage["current_and_planned_writer_inventory"])
+        self.assertTrue(usage["authority_consumed"])
+        self.assertFalse(usage["rerun_authorized"])
 
         assessment = payload["cloud_paper_market_data_source_assessment"]
         self.assertEqual(assessment["status"], "ASSESSMENT_ONLY_NOT_APPROVED")
@@ -66,11 +89,11 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         self.assertFalse(assessment["source_switch_authorized"])
         self.assertEqual(
             payload["live_repository_checkpoint"]["evidence_basis_main_sha"],
-            "2ad53494fb0bb114ae9cfd93cf8d30a0352f5e1c",
+            "e4706d1f1b82c9b7a760f3dab3fc1d729e9ffe11",
         )
         self.assertEqual(
             payload["live_repository_checkpoint"]["dashboard_pages_result"],
-            "NOT_RUN_NO_WEB_PATH_CHANGED",
+            "BUILD_SUCCESS_DEPLOY_AND_BROWSER_SKIPPED_DOCS_ONLY",
         )
 
         core100 = payload["core100"]
