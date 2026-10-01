@@ -91,7 +91,13 @@ class SharedWriterLifecycleTests(unittest.TestCase):
     def test_unconfigured_capacity_blocks_writer_and_reservation_creation(self) -> None:
         with self.assertRaisesRegex(sqlite3.IntegrityError, "BLOCKED_WRITER_IDENTITY_CAP"):
             self.register("project-a:writer")
-        self.configure()
+        self.db.execute(
+            """
+            UPDATE cloudflare_shared_writer_lifecycle_policy_v0_3
+            SET max_lifetime_writer_identities = 3
+            WHERE policy_id = 1
+            """
+        )
         self.register("project-a:writer")
         with self.assertRaisesRegex(sqlite3.IntegrityError, "BLOCKED_RESERVATION_CAPACITY"):
             self.reserve("project-a:writer", NOW_MS)
