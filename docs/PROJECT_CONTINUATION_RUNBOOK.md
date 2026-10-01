@@ -1,4 +1,23 @@
-## Live repository checkpoint — 2026-10-02 03:34 Asia/Taipei
+## Live repository checkpoint — 2026-10-02 03:49 Asia/Taipei
+
+Evidence basis: GitHub main=2ad53494fb0bb114ae9cfd93cf8d30a0352f5e1c, re-read after PR [#721](https://github.com/qookey109-pixel/crypto-autopilot/pull/721) merged. PR #721 head 36c8f6f62ed24e97ef4c7106153c3ed73e303ec9 adds a SQLite-tested schema constraint binding the daily budget partition to the UTC date derived from reservation time. Exact-head Python 3.12/3.13, workflow-static, CodeQL, and Dependency/SBOM checks [36916665641](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36916665641), [36916665548](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36916665548), and [36916665652](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36916665652) succeeded. Post-merge main Python 3.12/3.13 CI [36916920088](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36916920088), CodeQL [36916920404](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36916920404), Dependency/SBOM [36916919932](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36916919932), and V0.10 Freeze Guard [36916920187](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36916920187) succeeded. Main workflow-static was skipped because no workflow changed. The delivery branch was deleted after merge.
+
+- Shared-writer admission V0.3 remains PREPARED_SYNTHETIC_VALIDATION_ONLY. The daily aggregate key is now constrained to the UTC date derived from reservation time in the synthetic schema; this does not establish Cloudflare D1 behavior.
+- D1 remains unprovisioned; Cloudflare requests, production compaction, and writer integration remain unauthorized. No provider, R2, D1, or runtime request occurred for PR #721.
+- The user expects other projects/services may later share the Cloudflare account. Complete current/future writer inventory, account-wide usage/headroom, fixed charges, and total zero-cost scope remain UNKNOWN; do not assume a dedicated account.
+- Seven other PRs remain open: #708 is a stale-base Draft and #693–#698 are stale-base Dependabot updates. Reconcile exact heads, bases, and checks before any merge.
+- Cloud Paper remains NOT_WIRED / NOT_RUN / NOT_CONFIGURED; the production strategy registry is empty, Core100 quality remains REJECT, and required market inputs are incomplete.
+- No Pages run was triggered for this non-web change. Prior Pages evidence is not refreshed.
+
+The machine-readable operations snapshot retains its historical strategy and billing evidence basis; only its live repository checkpoint is refreshed. Frozen receipts and prior failure evidence remain unchanged.
+
+Next: establish an owner-attested inventory for current and planned Cloudflare writers and a complete account-wide cost/headroom evidence path; separately prepare exact D1 metering/atomicity validation under future versioned authority. Keep production D1, Cloud Paper, provider access, and natural scheduling disabled until all data, budget, and execution gates are satisfied.
+
+CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+
+---
+
+## Historical checkpoint — 2026-10-02 03:34 Asia/Taipei (superseded by PR #721 checkpoint)
 
 Evidence basis: GitHub main=39d7e3392430c927e2cea3b365c7150c12583e7e, re-read after PR [#719](https://github.com/qookey109-pixel/crypto-autopilot/pull/719) merged. PR #719 head f1d8d65bf053349b76d2edcfb104e6eafddc533b added a prepared synthetic-only V0.3 shared-writer D1 lifecycle successor. Final PR-head Python 3.12/3.13 and workflow-static checks [36914499963](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36914499963), CodeQL [36914499940](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36914499940), and Dependency/SBOM [36914500014](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36914500014) succeeded. Post-merge main Python 3.12/3.13 CI [36914826073](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36914826073), CodeQL [36914826174](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36914826174), Dependency/SBOM [36914826041](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36914826041), and V0.10 Freeze Guard [36914825928](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36914825928) succeeded. Main workflow-static was skipped because no workflow changed. The delivery branch was deleted after merge.
 
