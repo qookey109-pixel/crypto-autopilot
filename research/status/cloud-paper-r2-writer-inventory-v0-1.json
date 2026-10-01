@@ -1,16 +1,16 @@
 {
   "schema": "qookey-cloud-paper-r2-writer-inventory-v0.1",
   "updated_date": "2026-10-01",
-  "evidence_basis_main_sha": "b2f0a1e2b4129cff207f6b9c59d395ecc705aaab",
+  "evidence_basis_main_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
   "is_latest_main_claim": false,
   "scan": {
-    "workflow_file_count": 94,
-    "workflows_with_r2_or_cloudflare_secret_references": 24,
+    "workflow_file_count": 95,
+    "workflows_with_r2_or_cloudflare_secret_references": 25,
     "scanner_contract": "scripts/validate_cloud_paper_r2_writer_inventory.py",
     "exact_reference_scan": true,
     "values_or_secret_contents_read": false,
     "workflow_count_before_nonaccess_preflight": 84,
-    "note": "V0.1 Billing and Usage Audit, V0.2 Usage Audit, and V0.3 R2 Usage Audit are consumed. V0.3 run 36593296360 returned READY_FOR_REVIEW after one R2 analytics request. These audit workflows do not access R2 objects. The workflow scan retains its dated evidence basis; the V0.3 result does not prove invoice totals, D1 inventory, complete bucket inventory, shared writer coverage, zero cost, or headroom. The new Cloud Paper Billable Usage V0.2 workflow is a separately versioned one-time read-only billable-usage diagnostic; its PR CI does not execute it and no Cloudflare request has occurred.",
+    "note": "Credential-reference inventory updated in PR #692 head after Cloud Paper Billable Usage V0.3 was added. Baseline main SHA is cca6181f53e18fab8d5498bf4a866bf02abe2671; this PR-head inventory is not a latest-main claim until merge. V0.2 billable usage run 36839577708 consumed its one-time authority and returned HTTP 403; exact cause UNKNOWN, no rerun. V0.3 is a separate prepared successor using one bounded read-only V1 billable-usage request after merge; no dispatch has occurred in this PR. These usage workflows do not access R2 objects or D1. R2/D1 headroom, account-wide writer coverage, invoice totals, and zero total project cost remain unproven.",
     "d1_access_marker_scan": "scripts/validate_cloud_paper_r2_writer_inventory.py"
   },
   "account_wide_reservation_coverage": {
@@ -56,10 +56,18 @@
     {
       "workflow": ".github/workflows/cloud-paper-billable-usage-v0-2.yml",
       "access": "READ_ONLY",
-      "lifecycle": "AUTHORIZED_ON_MAIN_MERGE_ONE_TIME_NOT_DISPATCHED",
+      "lifecycle": "CONSUMED_ONE_TIME_FAILED_HTTP_403_NO_RERUN",
       "trigger": "workflow_dispatch on main",
       "authority": "config/cloud_paper_billable_usage_v0_2.json",
-      "evidence": "One billable-usage GET after unique-run and main-branch gates; no R2 object access, D1 access, retries, pagination, or runtime activation. Alpha/Restricted API; zero cost and full account coverage remain unknown."
+      "evidence": "Run 36839577708 made one request to the V2 Alpha/Restricted endpoint and returned HTTP 403; precise cause UNKNOWN. Authority consumed; no rerun. No R2 object access or D1 access."
+    },
+    {
+      "workflow": ".github/workflows/cloud-paper-billable-usage-v0-3.yml",
+      "access": "READ_ONLY",
+      "lifecycle": "PREPARED_ONE_TIME_AUTHORITY_EFFECTIVE_AFTER_MERGE_NOT_DISPATCHED",
+      "trigger": "workflow_dispatch on main",
+      "authority": "config/cloud_paper_billable_usage_v0_3.json",
+      "evidence": "One GitHub run-history check and at most one GET to the V1 billable-usage endpoint; no R2 object access, D1, retries, pagination, schedule, or runtime activation. Zero total cost and full account coverage remain unknown."
     },
     {
       "workflow": ".github/workflows/cloud-paper-billing-evidence-readiness-v0-1.yml",
