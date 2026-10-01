@@ -4,6 +4,8 @@ import importlib.util
 from pathlib import Path
 import unittest
 
+from crypto_autopilot.paper.run_store_v0_1 import _canonical_bytes
+
 PATH = Path(__file__).resolve().parents[1] / "scripts" / "measure_cloud_paper_r2_protocol_profile_v0_1.py"
 SPEC = importlib.util.spec_from_file_location("r2_protocol_profile", PATH)
 assert SPEC is not None and SPEC.loader is not None
@@ -49,7 +51,7 @@ class CloudPaperR2ProtocolProfileTests(unittest.TestCase):
         self.assertEqual(paginated["objects_added"], 5)
         self.assertEqual(
             paginated["put_application_payload_bytes"],
-            sum(len(profile._canonical_bytes({"item": index})) for index in range(5)),
+            sum(len(_canonical_bytes({"item": index})) for index in range(5)),
         )
 
     def test_report_is_deterministic_and_contains_no_payloads(self):
