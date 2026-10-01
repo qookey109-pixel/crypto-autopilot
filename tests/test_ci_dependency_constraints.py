@@ -24,7 +24,7 @@ EXPECTED = {
     "packaging": "26.3",
     "pluggy": "1.6.0",
     "pygments": "2.21.0",
-    "ruff": "0.16.0",
+    "ruff": "0.16.9",
 }
 
 CRITICAL = (
