@@ -1,3 +1,17 @@
+## Live delivery checkpoint — 2026-10-02 07:52 Asia/Taipei
+
+Evidence basis: reviewed parent `main=bc1ae2c30cf70b228b96a19b4829aaa1f318d91f`; resolve protected `main` live after this documentation change.
+
+- PR #665 completed the second storage-lineage slice: new V0.2 coordinator steps reference independent immutable `live-tick` evidence by ID and canonical digest. Legacy V0.1 embedded steps remain readable; missing/tampered tick, mixed-schema continuation, replay, recovery, and partial-write paths are covered. Frozen Coordinator/Recovery V0.1 files and the original slot-claim binding were preserved.
+- Matched GitHub CI fixtures reduced `entry_exit_no_trade` serialization from 157,367 to 116,608 canonical JSON bytes (40,759 bytes, about 25.9%); `get_json` calls stayed 76→76. This is synthetic serialization evidence only, not production R2 usage, fee savings, or account headroom. Profile artifact: [11101819985](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726001018/artifacts/11101819985).
+- PR #665 merged at [commit bbd3cccf](https://github.com/qookey109-pixel/crypto-autopilot/commit/bbd3cccf2841219104cffef46ad2d5aa9ff87648) from exact head `49e27a3257f9163c9c39e996b57ca850af273f9f). Python 3.12/3.13, CodeQL, Dependency/SBOM, and Freeze Guard checks passed; Pages deploy/browser checks were skipped for the PR content filter.
+- Current main also contains the status sync PR #737 at `bc1ae2c`; post-merge Python 3.12/3.13, CodeQL, Dependency/SBOM, Freeze Guard, and Pages build passed. Pages deploy/browser were skipped because the change did not alter published content. No runtime or Cloudflare operation occurred.
+- Cloud Paper is still `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 is unprovisioned, production strategy registry is empty, Core100 quality is `REJECT`, and account-wide cost/headroom plus external writer coverage remain unproven. Billing History V0.2 remains undispatched pending its explicit one-time owner confirmation. Do not activate R2/D1 writes or a natural simulation schedule.
+
+This checkpoint supersedes older present-tense statements below. Frozen reports, receipts, and historical observations remain unchanged.
+
+---
+
 ## Live repository checkpoint — 2026-10-02 07:20 Asia/Taipei
 
 Evidence basis: protected `main=c54aaa82875c7373e68ec489b39cb8d91357840a`, after [PR #734](https://github.com/qookey109-pixel/crypto-autopilot/pull/734) merged.
