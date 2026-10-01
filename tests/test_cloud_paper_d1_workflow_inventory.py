@@ -131,5 +131,104 @@ class D1WorkflowInventoryTests(unittest.TestCase):
         self.assertTrue(contains_d1_access_reference("${{ secrets.DATABASE_ID }}"))
 
 
+    @staticmethod
+    def _shared_registry_fixture():
+        inventory = {
+            "workflows": [
+                {
+                    "workflow": ".github/workflows/paper.yml",
+                    "access": "WRITER",
+                    "lifecycle": "CURRENT_MANUAL_PAPER",
+                },
+                {
+                    "workflow": ".github/workflows/retired.yml",
+                    "access": "WRITER",
+                    "lifecycle": "EXPIRED",
+                },
+            ]
+        }
+        registry = {
+            "repository_writers": [
+                {
+                    "writer_id": "repo:paper",
+                    "workflow": ".github/workflows/paper.yml",
+                    "resource": "R2",
+                    "registration_state": "DECLARED_SHARED_ADMISSION_NOT_VERIFIED",
+                }
+            ],
+            "external_writer_inventory": {
+                "state": "UNCONFIRMED",
+                "complete": False,
+                "registered_writers": [],
+            },
+            "production_gate": {
+                "account_wide_coverage_proven": False,
+                "shared_admission_integrated_for_all_repository_writers": False,
+                "d1_provisioned": False,
+                "activation_enabled": False,
+            },
+        }
+        return inventory, registry
+
+    def test_shared_registry_lists_current_repository_writer_without_claiming_account_coverage(self) -> None:
+        from scripts.validate_cloud_paper_r2_writer_inventory import (
+            validate_shared_account_writer_registry,
+        )
+
+        inventory, registry = self._shared_registry_fixture()
+        self.assertEqual(
+            validate_shared_account_writer_registry(inventory, registry),
+            [".github/workflows/paper.yml"],
+        )
+
+    def test_shared_registry_rejects_new_unregistered_current_writer(self) -> None:
+        from scripts.validate_cloud_paper_r2_writer_inventory import (
+            validate_shared_account_writer_registry,
+        )
+
+        inventory, registry = self._shared_registry_fixture()
+        inventory["workflows"].append(
+            {
+                "workflow": ".github/workflows/new-writer.yml",
+                "access": "CONDITIONAL_WRITER",
+                "lifecycle": "CURRENT_CONDITIONAL",
+            }
+        )
+        with self.assertRaisesRegex(RuntimeError, "unregistered"):
+            validate_shared_account_writer_registry(inventory, registry)
+
+    def test_shared_registry_rejects_activation_with_unknown_external_writers(self) -> None:
+        from scripts.validate_cloud_paper_r2_writer_inventory import (
+            validate_shared_account_writer_registry,
+        )
+
+        inventory, registry = self._shared_registry_fixture()
+        registry["production_gate"].update(
+            {
+                "shared_admission_integrated_for_all_repository_writers": True,
+                "d1_provisioned": True,
+                "activation_enabled": True,
+            }
+        )
+        registry["repository_writers"][0]["registration_state"] = (
+            "SHARED_ADMISSION_VERIFIED"
+        )
+        with self.assertRaisesRegex(RuntimeError, "production activation"):
+            validate_shared_account_writer_registry(inventory, registry)
+
+    def test_shared_registry_requires_receipt_before_external_inventory_is_complete(self) -> None:
+        from scripts.validate_cloud_paper_r2_writer_inventory import (
+            validate_shared_account_writer_registry,
+        )
+
+        inventory, registry = self._shared_registry_fixture()
+        registry["external_writer_inventory"].update(
+            {"state": "ATTESTED", "complete": True}
+        )
+        registry["production_gate"]["account_wide_coverage_proven"] = True
+        with self.assertRaisesRegex(RuntimeError, "attestation receipt"):
+            validate_shared_account_writer_registry(inventory, registry)
+
+
 if __name__ == "__main__":
     unittest.main()
