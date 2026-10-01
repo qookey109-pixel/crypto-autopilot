@@ -60,6 +60,11 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         )
         self.assertTrue(subscription["authority_consumed"])
         self.assertFalse(subscription["rerun_authorized"])
+        plan_check = subscription["rate_plan_id_documentation_check"]
+        self.assertEqual(plan_check["classification"], "UNMAPPED_DOCUMENTED_ENUM_REQUIRES_REVIEW")
+        self.assertNotIn("r2_paid", plan_check["documented_values"])
+        self.assertFalse(plan_check["additional_cloudflare_request_performed"])
+        self.assertIn("developers.cloudflare.com/api/resources/accounts/subresources/subscriptions/methods/get/", plan_check["source_url"])
 
         usage = payload["cloud_paper_billable_usage_v0_3"]
         self.assertEqual(usage["run_id"], 36852292356)
