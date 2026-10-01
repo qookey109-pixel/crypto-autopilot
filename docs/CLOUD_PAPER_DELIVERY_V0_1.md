@@ -1,3 +1,11 @@
+## Shared-writer admission V0.1 (prepared, not wired)
+
+The successor contract in `src/crypto_autopilot/paper/shared_writer_admission_v0_1.py` and its prepare-only migration uses `(writer_id, idempotency_key)` as the reservation identity. Different registered writers can reserve the same slot while sharing account-wide daily totals and R2 rolling-31-day totals. The admission is one parameterized INSERT...SELECT statement; a repeated exact identity reads back the prior envelope and returns `EXISTING_RESERVATION`, while changed content under that key blocks.
+
+Cloud CI uses an in-memory SQLite analogue to test shared caps, same-slot cross-writer reservations, replay, changed-envelope conflicts and concurrent admission. This is not production D1 evidence and does not prove D1 concurrency semantics or account-wide coverage. No D1 migration was applied and no Cloudflare, R2, D1 or provider request occurred. Limits are required inputs with no production values approved.
+
+Reservations are conservative and are not released or rebated. Long-term retention/compaction is unresolved; D1 usage/headroom evidence, all-writer integration, the admission ledger's own guarded query costs, and bounded storage/retention remain activation blockers. Cloud Paper and all existing writer workflows remain unchanged and disabled from this successor.
+
 # Cloud Paper Loop delivery V0.1
 
 
