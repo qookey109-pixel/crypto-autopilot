@@ -66,11 +66,11 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         self.assertFalse(assessment["source_switch_authorized"])
         self.assertEqual(
             payload["live_repository_checkpoint"]["evidence_basis_main_sha"],
-            "289dad5d29a59eb1139e4d1d7a862d10f7e5083e",
+            "39d7e3392430c927e2cea3b365c7150c12583e7e",
         )
         self.assertEqual(
             payload["live_repository_checkpoint"]["dashboard_pages_result"],
-            "BUILD_SUCCESS_DEPLOY_AND_PRODUCTION_BROWSER_SKIPPED_DOCS_ONLY",
+            "NOT_RUN_NO_WEB_PATH_CHANGED",
         )
 
         core100 = payload["core100"]

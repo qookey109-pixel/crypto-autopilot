@@ -309,8 +309,8 @@
     "next_step": "SEPARATELY_VERSION_D1_BILLING_AND_STORAGE_WRITER_COVERAGE_EVIDENCE_BEFORE_ACTIVATION"
   },
   "live_repository_checkpoint": {
-    "evidence_basis_main_sha": "289dad5d29a59eb1139e4d1d7a862d10f7e5083e",
-    "observed_at_utc": "2026-10-01T18:58:48Z",
+    "evidence_basis_main_sha": "39d7e3392430c927e2cea3b365c7150c12583e7e",
+    "observed_at_utc": "2026-10-01T19:33:59Z",
     "is_latest_main_claim": false,
     "open_pull_requests": [
       {
@@ -377,32 +377,27 @@
         "mergeable": false
       }
     ],
-    "ci_run_id": 36909261482,
+    "ci_run_id": 36914826073,
     "ci": "SUCCESS",
     "python_3_12": "SUCCESS",
     "python_3_13": "SUCCESS",
     "workflow_static": "SKIPPED_NO_WORKFLOW_CHANGE",
-    "codeql_run_id": 36909261456,
+    "codeql_run_id": 36914826174,
     "codeql": "SUCCESS",
-    "dependency_sbom_run_id": 36909261531,
+    "dependency_sbom_run_id": 36914826041,
     "dependency_sbom": "SUCCESS",
-    "freeze_guard_run_id": 36909261490,
+    "freeze_guard_run_id": 36914825928,
     "freeze_guard": "SUCCESS",
-    "dashboard_pages_run_id": 36909261435,
-    "dashboard_build": "SUCCESS",
-    "dashboard_deploy": "SKIPPED_DOCS_ONLY",
-    "dashboard_browser_production": "SKIPPED_DOCS_ONLY",
+    "dashboard_build": "NOT_RUN_NO_WEB_PATH_CHANGED",
+    "dashboard_deploy": "NOT_RUN_NO_WEB_PATH_CHANGED",
+    "dashboard_browser_production": "NOT_RUN_NO_WEB_PATH_CHANGED",
+    "dashboard_pages_result": "NOT_RUN_NO_WEB_PATH_CHANGED",
     "cloud_paper_activation": false,
     "d1_provisioned": false,
     "production_cycle_status": "NOT_RUN",
-    "usage_receipt": "research/receipts/2026-09-29-cloud-paper-r2-usage-audit-v0-3-result.json",
-    "usage_evidence": "PARTIAL_V0_3_ZERO_COST_AND_HEADROOM_UNKNOWN",
-    "billing_run_id": 36513941565,
-    "billing_report_status": "READY_FOR_BILLING_REVIEW",
-    "billing_zero_cost_conclusion": "NOT_PROVEN_BY_SUBSCRIPTION_SNAPSHOT",
     "latest_maintenance_run_id": 36676302904,
     "latest_maintenance_propose": "OBSERVATION_CHANGED",
-    "next_work": "DESIGN_TEST_VERSIONED_D1_SHARED_LEDGER_LIFECYCLE_AND_COMPLETE_ACCOUNT_WRITER_COVERAGE_BEFORE_CLOUD_PAPER_ACTIVATION",
+    "next_work": "OWNER_ATTEST_COMPLETE_CURRENT_AND_PLANNED_CLOUDFLARE_WRITER_INVENTORY_AND_COMPLETE_ACCOUNT_WIDE_COST_HEADROOM_EVIDENCE; PREPARE_SEPARATE_AUTHORITY_FOR_D1_METERING_AND_ATOMICITY_VALIDATION",
     "closed_unmerged_pull_requests": [
       {
         "number": 679,
@@ -414,8 +409,7 @@
         "closed_at_utc": "2026-10-01T08:15:20Z",
         "note": "STALE_GENERATED_SNAPSHOT_CLOSED_UNMERGED_HISTORICAL_EVIDENCE_PRESERVED"
       }
-    ],
-    "dashboard_pages_result": "BUILD_SUCCESS_DEPLOY_AND_PRODUCTION_BROWSER_SKIPPED_DOCS_ONLY"
+    ]
   },
   "cloud_paper_billing_evidence": {
     "updated_date": "2026-10-01",
