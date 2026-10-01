@@ -1,6 +1,6 @@
-## Cloud Paper 接續狀態 — 2026-10-01
+## Cloud Paper 接續狀態 — #667 合併後（2026-10-01）
 
-正式 authority：GitHub main `bbd3cccf2841219104cffef46ad2d5aa9ff87648`。先重新解析 main、open PR、最新自然 Health/Maintenance 與 Pages runs，再採取任何執行。
+查核基準：GitHub main `1549cc49e0e308a2cbf13a412e898a1028968468`；該查核點 open PR = 0。這是文件更新前的快照；每次接續先重新解析 main、open PR、最新自然 Health/Maintenance 與 Pages runs。
 
 - PR #665 已合併；其 frozen V0.1 coordinator/recovery 綁定保持 byte-exact，compact successor 以獨立 tick ID+完整摘要回讀。PR CI、main CI、CodeQL、SBOM、Freeze Guard 結果與合成量測見 [CURRENT_STATUS.md](../CURRENT_STATUS.md)。
 - PR [#667](https://github.com/qookey109-pixel/crypto-autopilot/pull/667) 已合併其[市場資料來源與預算缺口評估](CLOUD_PAPER_MARKET_DATA_SOURCE_ASSESSMENT_V0_1.md)。固定 23 市場 4H breadth、5 個候選各自 60M/15M 與 3 項市場請求合計估算為 36 requests/slot，超出既有 18 次 ceiling。這是設計估算；沒有 provider access、schedule 或 authority 變更。
