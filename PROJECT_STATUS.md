@@ -1,6 +1,6 @@
-## Cloud Paper current checkpoint — 2026-10-01 (#667 merged)
+## Cloud Paper checkpoint at #667 merge — 2026-10-01
 
-Formal authority: GitHub `main=1549cc49e0e308a2cbf13a412e898a1028968468`; open PRs = 0. PRs [#666](https://github.com/qookey109-pixel/crypto-autopilot/pull/666) and [#667](https://github.com/qookey109-pixel/crypto-autopilot/pull/667) are merged. PR #667 added the [market-data source and budget-gap assessment](docs/CLOUD_PAPER_MARKET_DATA_SOURCE_ASSESSMENT_V0_1.md). Post-merge Python 3.12/3.13, CodeQL, Dependency/SBOM, and Freeze Guard passed; workflow-static was skipped because no workflow changed.
+Checkpoint basis: GitHub `main=1549cc49e0e308a2cbf13a412e898a1028968468`; there were no open PRs at that checkpoint. PRs [#666](https://github.com/qookey109-pixel/crypto-autopilot/pull/666) and [#667](https://github.com/qookey109-pixel/crypto-autopilot/pull/667) are merged. PR #667 added the [market-data source and budget-gap assessment](docs/CLOUD_PAPER_MARKET_DATA_SOURCE_ASSESSMENT_V0_1.md). Post-merge Python 3.12/3.13, CodeQL, Dependency/SBOM, and Freeze Guard passed; workflow-static was skipped because no workflow changed.
 
 - Strategy inputs require 4H/60M/15M; the current adapter fetches only 60M. The estimate for fixed 23-market 4H breadth, 60M and 15M candles for five candidates, plus three shared market calls is 36 requests/slot, above the existing 18-call ceiling. This is a design estimate, not an observed provider quota or usage.
 - Pionex documentation lists the Kline intervals, but this project has not verified formal capture, coverage, or quota. CoinGecko Demo terms may conflict with retaining decision evidence; it is not approved or connected. No new provider, R2/D1, or usage-endpoint access occurred.
