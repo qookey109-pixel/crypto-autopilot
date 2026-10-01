@@ -1,3 +1,11 @@
+## Current checkpoint — #667 merged (2026-10-01)
+
+Evidence basis: GitHub main `1549cc49e0e308a2cbf13a412e898a1028968468`; open PRs = 0. PR #666 and [#667](https://github.com/qookey109-pixel/crypto-autopilot/pull/667) are merged. Post-merge Python 3.12/3.13, CodeQL, Dependency/SBOM, and Freeze Guard passed; workflow-static was skipped because no workflow changed.
+
+- The new [market-data source and budget-gap assessment](CLOUD_PAPER_MARKET_DATA_SOURCE_ASSESSMENT_V0_1.md) records the 4H/60M/15M gap and estimates 36 requests/slot for 23-market 4H breadth, five candidates at 60M/15M, and three shared market calls. This exceeds the existing 18-request ceiling; it is a design estimate, not observed provider usage.
+- Pionex's documented intervals do not prove project capture completeness or quota. CoinGecko Demo is not approved because its terms may conflict with retaining decision evidence. No provider, Cloudflare usage, R2, or D1 access occurred.
+- Cloud Paper stays disabled. Resolve the request/persistence budget and source terms before preparing a new bounded contract. Do not activate a workflow or schedule until a new versioned authority and zero-cost gate are in place.
+
 ## Cloud Paper — #665 保存精簡合併後狀態（2026-10-01）
 
 查核基準 main：`bbd3cccf2841219104cffef46ad2d5aa9ff87648`。PR [#665](https://github.com/qookey109-pixel/crypto-autopilot/pull/665) 已合併；修復後 head `49e27a3257f9163c9c39e996b57ca850af273f9f`。PR CI [36726001018](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726001018)：Python 3.12／3.13 通過，Ruff 通過（1,638 tests），CodeQL [36726000835](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726000835)、SBOM [36726000872](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726000872) 通過。合併 main CI [36726499079](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499079) 的兩個 Python jobs 成功、workflow-static skipped；CodeQL [36726499004](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499004)、SBOM [36726499003](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499003)、Freeze Guard [36726499085](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499085) 成功。
