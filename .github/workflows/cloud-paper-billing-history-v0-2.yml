@@ -55,4 +55,4 @@ jobs:
           if-no-files-found: warn
       - name: Remove ephemeral report
         if: always()
-        run: rm -rf -- cloud-paper-billing-history
+        run: rm -rf -- cloud-paper-billing-history-v0-2
