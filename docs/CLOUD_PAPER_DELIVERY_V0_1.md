@@ -1,3 +1,16 @@
+## Live repository checkpoint — 2026-10-02 06:24 Asia/Taipei
+
+Evidence basis: GitHub `main=2de48f8cb8488304487b50abcaa2489b58f45c27`. This is the reviewed parent SHA; the diagnostic successor below is prepared on a short-lived delivery branch and has not been merged or executed.
+
+- The consumed Billing History V0.1 run [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281), attempt 1, remains `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`; its secret-free artifact is [11196466171](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281/artifacts/11196466171). It made one Cloudflare request, accepted zero pages, and concluded `zero_cost_conclusion=UNKNOWN`. Do not rerun or rewrite its report.
+- The official [Cloudflare Billing History response contract](https://developers.cloudflare.com/api/resources/billing/subresources/history/methods/list/) documents the standard `result_info` fields `count/page/per_page/total_count`. It does not reveal which value in the consumed response failed validation; the original workflow intentionally retained no raw response or field-level diagnostics. Exact runtime cause remains unknown.
+- A separate V0.2 successor is prepared to report only each pagination field's presence, JSON type, and validity bit, without persisting its value or the raw response. It has not yet merged and has made no Cloudflare request. Its one-time query may run only after its own authority is merged to protected `main`; do not treat preparation or CI as account evidence.
+- Cloud Paper remains disabled; zero total account cost, free-tier eligibility, and complete current/future writer coverage remain unproven. D1 remains unprovisioned, production strategy registry empty, and Core100 quality `REJECT`.
+
+CLOUD-ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+
+---
+
 ## Live Cloud Paper delivery checkpoint — 2026-10-02 05:54 Asia/Taipei
 
 Evidence: Billing History run [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281), attempt 1, dispatched from main SHA 0543815905d75aa26a188d2d9e861d4929e2570c. Final conclusion `failure`; uploaded report `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`. The report recorded exactly 1 Cloudflare HTTP request, `page_count_read=0`, `returned_row_count=0`, incomplete coverage, `zero_cost_conclusion=UNKNOWN`, and `cloud_paper_activation=REMAINS_DISABLED`. Artifact [11196466171](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281/artifacts/11196466171), SHA-256 `884a65a30f4a87c1e2b90f4b42ab07427b9e51baa3835ab24d7f3574b2505524`, expires 2026-10-08T21:54:37Z. The secret-free report persisted no account identity, item identifiers, invoice identifiers/URLs, descriptions, or raw response.
