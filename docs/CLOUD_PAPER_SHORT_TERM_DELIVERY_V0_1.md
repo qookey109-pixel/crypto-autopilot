@@ -1,4 +1,13 @@
-## Live checkpoint — 2026-10-01 17:09 Asia/Taipei
+## Live checkpoint — 2026-10-02 04:18 Asia/Taipei
+
+Evidence basis: GitHub `main=e4706d1f1b82c9b7a760f3dab3fc1d729e9ffe11`, after PR [#722](https://github.com/qookey109-pixel/crypto-autopilot/pull/722) merged. The post-merge Python 3.12/3.13 CI [36918505800](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36918505800), Pages build [36918505798](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36918505798), CodeQL [36918506053](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36918506053), Dependency/SBOM [36918506086](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36918506086), and V0.10 Freeze Guard [36918506034](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36918506034) succeeded. Workflow-static, Pages deploy and production-browser checks were skipped by change filters.
+
+- Subscription snapshot [run 36513941565](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513941565), attempt 1, reported one row: `rate_plan_id=r2_paid`, `state=Paid`, listed price `0.00 USD`; report status `READY_FOR_BILLING_REVIEW`. Artifact [11009764477](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513941565/artifacts/11009764477), digest `sha256:7a2d8c5dce415392614c90266ebc8e7625e40cc2e92a19bc457c8cd9fd7d3338`, expires 2026-10-06T02:43:49Z.
+- Usage snapshot [run 36852292356](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36852292356), attempt 1, used one Cloudflare request and returned 42 rows with billed-cost fields totaling `0.00 USD`. The report is `USAGE_ROWS_CAPTURED_REVIEW_REQUIRED_FOR_SCOPE`; fixed subscription charges are excluded, provider data may lag daily, and complete account usage coverage is unknown. Artifact [11156336210](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36852292356/artifacts/11156336210), digest `sha256:aafc0e4c58bdb8d25426a390c1d9689ce77324ef2c780d91e6fcc2f90c1bbcbf`.
+- Both authorities are consumed; neither run may be rerun. The two snapshots do not prove zero total cost or FREE-ONLY eligibility. The user expects additional Cloudflare services/writers to be added later; the exact current and planned writer inventory is not confirmed.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`; D1 unprovisioned, production strategy registry empty, Core100 quality `REJECT`. No Cloudflare production use is authorized by these snapshots.
+
+## Historical checkpoint — 2026-10-01 17:09 Asia/Taipei (superseded by billing evidence below)
 
 Evidence basis: the Cloudflare diagnostic ran on GitHub `main=7c6bb943f74aebb08fa927e30730e23845825609`; PR #686 later merged status at `fb6d35b6478989dc91de8ffcb096fa060a494db7`.
 
