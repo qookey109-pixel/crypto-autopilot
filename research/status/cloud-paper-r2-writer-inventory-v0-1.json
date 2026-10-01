@@ -1,16 +1,16 @@
 {
   "schema": "qookey-cloud-paper-r2-writer-inventory-v0.1",
-  "updated_date": "2026-10-01",
-  "evidence_basis_main_sha": "4d5f8f00d2f6a67f5b5ff242f69d1cf032e98e6c",
+  "updated_date": "2026-10-02",
+  "evidence_basis_main_sha": "2de48f8cb8488304487b50abcaa2489b58f45c27",
   "is_latest_main_claim": false,
   "scan": {
-    "workflow_file_count": 96,
-    "workflows_with_r2_or_cloudflare_secret_references": 26,
+    "workflow_file_count": 97,
+    "workflows_with_r2_or_cloudflare_secret_references": 27,
     "scanner_contract": "scripts/validate_cloud_paper_r2_writer_inventory.py",
     "exact_reference_scan": true,
     "values_or_secret_contents_read": false,
     "workflow_count_before_nonaccess_preflight": 84,
-    "note": "This branch reconciles the inventory to base main 4d5f8f00d2f6a67f5b5ff242f69d1cf032e98e6c. V0.2 billable-usage run 36839577708 consumed its one-time authority and returned HTTP 403; exact cause UNKNOWN, no rerun. V0.3 run 36852292356 completed once on main (attempt 1), captured 42 usage rows with billed_cost fields and a 0.0 USD usage-based subtotal; fixed plan fees, full-account cost scope, and zero total project cost remain unknown. The report artifact is short-retention and is not a durable replacement for the committed summary. R2 analytics coverage is partial; D1 remains unprovisioned and account-wide writer/headroom coverage is unproven. PR #727 adds one manual-only Billing Read workflow; it makes at most ten read-only billing-history requests, stores redacted item-level fields only, and never proves zero total cost or account-wide writer coverage. It is not dispatched by the PR.",
+    "note": "This PR reconciles repository workflow references against reviewed base main 2de48f8cb8488304487b50abcaa2489b58f45c27 plus proposed PR #731. Billing History V0.1 run 36931736281 consumed its one-time authority and returned REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID after one request; zero cost remains UNKNOWN and the run must not be repeated. Billing History V0.2 is prepared in PR #731 and has not been dispatched. Existing V0.3 usage evidence covers 42 usage rows and a 0.0 USD usage-based subtotal only; fixed fees and total project/account cost remain UNKNOWN. R2 analytics coverage is partial and D1 is unprovisioned. The user indicates additional Cloudflare projects/services may write later, but does not have their complete identity list available now: external_writer_inventory remains UNCONFIRMED and incomplete. This repository-only index does not prove account-wide writers, headroom, or zero total cost.",
     "d1_access_marker_scan": "scripts/validate_cloud_paper_r2_writer_inventory.py"
   },
   "account_wide_reservation_coverage": {
@@ -88,10 +88,18 @@
     {
       "workflow": ".github/workflows/cloud-paper-billing-history-v0-1.yml",
       "access": "READ_ONLY",
-      "lifecycle": "ONE_TIME_BOUNDED_BILLING_HISTORY_NOT_DISPATCHED",
+      "lifecycle": "CONSUMED_ONE_TIME_FAILED_METADATA_INVALID_NO_RERUN",
       "trigger": "workflow_dispatch on main",
       "authority": "config/cloud_paper_billing_history_v0_1.json",
-      "evidence": "At most ten sequential Billing Read GET pages / 1,000 items; identifiers, invoice URLs, descriptions and raw responses are omitted. Zero cost remains UNKNOWN; one-time authority must not be rerun."
+      "evidence": "Run 36931736281 made one read-only request, accepted zero pages, and returned REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID; zero cost remains UNKNOWN. Authority consumed; do not rerun."
+    },
+    {
+      "workflow": ".github/workflows/cloud-paper-billing-history-v0-2.yml",
+      "access": "READ_ONLY",
+      "lifecycle": "PREPARED_ONE_TIME_DIAGNOSTIC_NOT_DISPATCHED",
+      "trigger": "workflow_dispatch on main",
+      "authority": "config/cloud_paper_billing_history_v0_2.json",
+      "evidence": "Prepared in PR #731. One bounded read-only successor; invalid pagination diagnostics retain only field presence/type/validity, not values or raw response. Not dispatched; zero total cost and account-wide writer coverage remain UNKNOWN."
     },
     {
       "workflow": ".github/workflows/cloud-paper-r2-usage-audit-v0-3.yml",
