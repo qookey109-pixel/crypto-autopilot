@@ -72,7 +72,7 @@ class CurrentOperationsStatusTests(unittest.TestCase):
             payload["live_repository_checkpoint"][
                 "dashboard_pages_relation_to_source_merge_pr_681"
             ],
-            "NO_NEW_DEPLOY_DOCS_ONLY_PR_717_MERGE",
+            "BUILD_SUCCESS_DEPLOY_AND_PRODUCTION_BROWSER_SKIPPED_DOCS_ONLY",
         )
 
         core100 = payload["core100"]
