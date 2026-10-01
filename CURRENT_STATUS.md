@@ -1,14 +1,15 @@
-## Live checkpoint — 2026-10-01 18:11 Asia/Taipei
+## Live checkpoint — 2026-10-01 18:38 Asia/Taipei
 
-Evidence basis: GitHub `main=0310d8ba31867b50672765b00f3651951d378583`, read after PR #692 merged; no open PRs at that observation. Post-merge CI #36847151342, Dependency/SBOM #36847151339, CodeQL #36847151432, and V0.10 Freeze Guard #36847151394 all succeeded. PR #692 exact-head checks passed before merge; its head was `19dcb484b013344ba433cbd2abca38fdf3d3a5de`.
+Evidence basis: GitHub `main=068a09b99dd2fbd11f71a7eda4ab47db8223a5af`, reread from the default branch. Six open PRs are Dependabot updates #693–#698; their current exact-head checks and mergeability must be reviewed before merge. The two documentation PRs #699 and #700 are merged; branches deleted. PR #700 post-merge main CI #36848531615, CodeQL #36848531797, Dependency/SBOM #36848531664, and V0.10 Freeze Guard #36848531766 succeeded. PR #699 Pages build #36847992305 succeeded; deploy and browser-production were skipped for documentation-only changes.
 
-- PR [#692](https://github.com/qookey109-pixel/crypto-autopilot/pull/692) adds Cloud Paper Billable Usage V0.3, a separately versioned one-shot read-only successor using Cloudflare's self-serve `/billable-usage` route. The consumed V0.2 run [36839577708](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36839577708) returned HTTP 403 from the V2 Alpha/Restricted route; its precise cause remains UNKNOWN. V0.2 is not rerun.
-- V0.3 is enabled only for manual dispatch on main and is **NOT YET DISPATCHED**. No Cloudflare request has been made under V0.3. It allows one workflow run/attempt, one GitHub workflow-history request, at most one Cloudflare GET, no retries, redirects, pagination, R2/D1, schedule, or runtime activation. If it fails, preserve the report/log and do not rerun.
-- V0.3 can provide usage-based charges for review only. Fixed subscription charges are excluded; a zero subtotal, empty response, or missing rows never proves zero total project cost. Coverage, freshness, all writers, invoice totals, R2/D1 headroom and zero total cost remain UNKNOWN.
-- Cloud Paper stays disabled: formal entrypoint `NOT_WIRED`, cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production strategy registry empty, Core100 quality `REJECT`.
-- Next: open the [V0.3 workflow](https://github.com/qookey109-pixel/crypto-autopilot/actions/workflows/cloud-paper-billable-usage-v0-3.yml) on main and perform the single authorized dispatch. Review the report and exact request count; any error consumes this successor authority. Then establish a separate sustainable, fresh, account-wide usage/headroom design before considering runtime acceptance.
+- Cloud Paper Billable Usage V0.3 remains **NOT DISPATCHED** on main; latest GitHub Actions run inventory contains no V0.3 run and no V0.3 Cloudflare request is evidenced. Its one-time authority allows only one main run/attempt, one GitHub run-history request and at most one Cloudflare GET; no retry, rerun, redirect, pagination, fallback, R2/D1, schedule or runtime. V0.2 run #36839577708 failed with HTTP 403; preserve it and never rerun.
+- V0.3 measures usage-based billable usage only. Fixed-fee invoices, complete account inventory, all writers, freshness, R2/D1 headroom, and zero total project cost remain unproven.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, production cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production registry empty, Core100 quality `REJECT`.
+- The storage-compaction evidence is synthetic only. Required market fields remain incomplete: no approved TOTAL3 source; BTC dominance is partial/unapproved; Pionex breadth and 4H/15M production coverage are unverified.
 
-CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Preserve V0.2 failure evidence. No holdout, source switch, promotion, real-money orders, live trading, or schedule activation.
+Next: dispatch the V0.3 workflow from main **once** and inspect its final job, artifact/report, exact request count and response period. Do not rerun on failure or ambiguity. Then proceed with a separately versioned sustainable account-wide cost/headroom evidence design, market-field qualification, and other full-delivery gates. Do not activate the runtime or schedule until those gates pass.
+
+CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
 
 ## Live checkpoint — 2026-10-01 17:44 Asia/Taipei
 
