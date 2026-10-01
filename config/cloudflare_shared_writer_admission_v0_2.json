@@ -19,7 +19,7 @@
     "retention_policy": "MONOTONIC_CAPACITY_COUNTER_WITH_FAIL_CLOSED_HARD_STOP",
     "compaction_or_deletion": "NOT_IMPLEMENTED; REQUIRES_SEPARATE_AUTHORITY",
     "capacity_counter": "TRIGGER_INCREMENTED_IN_SAME_DATABASE_TRANSACTION",
-    "d1_counter_write_included_in_minimum_d1_rows_written": 2
+    "maximum_capacity_source": "SINGLE_DATABASE_POLICY_ROW; NULL_BLOCKS_ADMISSION"
   },
   "limits": "INJECTED_PER_CALL; NO_PRODUCTION_VALUES_APPROVED",
   "required_before_activation": [
@@ -27,7 +27,7 @@
     "fresh_account_wide_usage_and_headroom_evidence",
     "approved_zero_cost_usage_envelopes",
     "d1_free_tier_and_storage_calibration",
-    "approved_retained_reservation_capacity",
+    "approved_retained_reservation_capacity_in_shared_database_policy_row",
     "separate_compaction_authority_before_capacity_exhaustion",
     "integration_of_every_active_writer",
     "controlled_paper_acceptance"

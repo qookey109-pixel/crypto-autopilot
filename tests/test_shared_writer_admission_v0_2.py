@@ -29,8 +29,16 @@ class SQLiteAdmissionClient:
         self.connection = sqlite3.connect(":memory:", check_same_thread=False)
         self.connection.row_factory = sqlite3.Row
         self.connection.executescript(MIGRATION)
+        self.configure_capacity(100)
         self.lock = threading.Lock()
         self.query_count = 0
+
+    def configure_capacity(self, maximum: int) -> None:
+        self.connection.execute(
+            "UPDATE cloudflare_shared_writer_admission_capacity_v0_2 "
+            "SET max_retained_reservations = ? WHERE capacity_id = 1",
+            (maximum,),
+        )
 
     def __call__(self, sql: str, params: tuple[object, ...]):
         with self.lock:
@@ -263,7 +271,8 @@ class SharedWriterAdmissionTests(unittest.TestCase):
 
     def test_retained_capacity_hard_stops_across_writers(self):
         client = SQLiteAdmissionClient()
-        cap = limits(max_retained_reservations=2)
+        cap = limits()
+        client.configure_capacity(2)
         reserve_shared_writer_envelope(
             execute=client, reservation=reservation("project-a:writer"),
             limits=cap,
@@ -288,7 +297,8 @@ class SharedWriterAdmissionTests(unittest.TestCase):
 
     def test_exact_replay_does_not_consume_retained_capacity(self):
         client = SQLiteAdmissionClient()
-        cap = limits(max_retained_reservations=1)
+        cap = limits()
+        client.configure_capacity(1)
         entry = reservation()
         reserve_shared_writer_envelope(
             execute=client, reservation=entry, limits=cap,

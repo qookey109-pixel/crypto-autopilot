@@ -3,11 +3,13 @@
 -- archive, provision, or activate production D1.
 CREATE TABLE IF NOT EXISTS cloudflare_shared_writer_admission_capacity_v0_2 (
     capacity_id INTEGER PRIMARY KEY CHECK (capacity_id = 1),
-    retained_reservations INTEGER NOT NULL CHECK (retained_reservations >= 0)
+    retained_reservations INTEGER NOT NULL CHECK (retained_reservations >= 0),
+    max_retained_reservations INTEGER
+        CHECK (max_retained_reservations IS NULL OR max_retained_reservations > 0)
 );
 INSERT INTO cloudflare_shared_writer_admission_capacity_v0_2
-    (capacity_id, retained_reservations)
-VALUES (1, 0)
+    (capacity_id, retained_reservations, max_retained_reservations)
+VALUES (1, 0, NULL)
 ON CONFLICT(capacity_id) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS cloudflare_shared_writer_reservations_v0_2 (

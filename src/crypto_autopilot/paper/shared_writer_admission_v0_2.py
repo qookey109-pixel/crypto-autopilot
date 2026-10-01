@@ -33,7 +33,7 @@ WITH day_totals AS (
     WHERE reserved_at_ms >= CAST(? AS INTEGER)
       AND reserved_at_ms <= CAST(? AS INTEGER)
 ), capacity AS (
-    SELECT retained_reservations
+    SELECT retained_reservations, max_retained_reservations
     FROM cloudflare_shared_writer_admission_capacity_v0_2
     WHERE capacity_id = 1
 )
@@ -49,7 +49,8 @@ SELECT
     CAST(? AS INTEGER), CAST(? AS INTEGER)
 FROM day_totals, rolling_totals, capacity
 WHERE day_totals.reservations < CAST(? AS INTEGER)
-  AND capacity.retained_reservations < CAST(? AS INTEGER)
+  AND capacity.max_retained_reservations IS NOT NULL
+  AND capacity.retained_reservations < capacity.max_retained_reservations
   AND day_totals.provider_requests + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
   AND day_totals.r2_class_a + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
   AND day_totals.r2_class_b + CAST(? AS INTEGER) <= CAST(? AS INTEGER)
@@ -168,7 +169,6 @@ class SharedWriterAdmissionLimits:
     d1_queries_per_utc_day: int
     d1_rows_written_per_utc_day: int
     d1_storage_growth_bytes_per_utc_day: int
-    max_retained_reservations: int
     r2_class_a_per_rolling_31_days: int
     r2_class_b_per_rolling_31_days: int
     r2_new_bytes_per_rolling_31_days: int
@@ -197,7 +197,6 @@ def reservation_params(
         reservation.reserved_at_ms,
         *reservation.values(),
         limits.max_reservations_per_utc_day,
-        limits.max_retained_reservations,
         reservation.provider_requests,
         limits.provider_requests_per_utc_day,
         reservation.r2_class_a,
