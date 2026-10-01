@@ -327,7 +327,7 @@
         "state": "OPEN",
         "draft": false,
         "title": "chore(deps): bump botocore from 1.43.75 to 1.43.103",
-        "base_sha": "a0f86649ac813523221d763e20d57fa55c25548b",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
         "head_sha": "582f097375b90dab659c76def22e8614c7fbd5d1",
         "mergeable": false
       },
@@ -336,7 +336,7 @@
         "state": "OPEN",
         "draft": false,
         "title": "chore(deps): bump boto3 from 1.43.75 to 1.43.103",
-        "base_sha": "a0f86649ac813523221d763e20d57fa55c25548b",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
         "head_sha": "7f5673542ee1326f55c682b1b8ebf0e33488c935",
         "mergeable": false
       },
@@ -345,7 +345,7 @@
         "state": "OPEN",
         "draft": false,
         "title": "chore(deps): bump ruff from 0.16.0 to 0.16.9",
-        "base_sha": "a0f86649ac813523221d763e20d57fa55c25548b",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
         "head_sha": "0168fc933d0167e53677230945a81ae046338c40",
         "mergeable": false
       },
@@ -354,7 +354,7 @@
         "state": "OPEN",
         "draft": false,
         "title": "chore(deps): bump github/codeql-action/analyze from 4.38.1 to 4.38.2",
-        "base_sha": "a0f86649ac813523221d763e20d57fa55c25548b",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
         "head_sha": "e9b6dc2fcbc496aa5dd350c633e8b02f815c91d3",
         "mergeable": false
       },
@@ -372,7 +372,7 @@
         "state": "OPEN",
         "draft": false,
         "title": "chore(deps): bump github/codeql-action/init from 4.38.1 to 4.38.2",
-        "base_sha": "a0f86649ac813523221d763e20d57fa55c25548b",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
         "head_sha": "838d344b6a7eb280c34a759cd7bc627706ade43f",
         "mergeable": false
       }
