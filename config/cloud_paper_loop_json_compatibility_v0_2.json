@@ -1,0 +1,30 @@
+{
+  "schema": "qookey-cloud-paper-loop-json-compatibility-v0.2",
+  "status": "PREPARED_IMPLEMENTATION_ONLY_NO_RUNTIME_AUTHORITY",
+  "predecessor": "src/crypto_autopilot/paper/cloud_loop_v0_1.py",
+  "implementation": "src/crypto_autopilot/paper/cloud_loop_v0_2.py",
+  "behavior": {
+    "normalize_new_report_to_json_before_digest": true,
+    "canonical_report_identity_unchanged": true,
+    "exact_readback_required": true,
+    "legacy_readers_retained": true,
+    "frozen_predecessor_unchanged": true,
+    "existing_objects_rewritten": false
+  },
+  "runtime": {
+    "activation_enabled": false,
+    "schedule_enabled": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "d1_access_authorized": false,
+    "budget_authority_changed": false
+  },
+  "boundaries": {
+    "monthly_budget_usd": 0,
+    "paper_only": true,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false
+  }
+}
