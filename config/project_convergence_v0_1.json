@@ -87,7 +87,9 @@
     "cloud_paper_r2_usage_audit": "config/cloud_paper_r2_usage_audit_v0_3.json",
     "cloud_paper_r2_usage_audit_state": "V0_3_PREPARED_ON_DELIVERY_BRANCH_NOT_DISPATCHED_R2_ANALYTICS_ONLY_ZERO_COST_UNKNOWN",
     "cloud_paper_billable_usage_audit": "config/cloud_paper_billable_usage_v0_3.json",
-    "cloud_paper_billable_usage_audit_state": "V0_3_SUCCESSOR_PREPARED_ONE_SHOT_READ_ONLY_NO_DISPATCH_ZERO_COST_UNKNOWN"
+    "cloud_paper_billable_usage_audit_state": "V0_3_SUCCESSOR_PREPARED_ONE_SHOT_READ_ONLY_NO_DISPATCH_ZERO_COST_UNKNOWN",
+    "cloud_paper_billing_history": "config/cloud_paper_billing_history_v0_1.json",
+    "cloud_paper_billing_history_state": "V0_1_ONE_SHOT_READ_ONLY_MAX_10_PAGES_ZERO_COST_UNKNOWN_NOT_DISPATCHED"
   },
   "scheduled_workflows": {
     "current_window": [],
@@ -173,6 +175,7 @@
       "cloud-paper-billable-usage-v0-2.yml",
       "cloud-paper-billable-usage-v0-3.yml",
       "cloud-paper-billing-evidence-v0-1.yml",
+      "cloud-paper-billing-history-v0-1.yml",
       "cloud-paper-r2-usage-audit-v0-3.yml",
       "cloud-paper-usage-audit-v0-1.yml",
       "cloud-paper-usage-audit-v0-2.yml",
