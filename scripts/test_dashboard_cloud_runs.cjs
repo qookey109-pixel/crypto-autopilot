@@ -88,6 +88,32 @@ const modern = {
   ],
 };
 
+const withDiagnostic = {
+  ...modern,
+  diagnosticRuns: [{
+    workflow: 'cloud-paper-billing-history-v0-1.yml',
+    title: 'Cloud Paper Billing History V0.1',
+    latestRun: {
+      state: 'WORKFLOW_FAILED',
+      runId: 36931736281,
+      runAttempt: 1,
+      event: 'workflow_dispatch',
+      headSha: 'b'.repeat(40),
+      createdAtUtc: '2026-10-01T21:54:29Z',
+      sourceUrl: 'https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281',
+    },
+  }],
+};
+context.renderCloudRuns(withDiagnostic);
+assert.equal(list.children.length, 3);
+assert.match(list.children[2].children[0].textContent, /Billing History V0.1/);
+assert.match(list.children[2].children[1].textContent, /#36931736281 · attempt 1 · workflow 失敗/);
+assert.match(list.children[2].children[2].textContent, /僅含 GitHub run metadata/);
+assert.equal(list.children[2].children[3].children[0].textContent, '查看 workflow / 報告 ↗');
+assert.equal(list.children[2].children[3].children[0].href,
+  'https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281');
+assert.equal(list.children[2].children[3].children[0].rel, 'noopener noreferrer');
+
 context.renderCloudRuns(modern);
 assert.equal(list.children.length, 2);
 assert.match(time.textContent, /宣告 2 \/ 監控 2 \/ 有效 1 \/ 到期 1/);
