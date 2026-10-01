@@ -27,8 +27,9 @@
 - 固定 23 市場的 4H regime/breadth；
 - 5 個候選各自的 60M setup 與 15M entry；
 - symbols、tickers、book tickers 三項共用市場資料；
+- 每個 open position 的 order book 與 recent trades execution frame（最多 5 個 positions、每個 2 次 public requests）；
 
-直接逐市場取 K 線需估算 `23 + 5 + 5 + 3 = 36` 次請求／輪，已超出既有 18 次／輪上限。以 96 輪／日推算為最多 3,456 次／日；30 日為 103,680 次／月。這是依照既有候選數與市場數計算的設計上界，不是實際用量或 provider 免費配額。
+行情與候選輸入需 `23 + 5 + 5 + 3 = 36` 次請求／輪；這還沒包含現有 Live-Paper feed 對每個 open position 讀 order book 與 recent trades 的兩次請求。依既有最多五個 positions 的預算包絡，完整上界為 `36 + 2 × 5 = 46` 次／輪，按 96 輪／日為 4,416 次／日、132,480 次／rolling 30 days。這是設計上界，不是實際用量或 provider 免費配額；若未來新增 macro provider，其請求也尚未計入。
 
 即使 4H breadth 只在每根新 4H 收盤後更新，也需要定義快取／持久化與新鮮度、runner 中斷恢復及同輪 request burst。舊值不得被當作新行情；不得因預算不合而漏掉 breadth 成員、跨來源補值或降低策略門檻。必須先產生新的 bounded request contract，逐端點標示每輪／每日／月度最大次數、資料時間、重試上限及 budget hook，再談 runtime wiring。
 

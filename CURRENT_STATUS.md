@@ -1,11 +1,12 @@
-## Cloud Paper checkpoint before status sync — 2026-10-01
+## Cloud Paper checkpoint before request-envelope correction — 2026-10-01
 
-本次文件同步前基準：GitHub `main=5374c7ab58f4d4cdc72a4aba8769d206e56a469f`；open PR = 0；PR #669–#673 均已合併。最新[預算評估](docs/CLOUD_PAPER_REQUEST_BUDGET_ASSESSMENT_V0_2.md)指出：3 個共用請求加 23 個固定 breadth Klines，未計候選 K 線至少需要 26 次/slot，已超過未變更的 18/run guard。完整直接請求設計為 36/slot、3,456/day、103,680/rolling 30 days。均為設計算術，不是 provider 配額或實際用量。合併後 Python 3.12／3.13、CodeQL、Dependency/SBOM、Freeze Guard 通過；workflow-static 因 workflow 未變更而 skipped。
+本次修正 PR 前基準：GitHub `main=cc140d46ba36f35846b91d0a7f1ccd400e6e8a40`；open PR = 0；PR #669–#675 已合併。重新依照正式市場 adapter 與 Live-Paper feed 對照呼叫公式後，發現舊 36 次／slot 估算漏掉每個 open position 的 order book 與 recent trades（兩次）；按既有最多五個 positions 的上界，完整直接來源循環應為 **46 次／slot、4,416 次／日、132,480 次／rolling 30 days**。固定共用資料及 23 市場 breadth 的最低下限為 26 次／slot，仍高於現有 18/run guard。此為設計算術，非 provider 配額或實際用量；Cloud Paper 繼續停用。
 
-- 程式推得最低需求：每個 4H breadth 市場 21 根收盤 K 線，60M／15M 技術快照各 200 根；預設市場結構使用 21 根。研究 Router 六家族共用技術與 regime 閘門，但 production registry 為空，未來正式策略專屬暖機／對齊需求仍未驗證。
-- 延遲可能使 15M K 線超過 freshness 提案；跨 runs 的 breadth cache 需 durable state 並增加成本。本輪沒有 provider、Cloudflare、R2、D1 存取，也未啟用 runtime／排程。
-- Cloud Paper 仍 disabled／NOT_RUN／NOT_WIRED／NOT_CONFIGURED；D1 未建立、正式策略 registry 空、Core100 REJECT、macro regime unavailable。帳戶級零費用、writers 覆蓋、freshness 與 headroom 未證明。已消耗的一次性 Billing／Usage／bootstrap authority 不重跑。
-- 下一步：找合規的聚合 breadth／macro 來源，或準備經審查的 breadth／頻率變更；取得權威 provider 配額及共享用量，並補齊帳戶級 R2／D1 費用與 writers 證據。只減候選數不足以符合目前上限。
+- Pionex 官方 rate limit 已補記為 10 requests/s/IP；這不是日／月 allowance、零費用證明或外部存取授權。日／月配額、shared account 使用及 request weights 仍未知。
+- 21 根 4H breadth、200 根 60M／15M 技術快照仍是程式推得的最低值；正式策略 registry 空、Core100 品質 REJECT，未來策略專屬輸入與 macro context 仍未驗證。
+- Cloud Paper 仍 disabled／NOT_RUN／NOT_WIRED／NOT_CONFIGURED；D1 未建立；帳戶級零費用、完整 writers、freshness 與 headroom 未證明。已消耗的一次性 Billing／Usage／bootstrap authority 不重跑。
+- 本修正只校正預算估算與防回歸測試，不改 18/run、1,728/day 現行上限，不做 provider／Cloudflare／R2／D1 存取，不啟用 runtime 或排程。
+- 下一步：先解決完整 request envelope 與零費用／quota evidence，再核准資料來源與正式入口；在 successor budget、來源、預算及 controlled acceptance 成立前，保持 Cloud Paper 停用。
 
 CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER；0 USD；PAPER／LIVE-PAPER ONLY。holdout、source switch、promotion、真實下單與 live trading 維持關閉。
 

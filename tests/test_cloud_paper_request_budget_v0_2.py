@@ -18,6 +18,7 @@ def test_market_request_budget_is_inactive_and_does_not_expand_v01():
         + proposal["requests"]["four_hour_breadth_calls_per_slot"]
         + proposal["requests"]["sixty_minute_candidate_calls_per_slot"]
         + proposal["requests"]["fifteen_minute_candidate_calls_per_slot"]
+        + proposal["requests"]["execution_frame_calls_per_slot_max"]
     )
     slots = proposal["assumptions"]["schedule_slots_per_day"]
     assert proposal["requests"]["maximum_calls_per_utc_day"] == (
@@ -25,6 +26,13 @@ def test_market_request_budget_is_inactive_and_does_not_expand_v01():
     )
     assert proposal["requests"]["maximum_calls_per_rolling_30_days"] == (
         proposal["requests"]["maximum_calls_per_utc_day"] * 30
+    )
+    assert proposal["requests"]["execution_frame_calls_per_slot_max"] == 2 * 5
+    assert proposal["requests"]["total_calls_per_slot"] == 46
+    assert proposal["requests"]["maximum_calls_per_utc_day"] == 4416
+    assert proposal["requests"]["maximum_calls_per_rolling_30_days"] == 132480
+    assert "excludes up to 10 existing Live-Paper execution-frame requests" in (
+        proposal["requests"]["full_direct_source_upper_bound_note"]
     )
     kline_calls = (
         proposal["requests"]["four_hour_breadth_calls_per_slot"]

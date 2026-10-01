@@ -1,11 +1,13 @@
-## Checkpoint before status sync — 2026-10-01
+## Checkpoint before request-envelope correction — 2026-10-01
 
-Evidence basis: GitHub main `5374c7ab58f4d4cdc72a4aba8769d206e56a469f`; open PRs = 0; PRs #669–#673 are merged. The [request-budget assessment](CLOUD_PAPER_REQUEST_BUDGET_ASSESSMENT_V0_2.md) establishes a minimum of 26 calls/slot (three shared calls plus 23 fixed breadth Klines) before candidate candles, already above the unchanged 18/run guard. The full direct-source design is 36 calls/slot, 3,456/day, 103,680/rolling 30 days; none is provider allowance or observed usage. Python 3.12/3.13, CodeQL, Dependency/SBOM, and Freeze Guard passed after merge; workflow-static was skipped for no workflow changes.
+Pre-correction evidence basis: GitHub main `cc140d46ba36f35846b91d0a7f1ccd400e6e8a40`; open PRs = 0; PRs #669–#675 are merged. Reconciliation of the market adapter and Live-Paper feed shows that the prior 36-call estimate covered market inputs only and omitted up to 10 position-follow-up requests (order book and recent trades for each of five open positions). The corrected full direct-source envelope is **46 calls/slot, 4,416/day, 132,480/rolling 30 days**. The 26-call fixed shared-plus-breadth floor remains above the unchanged 18/run guard. These are design arithmetic, not provider allowance or observed usage.
 
-- Code-derived minima: 21 closed 4H breadth bars per market, 200 60M and 15M technical bars, and 21 bars for default market structure. Research Router has six families sharing full technical/regime gates, but the production registry is empty, so future qualified strategy requirements remain unknown.
-- The 15M freshness proposal may be exceeded on delayed starts. Cross-run breadth reuse needs durable persistence and additional budget. No external access or runtime/schedule activation occurred.
-- Cloud Paper remains disabled; entrypoint not wired, natural schedule not configured, D1 unprovisioned, registry empty, Core100 REJECT, macro context unavailable. Account-wide 0-cost/headroom and full writer coverage remain unproven. Do not rerun consumed one-time Billing/Usage/bootstrap stages.
-- Next: find an approved aggregate breadth/macro source or prepare a reviewed breadth/cadence change, then obtain authoritative provider allowance/shared usage and complete account-wide R2/D1 cost/writer evidence. Lowering candidate count alone cannot fit the existing request limit.
+- Pionex documents a 10 requests/second/IP rate ceiling; this does not establish daily/monthly allowance, zero cost, or access authorization.
+- Cloud Paper remains disabled; entrypoint NOT_WIRED, cycle NOT_RUN, natural schedule NOT_CONFIGURED, D1 unprovisioned, production registry empty, and Core100 REJECT. Account-wide zero-cost/headroom and writer coverage remain unproven.
+- This estimate correction does not change 18/run or 1,728/day, call any provider or Cloudflare service, or activate runtime/scheduling.
+- Next: resolve full request and cost envelope, source eligibility, then proceed to formal entrypoint and controlled PAPER acceptance only under a bounded successor authority.
+
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders, and live trading remain closed.
 
 ## Historical checkpoint — 2026-09-30 (#662 merged)
 
