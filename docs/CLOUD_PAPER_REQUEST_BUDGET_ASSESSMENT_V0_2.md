@@ -1,12 +1,12 @@
 # Cloud Paper multi-timeframe request budget assessment V0.2
 
-Basis: GitHub `main=3b58fce4a27d0c65fa17b011fea4946cd20077ee` (2026-10-01).
+Basis: GitHub main=19a29e4b57e17821bf64c8cb01fb60c68b8f63c7 (2026-10-01).
 
-This is a planning assessment and inactive requirement envelope. It does not authorize provider, R2, or D1 access; runtime activation; strategy qualification; or scheduling. The machine-readable proposal is `config/cloud_paper_market_request_budget_v0_2.json`.
+This is a planning assessment and inactive requirement envelope. It does not authorize provider, R2, or D1 access; runtime activation; strategy qualification; or scheduling. The machine-readable proposal is config/cloud_paper_market_request_budget_v0_2.json.
 
 ## Request arithmetic
 
-The existing strategy configuration names 4H market context, 60M setup, and 15M entry. The market-regime research contract requires a fixed 23-market breadth set. The current market adapter captures only 60M candles for up to five candidates. The [Pionex Kline documentation](https://pionex-doc.gitbook.io/apidocs/restful/markets/get-klines) lists the required intervals and one request weight per Kline request; the repository has not verified live capture completeness, aggregate quota, or rate-limit capacity. Batch Kline support is unverified, so the estimate assumes one request per symbol and interval.
+The existing strategy configuration names 4H market context, 60M setup, and 15M entry. The market-regime research contract requires a fixed 23-market breadth set. The current market adapter captures only 60M candles for up to five candidates. The Pionex Kline documentation (https://pionex-doc.gitbook.io/apidocs/restful/markets/get-klines) lists the required intervals, up to 500 klines per response, and one request weight per Kline request; the repository has not verified live capture completeness, aggregate quota, or rate-limit capacity. Batch Kline support is unverified, so the estimate assumes one request per symbol and interval.
 
 For direct per-symbol candle requests, the upper-bound design is:
 
@@ -20,6 +20,18 @@ For direct per-symbol candle requests, the upper-bound design is:
 
 At 96 nominal slots/day with no retries or backfill, that is 3,456 calls/day and 103,680 calls per rolling 30 days. The Kline portion contributes at most 33 weight units/slot, 3,168/day, and 95,040 per rolling 30 days under the one-request-per-symbol assumption. Weights for the three shared endpoints, account allowance, and observed shared usage remain unknown. These are arithmetic design bounds, not provider allowances or expected observed usage. The current V0.1 Cloud Paper budget permits 18 requests/run and 1,728/day, so the proposal does not fit it. The active guard must continue to block any request beyond its current limit.
 
+## Code-derived warmup minima
+
+The current implementation yields these mathematical lower bounds for complete aligned, closed-candle input:
+
+| Input | Minimum bars | Derivation |
+|---|---:|---|
+| 4H breadth/regime per market | 21 | The regime uses a 20-bar return lookback (current index 20); breadth EMA20 is ready by then. |
+| 60M candidate technicals | 200 | Full ready_v0_2 includes EMA200; the first full snapshot is at index 199. |
+| 15M candidate technicals | 200 | Same full technical feature set and EMA200 dependency. |
+
+Market structure's default trailing 20-bar range also needs the current bar plus 20 preceding bars, or 21. Under the stated 23 breadth members and five candidates per candidate timeframe, the resulting lower-bound payload is 2,483 closed candles/slot (23×21 + 5×200 + 5×200). The documented one-request limit of up to 500 can fit each of these per-symbol windows in one request. This only shows the configured windows fit the documented endpoint limit; it does not establish endpoint availability, batch behavior, provider quota, or all strategy-specific dependencies. Additional strategy-family requirements remain unverified.
+
 ## Freshness and caching
 
 The current schedule runs at minutes 7, 22, 37, and 52, with a maximum start delay of 10 minutes. A 15M closed bar can already be about seven minutes old at nominal start; a delayed start can exceed a proposed 15-minute input-age limit. That limit is a design proposal, not current authority. If adopted, such input must fail closed, and the schedule cannot be treated as guaranteed to produce a new entry on every slot. The approved maximum input age must be derived from strategy needs and explicit authority.
@@ -28,7 +40,7 @@ Reusing 4H breadth across separate GitHub-hosted runs requires durable state; in
 
 ## Required evidence before any successor can execute
 
-1. Verify required warmup counts for every timeframe from the actual strategy and indicator implementation.
+1. Confirm the strategy families consume no warmup beyond the code-derived technical and regime minima.
 2. Establish fixed breadth membership, per-symbol coverage, closed-bar alignment, and missing-member behavior.
 3. Obtain authoritative provider allowance and rate-limit-capacity evidence, plus shared usage from all provider workflows. Public endpoint documentation alone does not establish these.
 4. Resolve schedule-to-15M freshness, including delayed starts, without admitting stale candles; record and authorize the chosen maximum age.
