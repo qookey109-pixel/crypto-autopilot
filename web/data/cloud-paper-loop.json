@@ -137,7 +137,13 @@
         "classification": "UNMAPPED_DOCUMENTED_ENUM_REQUIRES_REVIEW",
         "additional_cloudflare_request_performed": false
       },
-      "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513941565"
+      "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36513941565",
+      "event": "workflow_dispatch",
+      "workflow_conclusion": "success",
+      "run_head_sha": "414cf9a0a3b60612f9d1e09d7c5d29d76b05455e",
+      "artifact_id": 11009764477,
+      "artifact_digest": "sha256:7a2d8c5dce415392614c90266ebc8e7625e40cc2e92a19bc457c8cd9fd7d3338",
+      "artifact_expires_at_utc": "2026-10-06T02:43:49Z"
     },
     "billable_usage_snapshot": {
       "run_id": 36852292356,
@@ -152,7 +158,12 @@
       "daily_provider_data_may_lag": true,
       "complete_account_usage_coverage": "UNKNOWN_UNTIL_REVIEWED",
       "cloudflare_http_requests_performed": 1,
-      "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36852292356"
+      "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36852292356",
+      "event": "workflow_dispatch",
+      "workflow_conclusion": "success",
+      "run_head_sha": "54c099254303512eba7f8f2b57dcd98124b17348",
+      "artifact_id": 11156336210,
+      "artifact_digest": "sha256:aafc0e4c58bdb8d25426a390c1d9689ce77324ef2c780d91e6fcc2f90c1bbcbf"
     },
     "total_cloudflare_http_requests": 2,
     "account_wide_cost": "UNKNOWN",
