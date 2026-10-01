@@ -1,3 +1,19 @@
+## Live Cloud Paper checkpoint — 2026-10-01 17:44 Asia/Taipei
+
+Evidence basis: GitHub `main=ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a`, latest commit observed at 2026-10-01T09:38:46Z; open PR search returned 0. Resolve main and PR state again before later work.
+
+- PR [#690](https://github.com/qookey109-pixel/crypto-autopilot/pull/690) merged market-data source assessment V0.3 as this main commit. Exact-head CI [36843908975](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36843908975), CodeQL [36843909019](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36843909019), and Dependency/SBOM [36843909009](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36843909009) passed. Post-merge main checks were not independently verified; no deployment or runtime acceptance is claimed.
+- V0.3 confirms there is no approved source for TOTAL3, BTC dominance remains an unapproved partial candidate, and Pionex 23-market breadth plus 4H/15M coverage are not production-verified. Scraping tools are candidates only; terms and explicit automation/data-retention permission must be reviewed per source. No provider request, source switch, or access authority was added.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production strategy registry empty, Core100 quality `REJECT`.
+- Cloudflare billable-usage run [36839577708](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36839577708), attempt 1, made one request and failed with `CLOUDFLARE_HTTP_403`; root cause and account-wide cost, freshness, all-writer coverage, and R2/D1 headroom remain `UNKNOWN`. Its one-time authority is consumed; do not rerun.
+- Synthetic storage compaction is not production R2 cost/headroom evidence. No Cloudflare, R2, D1, or market-data access was performed for this checkpoint.
+
+Next: establish a separately versioned, sustainable and fresh account-wide budget/headroom evidence path without replaying consumed audits; continue field-by-field compliant market-source verification; keep all external execution, controlled acceptance, and schedule activation disabled until their exact gates pass.
+
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; FREE-ONLY / 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders, and live trading remain closed.
+
+---
+
 ## Live Cloud Paper checkpoint — 2026-10-01 17:25 Asia/Taipei
 
 Evidence basis: GitHub `main=3b97bc70c726b6aba05960f0cbd7dfcc1c236862`, re-read at 2026-10-01T09:25:12Z. This snapshot describes the verified parent at read time; resolve `main` live for later work.

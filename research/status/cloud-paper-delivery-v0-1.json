@@ -1,13 +1,13 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
   "updated_date": "2026-10-01",
-  "evidence_basis_parent_main_sha": "7c6bb943f74aebb08fa927e30730e23845825609",
+  "evidence_basis_parent_main_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
   "batches": {
     "contract": "MERGED",
-    "market_adapter": "MERGED",
+    "market_adapter": "MERGED; SOURCE_ASSESSMENT_V0_3_PR690_MERGED; NO_PROVIDER_SOURCE_AUTHORIZED; TOTAL3_UNAVAILABLE; BTC_DOMINANCE_UNAPPROVED_PARTIAL; PIONEX_23_MARKET_BREADTH_AND_4H_15M_NOT_PRODUCTION_VERIFIED",
     "paper_loop": "MERGED",
     "activation": "BLOCKED_BUDGET_EVIDENCE_AND_CONTROLLED_ACCEPTANCE",
     "dashboard": "PR653_MAIN_89DD07A_PAGES_RUN_36676578296_BUILD_DEPLOY_BROWSER_PRODUCTION_SUCCESS_42_DESKTOP_MOBILE_TESTS; DASHBOARD_ONLY_NOT_RUNTIME_ACCEPTANCE",
@@ -415,10 +415,10 @@
     "runtime_authority_changed": false
   },
   "latest_repository_checkpoint": {
-    "evidence_basis_main_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
+    "evidence_basis_main_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
     "pull_request": null,
-    "pr_merge_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
-    "observed_at_utc": "2026-09-30T07:06:00Z",
+    "pr_merge_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
+    "observed_at_utc": "2026-10-01T09:44:13Z",
     "open_pull_requests": [],
     "pr_654": {
       "head_sha": "2117448a00edf599d08c8d6fb27596ba9cf0a0ab",
@@ -440,8 +440,19 @@
     "latest_maintenance_run_id": 36676302904,
     "latest_maintenance_inspect": "SUCCESS",
     "latest_maintenance_propose": "OBSERVATION_CHANGED",
-    "usage_evidence": "PARTIAL_V0_3_ZERO_COST_AND_HEADROOM_UNKNOWN",
-    "next_work": "SYNCHRONIZE_STATUS_THEN_COST_FRESHNESS_STORAGE_FEASIBILITY_NO_REPEAT_OF_CONSUMED_AUDITS"
+    "usage_evidence": "BILLABLE_USAGE_V0_2_HTTP_403; ROOT_CAUSE_ACCOUNT_WIDE_COST_FRESHNESS_ALL_WRITERS_AND_HEADROOM_UNKNOWN; ONE_TIME_AUTHORITY_CONSUMED_DO_NOT_RERUN",
+    "next_work": "SUSTAINABLE_FRESH_ACCOUNT_WIDE_BUDGET_AND_HEADROOM_EVIDENCE; FIELD_BY_FIELD_MARKET_SOURCE_QUALIFICATION; KEEP_RUNTIME_AND_SCHEDULE_DISABLED",
+    "pr_690": {
+      "head_sha": "b5dbfa5837c378ea61997a402d17d9d81ce24a82",
+      "merged": true,
+      "merge_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
+      "pr_ci_run_id": 36843908975,
+      "codeql_run_id": 36843909019,
+      "dependency_sbom_run_id": 36843909009,
+      "pr_checks": "SUCCESS",
+      "post_merge_main_checks": "UNKNOWN_NOT_INDEPENDENTLY_VERIFIED"
+    },
+    "market_data_assessment": "V0_3_MERGED; NO_APPROVED_TOTAL3_SOURCE; BTC_DOMINANCE_PARTIAL_UNAPPROVED_CANDIDATE; PIONEX_23_MARKET_BREADTH_AND_4H_15M_NOT_PRODUCTION_VERIFIED; SCRAPING_NOT_APPROVED"
   },
   "post_merge_storage_policy_evidence": {
     "pr_number": 616,
@@ -464,20 +475,20 @@
   },
   "production_cycle_status": "NOT_RUN",
   "latest_documentation_sync": {
-    "pull_request": 647,
-    "pr_head_sha": "7b957c496782ad2f46aa08c436b6766c0816ecff",
-    "merged_main_sha": "31831113d6997779ee18fe8ee4d5eb67390855a2",
+    "pull_request": 690,
+    "pr_head_sha": "b5dbfa5837c378ea61997a402d17d9d81ce24a82",
+    "merged_main_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
     "changed_runtime_or_authority": false,
-    "pr_ci_run_id": 36660991269,
+    "pr_ci_run_id": 36843908975,
     "pr_ci": "SUCCESS",
     "python_3_12": "SUCCESS",
     "python_3_13": "SUCCESS",
-    "codeql_run_id": 36660991267,
+    "codeql_run_id": 36843909019,
     "codeql": "SUCCESS",
-    "dependency_sbom_run_id": 36660991326,
+    "dependency_sbom_run_id": 36843909009,
     "dependency_sbom": "SUCCESS",
     "post_merge_main_ci_run_id": null,
-    "post_merge_main_ci": "UNKNOWN_NOT_VERIFIED",
+    "post_merge_main_ci": "UNKNOWN_NOT_INDEPENDENTLY_VERIFIED",
     "pages_run_id": null,
     "pages_deploy": "NOT_TRIGGERED_DOCUMENTATION_ONLY"
   },
@@ -589,10 +600,10 @@
     "one_time_authority": "CONSUMED_DO_NOT_RERUN"
   },
   "current_repository_checkpoint": {
-    "evidence_basis_main_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
+    "evidence_basis_main_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
     "pull_request": null,
-    "pr_merge_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
-    "observed_at_utc": "2026-09-30T07:06:00Z",
+    "pr_merge_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
+    "observed_at_utc": "2026-10-01T09:44:13Z",
     "open_pull_requests": [],
     "pr_654": {
       "head_sha": "2117448a00edf599d08c8d6fb27596ba9cf0a0ab",
@@ -614,8 +625,19 @@
     "latest_maintenance_run_id": 36676302904,
     "latest_maintenance_inspect": "SUCCESS",
     "latest_maintenance_propose": "OBSERVATION_CHANGED",
-    "usage_evidence": "PARTIAL_V0_3_ZERO_COST_AND_HEADROOM_UNKNOWN",
-    "next_work": "SYNCHRONIZE_STATUS_THEN_COST_FRESHNESS_STORAGE_FEASIBILITY_NO_REPEAT_OF_CONSUMED_AUDITS"
+    "usage_evidence": "BILLABLE_USAGE_V0_2_HTTP_403; ROOT_CAUSE_ACCOUNT_WIDE_COST_FRESHNESS_ALL_WRITERS_AND_HEADROOM_UNKNOWN; ONE_TIME_AUTHORITY_CONSUMED_DO_NOT_RERUN",
+    "next_work": "SUSTAINABLE_FRESH_ACCOUNT_WIDE_BUDGET_AND_HEADROOM_EVIDENCE; FIELD_BY_FIELD_MARKET_SOURCE_QUALIFICATION; KEEP_RUNTIME_AND_SCHEDULE_DISABLED",
+    "pr_690": {
+      "head_sha": "b5dbfa5837c378ea61997a402d17d9d81ce24a82",
+      "merged": true,
+      "merge_sha": "ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a",
+      "pr_ci_run_id": 36843908975,
+      "codeql_run_id": 36843909019,
+      "dependency_sbom_run_id": 36843909009,
+      "pr_checks": "SUCCESS",
+      "post_merge_main_checks": "UNKNOWN_NOT_INDEPENDENTLY_VERIFIED"
+    },
+    "market_data_assessment": "V0_3_MERGED; NO_APPROVED_TOTAL3_SOURCE; BTC_DOMINANCE_PARTIAL_UNAPPROVED_CANDIDATE; PIONEX_23_MARKET_BREADTH_AND_4H_15M_NOT_PRODUCTION_VERIFIED; SCRAPING_NOT_APPROVED"
   },
   "external_evidence_design": {
     "status": "DOCUMENTED_DESIGN_ONLY_NO_CLOUDFLARE_REQUEST",

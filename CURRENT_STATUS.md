@@ -1,3 +1,16 @@
+## Live checkpoint — 2026-10-01 17:44 Asia/Taipei
+
+Evidence basis: GitHub `main=ee7351af1d1a2a104e288a1df138ba2ad1b2cd3a`; open PR search returned 0. PR #690 merged market-data assessment V0.3; exact-head CI, CodeQL and Dependency/SBOM passed. Post-merge checks were not independently verified.
+
+- V0.3: no approved TOTAL3 source; BTC dominance is a partial unapproved candidate; Pionex 23-market breadth and 4H/15M remain unverified for production. HTML/browser scraping remains unapproved until source terms, automation permission, provenance and retention rights are verified. No live provider call or authority change occurred.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production registry empty, Core100 `REJECT`.
+- Cloudflare billable usage run #36839577708 failed once with HTTP 403; cause, account-wide cost, freshness, all-writer coverage and headroom remain `UNKNOWN`. Its one-time authority is consumed; do not rerun.
+- Synthetic storage reductions do not establish production R2 usage or zero cost.
+
+Next: obtain a separately versioned sustainable account-wide budget/headroom evidence path; continue qualifying each required market-data field. Keep provider/R2/D1 operations, controlled main acceptance and schedules disabled until all gates pass.
+
+CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Preserve frozen and failed evidence.
+
 ## Live checkpoint — 2026-10-01 17:09 Asia/Taipei
 
 Evidence basis: the Cloudflare diagnostic ran on GitHub `main=7c6bb943f74aebb08fa927e30730e23845825609`; PR #686 later merged status at `fb6d35b6478989dc91de8ffcb096fa060a494db7`.
