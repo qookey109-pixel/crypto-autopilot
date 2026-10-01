@@ -1,14 +1,15 @@
-## Cloud Paper checkpoint before request-envelope correction — 2026-10-01
+## Live Cloud Paper checkpoint — 2026-10-01
 
-Pre-correction PR basis: GitHub `main=cc140d46ba36f35846b91d0a7f1ccd400e6e8a40`; open PRs = 0; PRs #669–#675 are merged. Reconciliation of the market adapter and Live-Paper feed calls found the prior 36 calls/slot estimate omitted up to 10 existing position-follow-up requests (order book plus recent trades for each of five open positions). The corrected full direct-source upper bound is **46/slot, 4,416/day, and 132,480/rolling 30 days**. The structural floor of 26 shared-plus-breadth calls/slot still exceeds the unchanged 18/run guard. These are design arithmetic, not provider allowance or observed usage. Cloud Paper remains disabled.
+GitHub main is `d51eb813c4ef043eb2f9d54f546504a98851df57`; open PRs = 0. PR [#676](https://github.com/qookey109-pixel/crypto-autopilot/pull/676) is merged.
 
-- The official Pionex rate limit is recorded as 10 requests/second/IP. This is not a daily/monthly allowance, zero-cost proof, or access authority; aggregate allowance, shared account use, and endpoint weights remain unknown.
-- Code-derived minima remain 21 closed 4H breadth bars and 200 60M/15M technical bars. The production registry is empty and Core100 remains REJECT; future strategy-specific inputs and macro context are unverified.
-- Account-wide zero-cost evidence, full writer coverage, freshness, and headroom remain unproven. D1 is unprovisioned. Do not rerun consumed one-time Billing/Usage/bootstrap authorities.
-- This correction updates the inactive estimate and regression coverage only; it does not change the current 18/run or 1,728/day ceiling and performs no provider, Cloudflare, R2, or D1 access or runtime/schedule activation.
-- Next: resolve the full request envelope and obtain zero-cost/quota evidence before selecting sources or wiring production. Keep Cloud Paper inactive until a successor budget, source, budget, and controlled acceptance are authorized.
+- Exact-head CI [36823734488](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36823734488) passed Python 3.12/3.13, Ruff, the full test suite, workflow-static, and Cloud Paper budget/preflight checks. CodeQL [36823734537](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36823734537), Dependency/SBOM [36823734554](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36823734554), and Dashboard PR build/browser validation [36823734549](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36823734549) passed; desktop and mobile browser validation passed. Merge-commit status is `UNKNOWN_NOT_VERIFIED`: the available combined-status query returned no entries, and the workflow-run query is limited to pull-request events.
+- PR #676 corrected the inactive direct-source request estimate. The market-input estimate of 36 calls/slot omitted up to 10 existing execution-frame calls (order book plus recent trades for each of five open positions), giving a full upper bound of **46 calls/slot, 4,416/day, and 132,480/rolling 30 days**. These are design arithmetic, not provider allowance or observed use. The structural floor of 26 calls/slot remains above the unchanged 18/run and 1,728/day ceilings.
+- Pionex's documented 10 requests/second/IP rate ceiling is not evidence of daily/monthly allowance, endpoint weights, shared account use, zero-cost operation, or access authority.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`; D1 is unprovisioned, the production registry is empty, and Core100 remains `REJECT`. Account-wide cost/headroom, usage freshness, complete writer coverage, and missing source fields remain unresolved. Do not rerun consumed one-time Billing/Usage/bootstrap authorities.
+- This change corrected an inactive estimate and regression test only. No provider, Cloudflare, R2 or D1 access occurred; no runtime or schedule was activated.
+- Next: resolve request/cost feasibility and source eligibility before preparing any successor authority, production wiring, or controlled PAPER acceptance.
 
-CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders, and live trading remain closed.
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
 
 ## Prior checkpoint — #665 compact storage merge (2026-10-01)
 
