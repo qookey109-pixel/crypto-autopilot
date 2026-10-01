@@ -28,7 +28,9 @@
     "rolling_window_days": 31,
     "reservation_is_conservative": true,
     "reservation_release_or_rebate": "NOT_SUPPORTED",
-    "unknown_or_stale_account_usage": "BLOCK_BEFORE_EXTERNAL_ACCESS"
+    "unknown_or_stale_account_usage": "BLOCK_BEFORE_EXTERNAL_ACCESS",
+    "utc_day_derived_from_reserved_at_ms": true,
+    "utc_day_mismatch": "BLOCK_AT_SCHEMA_CONSTRAINT"
   },
   "retention": {
     "detail_window_days": 31,
