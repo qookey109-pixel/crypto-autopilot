@@ -113,7 +113,7 @@
     "root_docs_projection": "CLOUD_PAPER_DASHBOARD_V0_3_AND_CURRENT_CHECKPOINT",
     "security_projection": "CONVERGED_BY_PR_322",
     "open_pr_triage": "research/status/open-pr-triage-v0-5.json",
-    "open_pr_triage_state": "LIVE_CHECKPOINT_2026_10_02_SEVEN_OPEN_PRS_STALE_BASE_RECONCILIATION_REQUIRED",
+    "open_pr_triage_state": "LIVE_CHECKPOINT_2026_10_02_SEVEN_OPEN_PRS_STALE_BASE_RECONCILIATION_REQUIRED_OLD_HEAD_FAILURES_REVIEW_REQUIRED",
     "automation_health_count_policy": "DERIVED_FROM_EXACT_REPOSITORY_SCHEDULE_INVENTORY",
     "dashboard_projection_policy": "HISTORICAL_AUTHORITY_OVERLAY_THEN_CURRENT_OPERATIONS_OVERLAY",
     "homepage_projection_policy": "CURRENT_OPERATIONS_MUST_OVERRIDE_DATED_SIMULATION_READINESS_FOR_PRESENT_TENSE_STATE",
@@ -170,9 +170,9 @@
       "blocking": false,
       "classification": "NONBLOCKING_CI_VISIBILITY"
     },
-    "dashboard_pages_validation_state": "MAIN_PAGES_BUILD_SUCCESS_DEPLOY_AND_PRODUCTION_BROWSER_SKIPPED_DOCS_ONLY_PR_717"
+    "dashboard_pages_validation_state": "NO_PAGES_RUN_OBSERVED_FOR_PR_727_MAIN_HEAD"
   },
-  "next_decision": "DESIGN_AND_TEST_VERSIONED_SHARED_D1_WRITER_SCOPED_SLOT_IDEMPOTENCY_BOUNDED_RETENTION_AND_ACCOUNT_WIDE_BUDGET; KEEP_CLOUD_PAPER_DISABLED",
+  "next_decision": "Dispatch Cloud Paper Billing History V0.1 exactly once on main when available; then review report alongside existing subscription/usage evidence. Keep Cloud Paper disabled because 0 USD, complete account writer coverage, D1/capacity, data readiness, and production strategy qualification remain unproven.",
   "notes": [
     "Live checkpoint at parent main 42f8c1cdad46107f5f8f720b9809a7ad71286815: PR #679 stale generated snapshot closed unmerged at 2026-10-01T08:15:20Z; no open PRs. PR #665 persistence compatibility/recovery fixes are merged. This status update grants no provider, R2, D1, runtime, or schedule access.",
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
@@ -520,5 +520,110 @@
     "rerun_authorized": false,
     "artifact_id": 11156336210,
     "artifact_digest": "sha256:aafc0e4c58bdb8d25426a390c1d9689ce77324ef2c780d91e6fcc2f90c1bbcbf"
+  },
+  "cloud_paper_billing_history_v0_1": {
+    "authority": "config/cloud_paper_billing_history_v0_1.json",
+    "status": "AUTHORIZED_ON_PROTECTED_MAIN_NOT_DISPATCHED",
+    "workflow": "Cloud Paper Billing History V0.1",
+    "maximum_runs": 1,
+    "maximum_attempts": 1,
+    "workflow_run_observed": false,
+    "cloudflare_http_requests_performed": 0,
+    "report_status": "NOT_AVAILABLE",
+    "artifact_id": null,
+    "one_time_authority_consumed": false,
+    "rerun_authorized": false,
+    "zero_cost_conclusion": "UNKNOWN",
+    "cloud_paper_activation": false,
+    "note": "Dispatch once on main when UI/API dispatch is available; preserve failure or incomplete output and never rerun."
+  },
+  "post_pr_727_repository_checkpoint": {
+    "evidence_basis_main_sha": "ec05d61f0724b741ad4b49be800f0ff3ee0de202",
+    "observed_at_utc": "2026-10-01T21:32:26Z",
+    "is_latest_main_claim": false,
+    "merged_pr": {
+      "number": 727,
+      "head_sha": "9af2d06fdfe5dc4bee9369ef592b63fd3aca9d71",
+      "merge_commit_sha": "ec05d61f0724b741ad4b49be800f0ff3ee0de202"
+    },
+    "open_pull_requests": [
+      {
+        "number": 708,
+        "state": "OPEN",
+        "draft": true,
+        "head_sha": "281b8def52202e5d075df2f78f6c5872fbc4426e",
+        "base_sha": "a0f86649ac813523221d763e20d57fa55c25548b",
+        "checks_summary": "NO_CHECK_RUNS_FOR_CURRENT_HEAD"
+      },
+      {
+        "number": 693,
+        "state": "OPEN",
+        "draft": false,
+        "head_sha": "582f097375b90dab659c76def22e8614c7fbd5d1",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
+        "checks_summary": "PYTHON_3_12_3_13_AND_FREEZE_GUARD_FAILED"
+      },
+      {
+        "number": 694,
+        "state": "OPEN",
+        "draft": false,
+        "head_sha": "7f5673542ee1326f55c682b1b8ebf0e33488c935",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
+        "checks_summary": "PYTHON_3_12_3_13_FREEZE_GUARD_AND_DEPENDENCY_SECURITY_FAILED"
+      },
+      {
+        "number": 695,
+        "state": "OPEN",
+        "draft": false,
+        "head_sha": "0168fc933d0167e53677230945a81ae046338c40",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
+        "checks_summary": "PYTHON_3_12_3_13_AND_FREEZE_GUARD_FAILED"
+      },
+      {
+        "number": 696,
+        "state": "OPEN",
+        "draft": false,
+        "head_sha": "e9b6dc2fcbc496aa5dd350c633e8b02f815c91d3",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
+        "checks_summary": "CODEQL_FAILED"
+      },
+      {
+        "number": 697,
+        "state": "OPEN",
+        "draft": false,
+        "head_sha": "d30f4b511aca81d72cd38fba7a4eddfcc48e12b0",
+        "base_sha": "a0f86649ac813523221d763e20d57fa55c25548b",
+        "checks_summary": "PYTHON_3_12_3_13_WORKFLOW_STATIC_AND_FREEZE_GUARD_FAILED"
+      },
+      {
+        "number": 698,
+        "state": "OPEN",
+        "draft": false,
+        "head_sha": "838d344b6a7eb280c34a759cd7bc627706ade43f",
+        "base_sha": "cca6181f53e18fab8d5498bf4a866bf02abe2671",
+        "checks_summary": "CODEQL_FAILED"
+      }
+    ],
+    "ci_run_id": 36928500736,
+    "ci": "SUCCESS",
+    "python_3_12": "SUCCESS",
+    "python_3_13": "SUCCESS",
+    "workflow_static": "NOT_OBSERVED_FOR_THIS_HEAD",
+    "codeql_run_id": 36928500785,
+    "codeql": "SUCCESS",
+    "dependency_sbom_run_id": 36928500794,
+    "dependency_sbom": "SUCCESS",
+    "freeze_guard_run_id": 36928500740,
+    "freeze_guard": "SUCCESS",
+    "dashboard_pages_result": "NO_PAGES_RUN_OBSERVED_FOR_THIS_HEAD",
+    "cloud_paper_activation": false,
+    "d1_provisioned": false,
+    "production_cycle_status": "NOT_RUN",
+    "billing_history_workflow_run_observed": false,
+    "billing_history_cloudflare_requests": 0,
+    "billing_history_report": "NOT_AVAILABLE_NOT_DISPATCHED",
+    "cloud_paper_zero_cost": "NOT_PROVEN",
+    "cloudflare_writer_inventory": "INCOMPLETE_OWNER_EXPECTS_FUTURE_PROJECTS_SERVICES",
+    "next_work": "ONE_AUTHORIZED_BILLING_HISTORY_DISPATCH_ON_MAIN_ONCE; THEN_REVIEW_PLAN_FIXED_CHARGES_TOTAL_COST_AND_WRITER_COVERAGE; KEEP_CLOUD_PAPER_DISABLED_UNTIL_ALL_GATES_PASS"
   }
 }
