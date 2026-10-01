@@ -33,7 +33,7 @@ class SQLiteAdmissionClient:
         self.lock = threading.Lock()
         self.query_count = 0
 
-    def configure_capacity(self, maximum: int) -> None:
+    def configure_capacity(self, maximum: int | None) -> None:
         self.connection.execute(
             "UPDATE cloudflare_shared_writer_admission_capacity_v0_2 "
             "SET max_retained_reservations = ? WHERE capacity_id = 1",
@@ -61,7 +61,6 @@ def limits(**changes: int) -> SharedWriterAdmissionLimits:
         "d1_queries_per_utc_day": 40,
         "d1_rows_written_per_utc_day": 200,
         "d1_storage_growth_bytes_per_utc_day": 20000,
-        "max_retained_reservations": 100,
         "r2_class_a_per_rolling_31_days": 50,
         "r2_class_b_per_rolling_31_days": 50,
         "r2_new_bytes_per_rolling_31_days": 5000,
@@ -268,6 +267,24 @@ class SharedWriterAdmissionTests(unittest.TestCase):
                 limits=limits(provider_requests_per_utc_day=0),
             )
         self.assertEqual(client.query_count, 0)
+
+    def test_null_shared_capacity_policy_blocks_admission(self):
+        client = SQLiteAdmissionClient()
+        client.configure_capacity(None)
+        with self.assertRaisesRegex(
+            BudgetBlocked, "SHARED_ACCOUNT_BUDGET_EXCEEDED",
+        ):
+            reserve_shared_writer_envelope(
+                execute=client, reservation=reservation(), limits=limits(),
+            )
+        self.assertEqual(
+            client.connection.execute(
+                "SELECT retained_reservations "
+                "FROM cloudflare_shared_writer_admission_capacity_v0_2 "
+                "WHERE capacity_id = 1"
+            ).fetchone()[0],
+            0,
+        )
 
     def test_retained_capacity_hard_stops_across_writers(self):
         client = SQLiteAdmissionClient()
