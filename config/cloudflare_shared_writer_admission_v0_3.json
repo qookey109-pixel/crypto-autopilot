@@ -70,8 +70,6 @@
     "checked_at_utc": "2026-10-02",
     "free_rows_read_per_utc_day": 5000000,
     "free_rows_written_per_utc_day": 100000,
-    "free_storage_account_bytes": 5000000000,
-    "free_storage_per_database_bytes": 500000000,
     "over_daily_read_or_write_limit_behavior": "QUERIES_FAIL_UNTIL_00_00_UTC_RESET",
     "references": [
       "https://developers.cloudflare.com/d1/platform/pricing/",
@@ -79,7 +77,9 @@
       "https://developers.cloudflare.com/changelog/post/2026-09-01-d1-free-tier-limit-enforcement/",
       "https://developers.cloudflare.com/d1/worker-api/d1-database/"
     ],
-    "account_plan_and_actual_headroom": "UNKNOWN; MUST_REVALIDATE_BEFORE_ACTIVATION"
+    "account_plan_and_actual_headroom": "UNKNOWN; MUST_REVALIDATE_BEFORE_ACTIVATION",
+    "free_storage_account_gb": 5,
+    "free_storage_per_database_mb": 500
   },
   "required_before_any_production_use": [
     "owner_attested_complete_inventory_of_all_current_and_planned_account_writers",
