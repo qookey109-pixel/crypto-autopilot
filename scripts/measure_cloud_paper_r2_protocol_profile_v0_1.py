@@ -51,10 +51,10 @@ class _MemoryS3Client:
         })
         if conditional and key in self.objects:
             error = RuntimeError("conditional create conflict")
-            error.response = {
+            setattr(error, "response", {
                 "Error": {"Code": "PreconditionFailed"},
                 "ResponseMetadata": {"HTTPStatusCode": 412},
-            }
+            })
             raise error
         metadata = kwargs.get("Metadata", {})
         self.objects[key] = (body, dict(metadata))
@@ -103,7 +103,7 @@ class _MemoryS3Client:
 
 
 def _snapshot(
-    client: _MemoryS3Client,
+    client: Any,
     reservations: Counter[str],
     objects_before: int,
 ) -> dict[str, object]:
