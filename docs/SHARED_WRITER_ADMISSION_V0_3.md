@@ -17,7 +17,7 @@ The new migration is a **fresh versioned schema**. V0.2 databases and receipts a
 ## V0.3 identity and stale-replay rules
 
 - A slot identity is canonical `slot:<slot_at_ms>`; `idempotency_key` must equal the slot ID. The unique key is `(writer_id, slot_id)`, so two registered writers can reserve the same slot while one writer cannot create two envelopes for that slot.
-- The envelope carries both scheduled slot time and actual reservation time. Callers must provide a bounded freshness window and runtime time before any external access.
+- The envelope carries both scheduled slot time and actual reservation time. Callers must provide a bounded freshness window and runtime time before any external access. The daily budget key is the UTC calendar date derived from actual reservation time; the SQL CHECK rejects a caller-supplied day that differs or an out-of-range timestamp.
 - The caller reads the retained reservation by `(writer_id, slot_id)` before freshness rejection. `classify_reservation_replay` returns `RETURN_EXISTING` only when every immutable envelope field matches; changed or malformed content blocks as an idempotency conflict. This path must not repeat provider or write access. If the row has been compacted, the missing row goes through freshness and watermark checks and stale replay blocks.
 - Compaction deletes only rows with `reserved_at_ms < now_ms - 31 days`. The 31-day boundary remains included in rolling totals.
 - The delete trigger monotonically advances a per-writer maximum purged slot watermark and decrements the active retained-row counter. Any attempt to reinsert a slot at or below that watermark fails closed. Writer identities and watermarks are never deleted.
@@ -43,6 +43,7 @@ The D1 Free tier is not just a 5 GB account storage ceiling: Cloudflare currentl
 GitHub CI uses SQLite fixtures to exercise:
 
 - multiple writers reserving one slot and cross-writer daily/rolling aggregates;
+- a mismatched UTC day cannot hide a reservation from the shared daily aggregate;
 - exact retained replay returns the existing envelope, changed replay conflicts, and missing stale replay blocks;
 - execution of the same bounded compaction SQL constant used by the prepared helper;
 - NULL/default capacity blocking and capacity release on compaction;
