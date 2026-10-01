@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import importlib.util
+from collections import Counter
 from pathlib import Path
 import unittest
 
+from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Client
 from crypto_autopilot.paper.run_store_v0_1 import _canonical_bytes
 
 PATH = Path(__file__).resolve().parents[1] / "scripts" / "measure_cloud_paper_r2_protocol_profile_v0_1.py"
@@ -19,6 +21,13 @@ class CloudPaperR2ProtocolProfileTests(unittest.TestCase):
         self.assertEqual(report["evidence_type"], "SYNTHETIC_ADAPTER_PROTOCOL_ONLY")
         self.assertEqual(report["scope"]["cloudflare_r2_requests"], 0)
         scenarios = {row["scenario"]: row for row in report["scenarios"]}
+
+        for row in scenarios.values():
+            self.assertEqual(
+                row["reserved_put_application_payload_bytes"],
+                row["put_application_payload_bytes"],
+                row["scenario"],
+            )
 
         new_write = scenarios["new_put_json"]
         self.assertEqual(new_write["s3_compatible_operation_calls"], {"GET": 1, "PUT": 1})
@@ -53,6 +62,43 @@ class CloudPaperR2ProtocolProfileTests(unittest.TestCase):
             paginated["put_application_payload_bytes"],
             sum(len(_canonical_bytes({"item": index})) for index in range(5)),
         )
+
+
+    def test_snapshot_preserves_independent_reservation_measurement(self):
+        client = profile._MemoryS3Client()
+        client.put_object(Key="synthetic", Body=b"payload")
+        row = profile._snapshot(
+            client, Counter({"R2_CLASS_A": 1}), Counter({"R2_CLASS_A": 2}), 0,
+        )
+        self.assertEqual(row["put_application_payload_bytes"], 7)
+        self.assertEqual(row["reserved_put_application_payload_bytes"], 2)
+
+    def test_budget_denial_prevents_underlying_operation(self):
+        for operation in ("put_object", "get_object", "list_objects_v2"):
+            with self.subTest(operation=operation):
+                client = profile._MemoryS3Client()
+                reservations = []
+
+                def deny(kind, size):
+                    reservations.append((kind, size))
+                    raise ValueError("synthetic budget denied")
+
+                guarded = BudgetedR2Client(client=client, before_external=deny)
+                arguments = {
+                    "put_object": {"Key": "synthetic", "Body": b"payload"},
+                    "get_object": {"Key": "synthetic"},
+                    "list_objects_v2": {"Prefix": "synthetic", "MaxKeys": 2},
+                }
+                with self.assertRaisesRegex(ValueError, "synthetic budget denied"):
+                    getattr(guarded, operation)(**arguments[operation])
+                self.assertEqual(client.calls, [])
+                self.assertEqual(client.objects, {})
+                self.assertEqual(len(reservations), 1)
+                self.assertEqual(
+                    reservations[0],
+                    ("R2_CLASS_B", 0) if operation == "get_object"
+                    else ("R2_CLASS_A", 7 if operation == "put_object" else 0),
+                )
 
     def test_report_is_deterministic_and_contains_no_payloads(self):
         first = profile.build_report()
