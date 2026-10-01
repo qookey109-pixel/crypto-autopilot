@@ -66,7 +66,7 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         self.assertFalse(assessment["source_switch_authorized"])
         self.assertEqual(
             payload["live_repository_checkpoint"]["evidence_basis_main_sha"],
-            "0a8161f1c101cb72c717ea4917a71a1c7da0541a",
+            "42f8c1cdad46107f5f8f720b9809a7ad71286815",
         )
         self.assertEqual(
             payload["live_repository_checkpoint"][
