@@ -3,7 +3,10 @@
   "status": "PREPARED_REGISTRY_NOT_ACCOUNT_COMPLETE",
   "scope": {
     "account_identity": "INJECTED_AT_RUNTIME_NOT_STORED",
-    "resources": ["R2", "D1"],
+    "resources": [
+      "R2",
+      "D1"
+    ],
     "dedicated_account_assumed": false
   },
   "source_inventory": "research/status/cloud-paper-r2-writer-inventory-v0-1.json",
@@ -40,7 +43,10 @@
     "user_confirmed_future_projects_or_services_may_be_added": true
   },
   "registration_contract": {
-    "required_before_first_cloud_write": true,
+    "applies_to": "NEW_WRITERS_AND_ANY_NEW_RUNTIME_ACTIVATION",
+    "required_before_new_writer_first_cloud_write": true,
+    "existing_writer_policy": "Existing workflows retain their own versioned authorities; shared-admission coverage remains unknown until integrated and verified.",
+    "cloud_paper_activation_requires_all_existing_writers_integrated": true,
     "required_fields": [
       "stable_writer_id",
       "repository_or_service",
@@ -63,7 +69,8 @@
     "account_wide_coverage_proven": false,
     "shared_admission_integrated_for_all_repository_writers": false,
     "d1_provisioned": false,
-    "activation_enabled": false
+    "activation_enabled": false,
+    "legacy_existing_writes_claimed_globally_admitted": false
   },
   "limitations": [
     "This registry and CI validation cover only the repository source inventory.",
