@@ -2,8 +2,8 @@
   "schema": "qookey-cloud-paper-market-request-budget-v0.2",
   "status": "PREPARED_REQUIREMENT_ENVELOPE_NOT_EXECUTION_AUTHORITY",
   "evidence_basis": {
-    "main_sha": "3b58fce4a27d0c65fa17b011fea4946cd20077ee",
-    "assessment": "docs/CLOUD_PAPER_MARKET_DATA_SOURCE_ASSESSMENT_V0_1.md"
+    "main_sha": "19a29e4b57e17821bf64c8cb01fb60c68b8f63c7",
+    "assessment": "docs/CLOUD_PAPER_REQUEST_BUDGET_ASSESSMENT_V0_2.md"
   },
   "purpose": "Quantify the direct Pionex public Kline request envelope for the existing 4H/60M/15M strategy inputs. This proposal does not prove provider capacity, account allowance, complete data availability, or zero-cost operation.",
   "assumptions": {
@@ -15,6 +15,28 @@
     "cross_run_cache_available": false,
     "automatic_retries": 0,
     "missed_slots_backfilled": false
+  },
+  "warmup": {
+    "status": "CODE_DERIVED_MINIMA_NOT_PROVIDER_VERIFIED",
+    "closed_bars_per_timeframe": {
+      "4H_breadth_per_market": 21,
+      "60M_candidate_technical": 200,
+      "15M_candidate_technical": 200
+    },
+    "maximum_closed_bars_requested_per_slot": 2483,
+    "derivation": {
+      "technical_v0_2_ready": "EMA200 is the longest required indicator; the full ready_v0_2 snapshot is first computable with 200 closed contiguous candles.",
+      "market_structure_range": "The default 20-bar prior range becomes available at index 20, requiring 21 bars including the current candle.",
+      "market_regime": "The configured 20-bar return lookback becomes available at index 20, requiring 21 aligned context observations; breadth EMA20 is ready by then.",
+      "calculation": "23 * 21 + 5 * 200 + 5 * 200 = 2483 closed bars per slot."
+    },
+    "indicator_and_regime_configuration": [
+      "src/crypto_autopilot/technical.py",
+      "src/crypto_autopilot/features/structure.py",
+      "src/crypto_autopilot/features/regime.py",
+      "config/market_regime_breadth_research_v0_1.json"
+    ],
+    "strategy_specific_requirements_beyond_these_minima": "UNVERIFIED"
   },
   "requests": {
     "shared_market_calls_per_slot": 3,
@@ -61,7 +83,7 @@
     "Pionex aggregate account request allowance and rate-limit capacity",
     "Shared market endpoint weights and batch Kline support",
     "Whether the 23-market fixed breadth set is complete and continuously available",
-    "Actual warmup bar counts for every strategy-required timeframe",
+    "Strategy-specific warmup requirements beyond the code-derived minima",
     "Shared account-wide request use by other provider workflows",
     "Approved freshness tolerance and safe handling for delayed 15M entry slots",
     "D1/R2 costs if any cross-run cache is proposed",
