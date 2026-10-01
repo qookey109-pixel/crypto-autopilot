@@ -29,6 +29,30 @@ WHERE rowid IN (
 RETURNING writer_id, slot_id, slot_at_ms, reserved_at_ms
 """
 
+DAILY_SHARED_AGGREGATE_SQL = """
+SELECT COUNT(*) AS reservations,
+       COALESCE(SUM(provider_requests), 0) AS provider_requests,
+       COALESCE(SUM(r2_class_a), 0) AS r2_class_a,
+       COALESCE(SUM(r2_class_b), 0) AS r2_class_b,
+       COALESCE(SUM(r2_new_bytes), 0) AS r2_new_bytes,
+       COALESCE(SUM(d1_queries), 0) AS d1_queries,
+       COALESCE(SUM(d1_rows_read), 0) AS d1_rows_read,
+       COALESCE(SUM(d1_rows_written), 0) AS d1_rows_written,
+       COALESCE(SUM(d1_storage_growth_bytes), 0) AS d1_storage_growth_bytes
+FROM cloudflare_shared_writer_reservations_v0_3
+WHERE utc_day = CAST(? AS TEXT)
+"""
+
+ROLLING_SHARED_AGGREGATE_SQL = """
+SELECT COUNT(*) AS reservations,
+       COALESCE(SUM(r2_class_a), 0) AS r2_class_a,
+       COALESCE(SUM(r2_class_b), 0) AS r2_class_b,
+       COALESCE(SUM(r2_new_bytes), 0) AS r2_new_bytes
+FROM cloudflare_shared_writer_reservations_v0_3
+WHERE reserved_at_ms >= CAST(? AS INTEGER)
+  AND reserved_at_ms <= CAST(? AS INTEGER)
+"""
+
 READ_WRITER_WATERMARK_SQL = """
 SELECT retired_through_slot_at_ms, retired_reservation_count
 FROM cloudflare_shared_writer_retirement_watermarks_v0_3
