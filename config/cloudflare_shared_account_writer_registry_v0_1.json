@@ -1,0 +1,74 @@
+{
+  "schema": "qookey-cloudflare-shared-account-writer-registry-v0.1",
+  "status": "PREPARED_REGISTRY_NOT_ACCOUNT_COMPLETE",
+  "scope": {
+    "account_identity": "INJECTED_AT_RUNTIME_NOT_STORED",
+    "resources": ["R2", "D1"],
+    "dedicated_account_assumed": false
+  },
+  "source_inventory": "research/status/cloud-paper-r2-writer-inventory-v0-1.json",
+  "repository_writers": [
+    {
+      "writer_id": "crypto-autopilot:research-signal-layer-v0-2",
+      "workflow": ".github/workflows/research-signal-layer-v0-2.yml",
+      "resource": "R2",
+      "registration_state": "DECLARED_SHARED_ADMISSION_NOT_VERIFIED"
+    },
+    {
+      "writer_id": "crypto-autopilot:binance-usdm-detailed-training-v0-1",
+      "workflow": ".github/workflows/binance-usdm-detailed-training-v0-1.yml",
+      "resource": "R2",
+      "registration_state": "DECLARED_SHARED_ADMISSION_NOT_VERIFIED"
+    },
+    {
+      "writer_id": "crypto-autopilot:live-paper-run-coordinator-v0-1",
+      "workflow": ".github/workflows/live-paper-run-coordinator-v0-1.yml",
+      "resource": "R2",
+      "registration_state": "DECLARED_SHARED_ADMISSION_NOT_VERIFIED"
+    },
+    {
+      "writer_id": "crypto-autopilot:live-paper-run-recovery-v0-1",
+      "workflow": ".github/workflows/live-paper-run-recovery-v0-1.yml",
+      "resource": "R2",
+      "registration_state": "DECLARED_SHARED_ADMISSION_NOT_VERIFIED"
+    }
+  ],
+  "external_writer_inventory": {
+    "state": "UNCONFIRMED",
+    "complete": false,
+    "registered_writers": [],
+    "user_confirmed_future_projects_or_services_may_be_added": true
+  },
+  "registration_contract": {
+    "required_before_first_cloud_write": true,
+    "required_fields": [
+      "stable_writer_id",
+      "repository_or_service",
+      "workflow_or_entrypoint",
+      "resource_types",
+      "versioned_authority",
+      "maximum_per_run",
+      "maximum_per_utc_day",
+      "maximum_per_rolling_31_days",
+      "shared_admission_mechanism",
+      "idempotency_namespace",
+      "owner_attestation"
+    ],
+    "unregistered_writer_result": "BLOCKED_WRITER_REGISTRATION",
+    "incomplete_inventory_result": "BLOCKED_ACCOUNT_COVERAGE",
+    "shared_admission_must_precede_external_access": true,
+    "unknown_usage_must_fail_closed": true
+  },
+  "production_gate": {
+    "account_wide_coverage_proven": false,
+    "shared_admission_integrated_for_all_repository_writers": false,
+    "d1_provisioned": false,
+    "activation_enabled": false
+  },
+  "limitations": [
+    "This registry and CI validation cover only the repository source inventory.",
+    "A manifest entry is not evidence that its workflow uses a live shared admission ledger.",
+    "This file cannot discover or enumerate writers in other repositories or Cloudflare services.",
+    "External writer coverage requires an account-owner-attested inventory and integration of each writer."
+  ]
+}
