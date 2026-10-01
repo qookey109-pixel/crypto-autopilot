@@ -53,15 +53,27 @@ class CurrentOperationsStatusTests(unittest.TestCase):
 
         assessment = payload["cloud_paper_market_data_source_assessment"]
         self.assertEqual(assessment["status"], "ASSESSMENT_ONLY_NOT_APPROVED")
-        self.assertFalse(assessment["btc_excluded_altcoin_market_cap_matches_total3_excluding_btc_and_eth"])
-        self.assertEqual(assessment["keyless_request_allowance"], "UNKNOWN_SHARED_IP_POOL")
+        self.assertFalse(
+            assessment["btc_excluded_altcoin_market_cap_matches_total3_excluding_btc_and_eth"]
+        )
+        self.assertEqual(
+            assessment["keyless_request_allowance"], "UNKNOWN_SHARED_IP_POOL"
+        )
         self.assertEqual(assessment["external_market_endpoint_requests_performed"], 0)
         self.assertFalse(assessment["r2_access_performed"])
         self.assertFalse(assessment["d1_access_performed"])
         self.assertFalse(assessment["live_fetch_authorized"])
         self.assertFalse(assessment["source_switch_authorized"])
-        self.assertEqual(payload["live_repository_checkpoint"]["evidence_basis_main_sha"], "0a8161f1c101cb72c717ea4917a71a1c7da0541a")
-        self.assertEqual(payload["live_repository_checkpoint"]["dashboard_pages_relation_to_source_merge_pr_681"], "NOT_TRIGGERED_NO_DASHBOARD_FILES_CHANGED")
+        self.assertEqual(
+            payload["live_repository_checkpoint"]["evidence_basis_main_sha"],
+            "0a8161f1c101cb72c717ea4917a71a1c7da0541a",
+        )
+        self.assertEqual(
+            payload["live_repository_checkpoint"][
+                "dashboard_pages_relation_to_source_merge_pr_681"
+            ],
+            "NOT_TRIGGERED_NO_DASHBOARD_FILES_CHANGED",
+        )
 
         core100 = payload["core100"]
         self.assertEqual(core100["history_status"], "COMPLETE")
