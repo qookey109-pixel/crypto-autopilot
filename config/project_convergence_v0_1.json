@@ -86,8 +86,8 @@
     "live_paper_run_claim_state": "DETERMINISTIC_SLOT_CREATE_IF_ABSENT_NO_EXPIRY_NO_TAKEOVER_NO_AUTO_RETRY",
     "cloud_paper_r2_usage_audit": "config/cloud_paper_r2_usage_audit_v0_3.json",
     "cloud_paper_r2_usage_audit_state": "V0_3_PREPARED_ON_DELIVERY_BRANCH_NOT_DISPATCHED_R2_ANALYTICS_ONLY_ZERO_COST_UNKNOWN",
-    "cloud_paper_billable_usage_audit": "config/cloud_paper_billable_usage_v0_2.json",
-    "cloud_paper_billable_usage_audit_state": "V0_2_ONE_TIME_READ_ONLY_DIAGNOSTIC_ALPHA_RESTRICTED_ZERO_COST_UNKNOWN_NOT_DISPATCHED"
+    "cloud_paper_billable_usage_audit": "config/cloud_paper_billable_usage_v0_3.json",
+    "cloud_paper_billable_usage_audit_state": "V0_3_SUCCESSOR_PREPARED_ONE_SHOT_READ_ONLY_NO_DISPATCH_ZERO_COST_UNKNOWN"
   },
   "scheduled_workflows": {
     "current_window": [],
@@ -171,6 +171,7 @@
       "bnx-archive-diagnosis-v0-3.yml",
       "ci.yml",
       "cloud-paper-billable-usage-v0-2.yml",
+      "cloud-paper-billable-usage-v0-3.yml",
       "cloud-paper-billing-evidence-v0-1.yml",
       "cloud-paper-r2-usage-audit-v0-3.yml",
       "cloud-paper-usage-audit-v0-1.yml",
