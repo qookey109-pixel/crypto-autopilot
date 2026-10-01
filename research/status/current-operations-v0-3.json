@@ -454,7 +454,25 @@
       "complete_account_product_coverage": false,
       "all_writers_established": false,
       "authority_consumed": true,
-      "rerun_authorized": false
+      "rerun_authorized": false,
+      "rate_plan_id_documentation_check": {
+        "documented_values": [
+          "free",
+          "lite",
+          "pro",
+          "pro_plus",
+          "business",
+          "enterprise",
+          "partners_free",
+          "partners_pro",
+          "partners_business",
+          "partners_enterprise"
+        ],
+        "classification": "UNMAPPED_DOCUMENTED_ENUM_REQUIRES_REVIEW",
+        "source_url": "https://developers.cloudflare.com/api/resources/accounts/subresources/subscriptions/methods/get/",
+        "additional_cloudflare_request_performed": false,
+        "interpretation": "The report value r2_paid is outside the current documented enum; this discrepancy alone proves neither a billable charge nor free-plan eligibility."
+      }
     }
   },
   "cloud_paper_market_data_source_assessment": {
