@@ -23,3 +23,12 @@ Cloud Paper remains disabled until account-wide usage, billing, all-writer cover
 ## Official source
 
 - [Cloudflare Get Account Usage V2 API](https://developers.cloudflare.com/api/resources/billing/subresources/usage/methods/get_account_usage_v2/) — endpoint, date-window semantics, daily billable metric records, Alpha/Restricted state, and notice that cost/pricing fields may be absent until billing integration is complete.
+
+
+## Observed one-time execution result
+
+- Workflow run: [36839577708](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36839577708), attempt 1, head `7c6bb943f74aebb08fa927e30730e23845825609`, event `workflow_dispatch`; completed with conclusion `failure`.
+- The only Cloudflare request returned HTTP 403, exposed in the job log only as the fixed safe code `CLOUDFLARE_HTTP_403`. Available evidence does not identify whether this reflects endpoint access/entitlement, token permission, account scope, or another cause. Do not infer or publish a more specific diagnosis.
+- No report file was produced and the artifact list is empty. The report-summary step recorded that no report file existed; artifact upload warned that the configured path had no files. The Actions run/job log is the preserved evidence.
+- The one-time authority is `CONSUMED_DO_NOT_RERUN`, including after credential or settings changes. No retry was performed. Any further external query requires a distinct successor version and separate authority.
+- `zero_cost=UNKNOWN`; complete billing and account-wide coverage remain unverified. Cloud Paper activation remains blocked. No R2/D1 access, runtime, or schedule activation occurred.

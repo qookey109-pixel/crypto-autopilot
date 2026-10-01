@@ -1,7 +1,7 @@
 {
   "schema": "qookey-cloud-paper-delivery-v0.1",
-  "updated_date": "2026-09-30",
-  "evidence_basis_parent_main_sha": "c9e220cb6f2191e6fb0dd50a5918a62971360e8e",
+  "updated_date": "2026-10-01",
+  "evidence_basis_parent_main_sha": "7c6bb943f74aebb08fa927e30730e23845825609",
   "is_latest_main_claim": false,
   "status": "IMPLEMENTATION_IN_PROGRESS",
   "contract": "config/cloud_paper_loop_v0_1.json",
@@ -56,7 +56,26 @@
       "audit_head_sha": "2516a80c32fa04b9789bef379b108eb50c87fd49"
     },
     "historical_cloudflare_billing_snapshot": "PR630_MERGED; ONE_READ_ONLY_GET_AUTHORITY; READINESS_RUN_36497596228_BLOCKED_MISSING_BILLING_READ_ONLY_CREDENTIAL; ZERO_CLOUDFLARE_REQUESTS; AUDIT_UNCONSUMED",
-    "dashboard_usage_evidence": "PR653_DEPLOYED_PRIOR_MAIN; NO_NEW_DEPLOYMENT_FROM_PR654_CODE_ONLY_CHANGE; LIVE_PAPER_REPORT_READBACK_PENDING"
+    "dashboard_usage_evidence": "PR653_DEPLOYED_PRIOR_MAIN; NO_NEW_DEPLOYMENT_FROM_PR654_CODE_ONLY_CHANGE; LIVE_PAPER_REPORT_READBACK_PENDING",
+    "cloudflare_billable_usage_v0_2": {
+      "run_id": 36839577708,
+      "attempt": 1,
+      "head_sha": "7c6bb943f74aebb08fa927e30730e23845825609",
+      "event": "workflow_dispatch",
+      "workflow_conclusion": "failure",
+      "job_id": 110295192832,
+      "job_conclusion": "failure",
+      "cloudflare_requests": 1,
+      "response_status": 403,
+      "reason_code": "CLOUDFLARE_HTTP_403",
+      "root_cause": "UNKNOWN",
+      "report_file_produced": false,
+      "artifact_count": 0,
+      "evidence": "ACTIONS_JOB_LOG_AND_RUN_SUMMARY_ONLY",
+      "one_time_authority": "CONSUMED_DO_NOT_RERUN",
+      "zero_cost": "UNKNOWN",
+      "cloud_paper_enabled": false
+    }
   },
   "activation_blockers": {
     "shared_account_r2_usage_evidence": "R2 V0.3 run 36593296360 is partial: one returned bucket (616541780 bytes) and 6 operation groups / 125309 requests with no operation timestamp; complete bucket inventory, all writers, freshness and headroom remain UNKNOWN; V0.3 one-time authority consumed; do not rerun.",
