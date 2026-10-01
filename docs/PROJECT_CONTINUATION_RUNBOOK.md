@@ -1,3 +1,21 @@
+## Live Cloudflare shared-admission checkpoint — 2026-10-02 02:12 Asia/Taipei
+
+Evidence basis: GitHub `main=e50e19996234c166af480fa63ecc3e99a9b56e83`. PR [#714](https://github.com/qookey109-pixel/crypto-autopilot/pull/714) merged a prepared shared-writer reservation contract keyed by `(writer_id, idempotency_key)`. Distinct writers can reserve the same slot; synthetic SQLite CI covers aggregate daily and rolling-31-day caps, replay behavior, conflict rejection, invalid inputs and concurrent reservations. Final PR-head CI [36904453148](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36904453148), CodeQL [36904453025](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36904453025) and Dependency/SBOM [36904453174](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36904453174) succeeded. The first PR CI attempts found Ruff issues; they were corrected before final-head validation.
+
+Post-merge main CI [36904789297](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36904789297), CodeQL [36904789309](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36904789309), Dependency/SBOM [36904789311](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36904789311), and V0.10 Freeze Guard [36904789354](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36904789354) succeeded. Workflow-static was skipped on push. This change performed no Cloudflare, R2, D1, or market-data requests and did not run Pages deployment.
+
+- The successor is **prepared only**: D1 remains unprovisioned, no writer calls this ledger, and no production limits are approved. SQLite tests do not prove D1 concurrency or account-wide coverage.
+- Reservations are conservative and never released; a long-term bounded retention/compaction policy is unresolved. The ledger's own query cost must remain behind the shared D1 rows guard.
+- The user confirmed other projects/services may later use this Cloudflare account. External writers remain unconfirmed; every existing and future writer must register and integrate before account-wide admission can be claimed.
+- Cloud Paper remains **NOT_WIRED / NOT_RUN / NOT_CONFIGURED**; production strategy registry is empty, Core100 quality `REJECT`, required market inputs incomplete, and account cost/headroom unknown.
+- Six PRs remain open: #708 is a stale-base Draft; Dependabot #693–#698 have stale bases. Reconcile exact heads, bases and checks before merge.
+
+Next: define a bounded reservation retention/compaction successor and tie limit inputs to fresh account-wide usage evidence. Then integrate writers one at a time under their existing authorities. Keep D1, Cloud Paper runtime, provider access and natural scheduling disabled until all gates pass.
+
+CLOUD_ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+
+---
+
 ## Live Cloudflare shared-writer checkpoint — 2026-10-02 01:49 Asia/Taipei
 
 Evidence basis: GitHub `main=9ee2aec0e9e6f78bae5bdbff3a759e0d1510b630`. PR [#712](https://github.com/qookey109-pixel/crypto-autopilot/pull/712) merged its versioned shared-account writer registry and CI gate. Post-merge CI [36901137727](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36901137727), CodeQL [36901137747](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36901137747), Dependency/SBOM [36901137749](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36901137749), and V0.10 Freeze Guard [36901137793](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36901137793) succeeded. This change made no Cloudflare, R2, D1, or provider requests.
