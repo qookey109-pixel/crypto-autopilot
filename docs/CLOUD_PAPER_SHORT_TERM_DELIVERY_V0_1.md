@@ -1,15 +1,28 @@
-## Live checkpoint — 2026-10-01 17:00 Asia/Taipei
+## Live checkpoint — 2026-10-01 16:15 Asia/Taipei
 
-Evidence basis: GitHub `main=7c6bb943f74aebb08fa927e30730e23845825609`, re-read at 2026-10-01T08:53:46Z before this documentation update. This is the parent snapshot, not a latest-main claim; resolve `main` live at read time. Open PR count at 2026-10-01T09:00:16Z UTC: 0.
+Evidence basis: GitHub `main=42f8c1cdad46107f5f8f720b9809a7ad71286815`, re-read at 2026-10-01T08:15:20Z before this documentation update. This is a parent snapshot, not a latest-main claim; resolve `main` live at read time.
 
-- PR [#685](https://github.com/qookey109-pixel/crypto-autopilot/pull/685) merged at `7c6bb943f74aebb08fa927e30730e23845825609`. Its bounded diagnostic V0.2 was authorized for one main-only attempt.
-- Cloud Paper Billable Usage run [36839577708](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36839577708), attempt 1, started 2026-10-01T08:57:17Z on the recorded main SHA and completed `failure`. Job 110295192832 made one Cloudflare request; the sanitized log reports `CLOUDFLARE_HTTP_403`. The cause is not established by the available response evidence.
-- The run produced no report file and no artifact (artifact list empty). The upload step completed with a warning because its input file was absent; it is not report success. The Actions job log and run summary are the available evidence. No retry or second Cloudflare request occurred.
-- V0.2 one-time authority is consumed. Do not rerun it, even after changing credentials or settings. Any future Cloudflare request needs a separately versioned successor scope and fresh authorization.
-- This result does not prove insufficient quota or a specific token-scope problem. Account-wide cost, billable usage coverage, R2/D1 headroom, all writers, and zero-cost status remain `UNKNOWN`. Cloud Paper remains disabled: entrypoint `NOT_WIRED`, production cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production strategy registry empty, and Core100 quality `REJECT`.
-- No R2 or D1 access, market/provider request, training, holdout/source-switch/promotion change, runtime activation, or schedule activation occurred in this run.
+- PR [#682](https://github.com/qookey109-pixel/crypto-autopilot/pull/682) merged at `42f8c1cdad46107f5f8f720b9809a7ad71286815`; PR #679 was then closed unmerged at 2026-10-01T08:15:20Z because its generated evidence was based on stale main `358be62e4239ffaeeae2e363e209f7ed278d692f`. Its history is preserved; it was not merged or used to overwrite current status. Live open PR count at this checkpoint: 0.
+- PR #665 is already merged. Its old-schema compatibility and missing-tick recovery regression fixes are complete. Matched synthetic profile: 116,608 canonical JSON bytes vs 157,367 before this slice; this does not prove production R2 savings, cost, or headroom.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, production cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production strategy registry empty, and Core100 quality `REJECT`.
+- Account-wide cost/usage freshness, complete shared-writer coverage, current R2/D1 headroom and eligible strategy input sources remain unresolved. The previous one-time billing, usage, and bootstrap authorities remain consumed and must not be rerun. No provider, R2, or D1 access, migration, runtime activation, or schedule activation occurred in this reconciliation.
+- Next: prepare the smallest separately versioned, read-only successor evidence scope for the still-missing cost/usage dimensions, and finish field-by-field compliant market-source eligibility. Keep all external access disabled until its authority, freshness, free-tier boundary, and expected request/read/write envelope are explicit.
 
-CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; FREE-ONLY / 0 USD; PAPER/LIVE-PAPER ONLY. Preserve the failed run as evidence; do not rerun the consumed authority.
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; FREE-ONLY / 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, model promotion, real-money orders, live trading, and automatic Cloud Maintenance merge remain closed.
+
+
+## Historical checkpoint — 2026-10-01 16:15 Asia/Taipei (superseded by later evidence)
+
+Evidence basis: GitHub `main=42f8c1cdad46107f5f8f720b9809a7ad71286815`, re-read at 2026-10-01T08:15:20Z before this documentation update. This is a parent snapshot, not a latest-main claim; resolve `main` live at read time.
+
+- PR [#682](https://github.com/qookey109-pixel/crypto-autopilot/pull/682) merged at `42f8c1cdad46107f5f8f720b9809a7ad71286815`; PR #679 was then closed unmerged at 2026-10-01T08:15:20Z because its generated evidence was based on stale main `358be62e4239ffaeeae2e363e209f7ed278d692f`. Its history is preserved; it was not merged or used to overwrite current status. Live open PR count at this checkpoint: 0.
+- PR #665 is already merged. Its old-schema compatibility and missing-tick recovery regression fixes are complete. Matched synthetic profile: 116,608 canonical JSON bytes vs 157,367 before this slice; this does not prove production R2 savings, cost, or headroom.
+- Cloud Paper remains disabled: entrypoint `NOT_WIRED`, production cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`, D1 unprovisioned, production strategy registry empty, and Core100 quality `REJECT`.
+- Account-wide cost/usage freshness, complete shared-writer coverage, current R2/D1 headroom and eligible strategy input sources remain unresolved. The previous one-time billing, usage, and bootstrap authorities remain consumed and must not be rerun. No provider, R2, or D1 access, migration, runtime activation, or schedule activation occurred in this reconciliation.
+- Next: prepare the smallest separately versioned, read-only successor evidence scope for the still-missing cost/usage dimensions, and finish field-by-field compliant market-source eligibility. Keep all external access disabled until its authority, freshness, free-tier boundary, and expected request/read/write envelope are explicit.
+
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; FREE-ONLY / 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, model promotion, real-money orders, live trading, and automatic Cloud Maintenance merge remain closed.
+
 
 ## Prior checkpoint — 2026-10-01 (before PR #679 reconciliation)
 
