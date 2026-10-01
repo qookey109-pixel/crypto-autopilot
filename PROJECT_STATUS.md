@@ -1,4 +1,17 @@
-## Cloud Paper — #665 保存精簡合併後狀態（2026-10-01）
+## Cloud Paper checkpoint at #667 merge — 2026-10-01
+
+Checkpoint basis: GitHub `main=1549cc49e0e308a2cbf13a412e898a1028968468`; there were no open PRs at that checkpoint. PRs [#666](https://github.com/qookey109-pixel/crypto-autopilot/pull/666) and [#667](https://github.com/qookey109-pixel/crypto-autopilot/pull/667) are merged. PR #667 added the [market-data source and budget-gap assessment](docs/CLOUD_PAPER_MARKET_DATA_SOURCE_ASSESSMENT_V0_1.md). Post-merge Python 3.12/3.13, CodeQL, Dependency/SBOM, and Freeze Guard passed; workflow-static was skipped because no workflow changed.
+
+- Strategy inputs require 4H/60M/15M; the current adapter fetches only 60M. The estimate for fixed 23-market 4H breadth, 60M and 15M candles for five candidates, plus three shared market calls is 36 requests/slot, above the existing 18-call ceiling. This is a design estimate, not an observed provider quota or usage.
+- Pionex documentation lists the Kline intervals, but this project has not verified formal capture, coverage, or quota. CoinGecko Demo terms may conflict with retaining decision evidence; it is not approved or connected. No new provider, R2/D1, or usage-endpoint access occurred.
+- Cloud Paper remains disabled/NOT_RUN/NOT_WIRED/NOT_CONFIGURED; D1 is unprovisioned, production registry empty, and Core100 quality REJECT. Account-wide zero-cost evidence, complete writer coverage, freshness, and headroom remain unproven.
+- Next: reconcile per-slot/daily/monthly request and persistence costs; define a successor contract for multi-timeframe grids, warmup, breadth freshness and budget gates; validate with synthetic GitHub CI. Do not activate a production entrypoint or schedule before a new authority and budget gate pass.
+
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; 0 USD; PAPER/LIVE-PAPER ONLY. Holdout, source switch, promotion, real-money orders, and live trading remain closed.
+
+## Prior checkpoint — #665 compact storage merge (2026-10-01)
+
+
 
 查核基準 main：`bbd3cccf2841219104cffef46ad2d5aa9ff87648`。PR [#665](https://github.com/qookey109-pixel/crypto-autopilot/pull/665) 已合併；修復後 head `49e27a3257f9163c9c39e996b57ca850af273f9f`。PR CI [36726001018](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726001018)：Python 3.12／3.13 通過，Ruff 通過（1,638 tests），CodeQL [36726000835](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726000835)、SBOM [36726000872](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726000872) 通過。合併 main CI [36726499079](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499079) 的兩個 Python jobs 成功、workflow-static skipped；CodeQL [36726499004](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499004)、SBOM [36726499003](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499003)、Freeze Guard [36726499085](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36726499085) 成功。
 
