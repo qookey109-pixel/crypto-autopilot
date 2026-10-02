@@ -799,7 +799,7 @@ class CloudPaperCompositionTests(unittest.TestCase):
         )
         self.assertEqual(result["state"], "NO_TRADE")
         self.assertEqual(result["reason_codes"], [
-            "REGIME_UNAVAILABLE", "MARKET_SCAN_SKIPPED_NO_ELIGIBLE_STRATEGY",
+            "MARKET_CONTEXT_UNAVAILABLE", "MARKET_SCAN_SKIPPED_NO_ELIGIBLE_STRATEGY",
             "NO_ELIGIBLE_STRATEGY",
         ])
         self.assertEqual(result["market"]["provider"], "NOT_ACCESSED")
