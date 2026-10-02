@@ -57,6 +57,8 @@ class PublishAPI:
         self.ref = None
         self.writes = []
         self.main_sha = A
+        self.main_sequence = []
+        self.main_calls = 0
         self.drift_after_commit = False
         self.files = list(TARGETS)
         self.commits = [{"author": {"login": "github-actions[bot]"},
@@ -65,6 +67,9 @@ class PublishAPI:
         self.closed_prs = []
 
     def main(self):
+        self.main_calls += 1
+        if self.main_sequence:
+            return self.main_sequence.pop(0)
         return self.main_sha
 
     def file(self, path, ref):
@@ -205,7 +210,18 @@ class PureMaintenanceTests(unittest.TestCase):
         publish(api, record())
         api.head_docs = project_documents(documents(), record())
         api.writes.clear()
-        self.assertEqual(publish(api, record())["status"], "NO_CHANGE")
+        result = publish(api, record())
+        self.assertEqual(result["status"], "NO_CHANGE")
+        self.assertEqual(result["commits_created"], 0)
+        self.assertEqual(api.main_calls, 1)
+        self.assertEqual(api.writes, [])
+
+    def test_no_change_revalidates_main_before_reporting(self):
+        api = PublishAPI()
+        api.head_docs = project_documents(documents(), record())
+        api.main_sequence = [B]
+        with self.assertRaisesRegex(Stop, "MAIN_CHANGED_BEFORE_NO_CHANGE_RESULT"):
+            publish(api, record())
         self.assertEqual(api.writes, [])
 
     def test_missing_pr_permission_recovers_without_duplicate_commit(self):
@@ -244,7 +260,7 @@ class PureMaintenanceTests(unittest.TestCase):
     def test_main_race_before_ref_write_stops(self):
         api = PublishAPI()
         api.drift_after_commit = True
-        with self.assertRaisesRegex(Stop, "MAIN_CHANGED"):
+        with self.assertRaisesRegex(Stop, "MAIN_CHANGED_AFTER_COMMIT_BEFORE_REF"):
             publish(api, record())
         self.assertFalse(any(path.startswith("/git/refs") or path == "/pulls"
                              for _, path, _ in api.writes))
@@ -359,8 +375,11 @@ class CollectAPI:
         self.fail_pages = False
         self.prs = [{"number": 999, "head": {"ref": PREFIX + A[:12]}}]
         self.now = NOW
+        self.main_sequence = []
 
     def main(self):
+        if self.main_sequence:
+            return self.main_sequence.pop(0)
         return A
 
     def file(self, path, ref):
@@ -439,8 +458,11 @@ class CollectionTests(unittest.TestCase):
         api.latest = run(event="push")
         with self.assertRaisesRegex(Stop, "LINEAGE"):
             collect(api, event(), A, NOW)
-        with self.assertRaisesRegex(Stop, "MAIN_CHANGED"):
+        with self.assertRaisesRegex(Stop, "MAIN_CHANGED_AT_SNAPSHOT_START"):
             collect(api, event(), B, NOW)
+        api.main_sequence = [A, B]
+        with self.assertRaisesRegex(Stop, "MAIN_CHANGED_DURING_SNAPSHOT"):
+            collect(api, event(), A, NOW)
 
 
     def test_trigger_failure_is_preserved_when_latest_health_has_recovered(self):
