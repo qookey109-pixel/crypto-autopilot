@@ -547,7 +547,40 @@ class CloudPaperCompositionTests(unittest.TestCase):
     def test_provider_limit_blocks_before_the_excess_market_request(self):
         client, accesses = FakeClient(), []
         guard = make_budget_guard(CloudBudgetPolicy(provider_per_run=3))
-        runtime = composition(client, MemoryStore(), guard=guard, accesses=accesses)
+        implementation_sha = "a" * 64
+        registry = {
+            "schema": "qookey-cloud-paper-strategy-registry-v0.1",
+            "status": "QUALIFIED_PAPER_STRATEGIES_AVAILABLE",
+            "provider": "PIONEX_PUBLIC",
+            "strategies": [{
+                "strategy_id": "test-only-budget",
+                "strategy_family": "TREND_FOLLOWING",
+                "provider": "PIONEX_PUBLIC",
+                "symbols": ["BTC_USDT_PERP"],
+                "regimes": ["ALT_EXPANSION"],
+                "implementation_sha256": implementation_sha,
+                "model_dependency": "NONE",
+                "qualification": {
+                    "state": "PAPER_ELIGIBLE",
+                    "receipt_path": "research/receipts/test-only-budget.json",
+                    "receipt_sha256": "b" * 64,
+                    "implementation_sha256": implementation_sha,
+                    "family_validation_report_sha256": "c" * 64,
+                    "paper_execution_authorized": True,
+                    "holdout_accessed": False,
+                    "source_switch_authorized": False,
+                    "model_promotion_authorized": False,
+                    "real_money_order_authorized": False,
+                    "live_trading_authorized": False,
+                },
+            }],
+            "model_quality": "REJECT",
+            "production_fixture_admission": False,
+            "automatic_promotion": False,
+        }
+        runtime = composition(
+            client, MemoryStore(), registry=registry, guard=guard, accesses=accesses,
+        )
         with self.assertRaisesRegex(BudgetBlocked, "PROVIDER_RUN_LIMIT"):
             runtime.run_slot(
                 tick_ms=NOW, previous_slot=None, activation_enabled=True,
@@ -766,12 +799,14 @@ class CloudPaperCompositionTests(unittest.TestCase):
         )
         self.assertEqual(result["state"], "NO_TRADE")
         self.assertEqual(result["reason_codes"], [
-            "REGIME_UNAVAILABLE", "NO_ELIGIBLE_STRATEGY",
+            "MARKET_SCAN_SKIPPED_NO_ELIGIBLE_STRATEGY", "NO_ELIGIBLE_STRATEGY",
         ])
-        self.assertEqual(result["market"]["provider"], "PIONEX_PUBLIC")
+        self.assertEqual(result["market"]["provider"], "NOT_ACCESSED")
+        self.assertEqual(result["market"]["configured_provider"], "PIONEX_PUBLIC")
+        self.assertEqual(result["market"]["market_status"], "NOT_SCANNED")
         self.assertEqual(result["market"]["candidate_specs"], [])
-        self.assertEqual(result["operation_counts"]["provider_requests"], 4)
-        self.assertEqual(len(client.calls), 4)
+        self.assertEqual(result["operation_counts"]["provider_requests"], 0)
+        self.assertEqual(client.calls, [])
         self.assertTrue(store.calls)
         self.assertTrue(accesses)
         self.assertTrue(any(kind == "cloud-report" for kind, _ in store.objects))
