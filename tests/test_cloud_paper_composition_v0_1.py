@@ -765,11 +765,19 @@ class CloudPaperCompositionTests(unittest.TestCase):
             self.assertEqual(first["account"]["initial_equity_usd"], 10_000.0)
             self.assertEqual(first["account"]["open_position_count"], 1)
 
+            # A strategy registry can become empty between slots, but the
+            # independent continuity feed must still manage an existing position.
+            registry["status"] = "EMPTY_NO_ELIGIBLE_STRATEGIES"
+            registry["strategies"] = []
             client.tick_ms = NOW + 15 * 60 * 1000
             second = runtime.run_slot(
                 tick_ms=client.tick_ms, previous_slot=first["slot_id"],
                 activation_enabled=True, run_id="synthetic-exit",
             )
+            self.assertEqual(second["market"]["provider"], "NOT_ACCESSED")
+            self.assertEqual(second["market"]["market_status"], "NOT_SCANNED")
+            self.assertEqual(second["market"]["provider_requests_performed"], 0)
+            self.assertGreater(second["operation_counts"]["provider_requests"], 0)
             self.assertEqual(second["state"], "COMMITTED")
             self.assertEqual(second["account"]["open_position_count"], 0)
             self.assertGreater(
