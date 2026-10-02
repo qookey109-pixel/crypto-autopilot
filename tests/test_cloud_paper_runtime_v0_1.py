@@ -212,7 +212,7 @@ class CloudPaperRuntimeAssemblyTests(unittest.TestCase):
         self.assertEqual(report["state"], "NO_TRADE")
         self.assertEqual(report["account"]["initial_equity_usd"], 10_000)
         self.assertEqual(report["account"]["open_position_count"], 0)
-        self.assertEqual(provider_calls, 4)
+        self.assertEqual(provider_calls, 0)
         self.assertEqual(opener.open.call_count, provider_calls)
         self.assertEqual(len(sdk.calls), r2_calls)
         self.assertTrue(sdk.objects)

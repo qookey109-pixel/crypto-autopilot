@@ -114,9 +114,9 @@ class CloudPaperNoTradeComposition:
         if not isinstance(self.run_name, str) or not self.run_name:
             raise ValueError("run_name is required")
 
-    def _validate_strategy_registry(self) -> None:
+    def _validate_strategy_registry(self) -> dict[str, Mapping[str, object]]:
         try:
-            validate_strategy_registry(self.strategy_registry)
+            return validate_strategy_registry(self.strategy_registry)
         except CloudCandidateRegistryBlocked:
             raise CloudPaperCompositionBlocked(
                 "PRODUCTION_STRATEGY_AUTHORITY_UNAVAILABLE"
@@ -138,8 +138,11 @@ class CloudPaperNoTradeComposition:
         # the same immutable Paper report.
         if not isinstance(market, dict):
             raise CloudPaperCompositionBlocked("MARKET_REPORT_NOT_MUTABLE")
+        selection_reasons = list(selection.reasons)
+        if market.get("market_scan_skip_reason") == "NO_ELIGIBLE_STRATEGY":
+            selection_reasons.insert(0, "MARKET_SCAN_SKIPPED_NO_ELIGIBLE_STRATEGY")
         market["execution_selection_status"] = selection.status
-        market["execution_selection_reasons"] = list(selection.reasons)
+        market["execution_selection_reasons"] = selection_reasons
         return selection.candidates
 
     def _reserve_provider_request(self) -> None:
@@ -237,7 +240,7 @@ class CloudPaperNoTradeComposition:
 
         # Validate registry authority before any D1, provider, or R2 access.
         # The current empty registry remains a normal no-trade configuration.
-        self._validate_strategy_registry()
+        registrations = self._validate_strategy_registry()
 
         if self.reservation_ledger is None or self.d1_usage_guard is None:
             raise CloudPaperCompositionBlocked(
@@ -262,6 +265,18 @@ class CloudPaperNoTradeComposition:
         )
 
         def market_supplier() -> Mapping[str, object]:
+            if not registrations:
+                return {
+                    "schema": "qookey-cloud-paper-market-report-v0.1",
+                    "provider": "NOT_ACCESSED",
+                    "configured_provider": "PIONEX_PUBLIC",
+                    "market_status": "NOT_SCANNED",
+                    "context_status": "NOT_EVALUATED",
+                    "market_scan_skip_reason": "NO_ELIGIBLE_STRATEGY",
+                    "as_of_ms": tick_ms,
+                    "candidate_specs": [],
+                    "provider_requests_performed": 0,
+                }
             capture = capture_market(
                 self.client,
                 as_of_ms=tick_ms,
