@@ -285,16 +285,13 @@ def decision_reason_codes(
     reasons: list[str] = []
     if market.get("market_status") == "REVIEW_REQUIRED":
         reasons.append("MARKET_INPUT_REVIEW_REQUIRED")
-    if market.get("market_scan_skip_reason") == "NO_ELIGIBLE_STRATEGY":
-        reasons.append("MARKET_SCAN_SKIPPED_NO_ELIGIBLE_STRATEGY")
-    else:
-        context_status = market.get("context_status")
-        if context_status != "AVAILABLE":
-            reasons.append(
-                "REGIME_UNAVAILABLE"
-                if context_status == "REGIME_UNAVAILABLE"
-                else "MARKET_CONTEXT_UNAVAILABLE"
-            )
+    context_status = market.get("context_status")
+    if context_status != "AVAILABLE":
+        reasons.append(
+            "REGIME_UNAVAILABLE"
+            if context_status == "REGIME_UNAVAILABLE"
+            else "MARKET_CONTEXT_UNAVAILABLE"
+        )
     if market.get("execution_selection_status") == "REVIEW_REQUIRED":
         reasons.append("CANDIDATE_SELECTION_REVIEW_REQUIRED")
     selection_reasons = market.get("execution_selection_reasons")
