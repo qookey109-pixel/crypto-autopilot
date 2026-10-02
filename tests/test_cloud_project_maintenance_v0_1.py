@@ -210,6 +210,7 @@ class PureMaintenanceTests(unittest.TestCase):
         publish(api, record())
         api.head_docs = project_documents(documents(), record())
         api.writes.clear()
+        api.main_calls = 0
         result = publish(api, record())
         self.assertEqual(result["status"], "NO_CHANGE")
         self.assertEqual(result["commits_created"], 0)
