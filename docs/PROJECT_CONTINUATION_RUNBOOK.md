@@ -1,3 +1,18 @@
+## Live repository checkpoint — 2026-10-02 08:00 Asia/Taipei
+
+Evidence basis: protected `main=4232d092ed880e6414b0b9c2b41b6f303eaddf77`; PR #738 has merged.
+
+- PR #738 records merged PR #665 storage-lineage evidence and refreshes the Cloud Paper delivery checkpoint. No runtime, frozen evidence, Cloudflare access, or activation changed.
+- Main checks: Python 3.12/3.13 CI [36943358428](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36943358428), CodeQL [36943358429](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36943358429), Dependency/SBOM [36943358451](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36943358451), and V0.10 Freeze Guard [36943358470](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36943358470) succeeded; `workflow-static` was skipped by the change filter. Latest Pages success is [36942411579](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36942411579) on previous main `bc1ae2c30cf70b228b96a19b4829aaa1f318d91f`; it was not rerun for #738.
+- Seven PRs remain open: stale Draft #708 and Dependabot #693–#698. Recheck exact head, base, diff, and checks against current main before deciding on any merge.
+- Billing History V0.1 run [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281), attempt 1, remains consumed as `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`; never rerun. Billing History V0.2 is authorized on main but undispatched. It would be a distinct one-time read-only Cloudflare account billing-history operation (maximum 10 sequential requests, one attempt, no retries); it cannot prove zero total account cost. No request has been made; explicit owner confirmation remains required.
+- The owner expects more Cloudflare projects/services may be added later. Complete current/future external writer coverage remains unconfirmed; repository declarations do not establish the full account inventory. Register each new writer before its first cloud write. Account-wide cost/headroom and zero-cost operation remain unproven.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 is unprovisioned, production strategy registry is empty, Core100 quality remains `REJECT`, and natural scheduling is disabled. Keep R2/D1 writes and activation off; maintain FREE-ONLY and PAPER/LIVE-PAPER-only boundaries.
+
+This checkpoint supersedes the following older live checkpoint. Historical evidence is retained.
+
+---
+
 ## Live repository checkpoint — 2026-10-02 07:41 Asia/Taipei
 
 Evidence basis: reviewed parent `main=8b657c24255bc140f5420f4010e4955dcdca5c8c`; re-resolve protected `main` after this documentation change.
