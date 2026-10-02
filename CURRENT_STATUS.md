@@ -1,3 +1,19 @@
+## Live repository checkpoint — 2026-10-02 09:29 Asia/Taipei
+
+Evidence basis: re-read protected `main=d49f5d3280344b713d9ec736f85f96b4c7466eec` after [PR #745](https://github.com/qookey109-pixel/crypto-autopilot/pull/745) merged. This is the reviewed parent SHA for the present status-only update; resolve `main` again after merge.
+
+- PR #745 refreshed the Cloud Paper delivery checkpoint after #744. Exact-main post-merge CI [36950443856](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36950443856), CodeQL [36950443830](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36950443830), Dependency/SBOM [36950443836](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36950443836), and V0.10 Critical Path Freeze Guard [36950443895](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36950443895) succeeded. Workflow-static was skipped by its change filter. This was a documentation change; it did not activate Cloud Paper or establish a new natural run.
+- Six open PRs remain: Dependabot #693–#698. Their recorded base SHAs predate current `main`; inspect each exact diff and current checks before merge. No stale PR is treated as ready from its prior green checks.
+- Latest observed natural Health/Maintenance chain remains Health [36945143410](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36945143410) SUCCESS on old SHA `22d3852e32160fe2aa4485218e78f19da58bc232`, then Maintenance [36945187313](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36945187313) `inspect=success`, `propose=failure / MAIN_CHANGED`, with no report. No qualifying post-#742 natural chain was found; retain the failure and do not rerun it or count it as acceptance.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 is unprovisioned, the production strategy registry is empty, Core100 quality is `REJECT`, and natural scheduling is disabled. Keep provider/R2/D1 execution and activation disabled.
+- Existing usage/billing evidence does not establish total account cost or current account-wide headroom. The owner expects additional Cloudflare projects/services later; current/future external writer coverage is `UNCONFIRMED` and incomplete. Require registration and shared admission before any new writer's first cloud write.
+- Billing History V0.1 [run 36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281) remains consumed as `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`; do not rerun. The separate Billing History V0.2 one-time read is prepared on main but remains undispatched pending explicit owner confirmation. No Cloudflare request occurred in this status refresh.
+- Preserve FREE-ONLY / 0 USD / PAPER-LIVE-PAPER-only. Holdout, source switch, model promotion, real-money orders and live trading remain closed.
+
+This checkpoint supersedes the older live checkpoints below. Historical evidence is preserved unchanged.
+
+---
+
 ## Live repository checkpoint — 2026-10-02 09:05 Asia/Taipei
 
 Evidence basis: protected `main=bce2297e25393ed1a9d01b3924187ed3ef8fd36b`, after [PR #743](https://github.com/qookey109-pixel/crypto-autopilot/pull/743) merged.
