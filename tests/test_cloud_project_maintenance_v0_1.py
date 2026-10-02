@@ -459,6 +459,7 @@ class CollectionTests(unittest.TestCase):
         api.latest = run(event="push")
         with self.assertRaisesRegex(Stop, "LINEAGE"):
             collect(api, event(), A, NOW)
+        api.latest = run()
         with self.assertRaisesRegex(Stop, "MAIN_CHANGED_AT_SNAPSHOT_START"):
             collect(api, event(), B, NOW)
         api.main_sequence = [A, B]
