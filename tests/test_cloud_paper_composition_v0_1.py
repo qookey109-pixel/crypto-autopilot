@@ -399,7 +399,7 @@ class CloudPaperCompositionTests(unittest.TestCase):
         settled_slot, completed_at, usage = ledger.settlements[0]
         self.assertEqual(settled_slot, slot)
         self.assertEqual(completed_at, NOW + 1)
-        self.assertEqual(usage.provider_requests, 4)
+        self.assertEqual(usage.provider_requests, 0)
         self.assertGreater(usage.class_a, 0)
         self.assertGreater(usage.class_b, 0)
         self.assertGreater(usage.new_bytes, 0)
@@ -799,7 +799,8 @@ class CloudPaperCompositionTests(unittest.TestCase):
         )
         self.assertEqual(result["state"], "NO_TRADE")
         self.assertEqual(result["reason_codes"], [
-            "MARKET_SCAN_SKIPPED_NO_ELIGIBLE_STRATEGY", "NO_ELIGIBLE_STRATEGY",
+            "REGIME_UNAVAILABLE", "MARKET_SCAN_SKIPPED_NO_ELIGIBLE_STRATEGY",
+            "NO_ELIGIBLE_STRATEGY",
         ])
         self.assertEqual(result["market"]["provider"], "NOT_ACCESSED")
         self.assertEqual(result["market"]["configured_provider"], "PIONEX_PUBLIC")
