@@ -219,7 +219,7 @@ class PureMaintenanceTests(unittest.TestCase):
 
     def test_no_change_revalidates_main_before_reporting(self):
         api = PublishAPI()
-        api.head_docs = project_documents(documents(), record())
+        api.docs = project_documents(documents(), record())
         api.main_sequence = [B]
         with self.assertRaisesRegex(Stop, "MAIN_CHANGED_BEFORE_NO_CHANGE_RESULT"):
             publish(api, record())
