@@ -1,3 +1,19 @@
+## Live repository checkpoint — 2026-10-02 08:18 Asia/Taipei
+
+Evidence basis: protected `main=22d3852e32160fe2aa4485218e78f19da58bc232`, after PRs #739 and #740 merged.
+
+- PR #739 synchronized `CURRENT_STATUS.md` and the continuation runbook; PR #740 synchronized `PROJECT_STATUS.md`. PR #740 post-merge Python 3.12/3.13 CI [36944913280](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36944913280), CodeQL [36944913126](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36944913126), Dependency/SBOM [36944913051](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36944913051), and V0.10 Freeze Guard [36944913094](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36944913094) succeeded. Its Pages deploy/browser were skipped because the content hash was unchanged. The subsequent Health-triggered Pages run [36945187325](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36945187325) completed build, deploy, and desktop/mobile production browser validation successfully.
+- Latest natural Health chain: scheduled run [36945143410](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36945143410), attempt 1, main `22d3852e32160fe2aa4485218e78f19da58bc232`, completed SUCCESS; secret-free artifact [11201434425](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36945143410/artifacts/11201434425).
+- Its Cloud Project Maintenance run [36945187313](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36945187313), event `workflow_run`, attempt 1: `inspect=success`, `propose=failure` with `MAIN_CHANGED`; no report artifact was produced. The run log shows the bounded publisher stopped before proposal creation. The workflow/source only reads GitHub metadata and has no Cloudflare/R2/D1/provider access. At the time of recheck, main still resolved to the same SHA; the exact transient guard cause is unknown. Preserve this failure; do not rerun or count the chain as maintenance acceptance.
+- Open PR inventory remains seven: stale Draft maintenance PR #708 and Dependabot PRs #693–#698. Recheck exact head/base/diff/checks against current main before any merge; do not merge stale evidence on green checks alone.
+- Billing History V0.1 [run 36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281), attempt 1, remains consumed as `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`; never rerun. Billing History V0.2 is authorized on main but undispatched and has made no Cloudflare request. It remains a separate one-time read capped at ten sequential requests and one attempt, pending explicit owner confirmation.
+- The owner confirmed additional Cloudflare projects/services may be added later. Current/future external writer coverage remains incomplete and `UNCONFIRMED`; repository declarations do not prove full account coverage. Register each new writer with shared admission before its first cloud write. Account-wide cost/headroom and zero-cost operation remain unproven.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 is unprovisioned, production strategy registry is empty, Core100 quality is `REJECT`, and natural scheduling is disabled. Keep R2/D1 writes and activation disabled; preserve FREE-ONLY, PAPER/LIVE-PAPER-only boundaries, with holdout, source switch, promotion, real-money orders, and live trading closed.
+
+This checkpoint supersedes the older live checkpoints below. Historical observations and frozen evidence remain unchanged.
+
+---
+
 ## Live repository checkpoint — 2026-10-02 08:00 Asia/Taipei
 
 Evidence basis: protected `main=4232d092ed880e6414b0b9c2b41b6f303eaddf77`, after [PR #738](https://github.com/qookey109-pixel/crypto-autopilot/pull/738) merged.
