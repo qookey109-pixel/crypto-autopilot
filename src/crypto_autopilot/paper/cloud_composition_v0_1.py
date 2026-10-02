@@ -138,8 +138,11 @@ class CloudPaperNoTradeComposition:
         # the same immutable Paper report.
         if not isinstance(market, dict):
             raise CloudPaperCompositionBlocked("MARKET_REPORT_NOT_MUTABLE")
+        selection_reasons = list(selection.reasons)
+        if market.get("market_scan_skip_reason") == "NO_ELIGIBLE_STRATEGY":
+            selection_reasons.insert(0, "MARKET_SCAN_SKIPPED_NO_ELIGIBLE_STRATEGY")
         market["execution_selection_status"] = selection.status
-        market["execution_selection_reasons"] = list(selection.reasons)
+        market["execution_selection_reasons"] = selection_reasons
         return selection.candidates
 
     def _reserve_provider_request(self) -> None:
