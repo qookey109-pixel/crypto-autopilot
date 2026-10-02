@@ -1,3 +1,14 @@
+## Live repository checkpoint — 2026-10-02 10:18 Asia/Taipei
+
+Evidence basis: protected `main=39ff3a0091d1e1827135225772498da9bdebdd4f`, re-read at 2026-10-02 02:18 UTC. This checkpoint supersedes older present-tense snapshots below; historical evidence is preserved.
+
+- PR [#749](https://github.com/qookey109-pixel/crypto-autopilot/pull/749) merged at 2026-10-02 10:10 Asia/Taipei. It prevents new-opportunity market scanning when the validated production strategy registry is empty, while retaining the separate existing-position continuity feed. Its post-merge Python 3.12/3.13, dependency-security, CodeQL and V0.10 Critical Path Freeze checks succeeded; workflow-static was skipped by its change filter. The short-lived branch was removed.
+- Latest natural schedule chain is still pre-fix/pre-#749: Health [36945143410](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36945143410) succeeded at 2026-10-02 08:16 Asia/Taipei on `22d3852e32160fe2aa4485218e78f19da58bc232`; its `workflow_run` Maintenance [36945187313](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36945187313) had `inspect=success`, `propose=failure / MAIN_CHANGED`, and no report artifact. This chain predates the #742 fix (documented as merged after 09:05 Taipei) and #749 (merged 10:10 Taipei), so it does not evaluate either fix. Preserve it; do not rerun or manually trigger. As of 10:18 Taipei, no qualifying natural Health → Maintenance chain on the post-#742/#749 main was present.
+- Six open PRs #693–#698 are Dependabot updates with older bases; recheck exact head/base/diff/checks before any merge.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 is unprovisioned, the validated production strategy registry is empty, and Core100 quality is `REJECT`. Natural Cloud Paper scheduling remains disabled.
+- Account-wide cost/headroom and complete current/future Cloudflare writer coverage remain `UNCONFIRMED`; the owner expects additional projects/services may be added later. Billing History V0.1 run [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281) remains consumed as `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`. Do not rerun. Billing History V0.2 remains undispatched pending explicit owner confirmation.
+- This review made no Cloudflare, R2, D1 or market-endpoint requests. Keep FREE-ONLY / 0 USD and PAPER/LIVE-PAPER-only; holdout, source switch, promotion, real-money orders and live trading remain closed.
+
 ## Live repository checkpoint — 2026-10-02 09:05 Asia/Taipei
 
 Evidence basis: protected `main=bce2297e25393ed1a9d01b3924187ed3ef8fd36b`, after [PR #743](https://github.com/qookey109-pixel/crypto-autopilot/pull/743) merged.
