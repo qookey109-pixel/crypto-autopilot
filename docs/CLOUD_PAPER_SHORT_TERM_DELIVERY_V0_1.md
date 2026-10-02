@@ -1,3 +1,19 @@
+## Live repository checkpoint — 2026-10-02, after PR #747
+
+Evidence basis: protected `main=59038866789a4315110daccc09ae118549817e1c`; PR [#747](https://github.com/qookey109-pixel/crypto-autopilot/pull/747) merged by squash at this SHA.
+
+- PR #747 skips only the new-opportunity market scan when the validated production strategy registry is empty. It records `MARKET_SCAN_SKIPPED_NO_ELIGIBLE_STRATEGY`, `provider=NOT_ACCESSED`, `configured_provider=PIONEX_PUBLIC`, and zero scan requests. The independent continuity feed for an existing position remains unchanged. This reduces unnecessary public requests; it does not enable or run Cloud Paper.
+- Exact-head PR checks passed: Python 3.12/3.13, workflow-static, dependency-security and CodeQL. Post-merge main checks passed: Python 3.12/3.13, dependency-security, CodeQL and V0.10 Critical Path Freeze Guard. Post-merge workflow-static was skipped by its change filter.
+- No Cloudflare, R2, D1 or market endpoint was called. The short-lived delivery branch was deleted.
+- Six open PRs remain (#693–#698), all Dependabot updates with bases older than current main. Recheck exact head/base/diff/checks before deciding whether to update or merge them.
+- Cloud Paper is still `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 is unprovisioned, the production strategy registry is empty and Core100 quality is `REJECT`. Natural Cloud Paper scheduling remains disabled.
+- Account-wide cost/headroom and complete current/future Cloudflare writer coverage remain `UNCONFIRMED`; the owner expects additional projects/services may be added later. Billing History V0.1 run [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281) remains consumed as `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`. Do not rerun it. Billing History V0.2 remains undispatched pending explicit owner confirmation.
+- Keep FREE-ONLY / 0 USD and PAPER/LIVE-PAPER-only. Holdout, source switch, promotion, real-money orders and live trading remain closed.
+
+This checkpoint supersedes older present-tense snapshots below it. Historical evidence remains unchanged.
+
+---
+
 ## Live delivery checkpoint — 2026-10-02 09:29 Asia/Taipei
 
 Evidence basis: re-read protected `main=d49f5d3280344b713d9ec736f85f96b4c7466eec` after [PR #745](https://github.com/qookey109-pixel/crypto-autopilot/pull/745) merged. This is the reviewed parent SHA for this status-only update; resolve `main` again after merge.
