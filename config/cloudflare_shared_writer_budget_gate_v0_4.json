@@ -1,0 +1,28 @@
+{
+  "schema": "qookey-cloudflare-shared-writer-budget-gate-v0.4",
+  "status": "PREPARED_SYNTHETIC_VALIDATION_ONLY",
+  "depends_on": {"schema": "cloudflare_shared_writer_admission_v0_3", "database": "fresh_successor_schema_only", "production_d1_provisioned": false},
+  "activation_enabled": false,
+  "cloudflare_requests_authorized": false,
+  "central_policy": {
+    "stored_in_shared_d1_row": true,
+    "caller_supplied_limits_allowed": false,
+    "unset_or_invalid_policy": "BLOCK_BEFORE_EXTERNAL_ACCESS",
+    "daily_aggregate_scope": "ALL_WRITERS_IN_SHARED_LEDGER",
+    "rolling_window_days": 31,
+    "reservation_includes_shared_ledger_cost": true,
+    "all_policy_caps_start_null": true,
+    "policy_mutation_authority": "SEPARATE_VERSIONED_AUTHORITY_REQUIRED"
+  },
+  "reserved_dimensions": ["provider_requests", "r2_class_a", "r2_class_b", "r2_new_bytes", "d1_queries", "d1_rows_read", "d1_rows_written", "d1_storage_growth_bytes"],
+  "budget_windows": {"daily": "UTC_CALENDAR_DAY", "rolling": "INCLUSIVE_31_DAYS_FOR_R2_CLASS_A_CLASS_B_AND_NEW_BYTES", "unknown_or_exceeded": "BLOCK_AND_PRESERVE_EVIDENCE"},
+  "idempotency": {"key": ["writer_id", "slot_id"], "exact_replay": "RETURN_EXISTING_NO_EXTERNAL_ACCESS", "changed_payload": "BLOCK_CONFLICT", "inactive_or_unregistered_writer": "BLOCK", "retired_slot": "BLOCK"},
+  "validation": {
+    "mode": "GITHUB_CI_SQLITE_SYNTHETIC_ONLY",
+    "covers": ["central_null_policy_fails_closed", "account_aggregate_spans_distinct_writers", "daily_and_rolling_caps", "writer_identity_gate", "exact_replay", "changed_envelope_conflict", "ledger_cost_floor", "UTC_day_partition"],
+    "sqlite_proves_cloudflare_d1_semantics": false,
+    "production_query_metering_calibrated": false
+  },
+  "required_before_production_use": ["owner_attested_complete_current_and_planned_writer_inventory", "all_active_writers_use_the_same_shared_admission_database", "separate_authority_for_d1_provisioning_and_policy_values", "fresh_account_wide_r2_d1_usage_and_storage_headroom", "fixed_and_usage_based_cost_scope_proves_zero_usd", "finite_caps_approved_below_actual_account_free_limits", "exact_d1_metadata_cost_calibration_and_concurrency_validation", "all_admission_and_replay_queries_included_in_d1_budget", "separate_authority_for_compaction", "controlled_paper_acceptance_after_market_and_strategy_gates"],
+  "boundaries": {"provider_access": false, "r2_access": false, "d1_access": false, "d1_provisioning": false, "compaction": false, "schedule_activation": false, "holdout_access": false, "source_switch": false, "model_promotion": false, "real_money_orders": false, "live_trading": false, "monthly_budget_usd": 0}
+}
