@@ -2,8 +2,8 @@
   "schema": "qookey-cloud-paper-dashboard-v0.1",
   "authority": false,
   "mode": "PAPER_AND_LIVE_PAPER_ONLY",
-  "evidence_basis_main_sha": "2fd2d9f5c5b5a2dfe33ec1aa6593574c7df335d5",
-  "observed_at_utc": "2026-10-01T20:42:50Z",
+  "evidence_basis_main_sha": "e1d28e10542f5d0e0afe73f01bf2e7b662e33487",
+  "observed_at_utc": "2026-10-02T02:34:29Z",
   "activation": {
     "enabled": false,
     "status": "BLOCKED"
