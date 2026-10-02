@@ -29,8 +29,9 @@ def main():
         record = collect(api, event, os.environ["GITHUB_SHA"], datetime.now(timezone.utc))
         semantic = digest(record["semantic"])
         if args.mode == "publish":
-            require(record["evidence"]["main_sha"] == os.environ.get("EXPECTED_MAIN")
-                    and semantic == os.environ.get("EXPECTED_DIGEST"), "OBSERVATION_CHANGED")
+            require(record["evidence"]["main_sha"] == os.environ.get("EXPECTED_MAIN"),
+                    "MAIN_CHANGED_BETWEEN_JOBS")
+            require(semantic == os.environ.get("EXPECTED_DIGEST"), "OBSERVATION_CHANGED")
             result = publish(api, record)
         else:
             result = {"status": "READ_ONLY_COMPLETE"}

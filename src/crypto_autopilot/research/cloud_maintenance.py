@@ -272,7 +272,7 @@ def validate_branch_documents(base_docs, head_docs):
 
 def collect(api, event, checkout_sha, now):
     main = api.main()
-    require(main == checkout_sha, "MAIN_CHANGED")
+    require(main == checkout_sha, "MAIN_CHANGED_AT_SNAPSHOT_START")
     config = json.loads(api.file(POLICY, main))
     receipt = json.loads(api.file(RECEIPT, main))
     validate_contract(config, receipt)
@@ -365,12 +365,12 @@ def collect(api, event, checkout_sha, now):
               "evidence": {"main_sha": main, "observed_at_utc": now.isoformat(),
                            "source": run_evidence(source), "workflows": evidence,
                            "prs": pr_evidence, "coverage": api.coverage}}
-    require(api.main() == main, "MAIN_CHANGED")
+    require(api.main() == main, "MAIN_CHANGED_DURING_SNAPSHOT")
     return record
 
 
-def guard_main(api, expected):
-    require(api.main() == expected, "MAIN_CHANGED")
+def guard_main(api, expected, phase):
+    require(api.main() == expected, phase)
 
 
 def publish(api, record):
@@ -394,8 +394,10 @@ def publish(api, record):
         require(not history, "CLOSED_BRANCH_REVIEW_REQUIRED")
     if head != main:
         comparison = api.request("GET", f"/compare/{main}...{head}")
-        require(comparison["status"] == "ahead" and comparison["behind_by"] == 0
-                and comparison["merge_base_commit"]["sha"] == main, "MAIN_CHANGED")
+        require(comparison["status"] == "ahead" and comparison["behind_by"] == 0,
+                "DELIVERY_BRANCH_NOT_AHEAD_OF_MAIN")
+        require(comparison["merge_base_commit"]["sha"] == main,
+                "MAIN_CHANGED_AT_DELIVERY_BRANCH_BASE")
         require(set(f["filename"] for f in comparison["files"]) <= set(TARGETS),
                 "OUTSIDE_ALLOWLIST")
         require(comparison["total_commits"] == len(comparison["commits"]),
@@ -408,11 +410,12 @@ def publish(api, record):
     proposed = project_documents(documents, record)
     changed = {p: text for p, text in proposed.items() if text != documents[p]}
     if not changed and (pr or head == main):
+        guard_main(api, main, "MAIN_CHANGED_BEFORE_NO_CHANGE_RESULT")
         return {"status": "NO_CHANGE", "pr": pr["number"] if pr else None,
                 "head_sha": head, "commits_created": 0}
     # Frozen paths cannot enter this hardcoded allowlist.
     require(set(changed) <= set(TARGETS), "OUTSIDE_ALLOWLIST")
-    guard_main(api, main)
+    guard_main(api, main, "MAIN_CHANGED_BEFORE_DRAFT_WRITES")
     if changed:
         parent = api.request("GET", f"/git/commits/{head}")
         tree = api.request("POST", "/git/trees", {
@@ -421,7 +424,7 @@ def publish(api, record):
                      for p, content in sorted(changed.items())]})
         commit = api.request("POST", "/git/commits", {
             "message": MESSAGE, "tree": tree["sha"], "parents": [head]})
-        guard_main(api, main)
+        guard_main(api, main, "MAIN_CHANGED_AFTER_COMMIT_BEFORE_REF")
         current = api.request("GET", f"/git/ref/heads/{branch}", missing_ok=True)
         require((current["object"]["sha"] if current else None) == (head if ref else None),
                 "BRANCH_CHANGED")
@@ -432,7 +435,7 @@ def publish(api, record):
             api.request("POST", "/git/refs", {"ref": f"refs/heads/{branch}", "sha": commit["sha"]})
         head = commit["sha"]
         # GitHub does not offer a main+delivery-ref transaction; stale drafts cannot merge.
-        guard_main(api, main)
+        guard_main(api, main, "MAIN_CHANGED_AFTER_REF_BEFORE_PR")
     if not pr:
         pr = api.request("POST", "/pulls", {
             "title": "docs: refresh cloud maintenance evidence",
