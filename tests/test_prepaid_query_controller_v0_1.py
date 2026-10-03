@@ -405,7 +405,7 @@ class PrepaidControllerTests(unittest.TestCase):
         calls = []
 
         def execute(sql: str, params: tuple[object, ...]) -> Result:
-            self.assertEqual(len(self.github.refs), 1)
+            self.assertGreaterEqual(len(self.github.refs), 1)
             calls.append(sql)
             cursor = db.execute(sql, params)
             columns = tuple(column[0] for column in cursor.description or ())
@@ -422,6 +422,13 @@ class PrepaidControllerTests(unittest.TestCase):
         with self.assertRaises(BudgetBlocked):
             claim_and_reserve_shared_writer_envelope(**args)
         self.assertEqual(len(calls), 1)
+        args["run_id"] = 102
+        result, report = claim_and_reserve_shared_writer_envelope(**args)
+        self.assertEqual(result, "EXISTING_RESERVATION")
+        self.assertEqual(report["query_attempts_charged"], 2)
+        with self.assertRaises(BudgetBlocked):
+            claim_and_reserve_shared_writer_envelope(**args)
+        self.assertEqual(len(calls), 3)
         self.assertEqual(db.execute("SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3").fetchone()[0], 1)
 
     def test_transport_http_rejection_has_no_body_and_no_retry(self) -> None:

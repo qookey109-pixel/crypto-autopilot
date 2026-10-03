@@ -1,4 +1,20 @@
-## Shared writer budget implementation checkpoint — 2026-10-03
+## Prepaid query controller checkpoint — 2026-10-03
+
+Scope: implemented controller, disabled execution. Reviewed parent main `72420c7c34729e61bfdfff3507078dc2dc2063e3` is the evidence basis, not a latest-main claim.
+
+- [PR #754](https://github.com/qookey109-pixel/crypto-autopilot/pull/754) adds the concrete GitHub reference claim backend, finite per-writer daily query tickets, and a composition entrypoint into V0.4 shared admission. Whole-ticket prepayment survives a reconstructed caller: no reclaim, refund or automatic retry after failure.
+- Implementation head `1f62483ec74ae70bab1012c656fad4746483a8e0` passed [GitHub CI 37091464727](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37091464727), including Python 3.12/3.13, Ruff and 23 controller tests. CodeQL and Dependency/SBOM passed. Synthetic GitHub and actual V0.4 SQLite composition are engineering evidence; production reference atomicity/protection and D1 cost/concurrency are still unverified.
+- The successor controller is **IMPLEMENTED_DISABLED / NOT_WIRED**. Its merged-default configuration prevents even GitHub ticket claims. Finite scope, writers, cost ceilings and tag ruleset ID remain unset. No runtime claim tag, tag ruleset, Cloudflare/R2/D1/provider access, provisioning or schedule was created.
+- PR #752 is merged at the reviewed parent. Post-merge [CI 37089078537](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37089078537), CodeQL and Dependency/SBOM passed; [Pages 37089078530](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37089078530) build, deploy and desktop/mobile production browser checks passed. Its delivery branch was deleted. Deployment health does not establish account cost or PAPER activation.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 is unprovisioned, production strategy registry empty and Core100 REJECT. Current account writer coverage/cost/headroom are unconfirmed; future services register before first write. Empty strategy registry is a valid normal NO_TRADE outcome, not grounds to promote the rejected model.
+- Next: verify protected GitHub ticket claims under a finite merged authority, provide fresh complete account allocations and calibrated D1 ceilings, and wire the trusted gateway into controlled PAPER acceptance. Billing History V0.1 remains consumed; V0.2 remains undispatched pending its distinct owner confirmation.
+- Sources: [controller contract](config/cloudflare_prepaid_query_controller_v0_1.json), [implementation and limits](docs/PREPAID_QUERY_CONTROLLER_V0_1.md). CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER / 0 USD / PAPER-LIVE-PAPER ONLY.
+
+Older dated checkpoints below are historical observations. Their unfinished-controller wording is superseded only by the implemented-but-disabled successor above.
+
+---
+
+## Historical V0.4 preparation checkpoint — 2026-10-03
 
 Scope: V0.4 preparation only; reviewed parent main `e3e98100181ae98fe98ce630108a24569e16be24` is an evidence basis, not a claim about the latest main after merge.
 

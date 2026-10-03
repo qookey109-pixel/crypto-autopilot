@@ -30,7 +30,7 @@ CONFIG_PATH = "config/cloudflare_prepaid_query_controller_v0_1.json"
 _SCHEMA = "qookey-cloudflare-prepaid-query-controller-v0.1"
 _ALIAS = re.compile(r"^[a-z0-9][a-z0-9-]{0,47}$")
 _WRITER = re.compile(r"^[a-z0-9][a-z0-9:._/-]{0,127}$")
-_REPO = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
+_REPO = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*$")
 _SHA = re.compile(r"^[0-9a-f]{40}$")
 _METRICS = ("queries", "rows_read", "rows_written", "storage_bytes")
 _MAX_GITHUB_REQUESTS = 8
@@ -262,7 +262,7 @@ class GitHubJSONClient:
     """Single-attempt bounded GitHub-only transport; never logs response bodies."""
 
     def __init__(self, *, token: str) -> None:
-        if not token or "\n" in token or "\r" in token:
+        if not isinstance(token, str) or not token or "\n" in token or "\r" in token:
             raise _blocked("GITHUB_CREDENTIAL_UNAVAILABLE")
         self._token = token
 
