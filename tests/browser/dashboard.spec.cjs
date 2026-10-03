@@ -454,3 +454,56 @@ for (const [name, status, body] of [
     await expect(page.locator("#cloud-paper-evidence-run")).toBeHidden();
   });
 }
+
+test("cloud paper readiness distinguishes engineering from five activation conditions", async ({ page, baseURL }) => {
+  await page.goto(baseURL, { waitUntil: "networkidle" });
+  await expect(page.locator("#cloud-paper-readiness-status")).toHaveText("尚未啟用 · 5 項待完成");
+  await expect(page.locator("#cloud-paper-readiness-list li")).toHaveCount(5);
+  await expect(page.locator("#cloud-paper-readiness-list")).toContainText("未來新增服務須先登錄");
+  await expect(page.locator("#cloud-paper-readiness-list")).toContainText("未證明不等於額度不足");
+  await expect(page.locator("#cloud-paper-engineering")).toContainText("16 項整合測試通過");
+  await expect(page.locator("#cloud-paper-engineering")).toContainText("未代表正式帳戶已執行");
+  await expect(page.locator("#cloud-paper-runtime")).toContainText("正式循環未執行");
+  await expect(page.locator("#cloud-paper-readiness-source")).toContainText("非行情或用量的新鮮度證據");
+  await expect(page.locator("#cloud-paper-engineering-run")).toHaveAttribute("href",
+    "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37094784992");
+});
+
+for (const [name, mutate] of [
+  ["missing readiness", data => { delete data.cloudPaperReadiness; }],
+  ["false production result", data => { data.cloudPaperReadiness.runtime.cycle = "NO_TRADE"; }],
+  ["false account coverage", data => { data.cloudPaperReadiness.blockers[0].state = "PASS"; }],
+  ["invalid CI identity", data => { data.cloudPaperReadiness.engineering.ci_run_id = true; }],
+  ["unregistered future writer", data => { data.cloudPaperReadiness.future_writers_require_registration_before_first_write = false; }],
+]) {
+  test(`cloud paper readiness rejects ${name} on refresh`, async ({ page, baseURL }) => {
+    await page.goto(baseURL, { waitUntil: "networkidle" });
+    await expect(page.locator("#cloud-paper-engineering-run")).toBeVisible();
+    await page.route("**/data/dashboard.json", async route => {
+      const response = await route.fetch();
+      const data = await response.json();
+      mutate(data);
+      await route.fulfill({ response, json: data });
+    });
+    await page.locator("#refresh-button").click();
+    await expect(page.locator("#cloud-paper-readiness-status")).toHaveText("無法核實");
+    await expect(page.locator("#cloud-paper-readiness-list li")).toHaveCount(0);
+    await expect(page.locator("#cloud-paper-engineering")).toHaveText("工程驗收：未核實");
+    await expect(page.locator("#cloud-paper-engineering-run")).toBeHidden();
+    await expect(page.locator("#cloud-paper-engineering-run")).not.toHaveAttribute("href");
+    await expect(page.locator("#refresh-button")).toBeEnabled();
+  });
+}
+
+test("cloud paper readiness clears stale success when dashboard fetch fails", async ({ page, baseURL }) => {
+  await page.goto(baseURL, { waitUntil: "networkidle" });
+  await expect(page.locator("#cloud-paper-engineering-run")).toBeVisible();
+  await page.route("**/data/dashboard.json", route => route.fulfill({
+    status: 503, contentType: "application/json", body: "{}",
+  }));
+  await page.locator("#refresh-button").click();
+  await expect(page.locator("#cloud-paper-readiness-status")).toHaveText("無法核實");
+  await expect(page.locator("#cloud-paper-readiness-list li")).toHaveCount(0);
+  await expect(page.locator("#cloud-paper-runtime")).toHaveText("正式執行與排程：未核實");
+  await expect(page.locator("#cloud-paper-engineering-run")).not.toHaveAttribute("href");
+});
