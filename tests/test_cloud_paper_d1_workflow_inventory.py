@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 from scripts.validate_cloud_paper_r2_writer_inventory import (
     contains_d1_access_reference,
@@ -130,6 +131,37 @@ class D1WorkflowInventoryTests(unittest.TestCase):
     def test_detects_database_id_secret_name(self) -> None:
         self.assertTrue(contains_d1_access_reference("${{ secrets.DATABASE_ID }}"))
 
+
+    def test_accepts_exact_two_guarded_clients_under_successor_inventory(self) -> None:
+        from scripts.validate_cloud_paper_r2_writer_inventory import PREPAID_D1_CLIENT_PATH
+        root = Path(__file__).parents[1]
+        legacy = "src/crypto_autopilot/paper/cloud_budget_ledger_v0_1.py"
+        sources = {path: (root / path).read_text() for path in (legacy, PREPAID_D1_CLIENT_PATH)}
+        self.assertEqual(
+            validate_d1_source_boundary(sources, legacy, successor_client_path=PREPAID_D1_CLIENT_PATH),
+            sorted(sources),
+        )
+
+    def test_prepaid_inventory_rejects_missing_each_guard_and_extra_client(self) -> None:
+        from scripts.validate_cloud_paper_r2_writer_inventory import (
+            PREPAID_D1_CLIENT_PATH,
+            PREPAID_D1_QUERY_GUARD_ORDER,
+        )
+        root = Path(__file__).parents[1]
+        legacy = "src/crypto_autopilot/paper/cloud_budget_ledger_v0_1.py"
+        original = {path: (root / path).read_text() for path in (legacy, PREPAID_D1_CLIENT_PATH)}
+        for marker in PREPAID_D1_QUERY_GUARD_ORDER:
+            with self.subTest(marker=marker):
+                sources = dict(original)
+                sources[PREPAID_D1_CLIENT_PATH] = sources[PREPAID_D1_CLIENT_PATH].replace(marker, "GUARD_REMOVED")
+                with self.assertRaisesRegex(RuntimeError, "guards are missing"):
+                    validate_d1_source_boundary(sources, legacy, successor_client_path=PREPAID_D1_CLIENT_PATH)
+        sources = dict(original)
+        sources["scripts/unregistered_d1.py"] = 'endpoint = "/d1/database/test"'
+        with self.assertRaisesRegex(RuntimeError, "boundary mismatch"):
+            validate_d1_source_boundary(sources, legacy, successor_client_path=PREPAID_D1_CLIENT_PATH)
+        with self.assertRaisesRegex(RuntimeError, "versioned implementation"):
+            validate_d1_source_boundary(original, legacy, successor_client_path="scripts/unregistered_d1.py")
 
     @staticmethod
     def _shared_registry_fixture():
