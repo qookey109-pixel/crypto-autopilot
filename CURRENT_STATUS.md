@@ -1,3 +1,18 @@
+## Shared writer budget implementation checkpoint — 2026-10-03
+
+Scope: V0.4 preparation only; reviewed parent main `e3e98100181ae98fe98ce630108a24569e16be24` is an evidence basis, not a claim about the latest main after merge.
+
+- [PR #752](https://github.com/qookey109-pixel/crypto-autopilot/pull/752) prepares the central shared-writer reservation policy and requires prepaid metering before every D1 reservation/replay-read attempt. Rejection and transport failure retain attempt debits; retired writers cannot replay retained reservations.
+- Implementation head `a690e0eeb02e700d7859e96a7516a6db819c0efe` passed [GitHub CI 37087094337](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37087094337), including Python 3.12/3.13, Ruff, workflow-static and 20 V0.4 tests; CodeQL and Dependency/SBOM also succeeded. This is synthetic evidence, not D1 production metering or restart/concurrency proof.
+- The required durable, atomic prepaid query controller is **NOT_IMPLEMENTED / NOT_WIRED**. All central policy caps start NULL. Workload envelopes, query-attempt pools, controller self-costs and other unreflected usage must fit the same account headroom before activation; caller restarts cannot reset the pool.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 is unprovisioned, validated production strategies are empty and Core100 remains REJECT. Account-wide cost/headroom and current external-writer coverage remain unconfirmed. Register future services before their first cloud write.
+- Next: implement and verify the prepaid controller and its bounded self-cost/restart contract, complete current writer and account-cost evidence, then proceed to controlled PAPER runtime acceptance under its own merged authority. Billing History V0.1 stays consumed; V0.2 stays undispatched pending its distinct owner confirmation.
+- Source: [V0.4 contract](config/cloudflare_shared_writer_budget_gate_v0_4.json), [implementation limits](docs/SHARED_WRITER_BUDGET_GATE_V0_4.md). CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER / 0 USD / PAPER-LIVE-PAPER ONLY.
+
+This budget checkpoint does not refresh the older workflow observations below. Preserve their dates and failures.
+
+---
+
 ## Live repository checkpoint — 2026-10-02 10:18 Asia/Taipei
 
 Evidence basis: protected `main=39ff3a0091d1e1827135225772498da9bdebdd4f`, re-read at 2026-10-02 02:18 UTC. This checkpoint supersedes older present-tense snapshots below; historical evidence is preserved.
