@@ -24,5 +24,7 @@
     36931736281,
     37133343598
   ],
-  "rerun_predecessors": false
+  "rerun_predecessors": false,
+  "documentation": "docs/CLOUD_PAPER_BILLING_PAGINATION_V0_3.md",
+  "complete_history_coverage_requires": "SUPPLIED_TOTAL_RECONCILED_WITH_EMPTY_TERMINAL"
 }

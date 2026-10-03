@@ -18,7 +18,8 @@ class PaginationTests(unittest.TestCase):
     def test_optional_totals_and_terminal(self):
         r = self.report([page(1, ["private-a"]), page(2, [])])
         self.assertEqual(r["status"], "READY_FOR_BILLING_REVIEW")
-        self.assertTrue(r["complete_history_coverage"])
+        self.assertFalse(r["complete_history_coverage"])
+        self.assertTrue(r["bounded_traversal_complete"])
         self.assertFalse(r["atomic_snapshot_proven"])
         self.assertEqual(r["zero_cost_conclusion"], "UNKNOWN")
         self.assertNotIn("private-a", str(r))
@@ -74,6 +75,54 @@ class PaginationTests(unittest.TestCase):
         self.assertFalse(r["complete_history_coverage"])
         self.assertEqual(self.report([page(1, []), page(2, [])])["reason_code"],
                          "BILLING_HISTORY_DATA_AFTER_TERMINAL")
+
+
+    def test_supplied_total_reconciled_with_empty_terminal(self):
+        r = self.report([page(1, ["a", "b"], total_count=2),
+                         page(2, [], total_count=2)])
+        self.assertTrue(r["complete_history_coverage"])
+        self.assertFalse(r["atomic_snapshot_proven"])
+
+    def test_bad_identity_and_changed_size_stop(self):
+        for bad in (page(2, ["a"]), page(1, ["a"])):
+            if bad["result_info"]["page"] == 1:
+                bad["result_info"]["per_page"] = 1
+            self.assertEqual(self.report([bad])["reason_code"],
+                             "BILLING_HISTORY_PAGE_METADATA_MISMATCH")
+
+    def test_oversized_rows_and_item_cap(self):
+        self.assertEqual(self.report([page(1, ["a", "b", "c"])])["reason_code"],
+                         "BILLING_HISTORY_PAGE_SIZE_EXCEEDED")
+        self.assertEqual(self.report([page(1, ["a", "b"])], max_items=1)["reason_code"],
+                         "BILLING_HISTORY_ITEM_CAP_EXCEEDED")
+
+    def test_partial_valid_rows_retained_on_invalid_later_page(self):
+        r = self.report([page(1, ["a"]), page(3, ["b"])])
+        self.assertEqual(r["returned_row_count"], 1)
+        self.assertFalse(r["complete_history_coverage"])
+
+    def test_invalid_row_returns_safe_reason(self):
+        bad = page(1, ["a"])
+        bad["result"][0]["amount"] = float("nan")
+        r = self.report([bad])
+        self.assertEqual(r["reason_code"], "BILLING_AMOUNT_INVALID")
+        self.assertEqual(r["items"], [])
+
+    def test_errors_and_missing_page_information(self):
+        for bad in ({"success": True, "errors": [{"private": "hidden"}]},
+                    {"success": True, "result": [], "result_info": None}):
+            r = self.report([bad])
+            self.assertEqual(r["status"], "REVIEW_REQUIRED")
+            self.assertNotIn("hidden", str(r))
+
+    def test_fetch_failure_is_not_retried(self):
+        calls = []
+        def fetch(n, size):
+            calls.append(n)
+            raise TimeoutError()
+        with self.assertRaises(TimeoutError):
+            collect_pages(fetch, observed_at=NOW, page_size=2)
+        self.assertEqual(calls, [1])
 
 
 if __name__ == "__main__":

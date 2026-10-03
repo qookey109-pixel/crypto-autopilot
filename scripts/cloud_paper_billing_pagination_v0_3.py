@@ -55,6 +55,7 @@ def summarize_pages(
         "reported_total_count": None, "items": [],
         "traversal_terminal_seen": False, "complete_history_coverage": False,
         "atomic_snapshot_proven": False, "zero_cost_conclusion": "UNKNOWN",
+        "bounded_traversal_complete": False, "coverage_basis": "INCOMPLETE",
         "cloud_paper_activation": "REMAINS_DISABLED",
         "pagination_metadata_diagnostics": [],
         "raw_response_persisted": False, "item_ids_persisted": False,
@@ -116,7 +117,12 @@ def summarize_pages(
         report["status"] = "READY_FOR_BILLING_REVIEW"
         report["reason_code"] = "TERMINAL_PAGE_OBSERVED_RECONCILIATION_REQUIRED"
         # Traversal is bounded evidence, not an atomic account-history snapshot.
-        report["complete_history_coverage"] = True
+        report["bounded_traversal_complete"] = True
+        report["complete_history_coverage"] = total is not None
+        report["coverage_basis"] = (
+            "SUPPLIED_TOTAL_RECONCILED_WITH_TERMINAL" if total is not None
+            else "TERMINAL_TRAVERSAL_WITHOUT_PROVIDER_TOTAL"
+        )
     elif len(pages) == max_pages:
         report["reason_code"] = "BILLING_HISTORY_PAGE_CAP_REACHED_WITHOUT_TERMINAL"
     return report

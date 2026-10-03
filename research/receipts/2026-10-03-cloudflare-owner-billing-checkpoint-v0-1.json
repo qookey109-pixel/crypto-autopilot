@@ -1,0 +1,49 @@
+{
+  "schema": "qookey-cloudflare-owner-billing-checkpoint-v0.1",
+  "evidence_basis_main": "c0dd3726907b392d9fa5e32183834760e186bfeb",
+  "observed_date": "2026-10-03",
+  "owner_attestation": {
+    "source": "DIRECT_USER_MESSAGE",
+    "scope": "CURRENT_EXTERNAL_R2_WRITERS",
+    "statement": "No other project currently writes into R2.",
+    "external_r2_writers_declared": [],
+    "future_writer_registration_required": true,
+    "does_not_prove_repository_shared_admission": true,
+    "does_not_prove_future_coverage": true
+  },
+  "billing_v0_2": {
+    "run_id": 37133343598,
+    "attempt": 1,
+    "head_sha": "c0dd3726907b392d9fa5e32183834760e186bfeb",
+    "status": "REVIEW_REQUIRED",
+    "reason": "BILLING_HISTORY_PAGE_METADATA_INVALID",
+    "cloudflare_http_requests_performed": 1,
+    "complete_history_coverage": false,
+    "zero_cost_conclusion": "UNKNOWN",
+    "artifact_id": 11277603262,
+    "artifact_digest": "sha256:5462a4b99d82172b2a66595c7316242e76ad899722c0ef169547ead53e4cbb51",
+    "authority_consumed": true,
+    "rerun_authorized": false,
+    "pagination_diagnostics": {
+      "count": "ABSENT",
+      "total_count": "ABSENT",
+      "page": "PRESENT_INTEGER",
+      "per_page": "PRESENT_INTEGER"
+    }
+  },
+  "ui_observation": {
+    "scope": "READ_ONLY_ACCOUNT_UI_NOT_RUNTIME_ADMISSION",
+    "r2_bucket_count": 1,
+    "r2_storage_display": "616.55 MB",
+    "r2_objects_display": "16.31k",
+    "billing_usage_observed_period": "2026-09-17 through 2026-10-03",
+    "metered_cost_display": "USD 0.00",
+    "r2_class_a_display": "1.02k",
+    "r2_class_b_display": "28.69k",
+    "d1_database_count": 0,
+    "worker_count": 5,
+    "current_exact_headroom_proven": false,
+    "fixed_or_future_cost_proven": false
+  },
+  "production_activation": false
+}
