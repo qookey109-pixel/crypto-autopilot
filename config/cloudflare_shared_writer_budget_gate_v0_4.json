@@ -1,28 +1,129 @@
 {
   "schema": "qookey-cloudflare-shared-writer-budget-gate-v0.4",
   "status": "PREPARED_SYNTHETIC_VALIDATION_ONLY",
-  "depends_on": {"schema": "cloudflare_shared_writer_admission_v0_3", "database": "fresh_successor_schema_only", "production_d1_provisioned": false},
+  "depends_on": {
+    "schema": "cloudflare_shared_writer_admission_v0_3",
+    "database": "fresh_successor_schema_only",
+    "production_d1_provisioned": false
+  },
   "activation_enabled": false,
   "cloudflare_requests_authorized": false,
   "central_policy": {
     "stored_in_shared_d1_row": true,
     "caller_supplied_limits_allowed": false,
     "unset_or_invalid_policy": "BLOCK_BEFORE_EXTERNAL_ACCESS",
-    "daily_aggregate_scope": "ALL_WRITERS_IN_SHARED_LEDGER",
+    "daily_aggregate_scope": "SUCCESSFUL_WORKLOAD_RESERVATIONS_ALL_WRITERS",
     "rolling_window_days": 31,
     "reservation_includes_shared_ledger_cost": true,
     "all_policy_caps_start_null": true,
     "policy_mutation_authority": "SEPARATE_VERSIONED_AUTHORITY_REQUIRED"
   },
-  "reserved_dimensions": ["provider_requests", "r2_class_a", "r2_class_b", "r2_new_bytes", "d1_queries", "d1_rows_read", "d1_rows_written", "d1_storage_growth_bytes"],
-  "budget_windows": {"daily": "UTC_CALENDAR_DAY", "rolling": "INCLUSIVE_31_DAYS_FOR_R2_CLASS_A_CLASS_B_AND_NEW_BYTES", "unknown_or_exceeded": "BLOCK_AND_PRESERVE_EVIDENCE"},
-  "idempotency": {"key": ["writer_id", "slot_id"], "exact_replay": "RETURN_EXISTING_NO_EXTERNAL_ACCESS", "changed_payload": "BLOCK_CONFLICT", "inactive_or_unregistered_writer": "BLOCK", "retired_slot": "BLOCK"},
+  "reserved_dimensions": [
+    "provider_requests",
+    "r2_class_a",
+    "r2_class_b",
+    "r2_new_bytes",
+    "d1_queries",
+    "d1_rows_read",
+    "d1_rows_written",
+    "d1_storage_growth_bytes"
+  ],
+  "budget_windows": {
+    "daily": "UTC_CALENDAR_DAY",
+    "rolling": "INCLUSIVE_31_DAYS_FOR_R2_CLASS_A_CLASS_B_AND_NEW_BYTES",
+    "unknown_or_exceeded": "BLOCK_AND_PRESERVE_EVIDENCE"
+  },
+  "idempotency": {
+    "key": [
+      "writer_id",
+      "slot_id"
+    ],
+    "exact_replay": "RETURN_EXISTING_NO_EXTERNAL_ACCESS",
+    "changed_payload": "BLOCK_CONFLICT",
+    "inactive_or_unregistered_writer": "BLOCK",
+    "retired_slot": "BLOCK"
+  },
   "validation": {
     "mode": "GITHUB_CI_SQLITE_SYNTHETIC_ONLY",
-    "covers": ["central_null_policy_fails_closed", "account_aggregate_spans_distinct_writers", "daily_and_rolling_caps", "writer_identity_gate", "exact_replay", "changed_envelope_conflict", "ledger_cost_floor", "UTC_day_partition"],
+    "covers": [
+      "central_null_policy_fails_closed",
+      "account_aggregate_spans_distinct_writers",
+      "daily_and_rolling_caps",
+      "writer_identity_gate",
+      "exact_replay",
+      "changed_envelope_conflict",
+      "ledger_cost_floor",
+      "UTC_day_partition",
+      "missing_meter_zero_sql",
+      "rejected_attempts_without_reservations_are_charged",
+      "bounded_repeated_replay",
+      "readback_budget_exhaustion",
+      "failed_query_no_refund_or_retry",
+      "meter_pool_shared_across_writers",
+      "replay_charged_to_current_day",
+      "inactive_writer_existing_replay_blocked"
+    ],
     "sqlite_proves_cloudflare_d1_semantics": false,
-    "production_query_metering_calibrated": false
+    "production_query_metering_calibrated": false,
+    "synthetic_meter_proves_production_durability": false
   },
-  "required_before_production_use": ["owner_attested_complete_current_and_planned_writer_inventory", "all_active_writers_use_the_same_shared_admission_database", "separate_authority_for_d1_provisioning_and_policy_values", "fresh_account_wide_r2_d1_usage_and_storage_headroom", "fixed_and_usage_based_cost_scope_proves_zero_usd", "finite_caps_approved_below_actual_account_free_limits", "exact_d1_metadata_cost_calibration_and_concurrency_validation", "all_admission_and_replay_queries_included_in_d1_budget", "separate_authority_for_compaction", "controlled_paper_acceptance_after_market_and_strategy_gates"],
-  "boundaries": {"provider_access": false, "r2_access": false, "d1_access": false, "d1_provisioning": false, "compaction": false, "schedule_activation": false, "holdout_access": false, "source_switch": false, "model_promotion": false, "real_money_orders": false, "live_trading": false, "monthly_budget_usd": 0}
+  "required_before_production_use": [
+    "owner_attested_complete_current_and_planned_writer_inventory",
+    "all_active_writers_use_the_same_shared_admission_database",
+    "separate_authority_for_d1_provisioning_and_policy_values",
+    "fresh_account_wide_r2_d1_usage_and_storage_headroom",
+    "fixed_and_usage_based_cost_scope_proves_zero_usd",
+    "finite_caps_approved_below_actual_account_free_limits",
+    "exact_d1_metadata_cost_calibration_and_concurrency_validation",
+    "verified_durable_atomic_prepaid_admission_meter_for_every_attempt_and_every_writer",
+    "attempt_meter_controller_costs_and_restart_semantics_included_in_same_account_budget",
+    "all_admission_and_replay_queries_included_in_d1_budget",
+    "separate_authority_for_compaction",
+    "controlled_paper_acceptance_after_market_and_strategy_gates"
+  ],
+  "boundaries": {
+    "provider_access": false,
+    "r2_access": false,
+    "d1_access": false,
+    "d1_provisioning": false,
+    "compaction": false,
+    "schedule_activation": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false,
+    "live_trading": false,
+    "monthly_budget_usd": 0
+  },
+  "query_attempt_accounting": {
+    "required_before_every_d1_statement": true,
+    "controller_contract": "AdmissionQueryMeter.charge_before_query",
+    "controller_result": "CHARGED",
+    "pool": "SEPARATELY_PREPAID_FROM_SHARED_ACCOUNT_D1_HEADROOM",
+    "debit_clock": "CONTROLLER_CURRENT_UTC_DAY_NOT_ORIGINAL_SLOT_DATE",
+    "includes": [
+      "successful_reservation",
+      "policy_or_writer_rejection",
+      "exact_replay",
+      "changed_envelope",
+      "transport_failure",
+      "malformed_response"
+    ],
+    "failure_or_replay_refund_allowed": false,
+    "automatic_transport_retry_allowed": false,
+    "shared_durable_atomic_controller_required": true,
+    "caller_recreation_or_restart_may_reset_pool": false,
+    "accounting_controller_must_not_recursively_fund_itself": true,
+    "controller_own_costs_require_finite_prepaid_envelope": true,
+    "production_controller_implemented": false,
+    "missing_or_invalid_controller": "BLOCK_BEFORE_D1_QUERY",
+    "workload_and_attempt_allocations_must_fit_same_account_caps": true,
+    "allowance_netting_or_double_refund_allowed": false
+  },
+  "limitations": [
+    "Successful reservation aggregates cannot account for failed or repeated admission queries.",
+    "The required attempt-meter interface has no production controller in this prepared version.",
+    "The SQLite tests use a CI-only in-memory prepaid pool and do not prove durability across runner restarts.",
+    "All workload reservations plus prepaid query-attempt/controller pools must fit the same account free-tier headroom; no pool may be reset or silently replenished by a caller."
+  ]
 }

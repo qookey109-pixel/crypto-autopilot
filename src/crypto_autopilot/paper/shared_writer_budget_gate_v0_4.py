@@ -1,4 +1,4 @@
-"""Prepared central account-wide budget gate for registered Cloudflare writers.
+"""Prepared shared writer gate with mandatory prepaid query-attempt metering.
 
 The gate uses only the V0.3 shared D1 reservation schema and a V0.4
 NULL-by-default policy row. It creates no client and grants no execution
@@ -119,6 +119,16 @@ SELECT writer_id, slot_id, idempotency_key, slot_at_ms, utc_day,
        d1_storage_growth_bytes
 FROM cloudflare_shared_writer_reservations_v0_3
 WHERE writer_id = CAST(? AS TEXT) AND slot_id = CAST(? AS TEXT)
+  AND EXISTS (
+      SELECT 1 FROM cloudflare_shared_writer_identities_v0_3 AS identity
+      WHERE identity.writer_id = cloudflare_shared_writer_reservations_v0_3.writer_id
+        AND identity.lifecycle_state = 'ACTIVE'
+  )
+  AND NOT EXISTS (
+      SELECT 1 FROM cloudflare_shared_writer_retirement_watermarks_v0_3 AS watermark
+      WHERE watermark.writer_id = cloudflare_shared_writer_reservations_v0_3.writer_id
+        AND slot_at_ms <= watermark.retired_through_slot_at_ms
+  )
 LIMIT 1
 """
 
@@ -134,6 +144,23 @@ class QueryResult(Protocol):
 
 class Query(Protocol):
     def __call__(self, sql: str, params: tuple[object, ...]) -> QueryResult: ...
+
+
+QueryOperation = Literal["RESERVATION", "REPLAY_READ"]
+
+
+class AdmissionQueryMeter(Protocol):
+    """Debit a globally prepaid, durable attempt pool before each D1 call.
+
+    The implementation owns its current UTC clock and calibrated statement
+    costs. It must retain debits across replays, failures, and process restarts.
+    Its own operations must be covered by a separately proven finite budget.
+    This module does not implement or authorize that production controller.
+    """
+
+    def charge_before_query(
+        self, *, writer_id: str, slot_id: str, operation: QueryOperation,
+    ) -> Literal["CHARGED"]: ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -195,15 +222,53 @@ def _row_values(row: Mapping[str, object]) -> dict[str, object]:
     return {name: row.get(name) for name in _FIELDS}
 
 
+def _execute_admission_query(
+    *, execute: Query, query_meter: AdmissionQueryMeter | None,
+    reservation: SharedWriterReservation, operation: QueryOperation,
+    sql: str, params: tuple[object, ...], failure_reason: str,
+) -> QueryResult:
+    if query_meter is None:
+        raise BudgetBlocked("BLOCKED_SHARED_WRITER_QUERY_METER_REQUIRED")
+    try:
+        charged = query_meter.charge_before_query(
+            writer_id=reservation.writer_id,
+            slot_id=reservation.slot_id,
+            operation=operation,
+        )
+    except BudgetBlocked:
+        raise
+    except Exception:
+        raise BudgetBlocked("BLOCKED_SHARED_WRITER_QUERY_METER_UNVERIFIED") from None
+    if type(charged) is not str or charged != "CHARGED":
+        raise BudgetBlocked("BLOCKED_SHARED_WRITER_QUERY_METER_RESULT_INVALID")
+    try:
+        # One transport attempt only. A failure keeps the prepaid debit consumed.
+        result = execute(sql, params)
+        rows = result.rows
+    except Exception:
+        raise BudgetBlocked(failure_reason) from None
+    if not isinstance(rows, tuple) or len(rows) > 1 or any(
+        not isinstance(row, dict) for row in rows
+    ):
+        raise BudgetBlocked("BLOCKED_SHARED_WRITER_QUERY_RESULT_INVALID")
+    return result
+
+
 def reserve_shared_writer_envelope(
     *, execute: Query, reservation: SharedWriterReservation,
+    query_meter: AdmissionQueryMeter | None = None,
 ) -> Literal["RESERVED", "EXISTING_RESERVATION"]:
-    """Reserve centrally capped account usage; ambiguous outcomes always block."""
+    """Reserve workload usage; separately charge every attempted gate/read.
+
+    Successful reservations alone cannot meter rejected or repeated queries.
+    A verified production prepaid controller is required before D1 execution.
+    """
     params = reservation_params(reservation)
-    try:
-        inserted = execute(RESERVE_SHARED_WRITER_SQL, params)
-    except Exception:
-        raise BudgetBlocked("BLOCKED_SHARED_WRITER_RESERVATION_UNVERIFIED") from None
+    inserted = _execute_admission_query(
+        execute=execute, query_meter=query_meter, reservation=reservation,
+        operation="RESERVATION", sql=RESERVE_SHARED_WRITER_SQL, params=params,
+        failure_reason="BLOCKED_SHARED_WRITER_RESERVATION_UNVERIFIED",
+    )
     if inserted.rows:
         if len(inserted.rows) != 1 or inserted.rows[0] != {
             "writer_id": reservation.writer_id, "slot_id": reservation.slot_id,
@@ -211,12 +276,12 @@ def reserve_shared_writer_envelope(
             raise BudgetBlocked("BLOCKED_SHARED_WRITER_RESERVATION_RESULT_INVALID")
         return "RESERVED"
 
-    try:
-        existing = execute(
-            READ_SHARED_WRITER_SQL, (reservation.writer_id, reservation.slot_id),
-        )
-    except Exception:
-        raise BudgetBlocked("BLOCKED_SHARED_WRITER_REPLAY_UNVERIFIED") from None
+    existing = _execute_admission_query(
+        execute=execute, query_meter=query_meter, reservation=reservation,
+        operation="REPLAY_READ", sql=READ_SHARED_WRITER_SQL,
+        params=(reservation.writer_id, reservation.slot_id),
+        failure_reason="BLOCKED_SHARED_WRITER_REPLAY_UNVERIFIED",
+    )
     if not existing.rows:
         raise BudgetBlocked("BLOCKED_SHARED_WRITER_POLICY_OR_WRITER_GATE")
     if len(existing.rows) != 1 or _row_values(existing.rows[0]) != dict(
