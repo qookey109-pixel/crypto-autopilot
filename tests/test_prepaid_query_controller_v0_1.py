@@ -286,6 +286,13 @@ class PrepaidControllerTests(unittest.TestCase):
                     self.claim()
                 self.assertEqual(len(self.github.refs), 0)
 
+    def test_remote_boolean_authority_cannot_be_replaced_by_integer(self) -> None:
+        # Python True == 1 must not substitute for the remote JSON true grant.
+        self.github.authority["github_claims_authorized"] = 1
+        with self.assertRaisesRegex(BudgetBlocked, "AUTHORITY_UNVERIFIED"):
+            self.claim()
+        self.assertEqual(len(self.github.refs), 0)
+
     def test_authority_mismatch_blocks_before_claim(self) -> None:
         self.github.authority["scope_id"] = "different-scope"
         with self.assertRaisesRegex(BudgetBlocked, "AUTHORITY_NOT_CURRENT_MAIN"):

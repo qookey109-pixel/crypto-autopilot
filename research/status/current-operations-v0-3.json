@@ -674,7 +674,7 @@
     "reviewed_implementation_head_sha": "1f62483ec74ae70bab1012c656fad4746483a8e0",
     "implementation_ci_run_id": 37091464727,
     "implementation_ci": "SUCCESS_SYNTHETIC_ONLY",
-    "controller_tests": 23,
+    "controller_tests": 24,
     "github_claims_enabled": false,
     "actual_claims_created": 0,
     "actual_tag_protection_verified": false,
@@ -686,6 +686,7 @@
     "cloud_paper_activation": false,
     "production_cycle_status": "NOT_RUN",
     "natural_schedule_status": "NOT_CONFIGURED",
-    "next_work": "VERIFY_PROTECTED_FINITE_GITHUB_CLAIMS_AND_ACCOUNT_ALLOCATIONS_THEN_WIRE_TRUSTED_PAPER_GATEWAY"
+    "next_work": "VERIFY_PROTECTED_FINITE_GITHUB_CLAIMS_AND_ACCOUNT_ALLOCATIONS_THEN_WIRE_TRUSTED_PAPER_GATEWAY",
+    "reviewed_implementation_controller_tests": 23
   }
 }

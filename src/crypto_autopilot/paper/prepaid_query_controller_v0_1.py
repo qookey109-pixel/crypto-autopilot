@@ -401,7 +401,7 @@ def claim_prepaid_query_meter(
         approved = json.loads(base64.b64decode(encoded, validate=True))
     except (ValueError, TypeError):
         raise _blocked("AUTHORITY_UNVERIFIED") from None
-    if approved != authority_document:
+    if approved != authority_document or PoolAuthority.parse(approved) != authority:
         raise _blocked("AUTHORITY_NOT_CURRENT_MAIN")
     run = request("GET", "/actions/runs/" + str(run_id))
     if (
