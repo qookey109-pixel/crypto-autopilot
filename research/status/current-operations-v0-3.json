@@ -1,6 +1,6 @@
 {
   "schema": "qookey-current-operations-v0.3",
-  "updated_date": "2026-10-02",
+  "updated_date": "2026-10-03",
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
@@ -172,7 +172,7 @@
     },
     "dashboard_pages_validation_state": "NO_PAGES_RUN_OBSERVED_FOR_PR_727_MAIN_HEAD"
   },
-  "next_decision": "Do not rerun Billing History V0.1. Preserve run 36931736281 and its artifact. Establish owner-attested current/planned Cloudflare writer coverage; investigate BILLING_HISTORY_PAGE_METADATA_INVALID from existing evidence or prepare a separately versioned successor authority without executing it. Keep Cloud Paper disabled until zero-cost, usage/headroom, data, production strategy and recovery gates pass.",
+  "next_decision": "Complete the durable prepaid D1 query-attempt controller and its bounded self-cost/restart proof, then reconcile current account writers and cost/headroom evidence. Billing History V0.1 remains consumed and cannot be rerun; the merged V0.2 diagnostic is undispatched pending its distinct owner confirmation. Cloud Paper remains disabled until all runtime acceptance gates pass.",
   "notes": [
     "Live checkpoint at parent main 42f8c1cdad46107f5f8f720b9809a7ad71286815: PR #679 stale generated snapshot closed unmerged at 2026-10-01T08:15:20Z; no open PRs. PR #665 persistence compatibility/recovery fixes are merged. This status update grants no provider, R2, D1, runtime, or schedule access.",
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
