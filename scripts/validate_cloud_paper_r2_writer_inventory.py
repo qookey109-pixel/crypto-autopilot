@@ -55,15 +55,39 @@ def find_d1_rest_source_paths(source_files: dict[str, str]) -> set[str]:
     }
 
 
+PREPAID_D1_CLIENT_PATH = "src/crypto_autopilot/paper/prepaid_d1_client_v0_1.py"
+PREPAID_D1_QUERY_GUARD_ORDER = (
+    "if self._poisoned:",
+    "operation = self._validate_statement(sql, params)",
+    "self._database_evidence.validate(",
+    "self._guard.reserve_query()",
+    "self._meter.charge_before_query(",
+    "self._guard.validate_evidence()",
+    "self._meter.validate_binding(",
+    "cost = self._meter.statement_cost(operation)",
+    "result, size = self._request(sql, params)",
+    "result.rows_read > cost.rows_read",
+    "result.rows_written > cost.rows_written",
+    "size > self._last_size + cost.storage_bytes",
+    "self._poisoned = True",
+)
+
+
 def validate_d1_source_boundary(
     source_files: dict[str, str], expected_client_path: str,
+    *, successor_client_path: str | None = None,
 ) -> list[str]:
-    """Require one guarded in-repository D1 REST client; account coverage stays separate."""
+    """Allow only named, independently guarded clients; account coverage stays separate."""
+    expected = {expected_client_path}
+    if successor_client_path is not None:
+        if successor_client_path != PREPAID_D1_CLIENT_PATH:
+            raise RuntimeError("D1 successor client path is not the versioned implementation")
+        expected.add(successor_client_path)
     paths = find_d1_rest_source_paths(source_files)
-    if paths != {expected_client_path}:
+    if paths != expected:
         raise RuntimeError(
             "D1 REST source boundary mismatch; "
-            f"expected={[expected_client_path]}, detected={sorted(paths)}"
+            f"expected={sorted(expected)}, detected={sorted(paths)}"
         )
     contents = source_files[expected_client_path]
     query_start = contents.find("    def query(self, sql: str, params: tuple[object, ...])")
@@ -79,6 +103,19 @@ def validate_d1_source_boundary(
             raise RuntimeError("D1 REST client budget guards are missing or out of order")
         positions.append(position)
         cursor = position + len(marker)
+    if successor_client_path is not None:
+        successor = source_files[successor_client_path]
+        start = successor.find("    def query(self, sql: str, params: tuple[object, ...])")
+        end = successor.find("    def _request(", start)
+        if start < 0 or end < 0:
+            raise RuntimeError("D1 prepaid client query boundary is missing")
+        body = successor[start:end]
+        cursor = 0
+        for marker in PREPAID_D1_QUERY_GUARD_ORDER:
+            position = body.find(marker, cursor)
+            if position < 0:
+                raise RuntimeError("D1 prepaid client guards are missing or out of order")
+            cursor = position + len(marker)
     return sorted(paths)
 
 
@@ -244,8 +281,19 @@ def main() -> int:
     expected_d1_client_path = source_boundary.get("expected_d1_rest_client_path")
     if not isinstance(expected_d1_client_path, str) or not expected_d1_client_path:
         raise RuntimeError("D1 source boundary expected client path is missing")
+    successor = json.loads(
+        (ROOT / "config/prepaid_d1_runtime_gateway_v0_1.json").read_text(encoding="utf-8")
+    )
+    if (
+        successor.get("schema") != "qookey-prepaid-d1-runtime-gateway-v0.1"
+        or successor.get("activation_enabled") is not False
+        or successor.get("cloudflare_execution_authorized") is not False
+        or successor.get("implementation") != PREPAID_D1_CLIENT_PATH
+    ):
+        raise RuntimeError("D1 prepaid implementation inventory contract is invalid")
     d1_client_paths = validate_d1_source_boundary(
         source_files, expected_d1_client_path,
+        successor_client_path=successor["implementation"],
     )
     if source_boundary.get("scope") != "REPOSITORY_SOURCE_ONLY":
         raise RuntimeError("D1 source boundary scope must remain explicit")
@@ -284,7 +332,7 @@ def main() -> int:
     )
     print(
         "D1 repository source boundary matches guarded client "
-        f"{d1_client_paths[0]}; external/account-wide coverage remains unproven."
+        f"{d1_client_paths}; external/account-wide coverage remains unproven."
     )
     print(
         "D1 workflow marker inventory matches "

@@ -1,4 +1,21 @@
-## Prepaid query controller checkpoint — 2026-10-03
+## Prepaid D1 runtime gateway checkpoint — 2026-10-03
+
+Scope: successor runtime integration, disabled execution. Evidence basis is parent main `a0c7d8a50527cfb95bb4878ca8f8fa7b07e82c2a`, not a live-main claim.
+
+- [PR #755](https://github.com/qookey109-pixel/crypto-autopilot/pull/755) connects the concrete prepaid meter to every approved D1 statement and the existing Cloud Paper composition. Central shared-writer admission precedes legacy slot admission and all R2/provider work. The old recursive D1 admission query is excluded from this successor.
+- Reviewed implementation head `1bd0b613dc9422c8b894219c6c8982fbe14ad10c` passed [CI 37094624252](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37094624252): Python 3.12/3.13, Ruff, workflow-static, source inventory, 15 runtime tests and full suite. This is actual SQLite/mocked HTTP/S3 engineering evidence, including NO_TRADE, immutable persistence, next-slot account continuation, duplicate blocking and lost-response retention. The first CI [37094480846](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37094480846) failed the D1 source inventory check; the exact successor client and guard sequence are now registered. Preserve that failure.
+- Final review adds bounded safe diagnostics and stale-evidence coverage; exact final-head CI/review and merge evidence belong to #755. No raw response/SQL/credential is included in diagnostics.
+- Source assembly is **IMPLEMENTED_DISABLED / SYNTHETICALLY_WIRED**. Production entry remains `NOT_WIRED`, cycle `NOT_RUN`, schedule `NOT_CONFIGURED`; D1 remains unprovisioned. No production tag, ruleset, Cloudflare/R2/D1/provider operation, workflow dispatch or schedule was created. Source assembly success is not production activation.
+- Owner expects additional projects/services later. Register and allocate every new writer before first write; unknown writers have no default allocation. This does not establish the current inventory is complete or that the entire account headroom belongs to this project. Current writer coverage/cost/headroom remain UNCONFIRMED.
+- Shared workload and whole ticket are never refunded. Admission conservatively charges two ticket debits for one HTTP attempt; successful NO_TRADE has three D1 HTTP attempts and four debits. Historical settlement recovery needs a separate fresh current workload authority; it cannot spend an old-day R2 envelope.
+- Next production work: complete current writer and fresh account cost/headroom evidence, calibrated SQL ceilings, immutable finite execution authority/protected claims and separately authorized D1 provision/migration; then controlled main PAPER acceptance, natural schedule and Dashboard evidence. Billing History V0.1 remains consumed; V0.2 remains undispatched pending distinct owner confirmation. Empty production strategy registry/Core100 REJECT remain unchanged.
+- Sources: [successor contract](config/prepaid_d1_runtime_gateway_v0_1.json), [runtime limits and handoff](docs/PREPAID_D1_RUNTIME_GATEWAY_V0_1.md). CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER / 0 USD / PAPER-LIVE-PAPER ONLY.
+
+Earlier checkpoints are dated historical evidence; their runtime-unwired statements do not describe this successor's tested source assembly.
+
+---
+
+## Historical prepaid query controller checkpoint — 2026-10-03
 
 Scope: implemented controller, disabled execution. Reviewed parent main `72420c7c34729e61bfdfff3507078dc2dc2063e3` is the evidence basis, not a latest-main claim.
 
