@@ -110,6 +110,9 @@ class PrepaidCloudflareD1QueryClient:
         self._last_size = database_evidence.size_bytes
         self._timeout = timeout_seconds
         self._poisoned = False
+        self._http_attempts = 0
+        self._review_reason: str | None = None
+        self._last_actual_meta: dict[str, int] | None = None
         self._lock = threading.Lock()
 
     @staticmethod
@@ -160,6 +163,18 @@ class PrepaidCloudflareD1QueryClient:
     def __repr__(self) -> str:
         return "PrepaidCloudflareD1QueryClient(credentials=REDACTED)"
 
+    def diagnostics(self) -> dict[str, object]:
+        """Bounded usage evidence only; never include SQL, credentials or raw body."""
+        with self._lock:
+            return {
+                "http_attempts": self._http_attempts,
+                "review_required": self._poisoned,
+                "review_reason": self._review_reason,
+                "last_actual_meta": None if self._last_actual_meta is None else dict(self._last_actual_meta),
+                "confirmed_database_size_high_water_bytes": self._last_size,
+                "allowance_refunded": False,
+            }
+
     def _validate_statement(self, sql: str, params: tuple[object, ...]) -> QueryOperation:
         if (
             not isinstance(sql, str) or sql not in _OPERATIONS
@@ -209,17 +224,29 @@ class PrepaidCloudflareD1QueryClient:
                 self._guard.validate_evidence()
                 self._meter.validate_binding(writer_id=self._writer, slot_id=self._slot)
                 cost = self._meter.statement_cost(operation)
+                self._http_attempts += 1
                 result, size = self._request(sql, params)
-                if (
-                    result.rows_read > cost.rows_read
-                    or result.rows_written > cost.rows_written
-                    or size > self._last_size + cost.storage_bytes
-                ):
-                    raise D1LedgerUnavailable("D1_LEDGER_QUERY_HARD_STOP")
+                self._last_actual_meta = {
+                    "rows_read": result.rows_read, "rows_written": result.rows_written,
+                    "size_after": size,
+                }
+                if result.rows_read > cost.rows_read:
+                    raise D1LedgerUnavailable("D1_LEDGER_READ_HARD_STOP")
+                if result.rows_written > cost.rows_written:
+                    raise D1LedgerUnavailable("D1_LEDGER_WRITE_HARD_STOP")
+                if size > self._last_size + cost.storage_bytes:
+                    raise D1LedgerUnavailable("D1_LEDGER_STORAGE_HARD_STOP")
                 self._last_size = max(self._last_size, size)
                 return result
-            except Exception:
+            except Exception as error:
                 self._poisoned = True
+                # Only our fixed reason vocabulary may leave this boundary.
+                allowed = {
+                    "D1_LEDGER_READ_HARD_STOP", "D1_LEDGER_WRITE_HARD_STOP",
+                    "D1_LEDGER_STORAGE_HARD_STOP", "D1_LEDGER_RESPONSE_UNVERIFIED",
+                }
+                reason = str(error)
+                self._review_reason = reason if reason in allowed else "D1_LEDGER_PRE_SEND_GUARD_UNVERIFIED"
                 raise D1LedgerUnavailable("D1_LEDGER_REVIEW_REQUIRED") from None
 
     def _request(self, sql: str, params: tuple[object, ...]) -> tuple[D1QueryResult, int]:

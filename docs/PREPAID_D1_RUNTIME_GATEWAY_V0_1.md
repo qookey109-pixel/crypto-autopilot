@@ -26,6 +26,8 @@ or consume Billing History V0.2. Historical contracts and receipts remain intact
   returned D1 statement metadata. Compare actual rows and database growth with
   the calibrated ceilings. Missing/invalid metadata, excess or lost response
   yields D1_LEDGER_REVIEW_REQUIRED and poisons the client. No refund or retry.
+  Bounded diagnostics retain HTTP-attempt count, fixed review reason and valid
+  integer actual meta only; no raw body, SQL, credentials or malformed values.
 - size_after is total database bytes after commit, not growth. Compare against
   independently measured, fresh evidence bound to the target database. Keep
   the greatest confirmed size; never manufacture a fresh measurement. Concurrent

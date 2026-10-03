@@ -175,6 +175,8 @@ class PrepaidD1RuntimeTests(unittest.TestCase):
         self.assertEqual(result.rows, ())
         self.assertEqual(opener.open.call_count, 1)
         self.assertNotIn("synthetic-only-token", repr(client))
+        self.assertEqual(client.diagnostics()["http_attempts"], 1)
+        self.assertFalse(client.diagnostics()["review_required"])
 
     def test_unapproved_sql_and_cross_slot_rejected_without_debit_or_network(self):
         client = self.client()
@@ -208,6 +210,9 @@ class PrepaidD1RuntimeTests(unittest.TestCase):
                     with self.assertRaisesRegex(D1LedgerUnavailable, "REVIEW_REQUIRED"):
                         client.query(READ_SLOT_RESERVATION_SQL, (self.slot,))
                 self.assertEqual(opener.open.call_count, 1)
+                self.assertTrue(client.diagnostics()["review_required"])
+                self.assertIsNotNone(client.diagnostics()["review_reason"])
+                self.assertEqual(client.diagnostics()["http_attempts"], 1)
         self.assertEqual(self.meter.report()["query_attempts_charged"], len(payloads))
 
     def test_transport_failure_keeps_debit_blocks_retry_and_redacts_error(self):
@@ -220,6 +225,8 @@ class PrepaidD1RuntimeTests(unittest.TestCase):
             with self.assertRaises(D1LedgerUnavailable):
                 client.query(READ_SLOT_RESERVATION_SQL, (self.slot,))
         self.assertNotIn("synthetic-secret", str(error.exception))
+        self.assertNotIn("synthetic-secret", json.dumps(client.diagnostics()))
+        self.assertEqual(client.diagnostics()["review_reason"], "D1_LEDGER_RESPONSE_UNVERIFIED")
         self.assertEqual(opener.open.call_count, 1)
         self.assertEqual(self.meter.report()["query_attempts_charged"], 1)
 
@@ -231,6 +238,15 @@ class PrepaidD1RuntimeTests(unittest.TestCase):
             with self.assertRaisesRegex(BudgetBlocked, "EXHAUSTED"):
                 client.query(READ_SLOT_RESERVATION_SQL, (self.slot,))
         network.assert_not_called()
+
+    def test_stale_evidence_blocks_http_without_a_new_debit(self):
+        client = self.client()
+        self.now += 50_001
+        with patch(f"{CLIENT_MODULE}.build_opener") as network:
+            with self.assertRaisesRegex(BudgetBlocked, "STALE"):
+                client.query(READ_SLOT_RESERVATION_SQL, (self.slot,))
+        network.assert_not_called()
+        self.assertEqual(self.meter.report()["query_attempts_charged"], 0)
 
     def runtime(self, *, meter=None, database_size=1024, enabled=True):
         def r2_factory(**kwargs):
