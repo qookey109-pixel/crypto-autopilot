@@ -4,13 +4,13 @@
   "evidence_basis_main_sha": "2de48f8cb8488304487b50abcaa2489b58f45c27",
   "is_latest_main_claim": false,
   "scan": {
-    "workflow_file_count": 97,
-    "workflows_with_r2_or_cloudflare_secret_references": 27,
+    "workflow_file_count": 98,
+    "workflows_with_r2_or_cloudflare_secret_references": 28,
     "scanner_contract": "scripts/validate_cloud_paper_r2_writer_inventory.py",
     "exact_reference_scan": true,
     "values_or_secret_contents_read": false,
     "workflow_count_before_nonaccess_preflight": 84,
-    "note": "This PR reconciles repository workflow references against reviewed base main 2de48f8cb8488304487b50abcaa2489b58f45c27 plus proposed PR #731. Billing History V0.1 run 36931736281 consumed its one-time authority and returned REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID after one request; zero cost remains UNKNOWN and the run must not be repeated. Billing History V0.2 is prepared in PR #731 and has not been dispatched. Existing V0.3 usage evidence covers 42 usage rows and a 0.0 USD usage-based subtotal only; fixed fees and total project/account cost remain UNKNOWN. R2 analytics coverage is partial and D1 is unprovisioned. The user indicates additional Cloudflare projects/services may write later, but does not have their complete identity list available now: external_writer_inventory remains UNCONFIRMED and incomplete. This repository-only index does not prove account-wide writers, headroom, or zero total cost.",
+    "note": "Repository reference inventory includes the separately gated V0.3 billing successor. Owner attested no current external R2 writers; repository admission and account-wide zero cost remain unproven. Billing V0.1/V0.2 consumed; do not rerun.",
     "d1_access_marker_scan": "scripts/validate_cloud_paper_r2_writer_inventory.py"
   },
   "account_wide_reservation_coverage": {
@@ -96,10 +96,18 @@
     {
       "workflow": ".github/workflows/cloud-paper-billing-history-v0-2.yml",
       "access": "READ_ONLY",
-      "lifecycle": "PREPARED_ONE_TIME_DIAGNOSTIC_NOT_DISPATCHED",
+      "lifecycle": "CONSUMED_ONE_TIME_FAILED_METADATA_INVALID_NO_RERUN",
       "trigger": "workflow_dispatch on main",
       "authority": "config/cloud_paper_billing_history_v0_2.json",
-      "evidence": "Prepared in PR #731. One bounded read-only successor; invalid pagination diagnostics retain only field presence/type/validity, not values or raw response. Not dispatched; zero total cost and account-wide writer coverage remain UNKNOWN."
+      "evidence": "Run 37133343598 attempt 1 made one read-only GET and returned REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID; zero cost UNKNOWN. Consumed, no rerun. Redacted receipt: research/receipts/2026-10-03-cloudflare-owner-billing-checkpoint-v0-1.json."
+    },
+    {
+      "workflow": ".github/workflows/cloud-paper-billing-history-v0-3.yml",
+      "access": "READ_ONLY",
+      "lifecycle": "ONE_TIME_SUCCESSOR_PENDING_DISTINCT_OWNER_CONFIRMATION",
+      "trigger": "workflow_dispatch on main with explicit confirmation",
+      "authority": "config/cloud_paper_billing_history_v0_3.json",
+      "evidence": "Optional-total successor. At most ten GETs, empty terminal traversal distinguished from total coverage. No rerun or product activation."
     },
     {
       "workflow": ".github/workflows/cloud-paper-r2-usage-audit-v0-3.yml",
