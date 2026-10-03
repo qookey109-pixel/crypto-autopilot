@@ -1,0 +1,30 @@
+{
+  "schema": "qookey-cloud-paper-billing-pagination-v0.3",
+  "stage": "PREPARED_NO_EXTERNAL_EXECUTION",
+  "execution_authorized": false,
+  "workflow": null,
+  "source": "scripts/cloud_paper_billing_pagination_v0_3.py",
+  "maximum_pages": 10,
+  "maximum_items": 1000,
+  "page_size": 100,
+  "optional_fields": [
+    "count",
+    "total_count"
+  ],
+  "required_identity_fields": [
+    "page",
+    "per_page"
+  ],
+  "terminal": "EMPTY_RESULT_ARRAY_WITH_VALID_PAGE_IDENTITY",
+  "atomic_snapshot_proven": false,
+  "zero_cost_conclusion": "ALWAYS_UNKNOWN",
+  "cloud_paper_activation": false,
+  "official_sdk_commit": "6992be906720834c83357ba99f4704c9f0ad7bd1",
+  "consumed_predecessors": [
+    36931736281,
+    37133343598
+  ],
+  "rerun_predecessors": false,
+  "documentation": "docs/CLOUD_PAPER_BILLING_PAGINATION_V0_3.md",
+  "complete_history_coverage_requires": "SUPPLIED_TOTAL_RECONCILED_WITH_EMPTY_TERMINAL"
+}
