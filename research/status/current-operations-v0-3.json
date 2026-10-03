@@ -640,5 +640,27 @@
     "cloud_paper_zero_cost": "NOT_PROVEN",
     "cloudflare_writer_inventory": "INCOMPLETE_OWNER_EXPECTS_FUTURE_PROJECTS_SERVICES",
     "next_work": "ONE_AUTHORIZED_BILLING_HISTORY_DISPATCH_ON_MAIN_ONCE; THEN_REVIEW_PLAN_FIXED_CHARGES_TOTAL_COST_AND_WRITER_COVERAGE; KEEP_CLOUD_PAPER_DISABLED_UNTIL_ALL_GATES_PASS"
+  },
+  "cloudflare_shared_writer_budget_gate_v0_4": {
+    "status": "PREPARED_SYNTHETIC_VALIDATION_ONLY",
+    "evidence_basis_parent_main_sha": "e3e98100181ae98fe98ce630108a24569e16be24",
+    "is_latest_main_claim": false,
+    "reviewed_implementation_head_sha": "a690e0eeb02e700d7859e96a7516a6db819c0efe",
+    "pull_request_number": 752,
+    "contract": "config/cloudflare_shared_writer_budget_gate_v0_4.json",
+    "implementation_document": "docs/SHARED_WRITER_BUDGET_GATE_V0_4.md",
+    "implementation_ci_run_id": 37087094337,
+    "implementation_ci": "SUCCESS_SYNTHETIC_ONLY",
+    "query_meter_required_before_each_sql": true,
+    "production_query_meter_controller": "NOT_IMPLEMENTED_NOT_WIRED",
+    "policy_caps": "NULL_BY_DEFAULT",
+    "d1_provisioned": false,
+    "cloudflare_requests_performed": 0,
+    "cloud_paper_activation": false,
+    "production_cycle_status": "NOT_RUN",
+    "natural_schedule_status": "NOT_CONFIGURED",
+    "account_wide_writer_coverage": "UNCONFIRMED",
+    "account_wide_cost_and_headroom": "UNCONFIRMED",
+    "next_work": "IMPLEMENT_VERIFIED_DURABLE_PREPAID_QUERY_CONTROLLER_WITH_BOUNDED_SELF_COSTS_AND_RESTART_BEHAVIOR; COMPLETE_ACCOUNT_COST_AND_CURRENT_WRITER_EVIDENCE_BEFORE_RUNTIME_ACCEPTANCE"
   }
 }
