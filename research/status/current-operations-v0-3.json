@@ -172,7 +172,7 @@
     },
     "dashboard_pages_validation_state": "NO_PAGES_RUN_OBSERVED_FOR_PR_727_MAIN_HEAD"
   },
-  "next_decision": "Complete the durable prepaid D1 query-attempt controller and its bounded self-cost/restart proof, then reconcile current account writers and cost/headroom evidence. Billing History V0.1 remains consumed and cannot be rerun; the merged V0.2 diagnostic is undispatched pending its distinct owner confirmation. Cloud Paper remains disabled until all runtime acceptance gates pass.",
+  "next_decision": "Verify immutable GitHub prepaid ticket claims under a finite merged authority; obtain fresh account-wide allocations and calibrated D1 ceilings; wire the trusted gateway into controlled PAPER acceptance. Current writers remain unconfirmed; future services register before writing. Consumed one-time evidence cannot be rerun; Billing History V0.2 remains undispatched pending distinct owner confirmation.",
   "notes": [
     "Live checkpoint at parent main 42f8c1cdad46107f5f8f720b9809a7ad71286815: PR #679 stale generated snapshot closed unmerged at 2026-10-01T08:15:20Z; no open PRs. PR #665 persistence compatibility/recovery fixes are merged. This status update grants no provider, R2, D1, runtime, or schedule access.",
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
@@ -652,7 +652,7 @@
     "implementation_ci_run_id": 37087094337,
     "implementation_ci": "SUCCESS_SYNTHETIC_ONLY",
     "query_meter_required_before_each_sql": true,
-    "production_query_meter_controller": "NOT_IMPLEMENTED_NOT_WIRED",
+    "production_query_meter_controller": "SUCCESSOR_V0_1_IMPLEMENTED_DISABLED_NOT_WIRED",
     "policy_caps": "NULL_BY_DEFAULT",
     "d1_provisioned": false,
     "cloudflare_requests_performed": 0,
@@ -661,6 +661,32 @@
     "natural_schedule_status": "NOT_CONFIGURED",
     "account_wide_writer_coverage": "UNCONFIRMED",
     "account_wide_cost_and_headroom": "UNCONFIRMED",
-    "next_work": "IMPLEMENT_VERIFIED_DURABLE_PREPAID_QUERY_CONTROLLER_WITH_BOUNDED_SELF_COSTS_AND_RESTART_BEHAVIOR; COMPLETE_ACCOUNT_COST_AND_CURRENT_WRITER_EVIDENCE_BEFORE_RUNTIME_ACCEPTANCE"
+    "next_work": "VERIFY_SUCCESSOR_CONTROLLER_BACKEND_AND_ACCOUNT_ALLOCATIONS_BEFORE_RUNTIME_ACCEPTANCE",
+    "successor_controller_contract": "config/cloudflare_prepaid_query_controller_v0_1.json"
+  },
+  "cloudflare_prepaid_query_controller_v0_1": {
+    "status": "IMPLEMENTED_DISABLED_NOT_WIRED",
+    "contract": "config/cloudflare_prepaid_query_controller_v0_1.json",
+    "implementation_document": "docs/PREPAID_QUERY_CONTROLLER_V0_1.md",
+    "pull_request_number": 754,
+    "evidence_basis_parent_main_sha": "72420c7c34729e61bfdfff3507078dc2dc2063e3",
+    "is_latest_main_claim": false,
+    "reviewed_implementation_head_sha": "1f62483ec74ae70bab1012c656fad4746483a8e0",
+    "implementation_ci_run_id": 37091464727,
+    "implementation_ci": "SUCCESS_SYNTHETIC_ONLY",
+    "controller_tests": 24,
+    "github_claims_enabled": false,
+    "actual_claims_created": 0,
+    "actual_tag_protection_verified": false,
+    "controller_cloudflare_requests": 0,
+    "controller_r2_requests": 0,
+    "controller_d1_queries": 0,
+    "production_d1_metering_verified": false,
+    "account_zero_cost_proven": false,
+    "cloud_paper_activation": false,
+    "production_cycle_status": "NOT_RUN",
+    "natural_schedule_status": "NOT_CONFIGURED",
+    "next_work": "VERIFY_PROTECTED_FINITE_GITHUB_CLAIMS_AND_ACCOUNT_ALLOCATIONS_THEN_WIRE_TRUSTED_PAPER_GATEWAY",
+    "reviewed_implementation_controller_tests": 23
   }
 }
