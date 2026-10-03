@@ -695,10 +695,10 @@
     "pull_request_number": 755,
     "evidence_basis_parent_main_sha": "a0c7d8a50527cfb95bb4878ca8f8fa7b07e82c2a",
     "is_latest_main_claim": false,
-    "reviewed_implementation_head_sha": "1bd0b613dc9422c8b894219c6c8982fbe14ad10c",
-    "implementation_ci_run_id": 37094624252,
+    "reviewed_implementation_head_sha": "8e4c0dcc5e59ce13fc90b77b65b21ccc956fd6ac",
+    "implementation_ci_run_id": 37094784992,
     "implementation_ci": "SUCCESS_SYNTHETIC_ONLY",
-    "reviewed_implementation_runtime_tests": 15,
+    "reviewed_implementation_runtime_tests": 16,
     "final_head_validation_location": "PR_755_EXACT_HEAD_CHECKS",
     "contract": "config/prepaid_d1_runtime_gateway_v0_1.json",
     "implementation_document": "docs/PREPAID_D1_RUNTIME_GATEWAY_V0_1.md",
@@ -717,6 +717,14 @@
     "r2_operations_performed": 0,
     "d1_operations_performed": 0,
     "historical_recovery_requires_fresh_current_workload_authority": true,
-    "next_work": "ACCOUNT_EVIDENCE_AND_CALIBRATION_THEN_FINITE_EXECUTION_AUTHORITY_D1_PROVISIONING_CONTROLLED_MAIN_ACCEPTANCE"
+    "next_work": "ACCOUNT_EVIDENCE_AND_CALIBRATION_THEN_FINITE_EXECUTION_AUTHORITY_D1_PROVISIONING_CONTROLLED_MAIN_ACCEPTANCE",
+    "post_merge_evidence": {
+      "main_sha": "57f022ec924d3e7e9b1e912e44f18c55caa4935d",
+      "ci_run_id": 37094969423,
+      "ci": "SUCCESS",
+      "pages_run_id": 37094969417,
+      "pages": "BUILD_SUCCESS_DEPLOY_AND_BROWSER_SKIPPED_CHANGE_FILTER",
+      "is_latest_main_claim": false
+    }
   }
 }

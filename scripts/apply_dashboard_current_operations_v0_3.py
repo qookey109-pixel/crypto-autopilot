@@ -173,6 +173,79 @@ def validate_current_operations(current: dict[str, Any]) -> None:
         raise RuntimeError("control plane re-enabled self-referential main claims")
 
 
+
+def project_cloud_paper_readiness(current: dict[str, Any]) -> dict[str, Any]:
+    """Project reviewed engineering evidence without granting runtime authority."""
+    result: dict[str, Any] = {
+        "schema": "qookey-cloud-paper-readiness-v0.1",
+        "authority": False,
+        "status": "UNKNOWN",
+        "source": str(CURRENT_OPERATIONS),
+        "is_latest_main_claim": False,
+        "evidence_kind": "REPOSITORY_STATUS_NOT_RUNTIME_EVIDENCE",
+        "engineering": None,
+        "blockers": [],
+    }
+    gateway = current.get("cloudflare_prepaid_d1_runtime_gateway_v0_1")
+    controller = current.get("cloudflare_prepaid_query_controller_v0_1")
+    if not isinstance(gateway, dict) or not isinstance(controller, dict):
+        return result
+    expected = {
+        "status": "IMPLEMENTED_DISABLED_SYNTHETICALLY_WIRED",
+        "is_latest_main_claim": False,
+        "implementation_ci": "SUCCESS_SYNTHETIC_ONLY",
+        "actual_d1_metering_verified": False,
+        "account_wide_writer_coverage": "UNCONFIRMED",
+        "account_cost_and_headroom": "UNCONFIRMED",
+        "entrypoint": "NOT_WIRED",
+        "production_cycle_status": "NOT_RUN",
+        "natural_schedule_status": "NOT_CONFIGURED",
+        "cloud_paper_activation": False,
+        "d1_provisioned": False,
+        "future_writers_require_registration_before_first_write": True,
+    }
+    if any(type(gateway.get(key)) is not type(value) or gateway[key] != value
+           for key, value in expected.items()):
+        return result
+    if controller.get("actual_tag_protection_verified") is not False:
+        return result
+    head = gateway.get("reviewed_implementation_head_sha")
+    basis = gateway.get("evidence_basis_parent_main_sha")
+    run = gateway.get("implementation_ci_run_id")
+    count = gateway.get("reviewed_implementation_runtime_tests")
+    if not all(isinstance(value, str) and len(value) == 40
+               and all(char in "0123456789abcdef" for char in value)
+               for value in (head, basis)):
+        return result
+    if any(type(value) is not int or value <= 0 for value in (run, count)):
+        return result
+    result.update({
+        "status": "NOT_ENABLED",
+        "evidence_basis_parent_main_sha": basis,
+        "engineering": {
+            "status": "SUCCESS_SYNTHETIC_ONLY",
+            "head_sha": head,
+            "ci_run_id": run,
+            "runtime_tests": count,
+        },
+        "runtime": {
+            "entrypoint": gateway["entrypoint"],
+            "cycle": gateway["production_cycle_status"],
+            "schedule": gateway["natural_schedule_status"],
+            "activated": False,
+        },
+        "blockers": [
+            {"id": "ACCOUNT_COVERAGE", "state": gateway["account_wide_writer_coverage"]},
+            {"id": "COST_AND_HEADROOM", "state": gateway["account_cost_and_headroom"]},
+            {"id": "PRODUCTION_BACKEND", "state": "UNPROVISIONED_UNVERIFIED"},
+            {"id": "PRODUCTION_CYCLE", "state": gateway["production_cycle_status"]},
+            {"id": "NATURAL_SCHEDULE", "state": gateway["natural_schedule_status"]},
+        ],
+        "future_writers_require_registration_before_first_write": True,
+    })
+    return result
+
+
 def overlay_current_operations(
     dashboard: dict[str, Any], current: dict[str, Any]
 ) -> dict[str, Any]:
@@ -374,6 +447,7 @@ def overlay_current_operations(
 
     if pionex_authority["private_api"] is not False:
         raise RuntimeError("private Pionex API cannot be projected as authorized")
+    dashboard["cloudPaperReadiness"] = project_cloud_paper_readiness(current)
     return dashboard
 
 

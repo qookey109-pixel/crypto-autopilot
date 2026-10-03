@@ -1232,6 +1232,63 @@ function renderCloudPaperLoop(data) {
   }
 }
 
+
+function renderCloudPaperReadiness(data) {
+  const status = document.getElementById("cloud-paper-readiness-status");
+  const list = document.getElementById("cloud-paper-readiness-list");
+  const engineering = document.getElementById("cloud-paper-engineering");
+  const runtime = document.getElementById("cloud-paper-runtime");
+  const source = document.getElementById("cloud-paper-readiness-source");
+  const link = document.getElementById("cloud-paper-engineering-run");
+  if (!status || !list || !engineering || !runtime || !source || !link) return;
+  // Clear the prior successful projection before validating a refresh.
+  list.replaceChildren();
+  link.hidden = true;
+  link.removeAttribute("href");
+  status.textContent = "無法核實";
+  engineering.textContent = "工程驗收：未核實";
+  runtime.textContent = "正式執行與排程：未核實";
+  source.textContent = "啟用條件來源：未核實";
+  const ids = ["ACCOUNT_COVERAGE", "COST_AND_HEADROOM", "PRODUCTION_BACKEND", "PRODUCTION_CYCLE", "NATURAL_SCHEDULE"];
+  const states = ["UNCONFIRMED", "UNCONFIRMED", "UNPROVISIONED_UNVERIFIED", "NOT_RUN", "NOT_CONFIGURED"];
+  const sha = value => typeof value === "string" && /^[0-9a-f]{40}$/.test(value);
+  const positiveInt = value => Number.isSafeInteger(value) && value > 0;
+  const safe = data?.schema === "qookey-cloud-paper-readiness-v0.1"
+    && data.authority === false && data.is_latest_main_claim === false
+    && data.status === "NOT_ENABLED"
+    && data.source === "research/status/current-operations-v0-3.json"
+    && data.evidence_kind === "REPOSITORY_STATUS_NOT_RUNTIME_EVIDENCE"
+    && sha(data.evidence_basis_parent_main_sha)
+    && data.engineering?.status === "SUCCESS_SYNTHETIC_ONLY"
+    && sha(data.engineering.head_sha) && positiveInt(data.engineering.ci_run_id)
+    && positiveInt(data.engineering.runtime_tests)
+    && data.runtime?.entrypoint === "NOT_WIRED"
+    && data.runtime.cycle === "NOT_RUN" && data.runtime.schedule === "NOT_CONFIGURED"
+    && data.runtime.activated === false
+    && data.future_writers_require_registration_before_first_write === true
+    && Array.isArray(data.blockers) && data.blockers.length === ids.length
+    && data.blockers.every((row, index) => row?.id === ids[index] && row.state === states[index]);
+  if (!safe) return;
+  status.textContent = "尚未啟用 · 5 項待完成";
+  engineering.textContent = `工程驗收：${data.engineering.runtime_tests} 項整合測試通過；合成資料驗證，未代表正式帳戶已執行。`;
+  runtime.textContent = "正式入口未接通；正式循環未執行；自然排程未配置。";
+  const reasons = [
+    "共享帳戶：目前哪些服務使用額度尚未確認；未來新增服務須先登錄並分配預算。",
+    "費用與容量：完整帳戶費用、剩餘額度及資料新鮮度尚未證明；未證明不等於額度不足。",
+    "保存與防重：資料庫尚未建立；實際計量、一次執行憑證與保護尚待驗證。",
+    "正式循環：需先完成受控雲端驗收，確認帳戶保存、回讀與下一輪延續。",
+    "自動排程：需在前述條件完成後啟用，再獨立核對首次自然執行。",
+  ];
+  for (const reason of reasons) {
+    const item = document.createElement("li");
+    item.textContent = reason;
+    list.appendChild(item);
+  }
+  source.textContent = `啟用條件來源：Repository 狀態紀錄，依據 ${data.evidence_basis_parent_main_sha.slice(0,12)}；非行情或用量的新鮮度證據。`;
+  link.href = `https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/${data.engineering.ci_run_id}`;
+  link.hidden = false;
+}
+
 async function loadData() {
   const refreshButton = document.querySelector("#refresh-button");
   refreshButton?.setAttribute("aria-busy", "true");
@@ -1298,6 +1355,7 @@ async function loadData() {
       renderAlternativeAssets(null);
     }
     render(mergeOperationalStatus(data, operational));
+    renderCloudPaperReadiness(data?.cloudPaperReadiness);
     renderHomeSummary(data, strategy, paperTraining, researchCalendar, historyProgress);
     renderPaperTraining(paperTraining);
     renderResearchEvidence(researchEvidence);
@@ -1311,6 +1369,7 @@ async function loadData() {
     renderHomeSummary(null, null, null, null, null);
     renderCloudRuns(null);
     renderCloudPaperLoop(null);
+    renderCloudPaperReadiness(null);
     renderCalendar(null);
     renderOperationsSchedule(null);
     renderPaperTraining(null);

@@ -7,7 +7,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.apply_dashboard_current_operations_v0_3 import overlay_current_operations
+from scripts.apply_dashboard_current_operations_v0_3 import (
+    overlay_current_operations,
+    project_cloud_paper_readiness,
+)
 from scripts.build_delivery_overview import build as build_delivery_overview
 
 
@@ -224,6 +227,69 @@ class DashboardCurrentOperationsV03Tests(unittest.TestCase):
         bad["pionex_validation"]["authority"]["live_trading"] = True
         with self.assertRaises(RuntimeError):
             overlay_current_operations(copy.deepcopy(self.dashboard), bad)
+
+
+    def test_cloud_paper_readiness_uses_final_reviewed_ci_only(self) -> None:
+        result = overlay_current_operations(copy.deepcopy(self.dashboard), self.current)
+        readiness = result["cloudPaperReadiness"]
+        gateway = self.current["cloudflare_prepaid_d1_runtime_gateway_v0_1"]
+        self.assertEqual(readiness["status"], "NOT_ENABLED")
+        self.assertFalse(readiness["authority"])
+        self.assertFalse(readiness["is_latest_main_claim"])
+        self.assertEqual(readiness["evidence_kind"], "REPOSITORY_STATUS_NOT_RUNTIME_EVIDENCE")
+        self.assertEqual(readiness["engineering"]["ci_run_id"], gateway["implementation_ci_run_id"])
+        self.assertEqual(readiness["engineering"]["head_sha"], gateway["reviewed_implementation_head_sha"])
+        self.assertEqual(readiness["engineering"]["runtime_tests"], 16)
+        self.assertEqual(readiness["runtime"]["cycle"], "NOT_RUN")
+        self.assertFalse(readiness["runtime"]["activated"])
+        self.assertEqual(len(readiness["blockers"]), 5)
+        self.assertEqual(readiness["blockers"][0]["state"], "UNCONFIRMED")
+        self.assertTrue(readiness["future_writers_require_registration_before_first_write"])
+
+    def test_cloud_paper_missing_successor_remains_unknown(self) -> None:
+        for name in (
+            "cloudflare_prepaid_d1_runtime_gateway_v0_1",
+            "cloudflare_prepaid_query_controller_v0_1",
+        ):
+            with self.subTest(section=name):
+                current = copy.deepcopy(self.current)
+                del current[name]
+                result = project_cloud_paper_readiness(current)
+                self.assertEqual(result["status"], "UNKNOWN")
+                self.assertIsNone(result["engineering"])
+                self.assertEqual(result["blockers"], [])
+                self.assertNotIn("runtime", result)
+
+    def test_cloud_paper_rejects_unknown_or_changed_gateway_evidence(self) -> None:
+        changes = (
+            ("status", "PASS"),
+            ("cloud_paper_activation", True),
+            ("cloud_paper_activation", 0),
+            ("d1_provisioned", True),
+            ("account_wide_writer_coverage", "COMPLETE"),
+            ("account_cost_and_headroom", "PASS"),
+            ("is_latest_main_claim", True),
+            ("production_cycle_status", "NO_TRADE"),
+            ("natural_schedule_status", "RUNNING"),
+            ("actual_d1_metering_verified", True),
+            ("implementation_ci", "SUCCESS"),
+            ("implementation_ci_run_id", True),
+            ("reviewed_implementation_head_sha", "x" * 40),
+            ("reviewed_implementation_runtime_tests", 0),
+            ("future_writers_require_registration_before_first_write", False),
+        )
+        for key, value in changes:
+            with self.subTest(field=key):
+                current = copy.deepcopy(self.current)
+                current["cloudflare_prepaid_d1_runtime_gateway_v0_1"][key] = value
+                result = project_cloud_paper_readiness(current)
+                self.assertEqual(result["status"], "UNKNOWN")
+                self.assertIsNone(result["engineering"])
+
+    def test_cloud_paper_changed_claim_protection_needs_successor_projection(self) -> None:
+        current = copy.deepcopy(self.current)
+        current["cloudflare_prepaid_query_controller_v0_1"]["actual_tag_protection_verified"] = True
+        self.assertEqual(project_cloud_paper_readiness(current)["status"], "UNKNOWN")
 
 
 if __name__ == "__main__":

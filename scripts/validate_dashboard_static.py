@@ -786,6 +786,12 @@ def main() -> int:
         "cloud-paper-billing-detail",
         "cloud-paper-billing-run",
         "cloud-paper-usage-run",
+        "cloud-paper-readiness-status",
+        "cloud-paper-readiness-list",
+        "cloud-paper-engineering",
+        "cloud-paper-runtime",
+        "cloud-paper-readiness-source",
+        "cloud-paper-engineering-run",
     ):
         if f'id="{required_id}"' not in html:
             raise RuntimeError(f"Cloud Paper billing projection element missing: {required_id}")
