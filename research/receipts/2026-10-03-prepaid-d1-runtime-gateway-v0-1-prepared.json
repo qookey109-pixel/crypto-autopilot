@@ -1,0 +1,18 @@
+{
+  "schema": "qookey-prepaid-d1-runtime-gateway-prepared-v0.1",
+  "date": "2026-10-03",
+  "evidence_basis_parent_main": "a0c7d8a50527cfb95bb4878ca8f8fa7b07e82c2a",
+  "scope": "IMPLEMENTATION_AND_SYNTHETIC_GITHUB_CI_ONLY",
+  "execution_authorized": false,
+  "implementation_config": "config/prepaid_d1_runtime_gateway_v0_1.json",
+  "cloudflare_requests_performed": 0,
+  "r2_operations_performed": 0,
+  "d1_operations_performed": 0,
+  "provider_requests_performed": 0,
+  "production_claims_created": 0,
+  "schedules_created": 0,
+  "frozen_evidence_modified": false,
+  "owner_future_writers_answer": "Additional projects/services may be added later; current inventory is unconfirmed.",
+  "current_account_coverage": "UNCONFIRMED",
+  "mode": "PAPER_AND_LIVE_PAPER_ONLY"
+}

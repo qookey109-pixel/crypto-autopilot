@@ -27,6 +27,9 @@ from crypto_autopilot.paper.shared_writer_budget_gate_v0_4 import (
 )
 
 CONFIG_PATH = "config/cloudflare_prepaid_query_controller_v0_1.json"
+_AUTHORITY_PATH = re.compile(
+    r"^config/cloudflare_prepaid_query_controller(?:_execution)?_v[0-9]+_[0-9]+\.json$"
+)
 _SCHEMA = "qookey-cloudflare-prepaid-query-controller-v0.1"
 _ALIAS = re.compile(r"^[a-z0-9][a-z0-9-]{0,47}$")
 _WRITER = re.compile(r"^[a-z0-9][a-z0-9:._/-]{0,127}$")
@@ -318,19 +321,32 @@ class PrepaidQueryMeter:
         self._queries_used = 0
         self._lock = threading.Lock()
 
+    def _validate_binding(self, writer_id: str, slot_id: str) -> None:
+        now_ms = self._clock_ms()
+        now = _clock(now_ms)
+        if now.date() != self._day or not self._authority.starts_on <= now.date() <= self._authority.ends_on:
+            raise _blocked("TICKET_EXPIRED")
+        self._evidence.validate(self._authority, now_ms)
+        if writer_id != self._writer.writer_id or slot_id != self._slot_id:
+            raise _blocked("TICKET_IDENTITY_MISMATCH")
+
+    def validate_binding(self, *, writer_id: str, slot_id: str) -> None:
+        """Check identity and original evidence without spending or refreshing."""
+        with self._lock:
+            self._validate_binding(writer_id, slot_id)
+
+    def statement_cost(self, operation: QueryOperation) -> QueryCost:
+        """Immutable calibrated ceiling for every statement in this class."""
+        if operation not in self._authority.costs:
+            raise _blocked("STATEMENT_UNSUPPORTED")
+        return self._authority.costs[operation]
+
     def charge_before_query(
         self, *, writer_id: str, slot_id: str, operation: QueryOperation,
     ) -> Literal["CHARGED"]:
         with self._lock:
-            now_ms = self._clock_ms()
-            now = _clock(now_ms)
-            if now.date() != self._day or not self._authority.starts_on <= now.date() <= self._authority.ends_on:
-                raise _blocked("TICKET_EXPIRED")
-            self._evidence.validate(self._authority, now_ms)
-            if writer_id != self._writer.writer_id or slot_id != self._slot_id:
-                raise _blocked("TICKET_IDENTITY_MISMATCH")
-            if operation not in self._authority.costs:
-                raise _blocked("STATEMENT_UNSUPPORTED")
+            self._validate_binding(writer_id, slot_id)
+            self.statement_cost(operation)
             if self._queries_used >= self._writer.queries_per_ticket:
                 raise _blocked("QUERY_POOL_EXHAUSTED")
             self._queries_used += 1
@@ -351,7 +367,7 @@ class PrepaidQueryMeter:
 def claim_prepaid_query_meter(
     *, authority_document: dict[str, object], writer_id: str, slot_id: str,
     run_id: int, transport: GitHubTransport, evidence: AllocationEvidence,
-    clock_ms: Callable[[], int],
+    clock_ms: Callable[[], int], authority_path: str = CONFIG_PATH,
 ) -> PrepaidQueryMeter:
     """Validate current main/run/protection, atomically claim, then read back.
 
@@ -360,6 +376,11 @@ def claim_prepaid_query_meter(
     be deleted, force-updated or silently replaced with a new scope.
     """
     authority = PoolAuthority.parse(authority_document)
+    if (
+        not isinstance(authority_path, str) or len(authority_path) > 100
+        or not _AUTHORITY_PATH.fullmatch(authority_path)
+    ):
+        raise _blocked("AUTHORITY_PATH_INVALID")
     _int(run_id, positive=True)
     if not re.fullmatch(r"slot:(0|[1-9][0-9]{0,15})", slot_id):
         raise _blocked("SLOT_INVALID")
@@ -393,7 +414,7 @@ def claim_prepaid_query_meter(
         return sha
 
     sha = main_sha()
-    content = request("GET", "/contents/" + CONFIG_PATH + "?ref=" + sha)
+    content = request("GET", "/contents/" + authority_path + "?ref=" + sha)
     try:
         if content.get("encoding") != "base64":
             raise ValueError
@@ -473,14 +494,14 @@ def claim_and_reserve_shared_writer_envelope(
     *, authority_document: dict[str, object], run_id: int,
     transport: GitHubTransport, evidence: AllocationEvidence,
     clock_ms: Callable[[], int], execute: Query,
-    reservation: SharedWriterReservation,
+    reservation: SharedWriterReservation, authority_path: str = CONFIG_PATH,
 ) -> tuple[Literal["RESERVED", "EXISTING_RESERVATION"], dict[str, object]]:
     """Connect a new durable ticket to the existing V0.4 admission path."""
     reservation.validate()
     meter = claim_prepaid_query_meter(
         authority_document=authority_document, writer_id=reservation.writer_id,
         slot_id=reservation.slot_id, run_id=run_id, transport=transport,
-        evidence=evidence, clock_ms=clock_ms,
+        evidence=evidence, clock_ms=clock_ms, authority_path=authority_path,
     )
     result = reserve_shared_writer_envelope(
         execute=execute, query_meter=meter, reservation=reservation,

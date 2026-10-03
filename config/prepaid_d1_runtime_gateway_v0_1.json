@@ -1,0 +1,38 @@
+{
+  "schema": "qookey-prepaid-d1-runtime-gateway-v0.1",
+  "stage": "IMPLEMENTED_DISABLED",
+  "activation_enabled": false,
+  "cloudflare_execution_authorized": false,
+  "implementation": "src/crypto_autopilot/paper/prepaid_d1_client_v0_1.py",
+  "runtime_factory": "src/crypto_autopilot/paper/cloud_runtime_v0_2.py",
+  "execution_authority_path": null,
+  "new_writers_require_registration_before_first_write": true,
+  "unknown_current_writer_coverage": "BLOCK",
+  "per_http_attempt_ticket_debits": 1,
+  "shared_admission_conservative_extra_ticket_debits": 1,
+  "successful_no_trade": {
+    "d1_http_attempts": 3,
+    "ticket_debits": 4
+  },
+  "database_size_evidence_required": true,
+  "missing_or_overlimit_actual_meta": "REVIEW_REQUIRED_POISON_CLIENT_RETAIN_FULL_TICKET",
+  "historical_recovery_requires_separate_fresh_workload_authority": true,
+  "production_state": {
+    "entrypoint": "NOT_WIRED",
+    "cycle": "NOT_RUN",
+    "schedule": "NOT_CONFIGURED",
+    "d1": "UNPROVISIONED"
+  },
+  "frozen_evidence_mutation": false,
+  "provider_access": false,
+  "r2_access": false,
+  "d1_access": false,
+  "provisioning": false,
+  "schedule_creation": false,
+  "billing_history_v0_2_dispatch": false,
+  "model_promotion": false,
+  "holdout_access": false,
+  "source_switch": false,
+  "real_money_orders": false,
+  "documentation": "docs/PREPAID_D1_RUNTIME_GATEWAY_V0_1.md"
+}
