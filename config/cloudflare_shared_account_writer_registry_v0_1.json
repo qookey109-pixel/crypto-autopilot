@@ -40,7 +40,13 @@
     "state": "UNCONFIRMED",
     "complete": false,
     "registered_writers": [],
-    "user_confirmed_future_projects_or_services_may_be_added": true
+    "user_confirmed_future_projects_or_services_may_be_added": true,
+    "current_external_r2_owner_attestation": {
+      "state": "ATTESTED_NONE_AT_CHECKPOINT",
+      "scope": "CURRENT_EXTERNAL_R2_WRITERS",
+      "observed_date": "2026-10-03",
+      "receipt": "research/receipts/2026-10-03-cloudflare-owner-billing-checkpoint-v0-1.json"
+    }
   },
   "registration_contract": {
     "applies_to": "NEW_WRITERS_AND_ANY_NEW_RUNTIME_ACTIVATION",
@@ -76,6 +82,7 @@
     "This registry and CI validation cover only the repository source inventory.",
     "A manifest entry is not evidence that its workflow uses a live shared admission ledger.",
     "This file cannot discover or enumerate writers in other repositories or Cloudflare services.",
-    "External writer coverage requires an account-owner-attested inventory and integration of each writer."
+    "External writer coverage requires an account-owner-attested inventory and integration of each writer.",
+    "The scoped current external R2 attestation does not establish D1, future writer, or repository shared admission coverage."
   ]
 }

@@ -206,13 +206,47 @@ def validate_shared_account_writer_registry(
         if ROOT.resolve() not in receipt_path.parents or not receipt_path.is_file():
             raise RuntimeError("external writer attestation receipt is missing")
     if (
-        gate.get("account_wide_coverage_proven") is not external_complete
+        type(gate.get("account_wide_coverage_proven")) is not bool
+        or (gate.get("account_wide_coverage_proven") and not external_complete)
         or type(gate.get("shared_admission_integrated_for_all_repository_writers"))
         is not bool
         or type(gate.get("d1_provisioned")) is not bool
         or type(gate.get("activation_enabled")) is not bool
     ):
         raise RuntimeError("shared account production gate fields are invalid")
+    scoped_r2 = external.get("current_external_r2_owner_attestation")
+    if scoped_r2 is not None:
+        if not isinstance(scoped_r2, dict):
+            raise RuntimeError("scoped R2 owner attestation is invalid")
+        receipt = scoped_r2.get("receipt")
+        if not isinstance(receipt, str) or not receipt:
+            raise RuntimeError("scoped R2 owner attestation receipt is missing")
+        receipt_path = (ROOT / receipt).resolve()
+        if ROOT.resolve() not in receipt_path.parents or not receipt_path.is_file():
+            raise RuntimeError("scoped R2 owner attestation receipt is missing")
+        try:
+            evidence = json.loads(receipt_path.read_text(encoding="utf-8"))
+        except (ValueError, OSError) as exc:
+            raise RuntimeError("scoped R2 owner attestation receipt is invalid") from exc
+        owner = evidence.get("owner_attestation") if isinstance(evidence, dict) else None
+        if (
+            not isinstance(evidence, dict)
+            or evidence.get("schema") != "qookey-cloudflare-owner-billing-checkpoint-v0.1"
+            or not isinstance(owner, dict)
+            or owner.get("source") != "DIRECT_USER_MESSAGE"
+            or owner.get("scope") != "CURRENT_EXTERNAL_R2_WRITERS"
+            or owner.get("external_r2_writers_declared") != []
+            or owner.get("future_writer_registration_required") is not True
+            or scoped_r2.get("state") != "ATTESTED_NONE_AT_CHECKPOINT"
+            or scoped_r2.get("observed_date") != evidence.get("observed_date")
+            or scoped_r2.get("scope") != owner.get("scope")
+        ):
+            raise RuntimeError("scoped R2 owner attestation exceeds receipt evidence")
+    if (
+        gate.get("account_wide_coverage_proven")
+        and not gate.get("shared_admission_integrated_for_all_repository_writers")
+    ):
+        raise RuntimeError("account coverage claimed with repository admission unverified")
     if (
         gate.get("shared_admission_integrated_for_all_repository_writers")
         and any(

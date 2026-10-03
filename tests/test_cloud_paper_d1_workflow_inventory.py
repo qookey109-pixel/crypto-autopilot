@@ -262,5 +262,49 @@ class D1WorkflowInventoryTests(unittest.TestCase):
             validate_shared_account_writer_registry(inventory, registry)
 
 
+class ScopedOwnerAttestationTests(unittest.TestCase):
+    _shared_registry_fixture = staticmethod(D1WorkflowInventoryTests._shared_registry_fixture)
+    @staticmethod
+    def _scoped(registry):
+        registry["external_writer_inventory"]["current_external_r2_owner_attestation"] = {
+            "state": "ATTESTED_NONE_AT_CHECKPOINT",
+            "scope": "CURRENT_EXTERNAL_R2_WRITERS",
+            "observed_date": "2026-10-03",
+            "receipt": "research/receipts/2026-10-03-cloudflare-owner-billing-checkpoint-v0-1.json",
+        }
+
+    def test_scoped_r2_attestation_keeps_account_gate_closed(self):
+        from scripts.validate_cloud_paper_r2_writer_inventory import validate_shared_account_writer_registry
+        inventory, registry = self._shared_registry_fixture()
+        self._scoped(registry)
+        self.assertEqual(validate_shared_account_writer_registry(inventory, registry),
+                         [".github/workflows/paper.yml"])
+        self.assertFalse(registry["production_gate"]["account_wide_coverage_proven"])
+
+    def test_scoped_r2_rejects_changed_scope_date_or_receipt(self):
+        from scripts.validate_cloud_paper_r2_writer_inventory import validate_shared_account_writer_registry
+        for field, value in (("scope", "ALL_ACCOUNT_WRITERS"), ("observed_date", "2099-01-01"),
+                             ("receipt", "README.md"), ("receipt", "../outside.json")):
+            with self.subTest(field=field, value=value):
+                inventory, registry = self._shared_registry_fixture()
+                self._scoped(registry)
+                registry["external_writer_inventory"]["current_external_r2_owner_attestation"][field] = value
+                with self.assertRaisesRegex(RuntimeError, "attestation"):
+                    validate_shared_account_writer_registry(inventory, registry)
+
+    def test_external_complete_allows_repository_admission_still_unverified(self):
+        from scripts.validate_cloud_paper_r2_writer_inventory import validate_shared_account_writer_registry
+        inventory, registry = self._shared_registry_fixture()
+        registry["external_writer_inventory"].update({
+            "state": "ATTESTED", "complete": True,
+            "attestation_receipt": "research/receipts/2026-10-03-cloudflare-owner-billing-checkpoint-v0-1.json",
+        })
+        self.assertEqual(validate_shared_account_writer_registry(inventory, registry),
+                         [".github/workflows/paper.yml"])
+        registry["production_gate"]["account_wide_coverage_proven"] = True
+        with self.assertRaisesRegex(RuntimeError, "repository admission"):
+            validate_shared_account_writer_registry(inventory, registry)
+
+
 if __name__ == "__main__":
     unittest.main()
