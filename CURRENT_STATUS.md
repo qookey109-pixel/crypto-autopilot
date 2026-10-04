@@ -1,3 +1,22 @@
+## Live Cloud Paper checkpoint — 2026-10-04 09:48 Asia/Taipei
+
+Evidence basis: protected `main=41878ffdb2ff98a935d352604c5a8664fd1d7cff`, re-read from GitHub at 2026-10-04 01:48 UTC. This is a dated checkpoint, not a claim that main will remain unchanged.
+
+- PR [#761](https://github.com/qookey109-pixel/crypto-autopilot/pull/761) merged at this main SHA. Its shared reservation-to-R2 per-operation bridge is implemented and CI-tested, but the four existing R2 writers are not migrated to it. Production shared-admission coverage remains false.
+- Main post-merge CI [37168434700](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37168434700), CodeQL [37168434698](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37168434698), Dependency/SBOM [37168434695](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37168434695), and V0.10 Freeze Guard [37168434718](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37168434718) succeeded. No Cloud Paper runtime operation was part of those checks.
+- Latest natural Health [37161610152](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37161610152) succeeded before #761. Its Maintenance chain [37161635852](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37161635852) ended with `inspect=success`, `propose=DELIVERY_BRANCH_NOT_AHEAD_OF_MAIN`; it produced no artifact. Preserve the failure; do not rerun it.
+- Current Cloudflare account UI (read-only) showed five Workers, one R2 bucket, 616.55 MB / 16.31k objects, Class A 1.08k and Class B 28.69k for the displayed period 2026-09-17 through 2026-10-17, metered usage displayed as USD 0.00, and zero D1 databases. These rounded dashboard values do **not** prove complete account cost, current exact headroom, or future zero-cost operation.
+- The owner directly confirms no other current external project writes into R2. This is scoped to current external R2 writers only. Future services must register before their first cloud write; it does not prove repository-writer shared admission or D1 writer coverage. Receipt: [research/receipts/2026-10-04-cloudflare-owner-writer-checkpoint-v0-2.json](research/receipts/2026-10-04-cloudflare-owner-writer-checkpoint-v0-2.json).
+- Cloud Paper remains disabled: source assembly is synthetically wired but the production entrypoint is `NOT_WIRED`, cycle `NOT_RUN`, natural schedule `NOT_CONFIGURED`; D1 is not provisioned, the production strategy registry is empty, and Core100 quality remains `REJECT`. No training, provider, R2 or D1 production operation was performed.
+- Six open PRs #693–#698 are Dependabot updates on older bases and still require exact-head/base/check review before merge.
+- Billing History V0.3 remains undispatched. This checkpoint's “authorization” was applied to the read-only account review and the current R2-writer attestation; it did not consume the separate one-time billing-history execution.
+
+Next: keep the production path disabled while calibrating finite shared limits and accounting for ledger/controller costs; integrate every current repository writer only when shared admission is operational; then obtain the separate D1 provisioning/execution authority and run controlled main PAPER acceptance. After those gates, establish a natural schedule and verified Dashboard projection.
+
+Boundaries: CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER, USD 0/month, PAPER/LIVE-PAPER only. Holdout, source switch, promotion, real-money orders and live trading remain closed. Historical receipts and failures remain unchanged.
+
+---
+
 ## Prepaid D1 runtime gateway checkpoint — 2026-10-03
 
 Scope: successor runtime integration, disabled execution. Evidence basis is parent main `a0c7d8a50527cfb95bb4878ca8f8fa7b07e82c2a`, not a live-main claim.
