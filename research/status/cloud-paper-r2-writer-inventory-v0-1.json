@@ -1,16 +1,16 @@
 {
   "schema": "qookey-cloud-paper-r2-writer-inventory-v0.1",
-  "updated_date": "2026-10-02",
-  "evidence_basis_main_sha": "2de48f8cb8488304487b50abcaa2489b58f45c27",
+  "updated_date": "2026-10-04",
+  "evidence_basis_main_sha": "391fc329d75817342f790a787f3e5868c6538996",
   "is_latest_main_claim": false,
   "scan": {
-    "workflow_file_count": 98,
-    "workflows_with_r2_or_cloudflare_secret_references": 28,
+    "workflow_file_count": 99,
+    "workflows_with_r2_or_cloudflare_secret_references": 29,
     "scanner_contract": "scripts/validate_cloud_paper_r2_writer_inventory.py",
     "exact_reference_scan": true,
     "values_or_secret_contents_read": false,
     "workflow_count_before_nonaccess_preflight": 84,
-    "note": "Repository reference inventory includes the separately gated V0.3 billing successor. Owner attested no current external R2 writers; repository admission and account-wide zero cost remain unproven. Billing V0.1/V0.2 consumed; do not rerun.",
+    "note": "Repository credential-reference inventory includes the V0.3 billing history successor and prepared V0.5 read-only billing metadata diagnostic. V0.5 does not access R2/D1 and requires separate owner confirmation before its single GET. Owner attests no other current external R2 writers; repository shared admission, D1 and account-wide zero cost remain unproven. Consumed authorities must not be rerun.",
     "d1_access_marker_scan": "scripts/validate_cloud_paper_r2_writer_inventory.py"
   },
   "account_wide_reservation_coverage": {
@@ -108,6 +108,14 @@
       "trigger": "workflow_dispatch on main with explicit confirmation",
       "authority": "config/cloud_paper_billing_history_v0_3.json",
       "evidence": "Optional-total successor. At most ten GETs, empty terminal traversal distinguished from total coverage. No rerun or product activation."
+    },
+    {
+      "workflow": ".github/workflows/cloud-paper-billing-metadata-diagnostic-v0-5.yml",
+      "access": "READ_ONLY",
+      "lifecycle": "PREPARED_ONE_TIME_READ_ONLY_DIAGNOSTIC",
+      "trigger": "workflow_dispatch on main with distinct owner confirmation",
+      "authority": "config/cloud_paper_billing_metadata_diagnostic_v0_5.json",
+      "evidence": "Preparation only. At most one GET to account billing-history pagination metadata; no R2/D1/provider access or billing values in report. No dispatch has occurred; first dispatch consumes this one-time authority even if it fails."
     },
     {
       "workflow": ".github/workflows/cloud-paper-r2-usage-audit-v0-3.yml",

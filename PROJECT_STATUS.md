@@ -1,12 +1,6 @@
 ## Current live checkpoint — 2026-10-04
 
-Evidence basis: immediately preceding protected main `642400a8ec35a8b2116121fdaae8c08c164bf245`; this dated snapshot does not claim that SHA remains current after its delivery PR merges. PR #765 is merged and its post-merge CI, CodeQL, Dependency/SBOM, V0.10 Freeze Guard and Pages build succeeded (runs 37185594440, 37185594430, 37185594425, 37185594404).
-
-Natural Core100 run [37196295102](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37196295102), attempt 1, ended `REVIEW_REQUIRED / RUNTIME_CHANGED`. Its report says no training, provider request or R2 write; it did perform R2 reads and did not access holdout. Preserve artifact 11301206291 and do not rerun or update the frozen runtime guard automatically. Core100 model quality remains `REJECT`.
-
-The owner reconfirmed there are no other current external projects/services writing to R2; future writers must register before their first write. This is narrower than full account inventory: repository writers remain declared but not verified on shared admission, D1 writers and total account charges/headroom remain unproven. Seven PRs are open (#763 and #693–#698); review each exact head/base/diff/check before merging, and do not apply stale #763 evidence over this checkpoint.
-
-Cloud Paper remains disabled: entry `NOT_WIRED`, cycle `NOT_RUN`, schedule `NOT_CONFIGURED`, D1 unprovisioned and production strategy registry empty. No Cloudflare request or resource activation occurred in this checkpoint. The V0.4 billing metadata diagnostic is synthetic-only; billing readiness and zero total cost remain `UNKNOWN`.
+Evidence basis: GitHub `main=391fc329d75817342f790a787f3e5868c6538996`, re-read before V0.5 preparation; PR #766 is the latest merged status reconciliation. The owner confirms there are no other external projects/services currently writing to this account's R2. Register any future external writer before its first write. This confirmation is limited to external R2 writers: the four repository writers still lack verified shared admission, and it does not prove D1 coverage, complete account costs, or exact headroom. Cloud Paper remains disabled (`NOT_WIRED` / `NOT_RUN` / `NOT_CONFIGURED`), D1 is absent, the production strategy registry is empty, and Core100 remains `REJECT`. The one-time Billing History V0.3 failure remains consumed; V0.5 is preparation only and has made no Cloudflare request. Preserve earlier dated evidence without rewriting it.
 
 ---
 

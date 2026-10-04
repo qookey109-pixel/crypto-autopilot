@@ -1,3 +1,14 @@
+## Billing metadata diagnostic V0.5 preparation — 2026-10-04 19:50 Asia/Taipei
+
+Evidence basis: parent main `391fc329d75817342f790a787f3e5868c6538996`, resolved from GitHub before this change.
+
+- Review of V0.3 shows its mismatch gate covered `page`, `per_page`, `count == len(result)`, and `total_count` type/coverage. The exact V0.3 response field remains unknown and its one-time run [37183381165](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37183381165) is consumed; do not rerun.
+- V0.4 was synthetic-only and inspected page/per_page. This V0.5 proposal extends the value-free diagnostic to page, per_page, count-vs-result-length and total_count consistency, and prepares a separate one-GET workflow gated by explicit owner confirmation.
+- No Cloudflare request, R2/D1 access or other external operation is part of this PR. The workflow is not dispatched. Any first V0.5 dispatch consumes its one-time authority even on failure.
+- Billing readiness and zero total cost remain UNKNOWN. Cloud Paper remains disabled; no training, provider, holdout, write or schedule authority is changed.
+
+---
+
 ## Live checkpoint — 2026-10-04 19:38 Asia/Taipei
 
 Evidence basis: GitHub main `642400a8ec35a8b2116121fdaae8c08c164bf245`, resolved before this documentation change. The exact SHA is a parent checkpoint, not a latest-main claim after merge.
