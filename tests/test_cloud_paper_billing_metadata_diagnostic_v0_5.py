@@ -52,9 +52,9 @@ class BillingMetadataDiagnosticV05Tests(unittest.TestCase):
         self.assertNotIn('"500"', json.dumps(report))
 
     def test_count_mismatch_is_identified_without_persisting_row_count(self):
-        report = diagnose_payload(payload(count=2, rows=[{}, {}]), observed_at=NOW)
+        report = diagnose_payload(payload(count=2, rows=[{}]), observed_at=NOW)
         self.assertIn("count", report["mismatched_fields"])
-        self.assertTrue(report["pagination_fields"]["count"]["matches_result_length"])
+        self.assertFalse(report["pagination_fields"]["count"]["matches_result_length"])
         self.assertNotIn('"count": 2', json.dumps(report))
         self.assertNotIn('"result_length": 2', json.dumps(report))
 
