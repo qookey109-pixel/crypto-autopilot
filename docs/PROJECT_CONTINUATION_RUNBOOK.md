@@ -1,3 +1,11 @@
+## Billing metadata diagnostic V0.5 — preparation only — 2026-10-04 19:50 Asia/Taipei
+
+Parent main: `391fc329d75817342f790a787f3e5868c6538996`. Billing History V0.3 run 37183381165 is consumed; never rerun. Its mismatch could have been page, per_page, count-vs-result-length or total_count consistency, and the exact field was not retained.
+
+V0.5 prepares a value-free one-page metadata diagnostic and a separate workflow requiring `confirm_one_time_read_only=true`. No Cloudflare request occurred. After merge, no one-time run is made until explicit owner confirmation is given for that workflow input. The first dispatch consumes the authority even if the request fails. Billing/zero cost stay UNKNOWN; Cloud Paper remains disabled.
+
+---
+
 ## Live handoff — 2026-10-04 19:38 Asia/Taipei
 
 Resolve current main, open PRs and Actions again before further execution. Parent main at this checkpoint: `642400a8ec35a8b2116121fdaae8c08c164bf245`.

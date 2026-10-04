@@ -1,12 +1,6 @@
 ## Current live checkpoint — 2026-10-04
 
-Evidence basis: immediately preceding protected main `642400a8ec35a8b2116121fdaae8c08c164bf245`; this dated snapshot does not claim that SHA remains current after its delivery PR merges. PR #765 is merged and its post-merge CI, CodeQL, Dependency/SBOM, V0.10 Freeze Guard and Pages build succeeded (runs 37185594440, 37185594430, 37185594425, 37185594404).
-
-Natural Core100 run [37196295102](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37196295102), attempt 1, ended `REVIEW_REQUIRED / RUNTIME_CHANGED`. Its report says no training, provider request or R2 write; it did perform R2 reads and did not access holdout. Preserve artifact 11301206291 and do not rerun or update the frozen runtime guard automatically. Core100 model quality remains `REJECT`.
-
-The owner reconfirmed there are no other current external projects/services writing to R2; future writers must register before their first write. This is narrower than full account inventory: repository writers remain declared but not verified on shared admission, D1 writers and total account charges/headroom remain unproven. Seven PRs are open (#763 and #693–#698); review each exact head/base/diff/check before merging, and do not apply stale #763 evidence over this checkpoint.
-
-Cloud Paper remains disabled: entry `NOT_WIRED`, cycle `NOT_RUN`, schedule `NOT_CONFIGURED`, D1 unprovisioned and production strategy registry empty. No Cloudflare request or resource activation occurred in this checkpoint. The V0.4 billing metadata diagnostic is synthetic-only; billing readiness and zero total cost remain `UNKNOWN`.
+Protected `main=41878ffdb2ff98a935d352604c5a8664fd1d7cff`; see [CURRENT_STATUS.md](CURRENT_STATUS.md) and the [continuation checkpoint](docs/PROJECT_CONTINUATION_RUNBOOK.md) for current exact run, account observation, owner attestation, and remaining gates. PR #761 is merged, but its shared R2 budget bridge is not integrated into the four existing writers. Cloud Paper remains disabled / not run / no natural schedule; D1 is absent, the production strategy registry is empty, and Core100 remains REJECT. A read-only Cloudflare dashboard showed current-period metered usage of USD 0.00, but full account cost and exact headroom remain UNKNOWN. No runtime, schedule, or account resource was activated. Earlier sections are historical snapshots; preserve their original evidence.
 
 ---
 

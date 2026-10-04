@@ -1,0 +1,86 @@
+{
+  "schema": "qookey-cloud-paper-billing-metadata-diagnostic-v0.5",
+  "authority_status": "PREPARED_ONE_TIME_READ_ONLY_DISPATCH_REQUIRES_DISTINCT_OWNER_CONFIRMATION",
+  "purpose": "Identify value-free first-page pagination mismatch fields from consumed Billing History V0.3 without rerunning it or retaining billing values.",
+  "evidence_basis": {
+    "consumed_v0_3_run_id": 37183381165,
+    "attempt": 1,
+    "reason_code": "BILLING_HISTORY_PAGE_METADATA_MISMATCH",
+    "exact_mismatched_field": "UNKNOWN"
+  },
+  "execution": {
+    "trigger": "workflow_dispatch_on_main_only",
+    "maximum_workflow_runs": 1,
+    "maximum_attempts": 1,
+    "maximum_github_history_requests": 1,
+    "maximum_cloudflare_http_requests": 1,
+    "maximum_items_in_memory": 100,
+    "page": 1,
+    "per_page": 100,
+    "maximum_response_bytes_per_request": 1048576,
+    "timeout_seconds_per_request": 20,
+    "retry_count": 0,
+    "redirects": false,
+    "history_check": "Require this to be the only V0.5 workflow_dispatch and first attempt.",
+    "distinct_owner_confirmation_required": true,
+    "first_dispatch_consumes_authority_even_if_unsuccessful": true
+  },
+  "query": {
+    "method": "GET",
+    "endpoint": "https://api.cloudflare.com/client/v4/accounts/{account_id}/billing/history?page=1&per_page=100",
+    "required_token_permission": "Account Billing Read",
+    "account_id_source": "CLOUDFLARE_ACCOUNT_ID repository variable",
+    "token_source": "CLOUDFLARE_BILLING_READONLY_API_TOKEN repository secret",
+    "persist_account_identity": false,
+    "persist_response_values": false,
+    "persist_rows_or_row_count": false,
+    "persist_raw_response": false,
+    "persist_amounts": false,
+    "persist_invoice_ids_or_urls": false,
+    "persist_descriptions": false,
+    "allowed_report_fields": [
+      "fixed reason code",
+      "requested page and per_page",
+      "metadata field names",
+      "field presence booleans",
+      "JSON type labels",
+      "nonnegative integer booleans",
+      "matches-request booleans",
+      "count matches returned-length boolean",
+      "total-count covers count boolean"
+    ]
+  },
+  "interpretation": {
+    "diagnostic_complete": "Only means first-page metadata is structurally valid and reconciles with the request and returned rows.",
+    "billing_readiness": "UNKNOWN",
+    "zero_cost_conclusion": "UNKNOWN",
+    "complete_history_coverage": "NOT_EVALUATED",
+    "cloud_paper_activation": "REMAINS_DISABLED"
+  },
+  "allowed_operations": [
+    "One GitHub Actions workflow history request.",
+    "At most one sequential read-only Cloudflare billing-history GET.",
+    "Secret-free report artifact with seven-day retention."
+  ],
+  "forbidden_operations": [
+    "Any rerun, retry, redirect following, pagination beyond page 1, endpoint fallback, status filter, or other Cloudflare request.",
+    "Persisting account identity, raw rows, row counts, invoice identifiers/URLs, descriptions, amounts, or raw response.",
+    "R2/D1 access, writes, provisioning, provider access, training, holdout, source switch, model promotion, trading, or schedule activation.",
+    "Inferring complete billing or zero total cost from this diagnostic."
+  ],
+  "boundaries": {
+    "monthly_budget_usd": 0,
+    "paper_only": true,
+    "cloud_paper_activation": false,
+    "provider_access": false,
+    "r2_access": false,
+    "d1_access": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false,
+    "live_trading": false
+  },
+  "implementation": "scripts/cloud_paper_billing_metadata_diagnostic_v0_5.py",
+  "workflow": ".github/workflows/cloud-paper-billing-metadata-diagnostic-v0-5.yml"
+}
