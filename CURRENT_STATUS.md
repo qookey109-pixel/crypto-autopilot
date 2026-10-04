@@ -2,6 +2,8 @@
 
 Evidence basis: protected `main=5a76dd8bb09017d62949c062af5d10008f24354e`, re-read from GitHub at 2026-10-04 06:41 UTC. This is a dated checkpoint, not a claim that main will remain unchanged.
 
+- Current Operations V0.3 declares parent main `41878ffdb2ff98a935d352604c5a8664fd1d7cff` (source merge PR #682), reviewed before that status version. This historical parent is **not** a latest-main claim; resolve `main` live at read time for current decisions.
+
 - PR [#761](https://github.com/qookey109-pixel/crypto-autopilot/pull/761) merged at this main SHA. Its shared reservation-to-R2 per-operation bridge is implemented and CI-tested, but the four existing R2 writers are not migrated to it. Production shared-admission coverage remains false.
 - Main post-merge CI [37168434700](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37168434700), CodeQL [37168434698](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37168434698), Dependency/SBOM [37168434695](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37168434695), and V0.10 Freeze Guard [37168434718](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37168434718) succeeded. No Cloud Paper runtime operation was part of those checks.
 - Latest natural Health [37161610152](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37161610152) succeeded before #761. Its Maintenance chain [37161635852](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37161635852) ended with `inspect=success`, `propose=DELIVERY_BRANCH_NOT_AHEAD_OF_MAIN`; it produced no artifact. Preserve the failure; do not rerun it.
