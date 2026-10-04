@@ -5,7 +5,7 @@
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
     "parent_main_sha": "41878ffdb2ff98a935d352604c5a8664fd1d7cff",
-    "semantics": "PROTECTED_MAIN_RESOLVED_BEFORE_STATUS_UPDATE",
+    "semantics": "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
     "is_latest_main_claim": false,
     "source_merge_pr": 682,
     "observed_at_utc": "2026-10-04T01:48:00Z"
