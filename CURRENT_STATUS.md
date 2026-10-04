@@ -1,3 +1,12 @@
+## Billing metadata diagnostic V0.4 preparation — 2026-10-04 15:17 Asia/Taipei
+
+Evidence basis: parent main `41b0e706a243579d541161831098cae4281b6a24`, resolved from GitHub before this change. This dated note is not a latest-main claim.
+
+- The owner reconfirms that there are no other current external projects/services writing to this account's R2. Future external R2 writers must be registered before their first write. This statement does not cover repository writers, D1, full cost, or prove shared admission.
+- Billing History V0.3 run [37183381165](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37183381165) remains consumed and must not be rerun. Its safe report did not identify which pagination metadata field mismatched.
+- This successor prepares only a synthetic, value-free metadata diagnostic in code/config/tests. It adds no workflow, credentials reference, network client, Cloudflare request, R2/D1 operation, or runtime authority.
+- A future external diagnostic requires a separate versioned execution authority merged to main and distinct explicit approval. Billing readiness and zero total cost remain UNKNOWN; Cloud Paper remains disabled.
+
 ## Live Cloud Paper checkpoint — 2026-10-04 14:41 Asia/Taipei
 
 Evidence basis: protected `main=5a76dd8bb09017d62949c062af5d10008f24354e`, re-read from GitHub at 2026-10-04 06:41 UTC. This is a dated checkpoint, not a claim that main will remain unchanged.
