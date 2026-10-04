@@ -43,7 +43,7 @@ class BillingMetadataDiagnosticV05Tests(unittest.TestCase):
 
     def test_reports_exact_mismatched_field_names_without_values(self):
         report = diagnose_payload(
-            payload(page=9, per_page=500, count=0, total_count=0),
+            payload(page=9, per_page=500, count=0, total_count=0, rows=[]),
             observed_at=NOW,
         )
         self.assertEqual(report["reason_code"], "PAGINATION_METADATA_MISMATCH")
