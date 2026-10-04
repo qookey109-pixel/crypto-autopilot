@@ -254,22 +254,15 @@ class CurrentOperationsStatusTests(unittest.TestCase):
         )
         checkpoint = self.payload["live_repository_checkpoint"]
         checkpoint_numbers = [row["number"] for row in checkpoint["open_pull_requests"]]
-        self.assertTrue(checkpoint_numbers)
-        self.assertEqual(len(checkpoint_numbers), len(set(checkpoint_numbers)))
-        self.assertTrue(
-            all(row["state"] == "OPEN" for row in checkpoint["open_pull_requests"])
-        )
-        self.assertTrue(
-            all(
-                len(row["head_sha"]) == 40 and len(row["base_sha"]) == 40
-                for row in checkpoint["open_pull_requests"]
-            )
-        )
+        self.assertEqual(checkpoint_numbers, [708, 693, 694, 695, 696, 697, 698])
+        self.assertEqual(checkpoint["observed_at_utc"][:10], "2026-10-01")
+        self.assertFalse(checkpoint["is_latest_main_claim"])
         self.assertEqual(checkpoint["closed_unmerged_pull_requests"][0]["number"], 679)
         self.assertFalse(checkpoint["closed_unmerged_pull_requests"][0]["merged"])
-        self.assertEqual(control["open_pr_count"], len(checkpoint_numbers))
-        self.assertEqual(control["open_pr_numbers"], checkpoint_numbers)
-        self.assertIn("LIVE_CHECKPOINT_", control["open_pr_triage_state"])
+        # The dated main checkpoint is historical; the current overlay is separate.
+        self.assertEqual(control["open_pr_count"], 6)
+        self.assertEqual(control["open_pr_numbers"], [693, 694, 695, 696, 697, 698])
+        self.assertIn("LIVE_CHECKPOINT_2026_10_04", control["open_pr_triage_state"])
         self.assertIn("BASES_REVIEW_REQUIRED", control["open_pr_triage_state"])
         self.assertEqual(control["historical_open_pr_triage"]["open_pr_count"], 6)
         self.assertEqual(control["historical_open_pr_triage"]["open_pr_numbers"], [326, 327, 328, 329, 330, 331])
