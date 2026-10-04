@@ -1,3 +1,9 @@
+## Current live checkpoint — 2026-10-04
+
+Protected `main=41878ffdb2ff98a935d352604c5a8664fd1d7cff`; see [CURRENT_STATUS.md](CURRENT_STATUS.md) and the [continuation checkpoint](docs/PROJECT_CONTINUATION_RUNBOOK.md) for current exact run, account observation, owner attestation, and remaining gates. PR #761 is merged, but its shared R2 budget bridge is not integrated into the four existing writers. Cloud Paper remains disabled / not run / no natural schedule; D1 is absent, the production strategy registry is empty, and Core100 remains REJECT. A read-only Cloudflare dashboard showed current-period metered usage of USD 0.00, but full account cost and exact headroom remain UNKNOWN. No runtime, schedule, or account resource was activated. Earlier sections are historical snapshots; preserve their original evidence.
+
+---
+
 ## Prepaid D1 runtime gateway checkpoint — 2026-10-03
 
 Scope: successor runtime integration, disabled execution. Evidence basis is parent main `a0c7d8a50527cfb95bb4878ca8f8fa7b07e82c2a`, not a live-main claim.
