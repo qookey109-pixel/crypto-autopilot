@@ -235,7 +235,7 @@ def main() -> int:
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     report = execute_one_request(fetch_payload=_fetch_payload, observed_at=datetime.now(UTC))
-    output.write_text(json.dumps(report, indent=2, allow_nan=False) + "\\n", encoding="utf-8")
+    output.write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     print(f"Billing metadata diagnostic: {report['status']} ({report['reason_code']})")
     return 0 if report["status"] == "DIAGNOSTIC_COMPLETE" else 1
 
