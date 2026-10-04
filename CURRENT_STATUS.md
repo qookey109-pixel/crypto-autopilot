@@ -1,3 +1,15 @@
+## Live checkpoint — 2026-10-04 19:38 Asia/Taipei
+
+Evidence basis: GitHub main `642400a8ec35a8b2116121fdaae8c08c164bf245`, resolved before this documentation change. The exact SHA is a parent checkpoint, not a latest-main claim after merge.
+
+- PR [#765](https://github.com/qookey109-pixel/crypto-autopilot/pull/765) merged at this parent. Main CI [37185594440](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37185594440), CodeQL [37185594430](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37185594430), Dependency/SBOM [37185594425](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37185594425), V0.10 Freeze Guard [37185594404](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37185594404), and Pages build succeeded.
+- Natural Core100 schedule run [37196295102](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37196295102), attempt 1, on this main produced `REVIEW_REQUIRED / RUNTIME_CHANGED`. Report evidence: training=false, provider requests=0, R2 reads=true, R2 writes=false, holdout=false. Artifact [11301206291](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37196295102) is preserved. Do not rerun this consumed observation; do not accept a changed runtime or train automatically. Model quality remains `REJECT`.
+- The owner reconfirmed that no other external project/service currently writes to this account's R2; future external writers must register before their first cloud write. This does not include the four repository-declared R2 writers and does not prove shared admission, D1 coverage, total account cost, or headroom. Existing [owner checkpoint receipt](research/receipts/2026-10-04-cloudflare-owner-writer-checkpoint-v0-2.json) remains the attestation record.
+- There are seven open PRs: stale Cloud Maintenance snapshot #763 and Dependabot #693–#698. Their exact heads, bases, diffs and checks require live review before any merge; #763 must not overwrite current evidence.
+- Cloud Paper remains disabled: production entry `NOT_WIRED`, cycle `NOT_RUN`, schedule `NOT_CONFIGURED`, D1 unprovisioned, production strategy registry empty. Account-wide billing, freshness, headroom and complete repository writer admission remain unproven. The V0.4 billing parser is synthetic-only; it does not authorize a Cloudflare request.
+
+---
+
 ## Billing metadata diagnostic V0.4 preparation — 2026-10-04 15:17 Asia/Taipei
 
 Evidence basis: parent main `41b0e706a243579d541161831098cae4281b6a24`, resolved from GitHub before this change. This dated note is not a latest-main claim.
