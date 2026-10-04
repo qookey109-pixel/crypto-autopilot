@@ -1,14 +1,14 @@
 {
   "schema": "qookey-current-operations-v0.3",
-  "updated_date": "2026-10-03",
+  "updated_date": "2026-10-04",
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
-    "parent_main_sha": "42f8c1cdad46107f5f8f720b9809a7ad71286815",
+    "parent_main_sha": "41878ffdb2ff98a935d352604c5a8664fd1d7cff",
     "semantics": "REPOSITORY_MAIN_REVIEWED_BEFORE_THIS_STATUS_VERSION",
     "is_latest_main_claim": false,
     "source_merge_pr": 682,
-    "observed_at_utc": "2026-10-01T08:15:20Z"
+    "observed_at_utc": "2026-10-04T01:48:00Z"
   },
   "mode": "PAPER_AND_LIVE_PAPER_ONLY",
   "core100": {
@@ -113,7 +113,7 @@
     "root_docs_projection": "CLOUD_PAPER_DASHBOARD_V0_3_AND_CURRENT_CHECKPOINT",
     "security_projection": "CONVERGED_BY_PR_322",
     "open_pr_triage": "research/status/open-pr-triage-v0-5.json",
-    "open_pr_triage_state": "LIVE_CHECKPOINT_2026_10_02_SEVEN_OPEN_PRS_STALE_BASE_RECONCILIATION_REQUIRED_OLD_HEAD_FAILURES_REVIEW_REQUIRED",
+    "open_pr_triage_state": "LIVE_CHECKPOINT_2026_10_04_SIX_DEPENDABOT_PRS_OLD_BASES_REVIEW_REQUIRED",
     "automation_health_count_policy": "DERIVED_FROM_EXACT_REPOSITORY_SCHEDULE_INVENTORY",
     "dashboard_projection_policy": "HISTORICAL_AUTHORITY_OVERLAY_THEN_CURRENT_OPERATIONS_OVERLAY",
     "homepage_projection_policy": "CURRENT_OPERATIONS_MUST_OVERRIDE_DATED_SIMULATION_READINESS_FOR_PRESENT_TENSE_STATE",
@@ -125,9 +125,8 @@
     "research_signal_quality_state": "UPSTREAM_COMPLETION_CHAINED_WITH_EXACT_IMMUTABLE_RUN_DEDUP_AND_DAILY_FALLBACK",
     "dashboard_browser_validation_state": "PLAYWRIGHT_CHROMIUM_DESKTOP_MOBILE_PR_BUILD_PLUS_POST_DEPLOY_PRODUCTION_CHECK",
     "live_paper_slot_claim_state": "ACTIVE_MANUAL_COORDINATOR_FAIL_CLOSED_ATOMIC_CREATE_IF_ABSENT",
-    "open_pr_count": 7,
+    "open_pr_count": 6,
     "open_pr_numbers": [
-      708,
       693,
       694,
       695,
@@ -141,7 +140,7 @@
       "contract": "config/cloud_project_maintenance_v0_1.json",
       "receipt": "research/receipts/2026-09-25-cloud-project-maintenance-v0-1.json",
       "effective_condition": "REVIEWED_MAIN_MERGE",
-      "acceptance": "LATEST_NATURAL_HEALTH_36676258650_MAINTENANCE_36676302904_INSPECT_SUCCESS_PROPOSE_OBSERVATION_CHANGED_SAFE_STOP; NOT_NO_CHANGE_ACCEPTANCE",
+      "acceptance": "LATEST_NATURAL_HEALTH_37161610152_SUCCESS; MAINTENANCE_37161635852_INSPECT_SUCCESS_PROPOSE_DELIVERY_BRANCH_NOT_AHEAD_OF_MAIN; NO_ARTIFACT; NOT_ACCEPTANCE",
       "local_work": "EXCLUDED_BY_USER",
       "model_required": false,
       "automatic_merge": false,
@@ -172,7 +171,7 @@
     },
     "dashboard_pages_validation_state": "NO_PAGES_RUN_OBSERVED_FOR_PR_727_MAIN_HEAD"
   },
-  "next_decision": "Source prepaid D1/runtime assembly is now synthetically wired but disabled. Verify current account writers and fresh zero-cost/headroom evidence, calibrate every SQL class, prepare immutable finite execution authority/protected claims and separately authorized D1 provisioning/migrations; then controlled main PAPER acceptance, natural schedule and Dashboard. Future writers register before their first write. Billing History V0.1 is consumed; V0.2 remains undispatched pending distinct owner confirmation.",
+  "next_decision": "Cloud Paper remains disabled. PR #761 is merged but existing repository R2 writers are not integrated with shared admission. Current external R2 writers are owner-attested none; future writers must register before first write. The account UI shows zero metered usage for the displayed period, but complete account cost and exact headroom remain UNKNOWN; D1 is not provisioned. Calibrate finite D1/shared-admission ceilings and controller costs, prepare separate D1 provisioning authority, migrate every current repository writer, then perform controlled main PAPER acceptance and only afterward configure/verify natural schedule and Dashboard.",
   "notes": [
     "Live checkpoint at parent main 42f8c1cdad46107f5f8f720b9809a7ad71286815: PR #679 stale generated snapshot closed unmerged at 2026-10-01T08:15:20Z; no open PRs. PR #665 persistence compatibility/recovery fixes are merged. This status update grants no provider, R2, D1, runtime, or schedule access.",
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
@@ -196,7 +195,8 @@
     "PR #426 merged non-blocking mypy semantic type visibility on Python 3.13; the first baseline reported 261 type errors without failing CI or changing execution authority.",
     "Type Debt Baseline V0.1 records the post-PR-427 CI baseline: mypy 2.3.1 on Python 3.13 reports 261 errors across 49 files; 82.38% are arg-type/call-overload/attr-defined and remain non-blocking.",
     "Live repository checkpoint refreshed from main 289dad5d29a59eb1139e4d1d7a862d10f7e5083e at 2026-10-01T18:58:48Z. Seven open PRs are recorded with exact heads and bases; all have a recorded base SHA different from the reviewed main and require reconciliation before merge. Main post-merge CI, CodeQL, Dependency/SBOM, Freeze Guard and Pages build succeeded; Pages deploy/browser jobs were skipped for documentation-only changes.",
-    "Cloud Paper Billing History V0.1 run 36931736281, attempt 1 on main 0543815905d75aa26a188d2d9e861d4929e2570c, failed with REVIEW_REQUIRED/BILLING_HISTORY_PAGE_METADATA_INVALID after one Cloudflare request; page_count_read=0, returned_row_count=0, zero_cost_conclusion=UNKNOWN. Artifact 11196466171 sha256:884a65a30f4a87c1e2b90f4b42ab07427b9e51baa3835ab24d7f3574b2505524. One-time authority consumed; never rerun. Owner expects future Cloudflare projects/services, so account-wide writer coverage remains incomplete."
+    "Cloud Paper Billing History V0.1 run 36931736281, attempt 1 on main 0543815905d75aa26a188d2d9e861d4929e2570c, failed with REVIEW_REQUIRED/BILLING_HISTORY_PAGE_METADATA_INVALID after one Cloudflare request; page_count_read=0, returned_row_count=0, zero_cost_conclusion=UNKNOWN. Artifact 11196466171 sha256:884a65a30f4a87c1e2b90f4b42ab07427b9e51baa3835ab24d7f3574b2505524. One-time authority consumed; never rerun. Owner expects future Cloudflare projects/services, so account-wide writer coverage remains incomplete.",
+    "Live checkpoint 2026-10-04T01:48:00Z on protected main 41878ffdb2ff98a935d352604c5a8664fd1d7cff: PR #761 merged with all four post-merge checks successful; shared R2 bridge remains unwired to four existing writers. Owner directly attests no other current external R2 writers; future writers must register before first write. Read-only UI showed 5 Workers, 1 R2 bucket, 616.55 MB / 16.31k objects, Class A 1.08k, Class B 28.69k, USD 0.00 metered in 2026-09-17..2026-10-17, and 0 D1 databases. This does not prove total cost, exact headroom, repository shared admission or D1 writer coverage. Cloud Paper disabled, production entry NOT_WIRED, no cycle or natural schedule, D1 unprovisioned, production strategy registry empty, Core100 REJECT. Latest Health 37161610152 succeeded; Maintenance 37161635852 failed safely with DELIVERY_BRANCH_NOT_AHEAD_OF_MAIN and no artifact; do not rerun. Billing History V0.3 remains undispatched."
   ],
   "live_paper": {
     "status": "AUTHORIZED_PUBLIC_MARKET_PAPER_ONLY",

@@ -1,0 +1,49 @@
+{
+  "schema": "qookey-cloudflare-owner-writer-checkpoint-v0.2",
+  "evidence_basis_main_sha": "41878ffdb2ff98a935d352604c5a8664fd1d7cff",
+  "observed_at_utc": "2026-10-04T01:48:00Z",
+  "owner_attestation": {
+    "source": "DIRECT_USER_MESSAGE",
+    "scope": "CURRENT_EXTERNAL_R2_WRITERS",
+    "statement": "No other project currently writes into R2.",
+    "current_external_r2_writers": [],
+    "future_projects_or_services_may_be_added": true,
+    "registration_required_before_first_cloud_write": true,
+    "does_not_prove_repository_shared_admission": true,
+    "does_not_prove_future_writer_coverage": true
+  },
+  "cloudflare_dashboard_observation": {
+    "source": "READ_ONLY_ACCOUNT_UI",
+    "observed_at_utc": "2026-10-04T01:48:00Z",
+    "workers_service_count": 5,
+    "r2_bucket_count": 1,
+    "r2_storage_display": "616.55 MB",
+    "r2_object_count_display": "16.31k",
+    "r2_class_a_operations_display": "1.08k",
+    "r2_class_b_operations_display": "28.69k",
+    "billing_period": "2026-09-17 through 2026-10-17",
+    "metered_cost_display_usd": "0.00",
+    "d1_database_count": 0
+  },
+  "interpretation": {
+    "current_external_r2_writers": "OWNER_ATTESTED_NONE",
+    "repository_r2_writers_integrated_with_shared_admission": false,
+    "account_wide_shared_admission_coverage": false,
+    "full_account_cost": "UNKNOWN",
+    "exact_current_headroom": "UNKNOWN",
+    "d1_provisioned": false,
+    "production_activation": false
+  },
+  "boundaries": {
+    "monthly_budget_usd": 0,
+    "paper_only": true,
+    "provider_access": false,
+    "r2_write": false,
+    "d1_provisioning": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
