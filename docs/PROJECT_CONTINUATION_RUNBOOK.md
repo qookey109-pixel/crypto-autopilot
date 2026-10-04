@@ -1,22 +1,23 @@
-## Live continuation checkpoint — 2026-10-04 09:48 Asia/Taipei
+## Live continuation checkpoint — 2026-10-04 14:41 Asia/Taipei
 
-Re-resolved GitHub authority: `main=41878ffdb2ff98a935d352604c5a8664fd1d7cff`; six open PRs #693–#698 are stale-base Dependabot updates. Do not treat this checkpoint or an older page as execution authority.
+Re-resolved GitHub authority: `main=5a76dd8bb09017d62949c062af5d10008f24354e`; six open PRs #693–#698 are stale-base Dependabot updates. Do not treat this checkpoint or an older page as execution authority.
 
 - PR #761 is merged. Its shared R2 reservation bridge is CI-verified, but no existing writer has been migrated; the bridge is preparation only.
 - Main CI / CodeQL / Dependency-SBOM / V0.10 Freeze Guard runs: [37168434700](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37168434700), [37168434698](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37168434698), [37168434695](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37168434695), [37168434718](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37168434718); all success.
 - Latest pre-merge natural Health #37161610152 succeeded. Its Maintenance run #37161635852 stopped safely at `DELIVERY_BRANCH_NOT_AHEAD_OF_MAIN`, with no artifact. Keep the failure as evidence; do not rerun.
-- Read-only Cloudflare UI observation: 5 Workers; 1 R2 bucket; 616.55 MB / 16.31k objects; Class A 1.08k / Class B 28.69k in the displayed Sep 17–Oct 17 period; metered cost displayed $0.00; no D1 database. These rounded UI values do not prove complete costs, headroom or writer enforcement.
+- Read-only Cloudflare UI observation: 5 Workers; 1 R2 bucket; 616.55 MB / 16.31k objects; Class A 1.08k / Class B 28.69k in the displayed Sep 17–Oct 17 period; metered cost displayed USD 0.00; no D1 database. These rounded UI values do not prove complete costs, headroom or writer enforcement.
 - Owner directly attests there are no other current external R2 writers. Future writers must register before first write. Current repository writers remain outside shared admission; D1 external-writer coverage is not inferred. Evidence is in [the Oct 4 owner checkpoint](../research/receipts/2026-10-04-cloudflare-owner-writer-checkpoint-v0-2.json).
-- Cloud Paper source assembly is synthetic and disabled; production entrypoint NOT_WIRED, cycle NOT_RUN, natural schedule NOT_CONFIGURED; D1 absent; production strategy registry empty; Core100 REJECT. Keep all of these distinctions.
+- One-time Billing History V0.3 run [37183381165](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37183381165), attempt 1, completed `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_MISMATCH`. It performed one Cloudflare GET; zero pages/rows were accepted and no raw response or billing items were persisted. The exact mismatched field/value remains unknown. The one-time authority is consumed; do not rerun. It does not prove zero total cost.
+- Cloud Paper remains disabled: production entrypoint `NOT_WIRED`, cycle `NOT_RUN`, schedule `NOT_CONFIGURED`; D1 absent; production strategy registry empty; Core100 quality `REJECT`.
 
 Next sequence:
-1. Keep Cloud Paper disabled while calibrating real D1 statement cost/limits, whole-ticket metering and controller self-cost against fresh free-tier headroom.
-2. Prepare separate versioned authority for D1 provisioning/migration and finite policy values; do not provision until that authority is effective.
-3. Integrate each current repository R2 writer through the same shared admission before any Cloud Paper acceptance.
-4. Run controlled main PAPER acceptance only after budget, writer, strategy/data and recovery gates pass.
-5. Then enable the bounded natural schedule and verify run report/readback plus Dashboard projection separately.
-
-Billing History V0.3 has not been dispatched; the account-read authorization in the latest user message is not recorded as its distinct one-time execution approval. V0.1/V0.2 remain consumed. No R2 writes or D1 calls from this checkpoint.
+1. Preserve run #37183381165 as the consumed failed attempt; never rerun V0.3.
+2. If more billing evidence is needed, prepare a distinct versioned successor that emits only value-free metadata-match diagnostics; require a new explicit one-time execution authority before any request.
+3. Keep Cloud Paper disabled while calibrating real D1 statement cost/limits, whole-ticket metering and controller self-cost against fresh free-tier headroom.
+4. Prepare separate versioned authority for D1 provisioning/migration and finite policy values; do not provision until that authority is effective.
+5. Integrate each current repository R2 writer through the same shared admission before any Cloud Paper acceptance.
+6. Run controlled main PAPER acceptance only after budget, writer, strategy/data and recovery gates pass.
+7. Then enable the bounded natural schedule and verify run report/readback plus Dashboard projection separately.
 
 All work remains CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER, USD 0/month, PAPER/LIVE-PAPER only; holdout, source switch, promotion and real-money/live trading remain closed.
 
