@@ -1,3 +1,13 @@
+## Billing metadata diagnostic V0.4 preparation — 2026-10-04 15:17 Asia/Taipei
+
+Parent authority at preparation: GitHub `main=41b0e706a243579d541161831098cae4281b6a24`. Resolve live main and PR state before continuing.
+
+- Owner reconfirms no other current external R2 writers; register any future external writer before its first write. This is scoped to current external R2 writers only.
+- V0.3 Billing History run [37183381165](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37183381165) is consumed; do not rerun.
+- V0.4 is synthetic-only preparation: pure parser, config, and CI tests; no workflow, credentials, network request, R2/D1 access, or execution authority.
+- The next implementation step after this PR is a separately versioned, explicitly authorized one-time Cloudflare metadata diagnostic, if still needed. Do not dispatch this preparation.
+- Zero cost and billing readiness remain UNKNOWN; Cloud Paper stays disabled. Repository R2 writers still lack verified shared admission, and this owner confirmation does not establish D1 writer coverage.
+
 ## Live continuation checkpoint — 2026-10-04 14:41 Asia/Taipei
 
 Re-resolved GitHub authority: `main=5a76dd8bb09017d62949c062af5d10008f24354e`; six open PRs #693–#698 are stale-base Dependabot updates. Do not treat this checkpoint or an older page as execution authority.

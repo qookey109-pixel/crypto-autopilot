@@ -1,0 +1,55 @@
+{
+  "schema": "qookey-cloud-paper-billing-metadata-diagnostic-v0.4",
+  "authority_status": "PREPARED_SYNTHETIC_ONLY_NO_EXTERNAL_EXECUTION",
+  "purpose": "Prepare value-free diagnostics for the page/per_page metadata mismatch reported by consumed Billing History V0.3.",
+  "evidence_basis": {
+    "consumed_run_id": 37183381165,
+    "consumed_attempt": 1,
+    "observed_reason_code": "BILLING_HISTORY_PAGE_METADATA_MISMATCH",
+    "exact_mismatched_field": "UNKNOWN"
+  },
+  "execution": {
+    "workflow_present": false,
+    "external_execution_authorized": false,
+    "cloudflare_http_requests_authorized": 0,
+    "r2_access_authorized": false,
+    "d1_access_authorized": false,
+    "requires_distinct_versioned_execution_authority": true,
+    "requires_separate_explicit_owner_confirmation": true
+  },
+  "synthetic_diagnostic": {
+    "requested_page": 1,
+    "requested_per_page": 100,
+    "persist_response_values": false,
+    "persist_result_rows_or_row_count": false,
+    "persist_account_or_item_identity": false,
+    "allowed_output": [
+      "fixed reason code",
+      "pagination field names",
+      "field presence booleans",
+      "JSON type labels",
+      "nonnegative-integer booleans",
+      "request-match booleans"
+    ],
+    "external_request_count": 0
+  },
+  "interpretation": {
+    "diagnostic_complete": "Only confirms that a synthetic or later-authorized response's page metadata matches the request.",
+    "billing_readiness": "UNKNOWN",
+    "zero_cost_conclusion": "UNKNOWN",
+    "cloud_paper_activation": "REMAINS_DISABLED"
+  },
+  "boundaries": {
+    "monthly_budget_usd": 0,
+    "paper_only": true,
+    "provider_access": false,
+    "r2_access": false,
+    "d1_access": false,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false,
+    "live_trading": false
+  },
+  "implementation": "scripts/cloud_paper_billing_metadata_diagnostic_v0_4.py"
+}
