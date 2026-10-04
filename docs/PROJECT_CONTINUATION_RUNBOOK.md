@@ -1,3 +1,16 @@
+## Live handoff — 2026-10-04 19:38 Asia/Taipei
+
+Resolve current main, open PRs and Actions again before further execution. Parent main at this checkpoint: `642400a8ec35a8b2116121fdaae8c08c164bf245`.
+
+- Core100 natural run [37196295102](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37196295102), attempt 1, is `REVIEW_REQUIRED / RUNTIME_CHANGED`; artifact 11301206291 is retained. It read R2 but did not train, make provider requests, write R2, or access holdout. Never rerun this observation or automatically refresh the frozen runtime guard.
+- Owner reconfirmation: no other external projects/services currently write to this account's R2; register every future external writer before its first write. This does not verify repository writers' shared admission or D1/account-wide cost coverage. See receipt `research/receipts/2026-10-04-cloudflare-owner-writer-checkpoint-v0-2.json`.
+- PR #765 is merged with main checks green. Seven PRs remain open (#763 and #693–#698); #763 is an older Maintenance snapshot and cannot replace later evidence.
+- Cloud Paper remains disabled, D1 unprovisioned, production strategy registry empty, and Core100 quality `REJECT`. V0.4 is synthetic-only; do not send the one-time billing GET unless a separate versioned execution authority is merged and its dispatch is explicitly authorized.
+
+Next: re-resolve the exact main and PR state; review the preserved Core100 runtime delta under the existing identity contract; keep the account-level cost/budget gate closed; continue only with a separately versioned successor authority. Do not rerun consumed one-time authorities or enable R2/D1 writes, provider execution, holdout, source switching, promotion, trading, or scheduling.
+
+---
+
 ## Billing metadata diagnostic V0.4 preparation — 2026-10-04 15:17 Asia/Taipei
 
 Parent authority at preparation: GitHub `main=41b0e706a243579d541161831098cae4281b6a24`. Resolve live main and PR state before continuing.
