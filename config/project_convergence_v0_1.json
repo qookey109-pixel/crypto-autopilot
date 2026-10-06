@@ -91,7 +91,9 @@
     "cloud_paper_billing_history": "config/cloud_paper_billing_history_v0_1.json",
     "cloud_paper_billing_history_state": "V0_1_ONE_SHOT_READ_ONLY_MAX_10_PAGES_ZERO_COST_UNKNOWN_NOT_DISPATCHED",
     "cloud_paper_billing_history_v0_2": "config/cloud_paper_billing_history_v0_2.json",
-    "cloud_paper_billing_history_v0_2_state": "PREPARED_IN_PR_731_ONE_SHOT_READ_ONLY_NOT_DISPATCHED_ZERO_COST_UNKNOWN"
+    "cloud_paper_billing_history_v0_2_state": "PREPARED_IN_PR_731_ONE_SHOT_READ_ONLY_NOT_DISPATCHED_ZERO_COST_UNKNOWN",
+    "prospective_shadow_collection": "config/prospective_shadow_collection_runtime_v0_1.json",
+    "prospective_shadow_collection_state": "AUTHORIZED_4H_RESEARCH_COLLECTION_ARTIFACT_ONLY_NO_R2_D1_NO_TRADING"
   },
   "scheduled_workflows": {
     "current_window": [],
@@ -127,6 +129,13 @@
           "43 4 * * *"
         ],
         "scope": "NON_AUTHORITATIVE_WEBSITE_PROJECTION_BACKSTOP_CONTENT_HASH_DEDUP"
+      },
+      {
+        "workflow": "prospective-shadow-collection-v0-1.yml",
+        "cron_utc": [
+          "17 */4 * * *"
+        ],
+        "scope": "RESEARCH_ONLY_PROSPECTIVE_SHADOW_EVIDENCE_GITHUB_ARTIFACT_ONLY_NO_R2_D1_NO_TRADING"
       }
     ],
     "authorized_post_window": [
@@ -205,6 +214,7 @@
       "pionex-research-universe-v0-1.yml",
       "pionex-validation-materialization-v0-1.yml",
       "pionex-validation-materialization-v0-2.yml",
+      "prospective-shadow-collection-v0-1.yml",
       "qookey-crypto-toolkit-v0-2-cloud.yml",
       "research-automation-health-v0-2.yml",
       "research-signal-layer-v0-2.yml",
@@ -326,7 +336,11 @@
     "zec_v0_4_fresh_confirmation_opened": false,
     "zec_v0_4_development_one_shot_authority_consumed": true,
     "zec_v0_4_development_champion_frozen": false,
-    "live_paper_run_slot_claim_added": true
+    "live_paper_run_slot_claim_added": true,
+    "prospective_shadow_collection_authority_added": true,
+    "prospective_shadow_collection_schedule_added": true,
+    "prospective_shadow_collection_r2_or_d1_added": false,
+    "prospective_shadow_collection_trading_authority_added": false
   },
   "retired_schedule_windows": [],
   "expired_frozen_schedule_windows": [
