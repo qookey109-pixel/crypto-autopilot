@@ -62,8 +62,13 @@ def build_shadow_signal_record(
     price = _finite_positive(reference_price, "reference_price")
     if not isinstance(qookey_candidate, Mapping):
         raise ValueError("qookey_candidate must be an object")
-    if not isinstance(router_result, str) or router_result not in {"MATCH", "NO_TRADE"}:
-        raise ValueError("router_result must be MATCH or NO_TRADE")
+    if not isinstance(router_result, str) or router_result not in {
+        "MATCH",
+        "ROUTES_READY",
+        "NO_TRADE",
+    }:
+        raise ValueError("router_result must be MATCH, ROUTES_READY or NO_TRADE")
+    normalized_router_result = "MATCH" if router_result == "ROUTES_READY" else router_result
 
     detected = decision_time if qookey_detected_at_ms is None else _non_negative_int(
         qookey_detected_at_ms,
@@ -105,7 +110,8 @@ def build_shadow_signal_record(
         "as_of_ms": decision_time,
         "reference_price": price,
         "qookey_candidate": dict(qookey_candidate),
-        "router_result": router_result,
+        "router_status": router_result,
+        "router_result": normalized_router_result,
         "qookey_detected_at_ms": detected,
         "event_observed_at_ms": event_time,
         "qookey_latency_ms": qookey_latency_ms,
@@ -137,6 +143,9 @@ def evaluate_shadow_outcomes(
 
     if signal.get("schema") != "qookey-prospective-shadow-signal-v0.1":
         raise ValueError("unsupported shadow signal schema")
+    signal_body = {key: value for key, value in signal.items() if key != "signal_id"}
+    if signal.get("signal_id") != _record_id(signal_body):
+        raise ValueError("shadow signal integrity mismatch")
     if interval not in INTERVAL_MS:
         raise ValueError(f"unsupported outcome interval: {interval}")
     source = tuple(candles)
