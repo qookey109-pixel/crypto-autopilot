@@ -1,0 +1,59 @@
+{
+  "schema": "qookey-prospective-shadow-collection-proposal-v0.1",
+  "status_date": "2026-10-06",
+  "status": "PREPARED_NOT_ACTIVE",
+  "purpose": "Define the bounded future collection needed to populate the 30-90 day Prospective Shadow Test without granting execution authority.",
+  "proposed_runtime": {
+    "signal_snapshot_cadence": "4H_CLOSED_BAR",
+    "outcome_settlement_cadence": "HOURLY",
+    "observation_window_days_minimum": 30,
+    "observation_window_days_target_maximum": 90,
+    "governed_universe_only": true,
+    "maximum_candidates_per_snapshot": 5
+  },
+  "proposed_inputs": {
+    "daily_opportunity_engine_v0_1": "UNCHANGED",
+    "strategy_router_v0_1": "UNCHANGED",
+    "market_event_radar_v0_1": "RESEARCH_ONLY",
+    "technical_confluence_sidecar_v0_1": "RESEARCH_ONLY",
+    "deterministic_technical_detectors_v0_1": "RESEARCH_ONLY",
+    "bounded_decision_provider": "OFFLINE_ONLY_UNTIL_SEPARATE_AUTHORITY",
+    "external_comparison_signal": "PREFETCHED_OR_MANUAL_ONLY_UNTIL_GOVERNED_SOURCE_EXISTS"
+  },
+  "evidence_backend": {
+    "status": "UNRESOLVED",
+    "r2_write_authorized": false,
+    "d1_write_authorized": false,
+    "github_artifact_persistence_authorized": false,
+    "repository_commit_persistence_authorized": false
+  },
+  "activation_blockers": [
+    "Select and authorize a causal public-market collection path.",
+    "Select a durable 30-90 day evidence backend and its bounded retention/cost policy.",
+    "Define exact provider/request budgets before any network capture.",
+    "Define comparison-signal provenance; Yaozi private API is not available.",
+    "Review and merge a separate finite execution authority.",
+    "Only then add or enable a workflow schedule."
+  ],
+  "authority": {
+    "execution_authorized": false,
+    "workflow_creation_authorized": false,
+    "workflow_dispatch_authorized": false,
+    "schedule_authorized": false,
+    "provider_access_authorized": false,
+    "network_capture_authorized": false,
+    "r2_read_authorized": false,
+    "r2_write_authorized": false,
+    "d1_read_authorized": false,
+    "d1_write_authorized": false,
+    "github_artifact_write_authorized": false,
+    "holdout_access_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "candidate_reranking_authorized": false,
+    "strategy_router_change_authorized": false,
+    "paper_submission_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
