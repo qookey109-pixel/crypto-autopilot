@@ -1,0 +1,58 @@
+{
+  "schema": "qookey-research-sidecars-v0.1",
+  "status_date": "2026-10-06",
+  "status": "PREPARED_RESEARCH_ONLY",
+  "purpose": "Add faster market-event sensing, deterministic technical-confluence evidence, bounded decision classification, and research-only opportunity attachment without changing Daily Opportunity Engine V0.1 or downstream trading gates.",
+  "market_event_radar": {
+    "inputs": [
+      "relative_volume",
+      "volume_zscore",
+      "oi_change_pct",
+      "oi_acceleration",
+      "funding_rate",
+      "liquidation_imbalance",
+      "vwap_zscore",
+      "volatility_compression_ratio",
+      "volatility_expansion_ratio",
+      "market_breadth"
+    ],
+    "network_capture_authorized": false
+  },
+  "technical_confluence": {
+    "timeframes": ["1D", "4H", "1H", "15M", "5M"],
+    "features": [
+      "structure_state",
+      "liquidity_event",
+      "fvg_bias",
+      "order_block_bias",
+      "harmonic_prz",
+      "macd_divergence"
+    ]
+  },
+  "bounded_decision_schema": {
+    "market_regime": ["TREND", "RANGE", "BREAKOUT", "REVERSAL"],
+    "direction": ["LONG", "SHORT", "NEUTRAL"],
+    "flow_state": ["ACCUMULATION", "DISTRIBUTION", "NEUTRAL"],
+    "event_importance": ["NOISE", "WATCH", "IMPORTANT", "CRITICAL"],
+    "risk_regime": ["LOW", "NORMAL", "HIGH", "EXTREME"],
+    "strategy_hint": ["TREND", "MOMENTUM", "MEAN_REVERSION", "NONE"]
+  },
+  "opportunity_adapter": {
+    "daily_opportunity_v0_1_score_change_authorized": false,
+    "daily_opportunity_v0_1_threshold_change_authorized": false,
+    "candidate_reranking_authorized": false,
+    "strategy_router_threshold_change_authorized": false
+  },
+  "authority": {
+    "research_only": true,
+    "provider_access_authorized": false,
+    "r2_write_authorized": false,
+    "d1_write_authorized": false,
+    "holdout_access_authorized": false,
+    "training_authorized": false,
+    "model_promotion_authorized": false,
+    "paper_submission_authorized": false,
+    "real_money_order_authorized": false,
+    "live_trading_authorized": false
+  }
+}
