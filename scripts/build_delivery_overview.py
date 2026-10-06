@@ -212,6 +212,11 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
             "每日 12:43 + 核准上游完成事件",
             "authority=false；業務內容 hash 相同時跳過重複部署",
         ),
+        "prospective-shadow-collection-v0-1.yml": (
+            "前瞻 Shadow 研究收集",
+            "每 4 小時 :17",
+            "公開 Pionex + CoinPaprika；90 天 GitHub Artifact，無 R2/D1、無下單",
+        ),
     }
     declared = read_json("config/project_convergence_v0_1.json", root)["scheduled_workflows"]
     inventory = {item["workflow"]: item["cron_utc"] for group in declared.values() for item in group}
