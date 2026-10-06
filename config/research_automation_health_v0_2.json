@@ -126,6 +126,20 @@
       "allowed_conclusions": [
         "success"
       ]
+    },
+    {
+      "workflow": "prospective-shadow-collection-v0-1.yml",
+      "label": "Prospective shadow public research collection",
+      "mode": "bounded",
+      "active_from_utc": "2026-10-06T08:00:00Z",
+      "active_until_utc": "2027-01-04T08:00:00Z",
+      "max_age_seconds": 28800,
+      "allowed_events": [
+        "schedule"
+      ],
+      "allowed_conclusions": [
+        "success"
+      ]
     }
   ],
   "authority": {

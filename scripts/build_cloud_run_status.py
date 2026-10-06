@@ -117,8 +117,8 @@ def load_monitor_definitions() -> list[dict]:
 
     if set(health_rows) != {row["workflow"] for row in definitions}:
         raise RuntimeError("health and automatic-operations workflow inventories diverged")
-    if sum(row["lifecycleState"] == "CURRENT_EFFECTIVE" for row in definitions) != 7:
-        raise RuntimeError("expected seven current-effective schedules")
+    if sum(row["lifecycleState"] == "CURRENT_EFFECTIVE" for row in definitions) != 8:
+        raise RuntimeError("expected eight current-effective schedules")
     if sum(
         row["lifecycleState"] == "EXPIRED_BOUNDED_FROZEN_CRON_DECLARATION"
         for row in definitions

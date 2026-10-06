@@ -1,0 +1,55 @@
+name: Prospective Shadow Collection V0.1
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */4 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prospective-shadow-collection-v0-1
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install constrained package
+        run: python -m pip install -c requirements/ci-constraints.txt .
+
+      - name: Require main branch and authorized event
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF}" = "refs/heads/main"
+          case "${GITHUB_EVENT_NAME}" in
+            schedule|workflow_dispatch) ;;
+            *) exit 1 ;;
+          esac
+
+      - name: Collect prospective shadow research evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH=src python scripts/run_prospective_shadow_collection_v0_1.py \
+            --output artifacts/prospective-shadow-collection-v0-1/report.json
+
+      - name: Upload prospective shadow evidence
+        if: ${{ !cancelled() && hashFiles('artifacts/prospective-shadow-collection-v0-1/report.json') != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: prospective-shadow-v0-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/prospective-shadow-collection-v0-1/report.json
+          if-no-files-found: error
+          retention-days: 90

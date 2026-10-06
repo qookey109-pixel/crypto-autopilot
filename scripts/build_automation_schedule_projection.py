@@ -120,9 +120,9 @@ def build_projection(
     if not isinstance(semantics, Mapping):
         raise RuntimeError("automatic operations schedule semantics missing")
     if (
-        int(semantics.get("repository_cron_declaration_count") or -1) != 8
-        or int(semantics.get("monitored_cron_declaration_count") or -1) != 8
-        or int(semantics.get("current_effective_schedule_count") or -1) != 7
+        int(semantics.get("repository_cron_declaration_count") or -1) != 9
+        or int(semantics.get("monitored_cron_declaration_count") or -1) != 9
+        or int(semantics.get("current_effective_schedule_count") or -1) != 8
         or int(semantics.get("expired_frozen_cron_declaration_count") or -1) != 1
         or semantics.get("workflow_file_mutation_required") is not False
         or semantics.get("outside_window_execution_effective") is not False
@@ -353,8 +353,8 @@ def build_projection(
             "currentEffectiveScheduledWorkflowCount": effective_scheduled_count,
             "expiredFrozenCronDeclarationCount": expired_frozen_count,
             "scheduleInventoryConverged": (
-                repository_scheduled_count == monitored_scheduled_count == 8
-                and scheduled_count == effective_scheduled_count == 7
+                repository_scheduled_count == monitored_scheduled_count == 9
+                and scheduled_count == effective_scheduled_count == 8
                 and expired_frozen_count == 1
                 and repository_scheduled_count
                 == effective_scheduled_count + expired_frozen_count

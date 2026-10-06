@@ -141,7 +141,7 @@ class ContextForwardCaptureExecutionV01Tests(unittest.TestCase):
             for item in values
             if isinstance(item, dict) and item.get("cron_utc")
         ]
-        self.assertEqual(len(cron_entries), 8)
+        self.assertEqual(len(cron_entries), 9)
 
 
 if __name__ == "__main__":

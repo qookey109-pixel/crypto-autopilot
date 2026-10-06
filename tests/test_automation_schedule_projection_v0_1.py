@@ -19,11 +19,11 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     )
     assert actual == expected
     assert actual["authority"] is False
-    assert actual["summary"]["scheduledJobCount"] == 7
-    assert actual["summary"]["projectedScheduledJobCount"] == 7
-    assert actual["summary"]["repositoryScheduledWorkflowCount"] == 8
-    assert actual["summary"]["monitoredScheduledWorkflowCount"] == 8
-    assert actual["summary"]["currentEffectiveScheduledWorkflowCount"] == 7
+    assert actual["summary"]["scheduledJobCount"] == 8
+    assert actual["summary"]["projectedScheduledJobCount"] == 8
+    assert actual["summary"]["repositoryScheduledWorkflowCount"] == 9
+    assert actual["summary"]["monitoredScheduledWorkflowCount"] == 9
+    assert actual["summary"]["currentEffectiveScheduledWorkflowCount"] == 8
     assert actual["summary"]["expiredFrozenCronDeclarationCount"] == 1
     assert actual["summary"]["scheduleInventoryConverged"] is True
     scheduled_workflows = {
@@ -31,7 +31,7 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
         for row in actual["items"]
         if row.get("workflow") and row.get("expected_crons")
     }
-    assert len(scheduled_workflows) == 7
+    assert len(scheduled_workflows) == 8
     assert "provider-equivalence-v0-12-successor-metadata-capture.yml" not in scheduled_workflows
     assert actual["summary"]["waitingAuthorityCount"] == 2
     assert actual["summary"]["plannedNotScheduledCount"] == 5
@@ -41,10 +41,10 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     assert actual["summary"]["core100TrainingDedupeState"] == "ACTIVE_FINGERPRINT_NO_CHANGE"
     assert actual["sourceStatus"]["scheduleInventory"] == {
         "state": "CONVERGED_WITH_EXPIRED_FROZEN_DECLARATION",
-        "repositoryScheduledWorkflowCount": 8,
-        "projectedScheduledJobCount": 7,
-        "monitoredScheduledWorkflowCount": 8,
-        "currentEffectiveScheduledWorkflowCount": 7,
+        "repositoryScheduledWorkflowCount": 9,
+        "projectedScheduledJobCount": 8,
+        "monitoredScheduledWorkflowCount": 9,
+        "currentEffectiveScheduledWorkflowCount": 8,
         "expiredFrozenCronDeclarationCount": 1,
         "expiredFrozenWorkflows": [
             "provider-equivalence-v0-12-successor-metadata-capture.yml"
@@ -79,6 +79,7 @@ def test_checked_in_automation_projection_matches_versioned_sources() -> None:
     assert items["research-signal-quality-v0-1"]["freshness_seconds"] == 108000
     assert items["automation-health-v0-2"]["freshness_seconds"] == 14400
     assert items["dashboard-pages-projection"]["freshness_seconds"] == 108000
+    assert items["prospective-shadow-collection-v0-1"]["freshness_seconds"] == 28800
     assert items["core100-training-v0-1-2"]["freshness_seconds"] == 691200
     assert items["pionex-alternative-observability-v0-2"]["freshness_seconds"] == 691200
     assert all(

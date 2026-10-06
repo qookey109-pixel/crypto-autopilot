@@ -1,0 +1,41 @@
+{
+  "schema": "qookey-prospective-shadow-collection-runtime-v0.1",
+  "version": "0.1.0",
+  "status": "IMPLEMENTATION_BOUND_TO_AUTHORITY",
+  "authority_config": "config/prospective_shadow_collection_execution_v0_1.json",
+  "authority_main_sha": "09cc3bda91e9908757622ccf217058b563ad927f",
+  "window": {
+    "not_before_utc": "2026-10-06T08:00:00Z",
+    "expires_utc": "2027-01-04T08:00:00Z",
+    "maximum_days": 90
+  },
+  "workflow": {
+    "path": ".github/workflows/prospective-shadow-collection-v0-1.yml",
+    "schedule": "17 */4 * * *",
+    "manual_dispatch": true,
+    "main_only": true,
+    "concurrency_group": "prospective-shadow-collection-v0-1",
+    "cancel_in_progress": false
+  },
+  "output": {
+    "path": "artifacts/prospective-shadow-collection-v0-1/report.json",
+    "artifact_name_prefix": "prospective-shadow-v0-1-",
+    "retention_days": 90,
+    "raw_provider_payloads": false
+  },
+  "network": {
+    "pionex_max_requests_per_run": 8,
+    "coinpaprika_max_requests_per_run": 2,
+    "automatic_retries": 0
+  },
+  "authority": {
+    "r2": false,
+    "d1": false,
+    "holdout": false,
+    "training": false,
+    "model_promotion": false,
+    "paper_submission": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}

@@ -80,6 +80,14 @@
       ],
       "scope": "NON_AUTHORITATIVE_DASHBOARD_BACKSTOP_CONTENT_HASH_DEDUP",
       "lifecycle_state": "CURRENT_EFFECTIVE"
+    },
+    {
+      "workflow": "prospective-shadow-collection-v0-1.yml",
+      "cron_utc": [
+        "17 */4 * * *"
+      ],
+      "scope": "PROSPECTIVE_SHADOW_PUBLIC_RESEARCH_COLLECTION_ARTIFACT_ONLY",
+      "lifecycle_state": "CURRENT_EFFECTIVE"
     }
   ],
   "waiting_not_automatically_unblocked": [
@@ -109,13 +117,13 @@
     "live_trading": false
   },
   "predecessor": "config/github_automatic_research_operations_v0_4.json",
-  "change_reason": "Classify the frozen V0.12 successor cron declaration as expired/non-effective after its bounded window, while preserving the exact critical-path workflow bytes. Repository and Health still inventory eight cron declarations; seven are current-effective.",
+  "change_reason": "Preserve the expired V0.12 frozen declaration and inventory the separately authorized Prospective Shadow Collection V0.1 schedule. Repository and Health now inventory nine cron-bearing workflows; eight are current-effective and one remains expired/frozen.",
   "historical_schedule_appendix": "config/history_cadence_v0_1.json",
   "history_retirement": "config/core100_history_retirement_v0_1.json",
   "schedule_semantics": {
-    "repository_cron_declaration_count": 8,
-    "monitored_cron_declaration_count": 8,
-    "current_effective_schedule_count": 7,
+    "repository_cron_declaration_count": 9,
+    "monitored_cron_declaration_count": 9,
+    "current_effective_schedule_count": 8,
     "expired_frozen_cron_declaration_count": 1,
     "expired_frozen_workflow": "provider-equivalence-v0-12-successor-metadata-capture.yml",
     "workflow_file_mutation_required": false,

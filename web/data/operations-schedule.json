@@ -4,7 +4,7 @@
   "timezone": "Asia/Taipei",
   "projectionGeneratedAtUtc": null,
   "summary": {
-    "scheduledJobCount": 7,
+    "scheduledJobCount": 8,
     "waitingAuthorityCount": 2,
     "plannedNotScheduledCount": 5,
     "core100HistoryStatus": "COMPLETE",
@@ -13,11 +13,11 @@
     "zecDevelopmentCompletedCells": 256,
     "core100HistoryScheduleRetired": true,
     "core100TrainingDedupeState": "ACTIVE_FINGERPRINT_NO_CHANGE",
-    "projectedScheduledJobCount": 7,
-    "repositoryScheduledWorkflowCount": 8,
-    "monitoredScheduledWorkflowCount": 8,
+    "projectedScheduledJobCount": 8,
+    "repositoryScheduledWorkflowCount": 9,
+    "monitoredScheduledWorkflowCount": 9,
     "scheduleInventoryConverged": true,
-    "currentEffectiveScheduledWorkflowCount": 7,
+    "currentEffectiveScheduledWorkflowCount": 8,
     "expiredFrozenCronDeclarationCount": 1
   },
   "sourceStatus": {
@@ -55,10 +55,10 @@
     },
     "scheduleInventory": {
       "state": "CONVERGED_WITH_EXPIRED_FROZEN_DECLARATION",
-      "repositoryScheduledWorkflowCount": 8,
-      "projectedScheduledJobCount": 7,
-      "monitoredScheduledWorkflowCount": 8,
-      "currentEffectiveScheduledWorkflowCount": 7,
+      "repositoryScheduledWorkflowCount": 9,
+      "projectedScheduledJobCount": 8,
+      "monitoredScheduledWorkflowCount": 9,
+      "currentEffectiveScheduledWorkflowCount": 8,
       "expiredFrozenCronDeclarationCount": 1,
       "expiredFrozenWorkflows": [
         "provider-equivalence-v0-12-successor-metadata-capture.yml"
@@ -189,6 +189,27 @@
       "active_from": "2026-09-01T00:00:00Z",
       "active_until": null,
       "freshness_seconds": 14400,
+      "freshness_source": "config/research_automation_health_v0_2.json"
+    },
+    {
+      "id": "prospective-shadow-collection-v0-1",
+      "title": "Prospective Shadow 研究收集",
+      "workflow": ".github/workflows/prospective-shadow-collection-v0-1.yml",
+      "trigger": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "expected_crons": [
+        "17 */4 * * *"
+      ],
+      "local_schedule": "每 4 小時 :17",
+      "dependency_ids": [],
+      "status": "ACTIVE_BOUNDED_RESEARCH_COLLECTION",
+      "authority_link": "config/prospective_shadow_collection_execution_v0_1.json",
+      "detail": "公開 Pionex + CoinPaprika 前瞻研究證據；GitHub Artifact 90 天，無 R2/D1、無候選重排、無下單。",
+      "active_from": "2026-10-06T08:00:00Z",
+      "active_until": "2027-01-04T08:00:00Z",
+      "freshness_seconds": 28800,
       "freshness_source": "config/research_automation_health_v0_2.json"
     },
     {

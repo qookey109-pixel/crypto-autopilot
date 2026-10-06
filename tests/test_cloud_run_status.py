@@ -60,10 +60,10 @@ class CloudRunStatusTests(unittest.TestCase):
 
     def test_monitor_definitions_match_v0_5_health_and_effective_split(self):
         definitions = module.load_monitor_definitions()
-        self.assertEqual(len(definitions), 8)
+        self.assertEqual(len(definitions), 9)
         self.assertEqual(
             sum(row["lifecycleState"] == "CURRENT_EFFECTIVE" for row in definitions),
-            7,
+            8,
         )
         expired = [
             row for row in definitions
@@ -95,13 +95,13 @@ class CloudRunStatusTests(unittest.TestCase):
         self.assertEqual(result["schema"], "qookey-cloud-run-status-v0.2")
         self.assertFalse(result["authority"])
         self.assertEqual(result["mode"], "GITHUB_ACTIONS_METADATA_ONLY")
-        self.assertEqual(result["summary"]["repositoryCronDeclarationCount"], 8)
-        self.assertEqual(result["summary"]["monitoredCronDeclarationCount"], 8)
+        self.assertEqual(result["summary"]["repositoryCronDeclarationCount"], 9)
+        self.assertEqual(result["summary"]["monitoredCronDeclarationCount"], 9)
         self.assertEqual(result["summary"]["currentEffectiveScheduleCount"], 7)
         self.assertEqual(result["summary"]["expiredScheduleCount"], 1)
-        self.assertEqual(result["summary"]["pendingScheduleCount"], 0)
+        self.assertEqual(result["summary"]["pendingScheduleCount"], 1)
         self.assertEqual(result["summary"]["expiredFrozenCronDeclarationCount"], 1)
-        self.assertEqual(len(result["items"]), 8)
+        self.assertEqual(len(result["items"]), 9)
         current = next(
             row for row in result["items"]
             if row["lifecycleState"] == "CURRENT_EFFECTIVE"
@@ -124,21 +124,21 @@ class CloudRunStatusTests(unittest.TestCase):
             return {"workflow_runs": []}
 
         cases = [
-            (datetime(2026, 9, 30, 23, 59, 59, tzinfo=timezone.utc), 7, 1),
-            (datetime(2026, 10, 1, 0, 0, 0, tzinfo=timezone.utc), 6, 2),
-            (datetime(2026, 10, 1, 0, 0, 0, 1, tzinfo=timezone.utc), 6, 2),
+            (datetime(2026, 9, 30, 23, 59, 59, tzinfo=timezone.utc), 7, 1, 1),
+            (datetime(2026, 10, 1, 0, 0, 0, tzinfo=timezone.utc), 6, 2, 1),
+            (datetime(2026, 10, 1, 0, 0, 0, 1, tzinfo=timezone.utc), 6, 2, 1),
         ]
-        for observed, effective, expired in cases:
+        for observed, effective, expired, pending in cases:
             with self.subTest(observed=observed.isoformat()):
                 result = module.collect(fetch, now=observed)
-                self.assertEqual(result["summary"]["repositoryCronDeclarationCount"], 8)
-                self.assertEqual(result["summary"]["monitoredCronDeclarationCount"], 8)
+                self.assertEqual(result["summary"]["repositoryCronDeclarationCount"], 9)
+                self.assertEqual(result["summary"]["monitoredCronDeclarationCount"], 9)
                 self.assertEqual(
                     result["summary"]["currentEffectiveScheduleCount"],
                     effective,
                 )
                 self.assertEqual(result["summary"]["expiredScheduleCount"], expired)
-                self.assertEqual(result["summary"]["pendingScheduleCount"], 0)
+                self.assertEqual(result["summary"]["pendingScheduleCount"], pending)
                 self.assertEqual(
                     result["summary"]["expiredFrozenCronDeclarationCount"],
                     1,
@@ -188,7 +188,7 @@ class CloudRunStatusTests(unittest.TestCase):
             fetch,
             now=datetime(2026, 9, 21, 5, 0, tzinfo=timezone.utc),
         )
-        self.assertEqual(len(calls), 10)
+        self.assertEqual(len(calls), 11)
         self.assertTrue(any("cloud-paper-billing-history-v0-1.yml" in call for call in calls))
         self.assertTrue(any("cloud-paper-billing-history-v0-2.yml" in call for call in calls))
         self.assertTrue(all(
