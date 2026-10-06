@@ -19,7 +19,7 @@ A frozen signal record contains:
 - timestamp / symbol;
 - reference price;
 - Qookey candidate payload;
-- Router result: MATCH or NO_TRADE;
+- Router status: existing ROUTES_READY / NO_TRADE is preserved, with ROUTES_READY normalized to the report's MATCH comparison label;
 - Qookey detection timestamp;
 - optional external/comparison signal and direction;
 - optional event-observed timestamp;
