@@ -639,6 +639,7 @@ def main() -> int:
         "context-forward-capture-v0-1",
         "live-paper-hourly-v0-2",
         "automation-health-v0-2",
+        "prospective-shadow-collection-v0-1",
         "dashboard-pages-projection",
         "core100-history-v0-1-2",
         "core100-training-v0-1-2",
