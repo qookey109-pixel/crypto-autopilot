@@ -179,8 +179,10 @@ class ProspectiveShadowV01Tests(unittest.TestCase):
             as_of_ms=0,
             reference_price=100.0,
             qookey_candidate={"score": 70.0},
-            router_result="MATCH",
+            router_result="ROUTES_READY",
         )
+        self.assertEqual(signal["router_status"], "ROUTES_READY")
+        self.assertEqual(signal["router_result"], "MATCH")
         candles = [
             candle(i, open_=100, high=101, low=99, close=100)
             for i in range(4)
@@ -193,6 +195,26 @@ class ProspectiveShadowV01Tests(unittest.TestCase):
         )
         self.assertEqual(outcome["horizons"]["1H"]["status"], "OBSERVED")
         self.assertEqual(outcome["horizons"]["4H"]["status"], "NOT_YET_AVAILABLE")
+
+    def test_modified_frozen_signal_fails_integrity_check(self) -> None:
+        signal = build_shadow_signal_record(
+            symbol="BTCUSDT",
+            as_of_ms=0,
+            reference_price=100.0,
+            qookey_candidate={"score": 70.0},
+            router_result="NO_TRADE",
+        )
+        signal["reference_price"] = 101.0
+        with self.assertRaises(ValueError):
+            evaluate_shadow_outcomes(
+                signal=signal,
+                candles=[
+                    candle(i, open_=100, high=101, low=99, close=100)
+                    for i in range(4)
+                ],
+                interval="15M",
+                evaluated_at_ms=60 * 60 * 1000,
+            )
 
 
 if __name__ == "__main__":
