@@ -55,7 +55,7 @@ class DeterministicDetectorV01Tests(unittest.TestCase):
             for i in range(20)
         ]
         candles.append(candle(20, open_=100, high=103, low=100, close=101))
-        candles.append(candle(21, open_=101, high=102, low=101.5, close=101.8))
+        candles.append(candle(21, open_=101, high=102, low=100.8, close=101.8))
         candles.append(candle(22, open_=103.5, high=104, low=103.5, close=103.8))
 
         series = build_technical_pattern_series(
