@@ -76,7 +76,7 @@ def test_manual_pionex_workflow_remains_unscheduled_after_history_retirement() -
         for item in group
         if item.get("cron_utc")
     ]
-    assert len(scheduled) == 8
+    assert len(scheduled) == 9
 
 
 def test_runner_requires_headroom_before_pionex_history_and_writes_pointer_last() -> None:
