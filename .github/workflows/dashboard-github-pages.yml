@@ -331,7 +331,7 @@ jobs:
               'SCHEDULED_READ_ONLY_CHANGE_WATCH'
           )
           assert operations['sourceStatus']['externalCapabilityRegistry']['candidateCount'] == 10
-          assert operations['summary']['scheduledJobCount'] == 7
+          assert operations['summary']['scheduledJobCount'] == 8
           assert operations['summary']['core100HistoryRetirementPending'] is False
           assert operations['summary']['core100HistoryScheduleRetired'] is True
           assert operations['summary']['core100TrainingDedupeState'] == 'ACTIVE_FINGERPRINT_NO_CHANGE'
