@@ -568,7 +568,7 @@ def main() -> int:
     operations_summary = operations.get("summary") or {}
     if operations_summary.get("core100HistoryStatus") != "COMPLETE":
         raise RuntimeError("automation projection lost Core100 completion")
-    if operations_summary.get("scheduledJobCount") != 7:
+    if operations_summary.get("scheduledJobCount") != 8:
         raise RuntimeError("automation projection scheduled job count changed")
     if operations_summary.get("core100HistoryRetirementPending") is not False:
         raise RuntimeError("Core100 History retirement must no longer be pending")
