@@ -111,6 +111,23 @@
       "detail": "只以合法自動事件判斷執行 freshness；依賴與業務結果分開顯示。"
     },
     {
+      "id": "prospective-shadow-collection-v0-1",
+      "title": "Prospective Shadow 研究收集",
+      "workflow": ".github/workflows/prospective-shadow-collection-v0-1.yml",
+      "trigger": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "expected_crons": [
+        "17 */4 * * *"
+      ],
+      "local_schedule": "每 4 小時 :17",
+      "dependency_ids": [],
+      "status": "ACTIVE_BOUNDED_RESEARCH_COLLECTION",
+      "authority_link": "config/prospective_shadow_collection_execution_v0_1.json",
+      "detail": "公開 Pionex + CoinPaprika 前瞻研究證據；GitHub Artifact 90 天，無 R2/D1、無候選重排、無下單。"
+    },
+    {
       "id": "dashboard-pages-projection",
       "title": "網站投影與補查",
       "workflow": ".github/workflows/dashboard-github-pages.yml",
