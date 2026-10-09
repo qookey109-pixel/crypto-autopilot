@@ -374,3 +374,15 @@ td code { overflow-wrap: anywhere; word-break: break-word; }
   .vnext-market-panel .vnext-trace ol, .vnext-market-panel .vnext-evidence-times, .external-research-links { grid-template-columns: 1fr; }
   .vnext-market-panel .vnext-evidence-head { flex-direction: column; }
 }
+
+/* Evidence-first context disclosure: compact, keyboard operable and non-live. */
+.vnext-context-disclosure { margin-top: 14px; border: 1px solid var(--line-strong); border-radius: 12px; overflow: clip; }
+.vnext-context-disclosure > summary { cursor: pointer; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 7px; padding: 14px 16px; font-size: 15px; font-weight: 700; line-height: 1.5; list-style-position: inside; }
+.vnext-context-disclosure > summary span { font-size: 12px; font-weight: 500; color: var(--muted); }
+.vnext-context-disclosure > summary:focus-visible { outline: 3px solid var(--hero-teal); outline-offset: -3px; }
+.vnext-context-grid { padding: 0 14px 14px; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+.vnext-context-grid article { min-width: 0; background: #f5faf7; border: 1px solid var(--line-strong); border-radius: 10px; padding: 14px; }
+.vnext-context-grid h4 { font-size: 17px; margin: 7px 0 9px; overflow-wrap: anywhere; }
+.vnext-context-grid p { font-size: 13px; line-height: 1.65; margin: 0; }
+.vnext-context-disclosure .vnext-evidence-note { margin: 0 14px 14px; }
+@media (max-width: 850px) { .vnext-context-grid { grid-template-columns: 1fr; } }
