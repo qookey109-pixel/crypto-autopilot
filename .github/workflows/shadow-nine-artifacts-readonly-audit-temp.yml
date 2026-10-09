@@ -1,0 +1,125 @@
+name: Shadow Nine Existing ZIPs Audit TEMP (Never Merge)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/shadow-nine-artifacts-readonly-audit-temp.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  verify-existing-only:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+      - name: Read nine previously recorded GitHub-hosted ZIPs only, verify full archive hashes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for specification in \
+            '11434212008 a94dd84a633eda8208fecfda40e3dce299ab7532e1bd8b69c5625673f29b2289' \
+            '11451820918 4b7af3b33a2a534b3c63bfc22fe6f81a099dedbeba4cb1355e4ae135cbfcdf4d' \
+            '11463439332 fd007373ee5038c4b6f290dd1ae744089d0af9031ad63251366a60d263f9bffc' \
+            '11494027170 d3a32403e8aca76db7b85edaf89232dde6aa3bc7a69a81dadee8fab88e4122d3' \
+            '11512615320 7f1a26a2b399a003a2972dfd8e6315120406a831061ac309004997b1f9267ed5' \
+            '11531652676 007c739246773551174e419dce64cba1766218b924b0d08961aa71ea09882c84' \
+            '11561747502 01c0c62cff750a41a02e8f2d7dcf26c481327135cff8fcd38610874140a54891' \
+            '11579982145 adcfc5e1382b1b248bae0e14f5a9acbd305c88b30fca7931dbcf0b0a2b6862df' \
+            '11597884258 f4d98a6e46a904e0922d2740070b4f7073da9717621e60e8bb5d62921aad76d0'; do
+            read -r artifact_id expected_sha <<< "$specification"
+            curl --fail --silent --show-error --location --max-time 45 \
+              --proto '=https' --proto-redir '=https' \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header 'Accept: application/vnd.github+json' \
+              "https://api.github.com/repos/qookey109-pixel/crypto-autopilot/actions/artifacts/$artifact_id/zip" \
+              --output "shadow-$artifact_id.zip"
+            test "$(stat -c %s "shadow-$artifact_id.zip")" -le 2097152
+            printf '%s  shadow-%s.zip\n' "$expected_sha" "$artifact_id" | sha256sum -c -
+          done
+      - name: Authenticate embedded natural runs and audit all nine research snapshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH=src python - <<'PY'
+          import io
+          import json
+          from datetime import datetime
+          from pathlib import Path
+          from zipfile import ZipFile
+          from crypto_autopilot.research.prospective_shadow_continuity_v0_1 import (
+              ContinuityReviewRequired, inspect_shadow_batch_continuity,
+          )
+          expected = (
+              (37510931727, 11434212008, "2026-10-06T18:23:26Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+              (37548642486, 11451820918, "2026-10-06T23:49:19Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+              (37579330430, 11463439332, "2026-10-07T06:02:07Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+              (37644930944, 11494027170, "2026-10-07T15:33:59Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+              (37688505983, 11512615320, "2026-10-07T21:18:56Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+              (37735861279, 11531652676, "2026-10-08T06:06:55Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+              (37802372751, 11561747502, "2026-10-08T15:38:05Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+              (37846141319, 11579982145, "2026-10-08T21:21:03Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+              (37892197952, 11597884258, "2026-10-09T06:10:49Z", "3466235f4a706ae5ea953158ab75f0f346ff0699"),
+          )
+          reports = []
+          for run_id, artifact_id, created, source_sha in expected:
+              raw = Path(f"shadow-{artifact_id}.zip").read_bytes()
+              assert 0 < len(raw) <= 2097152
+              with ZipFile(io.BytesIO(raw)) as zipped:
+                  assert zipped.namelist() == ["report.json"], "unexpected source archive layout"
+                  info = zipped.getinfo("report.json")
+                  assert not info.flag_bits & 1 and info.file_size <= 2097152
+                  report = json.loads(zipped.read("report.json"))
+              gh = report.get("github", {})
+              assert gh.get("run_id") == str(run_id), f"unexpected run ID {run_id}"
+              assert gh.get("run_attempt") == "1", "unapproved attempt"
+              assert gh.get("sha") == source_sha, "source exact SHA mismatch"
+              assert gh.get("event_name") == "schedule", "not natural schedule"
+              assert gh.get("ref") == "refs/heads/main", "not main"
+              capture = report["collection"]["capture_timestamp_ms"]
+              metadata_ms = int(datetime.fromisoformat(created.replace("Z", "+00:00")).timestamp() * 1000)
+              assert metadata_ms - 180000 <= capture <= metadata_ms + 180000, "capture vs GitHub run metadata mismatch"
+              singleton = inspect_shadow_batch_continuity([report])
+              assert singleton["report_count"] == 1
+              assert singleton["context_warmup_state"] == "INSUFFICIENT"
+              assert singleton["execution_authority"] is False
+              reports.append(report)
+          print("NINE_ORIGINAL_GITHUB_ZIP_SHA256=PASS")
+          print("NINE_REPORT_IDENTITIES_TIMES_AND_SINGLETONS=PASS")
+          pairs = []
+          for earlier, later in zip(reports, reports[1:]):
+              ids = [int(earlier["github"]["run_id"]), int(later["github"]["run_id"])]
+              try:
+                  d = inspect_shadow_batch_continuity([earlier, later])
+                  pairs.append({"run_ids": ids, "status": d["status"],
+                      "overlapping_candles": d["shared_overlapping_candles_consistent"],
+                      "observed_gaps": d["observed_gaps"],
+                      "source_lag_minutes": d["maximum_source_lag_minutes"]})
+              except ContinuityReviewRequired as exc:
+                  pairs.append({"run_ids": ids, "status": "BLOCKED_SELF_CONSISTENCY",
+                      "error": str(exc), "overlapping_candles": None,
+                      "observed_gaps": None})
+          print("NINE_ADJACENT_PAIRS=" + json.dumps(pairs, sort_keys=True))
+          try:
+              d = inspect_shadow_batch_continuity(reports)
+              print("NINE_AGGREGATE_DIAGNOSTIC=" + json.dumps(d, sort_keys=True))
+              assert d["report_count"] == 9
+              assert d["context_warmup_state"] == "INSUFFICIENT"
+              assert d["full_schedule_coverage_proven"] is False
+              assert d["production_eligibility_proven"] is False
+              assert d["execution_authority"] is False
+          except ContinuityReviewRequired as exc:
+              print("NINE_AGGREGATE_REVIEW_REQUIRED=" + str(exc))
+          assert len(pairs) == 8
+          print("NINE_READ_ONLY_AUDIT_COMPLETE_NO_PRODUCTION_AUTHORITY=PASS")
+          PY
