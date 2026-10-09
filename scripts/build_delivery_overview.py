@@ -325,6 +325,7 @@ def market_decision_panel(current: dict) -> str:
         and audit.get("closed_60m_candles_per_market") == 240
         and audit.get("consecutive_closed_candles_verified") is True
         and audit.get("provenance_and_availability_verified") is True
+        and audit.get("provider_request_count_verified") is True
         and audit.get("production_eligibility_proven") is False
         and audit.get("signal_predictive_edge_proven") is False
         and audit.get("execution_authority_granted") is False
@@ -367,6 +368,24 @@ def market_decision_panel(current: dict) -> str:
         else "可用完整性證據：UNKNOWN"
     )
     execution_source = "GitHub Actions Run #37846141319" if verified else "UNKNOWN"
+    radar_detail = (
+        "該批研究證據含五個市場的 radar 欄位，但未投影逐市場事件或方向；"
+        "不代表即時警報。"
+        if verified else
+        "Radar 研究來源未核實，事件、異動與方向均為 UNKNOWN。"
+    )
+    top_detail = (
+        "5 個 governed research markets 已完成單批結構完整性驗證；"
+        "實際標的代碼與排名未投影，不能推定為熱門或推薦標的。"
+        if verified else
+        "研究市場數量及標的代碼尚未核實；不顯示排名。"
+    )
+    context_detail = (
+        "已記錄公開 Pionex／CoinPaprika 研究來源；"
+        "TOP5 breadth 僅為研究 proxy，未證明 production SState 相容。"
+        if verified else
+        "宏觀來源及可用時間未核實，維持 REGIME_UNAVAILABLE。"
+    )
     return f"""      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
         <div class="vnext-evidence-head">
           <div><p class="card-kicker">MARKET INTELLIGENCE / RESEARCH-ONLY</p>
@@ -378,6 +397,15 @@ def market_decision_panel(current: dict) -> str:
           <article><p class="card-kicker">CURRENT DECISION</p><h4>正式決策尚未產生</h4><p>{decision}</p></article>
           <article><p class="card-kicker">CANDIDATE FUNNEL</p><h4>候選資格未通過</h4><p>{funnel}</p></article>
         </div>
+        <details class="vnext-context-disclosure">
+          <summary>研究 Radar · Top Markets · Market Context <span>查看資料覆蓋與缺口</span></summary>
+          <div class="vnext-context-grid">
+            <article><p class="card-kicker">RADAR / RESEARCH</p><h4>事件資訊未發布</h4><p>{radar_detail}</p></article>
+            <article><p class="card-kicker">TOP MARKETS / COVERAGE</p><h4>{"5 個研究市場 · 非排名" if verified else "UNKNOWN · 非排名"}</h4><p>{top_detail}</p></article>
+            <article><p class="card-kicker">MARKET CONTEXT / SOURCE</p><h4>REGIME_UNAVAILABLE</h4><p>{context_detail}</p></article>
+          </div>
+          <p class="vnext-evidence-note">資料來源、研究時點與網站發布時間獨立；未提供逐市場可用時間、即時行情與正式訊號時，不會補值或產生買賣建議。</p>
+        </details>
         <div class="vnext-trace">
           <h4>Decision Trace · 已核實邊界</h4>
           <ol>
