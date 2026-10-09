@@ -129,6 +129,46 @@ class DeliveryOverviewTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     delivery.overview()
 
+    def test_vnext_market_panel_separates_research_from_formal_decision(self) -> None:
+        current = delivery.read_json(delivery.CURRENT_OPERATIONS)
+        panel = delivery.market_decision_panel(current)
+        self.assertIn("MARKET PULSE", panel)
+        self.assertIn("CURRENT DECISION", panel)
+        self.assertIn("CANDIDATE FUNNEL", panel)
+        self.assertIn("Decision Trace", panel)
+        self.assertIn("5 個市場各 240 根", panel)
+        self.assertIn("單批資料驗證 PASS", panel)
+        self.assertIn("NOT_RUN（非 NO_TRADE）", panel)
+        self.assertIn("UNKNOWN · 尚未投影精確來源時間", panel)
+        self.assertIn("37878449661", panel)
+        self.assertNotIn("今日買進", panel)
+
+    def test_market_panel_fails_closed_on_unverified_evidence(self) -> None:
+        original = delivery.read_json(delivery.CURRENT_OPERATIONS)
+        for field, bad_value in (
+            ("result", "REVIEW_REQUIRED"),
+            ("original_archive_sha256_verified", False),
+            ("consecutive_closed_candles_verified", False),
+            ("execution_authority_granted", True),
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(original)
+                changed["vnext_delivery_checkpoint"]["prospective_shadow"][
+                    "content_audit"
+                ][field] = bad_value
+                panel = delivery.market_decision_panel(changed)
+                self.assertIn("UNKNOWN · 未核實", panel)
+                self.assertNotIn("5 個市場各 240 根", panel)
+                self.assertNotIn("單批資料驗證 PASS", panel)
+
+        changed = copy.deepcopy(original)
+        changed["cloudflare_prepaid_d1_runtime_gateway_v0_1"][
+            "production_cycle_status"
+        ] = "SUCCESS"
+        panel = delivery.market_decision_panel(changed)
+        self.assertIn("正式 Paper 執行狀態 UNKNOWN", panel)
+        self.assertNotIn("NOT_RUN（非 NO_TRADE）", panel)
+
     def test_dated_readiness_remains_historical_and_fail_closed(self) -> None:
         original = delivery.read_json
         for change in ("authority", "full_ready", "btc_status", "btc_scope"):
@@ -218,6 +258,16 @@ class DeliveryOverviewTests(unittest.TestCase):
             )
             self.assertIn("<!-- DELIVERY_OVERVIEW_START -->", template)
             self.assertIn("<!-- DELIVERY_SCHEDULE_START -->", template)
+            self.assertIn("<!-- VNEXT_MARKET_START -->", template)
+            self.assertIn("Decision Trace", generated)
+            self.assertIn("正式決策尚未產生", generated)
+            for href in (
+                "https://app.mmt.gg/",
+                "https://github.com/Edwardxlai/easyread",
+                "https://yaozi.yalgo.io",
+                "https://blog.cloudflare.com/clef-decision-models/",
+            ):
+                self.assertIn(href, generated)
             self.assertIn(f"{current['updatedDate']} 目前作業狀態", generated)
             self.assertIn("10/10 · COMPLETE", generated)
             self.assertIn("COMPLETE · PASS", generated)
