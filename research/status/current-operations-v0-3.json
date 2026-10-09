@@ -804,6 +804,56 @@
         "r2_or_d1_accessed": false,
         "execution_authority_granted": false,
         "replay_maturity_proven": false
+      },
+      "three_batch_audit": {
+        "status": "REVIEW_REQUIRED_SOURCE_GAP",
+        "audit_run_id": 37893825259,
+        "audit_pr_number": 787,
+        "audit_pr_state": "CLOSED_UNMERGED",
+        "audit_workflow_merged": false,
+        "artifact_source": "THREE_EXISTING_GITHUB_ACTIONS_ZIPS_ONLY",
+        "natural_run_ids": [
+          37802372751,
+          37846141319,
+          37892197952
+        ],
+        "artifact_ids": [
+          11561747502,
+          11579982145,
+          11597884258
+        ],
+        "archive_zip_sha256": [
+          "01c0c62cff750a41a02e8f2d7dcf26c481327135cff8fcd38610874140a54891",
+          "adcfc5e1382b1b248bae0e14f5a9acbd305c88b30fca7931dbcf0b0a2b6862df",
+          "f4d98a6e46a904e0922d2740070b4f7073da9717621e60e8bb5d62921aad76d0"
+        ],
+        "source_main_shas": [
+          "cad0aea7273acc1cb1eaa138955b6381e30bd5a6",
+          "cad0aea7273acc1cb1eaa138955b6381e30bd5a6",
+          "3466235f4a706ae5ea953158ab75f0f346ff0699"
+        ],
+        "zip_sha256_verified_for_all_three": true,
+        "embedded_natural_run_identity_and_capture_bounds_verified": true,
+        "self_consistent_candle_and_record_hashes_verified": true,
+        "validated_report_count": 3,
+        "overlapping_identical_candles": 2091,
+        "observed_gap_over_6h_count": 1,
+        "observed_gap_minutes": 529,
+        "observed_gap_from_run": 37846141319,
+        "observed_gap_to_run": 37892197952,
+        "maximum_source_lag_minutes": 38,
+        "distinct_context_observations": 3,
+        "context_warmup_required": 21,
+        "context_warmup_state": "INSUFFICIENT",
+        "uninterrupted_collection_proven": false,
+        "full_natural_schedule_coverage_proven": false,
+        "signal_outcome_predictive_edge_proven": false,
+        "production_eligibility_proven": false,
+        "paper_submission_performed": false,
+        "training_performed": false,
+        "r2_or_d1_accessed": false,
+        "execution_authority_granted": false,
+        "replay_maturity_proven": false
       }
     },
     "pages": {
