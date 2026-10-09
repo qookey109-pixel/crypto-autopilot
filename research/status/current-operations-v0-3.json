@@ -926,6 +926,47 @@
         "r2_or_d1_accessed": false,
         "execution_authority_granted": false,
         "replay_maturity_proven": false
+      },
+      "schedule_arrival_diagnostic": {
+        "status": "REVIEW_REQUIRED_UNKNOWN_CAUSE",
+        "source_snapshot_path": "research/status/prospective_shadow_schedule_arrival_snapshot_2026_10_09_v0_1.json",
+        "source_nine_zip_audit_run_id": 37895797841,
+        "reviewed_cron_utc": "17 */4 * * *",
+        "unique_successful_natural_runs": 9,
+        "bounded_first_candidate_utc": "2026-10-06T16:17:00Z",
+        "bounded_last_candidate_utc": "2026-10-09T04:17:00Z",
+        "candidate_arrival_windows": 16,
+        "windows_with_created_run": 9,
+        "windows_without_created_run": 7,
+        "unoccupied_candidate_windows_utc": [
+          "2026-10-07T00:17:00Z",
+          "2026-10-07T08:17:00Z",
+          "2026-10-07T16:17:00Z",
+          "2026-10-08T00:17:00Z",
+          "2026-10-08T08:17:00Z",
+          "2026-10-08T16:17:00Z",
+          "2026-10-09T00:17:00Z"
+        ],
+        "arrival_phase_minutes_minimum": 61,
+        "arrival_phase_minutes_maximum": 212,
+        "observed_interarrival_over_6h_count": 5,
+        "observed_interarrival_gaps_minutes": [
+          372,
+          571,
+          527,
+          571,
+          529
+        ],
+        "original_trigger_slot_authenticated": false,
+        "actual_github_dispatch_queue_delay_measured": false,
+        "dropped_trigger_count_proven": false,
+        "schedule_gap_cause_proven": false,
+        "metadata_query_complete_history_proven": false,
+        "research_uninterrupted_continuity_proven": false,
+        "schedule_change_authorized": false,
+        "replay_backfill_authorized": false,
+        "production_readiness_proven": false,
+        "cloud_paper_or_live_authorized": false
       }
     },
     "pages": {
