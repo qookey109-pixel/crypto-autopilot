@@ -769,6 +769,41 @@
         "production_eligibility_proven": false,
         "signal_predictive_edge_proven": false,
         "execution_authority_granted": false
+      },
+      "cross_batch_audit": {
+        "status": "PASS_PARTIAL_ONLY_NOT_PRODUCTION",
+        "audit_run_id": 37882460289,
+        "audit_pr_number": 783,
+        "audit_pr_state": "CLOSED_UNMERGED",
+        "audit_workflow_merged": false,
+        "artifact_source": "TWO_EXISTING_GITHUB_ACTIONS_ZIPS_ONLY",
+        "natural_run_ids": [
+          37802372751,
+          37846141319
+        ],
+        "artifact_ids": [
+          11561747502,
+          11579982145
+        ],
+        "source_main_sha": "cad0aea7273acc1cb1eaa138955b6381e30bd5a6",
+        "zip_sha256_verified_for_both": true,
+        "embedded_run_identity_and_capture_time_verified": true,
+        "self_consistent_records_verified": true,
+        "validated_report_count": 2,
+        "overlapping_identical_candles": 936,
+        "observed_gap_over_6h_count": 0,
+        "maximum_source_lag_minutes": 38,
+        "context_warmup_count": 2,
+        "context_warmup_required": 21,
+        "context_warmup_state": "INSUFFICIENT",
+        "full_natural_schedule_coverage_proven": false,
+        "signal_outcome_predictive_edge_proven": false,
+        "production_eligibility_proven": false,
+        "paper_submission_performed": false,
+        "training_performed": false,
+        "r2_or_d1_accessed": false,
+        "execution_authority_granted": false,
+        "replay_maturity_proven": false
       }
     },
     "pages": {
