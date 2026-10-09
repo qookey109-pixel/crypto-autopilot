@@ -129,6 +129,102 @@ class DeliveryOverviewTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     delivery.overview()
 
+    def test_shadow_cron_grid_is_reference_only_and_not_a_missed_trigger_claim(self) -> None:
+        receipt = delivery.read_json(delivery.SHADOW_GRID_RECEIPT)
+        config = delivery.read_json(
+            "config/prospective_shadow_collection_execution_v0_1.json"
+        )
+        observed = delivery.read_json(delivery.CURRENT_OPERATIONS)[
+            "vnext_delivery_checkpoint"
+        ]["prospective_shadow"]["nine_batch_audit"]["natural_run_ids"]
+        diagnostic = delivery.shadow_cron_grid_diagnostic(receipt, config, observed)
+        self.assertEqual(diagnostic["status"], "UNDETERMINED_RUN_TO_CRON_SLOT")
+        self.assertEqual(diagnostic["actual_successful_run_created_count"], 9)
+        self.assertEqual(
+            diagnostic["nominal_reference_slots_between_first_last_created"], 15
+        )
+        self.assertEqual(diagnostic["created_gaps_over_six_hours"], 5)
+        self.assertEqual(
+            diagnostic["run_created_gap_minutes"],
+            [325, 372, 571, 344, 527, 571, 342, 529],
+        )
+        self.assertEqual(
+            diagnostic["offset_from_latest_prior_reference_slot_min_minutes"], 61
+        )
+        self.assertEqual(
+            diagnostic["offset_from_latest_prior_reference_slot_max_minutes"], 212
+        )
+        for field in (
+            "grid_offset_is_actual_dispatch_delay",
+            "nominal_slot_assignment_proven",
+            "skipped_slot_or_root_cause_proven",
+            "continuous_collection_proven",
+            "production_eligibility_proven",
+            "execution_authority",
+        ):
+            self.assertIs(diagnostic[field], False)
+
+        for field, bad in (
+            ("created_at_is_nominal_schedule_slot_identity", True),
+            ("per_run_original_cron_slot_id_authenticated", True),
+            ("exact_skipped_slot_identified", True),
+            ("github_dispatch_delay_root_cause_proven", True),
+            ("collector_failure_root_cause_proven", True),
+            ("execution_authority_granted", True),
+        ):
+            changed = copy.deepcopy(receipt)
+            changed["truth_boundaries"][field] = bad
+            with self.subTest(unauthorized_claim=field), self.assertRaises(ValueError):
+                delivery.shadow_cron_grid_diagnostic(changed, config, observed)
+
+        for mutation in ("timestamp", "source", "run", "attempt", "cron"):
+            changed = copy.deepcopy(receipt)
+            if mutation == "timestamp":
+                changed["run_metadata"][0]["created_at_utc"] = "2026-10-06T16:17:00Z"
+            elif mutation == "source":
+                changed["run_metadata"][0]["head_sha"] = "0" * 40
+            elif mutation == "run":
+                changed["run_metadata"][0]["run_id"] = 1
+            elif mutation == "attempt":
+                changed["run_metadata"][0]["run_attempt"] = 2
+            else:
+                changed["cron"]["expression_utc"] = "17 */2 * * *"
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                delivery.shadow_cron_grid_diagnostic(changed, config, observed)
+
+        changed_config = copy.deepcopy(config)
+        changed_config["execution"]["cron_utc"] = "17 */2 * * *"
+        with self.assertRaises(ValueError):
+            delivery.shadow_cron_grid_diagnostic(receipt, changed_config, observed)
+        with self.assertRaises(ValueError):
+            delivery.shadow_cron_grid_diagnostic(receipt, config, observed[:-1])
+
+    def test_market_cron_grid_fails_closed_if_receipt_is_mutated(self) -> None:
+        original_reader = delivery.read_json
+        current = original_reader(delivery.CURRENT_OPERATIONS)
+        original_receipt = original_reader(delivery.SHADOW_GRID_RECEIPT)
+        panel = delivery.market_decision_panel(current)
+        self.assertIn("15 個理論時槽", panel)
+        self.assertIn("61–212 分鐘", panel)
+        self.assertIn("這不是已證實的 GitHub 排程延遲", panel)
+        self.assertIn("9/21", panel)
+        self.assertNotIn("GitHub 排程延遲已證實", panel)
+
+        changed = copy.deepcopy(original_receipt)
+        changed["truth_boundaries"]["schedule_delivery_latency_proven"] = True
+
+        def mutated_reader(path, root=delivery.ROOT):
+            if path == delivery.SHADOW_GRID_RECEIPT:
+                return copy.deepcopy(changed)
+            return original_reader(path, root)
+
+        with patch.object(delivery, "read_json", mutated_reader):
+            panel = delivery.market_decision_panel(current)
+        self.assertIn("九批觀測需複核", panel)
+        self.assertNotIn("15 個理論時槽", panel)
+        self.assertNotIn("61–212 分鐘", panel)
+        self.assertIn("5 段", panel)
+
     def test_vnext_market_panel_separates_research_from_formal_decision(self) -> None:
         current = delivery.read_json(delivery.CURRENT_OPERATIONS)
         panel = delivery.market_decision_panel(current)
