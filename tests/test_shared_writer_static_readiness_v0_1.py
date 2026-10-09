@@ -3,7 +3,6 @@ from __future__ import annotations
 import copy
 import json
 import unittest
-from pathlib import Path
 
 from scripts.inspect_shared_writer_static_readiness_v0_1 import (
     REGISTRY_PATH,
