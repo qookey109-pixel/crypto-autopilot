@@ -142,12 +142,13 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertIn("逐市場事件或方向", panel)
         self.assertIn("TOP5 breadth 僅為研究 proxy", panel)
         self.assertIn("Decision Trace", panel)
-        self.assertIn("5 個市場各 240 根", panel)
-        self.assertIn("三批觀測需複核 · 非即時", panel)
-        self.assertIn("三批資料完整性 PASS，連續性 REVIEW_REQUIRED", panel)
-        self.assertIn("2,091 根重疊 K 線一致", panel)
-        self.assertIn("529 分鐘缺口", panel)
-        self.assertIn("3/21", panel)
+        self.assertIn("5 市場 × 240 根", panel)
+        self.assertIn("九批觀測需複核 · 非即時", panel)
+        self.assertIn("九批資料完整性 PASS，連續性 REVIEW_REQUIRED", panel)
+        self.assertIn("8,604 根重疊 K 線一致", panel)
+        self.assertIn("5 段", panel)
+        self.assertIn("9/21", panel)
+        self.assertIn("37895797841", panel)
         self.assertIn("37893825259", panel)
         self.assertIn("37882460289", panel)
         self.assertIn("NOT_RUN（非 NO_TRADE）", panel)
@@ -225,6 +226,46 @@ class DeliveryOverviewTests(unittest.TestCase):
         panel = delivery.market_decision_panel(changed)
         self.assertIn("雙批研究驗證 · 非即時", panel)
         self.assertNotIn("三批資料完整性", panel)
+
+        for field, bad_value in (
+            ("status", "PASS"),
+            ("source_archive_sha256_all_nine_authenticated_in_outer_github_action", False),
+            ("artifact_ids", [1] * 9),
+            ("archive_zip_sha256", ["a" * 64] * 9),
+            ("natural_run_ids", list(range(9))),
+            ("source_main_sha_ninth", "bad"),
+            ("validated_report_count", 8),
+            ("overlapping_identical_candles", 8603),
+            ("observed_gap_over_6h_count", 0),
+            ("observed_gap_minutes", []),
+            ("maximum_source_lag_minutes", 50),
+            ("distinct_context_observations", 21),
+            ("schedule_gap_root_cause_proven", True),
+            ("original_nominal_cron_slot_mapping_authenticated", True),
+            ("uninterrupted_collection_proven", True),
+            ("context_warmup_state", "READY"),
+            ("paper_submission_performed", True),
+            ("audit_pr_state", "MERGED"),
+        ):
+            with self.subTest(nine_batch_field=field):
+                changed = copy.deepcopy(original)
+                changed["vnext_delivery_checkpoint"]["prospective_shadow"][
+                    "nine_batch_audit"
+                ][field] = bad_value
+                panel = delivery.market_decision_panel(changed)
+                self.assertIn("三批觀測需複核 · 非即時", panel)
+                self.assertIn("2,091 根重疊 K 線一致", panel)
+                self.assertNotIn("8,604 根重疊 K 線一致", panel)
+                self.assertNotIn("九批觀測需複核", panel)
+                self.assertNotIn("九批唯讀稽核 Run #37895797841", panel)
+
+        changed = copy.deepcopy(original)
+        changed["vnext_delivery_checkpoint"]["prospective_shadow"].pop(
+            "nine_batch_audit"
+        )
+        panel = delivery.market_decision_panel(changed)
+        self.assertIn("三批觀測需複核 · 非即時", panel)
+        self.assertNotIn("九批資料完整性", panel)
 
         changed = copy.deepcopy(original)
         changed["cloudflare_prepaid_d1_runtime_gateway_v0_1"][
