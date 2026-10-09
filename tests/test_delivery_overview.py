@@ -135,6 +135,12 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertIn("MARKET PULSE", panel)
         self.assertIn("CURRENT DECISION", panel)
         self.assertIn("CANDIDATE FUNNEL", panel)
+        self.assertIn("TOP MARKETS / COVERAGE", panel)
+        self.assertIn("RADAR / RESEARCH", panel)
+        self.assertIn("MARKET CONTEXT / SOURCE", panel)
+        self.assertIn("5 個研究市場 · 非排名", panel)
+        self.assertIn("逐市場事件或方向", panel)
+        self.assertIn("TOP5 breadth 僅為研究 proxy", panel)
         self.assertIn("Decision Trace", panel)
         self.assertIn("5 個市場各 240 根", panel)
         self.assertIn("單批資料驗證 PASS", panel)
@@ -160,6 +166,8 @@ class DeliveryOverviewTests(unittest.TestCase):
                 self.assertIn("UNKNOWN · 未核實", panel)
                 self.assertNotIn("5 個市場各 240 根", panel)
                 self.assertNotIn("單批資料驗證 PASS", panel)
+                self.assertIn("Radar 研究來源未核實", panel)
+                self.assertIn("UNKNOWN · 非排名", panel)
 
         changed = copy.deepcopy(original)
         changed["cloudflare_prepaid_d1_runtime_gateway_v0_1"][

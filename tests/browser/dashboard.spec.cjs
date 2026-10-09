@@ -85,6 +85,14 @@ test("VNext market research is clearly non-live and fits a 390px phone", async (
   await expect(panel).toContainText("NOT_RUN（非 NO_TRADE）");
   await expect(panel).toContainText("來源 K 線時間");
   await expect(panel).toContainText("UNKNOWN");
+  const researchContext = panel.locator("details.vnext-context-disclosure");
+  await expect(researchContext).not.toHaveAttribute("open", "");
+  await researchContext.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(researchContext).toHaveAttribute("open", "");
+  await expect(researchContext).toContainText("5 個研究市場 · 非排名");
+  await expect(researchContext).toContainText("REGIME_UNAVAILABLE");
+  await expect(researchContext).toContainText("研究 Radar");
   const bounds = await panel.boundingBox();
   expect(bounds).not.toBeNull();
   expect(bounds.x).toBeGreaterThanOrEqual(-1);
