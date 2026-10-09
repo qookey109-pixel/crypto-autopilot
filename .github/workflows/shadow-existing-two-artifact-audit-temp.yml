@@ -1,0 +1,92 @@
+name: Shadow Existing Two-Batch Audit TEMP (Never Merge)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/shadow-existing-two-artifact-audit-temp.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit-existing-two:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+      - name: Download two previously recorded GitHub-hosted ZIPs only
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for specification in \
+            '11561747502 01c0c62cff750a41a02e8f2d7dcf26c481327135cff8fcd38610874140a54891' \
+            '11579982145 adcfc5e1382b1b248bae0e14f5a9acbd305c88b30fca7931dbcf0b0a2b6862df'; do
+            read -r artifact_id expected_sha <<< "$specification"
+            curl --fail --silent --show-error --location --max-time 45 \
+              --proto '=https' --proto-redir '=https' \
+              --header "Authorization: Bearer ${GH_TOKEN}" \
+              --header 'Accept: application/vnd.github+json' \
+              "https://api.github.com/repos/qookey109-pixel/crypto-autopilot/actions/artifacts/${artifact_id}/zip" \
+              --output "artifact-${artifact_id}.zip"
+            test "$(stat -c %s "artifact-${artifact_id}.zip")" -le 2097152
+            printf '%s  artifact-%s.zip\n' "$expected_sha" "$artifact_id" | sha256sum -c -
+          done
+      - name: Verify original report provenance and cross-batch overlap
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH=src python - <<'PY'
+          import io
+          import json
+          from datetime import datetime
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          from crypto_autopilot.research.prospective_shadow_continuity_v0_1 import (
+              inspect_shadow_batch_continuity,
+          )
+
+          expected = (
+              (11561747502, 37802372751, "2026-10-08T15:38:05Z"),
+              (11579982145, 37846141319, "2026-10-08T21:21:03Z"),
+          )
+          reports = []
+          for artifact, run_id, created in expected:
+              zip_bytes = Path(f"artifact-{artifact}.zip").read_bytes()
+              assert 0 < len(zip_bytes) <= 2097152, "archive size boundary"
+              with ZipFile(io.BytesIO(zip_bytes)) as source:
+                  assert source.namelist() == ["report.json"], "unexpected ZIP layout"
+                  assert source.getinfo("report.json").file_size <= 2097152, "oversize report"
+                  report = json.loads(source.read("report.json"))
+              github = report.get("github", {})
+              assert github.get("run_id") == str(run_id), "run ID differs"
+              assert github.get("run_attempt") == "1", "run attempt differs"
+              assert github.get("sha") == "cad0aea7273acc1cb1eaa138955b6381e30bd5a6", "source SHA differs"
+              assert github.get("event_name") == "schedule", "not a natural schedule"
+              capture_ms = report["collection"]["capture_timestamp_ms"]
+              source_ms = int(datetime.fromisoformat(
+                  created.replace("Z", "+00:00")
+              ).timestamp() * 1000)
+              assert source_ms - 180_000 <= capture_ms <= source_ms + 180_000, "capture time != run creation"
+              reports.append(report)
+          diagnostic = inspect_shadow_batch_continuity(reports)
+          print("EXISTING_TWO_ARTIFACT_ZIP_DIGESTS=PASS")
+          print("EXISTING_TWO_ARTIFACT_PROVENANCE=PASS")
+          print(json.dumps(diagnostic, sort_keys=True))
+          # The pure validator cannot attest external files: in THIS JOB
+          # original GitHub ZIP SHA-256 was independently verified above.
+          assert diagnostic["report_count"] == 2
+          assert diagnostic["run_ids"] == [37802372751, 37846141319]
+          assert diagnostic["status"] == "PARTIAL_OBSERVATION_ONLY", "review required"
+          assert diagnostic["shared_overlapping_candles_consistent"] > 0, "no overlapping evidence"
+          print("TWO_RUN_CROSS_BATCH_AUDIT=PASS_PARTIAL_ONLY_NOT_PRODUCTION")
+          PY
