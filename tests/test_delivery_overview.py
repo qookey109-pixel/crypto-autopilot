@@ -142,7 +142,7 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertIn("逐市場事件或方向", panel)
         self.assertIn("TOP5 breadth 僅為研究 proxy", panel)
         self.assertIn("Decision Trace", panel)
-        self.assertIn("5 個市場各 240 根", panel)
+        self.assertIn("5 市場 × 240 根", panel)
         self.assertIn("九批觀測需複核 · 非即時", panel)
         self.assertIn("九批資料完整性 PASS，連續性 REVIEW_REQUIRED", panel)
         self.assertIn("8,604 根重疊 K 線一致", panel)
