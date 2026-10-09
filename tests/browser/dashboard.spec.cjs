@@ -75,6 +75,29 @@ test("dashboard loads governed data and all primary views", async ({ page, baseU
   expect(badResponses).toEqual([]);
 });
 
+test("VNext market research is clearly non-live and fits a 390px phone", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(baseURL, { waitUntil: "networkidle" });
+  const panel = page.locator("#vnext-market-heading").locator("xpath=ancestor::section[1]");
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText("單批歷史觀測 · 非即時");
+  await expect(panel).toContainText("5 個市場各 240 根");
+  await expect(panel).toContainText("NOT_RUN（非 NO_TRADE）");
+  await expect(panel).toContainText("來源 K 線時間");
+  await expect(panel).toContainText("UNKNOWN");
+  const bounds = await panel.boundingBox();
+  expect(bounds).not.toBeNull();
+  expect(bounds.x).toBeGreaterThanOrEqual(-1);
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(391);
+
+  const links = page.locator(".external-research-links a");
+  await expect(links).toHaveCount(4);
+  for (const link of await links.all()) {
+    await expect(link).toHaveAttribute("target", "_blank");
+    await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+  }
+});
+
 test("served dashboard content hash matches the exact build", async ({ request, baseURL }) => {
   const expected = process.env.PLAYWRIGHT_EXPECTED_CONTENT_HASH;
   test.skip(!expected, "PLAYWRIGHT_EXPECTED_CONTENT_HASH is not set outside CI");

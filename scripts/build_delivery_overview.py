@@ -295,8 +295,111 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
     return summary, schedule, progress, web_current
 
 
+
+def market_decision_panel(current: dict) -> str:
+    """Expose only verified historical research coverage, never a trade recommendation."""
+    checkpoint = current.get("vnext_delivery_checkpoint")
+    shadow = checkpoint.get("prospective_shadow") if isinstance(checkpoint, dict) else None
+    audit = shadow.get("content_audit") if isinstance(shadow, dict) else None
+    gateway = current.get("cloudflare_prepaid_d1_runtime_gateway_v0_1")
+    core = current.get("core100")
+
+    verified = (
+        isinstance(checkpoint, dict)
+        and checkpoint.get("authority") is False
+        and isinstance(shadow, dict)
+        and shadow.get("content_validation") == "VERIFIED_ONE_EXISTING_ARTIFACT_ONLY"
+        and shadow.get("event") == "schedule"
+        and shadow.get("workflow_conclusion") == "success"
+        and type(shadow.get("run_id")) is int
+        and shadow.get("run_id") == 37846141319
+        and type(shadow.get("artifact_id")) is int
+        and shadow.get("artifact_id") == 11579982145
+        and isinstance(audit, dict)
+        and audit.get("result") == "PASS"
+        and audit.get("audit_run_id") == 37878449661
+        and audit.get("original_archive_sha256_verified") is True
+        and audit.get("record_id_verified") is True
+        and audit.get("candle_sha256_count_verified") == 5
+        and audit.get("governed_markets_verified") == 5
+        and audit.get("closed_60m_candles_per_market") == 240
+        and audit.get("consecutive_closed_candles_verified") is True
+        and audit.get("provenance_and_availability_verified") is True
+        and audit.get("production_eligibility_proven") is False
+        and audit.get("signal_predictive_edge_proven") is False
+        and audit.get("execution_authority_granted") is False
+    )
+    production_disabled = (
+        isinstance(gateway, dict)
+        and gateway.get("entrypoint") == "NOT_WIRED"
+        and gateway.get("production_cycle_status") == "NOT_RUN"
+        and gateway.get("natural_schedule_status") == "NOT_CONFIGURED"
+        and gateway.get("cloud_paper_activation") is False
+        and isinstance(core, dict)
+        and core.get("model_quality_gate", {}).get("status") == "REJECT"
+    )
+
+    pulse = (
+        "已驗證單批研究輸入：5 個市場各 240 根已收盤 60M K 線；"
+        "原始檔、時間順序及 Hash 通過。沒有核實的當前價格或市場方向。"
+        if verified
+        else "研究來源未通過完整性檢查；即時行情與市場方向維持 UNKNOWN。"
+    )
+    pulse_label = "單批歷史觀測 · 非即時" if verified else "UNKNOWN · 未核實"
+    decision = (
+        "Cloud Paper 正式入口尚未接通、循環 NOT_RUN；不能將工程測試或策略庫為空"
+        "當成已執行的 NO_TRADE。"
+        if production_disabled
+        else "正式 Paper 執行狀態 UNKNOWN；不得宣稱已交易或已產生 NO_TRADE。"
+    )
+    funnel = (
+        "Core100 模型品質 REJECT；研究觀測尚未取得正式策略資格，"
+        "不得自動提高分數或繞過風險／組合閘門。"
+        if production_disabled
+        else "策略品質與正式候選資格尚未核實；不顯示推薦或信號排名。"
+    )
+    evidence = (
+        '<a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/'
+        '37846141319" target="_blank" rel="noopener noreferrer">研究來源 Run #37846141319 ↗</a>'
+        ' · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/'
+        '37878449661" target="_blank" rel="noopener noreferrer">單批驗證 Run #37878449661 ↗</a>'
+        if verified
+        else "可用完整性證據：UNKNOWN"
+    )
+    execution_source = "GitHub Actions Run #37846141319" if verified else "UNKNOWN"
+    return f"""      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
+        <div class="vnext-evidence-head">
+          <div><p class="card-kicker">MARKET INTELLIGENCE / RESEARCH-ONLY</p>
+            <h3 id="vnext-market-heading">市場觀測與決策狀態</h3></div>
+          <span class="badge neutral">非即時行情 · 無正式下單</span>
+        </div>
+        <div class="vnext-market-grid">
+          <article><p class="card-kicker">MARKET PULSE</p><h4>{pulse_label}</h4><p>{pulse}</p></article>
+          <article><p class="card-kicker">CURRENT DECISION</p><h4>正式決策尚未產生</h4><p>{decision}</p></article>
+          <article><p class="card-kicker">CANDIDATE FUNNEL</p><h4>候選資格未通過</h4><p>{funnel}</p></article>
+        </div>
+        <div class="vnext-trace">
+          <h4>Decision Trace · 已核實邊界</h4>
+          <ol>
+            <li>Research Evidence：{"單批資料驗證 PASS" if verified else "UNKNOWN"}</li>
+            <li>Market Radar／Context：尚無正式市場結論</li>
+            <li>Strategy Admission：{"REJECT，不可晉升" if production_disabled else "UNKNOWN"}</li>
+            <li>Paper Run：{"NOT_RUN（非 NO_TRADE）" if production_disabled else "UNKNOWN"}</li>
+          </ol>
+        </div>
+        <dl class="vnext-evidence-times">
+          <div><dt>來源 K 線時間</dt><dd>UNKNOWN · 尚未投影精確來源時間</dd></div>
+          <div><dt>研究執行證據</dt><dd>{execution_source} · 執行時間請查看 Run</dd></div>
+          <div><dt>網站發布時間</dt><dd>獨立於研究 Run · 請查看 Pages 部署</dd></div>
+        </dl>
+        <p class="vnext-evidence-note">{evidence}</p>
+        <p class="vnext-evidence-note">沒有合格策略是正常的准入限制，但正式 NO_TRADE 需要已執行且驗證的 Paper 報告。此區不查詢第三方市場、不讀取 R2/D1、不推定訊號獲利能力。</p>
+      </section>"""
+
+
 def build(site: Path, root: Path = ROOT) -> None:
     summary, schedule, progress, web_current = overview(root)
+    market_panel = market_decision_panel(read_json(CURRENT_OPERATIONS, root))
     path = site / "index.html"
     content = path.read_text(encoding="utf-8")
     for label, replacement in (("OVERVIEW", summary), ("SCHEDULE", schedule)):
@@ -309,6 +412,20 @@ def build(site: Path, root: Path = ROOT) -> None:
         )
         if count != 1:
             raise ValueError(f"Expected exactly one {label} block")
+
+    market_pattern = r'<!-- VNEXT_MARKET_START -->.*?<!-- VNEXT_MARKET_END -->'
+    content, market_count = re.subn(
+        market_pattern,
+        lambda _: (
+            '<!-- VNEXT_MARKET_START -->\n'
+            + market_panel
+            + '\n      <!-- VNEXT_MARKET_END -->'
+        ),
+        content,
+        flags=re.S,
+    )
+    if market_count != 1:
+        raise ValueError("Expected exactly one VNEXT_MARKET block")
 
     if "./assets/js/current-operations.js" not in content:
         script_pattern = r'(\s*<script src="\./assets/js/app\.js[^"]*" defer></script>)'

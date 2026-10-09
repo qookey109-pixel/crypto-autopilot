@@ -343,3 +343,34 @@ td code { overflow-wrap: anywhere; word-break: break-word; }
 .cloud-paper-trace .panel-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: .5rem; }
 .cloud-paper-trace h4 { margin: 0; font-size: 1rem; color: var(--ink-soft); }
 .cloud-paper-trace p { margin: .35rem 0 0; color: var(--muted); line-height: 1.55; overflow-wrap: anywhere; }
+
+/* Market-research versus production-decision distinction; no live quote UI. */
+.vnext-market-panel { margin-bottom: 20px; }
+.vnext-market-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.vnext-market-grid article { min-width: 0; padding: 17px; border-radius: 12px; border: 1px solid var(--line-strong); background: #f5faf7; }
+.vnext-market-grid h4 { margin: 7px 0 10px; font-size: clamp(18px, 2vw, 22px); line-height: 1.3; overflow-wrap: anywhere; }
+.vnext-market-grid p { margin: 0; font-size: 14px; line-height: 1.65; }
+.vnext-market-grid .card-kicker { letter-spacing: .09em; font-size: 12px; color: var(--hero-teal); }
+.vnext-market-panel .vnext-evidence-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.vnext-market-panel .vnext-evidence-head h3 { margin: 5px 0 14px; }
+.vnext-market-panel .vnext-trace { padding: 14px 16px; margin-top: 14px; border: 1px solid var(--line-strong); border-radius: 12px; }
+.vnext-market-panel .vnext-trace h4 { margin: 0 0 10px; font-size: 17px; }
+.vnext-market-panel .vnext-trace ol { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; padding-left: 20px; margin: 0; }
+.vnext-market-panel .vnext-trace li { min-width: 0; padding-left: 2px; font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
+.vnext-market-panel .vnext-evidence-times { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin: 14px 0 8px; }
+.vnext-market-panel .vnext-evidence-times div { min-width: 0; }
+.vnext-market-panel .vnext-evidence-times dt { color: var(--muted); font-size: 12px; }
+.vnext-market-panel .vnext-evidence-times dd { margin: 3px 0 0; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.vnext-market-panel .vnext-evidence-note { margin: 12px 0 0; font-size: 13px; color: var(--muted); line-height: 1.65; }
+.external-research-links { list-style: none; padding: 0; margin: 14px 0; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.external-research-links li { min-width: 0; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 10px; background: #f5faf7; }
+.external-research-links a { display: block; width: fit-content; min-height: 28px; color: var(--hero-teal); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.external-research-links span { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+@media (max-width: 850px) {
+  .vnext-market-grid { grid-template-columns: 1fr; }
+  .vnext-market-panel .vnext-trace ol { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 600px) {
+  .vnext-market-panel .vnext-trace ol, .vnext-market-panel .vnext-evidence-times, .external-research-links { grid-template-columns: 1fr; }
+  .vnext-market-panel .vnext-evidence-head { flex-direction: column; }
+}
