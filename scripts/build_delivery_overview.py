@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timedelta, timezone
 import html
 import json
 from pathlib import Path
@@ -9,6 +10,126 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 CURRENT_OPERATIONS = "research/status/current-operations-v0-3.json"
+
+SHADOW_GRID_RECEIPT = "research/receipts/2026-10-09-shadow-nine-run-cron-grid-v0-1.json"
+SHADOW_GRID_CRON = "17 */4 * * *"
+SHADOW_NINE_METADATA = (
+    (37510931727, "2026-10-06T18:23:26Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+    (37548642486, "2026-10-06T23:49:19Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+    (37579330430, "2026-10-07T06:02:07Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+    (37644930944, "2026-10-07T15:33:59Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+    (37688505983, "2026-10-07T21:18:56Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+    (37735861279, "2026-10-08T06:06:55Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+    (37802372751, "2026-10-08T15:38:05Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+    (37846141319, "2026-10-08T21:21:03Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+    (37892197952, "2026-10-09T06:10:49Z", "3466235f4a706ae5ea953158ab75f0f346ff0699"),
+)
+
+
+def shadow_cron_grid_diagnostic(receipt: dict, config: dict, run_ids: list[int]) -> dict:
+    """Pure reference-grid check; a created_at is not an intended cron-slot ID."""
+    expected = [
+        {
+            "run_id": rid, "created_at_utc": ts, "event": "schedule",
+            "run_attempt": 1, "conclusion": "success", "head_sha": sha,
+        }
+        for rid, ts, sha in SHADOW_NINE_METADATA
+    ]
+    expected_false = (
+        "created_at_is_nominal_schedule_slot_identity",
+        "per_run_original_cron_slot_id_authenticated",
+        "schedule_delivery_latency_proven",
+        "exact_skipped_slot_identified",
+        "github_dispatch_delay_root_cause_proven",
+        "collector_failure_root_cause_proven",
+        "all_nominal_slots_covered_proven",
+        "consecutive_research_context_warmup_proven",
+        "signal_outcome_predictive_edge_proven",
+        "production_eligibility_proven",
+        "execution_authority_granted",
+        "r2_or_d1_access_authorized",
+        "holdout_access_authorized",
+        "training_authorized",
+        "paper_submission_authorized",
+        "live_trading_authorized",
+    )
+    if (
+        not isinstance(receipt, dict)
+        or receipt.get("schema") != "qookey-shadow-nine-run-cron-grid-reconciliation-v0.1"
+        or receipt.get("status") != "REFERENCE_CRON_GRID_ONLY_ASSIGNMENT_AND_CAUSE_UNKNOWN"
+        or receipt.get("basis_main_sha") != "36de16ee68a0be323e4d2b61716cdf2c1458ed32"
+        or receipt.get("evidence_date_utc") != "2026-10-09"
+        or receipt.get("data_scope") != "EXISTING_ACTIONS_RUN_CREATED_AT_ONLY_NOT_NEXT_RUN_SCHEDULED_SLOT_PROOF"
+        or receipt.get("cron") != {
+            "workflow": ".github/workflows/prospective-shadow-collection-v0-1.yml",
+            "execution_config": "config/prospective_shadow_collection_execution_v0_1.json",
+            "expression_utc": SHADOW_GRID_CRON,
+            "max_theoretical_slots_in_observed_window": 1000,
+        }
+        or receipt.get("original_artifact_integrity_audit") != {
+            "audit_workflow_run_id": 37895797841,
+            "temporary_pull_request": 790,
+            "state": "CLOSED_UNMERGED",
+            "verified_nine_zip_archives": True,
+            "continuous_schedule_proven": False,
+        }
+        or not isinstance(config, dict)
+        or config.get("execution", {}).get("cron_utc") != SHADOW_GRID_CRON
+        or run_ids != [row[0] for row in SHADOW_NINE_METADATA]
+        or receipt.get("run_metadata") != expected
+        or not isinstance(receipt.get("truth_boundaries"), dict)
+        or set(receipt["truth_boundaries"]) != set(expected_false)
+        or any(receipt["truth_boundaries"][key] is not False for key in expected_false)
+    ):
+        raise ValueError("Shadow schedule metadata / authority mismatch")
+
+    created = [
+        datetime.fromisoformat(ts.replace("Z", "+00:00"))
+        for _, ts, _ in SHADOW_NINE_METADATA
+    ]
+    if not all(t.tzinfo == timezone.utc for t in created):
+        raise ValueError("Shadow schedule times must use UTC")
+    gaps = [
+        int((b - a).total_seconds() // 60)
+        for a, b in zip(created, created[1:])
+    ]
+    if any(delta <= 0 for delta in gaps):
+        raise ValueError("Non-increasing run creation time")
+
+    # Reference time points strictly inside the interval. Never treat a grid
+    # point as an assigned, missed, delayed or failed real schedule event.
+    grid = created[0].replace(hour=0, minute=17, second=0, microsecond=0)
+    grid_count = 0
+    while grid < created[-1]:
+        if grid > created[0]:
+            grid_count += 1
+        if grid_count > 1000:
+            raise ValueError("Unbounded cron grid")
+        grid += timedelta(hours=4)
+    offsets = []
+    for at in created:
+        midnight_grid = at.replace(hour=0, minute=17, second=0, microsecond=0)
+        reference = midnight_grid + timedelta(
+            hours=4 * int((at - midnight_grid) // timedelta(hours=4))
+        )
+        offsets.append(int((at - reference).total_seconds() // 60))
+    return {
+        "status": "UNDETERMINED_RUN_TO_CRON_SLOT",
+        "actual_successful_run_created_count": len(created),
+        "nominal_reference_slots_between_first_last_created": grid_count,
+        "run_created_gap_minutes": gaps,
+        "created_gaps_over_six_hours": sum(value > 360 for value in gaps),
+        "offset_from_latest_prior_reference_slot_min_minutes": min(offsets),
+        "offset_from_latest_prior_reference_slot_max_minutes": max(offsets),
+        "grid_offset_is_actual_dispatch_delay": False,
+        "nominal_slot_assignment_proven": False,
+        "skipped_slot_or_root_cause_proven": False,
+        "continuous_collection_proven": False,
+        "production_eligibility_proven": False,
+        "execution_authority": False,
+    }
+
+
 
 
 def read_json(path: str, root: Path = ROOT) -> dict:
