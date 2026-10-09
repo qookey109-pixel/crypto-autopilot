@@ -143,10 +143,12 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertIn("TOP5 breadth 僅為研究 proxy", panel)
         self.assertIn("Decision Trace", panel)
         self.assertIn("5 個市場各 240 根", panel)
-        self.assertIn("雙批研究驗證 · 非即時", panel)
-        self.assertIn("兩批研究驗證 PASS（僅完整性）", panel)
-        self.assertIn("936 根重疊 K 線一致", panel)
-        self.assertIn("暖機 2/21 不足", panel)
+        self.assertIn("三批觀測需複核 · 非即時", panel)
+        self.assertIn("三批資料完整性 PASS，連續性 REVIEW_REQUIRED", panel)
+        self.assertIn("2,091 根重疊 K 線一致", panel)
+        self.assertIn("529 分鐘缺口", panel)
+        self.assertIn("3/21", panel)
+        self.assertIn("37893825259", panel)
         self.assertIn("37882460289", panel)
         self.assertIn("NOT_RUN（非 NO_TRADE）", panel)
         self.assertIn("UNKNOWN · 尚未投影精確來源時間", panel)
@@ -189,6 +191,40 @@ class DeliveryOverviewTests(unittest.TestCase):
                 self.assertNotIn("936 根重疊 K 線一致", panel)
                 self.assertNotIn("兩批研究驗證 PASS", panel)
                 self.assertNotIn("跨批次唯讀驗證 Run #37882460289", panel)
+
+        for field, bad_value in (
+            ("status", "PASS"),
+            ("zip_sha256_verified_for_all_three", False),
+            ("archive_zip_sha256", ["x" * 64] * 3),
+            ("natural_run_ids", [37802372751, 37846141319, 3]),
+            ("overlapping_identical_candles", 2090),
+            ("observed_gap_over_6h_count", 0),
+            ("observed_gap_minutes", 0),
+            ("uninterrupted_collection_proven", True),
+            ("context_warmup_state", "READY"),
+            ("paper_submission_performed", True),
+            ("audit_pr_state", "MERGED"),
+            ("source_main_shas", ["bad"] * 3),
+        ):
+            with self.subTest(three_batch_field=field):
+                changed = copy.deepcopy(original)
+                changed["vnext_delivery_checkpoint"]["prospective_shadow"][
+                    "three_batch_audit"
+                ][field] = bad_value
+                panel = delivery.market_decision_panel(changed)
+                self.assertIn("雙批研究驗證 · 非即時", panel)
+                self.assertIn("936 根重疊 K 線一致", panel)
+                self.assertNotIn("2,091 根重疊 K 線一致", panel)
+                self.assertNotIn("三批觀測需複核", panel)
+                self.assertNotIn("三批唯讀稽核 Run #37893825259", panel)
+
+        changed = copy.deepcopy(original)
+        changed["vnext_delivery_checkpoint"]["prospective_shadow"].pop(
+            "three_batch_audit"
+        )
+        panel = delivery.market_decision_panel(changed)
+        self.assertIn("雙批研究驗證 · 非即時", panel)
+        self.assertNotIn("三批資料完整性", panel)
 
         changed = copy.deepcopy(original)
         changed["cloudflare_prepaid_d1_runtime_gateway_v0_1"][
