@@ -330,6 +330,38 @@ def market_decision_panel(current: dict) -> str:
         and audit.get("signal_predictive_edge_proven") is False
         and audit.get("execution_authority_granted") is False
     )
+    cross = shadow.get("cross_batch_audit") if isinstance(shadow, dict) else None
+    cross_verified = (
+        verified
+        and isinstance(cross, dict)
+        and cross.get("status") == "PASS_PARTIAL_ONLY_NOT_PRODUCTION"
+        and cross.get("audit_run_id") == 37882460289
+        and cross.get("audit_pr_number") == 783
+        and cross.get("audit_pr_state") == "CLOSED_UNMERGED"
+        and cross.get("audit_workflow_merged") is False
+        and cross.get("natural_run_ids") == [37802372751, 37846141319]
+        and cross.get("artifact_ids") == [11561747502, 11579982145]
+        and cross.get("source_main_sha") == "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"
+        and cross.get("zip_sha256_verified_for_both") is True
+        and cross.get("embedded_run_identity_and_capture_time_verified") is True
+        and cross.get("self_consistent_records_verified") is True
+        and cross.get("validated_report_count") == 2
+        and cross.get("overlapping_identical_candles") == 936
+        and cross.get("observed_gap_over_6h_count") == 0
+        and cross.get("maximum_source_lag_minutes") == 38
+        and cross.get("context_warmup_count") == 2
+        and cross.get("context_warmup_required") == 21
+        and cross.get("context_warmup_state") == "INSUFFICIENT"
+        and cross.get("full_natural_schedule_coverage_proven") is False
+        and cross.get("signal_outcome_predictive_edge_proven") is False
+        and cross.get("production_eligibility_proven") is False
+        and cross.get("paper_submission_performed") is False
+        and cross.get("training_performed") is False
+        and cross.get("r2_or_d1_accessed") is False
+        and cross.get("execution_authority_granted") is False
+        and cross.get("replay_maturity_proven") is False
+    )
+
     production_disabled = (
         isinstance(gateway, dict)
         and gateway.get("entrypoint") == "NOT_WIRED"
@@ -340,13 +372,21 @@ def market_decision_panel(current: dict) -> str:
         and core.get("model_quality_gate", {}).get("status") == "REJECT"
     )
 
-    pulse = (
-        "已驗證單批研究輸入：5 個市場各 240 根已收盤 60M K 線；"
-        "原始檔、時間順序及 Hash 通過。沒有核實的當前價格或市場方向。"
-        if verified
-        else "研究來源未通過完整性檢查；即時行情與市場方向維持 UNKNOWN。"
-    )
-    pulse_label = "單批歷史觀測 · 非即時" if verified else "UNKNOWN · 未核實"
+    if cross_verified:
+        pulse_label = "雙批研究驗證 · 非即時"
+        pulse = (
+            "兩批 GitHub 既存研究資料已驗證：5 個市場各 240 根 60M K 線的單批覆蓋，"
+            "跨批 936 根重疊 K 線一致；最大來源延遲 38 分鐘。"
+            "市場背景暖機 2/21 不足，不能當作即時價格、行情方向或正式訊號。"
+        )
+    else:
+        pulse = (
+            "已驗證單批研究輸入：5 個市場各 240 根已收盤 60M K 線；"
+            "原始檔、時間順序及 Hash 通過。沒有核實的當前價格或市場方向。"
+            if verified
+            else "研究來源未通過完整性檢查；即時行情與市場方向維持 UNKNOWN。"
+        )
+        pulse_label = "單批歷史觀測 · 非即時" if verified else "UNKNOWN · 未核實"
     decision = (
         "Cloud Paper 正式入口尚未接通、循環 NOT_RUN；不能將工程測試或策略庫為空"
         "當成已執行的 NO_TRADE。"
@@ -367,7 +407,17 @@ def market_decision_panel(current: dict) -> str:
         if verified
         else "可用完整性證據：UNKNOWN"
     )
-    execution_source = "GitHub Actions Run #37846141319" if verified else "UNKNOWN"
+    if cross_verified:
+        evidence += (
+            ' · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/'
+            '37882460289" target="_blank" rel="noopener noreferrer">'
+            '跨批次唯讀驗證 Run #37882460289 ↗</a>'
+        )
+    execution_source = (
+        "研究執行 #37802372751 + #37846141319；跨批驗證 #37882460289"
+        if cross_verified else
+        ("GitHub Actions Run #37846141319" if verified else "UNKNOWN")
+    )
     radar_detail = (
         "該批研究證據含五個市場的 radar 欄位，但未投影逐市場事件或方向；"
         "不代表即時警報。"
@@ -386,6 +436,9 @@ def market_decision_panel(current: dict) -> str:
         if verified else
         "宏觀來源及可用時間未核實，維持 REGIME_UNAVAILABLE。"
     )
+    if cross_verified:
+        context_detail += " 跨批研究僅 2/21 次背景觀測；暫不能產生正式市場 regime。"
+        radar_detail += " 多批一致性驗證不代表事件具預測能力。"
     return f"""      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
         <div class="vnext-evidence-head">
           <div><p class="card-kicker">MARKET INTELLIGENCE / RESEARCH-ONLY</p>
@@ -409,7 +462,7 @@ def market_decision_panel(current: dict) -> str:
         <div class="vnext-trace">
           <h4>Decision Trace · 已核實邊界</h4>
           <ol>
-            <li>Research Evidence：{"單批資料驗證 PASS" if verified else "UNKNOWN"}</li>
+            <li>Research Evidence：{"兩批研究驗證 PASS（僅完整性）" if cross_verified else ("單批資料驗證 PASS" if verified else "UNKNOWN")}</li>
             <li>Market Radar／Context：尚無正式市場結論</li>
             <li>Strategy Admission：{"REJECT，不可晉升" if production_disabled else "UNKNOWN"}</li>
             <li>Paper Run：{"NOT_RUN（非 NO_TRADE）" if production_disabled else "UNKNOWN"}</li>

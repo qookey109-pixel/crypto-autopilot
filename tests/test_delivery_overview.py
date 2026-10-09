@@ -143,7 +143,11 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertIn("TOP5 breadth 僅為研究 proxy", panel)
         self.assertIn("Decision Trace", panel)
         self.assertIn("5 個市場各 240 根", panel)
-        self.assertIn("單批資料驗證 PASS", panel)
+        self.assertIn("雙批研究驗證 · 非即時", panel)
+        self.assertIn("兩批研究驗證 PASS（僅完整性）", panel)
+        self.assertIn("936 根重疊 K 線一致", panel)
+        self.assertIn("暖機 2/21 不足", panel)
+        self.assertIn("37882460289", panel)
         self.assertIn("NOT_RUN（非 NO_TRADE）", panel)
         self.assertIn("UNKNOWN · 尚未投影精確來源時間", panel)
         self.assertIn("37878449661", panel)
@@ -168,6 +172,23 @@ class DeliveryOverviewTests(unittest.TestCase):
                 self.assertNotIn("單批資料驗證 PASS", panel)
                 self.assertIn("Radar 研究來源未核實", panel)
                 self.assertIn("UNKNOWN · 非排名", panel)
+
+        for field, bad_value in (
+            ("zip_sha256_verified_for_both", False),
+            ("overlapping_identical_candles", 935),
+            ("context_warmup_state", "READY"),
+            ("execution_authority_granted", True),
+        ):
+            with self.subTest(cross_batch_field=field):
+                changed = copy.deepcopy(original)
+                changed["vnext_delivery_checkpoint"]["prospective_shadow"][
+                    "cross_batch_audit"
+                ][field] = bad_value
+                panel = delivery.market_decision_panel(changed)
+                self.assertIn("單批歷史觀測 · 非即時", panel)
+                self.assertNotIn("936 根重疊 K 線一致", panel)
+                self.assertNotIn("兩批研究驗證 PASS", panel)
+                self.assertNotIn("跨批次唯讀驗證 Run #37882460289", panel)
 
         changed = copy.deepcopy(original)
         changed["cloudflare_prepaid_d1_runtime_gateway_v0_1"][

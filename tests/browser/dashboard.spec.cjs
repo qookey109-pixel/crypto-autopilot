@@ -80,8 +80,12 @@ test("VNext market research is clearly non-live and fits a 390px phone", async (
   await page.goto(baseURL, { waitUntil: "networkidle" });
   const panel = page.locator("#vnext-market-heading").locator("xpath=ancestor::section[1]");
   await expect(panel).toBeVisible();
-  await expect(panel).toContainText("單批歷史觀測 · 非即時");
+  await expect(panel).toContainText("雙批研究驗證 · 非即時");
   await expect(panel).toContainText("5 個市場各 240 根");
+  await expect(panel).toContainText("936 根重疊 K 線一致");
+  await expect(panel).toContainText("暖機 2/21 不足");
+  await expect(panel).toContainText("兩批研究驗證 PASS（僅完整性）");
+  await expect(panel.locator('a[href*="/actions/runs/37882460289"]')).toBeVisible();
   await expect(panel).toContainText("NOT_RUN（非 NO_TRADE）");
   await expect(panel).toContainText("來源 K 線時間");
   await expect(panel).toContainText("UNKNOWN");
