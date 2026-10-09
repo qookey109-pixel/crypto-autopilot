@@ -84,3 +84,10 @@ Temporary workflow PR #783 was deliberately **closed without merge**, so no extr
 
 ---
 
+
+## Cloud Paper shared-capacity forecast V0.1 — 2026-10-09 (synthetic only)
+
+New [read-only synthetic demand forecast](docs/CLOUD_PAPER_SHARED_CAPACITY_FORECAST_V0_1.md) adds a conservative **all-included-writer** resource projection to the prepared shared budget V0.4 contract: successful slots, changed/rejected/replay admission attempts, independent prepaid meter controller overhead, daily resource demand and 31-day R2/storage growth. Unknown caps fail closed; within caller-provided **hypothetical** caps remains **NOT_AUTHORIZED**, not 0-USD evidence. GitHub cloud CI/PR checks are required separately before accepting the engineering change. No Cloudflare account query, no R2/D1 provision/read/write, no new schedule, no model change and no Paper activation. Real caps remain NULL/unconfirmed, production query meter not implemented, complete account writer coverage and 0 USD unverified; Core100 quality REJECT and Paper NOT_WIRED / NOT_RUN / NOT_CONFIGURED remain binding.
+
+---
+
