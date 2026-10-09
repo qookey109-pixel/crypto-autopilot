@@ -1,3 +1,14 @@
+## VNext delivery reconciliation — 2026-10-09 Asia/Taipei
+
+Reviewed parent main: `cad0aea7273acc1cb1eaa138955b6381e30bd5a6`; resolve live main before acting. The [VNext work order](VNEXT_DELIVERY_WORK_ORDER_2026_10_09.md) records the complete product, website and acceptance sequence.
+
+- Stale bot Maintenance [#774](https://github.com/qookey109-pixel/crypto-autopilot/pull/774) was closed without merge after exact comparison proved its branch diverged from main (ahead 1 / behind 1). Preserve the branch and historical evidence. The ancestry guard stays intact. Recovery through the next qualifying natural Health chain is pending, not a maintenance PASS.
+- Latest reviewed natural Shadow [37846141319](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37846141319), attempt 1, succeeded with unexpired artifact 11579982145. Artifact content integrity, timestamps and feature coverage remain UNVERIFIED; metadata success does not establish data acceptance.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; production registry empty, Core100 `REJECT`. Preserve `RUNTIME_CHANGED` and consumed one-time evidence. Website redesign and safe research projection can proceed while budget, writer admission and D1 activation prerequisites are completed.
+- Older dated checkpoints below retain their original evidence. Their PR counts and SHAs describe those dates, not present state.
+
+---
+
 ## Billing metadata diagnostic V0.5 — preparation only — 2026-10-04 19:50 Asia/Taipei
 
 Parent main: `391fc329d75817342f790a787f3e5868c6538996`. Billing History V0.3 run 37183381165 is consumed; never rerun. Its mismatch could have been page, per_page, count-vs-result-length or total_count consistency, and the exact field was not retained.
