@@ -91,3 +91,18 @@ New [read-only synthetic demand forecast](docs/CLOUD_PAPER_SHARED_CAPACITY_FOREC
 
 ---
 
+
+## Three existing Shadow artifacts — validated integrity, 529-minute schedule gap (2026-10-09 Asia/Taipei)
+
+**Verification:** [GitHub Actions #37893825259](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37893825259) from ephemeral [PR #787](https://github.com/qookey109-pixel/crypto-autopilot/pull/787), **CLOSED_UNMERGED**. This PR-only read-only workflow fetched three *previously created* research archives (Artifact IDs 11561747502 / 11579982145 / 11597884258). Their original ZIP SHA-256 digests all matched recorded GitHub artifact metadata. The embedded reports' natural scheduled run identities/attempts, each source main SHA, and capture timestamps within three minutes of the run creation times were independently checked. No collector rerun or new provider/Cloudflare request was performed.
+
+**Actual three-report diagnostic:** `REVIEW_REQUIRED`, NOT `PASS`. Run IDs `37802372751 / 37846141319 / 37892197952`; three validated reports with 5 governed markets × 240 contiguous closed 60M candles each; **2,091 historical overlapping candle instances matched**; maximum source lag **38 min**. Between runs `37846141319` and `37892197952`, the real capture interval was **529 minutes** (>6-hour verification threshold): `observed_gap_count=1`. There are **3 distinct context observations of 21 required**, `INSUFFICIENT`, and these **do not prove uninterrupted collection** or a full schedule record. The earlier two-batch overlap audit [#37882460289](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37882460289) remains a separately verified consecutive pair, not invalidated by the later gap.
+
+The pure continuity validator correctly labels caller-supplied JSON provenance and archive authentication as `false`; archive hash and run identities were verified by the *outer GitHub Action*. Those layers must not be conflated. Data consistency does **not** establish exchange truth, signal outcomes, profitable edge, model quality, market regime, or Cloud Paper authority.
+
+The website displays three research observations as a **review-required** state with the 529-min gap and links to both audit runs. The checked-in machine checkpoint is versioned evidence, not a feed that grows automatically. Do not infer more than three verified reports from additional workflow-success metadata. Future evidence must be added only after explicit original archive SHA256, source SHA/attempt, and cross-batch consistency checks. Review why naturally scheduled runs were absent or delayed without silently backfilling, manually rerunning, or changing frozen cron authority.
+
+**Gates unchanged:** Core100 quality `REJECT`; regime `REGIME_UNAVAILABLE`; Cloud Paper `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; no holdout/training/source switch/model promotion/R2/D1 change, Paper submission, live-money order or paid runtime authorized. CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER / FREE-ONLY / 0 USD.
+
+---
+

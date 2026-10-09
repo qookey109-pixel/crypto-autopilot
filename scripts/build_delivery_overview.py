@@ -362,6 +362,54 @@ def market_decision_panel(current: dict) -> str:
         and cross.get("replay_maturity_proven") is False
     )
 
+    three = shadow.get("three_batch_audit") if isinstance(shadow, dict) else None
+    three_verified = (
+        cross_verified
+        and isinstance(three, dict)
+        and three.get("status") == "REVIEW_REQUIRED_SOURCE_GAP"
+        and three.get("audit_run_id") == 37893825259
+        and three.get("audit_pr_number") == 787
+        and three.get("audit_pr_state") == "CLOSED_UNMERGED"
+        and three.get("audit_workflow_merged") is False
+        and three.get("artifact_source") == "THREE_EXISTING_GITHUB_ACTIONS_ZIPS_ONLY"
+        and three.get("natural_run_ids") == [37802372751, 37846141319, 37892197952]
+        and three.get("artifact_ids") == [11561747502, 11579982145, 11597884258]
+        and three.get("archive_zip_sha256") == [
+            "01c0c62cff750a41a02e8f2d7dcf26c481327135cff8fcd38610874140a54891",
+            "adcfc5e1382b1b248bae0e14f5a9acbd305c88b30fca7931dbcf0b0a2b6862df",
+            "f4d98a6e46a904e0922d2740070b4f7073da9717621e60e8bb5d62921aad76d0",
+        ]
+        and three.get("source_main_shas") == [
+            "cad0aea7273acc1cb1eaa138955b6381e30bd5a6",
+            "cad0aea7273acc1cb1eaa138955b6381e30bd5a6",
+            "3466235f4a706ae5ea953158ab75f0f346ff0699",
+        ]
+        and three.get("zip_sha256_verified_for_all_three") is True
+        and three.get("embedded_natural_run_identity_and_capture_bounds_verified") is True
+        and three.get("self_consistent_candle_and_record_hashes_verified") is True
+        and three.get("validated_report_count") == 3
+        and three.get("overlapping_identical_candles") == 2091
+        and three.get("observed_gap_over_6h_count") == 1
+        and three.get("observed_gap_minutes") == 529
+        and three.get("observed_gap_from_run") == 37846141319
+        and three.get("observed_gap_to_run") == 37892197952
+        and three.get("maximum_source_lag_minutes") == 38
+        and three.get("distinct_context_observations") == 3
+        and three.get("context_warmup_required") == 21
+        and three.get("context_warmup_state") == "INSUFFICIENT"
+        and all(three.get(k) is False for k in (
+            "uninterrupted_collection_proven",
+            "full_natural_schedule_coverage_proven",
+            "signal_outcome_predictive_edge_proven",
+            "production_eligibility_proven",
+            "paper_submission_performed",
+            "training_performed",
+            "r2_or_d1_accessed",
+            "execution_authority_granted",
+            "replay_maturity_proven",
+        ))
+    )
+
     production_disabled = (
         isinstance(gateway, dict)
         and gateway.get("entrypoint") == "NOT_WIRED"
@@ -372,7 +420,16 @@ def market_decision_panel(current: dict) -> str:
         and core.get("model_quality_gate", {}).get("status") == "REJECT"
     )
 
-    if cross_verified:
+    if three_verified:
+        pulse_label = "三批觀測需複核 · 非即時"
+        pulse = (
+            "三份既存 GitHub 研究資料 Hash、時間與跨批一致性已核實："
+            "5 個市場各 240 根已收盤 60M K 線，跨批 2,091 根重疊 K 線一致；"
+            "最大來源延遲 38 分鐘。但收集間隔出現 529 分鐘缺口（逾 6 小時），"
+            "連續性 REVIEW_REQUIRED。背景僅 3/21 次觀測且不連續，"
+            "不可當成即時行情、正式訊號或策略資格。"
+        )
+    elif cross_verified:
         pulse_label = "雙批研究驗證 · 非即時"
         pulse = (
             "兩批 GitHub 既存研究資料已驗證：5 個市場各 240 根 60M K 線的單批覆蓋，"
@@ -413,10 +470,19 @@ def market_decision_panel(current: dict) -> str:
             '37882460289" target="_blank" rel="noopener noreferrer">'
             '跨批次唯讀驗證 Run #37882460289 ↗</a>'
         )
+    if three_verified:
+        evidence += (
+            ' · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/'
+            '37893825259" target="_blank" rel="noopener noreferrer">'
+            '三批唯讀稽核 Run #37893825259（529 分鐘缺口）↗</a>'
+        )
     execution_source = (
-        "研究執行 #37802372751 + #37846141319；跨批驗證 #37882460289"
-        if cross_verified else
-        ("GitHub Actions Run #37846141319" if verified else "UNKNOWN")
+        "研究執行 #37802372751 + #37846141319 + #37892197952；"
+        "完整性稽核 #37893825259（連續性 REVIEW_REQUIRED）"
+        if three_verified else
+        ("研究執行 #37802372751 + #37846141319；跨批驗證 #37882460289"
+         if cross_verified else
+         ("GitHub Actions Run #37846141319" if verified else "UNKNOWN"))
     )
     radar_detail = (
         "該批研究證據含五個市場的 radar 欄位，但未投影逐市場事件或方向；"
@@ -436,7 +502,13 @@ def market_decision_panel(current: dict) -> str:
         if verified else
         "宏觀來源及可用時間未核實，維持 REGIME_UNAVAILABLE。"
     )
-    if cross_verified:
+    if three_verified:
+        context_detail += (
+            " 三批研究背景觀測 3/21 不足，且 529 分鐘收集缺口需複核；"
+            "不得宣稱已連續暖機或產出正式 regime。"
+        )
+        radar_detail += " 研究 K 線一致性不代表事件或方向具有預測能力。"
+    elif cross_verified:
         context_detail += " 跨批研究僅 2/21 次背景觀測；暫不能產生正式市場 regime。"
         radar_detail += " 多批一致性驗證不代表事件具預測能力。"
     return f"""      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
@@ -462,7 +534,7 @@ def market_decision_panel(current: dict) -> str:
         <div class="vnext-trace">
           <h4>Decision Trace · 已核實邊界</h4>
           <ol>
-            <li>Research Evidence：{"兩批研究驗證 PASS（僅完整性）" if cross_verified else ("單批資料驗證 PASS" if verified else "UNKNOWN")}</li>
+            <li>Research Evidence：{"三批資料完整性 PASS，連續性 REVIEW_REQUIRED（529 分鐘缺口）" if three_verified else ("兩批研究驗證 PASS（僅完整性）" if cross_verified else ("單批資料驗證 PASS" if verified else "UNKNOWN"))}</li>
             <li>Market Radar／Context：尚無正式市場結論</li>
             <li>Strategy Admission：{"REJECT，不可晉升" if production_disabled else "UNKNOWN"}</li>
             <li>Paper Run：{"NOT_RUN（非 NO_TRADE）" if production_disabled else "UNKNOWN"}</li>
