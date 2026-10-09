@@ -1,0 +1,113 @@
+{
+  "schema": "qookey-shadow-nine-run-cron-grid-reconciliation-v0.1",
+  "status": "REFERENCE_CRON_GRID_ONLY_ASSIGNMENT_AND_CAUSE_UNKNOWN",
+  "evidence_date_utc": "2026-10-09",
+  "basis_main_sha": "36de16ee68a0be323e4d2b61716cdf2c1458ed32",
+  "original_artifact_integrity_audit": {
+    "audit_workflow_run_id": 37895797841,
+    "temporary_pull_request": 790,
+    "state": "CLOSED_UNMERGED",
+    "verified_nine_zip_archives": true,
+    "continuous_schedule_proven": false
+  },
+  "cron": {
+    "workflow": ".github/workflows/prospective-shadow-collection-v0-1.yml",
+    "execution_config": "config/prospective_shadow_collection_execution_v0_1.json",
+    "expression_utc": "17 */4 * * *",
+    "max_theoretical_slots_in_observed_window": 1000
+  },
+  "run_metadata": [
+    {
+      "run_id": 37510931727,
+      "created_at_utc": "2026-10-06T18:23:26Z",
+      "event": "schedule",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "head_sha": "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"
+    },
+    {
+      "run_id": 37548642486,
+      "created_at_utc": "2026-10-06T23:49:19Z",
+      "event": "schedule",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "head_sha": "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"
+    },
+    {
+      "run_id": 37579330430,
+      "created_at_utc": "2026-10-07T06:02:07Z",
+      "event": "schedule",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "head_sha": "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"
+    },
+    {
+      "run_id": 37644930944,
+      "created_at_utc": "2026-10-07T15:33:59Z",
+      "event": "schedule",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "head_sha": "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"
+    },
+    {
+      "run_id": 37688505983,
+      "created_at_utc": "2026-10-07T21:18:56Z",
+      "event": "schedule",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "head_sha": "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"
+    },
+    {
+      "run_id": 37735861279,
+      "created_at_utc": "2026-10-08T06:06:55Z",
+      "event": "schedule",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "head_sha": "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"
+    },
+    {
+      "run_id": 37802372751,
+      "created_at_utc": "2026-10-08T15:38:05Z",
+      "event": "schedule",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "head_sha": "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"
+    },
+    {
+      "run_id": 37846141319,
+      "created_at_utc": "2026-10-08T21:21:03Z",
+      "event": "schedule",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "head_sha": "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"
+    },
+    {
+      "run_id": 37892197952,
+      "created_at_utc": "2026-10-09T06:10:49Z",
+      "event": "schedule",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "head_sha": "3466235f4a706ae5ea953158ab75f0f346ff0699"
+    }
+  ],
+  "truth_boundaries": {
+    "created_at_is_nominal_schedule_slot_identity": false,
+    "per_run_original_cron_slot_id_authenticated": false,
+    "schedule_delivery_latency_proven": false,
+    "exact_skipped_slot_identified": false,
+    "github_dispatch_delay_root_cause_proven": false,
+    "collector_failure_root_cause_proven": false,
+    "all_nominal_slots_covered_proven": false,
+    "consecutive_research_context_warmup_proven": false,
+    "signal_outcome_predictive_edge_proven": false,
+    "production_eligibility_proven": false,
+    "execution_authority_granted": false,
+    "r2_or_d1_access_authorized": false,
+    "holdout_access_authorized": false,
+    "training_authorized": false,
+    "paper_submission_authorized": false,
+    "live_trading_authorized": false
+  },
+  "data_scope": "EXISTING_ACTIONS_RUN_CREATED_AT_ONLY_NOT_NEXT_RUN_SCHEDULED_SLOT_PROOF",
+  "notes": "All nine run records have already-successful research archive evidence; this receipt adds no collection, schedule dispatch, storage, backfill or run-to-nominal-slot assignment. Metadata is a reviewed finite observation, not a live feed."
+}

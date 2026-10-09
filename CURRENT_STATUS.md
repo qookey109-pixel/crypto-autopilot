@@ -1,3 +1,9 @@
+## Shadow theoretical UTC schedule-slot diagnostic — 2026-10-09
+
+New read-only [slot reconciliation](docs/SHADOW_NINE_RUN_CRON_GRID_DIAGNOSTIC_2026_10_09.md) and immutable [nine-run source receipt](research/receipts/2026-10-09-shadow-nine-run-cron-grid-v0-1.json). The actual workflow/config is unchanged at `17 */4 * * *` UTC. Between the first and last of nine **observed** successful GitHub scheduled-run creation timestamps, there are **15 strictly interior theoretical UTC cron points**; each observed creation time falls **61–212 minutes after its nearest earlier grid point**. These are *reference clock comparisons*, not missing-run counts or proved GitHub queue delays. Five run-created intervals exceeded six hours, consistent in count with the separate nine-archive capture-gap evidence. **Per-run scheduled-for identity and cause remain UNKNOWN**, research maturity remains **9/21 insufficient** and temporal continuity `REVIEW_REQUIRED`. Fail-closed static tests and dashboard render the scope; no cron change, backfill, provider request, D1/R2/holdout, training or trading authority added. CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER / 0 USD.
+
+---
+
 ## Shadow nine existing natural artifacts — authenticated 2026-10-09, five observation gaps (Asia/Taipei)
 
 **Authority:** CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER; GitHub Actions Artifact research collection only; zero extra paid/cloud providers, no R2/D1 access, no replay/backfill/manual collection, no schedule change. Official live main must be resolved afresh before additional operations.
