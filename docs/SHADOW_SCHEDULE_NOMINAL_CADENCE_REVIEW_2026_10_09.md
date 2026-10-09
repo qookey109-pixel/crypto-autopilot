@@ -27,6 +27,10 @@ These seven are *not equal* to five observed interarrival gaps: the former count
 
 **All nine actual `collect` jobs reported success.** Accordingly, the five gaps cannot be attributed to a verified collector-job failure. Whether individual cron events were queued late, dropped, never dispatched, or omitted from bounded retrieval remains **UNKNOWN**. GitHub's [official Actions documentation](https://docs.github.com/en/actions/how-tos/troubleshoot-workflows) says scheduled events can be delayed under high load and some queued jobs can be dropped; those are possible platform behaviors, not identified root causes for these particular runs.
 
+## Relationship to the already-merged reference-grid receipt
+
+The existing merged `research/receipts/2026-10-09-shadow-nine-run-cron-grid-v0-1.json` and `shadow_cron_grid_diagnostic` count **15 nominal UTC reference points strictly inside the interval between the first and last run creation timestamps**. This V0.1 diagnostic instead counts **16 inclusive four-hour candidate arrival buckets**, from the nearest prior cron reference before the first run to the nearest prior reference before the last run, of which **seven contain no run creation**. These are different counting conventions for different objects, **not inconsistent evidence and neither represents missed trigger count**. This companion additionally checks the independent successful `collect` job result on each existing run, which the original pure grid function did not attest.
+
 ## Guardrails and next check
 
 1. Do **not** backfill any gap, attach a fabricated intended-slot ID, rerun the research collector, adjust UTC cron, or set `github_schedule_changes_authorized=true` based on this review.
