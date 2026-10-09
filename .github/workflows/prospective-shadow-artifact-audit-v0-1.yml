@@ -1,0 +1,140 @@
+name: Prospective Shadow Artifact Read-Only Audit V0.1
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/prospective-shadow-artifact-audit-v0-1.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  existing-artifact:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch and hash existing GitHub Actions Artifact only
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --max-time 45 \
+            --proto '=https' --proto-redir '=https' \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header 'Accept: application/vnd.github+json' \
+            'https://api.github.com/repos/qookey109-pixel/crypto-autopilot/actions/artifacts/11579982145/zip' \
+            --output shadow-artifact.zip
+          test "$(stat -c %s shadow-artifact.zip)" -le 2097152
+          echo 'adcfc5e1382b1b248bae0e14f5a9acbd305c88b30fca7931dbcf0b0a2b6862df  shadow-artifact.zip' | sha256sum -c -
+      - name: Validate source, schema, hashes, coverage and as-of times
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import io
+          import json
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          class AuditError(Exception):
+              pass
+
+          def require(condition, reason):
+              if not condition:
+                  raise AuditError(reason)
+
+          def digest(value):
+              return hashlib.sha256(json.dumps(
+                  value, sort_keys=True, separators=(",", ":"), allow_nan=False
+              ).encode()).hexdigest()
+
+          def validate():
+              payload = Path("shadow-artifact.zip").read_bytes()
+              require(len(payload) <= 2097152, "ZIP_TOO_LARGE")
+              with ZipFile(io.BytesIO(payload)) as z:
+                  require(z.namelist() == ["report.json"], "ZIP_LAYOUT")
+                  require(z.getinfo("report.json").file_size <= 2097152, "JSON_TOO_LARGE")
+                  report = json.loads(z.read("report.json"))
+              require(isinstance(report, dict), "ROOT_SCHEMA")
+              require(report.get("schema") == "qookey-prospective-shadow-collection-execution-report-v0.1", "REPORT_SCHEMA")
+              require(report.get("status") == "PASS", "COLLECTOR_NOT_PASS")
+              run = report.get("github")
+              require(isinstance(run, dict), "RUN_METADATA_MISSING")
+              require(str(run.get("run_id")) == "37846141319" and str(run.get("run_attempt")) == "1", "RUN_ID_OR_ATTEMPT")
+              require(run.get("sha") == "cad0aea7273acc1cb1eaa138955b6381e30bd5a6", "RUN_SHA")
+              require(run.get("ref") == "refs/heads/main" and run.get("event_name") == "schedule", "RUN_CONTEXT")
+              counts = report.get("provider_requests")
+              require(isinstance(counts, dict), "COUNTS_MISSING")
+              require(tuple(counts.get(k) for k in ("pionex", "coinpaprika", "total")) == (8, 2, 10), "REQUEST_BUDGET")
+              guard = report.get("authority")
+              require(isinstance(guard, dict) and guard.get("artifact_only_persistence") is True, "ARTIFACT_ONLY")
+              forbidden = ("r2_accessed", "d1_accessed", "holdout_accessed", "training_performed",
+                           "model_promotion_performed", "paper_submission_performed",
+                           "real_money_order_performed", "live_trading_performed")
+              require(all(guard.get(k) is False for k in forbidden), "EXECUTION_AUTHORITY")
+              record = report.get("collection")
+              require(isinstance(record, dict) and record.get("schema") == "qookey-prospective-shadow-collection-run-v0.1", "COLLECTION_SCHEMA")
+              require(record.get("record_id") == digest({k: v for k, v in record.items() if k != "record_id"}), "COLLECTION_HASH")
+              capture = record.get("capture_timestamp_ms")
+              require(type(capture) is int and 1791494100000 <= capture <= 1791495000000, "CAPTURE_TIME_OUTSIDE_RUN")
+              market = record.get("market_evidence")
+              summary = record.get("universe_summary")
+              require(isinstance(market, list) and len(market) == 5 and isinstance(summary, dict), "MARKET_COVERAGE")
+              symbols = summary.get("top5_symbols")
+              require(isinstance(symbols, list) and len(symbols) == 5 and len(set(symbols)) == 5, "SYMBOL_COUNT")
+              require([r.get("symbol") for r in market] == symbols, "SYMBOL_LINEAGE")
+              require(isinstance(record.get("context_snapshot"), dict), "CONTEXT_MISSING")
+              regime = record.get("regime_observation_input")
+              require(isinstance(regime, dict) and regime.get("breadth_scope") == "TOP5_GOVERNED_SCAN_RESEARCH_PROXY", "REGIME_SCOPE")
+              require(regime.get("production_regime_equivalence_claimed") is False, "REGIME_AUTHORITY")
+              require(regime.get("time_ms") == capture and regime.get("available_at_ms") == capture, "REGIME_AVAILABILITY")
+              comparison = record.get("comparison_source")
+              require(isinstance(comparison, dict) and comparison.get("status") == "UNAVAILABLE", "COMPARISON_AUTHORITY")
+              replay = record.get("replay_state")
+              require(isinstance(replay, dict) and all(replay.get(k) is False for k in (
+                  "daily_opportunity_engine_v0_1_changed", "strategy_router_v0_1_changed",
+                  "signal_selection_performed_in_collector", "outcome_evaluation_performed_in_collector"
+              )), "RESEARCH_SCOPE")
+              lengths = []
+              for row in market:
+                  require(isinstance(row, dict), "INVALID_MARKET")
+                  candles = row.get("candles_60m")
+                  require(isinstance(candles, list) and 200 <= len(candles) <= 240, "CANDLE_COVERAGE")
+                  stamps = [c.get("time_ms") for c in candles]
+                  require(all(type(t) is int for t in stamps), "CANDLE_TIMESTAMP_TYPE")
+                  require(all(b - a == 3600000 for a, b in zip(stamps, stamps[1:])), "CANDLE_GAP")
+                  require(stamps[-1] + 3600000 <= capture, "UNCLOSED_CANDLE")
+                  require(row.get("candles_sha256") == digest(candles), "CANDLE_HASH")
+                  require(all(isinstance(row.get(k), dict) for k in (
+                      "technical", "structure", "patterns", "market_event_radar", "universe_market"
+                  )), "FEATURE_COVERAGE")
+                  for key in ("technical", "structure", "patterns"):
+                      available = row[key].get("available_at_ms")
+                      require(available is None or (type(available) is int and available <= capture), "LOOKAHEAD_FEATURE")
+                  lengths.append(len(candles))
+              authority = record.get("authority")
+              require(isinstance(authority, dict) and all(authority.get(k) is False for k in (
+                  *forbidden, "raw_provider_payload_persisted", "candidate_reranking_changed",
+                  "strategy_router_threshold_changed"
+              )), "COLLECTION_AUTHORITY")
+              print(json.dumps({
+                  "audit": "PASS", "run_id": 37846141319,
+                  "artifact_id": 11579982145, "top5_count": 5,
+                  "closed_60m_candles_per_market": lengths,
+                  "record_hash": "VERIFIED", "five_candle_hashes": "VERIFIED",
+                  "research_only": True
+              }, sort_keys=True))
+
+          try:
+              validate()
+          except AuditError as exc:
+              print("SHADOW_ARTIFACT_AUDIT=REVIEW_REQUIRED reason=" + str(exc))
+              raise SystemExit(1)
+          except Exception:
+              print("SHADOW_ARTIFACT_AUDIT=REVIEW_REQUIRED reason=UNEXPECTED_ERROR")
+              raise SystemExit(1)
+          PY
