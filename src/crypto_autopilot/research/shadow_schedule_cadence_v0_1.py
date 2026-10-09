@@ -79,7 +79,9 @@ def inspect_shadow_run_arrival_cadence(
             and item.get("head_branch") == "main"
             and item.get("status") == "completed"
             and item.get("conclusion") == "success"
-            and item.get("run_attempt") == 1,
+            and item.get("run_attempt") == 1
+            and item.get("job_name") == "collect"
+            and item.get("job_conclusion") == "success",
             "NOT_SUCCESSFUL_NATURAL_MAIN",
         )
         sha = item.get("head_sha")
