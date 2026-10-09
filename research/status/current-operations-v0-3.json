@@ -1,6 +1,6 @@
 {
   "schema": "qookey-current-operations-v0.3",
-  "updated_date": "2026-10-04",
+  "updated_date": "2026-10-09",
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
@@ -726,5 +726,43 @@
       "pages": "BUILD_SUCCESS_DEPLOY_AND_BROWSER_SKIPPED_CHANGE_FILTER",
       "is_latest_main_claim": false
     }
+  },
+  "vnext_delivery_checkpoint": {
+    "reviewed_date": "2026-10-09",
+    "evidence_basis_main_sha": "cad0aea7273acc1cb1eaa138955b6381e30bd5a6",
+    "is_latest_main_claim": false,
+    "work_order": "docs/VNEXT_DELIVERY_WORK_ORDER_2026_10_09.md",
+    "cloud_maintenance": {
+      "closed_stale_pr": 774,
+      "closed_head_sha": "2cfadff917a1878fd1f0db69f732871d79be5757",
+      "closed_unmerged": true,
+      "branch_preserved": true,
+      "last_run_id": 37866154083,
+      "result": "DELIVERY_BRANCH_NOT_AHEAD_OF_MAIN",
+      "next_natural_recovery": "PENDING"
+    },
+    "prospective_shadow": {
+      "run_id": 37846141319,
+      "attempt": 1,
+      "event": "schedule",
+      "head_sha": "cad0aea7273acc1cb1eaa138955b6381e30bd5a6",
+      "workflow_conclusion": "success",
+      "artifact_id": 11579982145,
+      "artifact_digest": "sha256:adcfc5e1382b1b248bae0e14f5a9acbd305c88b30fca7931dbcf0b0a2b6862df",
+      "content_validation": "UNVERIFIED"
+    },
+    "pages": {
+      "run_id": 37866154122,
+      "build": "success",
+      "deploy": "success",
+      "browser_production": "success"
+    },
+    "health": {
+      "run_id": 37866100224,
+      "result": "ALERT",
+      "alert_count": 1,
+      "failed_workflow": "binance-usdm-detailed-training-v0-1.yml"
+    },
+    "authority": false
   }
 }
