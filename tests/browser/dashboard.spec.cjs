@@ -92,7 +92,7 @@ test("VNext market research is clearly non-live and fits a 390px phone", async (
   await expect(researchContext).toHaveAttribute("open", "");
   await expect(researchContext).toContainText("5 個研究市場 · 非排名");
   await expect(researchContext).toContainText("REGIME_UNAVAILABLE");
-  await expect(researchContext).toContainText("Radar 研究");
+  await expect(researchContext).toContainText("研究 Radar");
   const bounds = await panel.boundingBox();
   expect(bounds).not.toBeNull();
   expect(bounds.x).toBeGreaterThanOrEqual(-1);
