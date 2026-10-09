@@ -1,0 +1,92 @@
+name: Shadow Existing Three-Batch Audit TEMP (Never Merge)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/shadow-existing-three-artifact-audit-temp.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit-existing-three:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+      - name: Download three existing research ZIPs from GitHub only
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for specification in \
+            '11561747502 01c0c62cff750a41a02e8f2d7dcf26c481327135cff8fcd38610874140a54891' \
+            '11579982145 adcfc5e1382b1b248bae0e14f5a9acbd305c88b30fca7931dbcf0b0a2b6862df' \
+            '11597884258 f4d98a6e46a904e0922d2740070b4f7073da9717621e60e8bb5d62921aad76d0'; do
+            read -r artifact_id expected_sha <<< "$specification"
+            curl --fail --silent --show-error --location --max-time 45 \
+              --proto '=https' --proto-redir '=https' \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header 'Accept: application/vnd.github+json' \
+              "https://api.github.com/repos/qookey109-pixel/crypto-autopilot/actions/artifacts/$artifact_id/zip" \
+              --output "artifact-$artifact_id.zip"
+            test "$(stat -c %s "artifact-$artifact_id.zip")" -le 2097152
+            printf '%s  artifact-%s.zip\n' "$expected_sha" "$artifact_id" | sha256sum -c -
+          done
+      - name: Validate embedded provenance and overlapping candles; report schedule gap
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH=src python - <<'PY'
+          import io
+          import json
+          from datetime import datetime
+          from pathlib import Path
+          from zipfile import ZipFile
+          from crypto_autopilot.research.prospective_shadow_continuity_v0_1 import inspect_shadow_batch_continuity
+
+          expected = (
+              (11561747502, 37802372751, "2026-10-08T15:38:05Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+              (11579982145, 37846141319, "2026-10-08T21:21:03Z", "cad0aea7273acc1cb1eaa138955b6381e30bd5a6"),
+              (11597884258, 37892197952, "2026-10-09T06:10:49Z", "3466235f4a706ae5ea953158ab75f0f346ff0699"),
+          )
+          reports = []
+          for artifact, run_id, created, original_main in expected:
+              raw = Path(f"artifact-{artifact}.zip").read_bytes()
+              assert 0 < len(raw) <= 2097152
+              with ZipFile(io.BytesIO(raw)) as archive:
+                  assert archive.namelist() == ["report.json"], "unexpected archive layout"
+                  assert archive.getinfo("report.json").file_size <= 2097152
+                  report = json.loads(archive.read("report.json"))
+              github = report.get("github", {})
+              assert github.get("run_id") == str(run_id), "run ID differs"
+              assert github.get("run_attempt") == "1", "run attempt differs"
+              assert github.get("sha") == original_main, "source main SHA differs"
+              assert github.get("event_name") == "schedule", "not a natural run"
+              assert github.get("ref") == "refs/heads/main", "not main"
+              capture_ms = report["collection"]["capture_timestamp_ms"]
+              created_ms = int(datetime.fromisoformat(created.replace("Z", "+00:00")).timestamp() * 1000)
+              assert created_ms - 180000 <= capture_ms <= created_ms + 180000, "run/capture mismatch"
+              reports.append(report)
+          diagnostic = inspect_shadow_batch_continuity(reports)
+          print("THREE_ORIGINAL_ZIP_SHA256_CHECKS=PASS")
+          print("THREE_EMBEDDED_GITHUB_IDENTITIES_AND_CAPTURE_BOUNDS=PASS")
+          print("THREE_REPORTS_CROSS_BATCH_DIAGNOSTIC=" + json.dumps(diagnostic, sort_keys=True))
+          assert diagnostic["report_count"] == 3
+          assert diagnostic["run_ids"] == [37802372751, 37846141319, 37892197952]
+          assert diagnostic["shared_overlapping_candles_consistent"] > 0
+          assert diagnostic["status"] in ("REVIEW_REQUIRED", "PARTIAL_OBSERVATION_ONLY")
+          assert diagnostic["context_warmup_state"] == "INSUFFICIENT"
+          assert diagnostic["full_schedule_coverage_proven"] is False
+          assert diagnostic["production_eligibility_proven"] is False
+          assert diagnostic["outcome_predictive_edge_proven"] is False
+          print("THREE_RUN_AUDIT=EVIDENCE_ONLY_NOT_PRODUCTION")
+          PY
