@@ -55,3 +55,13 @@ Delivery: required head/base/review/checks, main readback and applicable post-me
 P2: Clef shadow, selective Vibe-Trading references, richer derivatives/liquidity research, trading control panel, typing cleanup and large refactors do not block this delivery.
 
 All work stays 0 USD and PAPER/LIVE-PAPER ONLY. Consumed bootstrap/Billing/Usage authorities are not rerun. Frozen evidence, replacement holdout, source switch, automatic promotion and real-money/live trading retain their binding gates.
+
+## MMT free-terminal research reference
+
+The owner authorizes using the MMT free terminal as an external manual research tool. Homepage link: https://app.mmt.gg/. Reference functions include order flow, CVD, volume profile, liquidity and derivatives context; availability is subject to the user's free plan and provider terms.
+
+This integration is an outbound link only. It does not create an account, subscribe to a paid plan, request API credentials, fetch/embed/copy MMT data, install MCP, connect an exchange wallet, or execute orders. MMT API access is priced separately from its terminal and is excluded from this FREE-ONLY scope. Any future machine-data integration must independently establish access/redistribution rights, free quotas, source provenance, freshness and a merged versioned scope before execution.
+
+MMT is a research reference, not Pionex-native evidence or production strategy authority. Research observations do not automatically alter scores, risk limits, strategy eligibility or promotion.
+
+Official sources reviewed 2026-10-09: [features](https://mmt.gg/features/), [API pricing](https://mmt.gg/api/), [MCP](https://mmt.gg/mcp/).
