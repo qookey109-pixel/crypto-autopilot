@@ -749,7 +749,27 @@
       "workflow_conclusion": "success",
       "artifact_id": 11579982145,
       "artifact_digest": "sha256:adcfc5e1382b1b248bae0e14f5a9acbd305c88b30fca7931dbcf0b0a2b6862df",
-      "content_validation": "UNVERIFIED"
+      "content_validation": "VERIFIED_ONE_EXISTING_ARTIFACT_ONLY",
+      "content_audit": {
+        "event": "PR_ONLY_GITHUB_ACTIONS",
+        "audit_run_id": 37878449661,
+        "audit_pr_number": 777,
+        "audit_pr_state": "CLOSED_UNMERGED",
+        "audit_workflow_merged": false,
+        "result": "PASS",
+        "original_archive_sha256_verified": true,
+        "record_id_verified": true,
+        "candle_sha256_count_verified": 5,
+        "governed_markets_verified": 5,
+        "closed_60m_candles_per_market": 240,
+        "consecutive_closed_candles_verified": true,
+        "provenance_and_availability_verified": true,
+        "provider_request_count_verified": true,
+        "repeat_collection_performed": false,
+        "production_eligibility_proven": false,
+        "signal_predictive_edge_proven": false,
+        "execution_authority_granted": false
+      }
     },
     "pages": {
       "run_id": 37866154122,
