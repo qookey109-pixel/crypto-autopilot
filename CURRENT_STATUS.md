@@ -1,3 +1,9 @@
+## Core100 runtime-drift evidence — 2026-10-09 Asia/Taipei
+
+One-time training baseline run 36110721415 (2026-09-25) and scheduled comparison 37196295102 (2026-10-04) were compared **read-only** using their existing GitHub logs. GitHub Runner Image changed from `20260920.314.1` to `20260927.320.1`, while Python 3.13.15, listed project dependency versions, dataset fingerprint and runtime guard fingerprint matched. The frozen comparator incorporates `runner_image` in `runtime_manifest`, so the image change plausibly explains `RUNTIME_CHANGED`; full stored runtime manifests have not been field-diffed. Preserve `REVIEW_REQUIRED` and Core100 model-quality REJECT; **no rebaseline, rerun, new training, automatic acceptance or Health recovery**. Evidence and next review: [docs/CORE100_RUNTIME_CHANGED_FORENSICS_2026_10_09.md](docs/CORE100_RUNTIME_CHANGED_FORENSICS_2026_10_09.md).
+
+---
+
 ## Prospective Shadow existing-artifact content audit — 2026-10-09 Asia/Taipei
 
 Cloud-only read-only PR Actions [run 37878449661](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37878449661) verified the **existing** natural Shadow run [37846141319](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37846141319), artifact **11579982145**. The original archive SHA-256 matched `adcfc5e1382b1b248bae0e14f5a9acbd305c88b30fca7931dbcf0b0a2b6862df`. The collector schema, exact run/attempt/main SHA, research-only authority, collection record hash, five candle hashes, source-time bounds and 5 governed research markets × 240 consecutive closed 60M candles all passed the audit's explicit checks. This verifies **one stored research batch only**, not continuous completeness, source truth beyond recorded evidence, predictive edge, strategy qualification or Cloud Paper activation.
