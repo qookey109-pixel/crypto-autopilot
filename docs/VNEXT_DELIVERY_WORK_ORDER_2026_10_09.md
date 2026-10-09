@@ -65,3 +65,7 @@ This integration is an outbound link only. It does not create an account, subscr
 MMT is a research reference, not Pionex-native evidence or production strategy authority. Research observations do not automatically alter scores, risk limits, strategy eligibility or promotion.
 
 Official sources reviewed 2026-10-09: [features](https://mmt.gg/features/), [API pricing](https://mmt.gg/api/), [MCP](https://mmt.gg/mcp/).
+
+## Existing Shadow artifact audit — 2026-10-09
+
+The separate cloud-only GitHub Actions read-only audit [37878449661](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37878449661) passed for the pre-existing scheduled run 37846141319 / Artifact 11579982145: original ZIP SHA-256, report and collection identity, five market candle hashes, 5 × 240 consecutive closed 60M candles, record provenance, bounded availability, research-only scope and no collector rerun. This closes **single-artifact content integrity inspection**, not the multi-run research maturity or signal-outcome gate. Temporary [PR #777](https://github.com/qookey109-pixel/crypto-autopilot/pull/777) was closed without merge because a permanent new workflow would violate the frozen workflow inventory/classification without extra review; the audit observation remains available as run evidence. No new execution authority is granted.
