@@ -1,5 +1,16 @@
 # Prospective Shadow Cross-Batch Continuity V0.1 — Research-only Preparation
 
+## Actual existing two-Artifact audit — 2026-10-09 Asia/Taipei
+
+**Evidence:** [GitHub Actions run 37882460289](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37882460289) from temporary, **closed-unmerged** [PR #783](https://github.com/qookey109-pixel/crypto-autopilot/pull/783). The PR-only workflow used a read-only GitHub token to fetch **only** the previously recorded artifacts 11561747502 and 11579982145. ZIP SHA-256 matched the GitHub metadata digests for **both**. Embedded report Run IDs 37802372751 / 37846141319, attempts, schedule/main source SHA, and run/capture time bounds matched. The pure merged v0.1 validator accepted their 5-market/240-closed-60M-candle coverage, hashes, causality bounds and research-only authority, finding **936 identical overlapping candles**, no observed inter-capture gap over 6 hours, and maximum source lag **38 minutes**.
+
+**Interpretation:** `PARTIAL_OBSERVATION_ONLY` / `PASS_PARTIAL_ONLY_NOT_PRODUCTION`. Distinct context observations remain **2 of required 21** (`INSUFFICIENT`). The two captures do not prove every cron slot, continuous collection for 30–90 days, prospective future outcome measurement, strategy quality, execution readiness or any production `NO_TRADE`. The validator's stand-alone `source_archive_digests_authenticated=false` / `github_run_metadata_authenticated=false` are honest for caller-supplied JSON; the *surrounding temporary GitHub audit job* independently verified the original two ZIP digests and expected identities. These proof layers are not interchangeable.
+
+Temporary workflow PR #783 was deliberately **closed without merge**, so no extra scheduled or registered workflow was introduced to main and no convergence guard relaxed. No provider/API/Cloudflare/holdout access, R2/D1 write, train, promotion or trading occurred. This evidence may be projected read-only on the Dashboard but **does not authorize** real or Cloud Paper orders. Core100 quality remains REJECT and Cloud Paper NOT_WIRED / NOT_RUN / NOT_CONFIGURED.
+
+---
+
+
 **Date:** 2026-10-09 (Asia/Taipei). **Execution:** CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER. **Authority:** this batch is deterministic, pure and synthetic-tested only. No new GitHub workflow, provider call, GitHub artifact download, R2/D1, holdout, training, promotion or trading operation.
 
 ## Verified GitHub metadata versus content proof
