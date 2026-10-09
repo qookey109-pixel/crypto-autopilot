@@ -1,3 +1,13 @@
+## Prospective Shadow existing-artifact content audit — 2026-10-09 Asia/Taipei
+
+Cloud-only read-only PR Actions [run 37878449661](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37878449661) verified the **existing** natural Shadow run [37846141319](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/37846141319), artifact **11579982145**. The original archive SHA-256 matched `adcfc5e1382b1b248bae0e14f5a9acbd305c88b30fca7931dbcf0b0a2b6862df`. The collector schema, exact run/attempt/main SHA, research-only authority, collection record hash, five candle hashes, source-time bounds and 5 governed research markets × 240 consecutive closed 60M candles all passed the audit's explicit checks. This verifies **one stored research batch only**, not continuous completeness, source truth beyond recorded evidence, predictive edge, strategy qualification or Cloud Paper activation.
+
+The temporary audit [PR #777](https://github.com/qookey109-pixel/crypto-autopilot/pull/777) is **CLOSED_UNMERGED** after its read-only audit job PASS because introducing a new permanent workflow would require updating the governed workflow inventory and convergence classification (CI correctly rejected the unclassified workflow). No workflow guard was bypassed, and no permanent audit workflow, provider request, collector rerun, R2/D1 operation, holdout, training, promotion or trading authority was added. Preserve the audit run and PR as immutable observation evidence. The existing Shadow collection schedule is unchanged.
+
+Cloud Paper remains NOT_WIRED / NOT_RUN / NOT_CONFIGURED. Core100 remains REJECT and its historical RUNTIME_CHANGED alert is not cleared. Subsequent natural Health → Maintenance recovery remains pending separate evidence.
+
+---
+
 ## VNext delivery reconciliation — 2026-10-09 Asia/Taipei
 
 Reviewed parent main: `cad0aea7273acc1cb1eaa138955b6381e30bd5a6`; resolve live main before acting. The [VNext work order](docs/VNEXT_DELIVERY_WORK_ORDER_2026_10_09.md) records the complete product, website and acceptance sequence.
