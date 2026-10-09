@@ -417,7 +417,7 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
 
 
 
-def market_decision_panel(current: dict) -> str:
+def market_decision_panel(current: dict, root: Path = ROOT) -> str:
     """Expose only verified historical research coverage, never a trade recommendation."""
     checkpoint = current.get("vnext_delivery_checkpoint")
     shadow = checkpoint.get("prospective_shadow") if isinstance(checkpoint, dict) else None
@@ -591,6 +591,18 @@ def market_decision_panel(current: dict) -> str:
         ))
     )
 
+    cron_grid = None
+    if nine_verified:
+        try:
+            cron_grid = shadow_cron_grid_diagnostic(
+                read_json(SHADOW_GRID_RECEIPT, root),
+                read_json("config/prospective_shadow_collection_execution_v0_1.json", root),
+                nine["natural_run_ids"],
+            )
+        except (ValueError, OSError, TypeError, KeyError):
+            # Do not project unauthenticated slot identity or diagnostic state.
+            cron_grid = None
+
     production_disabled = (
         isinstance(gateway, dict)
         and gateway.get("entrypoint") == "NOT_WIRED"
@@ -708,6 +720,18 @@ def market_decision_panel(current: dict) -> str:
             " 九批研究 9/21 次背景觀測尚不足；5 段超過六小時的時序缺口"
             "尚未能歸因，不可宣稱完成連續暖機或產生正式 regime。"
         )
+        if cron_grid is not None:
+            context_detail += (
+                f" UTC 排程參考 {SHADOW_GRID_CRON}；在首末 Run 建立時間之間"
+                f"有 {cron_grid['nominal_reference_slots_between_first_last_created']}"
+                " 個理論時槽，不能據此認定漏跑數量。各 Run 建立時間距最近較早"
+                "的理論時槽約 "
+                f"{cron_grid['offset_from_latest_prior_reference_slot_min_minutes']}"
+                "–"
+                f"{cron_grid['offset_from_latest_prior_reference_slot_max_minutes']}"
+                " 分鐘；這不是已證實的 GitHub 排程延遲。缺少原定時槽 ID，"
+                "無法區分排程延遲、沒有觸發或收集端問題。"
+            )
         radar_detail += " 跨批資料一致性不代表價格方向或事件具預測能力。"
     elif three_verified:
         context_detail += (
@@ -759,7 +783,7 @@ def market_decision_panel(current: dict) -> str:
 
 def build(site: Path, root: Path = ROOT) -> None:
     summary, schedule, progress, web_current = overview(root)
-    market_panel = market_decision_panel(read_json(CURRENT_OPERATIONS, root))
+    market_panel = market_decision_panel(read_json(CURRENT_OPERATIONS, root), root)
     path = site / "index.html"
     content = path.read_text(encoding="utf-8")
     for label, replacement in (("OVERVIEW", summary), ("SCHEDULE", schedule)):
