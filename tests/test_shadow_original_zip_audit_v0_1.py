@@ -161,7 +161,8 @@ class PureExistingShadowZipAuditTests(unittest.TestCase):
     def test_cross_batch_revision_detected_even_if_rehashed(self):
         original = fixture(1)
         changed = copy.deepcopy(verify_existing_original_zip(*original))
-        candle = changed["collection"]["market_evidence"][0]["candles_60m"][-3]
+        # Later window has four newly closed hours; -8 is in the shared history.
+        candle = changed["collection"]["market_evidence"][0]["candles_60m"][-8]
         candle["close"] += 1
         market = changed["collection"]["market_evidence"][0]
         market["candles_sha256"] = canonical_digest(market["candles_60m"])
