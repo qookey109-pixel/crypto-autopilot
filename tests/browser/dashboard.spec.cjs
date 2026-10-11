@@ -119,20 +119,57 @@ test("VNext market research is clearly non-live and fits a 390px phone", async (
   }
 });
 
-test("served dashboard content hash matches the exact build", async ({ request, baseURL }) => {
-  const expected = process.env.PLAYWRIGHT_EXPECTED_CONTENT_HASH;
-  test.skip(!expected, "PLAYWRIGHT_EXPECTED_CONTENT_HASH is not set outside CI");
-  expect(expected).toMatch(/^[0-9a-f]{64}$/);
-
-  await expect.poll(async () => {
-    const url = new URL("data/content-hash.txt", baseURL);
-    url.searchParams.set("qa", String(Date.now()));
+async function probePublishedContentHash(request, baseURL) {
+  const url = new URL("data/content-hash.txt", baseURL);
+  url.searchParams.set("qa", String(Date.now()));
+  try {
     const response = await request.get(url.href, {
       headers: { "cache-control": "no-cache" },
     });
     if (!response.ok()) return `HTTP ${response.status()}`;
     return (await response.text()).trim();
-  }, {
+  } catch (error) {
+    // Transient GitHub Pages transport errors are NOT evidence of a matching
+    // deployed build. Keep the existing 30-second poll and exact-hash gate.
+    // Permission failures, malformed requests and all other errors still fail.
+    if (["ECONNRESET", "ECONNREFUSED", "ETIMEDOUT", "EAI_AGAIN", "socket hang up"].some(code => String(error).includes(code))) {
+      return "TRANSIENT_TRANSPORT_ERROR";
+    }
+    throw error;
+  }
+}
+
+test("content hash probe retries transient errors but cannot accept a wrong build", async () => {
+  const expected = "a".repeat(64);
+  const incorrect = "b".repeat(64);
+  let calls = 0;
+  const fakeRequest = {
+    get: async () => {
+      calls += 1;
+      if (calls === 1) throw new Error("apiRequestContext.get: read ECONNRESET");
+      if (calls === 2) return { ok: () => true, text: async () => incorrect };
+      return { ok: () => true, text: async () => expected };
+    },
+  };
+  await expect.poll(() => probePublishedContentHash(fakeRequest, "https://example.invalid/"), {
+    timeout: 5_000,
+    intervals: [10, 10],
+  }).toBe(expected);
+  expect(calls).toBe(3);
+  await expect(probePublishedContentHash({
+    get: async () => { throw new Error("UNEXPECTED_PERMISSION_DENIED"); },
+  }, "https://example.invalid/")).rejects.toThrow("UNEXPECTED_PERMISSION_DENIED");
+  expect(await probePublishedContentHash({
+    get: async () => ({ ok: () => false, status: () => 503 }),
+  }, "https://example.invalid/")).toBe("HTTP 503");
+});
+
+test("served dashboard content hash matches the exact build", async ({ request, baseURL }) => {
+  const expected = process.env.PLAYWRIGHT_EXPECTED_CONTENT_HASH;
+  test.skip(!expected, "PLAYWRIGHT_EXPECTED_CONTENT_HASH is not set outside CI");
+  expect(expected).toMatch(/^[0-9a-f]{64}$/);
+
+  await expect.poll(() => probePublishedContentHash(request, baseURL), {
     timeout: 30_000,
     intervals: [500, 1_000, 2_000],
   }).toBe(expected);
