@@ -207,7 +207,7 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertIn("15 個理論時槽", panel)
         self.assertIn("61–212 分鐘", panel)
         self.assertIn("這不是已證實的 GitHub 排程延遲", panel)
-        self.assertIn("15/21", panel)
+        self.assertIn("16/21", panel)
         self.assertNotIn("GitHub 排程延遲已證實", panel)
 
         changed = copy.deepcopy(original_receipt)
@@ -220,7 +220,7 @@ class DeliveryOverviewTests(unittest.TestCase):
 
         with patch.object(delivery, "read_json", mutated_reader):
             panel = delivery.market_decision_panel(current)
-        self.assertIn("十五批觀測需複核", panel)
+        self.assertIn("十六批觀測需複核", panel)
         self.assertNotIn("15 個理論時槽", panel)
         self.assertNotIn("61–212 分鐘", panel)
         self.assertIn("5 段", panel)
@@ -239,13 +239,14 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertIn("TOP5 breadth 僅為研究 proxy", panel)
         self.assertIn("Decision Trace", panel)
         self.assertIn("5 市場 × 240 根", panel)
-        self.assertIn("十五批觀測需複核 · 非即時", panel)
-        self.assertIn("十五批資料完整性 PASS，連續性 REVIEW_REQUIRED", panel)
-        self.assertIn("14,668 根重疊 K 線一致", panel)
-        self.assertIn("8 段", panel)
-        self.assertIn("15/21", panel)
+        self.assertIn("十六批觀測需複核 · 非即時", panel)
+        self.assertIn("十六批資料完整性 PASS，連續性 REVIEW_REQUIRED", panel)
+        self.assertIn("15,604 根重疊 K 線一致", panel)
+        self.assertIn("9 段", panel)
+        self.assertIn("16/21", panel)
         self.assertIn("37895797841", panel)
         self.assertIn("38105742124", panel)
+        self.assertIn("38117712031", panel)
         self.assertIn("37893825259", panel)
         self.assertIn("37882460289", panel)
         self.assertIn("NOT_RUN（非 NO_TRADE）", panel)
@@ -423,6 +424,71 @@ class DeliveryOverviewTests(unittest.TestCase):
         )
         panel = delivery.market_decision_panel(changed)
         self.assertIn("九批觀測需複核 · 非即時", panel)
+
+    def test_sixteen_shadow_evidence_fails_closed_to_verified_fifteen(self) -> None:
+        original = delivery.read_json(delivery.CURRENT_OPERATIONS)
+        self.assertIn("十六批觀測需複核 · 非即時",
+                      delivery.market_decision_panel(original))
+        for field, bad in (
+            ("status", "PASS"),
+            ("audit_run_id", 0),
+            ("temporary_pr_state", "MERGED"),
+            ("new_artifact_id", 2),
+            ("new_original_zip_sha256", "f" * 64),
+            ("consistent_overlap_candles", 15603),
+            ("observed_gaps_over_six_hours_count", 8),
+            ("new_observed_gap_minutes", 0),
+            ("cumulative_distinct_observations", 21),
+            ("maturity", "READY"),
+            ("continuity", "PASS"),
+            ("real_money_trading_authorized", True),
+            ("receipt_path", "missing.json"),
+        ):
+            with self.subTest(checkpoint=field):
+                changed = copy.deepcopy(original)
+                changed["vnext_delivery_checkpoint"]["prospective_shadow"][
+                    "sixteen_batch_audit"
+                ][field] = bad
+                panel = delivery.market_decision_panel(changed)
+                self.assertIn("十五批觀測需複核 · 非即時", panel)
+                self.assertIn("14,668 根重疊 K 線一致", panel)
+                self.assertIn("15/21", panel)
+                self.assertNotIn("16/21", panel)
+                self.assertNotIn("38117712031", panel)
+
+        receipt_path = original["vnext_delivery_checkpoint"]["prospective_shadow"][
+            "sixteen_batch_audit"
+        ]["receipt_path"]
+        original_reader = delivery.read_json
+        for section, field, bad in (
+            ("run_sixteen", "new_original_zip_sha256", "0" * 64),
+            ("run_sixteen", "adjacent_pair_overlap_validation_passed", False),
+            ("run_sixteen", "overlap_consistent_candles", 935),
+            ("run_sixteen", "temporary_pr_state", "MERGED"),
+            ("run_sixteen", "observed_gap_over_six_hours_minutes", 0),
+            ("cumulative", "verified_distinct_observations", 21),
+            ("cumulative", "continuity_state", "PASS"),
+            ("boundaries", "uninterrupted_collection_proven", True),
+            ("boundaries", "live_trading_authorized", True),
+        ):
+            with self.subTest(receipt=(section, field)):
+                def changed_reader(path, root=delivery.ROOT):
+                    val = copy.deepcopy(original_reader(path, root))
+                    if path == receipt_path:
+                        val[section][field] = bad
+                    return val
+
+                with patch.object(delivery, "read_json", changed_reader):
+                    panel = delivery.market_decision_panel(original)
+                self.assertIn("十五批觀測需複核 · 非即時", panel)
+                self.assertNotIn("16/21", panel)
+
+        changed = copy.deepcopy(original)
+        changed["vnext_delivery_checkpoint"]["prospective_shadow"].pop(
+            "sixteen_batch_audit"
+        )
+        panel = delivery.market_decision_panel(changed)
+        self.assertIn("十五批觀測需複核 · 非即時", panel)
 
     def test_dated_readiness_remains_historical_and_fail_closed(self) -> None:
         original = delivery.read_json
