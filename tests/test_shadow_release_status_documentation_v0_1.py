@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -74,6 +75,13 @@ def require_release_projection(
     overlaps = f"{totals['overlap_consistent_candles_across_15_adjacent_pairs']:,}"
     for path, text in documents.items():
         top = release_header(text)
+        # Every observation count in this top section must agree, not just
+        # one correct occurrence alongside a later corrupted duplicate.
+        observed_counts = set(re.findall(
+            rf"\\b\\d+/{totals['warmup_target_observations']}\\b", top,
+        ))
+        if observed_counts != {expected}:
+            raise ValueError("DOCUMENT_RELEASE_MISMATCH:" + path)
         required = (
             operations["updated_date"],
             f"main={RELEASE_MAIN}",
