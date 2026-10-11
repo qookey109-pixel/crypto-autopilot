@@ -693,6 +693,106 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
             # Neither absent nor modified evidence may silently increase coverage.
             fifteen_verified = False
 
+    sixteen = shadow.get("sixteen_batch_audit") if isinstance(shadow, dict) else None
+    expected_sixteen = {
+        "status": "REVIEW_REQUIRED_MULTIPLE_SOURCE_GAPS",
+        "receipt_path": "research/receipts/2026-10-11-shadow-sixteen-incremental-audit-v0-1.json",
+        "prior_fifteen_receipt_path": "research/receipts/2026-10-11-shadow-fifteen-incremental-audit-v0-1.json",
+        "audit_run_id": 38117712031,
+        "temporary_pr_number": 799,
+        "temporary_pr_state": "CLOSED_UNMERGED",
+        "bridge_run_id": 38095502539,
+        "new_run_id": 38116008986,
+        "new_artifact_id": 11693298438,
+        "new_original_zip_sha256": "39ed4318db20acd17f736e1d77c79c9d4babe668d07a91b1e625cb7ce52b61ab",
+        "cumulative_distinct_observations": 16,
+        "required_observations": 21,
+        "consistent_overlap_candles": 15604,
+        "observed_gaps_over_six_hours_count": 9,
+        "new_observed_gap_minutes": 374,
+        "maximum_source_lag_minutes": 55,
+        "continuity": "REVIEW_REQUIRED",
+        "maturity": "INSUFFICIENT",
+        "original_cron_slot_identity_proven": False,
+        "schedule_gap_root_cause_proven": False,
+        "continuous_collection_proven": False,
+        "production_eligibility_proven": False,
+        "model_promotion_authorized": False,
+        "paper_activated": False,
+        "real_money_trading_authorized": False,
+    }
+    sixteen_verified = False
+    if fifteen_verified and sixteen == expected_sixteen:
+        try:
+            receipt16 = read_json(expected_sixteen["receipt_path"], root)
+            prior16 = receipt16.get("prior_fifteen")
+            new16 = receipt16.get("run_sixteen")
+            cum16 = receipt16.get("cumulative")
+            bounds16 = receipt16.get("boundaries")
+            sixteen_verified = (
+                receipt16.get("schema") == "qookey-shadow-sixteen-authenticated-incremental-bridge-receipt-v0.1"
+                and receipt16.get("evidence_date") == "2026-10-11"
+                and receipt16.get("mode") == "READ_ONLY_EXISTING_GITHUB_ZIPS_ONLY"
+                and prior16 == {
+                    "evidence_receipt": expected_fifteen["receipt_path"],
+                    "verified_distinct_observations": 15,
+                    "overlap_consistent_candles": 14668,
+                    "observed_gaps_over_six_hours_count": 8,
+                    "max_source_lag_minutes": 55,
+                    "audit_runs": [37895797841, 38105742124],
+                }
+                and new16 == {
+                    "read_only_audit_run_id": 38117712031,
+                    "temporary_pr_number": 799,
+                    "temporary_pr_state": "CLOSED_UNMERGED",
+                    "verification_helper_pr": 798,
+                    "prior_bridge_run_id": 38095502539,
+                    "prior_bridge_artifact_id": 11684968889,
+                    "prior_bridge_zip_sha256": "81645faad3b2167a2cf50db1012898fd2aa576f0dcc593cce1370a26664c8153",
+                    "prior_bridge_created_at_utc": "2026-10-10T23:34:31Z",
+                    "new_run_id": 38116008986,
+                    "new_run_number": 16,
+                    "new_artifact_id": 11693298438,
+                    "new_original_zip_sha256": "39ed4318db20acd17f736e1d77c79c9d4babe668d07a91b1e625cb7ce52b61ab",
+                    "new_created_at_utc": "2026-10-11T05:48:56Z",
+                    "source_main_sha": "e0f742011ddb56f5f1325605f73f0868a3d81f47",
+                    "event": "schedule",
+                    "run_attempt": 1,
+                    "successful_collect_jobs_verified": True,
+                    "archive_sha256_and_original_rest_metadata_verified_by_outer_github_action": True,
+                    "singleton_report_hash_and_closed_candle_validation_passed": True,
+                    "adjacent_pair_overlap_validation_passed": True,
+                    "overlap_consistent_candles": 936,
+                    "observed_gap_over_six_hours_minutes": 374,
+                    "max_source_lag_in_pair_minutes": 49,
+                    "continuity_state": "REVIEW_REQUIRED",
+                }
+                and cum16 == {
+                    "verified_distinct_observations": 16,
+                    "warmup_target_observations": 21,
+                    "warmup_state": "INSUFFICIENT",
+                    "overlap_consistent_candles_across_15_adjacent_pairs": 15604,
+                    "gaps_over_six_hours_count": 9,
+                    "max_source_lag_minutes": 55,
+                    "continuity_state": "REVIEW_REQUIRED",
+                }
+                and isinstance(bounds16, dict)
+                and bounds16.get("prior_fifteen_receipt_unchanged") is True
+                and bounds16.get("source_archive_authenticated_by_outer_workflow_only") is True
+                and all(bounds16.get(key) is False for key in (
+                    "original_scheduled_slot_identity_authenticated",
+                    "skipped_trigger_or_github_queue_delay_root_cause_proven",
+                    "uninterrupted_collection_proven",
+                    "strategy_predictive_edge_proven",
+                    "model_promotion_authorized", "cloud_paper_activated",
+                    "live_trading_authorized", "provider_or_cloudflare_called_by_audit",
+                    "cron_changed",
+                ))
+            )
+        except (OSError, ValueError, TypeError, AttributeError, KeyError):
+            # Invalid new evidence retains the last independently verified 15.
+            sixteen_verified = False
+
     cron_grid = None
     if nine_verified:
         try:
@@ -882,6 +982,35 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
           ("兩批研究驗證 PASS（僅完整性）" if cross_verified else
            ("單批資料驗證 PASS" if verified else "UNKNOWN"))))
     )
+    if sixteen_verified:
+        pulse_label = "十六批觀測需複核 · 非即時"
+        pulse = (
+            "已獨立核實 16 批 GitHub 自然排程 Shadow 研究資料；"
+            "各批 5 市場 × 240 根 60M 已收盤 K 線，"
+            "跨 15 組相鄰批次合計 15,604 根重疊 K 線一致；最大來源延遲 55 分鐘。"
+            "9 段實際收集間隔超過六小時（最新新增 374 分鐘），"
+            "連續性 REVIEW_REQUIRED；背景暖機 16/21 尚不足且不連續。"
+            "原定 Cron 時槽、是否漏觸發及原因均 UNKNOWN；不能推定交易資格或獲利。"
+        )
+        execution_source = (
+            "已核實 16 次自然研究觀測（2026-10-06 至 10-11）；"
+            "九批 #37895797841 ＋ 六批 #38105742124 ＋ 第十六批 #38117712031"
+        )
+        evidence += (
+            ' · <a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/'
+            '38117712031" target="_blank" rel="noopener noreferrer">'
+            '第十六批原始 ZIP 驗證 Run #38117712031（新增 374 分鐘缺口）↗</a>'
+        )
+        context_detail = context_detail.replace(
+            "十五批研究 15/21 次背景觀測尚不足；8 段超過六小時的時序缺口",
+            "十六批研究 16/21 次背景觀測尚不足；9 段超過六小時的時序缺口",
+        ).replace(
+            "上述 15 個觀測數與舊九批 UTC 理論時槽診斷採不同範圍",
+            "上述 16 個觀測數與舊九批 UTC 理論時槽診斷採不同範圍",
+        )
+        trace_evidence = (
+            "十六批資料完整性 PASS，連續性 REVIEW_REQUIRED（9 段缺口）"
+        )
     return f"""      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
         <div class="vnext-evidence-head">
           <div><p class="card-kicker">MARKET INTELLIGENCE / RESEARCH-ONLY</p>
