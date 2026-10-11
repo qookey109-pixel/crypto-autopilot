@@ -1,0 +1,137 @@
+name: Shadow Six New Existing ZIPs Audit TEMP (Never Merge)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/shadow-six-new-artifacts-readonly-audit-temp.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  verify-existing-only:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+      - name: Read original GitHub metadata and seven already-created archives, no collection
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for specification in \
+            '37892197952 11597884258 f4d98a6e46a904e0922d2740070b4f7073da9717621e60e8bb5d62921aad76d0' \
+            '37950817788 11625946588 73afbf16ae4b8b48f78af121127a5dc7cbfe709b3e5bab1775439e892f41c62b' \
+            '37990196700 11644831928 7eea75326726834afc5965608193f03525f8dfb26e1d3ed732a54c059694004c' \
+            '38029103490 11660849983 b4ef68041a99a6505bee2222ebd505f436ade108a80938a2ab02b0e8360e321c' \
+            '38059744280 11673205237 0c04802496a92b9011d17904aac4a9e0ee0c8b349721e1898d800fad25fc0967' \
+            '38082311705 11680538139 a1f361f915769868adbe359c4203d983a0a6818aa470a2c1ab81d2e8f390c3d4' \
+            '38095502539 11684968889 81645faad3b2167a2cf50db1012898fd2aa576f0dcc593cce1370a26664c8153'; do
+            read -r run_id artifact_id expected_digest <<< "$specification"
+            for uri in "actions/runs/$run_id" "actions/runs/$run_id/jobs"; do
+              target="metadata-$run_id.json"
+              case "$uri" in */jobs) target="jobs-$run_id.json";; esac
+              curl --fail --silent --show-error --location --max-time 45 \
+                --proto '=https' --proto-redir '=https' \
+                --header "Authorization: Bearer $GH_TOKEN" \
+                --header 'Accept: application/vnd.github+json' \
+                "https://api.github.com/repos/qookey109-pixel/crypto-autopilot/$uri" \
+                --output "$target"
+              test "$(stat -c %s "$target")" -le 2097152
+            done
+            curl --fail --silent --show-error --location --max-time 60 \
+              --proto '=https' --proto-redir '=https' \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header 'Accept: application/vnd.github+json' \
+              "https://api.github.com/repos/qookey109-pixel/crypto-autopilot/actions/artifacts/$artifact_id/zip" \
+              --output "shadow-$artifact_id.zip"
+            test "$(stat -c %s "shadow-$artifact_id.zip")" -le 2097152
+            printf '%s  shadow-%s.zip\n' "$expected_digest" "$artifact_id" | sha256sum -c -
+          done
+      - name: Authenticate seven ZIPs, six novel reports, and five new cross-run boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH=src python - <<'PY'
+          import io
+          import json
+          from datetime import datetime, timezone
+          from pathlib import Path
+          from zipfile import ZipFile
+          from crypto_autopilot.research.prospective_shadow_continuity_v0_1 import (
+              inspect_shadow_batch_continuity,
+          )
+
+          # Previous authenticated #9 is only a bridge to six NEW natural runs (#10–15).
+          specs = (
+              (37892197952, 11597884258, "2026-10-09T06:10:49Z", "3466235f4a706ae5ea953158ab75f0f346ff0699", 9),
+              (37950817788, 11625946588, "2026-10-09T15:19:03Z", "e0f742011ddb56f5f1325605f73f0868a3d81f47", 10),
+              (37990196700, 11644831928, "2026-10-09T20:55:26Z", "e0f742011ddb56f5f1325605f73f0868a3d81f47", 11),
+              (38029103490, 11660849983, "2026-10-10T05:54:39Z", "e0f742011ddb56f5f1325605f73f0868a3d81f47", 12),
+              (38059744280, 11673205237, "2026-10-10T14:28:32Z", "e0f742011ddb56f5f1325605f73f0868a3d81f47", 13),
+              (38082311705, 11680538139, "2026-10-10T20:04:38Z", "e0f742011ddb56f5f1325605f73f0868a3d81f47", 14),
+              (38095502539, 11684968889, "2026-10-10T23:34:31Z", "e0f742011ddb56f5f1325605f73f0868a3d81f47", 15),
+          )
+          reports = []
+          for run_id, artifact_id, created, source_sha, run_number in specs:
+              metadata = json.loads(Path(f"metadata-{run_id}.json").read_text())
+              assert metadata["id"] == run_id and metadata["run_number"] == run_number
+              assert metadata["name"] == "Prospective Shadow Collection V0.1"
+              assert metadata["path"] == ".github/workflows/prospective-shadow-collection-v0-1.yml"
+              assert metadata["event"] == "schedule"
+              assert metadata["status"] == "completed" and metadata["conclusion"] == "success"
+              assert metadata["head_branch"] == "main" and metadata["head_sha"] == source_sha
+              assert metadata["run_attempt"] == 1 and metadata["created_at"] == created
+              jobs = json.loads(Path(f"jobs-{run_id}.json").read_text())["jobs"]
+              assert len([x for x in jobs if x.get("name") == "collect" and x.get("conclusion") == "success"]) == 1, "NO_SUCCESSFUL_COLLECT_JOB"
+              raw = Path(f"shadow-{artifact_id}.zip").read_bytes()
+              assert 0 < len(raw) <= 2097152
+              with ZipFile(io.BytesIO(raw)) as z:
+                  assert z.namelist() == ["report.json"], "UNEXPECTED_ARCHIVE_ENTRIES"
+                  info = z.getinfo("report.json")
+                  assert info.file_size <= 2097152 and not (info.flag_bits & 1)
+                  report = json.loads(z.read("report.json"))
+              gh = report.get("github", {})
+              assert gh.get("run_id") == str(run_id)
+              assert gh.get("run_attempt") == "1"
+              assert gh.get("sha") == source_sha and gh.get("event_name") == "schedule"
+              assert gh.get("ref") == "refs/heads/main"
+              stamp = int(datetime.fromisoformat(created.replace("Z", "+00:00")).timestamp() * 1000)
+              capture = report["collection"]["capture_timestamp_ms"]
+              assert stamp - 180000 <= capture <= stamp + 180000, "RUN_CAPTURE_PROVENANCE_MISMATCH"
+              d = inspect_shadow_batch_continuity([report])
+              assert d["report_count"] == 1 and d["execution_authority"] is False
+              assert d["context_warmup_state"] == "INSUFFICIENT"
+              reports.append(report)
+              print("AUTHENTICATED_RUN", run_number, run_id, artifact_id)
+          assert len(reports) == 7
+          pairs = []
+          for earlier, later in zip(reports, reports[1:]):
+              d = inspect_shadow_batch_continuity([earlier, later])
+              pairs.append({
+                  "runs": [int(earlier["github"]["run_id"]), int(later["github"]["run_id"])],
+                  "status": d["status"],
+                  "consistent_overlaps": d["shared_overlapping_candles_consistent"],
+                  "gaps": d["observed_gaps"],
+              })
+          combined = inspect_shadow_batch_continuity(reports)
+          assert combined["report_count"] == 7
+          assert combined["production_eligibility_proven"] is False
+          assert combined["full_schedule_coverage_proven"] is False
+          assert combined["execution_authority"] is False
+          assert len(pairs) == 6
+          print("SIX_NEW_ARCHIVE_HASHES_AND_PROVENANCE=PASS")
+          print("SIX_NEW_SINGLETONS_AND_SIX_ADJACENT_PAIRS=PASS")
+          print("SIX_NEW_PAIRS=" + json.dumps(pairs, sort_keys=True))
+          print("BRIDGE_PLUS_SIX_NEW_DIAGNOSTIC=" + json.dumps(combined, sort_keys=True))
+          print("PRIOR_NINE_INDEPENDENT_AUDIT_RUN=37895797841")
+          print("NO_COLLECTION_CRON_CHANGE_OR_TRADING_AUTHORITY=PASS")
+          PY
