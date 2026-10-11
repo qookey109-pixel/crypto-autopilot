@@ -78,7 +78,7 @@ def require_release_projection(
         # Every observation count in this top section must agree, not just
         # one correct occurrence alongside a later corrupted duplicate.
         observed_counts = set(re.findall(
-            rf"\\b\\d+/{totals['warmup_target_observations']}\\b", top,
+            rf"\b\d+/{totals['warmup_target_observations']}\b", top,
         ))
         if observed_counts != {expected}:
             raise ValueError("DOCUMENT_RELEASE_MISMATCH:" + path)
