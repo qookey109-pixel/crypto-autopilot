@@ -373,6 +373,46 @@ def guard_main(api, expected, phase):
     require(api.main() == expected, phase)
 
 
+def preflight_existing_delivery_draft(api, main):
+    """Read-only stale-draft gate; never rebase, close, merge or update refs.
+
+    A stale bot draft cannot be published by the existing strict compare guard.
+    Surface it during the read-only inspect job instead of starting a doomed
+    permissioned publish job. A later publish must still recheck independently.
+    """
+    candidates = [
+        pr for pr in api.pages("/pulls", params={"state": "open", "base": "main"})
+        if pr["head"]["ref"].startswith(PREFIX)
+    ]
+    require(len(candidates) <= 1, "MULTIPLE_MAINTENANCE_PRS")
+    if not candidates:
+        return None
+
+    pr = candidates[0]
+    require(
+        pr["draft"] is True
+        and pr["user"]["login"] == "github-actions[bot]"
+        and pr["head"]["repo"]["full_name"] == REPOSITORY,
+        "MANUAL_EDIT_DETECTED",
+    )
+    branch = pr["head"]["ref"]
+    ref = api.request("GET", f"/git/ref/heads/{branch}", missing_ok=True)
+    require(ref is not None, "BRANCH_CHANGED")
+    head = ref["object"]["sha"]
+    require(pr["head"]["sha"] == head, "BRANCH_CHANGED")
+    if head == main:
+        return None
+    comparison = api.request("GET", f"/compare/{main}...{head}")
+    require(isinstance(comparison, dict), "UNKNOWN_COMPARE")
+    if (
+        comparison.get("status") != "ahead"
+        or comparison.get("behind_by") != 0
+        or comparison.get("merge_base_commit", {}).get("sha") != main
+    ):
+        return {"status": "STALE_DRAFT_REVIEW_REQUIRED", "pr": pr["number"]}
+    return None
+
+
 def publish(api, record):
     main = record["evidence"]["main_sha"]
     base_docs = {p: api.file(p, main) for p in TARGETS}
