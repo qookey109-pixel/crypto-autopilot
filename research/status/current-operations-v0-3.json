@@ -967,6 +967,30 @@
         "replay_backfill_authorized": false,
         "production_readiness_proven": false,
         "cloud_paper_or_live_authorized": false
+      },
+      "fifteen_batch_audit": {
+        "status": "REVIEW_REQUIRED_MULTIPLE_SOURCE_GAPS",
+        "receipt_path": "research/receipts/2026-10-11-shadow-fifteen-incremental-audit-v0-1.json",
+        "prior_nine_audit_run_id": 37895797841,
+        "six_new_audit_run_id": 38105742124,
+        "six_new_temp_pr_number": 794,
+        "six_new_temp_pr_state": "CLOSED_UNMERGED",
+        "previous_report_count": 9,
+        "incremental_report_count": 6,
+        "cumulative_distinct_observations": 15,
+        "required_observations": 21,
+        "consistent_overlap_candles": 14668,
+        "observed_gaps_over_six_hours_count": 8,
+        "maximum_source_lag_minutes": 55,
+        "continuity": "REVIEW_REQUIRED",
+        "maturity": "INSUFFICIENT",
+        "original_cron_slot_identity_proven": false,
+        "schedule_gap_root_cause_proven": false,
+        "continuous_collection_proven": false,
+        "production_eligibility_proven": false,
+        "model_promotion_authorized": false,
+        "paper_activated": false,
+        "real_money_trading_authorized": false
       }
     },
     "pages": {
