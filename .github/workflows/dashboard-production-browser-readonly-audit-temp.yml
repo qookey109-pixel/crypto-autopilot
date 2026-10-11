@@ -1,0 +1,61 @@
+name: TEMP Read-Only Deployed Dashboard Browser QA (Never Merge)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/dashboard-production-browser-readonly-audit-temp.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live-existing-only:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: a7ee3e951d1d1f1e02e58a62c7951ea1ca5763db
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+      - name: Install pinned Playwright (no provider / Cloudflare clients)
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Read existing published hash and fail closed on mismatch
+        env:
+          PAGE_URL: https://qookey109-pixel.github.io/crypto-autopilot/
+          EXPECTED_SHA256: 8adddf2504a59fdd13661bdcdcf764be0c3ad58b9f73298b1935ffb3732ade83
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 10); do
+            if curl --fail --silent --show-error --max-time 15 "${PAGE_URL}data/content-hash.txt?verified=${GITHUB_RUN_ID}" > observed-hash.txt; then
+              observed="$(tr -d '\r\n' < observed-hash.txt)"
+              if [[ "${observed}" == "${EXPECTED_SHA256}" ]]; then
+                echo "PUBLISHED_EXACT_CONTENT_HASH=PASS"
+                exit 0
+              fi
+              echo "PUBLISHED_EXACT_CONTENT_HASH_MISMATCH"
+              exit 1
+            fi
+            sleep 2
+          done
+          echo "PUBLISHED_HASH_UNAVAILABLE"
+          exit 1
+      - name: Validate real published website (desktop/mobile, exact hash, no collection)
+        env:
+          PLAYWRIGHT_BASE_URL: https://qookey109-pixel.github.io/crypto-autopilot/
+          PLAYWRIGHT_EXPECTED_CONTENT_HASH: 8adddf2504a59fdd13661bdcdcf764be0c3ad58b9f73298b1935ffb3732ade83
+        run: npx playwright test --workers=1
+      - name: Upload QA failure trace (only on failure)
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0 # v7
+        with:
+          name: temp-browser-production-qa-${{ github.run_id }}
+          path: playwright-results
+          retention-days: 7
+          if-no-files-found: ignore
