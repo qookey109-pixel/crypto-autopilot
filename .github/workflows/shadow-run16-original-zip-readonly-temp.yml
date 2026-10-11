@@ -1,0 +1,95 @@
+name: Shadow Run16 Original ZIP Read-Only Audit TEMP (Never Merge)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/shadow-run16-original-zip-readonly-temp.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  existing-only:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+      - name: Download only existing GitHub metadata and original ZIPs 15-16
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for spec in \
+            '38095502539 11684968889 81645faad3b2167a2cf50db1012898fd2aa576f0dcc593cce1370a26664c8153' \
+            '38116008986 11693298438 39ed4318db20acd17f736e1d77c79c9d4babe668d07a91b1e625cb7ce52b61ab'; do
+            read -r run artifact digest <<< "$spec"
+            for endpoint in "actions/runs/$run" "actions/runs/$run/jobs" "actions/artifacts/$artifact"; do
+              name="run-$run.json"
+              case "$endpoint" in */jobs) name="jobs-$run.json";; */artifacts/*) name="artifact-$run.json";; esac
+              curl --fail --silent --show-error --location --max-time 45 \
+                --proto '=https' --proto-redir '=https' \
+                --header "Authorization: Bearer $GH_TOKEN" \
+                --header 'Accept: application/vnd.github+json' \
+                "https://api.github.com/repos/qookey109-pixel/crypto-autopilot/$endpoint" \
+                --output "$name"
+              test "$(stat -c %s "$name")" -le 2097152
+            done
+            curl --fail --silent --show-error --location --max-time 60 \
+              --proto '=https' --proto-redir '=https' \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header 'Accept: application/vnd.github+json' \
+              "https://api.github.com/repos/qookey109-pixel/crypto-autopilot/actions/artifacts/$artifact/zip" \
+              --output "archive-$run.zip"
+            test "$(stat -c %s "archive-$run.zip")" -le 2097152
+            printf '%s  archive-%s.zip\n' "$digest" "$run" | sha256sum --check --status
+          done
+      - name: Verify exact source identities and pair continuity with reusable helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH=src python - <<'PY'
+          import json
+          from pathlib import Path
+          from crypto_autopilot.research.shadow_original_zip_audit_v0_1 import audit_existing_original_zip_batch
+
+          specs = [
+              (38095502539, 15, 11684968889, "2026-10-10T23:34:31Z",
+               "81645faad3b2167a2cf50db1012898fd2aa576f0dcc593cce1370a26664c8153"),
+              (38116008986, 16, 11693298438, "2026-10-11T05:48:56Z",
+               "39ed4318db20acd17f736e1d77c79c9d4babe668d07a91b1e625cb7ce52b61ab"),
+          ]
+          data = []
+          for run_id, number, artifact_id, created, zip_digest in specs:
+              expect = {
+                  "run_id": run_id, "run_number": number,
+                  "artifact_id": artifact_id,
+                  "created_at_utc": created,
+                  "head_sha": "e0f742011ddb56f5f1325605f73f0868a3d81f47",
+                  "zip_sha256": zip_digest,
+              }
+              run = json.loads(Path(f"run-{run_id}.json").read_text())
+              artifact = json.loads(Path(f"artifact-{run_id}.json").read_text())
+              jobs = json.loads(Path(f"jobs-{run_id}.json").read_text())["jobs"]
+              raw = Path(f"archive-{run_id}.zip").read_bytes()
+              data.append((raw, expect, run, artifact, jobs))
+          out = audit_existing_original_zip_batch(data)
+          assert out["report_count"] == 2
+          assert out["github_source_metadata_independently_authenticated"] is False
+          assert out["production_eligibility_proven"] is False
+          assert out["execution_authority"] is False
+          pair = out["continuity"]
+          assert pair["run_ids"] == [38095502539, 38116008986]
+          assert pair["shared_overlapping_candles_consistent"] > 0
+          print("ORIGINAL_ZIP_SHA256_VS_TRUSTED_GITHUB_REST_AND_SOURCE_LINEAGE=PASS")
+          print("RUN_16_EXISTING_ONLY_SINGLETON_AND_RUN15_BRIDGE=PASS")
+          print("PAIR_DIAGNOSTIC=" + json.dumps(pair, sort_keys=True))
+          print("NO_PROVIDER_NO_COLLECTION_NO_CRON_NO_R2_D1_NO_TRADING=PASS")
+          PY
