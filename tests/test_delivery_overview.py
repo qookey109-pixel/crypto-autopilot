@@ -207,7 +207,7 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertIn("15 個理論時槽", panel)
         self.assertIn("61–212 分鐘", panel)
         self.assertIn("這不是已證實的 GitHub 排程延遲", panel)
-        self.assertIn("9/21", panel)
+        self.assertIn("15/21", panel)
         self.assertNotIn("GitHub 排程延遲已證實", panel)
 
         changed = copy.deepcopy(original_receipt)
@@ -220,7 +220,7 @@ class DeliveryOverviewTests(unittest.TestCase):
 
         with patch.object(delivery, "read_json", mutated_reader):
             panel = delivery.market_decision_panel(current)
-        self.assertIn("九批觀測需複核", panel)
+        self.assertIn("十五批觀測需複核", panel)
         self.assertNotIn("15 個理論時槽", panel)
         self.assertNotIn("61–212 分鐘", panel)
         self.assertIn("5 段", panel)
@@ -239,12 +239,13 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertIn("TOP5 breadth 僅為研究 proxy", panel)
         self.assertIn("Decision Trace", panel)
         self.assertIn("5 市場 × 240 根", panel)
-        self.assertIn("九批觀測需複核 · 非即時", panel)
-        self.assertIn("九批資料完整性 PASS，連續性 REVIEW_REQUIRED", panel)
-        self.assertIn("8,604 根重疊 K 線一致", panel)
-        self.assertIn("5 段", panel)
-        self.assertIn("9/21", panel)
+        self.assertIn("十五批觀測需複核 · 非即時", panel)
+        self.assertIn("十五批資料完整性 PASS，連續性 REVIEW_REQUIRED", panel)
+        self.assertIn("14,668 根重疊 K 線一致", panel)
+        self.assertIn("8 段", panel)
+        self.assertIn("15/21", panel)
         self.assertIn("37895797841", panel)
+        self.assertIn("38105742124", panel)
         self.assertIn("37893825259", panel)
         self.assertIn("37882460289", panel)
         self.assertIn("NOT_RUN（非 NO_TRADE）", panel)
@@ -370,6 +371,58 @@ class DeliveryOverviewTests(unittest.TestCase):
         panel = delivery.market_decision_panel(changed)
         self.assertIn("正式 Paper 執行狀態 UNKNOWN", panel)
         self.assertNotIn("NOT_RUN（非 NO_TRADE）", panel)
+
+    def test_fifteen_shadow_evidence_invalid_falls_back_to_nine(self) -> None:
+        original = delivery.read_json(delivery.CURRENT_OPERATIONS)
+        for field, invalid in (
+            ("status", "PASS"),
+            ("cumulative_distinct_observations", 21),
+            ("consistent_overlap_candles", 14667),
+            ("observed_gaps_over_six_hours_count", 0),
+            ("receipt_path", "nonexistent.json"),
+            ("six_new_audit_run_id", 0),
+            ("maturity", "COMPLETE"),
+            ("continuous_collection_proven", True),
+            ("paper_activated", True),
+        ):
+            with self.subTest(shadow15_field=field):
+                changed = copy.deepcopy(original)
+                changed["vnext_delivery_checkpoint"]["prospective_shadow"][
+                    "fifteen_batch_audit"
+                ][field] = invalid
+                panel = delivery.market_decision_panel(changed)
+                self.assertIn("九批觀測需複核 · 非即時", panel)
+                self.assertIn("8,604 根重疊 K 線一致", panel)
+                self.assertNotIn("14,668 根重疊 K 線一致", panel)
+                self.assertNotIn("38105742124", panel)
+
+        receipt_path = original["vnext_delivery_checkpoint"]["prospective_shadow"][
+            "fifteen_batch_audit"
+        ]["receipt_path"]
+        real_read_json = delivery.read_json
+        for key, value in (
+            ("original_zip_sha256", ["0" * 64] * 6),
+            ("new_adjacent_overlaps_consistent", 1),
+            ("status", "PASS"),
+        ):
+            with self.subTest(receipt_key=key):
+                def mutated_read(path, root=delivery.ROOT):
+                    result = copy.deepcopy(real_read_json(path, root))
+                    if path == receipt_path:
+                        result["new_six_audit"][key] = value
+                    return result
+
+                with patch.object(delivery, "read_json", mutated_read):
+                    panel = delivery.market_decision_panel(original)
+                self.assertIn("九批觀測需複核 · 非即時", panel)
+                self.assertNotIn("15/21", panel)
+
+        changed = copy.deepcopy(original)
+        changed["vnext_delivery_checkpoint"]["prospective_shadow"].pop(
+            "fifteen_batch_audit"
+        )
+        panel = delivery.market_decision_panel(changed)
+        self.assertIn("九批觀測需複核 · 非即時", panel)
 
     def test_dated_readiness_remains_historical_and_fail_closed(self) -> None:
         original = delivery.read_json
