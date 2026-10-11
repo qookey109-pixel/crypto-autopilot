@@ -403,11 +403,17 @@ def preflight_existing_delivery_draft(api, main):
     if head == main:
         return None
     comparison = api.request("GET", f"/compare/{main}...{head}")
-    require(isinstance(comparison, dict), "UNKNOWN_COMPARE")
+    require(
+        isinstance(comparison, dict)
+        and isinstance(comparison.get("status"), str)
+        and type(comparison.get("behind_by")) is int
+        and isinstance(comparison.get("merge_base_commit"), dict),
+        "UNKNOWN_COMPARE",
+    )
     if (
-        comparison.get("status") != "ahead"
-        or comparison.get("behind_by") != 0
-        or comparison.get("merge_base_commit", {}).get("sha") != main
+        comparison["status"] != "ahead"
+        or comparison["behind_by"] != 0
+        or comparison["merge_base_commit"].get("sha") != main
     ):
         return {"status": "STALE_DRAFT_REVIEW_REQUIRED", "pr": pr["number"]}
     return None
