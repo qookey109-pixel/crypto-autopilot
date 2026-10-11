@@ -132,7 +132,7 @@ async function probePublishedContentHash(request, baseURL) {
     // Transient GitHub Pages transport errors are NOT evidence of a matching
     // deployed build. Keep the existing 30-second poll and exact-hash gate.
     // Permission failures, malformed requests and all other errors still fail.
-    if (/\\b(?:ECONNRESET|ECONNREFUSED|ETIMEDOUT|EAI_AGAIN)\\b|socket hang up/i.test(String(error))) {
+    if (["ECONNRESET", "ECONNREFUSED", "ETIMEDOUT", "EAI_AGAIN", "socket hang up"].some(code => String(error).includes(code))) {
       return "TRANSIENT_TRANSPORT_ERROR";
     }
     throw error;
