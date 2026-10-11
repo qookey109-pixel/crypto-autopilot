@@ -115,6 +115,8 @@ def verify_existing_original_zip(
                      "ZIP_CONTENT_BOUND")
             _require(not info.is_dir(), "ZIP_LAYOUT")
             report = json.loads(zipped.read("report.json").decode("utf-8"))
+    except OriginalZipReviewRequired:
+        raise
     except (BadZipFile, UnicodeError, json.JSONDecodeError, RuntimeError,
             OSError, OverflowError, ValueError, EOFError):
         raise OriginalZipReviewRequired("ZIP_REPORT_UNREADABLE") from None
