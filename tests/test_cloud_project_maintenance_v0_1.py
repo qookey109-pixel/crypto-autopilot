@@ -243,6 +243,30 @@ class PureMaintenanceTests(unittest.TestCase):
             )
         self.assertEqual(api.writes, [])
 
+    def test_inspector_preflight_rejects_malformed_compare_without_writes(self):
+        api = PublishAPI()
+        publish(api, record())
+        api.writes.clear()
+        original_request = api.request
+
+        for payload in (
+            None,
+            {"status": "ahead", "behind_by": 0, "merge_base_commit": None},
+            {"status": "ahead", "behind_by": "0",
+             "merge_base_commit": {"sha": A}},
+            {"status": "ahead", "behind_by": 0},
+        ):
+            def malformed_compare(method, path, data=None, **kwargs):
+                if method == "GET" and path.startswith("/compare/"):
+                    return payload
+                return original_request(method, path, data, **kwargs)
+
+            with self.subTest(payload=payload), patch.object(
+                api, "request", side_effect=malformed_compare
+            ), self.assertRaisesRegex(Stop, "^UNKNOWN_COMPARE$"):
+                preflight_existing_delivery_draft(api, A)
+            self.assertEqual(api.writes, [])
+
     def test_inspector_preflight_fails_closed_on_untrusted_draft(self):
         api = PublishAPI()
         publish(api, record())
