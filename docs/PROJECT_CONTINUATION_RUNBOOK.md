@@ -1,4 +1,4 @@
-## Current merged release checkpoint — 2026-10-11 15:10 Asia/Taipei (dated; resolve main afresh)
+## Current merged release checkpoint — 2026-10-11 15:10 Asia/Taipei (machine-status version updated_date: 2026-10-09; dated, resolve main afresh)
 
 **Cloud-only evidence, no local files, no new authority.** The release reviewed at `main=a7ee3e951d1d1f1e02e58a62c7951ea1ca5763db` includes merged [#795](https://github.com/qookey109-pixel/crypto-autopilot/pull/795) (15- and 16-artifact versioned receipts), [#796](https://github.com/qookey109-pixel/crypto-autopilot/pull/796) (fail-closed 16/21 dashboard), [#797](https://github.com/qookey109-pixel/crypto-autopilot/pull/797) (read-only stale maintenance draft guard and dated Core100 drift diagnosis) and [#798](https://github.com/qookey109-pixel/crypto-autopilot/pull/798) (pure bounded original ZIP verifier). The subsequent [#800](https://github.com/qookey109-pixel/crypto-autopilot/pull/800) provides bounded deployed-hash retry without accepting a mismatched build. GitHub remains formal authority over this dated snapshot.
 
