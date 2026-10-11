@@ -10,7 +10,8 @@ from unittest.mock import patch
 from crypto_autopilot.research.cloud_maintenance import (
     BEGIN, END, HEALTH, MESSAGE, POLICY, PREFIX, RECEIPT, REPOSITORY, SCHEMA,
     TARGETS, GitHub, Stop, classify_checks, collect, digest, existing_record,
-    project_documents, publish, render, validate_branch_documents,
+    preflight_existing_delivery_draft, project_documents, publish, render,
+    validate_branch_documents,
     validate_contract, validate_trigger,
 )
 
@@ -216,6 +217,88 @@ class PureMaintenanceTests(unittest.TestCase):
         self.assertEqual(result["commits_created"], 0)
         self.assertEqual(api.main_calls, 1)
         self.assertEqual(api.writes, [])
+
+    def test_inspector_preflight_refuses_stale_bot_draft_before_publish(self):
+        api = PublishAPI()
+        self.assertIsNone(preflight_existing_delivery_draft(api, A))
+        self.assertEqual(api.writes, [])
+
+        publish(api, record())
+        api.writes.clear()
+        self.assertIsNone(preflight_existing_delivery_draft(api, A))
+        self.assertEqual(api.writes, [])
+
+        original_request = api.request
+
+        def stale_compare(method, path, payload=None, **kwargs):
+            if method == "GET" and path.startswith("/compare/"):
+                return {"status": "diverged", "behind_by": 1,
+                        "merge_base_commit": {"sha": "c" * 40}}
+            return original_request(method, path, payload, **kwargs)
+
+        with patch.object(api, "request", side_effect=stale_compare):
+            self.assertEqual(
+                preflight_existing_delivery_draft(api, A),
+                {"status": "STALE_DRAFT_REVIEW_REQUIRED", "pr": 500},
+            )
+        self.assertEqual(api.writes, [])
+
+    def test_inspector_preflight_rejects_malformed_compare_without_writes(self):
+        api = PublishAPI()
+        publish(api, record())
+        api.writes.clear()
+        original_request = api.request
+
+        for payload in (
+            None,
+            {"status": "ahead", "behind_by": 0, "merge_base_commit": None},
+            {"status": "ahead", "behind_by": "0",
+             "merge_base_commit": {"sha": A}},
+            {"status": "ahead", "behind_by": 0},
+        ):
+            def malformed_compare(method, path, data=None, **kwargs):
+                if method == "GET" and path.startswith("/compare/"):
+                    return payload
+                return original_request(method, path, data, **kwargs)
+
+            with self.subTest(payload=payload), patch.object(
+                api, "request", side_effect=malformed_compare
+            ), self.assertRaisesRegex(Stop, "^UNKNOWN_COMPARE$"):
+                preflight_existing_delivery_draft(api, A)
+            self.assertEqual(api.writes, [])
+
+    def test_inspector_preflight_fails_closed_on_untrusted_draft(self):
+        api = PublishAPI()
+        publish(api, record())
+        api.writes.clear()
+        for change in ("human", "ready", "branch_drift", "ref_missing"):
+            with self.subTest(change=change):
+                original_pr = copy.deepcopy(api.pr)
+                original_ref = copy.deepcopy(api.ref)
+                if change == "human":
+                    api.pr["user"]["login"] = "human"
+                elif change == "ready":
+                    api.pr["draft"] = False
+                elif change == "branch_drift":
+                    api.pr["head"]["sha"] = "c" * 40
+                else:
+                    api.ref = None
+                with self.assertRaisesRegex(
+                    Stop, "MANUAL_EDIT_DETECTED|BRANCH_CHANGED"
+                ):
+                    preflight_existing_delivery_draft(api, A)
+                self.assertEqual(api.writes, [])
+                api.pr = original_pr
+                api.ref = original_ref
+
+    def test_inspect_mode_never_marks_stale_draft_ready(self):
+        entrypoint = Path("scripts/cloud_project_maintenance.py").read_text()
+        self.assertIn("preflight_existing_delivery_draft(", entrypoint)
+        self.assertIn(
+            'return 1 if result["status"] == "STALE_DRAFT_REVIEW_REQUIRED" else 0',
+            entrypoint,
+        )
+        self.assertIn('if result["status"] == "READ_ONLY_COMPLETE":', entrypoint)
 
     def test_no_change_revalidates_main_before_reporting(self):
         api = PublishAPI()

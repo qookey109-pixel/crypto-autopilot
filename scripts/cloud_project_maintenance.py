@@ -8,7 +8,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from crypto_autopilot.research.cloud_maintenance import (
-    GitHub, REPOSITORY, Stop, collect, digest, publish, require, summary,
+    GitHub, REPOSITORY, Stop, collect, digest, preflight_existing_delivery_draft,
+    publish, require, summary,
 )
 
 
@@ -34,16 +35,21 @@ def main():
             require(semantic == os.environ.get("EXPECTED_DIGEST"), "OBSERVATION_CHANGED")
             result = publish(api, record)
         else:
-            result = {"status": "READ_ONLY_COMPLETE"}
-            with Path(os.environ["GITHUB_OUTPUT"]).open("a") as output:
-                output.write(f"main_sha={record['evidence']['main_sha']}\n")
-                output.write(f"semantic_digest={semantic}\nready=true\n")
+            # A stale maintenance draft needs review, not a failed write attempt.
+            # Retain an explicit nonzero outcome; never claim healthy delivery.
+            result = preflight_existing_delivery_draft(
+                api, record["evidence"]["main_sha"]
+            ) or {"status": "READ_ONLY_COMPLETE"}
+            if result["status"] == "READ_ONLY_COMPLETE":
+                with Path(os.environ["GITHUB_OUTPUT"]).open("a") as output:
+                    output.write(f"main_sha={record['evidence']['main_sha']}\n")
+                    output.write(f"semantic_digest={semantic}\nready=true\n")
         report = summary(record, result)
         require(len(report.encode()) <= 900_000, "SUMMARY_SIZE_LIMIT")
         if summary_path:
             Path(summary_path).write_text(report, encoding="utf-8")
         print(json.dumps(result, sort_keys=True))
-        return 0
+        return 1 if result["status"] == "STALE_DRAFT_REVIEW_REQUIRED" else 0
     except (Stop, KeyError, TypeError, ValueError, OSError) as exc:
         code = str(exc) if isinstance(exc, Stop) else "UNKNOWN_INVALID_INPUT"
         # No exception text from API/metadata/OS is exposed.

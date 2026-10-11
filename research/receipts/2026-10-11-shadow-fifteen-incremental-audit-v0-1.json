@@ -1,0 +1,84 @@
+{
+  "schema": "qookey-shadow-fifteen-authenticated-bridge-receipt-v0.1",
+  "evidence_date": "2026-10-11",
+  "mode": "READ_ONLY_GITHUB_ARTIFACT_AUDIT",
+  "prior_nine_audit": {
+    "run_id": 37895797841,
+    "report_count": 9,
+    "adjacent_overlap_candles": 8604,
+    "gaps_over_six_hours": [
+      372,
+      571,
+      527,
+      571,
+      529
+    ],
+    "max_source_lag_minutes": 49
+  },
+  "new_six_audit": {
+    "run_id": 38105742124,
+    "ephemeral_pr_number": 794,
+    "ephemeral_pr_state": "CLOSED_UNMERGED",
+    "bridge_prior_run_id": 37892197952,
+    "bridge_artifact_id": 11597884258,
+    "run_ids": [
+      37950817788,
+      37990196700,
+      38029103490,
+      38059744280,
+      38082311705,
+      38095502539
+    ],
+    "artifact_ids": [
+      11625946588,
+      11644831928,
+      11660849983,
+      11673205237,
+      11680538139,
+      11684968889
+    ],
+    "source_main_sha": "e0f742011ddb56f5f1325605f73f0868a3d81f47",
+    "original_zip_sha256": [
+      "73afbf16ae4b8b48f78af121127a5dc7cbfe709b3e5bab1775439e892f41c62b",
+      "7eea75326726834afc5965608193f03525f8dfb26e1d3ed732a54c059694004c",
+      "b4ef68041a99a6505bee2222ebd505f436ade108a80938a2ab02b0e8360e321c",
+      "0c04802496a92b9011d17904aac4a9e0ee0c8b349721e1898d800fad25fc0967",
+      "a1f361f915769868adbe359c4203d983a0a6818aa470a2c1ab81d2e8f390c3d4",
+      "81645faad3b2167a2cf50db1012898fd2aa576f0dcc593cce1370a26664c8153"
+    ],
+    "status": "REVIEW_REQUIRED",
+    "new_validated_report_count": 6,
+    "new_adjacent_overlaps_consistent": 6064,
+    "new_gaps_over_six_hours_minutes": [
+      548,
+      539,
+      513
+    ],
+    "new_max_source_lag_minutes": 55,
+    "original_zip_hashes_verified_by_outer_github_action": true,
+    "embedded_run_attempt_source_capture_and_successful_collect_jobs_verified": true,
+    "singleton_and_adjacent_pair_validator_passed": true
+  },
+  "cumulative": {
+    "verified_distinct_observations": 15,
+    "warmup_target_observations": 21,
+    "warmup_state": "INSUFFICIENT",
+    "overlap_consistent_candles_across_14_adjacent_pairs": 14668,
+    "gaps_over_six_hours_count": 8,
+    "max_source_lag_minutes": 55,
+    "continuity_state": "REVIEW_REQUIRED"
+  },
+  "boundaries": {
+    "previous_nine_receipt_unchanged": true,
+    "source_archive_authenticated_by_outer_workflow_only": true,
+    "original_scheduled_slot_identity_authenticated": false,
+    "skipped_trigger_or_github_queue_delay_root_cause_proven": false,
+    "uninterrupted_collection_proven": false,
+    "strategy_predictive_edge_proven": false,
+    "model_promotion_authorized": false,
+    "cloud_paper_activated": false,
+    "live_trading_authorized": false,
+    "provider_or_cloudflare_called_by_audit": false,
+    "cron_changed": false
+  }
+}
