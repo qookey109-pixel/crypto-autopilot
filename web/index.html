@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; manifest-src 'none'" />
   <meta name="referrer" content="no-referrer" />
-  <meta name="color-scheme" content="light" />
-  <meta name="theme-color" content="#075744" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0b1320" />
   <meta name="description" content="Qookey Crypto Autopilot 紙上交易與研究證據控制台。" />
   <title>Qookey Crypto Autopilot｜Research Space</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23075744'/%3E%3Ccircle cx='32' cy='32' r='21' fill='none' stroke='%23f2b28f' stroke-width='4'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='27' font-weight='700' fill='white'%3EQ%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="./assets/css/styles.css?v=ui-polish-20260926-v1" />
+  <link rel="stylesheet" href="./assets/css/styles.css?v=vnext-dark-20261023" />
 </head>
 <body>
   <a class="skip-link" href="#top">跳到主要內容</a>
@@ -38,13 +38,7 @@
     <h1 class="page-title" id="page-title">總覽</h1>
 
     <section class="view overview-content active" id="view-overview">
-      <div class="home-heading"><div><p class="eyebrow">QOOKEY</p><h2>今日總覽</h2></div><span class="badge neutral">研究與模擬</span></div>
-      <!-- VNEXT_MARKET_START -->
-      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
-        <h3 id="vnext-market-heading">市場觀測與決策</h3>
-        <p>正在讀取已核實研究證據。未驗證的行情、交易候選與 Paper 結果保持 UNKNOWN。</p>
-      </section>
-      <!-- VNEXT_MARKET_END -->
+      <div class="home-heading"><div><p class="eyebrow">QOOKEY</p><h2>今日總覽</h2></div><a class="system-shortcut" href="#system">查看系統狀態 ↓</a></div>
       <section class="panel external-research-panel" aria-labelledby="external-research-heading">
         <div class="panel-header">
           <div><p class="card-kicker">RESEARCH REFERENCE / MANUAL ONLY</p><h3 id="external-research-heading">外部研究工具</h3></div>
@@ -59,14 +53,13 @@
         </ul>
         <p class="muted">本區僅提供連結，不使用付費 API、擷取／重發布第三方資料、連接交易帳戶或送出訂單。</p>
       </section>
-      <!-- DELIVERY_OVERVIEW_START -->
-      <section class="panel readiness-summary" aria-labelledby="readiness-heading">
-        <h3 id="readiness-heading">目前作業狀態</h3>
-        <p><strong>正在建立 Repository current-truth 投影</strong>。正式 Pages build 會以版本化 evidence 與 Current Operations 產生此區塊；raw template 不保存日期、run ID 或進度數字。</p>
-        <p id="cloud-run-updated" role="status">雲端執行狀態尚未載入。</p>
-        <ul id="cloud-run-list" class="cloud-run-list" aria-live="polite"></ul>
+      <!-- VNEXT_MARKET_START -->
+      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
+        <h3 id="vnext-market-heading">市場觀測與決策</h3>
+        <p>正在讀取已核實研究證據。未驗證的行情、交易候選與 Paper 結果保持 UNKNOWN。</p>
       </section>
-      <!-- DELIVERY_OVERVIEW_END -->
+      <!-- VNEXT_MARKET_END -->
+
 <!-- CLOUD_PAPER_LOOP_PANEL_START -->
       <section class="panel cloud-paper-panel" aria-labelledby="cloud-paper-heading">
         <div class="panel-header">
@@ -137,6 +130,17 @@
         </article>
       </section>
       </details>
+      <section id="system" class="system-region" aria-labelledby="system-heading" tabindex="-1">
+        <div class="system-heading"><h2 id="system-heading">System · 系統與交付狀態</h2><p>工程檢查、來源執行與部署紀錄；不代表策略品質通過。</p></div>
+      <!-- DELIVERY_OVERVIEW_START -->
+      <section class="panel readiness-summary" aria-labelledby="readiness-heading">
+        <h3 id="readiness-heading">目前作業狀態</h3>
+        <p><strong>正在建立 Repository current-truth 投影</strong>。正式 Pages build 會以版本化 evidence 與 Current Operations 產生此區塊；raw template 不保存日期、run ID 或進度數字。</p>
+        <p id="cloud-run-updated" role="status">雲端執行狀態尚未載入。</p>
+        <ul id="cloud-run-list" class="cloud-run-list" aria-live="polite"></ul>
+      </section>
+      <!-- DELIVERY_OVERVIEW_END -->
+      </section>
       <details class="home-details">
         <summary>展開研究明細與排程</summary>
         <div class="home-details-content">
