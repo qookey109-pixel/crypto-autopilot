@@ -588,3 +588,61 @@ test("cloud paper readiness clears stale success when dashboard fetch fails", as
   await expect(page.locator("#cloud-paper-runtime")).toHaveText("正式執行與排程：未核實");
   await expect(page.locator("#cloud-paper-engineering-run")).not.toHaveAttribute("href");
 });
+
+
+test("VNext dark workspace exposes research links before evidence and keyboard System navigation", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(baseURL, { waitUntil: "networkidle" });
+  await expect(page.locator('meta[name="color-scheme"]')).toHaveAttribute("content", "dark");
+  for (const label of ["EasyRead", "Yaozi", "Cloudflare Clef"]) {
+    const link = page.locator(".external-research-links a").filter({ hasText: label });
+    const box = await link.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box.y + box.height).toBeLessThanOrEqual(844);
+  }
+  const shortcut = page.locator(".system-shortcut");
+  await shortcut.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#system")).toBeFocused();
+  await expect(page.locator("#system #readiness-heading")).toBeVisible();
+  await expect(page).toHaveURL(/#system$/);
+  await page.reload({ waitUntil: "networkidle" });
+  await expect(page.locator("#system")).toBeFocused();
+  await page.locator('.nav-item[data-view="overview"]').click();
+  expect(new URL(page.url()).hash).toBe("");
+});
+
+test("VNext dark surfaces preserve readable contrast and contain every view on narrow phones", async ({ page, baseURL }) => {
+  await page.goto(baseURL, { waitUntil: "networkidle" });
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const [view] of EXPECTED_VIEWS) {
+      const button = page.locator(`.nav-item[data-view="${view}"]`);
+      await button.scrollIntoViewIfNeeded();
+      await button.click();
+      const overflow = await page.evaluate(() =>
+        document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(overflow, `${view} at ${width}px`).toBeLessThanOrEqual(1);
+    }
+  }
+  await page.locator('.nav-item[data-view="overview"]').click();
+  const results = await page.evaluate(() => {
+    const luminance = rgb => rgb.map(v => v / 255).map(v =>
+      v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4
+    ).reduce((sum, v, i) => sum + v * [.2126, .7152, .0722][i], 0);
+    const rgb = color => color.match(/[\d.]+/g).slice(0, 3).map(Number);
+    return [".external-research-links a", ".vnext-market-grid h4",
+      ".vnext-market-grid p", ".cloud-paper-trace p", ".home-details > summary"].map(selector => {
+      const element = document.querySelector(selector);
+      if (!element) return { selector, ratio: 0 };
+      let parent = element;
+      while (parent && getComputedStyle(parent).backgroundColor === "rgba(0, 0, 0, 0)") {
+        parent = parent.parentElement;
+      }
+      const fg = luminance(rgb(getComputedStyle(element).color));
+      const bg = luminance(rgb(getComputedStyle(parent || document.body).backgroundColor));
+      return { selector, ratio: (Math.max(fg, bg) + .05) / (Math.min(fg, bg) + .05) };
+    });
+  });
+  for (const result of results) expect(result.ratio, result.selector).toBeGreaterThanOrEqual(4.5);
+});

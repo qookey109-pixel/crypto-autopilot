@@ -119,3 +119,9 @@ The website displays three research observations as a **review-required** state 
 
 ---
 
+
+## V3 dark decision workspace — 2026-10-23
+
+This presentation batch replaces the active garden background with dark charcoal/navy surfaces and semantic lime/cyan/amber/coral/violet accents. Research links precede the evidence panel; operational delivery metadata moves below the product/account panels into a labeled System region with a keyboard-accessible deep link. All existing provenance, research-only flags, UNKNOWN values, candidate qualification and formal NOT_RUN semantics remain unchanged. Historical image assets are retained but no longer requested as the active background.
+
+Cloud browser acceptance covers research-link visibility on the first 390px screen, keyboard/deep-link System navigation, all nine existing views at 320/390/768/1440px without document overflow, and representative text/surface contrast of at least 4.5:1. Existing data rejection and exact deployed-content-hash checks remain required. PR checks and production Pages verification must be recorded independently; this change does not authenticate newer Shadow archives or activate Cloud Paper.

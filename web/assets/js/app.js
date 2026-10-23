@@ -1422,6 +1422,11 @@ function activateView(view, { updateHistory = false } = {}) {
     window.history.pushState({ view }, "", targetUrl);
   }
   window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  if (isOverview && window.location.hash === "#system") {
+    const system = document.querySelector("#system");
+    system?.scrollIntoView({ block: "start", behavior: "auto" });
+    system?.focus({ preventScroll: true });
+  }
 }
 
 document.querySelectorAll(".nav-item, .view-link").forEach(button => {
