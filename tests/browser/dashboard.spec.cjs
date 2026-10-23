@@ -622,7 +622,14 @@ test("VNext dark surfaces preserve readable contrast and contain every view on n
       await button.click();
       const overflow = await page.evaluate(() =>
         document.documentElement.scrollWidth - document.documentElement.clientWidth);
-      expect(overflow, `${view} at ${width}px`).toBeLessThanOrEqual(1);
+      const outliers = overflow > 1 ? await page.evaluate(() =>
+        [...document.querySelectorAll("main .view.active *")].filter(el => {
+          const box = el.getBoundingClientRect();
+          return box.width > 0 && box.right > document.documentElement.clientWidth + 1 &&
+            !el.closest(".table-wrap");
+        }).slice(0, 12).map(el => ({ tag: el.tagName, id: el.id, class: el.className,
+          right: el.getBoundingClientRect().right }))) : [];
+      expect.soft(overflow, `${view} at ${width}px: ${JSON.stringify(outliers)}`).toBeLessThanOrEqual(1);
     }
   }
   await page.locator('.nav-item[data-view="overview"]').click();

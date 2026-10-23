@@ -434,3 +434,12 @@ code { font-family: var(--font-mono); overflow-wrap: anywhere; }
   .header-inner { column-gap: 8px; }
   .paper-pill { font-size: 11px; }
 }
+
+/* Long research labels must wrap within cards, including 320px screens. */
+.analysis-layer > *, .strategy-summary > * { min-width: 0; }
+.panel small, .panel span { overflow-wrap: anywhere; }
+.vnext-context-disclosure > summary:focus-visible { outline-color: var(--data-accent); }
+@media (max-width: 600px) {
+  .analysis-layer { flex-direction: column; }
+  .analysis-layer .badge { max-width: 100%; }
+}
