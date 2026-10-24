@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import io
+import json
 import unittest
 from dataclasses import replace
 from unittest.mock import patch
@@ -35,12 +36,20 @@ class MemoryS3:
         self.fail_key = None
         self.corrupt_key = None
         self.race = False
+        self.pointer_race = False
+        self.missing_etag = False
 
     def put_object(self, **kwargs):
         key = kwargs["Key"]
         self.events.append(("put", key))
         if self.fail_key == key:
             raise RuntimeError("SECRET raw provider response")
+        if key.endswith("/latest.json") and self.pointer_race:
+            self.objects[key] = b"newer concurrent pointer"
+        if "IfMatch" in kwargs and kwargs["IfMatch"] != (
+            '"' + hashlib.sha256(self.objects.get(key, b"")).hexdigest() + '"'
+        ):
+            raise RuntimeError("precondition failed")
         if kwargs.get("IfNoneMatch") == "*" and (self.race or key in self.objects):
             raise RuntimeError("precondition failed")
         self.objects[key] = kwargs["Body"]
@@ -57,6 +66,7 @@ class MemoryS3:
         if key == self.corrupt_key:
             body += b"changed"
         return {"Body": io.BytesIO(body),
+                "ETag": None if self.missing_etag else '"' + hashlib.sha256(body).hexdigest() + '"',
                 "Metadata": {"sha256": hashlib.sha256(body).hexdigest()}}
 
 
@@ -82,7 +92,7 @@ class SharedSignalPublisherTests(unittest.TestCase):
         self.reservation = SharedWriterReservation(
             writer_id=WRITER, slot_id=f"slot:{NOW}", idempotency_key=f"slot:{NOW}",
             slot_at_ms=NOW, reserved_at_ms=NOW, provider_requests=0,
-            r2_class_a=3, r2_class_b=5,
+            r2_class_a=3, r2_class_b=6,
             r2_new_bytes=sum(len(body) for _, body in _objects(self.payload, "123")),
             d1_queries=4, d1_rows_read=100, d1_rows_written=10,
             d1_storage_growth_bytes=100,
@@ -121,16 +131,17 @@ class SharedSignalPublisherTests(unittest.TestCase):
         self.assertEqual(self.events, [])
         self.mock_factory.assert_not_called()
 
-    def test_admission_then_three_writes_five_reads_and_latest_last(self):
+    def test_admission_then_three_writes_six_reads_and_latest_last(self):
         result = self.publish()
         self.assertEqual(result["status"], "PUBLISHED")
         self.assertEqual(result["objects_verified"], 3)
         self.assertEqual(result["attempted_usage"]["r2_class_a"], 3)
-        self.assertEqual(result["attempted_usage"]["r2_class_b"], 5)
+        self.assertEqual(result["attempted_usage"]["r2_class_b"], 6)
         self.assertEqual(result["bucket_scans_performed"], 0)
         self.assertFalse(result["paper_activation_allowed"])
         keys = [key for key, _ in _objects(self.payload, "123")]
         self.assertEqual(self.backend.events, [
+            ("get", keys[2]),
             ("get", keys[0]), ("put", keys[0]), ("get", keys[0]),
             ("get", keys[1]), ("put", keys[1]), ("get", keys[1]),
             ("put", keys[2]), ("get", keys[2]),
@@ -167,7 +178,7 @@ class SharedSignalPublisherTests(unittest.TestCase):
         result = self.publish()
         self.assertEqual(result["status"], "REVIEW_REQUIRED")
         self.assertFalse(result["latest_pointer_verified"])
-        self.assertEqual(self.backend.events, [("get", key)])
+        self.assertEqual(self.backend.events, [("get", f"{NAMESPACE}/latest.json"), ("get", key)])
 
     def test_partial_write_and_readback_failure_preserve_evidence(self):
         keys = [key for key, _ in _objects(self.payload, "123")]
@@ -202,7 +213,7 @@ class SharedSignalPublisherTests(unittest.TestCase):
         result = self.publish()
         self.assertEqual(result["status"], "PUBLISHED")
         self.assertEqual(result["attempted_usage"]["r2_class_a"], 1)
-        self.assertEqual(result["attempted_usage"]["r2_class_b"], 5)
+        self.assertEqual(result["attempted_usage"]["r2_class_b"], 6)
 
     def test_invalid_run_or_promoted_payload_never_queries(self):
         with self.assertRaises(BudgetBlocked):
@@ -210,6 +221,78 @@ class SharedSignalPublisherTests(unittest.TestCase):
         self.payload["authority"]["live_trading"] = True
         with self.assertRaises(BudgetBlocked):
             self.publish()
+        self.assertEqual(self.events, [])
+
+
+    def previous_pointer(self, timestamp="2027-01-15T07:59:00Z"):
+        pointer = json.loads(_objects(self.payload, "123")[2][1])
+        pointer["run_id"] = "122"
+        pointer["manifest_key"] = f"{NAMESPACE}/runs/run=122/manifest.json"
+        pointer["generated_at_utc"] = timestamp
+        body = json.dumps(pointer).encode()
+        self.backend.objects[f"{NAMESPACE}/latest.json"] = body
+        return body
+
+    def test_newer_payload_replaces_older_pointer_conditionally(self):
+        self.previous_pointer()
+        result = self.publish()
+        self.assertEqual(result["status"], "PUBLISHED")
+        pointer = json.loads(self.backend.objects[f"{NAMESPACE}/latest.json"])
+        self.assertEqual(pointer["run_id"], "123")
+
+    def test_equal_or_newer_pointer_stops_before_any_write(self):
+        for timestamp in ("2027-01-15T08:00:00Z", "2027-01-15T09:00:00Z"):
+            with self.subTest(timestamp=timestamp):
+                self.backend.events.clear()
+                previous = self.previous_pointer(timestamp)
+                result = self.publish()
+                self.assertEqual(result["status"], "REVIEW_REQUIRED")
+                self.assertEqual(result["stage"], "LATEST_POINTER_PREFLIGHT")
+                self.assertEqual(result["attempted_usage"]["r2_class_a"], 0)
+                self.assertEqual(self.backend.objects[f"{NAMESPACE}/latest.json"], previous)
+
+    def test_concurrent_pointer_change_is_not_overwritten_or_retried(self):
+        for existing in (False, True):
+            with self.subTest(existing=existing):
+                self.backend.objects.clear()
+                self.backend.events.clear()
+                # Fresh local guard for this independent simulated run.
+                self.guard = CloudBudgetGuard(snapshot=self.guard.snapshot, clock_ms=lambda: NOW)
+                if existing:
+                    self.previous_pointer()
+                self.backend.pointer_race = True
+                result = self.publish()
+                self.assertEqual(result["status"], "REVIEW_REQUIRED")
+                self.assertEqual(result["objects_verified"], 2)
+                self.assertEqual(self.backend.objects[f"{NAMESPACE}/latest.json"],
+                                 b"newer concurrent pointer")
+                puts = [event for event in self.backend.events
+                        if event == ("put", f"{NAMESPACE}/latest.json")]
+                self.assertEqual(len(puts), 1)
+
+    def test_missing_etag_or_malformed_pointer_prevents_write(self):
+        self.previous_pointer()
+        self.backend.missing_etag = True
+        result = self.publish()
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["attempted_usage"]["r2_class_a"], 0)
+        self.backend.missing_etag = False
+        self.backend.objects[f"{NAMESPACE}/latest.json"] = b"null"
+        result = self.publish()
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["attempted_usage"]["r2_class_a"], 0)
+
+    def test_oversized_pointer_prevents_write(self):
+        self.backend.objects[f"{NAMESPACE}/latest.json"] = b" " * 2_500_001
+        result = self.publish()
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["attempted_usage"]["r2_class_a"], 0)
+
+    def test_timestamp_requires_explicit_utc_instant_before_query(self):
+        for value in ("2027-01-15", "2027-01-15Z", "2027-01-15T08:00:00", "badZ"):
+            self.payload["generated_at_utc"] = value
+            with self.subTest(value=value), self.assertRaises(BudgetBlocked):
+                self.publish()
         self.assertEqual(self.events, [])
 
 
