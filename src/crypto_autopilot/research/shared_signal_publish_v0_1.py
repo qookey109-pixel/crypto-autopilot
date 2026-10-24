@@ -9,6 +9,7 @@ import hashlib
 import json
 import re
 from collections.abc import Callable, Mapping
+from datetime import UTC, datetime
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked, CloudBudgetGuard
 from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Store
@@ -25,6 +26,65 @@ MAX_BYTES = 2_500_000
 def _encode(value: Mapping[str, object]) -> bytes:
     return (json.dumps(value, ensure_ascii=False, sort_keys=True,
                        indent=2, allow_nan=False) + "\n").encode()
+
+
+def _timestamp(value: object) -> datetime:
+    if not isinstance(value, str) or not re.fullmatch(
+        r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z", value,
+    ):
+        raise BudgetBlocked("BLOCKED_SIGNAL_TIMESTAMP")
+    try:
+        result = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        raise BudgetBlocked("BLOCKED_SIGNAL_TIMESTAMP") from None
+    return result.astimezone(UTC)
+
+
+def _latest_condition(
+    store: BudgetedR2Store, *, generated_at: datetime,
+) -> dict[str, str]:
+    """Read one bounded pointer and bind publication to that exact S3 version."""
+    try:
+        response = store.client.get_object(Bucket=store.bucket, Key=f"{NAMESPACE}/latest.json")
+    except Exception as exc:
+        response_data = getattr(exc, "response", {}) or {}
+        if (
+            str(response_data.get("Error", {}).get("Code", "")) in
+            {"NoSuchKey", "NotFound", "404"}
+            or response_data.get("ResponseMetadata", {}).get("HTTPStatusCode") == 404
+        ):
+            return {"IfNoneMatch": "*"}
+        raise
+    stream = response["Body"]
+    try:
+        body = stream.read(MAX_BYTES + 1)
+    finally:
+        stream.close()
+    if not isinstance(body, bytes) or len(body) > MAX_BYTES:
+        raise BudgetBlocked("BLOCKED_SIGNAL_POINTER_SIZE")
+    etag = response.get("ETag")
+    if not isinstance(etag, str) or not re.fullmatch(r'"[^"\r\n]{1,128}"', etag):
+        raise BudgetBlocked("BLOCKED_SIGNAL_POINTER_ETAG")
+    previous = json.loads(body)
+    if not isinstance(previous, dict):
+        raise BudgetBlocked("BLOCKED_SIGNAL_POINTER_SCHEMA")
+    previous_run = previous.get("run_id")
+    if (
+        previous.get("schema") != "research-signal-layer-latest-v0.2"
+        or not isinstance(previous_run, str)
+        or not re.fullmatch(r"[1-9][0-9]{0,19}", previous_run)
+        or previous.get("manifest_key") !=
+        f"{NAMESPACE}/runs/run={previous_run}/manifest.json"
+        or not isinstance(previous.get("manifest_sha256"), str)
+        or not re.fullmatch(r"[0-9a-f]{64}", previous["manifest_sha256"])
+    ):
+        raise BudgetBlocked("BLOCKED_SIGNAL_POINTER_SCHEMA")
+    expected = response.get("Metadata", {}).get("sha256")
+    if expected != hashlib.sha256(body).hexdigest():
+        raise BudgetBlocked("BLOCKED_SIGNAL_POINTER_HASH")
+    if _timestamp(previous.get("generated_at_utc")) >= generated_at:
+        raise BudgetBlocked("BLOCKED_SIGNAL_POINTER_NOT_NEWER")
+    return {"IfMatch": etag}
 
 
 def _objects(payload: Mapping[str, object], run_id: str) -> tuple[tuple[str, bytes], ...]:
@@ -44,6 +104,7 @@ def _objects(payload: Mapping[str, object], run_id: str) -> tuple[tuple[str, byt
         or not payload["generated_at_utc"]
     ):
         raise BudgetBlocked("BLOCKED_SIGNAL_PAYLOAD_BINDING")
+    _timestamp(payload["generated_at_utc"])
     prefix = f"{NAMESPACE}/runs/run={run_id}"
     body = _encode(payload)
     manifest = _encode({
@@ -85,9 +146,13 @@ def publish_shared_signal_payload(
     objects = _objects(payload, run_id)
     planned_bytes = sum(len(body) for _, body in objects)
     reservation.validate()
+    now_ms = guard.clock_ms()
+    generated_ms = int(_timestamp(payload["generated_at_utc"]).timestamp() * 1000)
+    if type(now_ms) is not int or not reservation.slot_at_ms <= generated_ms <= now_ms:
+        raise BudgetBlocked("BLOCKED_SIGNAL_GENERATION_TIME")
     if (
         reservation.writer_id != WRITER or reservation.provider_requests != 0
-        or reservation.r2_class_a != 3 or reservation.r2_class_b != 5
+        or reservation.r2_class_a != 3 or reservation.r2_class_b != 6
         or reservation.r2_new_bytes != planned_bytes
     ):
         raise BudgetBlocked("BLOCKED_SIGNAL_ENVELOPE_MISMATCH")
@@ -109,6 +174,10 @@ def publish_shared_signal_payload(
             secret_access_key=credentials["secret_access_key"],
             before_external=budget.reserve,
         )
+        stage = "LATEST_POINTER_PREFLIGHT"
+        condition = _latest_condition(
+            store, generated_at=_timestamp(payload["generated_at_utc"]),
+        )
         for index, (key, body) in enumerate(objects):
             stage = f"IMMUTABLE_{index + 1}" if index < 2 else "LATEST_POINTER"
             if index < 2:
@@ -126,8 +195,12 @@ def publish_shared_signal_payload(
                                   "provider": "public_research", "version": "v0.2"},
                     )
                 else:
-                    store.put_bytes(key, body, content_type="application/json",
-                                    metadata={"provider": "public_research", "version": "v0.2"})
+                    store.client.put_object(
+                        Bucket=store.bucket, Key=key, Body=body,
+                        ContentType="application/json", **condition,
+                        Metadata={"sha256": hashlib.sha256(body).hexdigest(),
+                                  "provider": "public_research", "version": "v0.2"},
+                    )
             store.get_bytes_verified(key, expected_sha256=hashlib.sha256(body).hexdigest())
             verified += 1
     except Exception:
