@@ -107,6 +107,45 @@ class VNextV3ProvenanceTests(unittest.TestCase):
                 self.assertIn("稽核：UNKNOWN", html)
                 self.assertNotIn("獨立驗證：PASS", html)
 
+    def test_decision_trace_binds_archived_source_and_production_state(self):
+        receipt = delivery.read_json(delivery.SHADOW_SINGLETON_RECEIPT)
+        trace = delivery.shadow_decision_lineage_panel(
+            receipt, prior_sixteen_verified=True, production_disabled=True
+        )
+        self.assertIn("Decision Trace · 證據到正式決策", trace)
+        self.assertIn("16/21", trace)
+        self.assertIn("非連續第十七份獨立 ZIP", trace)
+        self.assertIn("40162915838", trace)
+        self.assertIn("12586364157", trace)
+        self.assertIn("40183609493", trace)
+        self.assertIn("2026-10-25T04:43:38.396000Z", trace)
+        self.assertIn("來源 K 線可用時間：UNKNOWN", trace)
+        self.assertIn("15M／4H：UNKNOWN", trace)
+        self.assertIn("策略准入：REJECT", trace)
+        self.assertIn("正式 PAPER：NOT_RUN（非 NO_TRADE）", trace)
+        self.assertNotIn("成交紀錄", trace)
+
+    def test_decision_trace_rejects_tampered_source_and_unknown_status(self):
+        original = delivery.read_json(delivery.SHADOW_SINGLETON_RECEIPT)
+        mutated = copy.deepcopy(original)
+        mutated["audit_job_conclusion"] = "failure"
+        for row in (None, mutated):
+            with self.subTest(receipt=row):
+                trace = delivery.shadow_decision_lineage_panel(
+                    row, prior_sixteen_verified=True, production_disabled=True
+                )
+                self.assertIn("原始 ZIP 稽核：UNKNOWN", trace)
+                self.assertNotIn("2026-10-25T04:43:38.396000Z", trace)
+                self.assertNotIn("40183609493", trace)
+                self.assertNotIn("已驗證的獨立 ZIP", trace)
+        untrusted_history = delivery.shadow_decision_lineage_panel(
+            original, prior_sixteen_verified=False, production_disabled=False
+        )
+        self.assertIn("歷史暖機：UNKNOWN", untrusted_history)
+        self.assertIn("策略准入：UNKNOWN", untrusted_history)
+        self.assertIn("正式 PAPER：UNKNOWN", untrusted_history)
+        self.assertNotIn("正式 PAPER：NOT_RUN", untrusted_history)
+
     def test_false_authority_or_invalid_metadata_falls_back_to_unknown(self):
         fixture = observed_fixture()
         mutants = [
