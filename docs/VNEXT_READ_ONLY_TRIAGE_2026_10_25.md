@@ -46,3 +46,9 @@ All check outcomes above refer to the listed **PR head**, not the latest main an
 | Health | Schedule coverage check succeeds, Core100 training alert remains | Treat `RUNTIME_CHANGED` as review-required until distinct runtime evidence resolves it; no unauthorized retraining |
 
 **Deferred P2:** Clef shadow, selective Vibe-Trading learning, derivative/liquidity research and trade-parameter console. Never broaden the critical-path authority while those are in progress. No fake `0` for missing current usage, performance, feature coverage or equity.
+
+## PR #807 in-flight engineering regression evidence (preserved)
+
+- Initial draft head `2d5ebd336daf0ac733e01f4a9c06df8285b3c077` passed [GitHub PR CI #40159655070](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40159655070) for Python 3.12, 3.13 and workflow-static; PR CodeQL/Dependencies and read-only authority snapshot checks also passed. This was engineering CI only, not an actual Pages deploy or paper run.
+- Initial [Pages PR build #40159655078](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40159655078) **FAILED**, with **62 of 64** desktop/mobile Playwright tests passing and exactly **2 failures** in the VNext disclosure initial-state assertion (`tests/browser/dashboard.spec.cjs:98`). Production deploy and browser-production jobs were skipped. The UI intentionally became default-visible but the historical test expected initial collapse.
+- Follow-up branch commit `a765b6673c636b5923ec27c97b76b301fedc6713` updates the cloud browser test to assert initial expanded Radar/Context, keyboard closing and reopening, and design-time-only reason coverage. This preserves the tested accessibility behavior, rather than weakening the UI or deleting the test. **New exact-head build, desktop/mobile checks, and post-merge production checks must be reviewed independently; do not reuse the first failed run as a pass.**
