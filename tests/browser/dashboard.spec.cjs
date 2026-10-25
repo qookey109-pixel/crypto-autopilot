@@ -105,6 +105,12 @@ test("VNext market research is clearly non-live and fits a 390px phone", async (
   await expect(observed.locator('a[href*="/actions/runs/40162915838"]')).toHaveAttribute(
     "rel", "noopener noreferrer"
   );
+  const authenticated = panel.locator('section[aria-label="原始 ZIP 稽核結果"]');
+  await expect(authenticated).toContainText("原始 ZIP 獨立驗證：PASS（單批）");
+  await expect(authenticated).toContainText("這不是連續 17/21");
+  await expect(authenticated).toContainText("2026-10-25T04:43:38.396000Z");
+  await expect(authenticated.locator('a[href*="/actions/runs/40183609493"]'))
+    .toHaveAttribute("rel", "noopener noreferrer");
   await expect(panel.locator("details.vnext-context-disclosure")).toHaveAttribute("open", "");
 
   await expect(panel).toContainText("來源 K 線時間");
