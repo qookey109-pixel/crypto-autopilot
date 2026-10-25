@@ -254,6 +254,40 @@ class DeliveryOverviewTests(unittest.TestCase):
         self.assertIn("37878449661", panel)
         self.assertNotIn("今日買進", panel)
 
+    def test_vnext_reason_and_feature_coverage_do_not_fabricate_trade_results(self) -> None:
+        current = delivery.read_json(delivery.CURRENT_OPERATIONS)
+        panel = delivery.market_decision_panel(current)
+        self.assertIn("NO_ELIGIBLE_STRATEGY", panel)
+        self.assertIn("僅設計時原因", panel)
+        self.assertIn("不是 runtime reason 或已發生的 NO_TRADE", panel)
+        self.assertIn("技術特徵的有效樣本數", panel)
+        self.assertIn("缺值率", panel)
+        self.assertIn("成本：UNKNOWN", panel)
+        self.assertIn('class="vnext-context-disclosure" open', panel)
+        self.assertIn("NOT_RUN（非 NO_TRADE）", panel)
+
+        original_read = delivery.read_json
+        for registry_change in ("missing", "fake_nonempty", "authority_changed"):
+            def patched_read(path, root=delivery.ROOT):
+                if path == "config/cloud_paper_strategy_registry_v0_1.json":
+                    if registry_change == "missing":
+                        raise OSError("missing registry")
+                    value = copy.deepcopy(original_read(path, root))
+                    if registry_change == "fake_nonempty":
+                        value["strategies"] = [{"strategy_id": "fake"}]
+                    else:
+                        value["automatic_promotion"] = True
+                    return value
+                return original_read(path, root)
+
+            with self.subTest(registry_change=registry_change), patch.object(
+                delivery, "read_json", patched_read
+            ):
+                panel = delivery.market_decision_panel(current)
+                self.assertIn("正式原因碼：UNKNOWN", panel)
+                self.assertNotIn("僅設計時原因：NO_ELIGIBLE_STRATEGY", panel)
+                self.assertIn("NOT_RUN（非 NO_TRADE）", panel)
+
     def test_market_panel_fails_closed_on_unverified_evidence(self) -> None:
         original = delivery.read_json(delivery.CURRENT_OPERATIONS)
         for field, bad_value in (
