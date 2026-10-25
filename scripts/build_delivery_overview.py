@@ -1011,6 +1011,34 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
         trace_evidence = (
             "十六批資料完整性 PASS，連續性 REVIEW_REQUIRED（9 段缺口）"
         )
+    # A not-yet-running production cycle must never be labelled NO_TRADE.
+    # Read the current registry separately; an invalid/missing registry is UNKNOWN,
+    # not an empty strategy list inferred from historical model quality.
+    try:
+        registry = read_json("config/cloud_paper_strategy_registry_v0_1.json", root)
+    except (OSError, ValueError, TypeError):
+        registry = None
+    empty_registry_verified = (
+        isinstance(registry, dict)
+        and registry.get("schema") == "qookey-cloud-paper-strategy-registry-v0.1"
+        and registry.get("status") == "EMPTY_NO_ELIGIBLE_STRATEGIES"
+        and registry.get("strategies") == []
+        and registry.get("production_fixture_admission") is False
+        and registry.get("automatic_promotion") is False
+    )
+    no_trade_reason = (
+        "僅設計時原因：NO_ELIGIBLE_STRATEGY；已核實策略登錄為空。"
+        "正式 PAPER 尚未執行，這不是 runtime reason 或已發生的 NO_TRADE。"
+        if production_disabled and empty_registry_verified else
+        "正式原因碼：UNKNOWN；缺少可驗證的正式 PAPER 執行與結果報告。"
+    )
+    feature_coverage = (
+        "歷史 K 線結構／Hash 已核實（5 個研究市場，每批 240 根 60M 已收盤資料）；"
+        "單項技術特徵的有效樣本數、缺值率、因果可用時間、跨時間框架覆蓋及進出場成本：UNKNOWN。"
+        "Research proxy 不等於正式模型特徵覆蓋或交易資格。"
+        if verified else
+        "研究輸入完整性未通過核實；技術特徵有效樣本、缺值率、可用時間及成本：UNKNOWN。"
+    )
     return f"""      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
         <div class="vnext-evidence-head">
           <div><p class="card-kicker">MARKET INTELLIGENCE / RESEARCH-ONLY</p>
@@ -1022,7 +1050,7 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
           <article><p class="card-kicker">CURRENT DECISION</p><h4>正式決策尚未產生</h4><p>{decision}</p></article>
           <article><p class="card-kicker">CANDIDATE FUNNEL</p><h4>候選資格未通過</h4><p>{funnel}</p></article>
         </div>
-        <details class="vnext-context-disclosure">
+        <details class="vnext-context-disclosure" open>
           <summary>研究 Radar · Top Markets · Market Context <span>查看資料覆蓋與缺口</span></summary>
           <div class="vnext-context-grid">
             <article><p class="card-kicker">RADAR / RESEARCH</p><h4>事件資訊未發布</h4><p>{radar_detail}</p></article>
@@ -1031,6 +1059,11 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
           </div>
           <p class="vnext-evidence-note">資料來源、研究時點與網站發布時間獨立；未提供逐市場可用時間、即時行情與正式訊號時，不會補值或產生買賣建議。</p>
         </details>
+        <div class="vnext-trace" aria-label="原因碼與資料覆蓋">
+          <h4>Reason Code / Feature Coverage · 研究與正式循環分離</h4>
+          <p>{no_trade_reason}</p>
+          <p>{feature_coverage}</p>
+        </div>
         <div class="vnext-trace">
           <h4>Decision Trace · 已核實邊界</h4>
           <ol>
