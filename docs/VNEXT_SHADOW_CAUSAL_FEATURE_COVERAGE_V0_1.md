@@ -16,6 +16,10 @@ The existing `prospective_shadow_continuity_v0_1.inspect_shadow_batch_continuity
 - `15M` and `4H` timeframes are explicitly `NOT_COLLECTED_IN_THIS_REPORT`. They are never inferred from 60M snapshots. Macro context, independent provider truth, fee/funding/slippage and return/candidate outcomes remain unavailable until separate admissible evidence exists.
 - Historical Shadow reports are collection-only; they did not select signals or evaluate outcomes. No candidate reranking, production strategy qualification, model promotion, paper submission, threshold/source switch, holdout or real-money/live-trading path is opened.
 
+## Additional fail-closed type guard (2026-10-25 review)
+
+A second code review found that a generic nonempty string or boolean could previously be counted as an available numeric observation even when the source field was `ema20`, `atr14` or Radar relative volume. **That is not admissible feature coverage.** The diagnostic now enforces the specific collector output schema: finite non-boolean numeric values for indicator/price/volume/imbalance fields; known strict categorical states for structure/pattern outputs; nonnegative relative volume and bounded liquidation imbalance. A valid `0`, `NONE`, or valid neutral state remains an observed value, not evidence of a positive trading signal. Tests explicitly mutate hash-valid synthetic reports to strings, booleans, unsupported states, out-of-range values and extreme integers, all of which must fail closed. This is an engineering validation hardening; actual external ZIPs still have not been re-audited.
+
 ## Engineering acceptance evidence versus actual research
 
 Tests in `tests/test_prospective_shadow_continuity_v0_1.py` use **synthetic fixtures only**. They assert complete timestamped fields, explicit-null and absent fields, missing lineage, premature/future timestamps, source-bar mismatch, invalid values, tampered authority and de-duplication of overlapping candle identities. Passing CI proves the **code contract**, not empirical feature coverage or live market validity.
