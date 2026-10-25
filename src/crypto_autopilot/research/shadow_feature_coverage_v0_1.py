@@ -107,6 +107,7 @@ def inspect_shadow_feature_coverage(
     }
     unique_closed_candles: set[tuple[str, int]] = set()
     market_observations = 0
+    attested_snapshot_family_rows = 0
     for report in reports:
         collection = report["collection"]
         capture = collection["capture_timestamp_ms"]
@@ -119,6 +120,7 @@ def inspect_shadow_feature_coverage(
                 family: _attested_snapshot(row, family, candle_start, capture)
                 for family, _ in _FEATURES
             }
+            attested_snapshot_family_rows += sum(attested_by_family.values())
             for family, field in _FEATURES:
                 record = counts[f"{family}.{field}"]
                 if not attested_by_family[family]:
@@ -154,7 +156,10 @@ def inspect_shadow_feature_coverage(
         "source_archive_digests_authenticated": False,
         "github_run_metadata_authenticated": False,
         "production_eligibility_proven": False,
-        "no_lookahead_verified_for_attested_feature_snapshots": True,
+        "no_lookahead_verified_for_attested_feature_snapshots": (
+            attested_snapshot_family_rows > 0
+        ),
+        "attested_snapshot_family_rows": attested_snapshot_family_rows,
         "no_lookahead_proven_for_unattested_snapshots": False,
         "observed_report_count": continuity["report_count"],
         "market_snapshot_rows": market_observations,
