@@ -513,6 +513,86 @@ def observed_shadow_metadata_panel(
     )
 
 
+# Keep the historical sixteen frozen; separately audit one later, non-adjacent ZIP.
+SHADOW_SINGLETON_RECEIPT = (
+    "research/receipts/2026-10-25-shadow-natural-zip-singleton-authentication-v0-1.json"
+)
+
+
+def authenticated_shadow_singleton_panel(
+    receipt: object, *, prior_sixteen_verified: bool = False
+) -> str:
+    """Require exact versioned read-only ZIP receipt, without assuming continuity."""
+    unknown = (
+        '<section class="vnext-observed-shadow" aria-label="原始 ZIP 稽核結果">'
+        '<h4>2026-10-25 原始 ZIP 稽核：UNKNOWN</h4>'
+        '<p>缺少可信的獨立稽核證據；不可新增合格批次或交易資格。</p>'
+        '</section>'
+    )
+    required = {
+        "schema": "qookey-shadow-archived-singleton-authentication-v0.1",
+        "review_date_utc": "2026-10-25",
+        "validation_mode": "PR_ONLY_GITHUB_HOSTED_READ_ONLY_ORIGINAL_ZIP",
+        "source_run_id": 40162915838,
+        "source_run_attempt": 1,
+        "source_run_number": 69,
+        "source_run_head_sha": "944895170f80af21e8f9b544ec42b279c45c0d6e",
+        "artifact_id": 12586364157,
+        "original_zip_sha256": "191fa626fbddd7f4a2a639618157605ab382a343936584fa2755ec2f6c08f03d",
+        "capture_time_utc": "2026-10-25T04:43:38.396000Z",
+        "audit_run_id": 40183609493,
+        "audit_job_id": 121139641155,
+        "audit_pr_number": 813,
+        "audit_pr_state": "CLOSED_UNMERGED",
+        "audit_head_sha": "53f230d2d92e7ac50d884d5e09a1802b6a8c024b",
+        "audit_job_conclusion": "success",
+        "verified_governed_market_count": 5,
+        "verified_closed_60m_candles_per_market": 240,
+        "single_original_zip_content_verified": True,
+        "prior_independent_original_zip_count": 16,
+        "prior_frozen_receipt_path": "research/receipts/2026-10-11-shadow-sixteen-incremental-audit-v0-1.json",
+        "continuous_sequence_of_17_proven": False,
+        "adjacent_pair_overlap_verified": False,
+        "multi_timeframe_feature_coverage_verified": False,
+        "full_schedule_coverage_proven": False,
+        "production_eligibility_proven": False,
+        "live_paper_cycle_executed": False,
+        "provider_requests_by_audit": 0,
+        "r2_access_by_audit": False,
+        "d1_access_by_audit": False,
+        "source_switch_authorized": False,
+        "model_promotion_authorized": False,
+        "live_trading_authorized": False,
+    }
+    if (
+        not isinstance(receipt, dict)
+        or set(receipt) != set(required)
+        or any(type(receipt[k]) is not type(expected) or receipt[k] != expected
+               for k, expected in required.items())
+    ):
+        return unknown
+    prior = (
+        "既有 16 批已通過原始稽核，另新增 1 份獨立 ZIP 驗證；這不是連續 17/21。"
+        if prior_sixteen_verified is True else
+        "歷史批次稽核狀態 UNKNOWN；新 ZIP 不可併算為連續暖機。"
+    )
+    return (
+        '<section class="vnext-observed-shadow" aria-label="原始 ZIP 稽核結果">'
+        '<h4>2026-10-25 原始 ZIP 獨立驗證：PASS（單批）</h4>'
+        '<p>已透過僅限 PR 的 GitHub 雲端工作流程核實原始 ZIP 的 SHA-256、'
+        '原始 Run 身分、內部報告、5 市場 × 各 240 根已收盤 60M K 線。'
+        f'{prior}跨批重疊、因果特徵覆蓋與正式 PAPER 資格：UNKNOWN／未驗證。</p>'
+        '<dl class="vnext-evidence-times">'
+        '<div><dt>來源資料擷取 UTC</dt><dd>2026-10-25T04:43:38.396000Z</dd></div>'
+        '<div><dt>原始 ZIP／來源 Run</dt><dd>Artifact #12586364157 ／ #40162915838</dd></div>'
+        '<div><dt>稽核完成來源</dt><dd>GitHub PR-only Run #40183609493</dd></div>'
+        '</dl>'
+        '<p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40183609493"'
+        ' target="_blank" rel="noopener noreferrer">查看獨立原始 ZIP 稽核 ↗</a></p>'
+        '</section>'
+    )
+
+
 def _vnext_design_time_reason(root: Path) -> str:
     """A prepared empty registry never constitutes an executed NO_TRADE."""
     unknown = "正式原因碼：UNKNOWN；缺少可驗證的正式 PAPER 執行與結果報告。"
@@ -1150,6 +1230,13 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
     observed_panel = observed_shadow_metadata_panel(
         observed_snapshot, verified_count=16 if sixteen_verified else None
     )
+    try:
+        singleton_receipt = read_json(SHADOW_SINGLETON_RECEIPT, root)
+    except (OSError, ValueError, json.JSONDecodeError):
+        singleton_receipt = None
+    singleton_panel = authenticated_shadow_singleton_panel(
+        singleton_receipt, prior_sixteen_verified=sixteen_verified
+    )
     return f"""      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
         <div class="vnext-evidence-head">
           <div><p class="card-kicker">MARKET INTELLIGENCE / RESEARCH-ONLY</p>
@@ -1176,6 +1263,7 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
           <p>{feature_coverage}</p>
         </div>
         {observed_panel}
+        {singleton_panel}
         <div class="vnext-trace">
           <h4>Decision Trace · 已核實邊界</h4>
           <ol>
