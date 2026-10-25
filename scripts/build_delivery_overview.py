@@ -417,6 +417,120 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
 
 
 
+# Versioned metadata *observation*, not an original ZIP content audit.
+SHADOW_OBSERVED_METADATA = (
+    "research/status/vnext-shadow-observed-metadata-2026-10-25-v0-1.json"
+)
+
+
+def observed_shadow_metadata_panel(snapshot: object) -> str:
+    """Render dated GitHub metadata only after exact reviewed bindings are intact.
+
+    The metadata layer cannot authenticate original ZIP bytes, raw candles or
+    feature coverage; it NEVER increases the verified research count.
+    """
+    unknown = (
+        '<section class="vnext-observed-shadow" aria-label="Shadow 最新觀測來源">'
+        '<h4>最近一次自然 Shadow 觀測：UNKNOWN</h4>'
+        '<p>GitHub run / artifact 中繼資料缺失或未通過來源格式核對；'
+        '原始 ZIP 內容未驗證，既有 16/21 獨立稽核不變。</p></section>'
+    )
+    if not isinstance(snapshot, dict):
+        return unknown
+    run = snapshot.get("run")
+    artifact = snapshot.get("artifact")
+    assurance = snapshot.get("assurance")
+    if not isinstance(run, dict) or not isinstance(artifact, dict) or not isinstance(assurance, dict):
+        return unknown
+    required_false = (
+        "original_zip_content_authenticated",
+        "source_candle_timestamp_authenticated",
+        "feature_coverage_authenticated",
+        "production_eligibility_proven",
+        "additional_verified_shadow_batch",
+        "paper_cycle_executed",
+    )
+    if (
+        set(snapshot) != {"schema", "metadata_checked_date_utc", "source", "run", "artifact", "assurance"}
+        or snapshot["schema"] != "qookey-vnext-shadow-observed-metadata-v0.1"
+        or snapshot["metadata_checked_date_utc"] != "2026-10-25"
+        or snapshot["source"] != "GITHUB_ACTIONS_EXISTING_NATURAL_RUN_METADATA_ONLY"
+        or set(run) != {"id", "attempt", "event", "created_at_utc", "head_sha", "conclusion"}
+        or type(run["id"]) is not int or run["id"] != 40162915838
+        or type(run["attempt"]) is not int or run["attempt"] != 1
+        or run["event"] != "schedule" or run["conclusion"] != "success"
+        or run["head_sha"] != "944895170f80af21e8f9b544ec42b279c45c0d6e"
+        or set(artifact) != {"id", "name", "created_at_utc", "digest", "size_bytes", "expired"}
+        or type(artifact["id"]) is not int or artifact["id"] != 12586364157
+        or artifact["name"] != "prospective-shadow-v0-1-40162915838-1"
+        or artifact["digest"] != "sha256:191fa626fbddd7f4a2a639618157605ab382a343936584fa2755ec2f6c08f03d"
+        or type(artifact["size_bytes"]) is not int or artifact["size_bytes"] != 31975
+        or artifact["expired"] is not False
+        or set(assurance) != set(required_false)
+        or any(assurance[name] is not False for name in required_false)
+    ):
+        return unknown
+
+    def strict_utc(value: object) -> datetime | None:
+        if not isinstance(value, str) or not re.fullmatch(
+            r"\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z", value
+        ):
+            return None
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+        return parsed if parsed.strftime("%Y-%m-%dT%H:%M:%SZ") == value else None
+
+    run_utc = strict_utc(run["created_at_utc"])
+    artifact_utc = strict_utc(artifact["created_at_utc"])
+    if run_utc is None or artifact_utc is None or artifact_utc < run_utc:
+        return unknown
+    # Escaped even for reviewed, exact-bound values: no HTML from JSON.
+    run_time = html.escape(run["created_at_utc"])
+    archive_time = html.escape(artifact["created_at_utc"])
+    return (
+        '<section class="vnext-observed-shadow" aria-label="Shadow 最新觀測來源">'
+        '<h4>最新自然 Shadow Run · 僅中繼資料（2026-10-25 查核）</h4>'
+        '<p>原始 ZIP 內容：尚未驗證；來源 K 線可用時間：UNKNOWN。'
+        '既有獨立稽核仍為 16/21，連續性 REVIEW_REQUIRED。'
+        'GitHub 自然工作成功與 artifact metadata 存在，不等於第 17 批資料驗證。</p>'
+        '<dl class="vnext-evidence-times">'
+        f'<div><dt>GitHub Run 建立 UTC</dt><dd>{run_time}</dd></div>'
+        f'<div><dt>Artifact 建立 UTC</dt><dd>{archive_time}</dd></div>'
+        '<div><dt>資料來源 K 線／網站發布</dt><dd>UNKNOWN／獨立 Pages 部署</dd></div>'
+        '</dl>'
+        '<p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40162915838" '
+        'target="_blank" rel="noopener noreferrer">GitHub Run #40162915838 ↗</a>'
+        ' · Artifact #12586364157（僅 GitHub 中繼資料）</p>'
+        '</section>'
+    )
+
+
+def _vnext_design_time_reason(root: Path) -> str:
+    """A prepared empty registry never constitutes an executed NO_TRADE."""
+    unknown = "正式原因碼：UNKNOWN；缺少可驗證的正式 PAPER 執行與結果報告。"
+    try:
+        registry = read_json("config/cloud_paper_strategy_registry_v0_1.json", root)
+    except (OSError, ValueError, json.JSONDecodeError):
+        return unknown
+    if (
+        isinstance(registry, dict)
+        and registry.get("schema") == "qookey-cloud-paper-strategy-registry-v0.1"
+        and registry.get("status") == "EMPTY_NO_ELIGIBLE_STRATEGIES"
+        and registry.get("provider") == "PIONEX_PUBLIC"
+        and registry.get("strategies") == []
+        and registry.get("model_quality") == "REJECT"
+        and registry.get("production_fixture_admission") is False
+        and registry.get("automatic_promotion") is False
+    ):
+        return (
+            "僅設計時原因：NO_ELIGIBLE_STRATEGY；目前策略登錄為空。"
+            "正式 PAPER 尚未執行，這不是 runtime reason 或已發生的 NO_TRADE。"
+        )
+    return unknown
+
+
 def market_decision_panel(current: dict, root: Path = ROOT) -> str:
     """Expose only verified historical research coverage, never a trade recommendation."""
     checkpoint = current.get("vnext_delivery_checkpoint")
@@ -1011,6 +1125,23 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
         trace_evidence = (
             "十六批資料完整性 PASS，連續性 REVIEW_REQUIRED（9 段缺口）"
         )
+    no_trade_reason = (
+        _vnext_design_time_reason(root)
+        if production_disabled else
+        "正式原因碼：UNKNOWN；缺少可驗證的正式 PAPER 執行與結果報告。"
+    )
+    feature_coverage = (
+        "歷史 K 線結構／Hash 已核實（5 個研究市場，每批 240 根 60M 已收盤資料）；"
+        "技術特徵的有效樣本數、缺值率、因果可用時間、15M/4H 覆蓋及成本：UNKNOWN。"
+        "研究樣本驗證不代表正式策略資格。"
+        if verified else
+        "技術特徵的有效樣本數、缺值率、來源時間及成本：UNKNOWN。"
+    )
+    try:
+        observed_snapshot = read_json(SHADOW_OBSERVED_METADATA, root)
+    except (OSError, ValueError, json.JSONDecodeError):
+        observed_snapshot = None
+    observed_panel = observed_shadow_metadata_panel(observed_snapshot)
     return f"""      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
         <div class="vnext-evidence-head">
           <div><p class="card-kicker">MARKET INTELLIGENCE / RESEARCH-ONLY</p>
@@ -1022,7 +1153,7 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
           <article><p class="card-kicker">CURRENT DECISION</p><h4>正式決策尚未產生</h4><p>{decision}</p></article>
           <article><p class="card-kicker">CANDIDATE FUNNEL</p><h4>候選資格未通過</h4><p>{funnel}</p></article>
         </div>
-        <details class="vnext-context-disclosure">
+        <details class="vnext-context-disclosure" open>
           <summary>研究 Radar · Top Markets · Market Context <span>查看資料覆蓋與缺口</span></summary>
           <div class="vnext-context-grid">
             <article><p class="card-kicker">RADAR / RESEARCH</p><h4>事件資訊未發布</h4><p>{radar_detail}</p></article>
@@ -1031,6 +1162,12 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
           </div>
           <p class="vnext-evidence-note">資料來源、研究時點與網站發布時間獨立；未提供逐市場可用時間、即時行情與正式訊號時，不會補值或產生買賣建議。</p>
         </details>
+        <div class="vnext-trace" aria-label="原因碼與資料缺口">
+          <h4>Reason Code / Feature Coverage · 研究與正式循環分離</h4>
+          <p>{no_trade_reason}</p>
+          <p>{feature_coverage}</p>
+        </div>
+        {observed_panel}
         <div class="vnext-trace">
           <h4>Decision Trace · 已核實邊界</h4>
           <ol>
