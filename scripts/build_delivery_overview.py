@@ -419,7 +419,7 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
 
 # Versioned metadata *observation*, not an original ZIP content audit.
 SHADOW_OBSERVED_METADATA = (
-    "research/status/vnext-shadow-observed-metadata-2026-10-25-v0-1.json"
+    "research/status/vnext-shadow-observed-metadata-2026-10-25-1311-v0-1.json"
 )
 
 
@@ -444,6 +444,31 @@ def observed_shadow_metadata_panel(
     assurance = snapshot.get("assurance")
     if not isinstance(run, dict) or not isinstance(artifact, dict) or not isinstance(assurance, dict):
         return unknown
+    # Dated public GitHub metadata bindings; intentionally separate from original ZIP
+    # authentication. An older artifact remains a distinct historical observation.
+    identities = {
+        40162915838: {
+            "run_time": "2026-10-25T04:43:22Z",
+            "head_sha": "944895170f80af21e8f9b544ec42b279c45c0d6e",
+            "artifact_id": 12586364157,
+            "artifact_name": "prospective-shadow-v0-1-40162915838-1",
+            "artifact_time": "2026-10-25T04:43:42Z",
+            "digest": "sha256:191fa626fbddd7f4a2a639618157605ab382a343936584fa2755ec2f6c08f03d",
+            "size_bytes": 31975,
+        },
+        40196502726: {
+            "run_time": "2026-10-25T13:11:49Z",
+            "head_sha": "805c43d687a37366f53c50c453679bb179222512",
+            "artifact_id": 12599619291,
+            "artifact_name": "prospective-shadow-v0-1-40196502726-1",
+            "artifact_time": "2026-10-25T13:12:06Z",
+            "digest": "sha256:8c4439e41d0816b9bb6de131e29652d2b499994e5f5c5294c5b9a9d6b61d4fda",
+            "size_bytes": 31514,
+        },
+    }
+    binding = identities.get(run.get("id")) if type(run.get("id")) is int else None
+    if binding is None:
+        return unknown
     required_false = (
         "original_zip_content_authenticated",
         "source_candle_timestamp_authenticated",
@@ -458,15 +483,15 @@ def observed_shadow_metadata_panel(
         or snapshot["metadata_checked_date_utc"] != "2026-10-25"
         or snapshot["source"] != "GITHUB_ACTIONS_EXISTING_NATURAL_RUN_METADATA_ONLY"
         or set(run) != {"id", "attempt", "event", "created_at_utc", "head_sha", "conclusion"}
-        or type(run["id"]) is not int or run["id"] != 40162915838
+        or type(run["id"]) is not int or run["id"] not in identities
         or type(run["attempt"]) is not int or run["attempt"] != 1
         or run["event"] != "schedule" or run["conclusion"] != "success"
-        or run["head_sha"] != "944895170f80af21e8f9b544ec42b279c45c0d6e"
+        or run["head_sha"] != binding["head_sha"]
         or set(artifact) != {"id", "name", "created_at_utc", "digest", "size_bytes", "expired"}
-        or type(artifact["id"]) is not int or artifact["id"] != 12586364157
-        or artifact["name"] != "prospective-shadow-v0-1-40162915838-1"
-        or artifact["digest"] != "sha256:191fa626fbddd7f4a2a639618157605ab382a343936584fa2755ec2f6c08f03d"
-        or type(artifact["size_bytes"]) is not int or artifact["size_bytes"] != 31975
+        or type(artifact["id"]) is not int or artifact["id"] != binding["artifact_id"]
+        or artifact["name"] != binding["artifact_name"]
+        or artifact["digest"] != binding["digest"]
+        or type(artifact["size_bytes"]) is not int or artifact["size_bytes"] != binding["size_bytes"]
         or artifact["expired"] is not False
         or set(assurance) != set(required_false)
         or any(assurance[name] is not False for name in required_false)
@@ -486,29 +511,36 @@ def observed_shadow_metadata_panel(
 
     run_utc = strict_utc(run["created_at_utc"])
     artifact_utc = strict_utc(artifact["created_at_utc"])
-    if run_utc is None or artifact_utc is None or artifact_utc < run_utc:
+    if (
+        run_utc is None or artifact_utc is None or artifact_utc < run_utc
+        or run["created_at_utc"] != binding["run_time"]
+        or artifact["created_at_utc"] != binding["artifact_time"]
+    ):
         return unknown
     # Escaped even for reviewed, exact-bound values: no HTML from JSON.
     run_time = html.escape(run["created_at_utc"])
     archive_time = html.escape(artifact["created_at_utc"])
+    run_id = run["id"]
+    artifact_id = artifact["id"]
     verified_label = (
         '16/21' if type(verified_count) is int and verified_count == 16
         else 'UNKNOWN（須獨立原始 ZIP 稽核）'
     )
     return (
         '<section class="vnext-observed-shadow" aria-label="Shadow 最新觀測來源">'
-        '<h4>最新自然 Shadow Run · 僅中繼資料（2026-10-25 查核）</h4>'
+        '<h4>自然 Shadow Run · 僅中繼資料（2026-10-25 查核）</h4>'
         '<p>原始 ZIP 內容：尚未驗證；來源 K 線可用時間：UNKNOWN。'
         f'已驗證批次 {verified_label}，連續性 REVIEW_REQUIRED。'
-        'GitHub 自然工作成功與 artifact metadata 存在，不等於第 17 批資料驗證。</p>'
+        'GitHub 自然工作成功與 artifact metadata 存在，不代表這個 Run 的 ZIP 已認證；'
+        '另一份較早獨立 ZIP 稽核另列，不可併算連續暖機。</p>'
         '<dl class="vnext-evidence-times">'
         f'<div><dt>GitHub Run 建立 UTC</dt><dd>{run_time}</dd></div>'
         f'<div><dt>Artifact 建立 UTC</dt><dd>{archive_time}</dd></div>'
         '<div><dt>資料來源 K 線／網站發布</dt><dd>UNKNOWN／獨立 Pages 部署</dd></div>'
         '</dl>'
-        '<p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40162915838" '
-        'target="_blank" rel="noopener noreferrer">GitHub Run #40162915838 ↗</a>'
-        ' · Artifact #12586364157（僅 GitHub 中繼資料）</p>'
+        f'<p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{run_id}" '
+        f'target="_blank" rel="noopener noreferrer">GitHub Run #{run_id} ↗</a>'
+        f' · Artifact #{artifact_id}（僅 GitHub 中繼資料）</p>'
         '</section>'
     )
 
