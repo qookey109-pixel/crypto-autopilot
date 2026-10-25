@@ -92,6 +92,21 @@ test("VNext market research is clearly non-live and fits a 390px phone", async (
   await expect(panel.locator('a[href*="/actions/runs/38105742124"]')).toBeVisible();
   await expect(panel.locator('a[href*="/actions/runs/38117712031"]')).toBeVisible();
   await expect(panel).toContainText("NOT_RUN（非 NO_TRADE）");
+  await expect(panel).toContainText("僅設計時原因：NO_ELIGIBLE_STRATEGY");
+  await expect(panel).toContainText("不是 runtime reason 或已發生的 NO_TRADE");
+  await expect(panel).toContainText("技術特徵的有效樣本數");
+  const observed = panel.locator(".vnext-observed-shadow");
+  await expect(observed).toBeVisible();
+  await expect(observed).toContainText("原始 ZIP 內容：尚未驗證");
+  await expect(observed).toContainText("16/21");
+  await expect(observed).toContainText("來源 K 線可用時間：UNKNOWN");
+  await expect(observed).toContainText("2026-10-25T04:43:22Z");
+  await expect(observed).toContainText("2026-10-25T04:43:42Z");
+  await expect(observed.locator('a[href*="/actions/runs/40162915838"]')).toHaveAttribute(
+    "rel", "noopener noreferrer"
+  );
+  await expect(panel.locator("details.vnext-context-disclosure")).toHaveAttribute("open", "");
+
   await expect(panel).toContainText("來源 K 線時間");
   await expect(panel).toContainText("UNKNOWN");
   const researchContext = panel.locator("details.vnext-context-disclosure");
