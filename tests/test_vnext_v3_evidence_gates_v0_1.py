@@ -47,7 +47,7 @@ def observed_fixture() -> dict[str, object]:
 
 class VNextV3ProvenanceTests(unittest.TestCase):
     def test_latest_observed_run_is_not_a_seventeenth_authenticated_shadow_batch(self):
-        panel = delivery.observed_shadow_metadata_panel(observed_fixture())
+        panel = delivery.observed_shadow_metadata_panel(observed_fixture(), verified_count=16)
         self.assertIn("40162915838", panel)
         self.assertIn("12586364157", panel)
         self.assertIn("2026-10-25T04:43:22Z", panel)
@@ -58,6 +58,14 @@ class VNextV3ProvenanceTests(unittest.TestCase):
         self.assertIn('href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40162915838"', panel)
         self.assertNotIn("17/21", panel)
         self.assertNotIn("正式 NO_TRADE", panel)
+
+    def test_observed_artifact_metadata_alone_cannot_claim_verified_count(self):
+        view = delivery.observed_shadow_metadata_panel(observed_fixture())
+        self.assertIn("已驗證批次 UNKNOWN", view)
+        self.assertNotIn("16/21", view)
+        view = delivery.observed_shadow_metadata_panel(observed_fixture(), verified_count=15)
+        self.assertIn("已驗證批次 UNKNOWN", view)
+        self.assertNotIn("16/21", view)
 
     def test_false_authority_or_invalid_metadata_falls_back_to_unknown(self):
         fixture = observed_fixture()
