@@ -22,6 +22,12 @@ Reviewed protected main: `805c43d687a37366f53c50c453679bb179222512` (PR #810 mer
 - Health [#40165377547](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40165377547) failure remains a real alert. Maintenance [#40165410002](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40165410002) later inspect/propose succeeded, but its draft PR #808 needs review; **older** `DELIVERY_BRANCH_NOT_AHEAD_OF_MAIN` failure cannot be erased or inferred as still latest.
 - Display separately: source candle / feature availability `UNKNOWN` unless proven, latest natural Run **creation UTC**, original report **capture UTC**, Artifact **creation UTC**, PR-only **audit run identity**, and independent published Pages SHA/time. A GitHub Workflow success is not a production trading signal.
 
+## Source-attested Decision Trace successor (additional review batch)
+
+The V3 `Decision Trace` now renders **six separately qualified stages** instead of conflating repository research with a Paper runtime decision: (1) frozen 16/21 historical context, (2) later nonadjacent authentic original ZIP audit and exact GitHub Run/Artifact/Audit references, (3) its authenticated capture UTC while closed source-candle availability remains UNKNOWN, (4) audited 60M raw candle window versus UNKNOWN feature causality/15M/4H/fees/slippage/funding, (5) model admission REJECT, and (6) formal Paper NOT_RUN, which is explicitly **not** an executed NO_TRADE. The original immutable singleton receipt is accepted only through the existing exact-field identity contract, factored into a shared pure validator so the independently audited ZIP card and trace cannot disagree on a tampered receipt. Missing/changed receipt degrades to UNKNOWN and does not expose archive source claims. No web live-market request or strategy ranking is implied.
+
+Cloud Python synthetic tests require the visible exact run, archive, audit and captured timestamp only for a valid original ZIP receipt; any tampered audit outcome must remove the verified lineage. Playwright built-site assertions cover six stages, narrow screen, external source link and untouched exact hash tests. These are branch engineering gates; no deployed Pages or formal PAPER acceptance before a separately approved merge.
+
 ## Engineering / research / production / schedule gates
 
 | Surface | This dated checkpoint | Evidence still required |
