@@ -296,6 +296,29 @@ class ShadowFeatureCoverageV01Tests(unittest.TestCase):
             with self.subTest(kind=kind), self.assertRaises(ContinuityReviewRequired):
                 inspect_shadow_feature_coverage([report])
 
+    def test_invalid_types_and_states_cannot_inflate_verified_coverage(self) -> None:
+        cases = [
+            ("numeric_as_string", "technical", "ema20", "100.0"),
+            ("numeric_bool", "technical", "atr14", False),
+            ("numeric_giant_int", "technical", "ema20", 10 ** 400),
+            ("enum_as_bool", "structure", "market_structure_state", True),
+            ("enum_unrecognized", "patterns", "fvg_bias", "TO_THE_MOON"),
+            ("enum_blank", "patterns", "liquidity_event", ""),
+            ("radar_numeric_string", "market_event_radar", "relative_volume", "2.0"),
+            ("radar_negative_volume", "market_event_radar", "relative_volume", -1.0),
+            ("radar_imbalance_range", "market_event_radar", "liquidation_imbalance", 1.2),
+        ]
+        for label, family, field, value in cases:
+            report = self._with_attested_features()
+            row = report["collection"]["market_evidence"][0]
+            target = row[family]
+            if family == "market_event_radar":
+                target = target["features"]
+            target[field] = value
+            resign(report)
+            with self.subTest(case=label), self.assertRaises(ContinuityReviewRequired):
+                inspect_shadow_feature_coverage([report])
+
     def test_overlaps_are_not_counted_as_unique_historical_candles(self) -> None:
         first = self._with_attested_features(0)
         second = self._with_attested_features(1)
