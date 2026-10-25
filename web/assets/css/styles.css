@@ -375,6 +375,26 @@ td code { overflow-wrap: anywhere; word-break: break-word; }
   .vnext-market-panel .vnext-evidence-head { flex-direction: column; }
 }
 
+/* Dated GitHub metadata is a separate, non-production provenance surface. */
+.vnext-observed-shadow {
+  margin-top: 14px;
+  padding: 16px 18px;
+  min-width: 0;
+  border: 1px solid var(--line-strong);
+  border-left: 4px solid var(--data-accent);
+  border-radius: 12px;
+  background: #142235;
+}
+.vnext-observed-shadow h4 { margin: 0 0 8px; font-size: 17px; line-height: 1.45; }
+.vnext-observed-shadow p { margin: 8px 0; font-size: 14px; line-height: 1.65; color: var(--ink-soft); overflow-wrap: anywhere; }
+.vnext-observed-shadow .vnext-evidence-times { margin: 14px 0 9px; }
+.vnext-observed-shadow a { color: var(--data-accent); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.vnext-observed-shadow :focus-visible { outline: 3px solid var(--accent-contrast-light); outline-offset: 3px; }
+@media (max-width: 600px) {
+  .vnext-observed-shadow { padding: 13px 14px; }
+  .vnext-observed-shadow .vnext-evidence-times { grid-template-columns: minmax(0, 1fr); }
+}
+
 /* Evidence-first context disclosure: compact, keyboard operable and non-live. */
 .vnext-context-disclosure { margin-top: 14px; border: 1px solid var(--line-strong); border-radius: 12px; overflow: clip; }
 .vnext-context-disclosure > summary { cursor: pointer; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 7px; padding: 14px 16px; font-size: 15px; font-weight: 700; line-height: 1.5; list-style-position: inside; }
