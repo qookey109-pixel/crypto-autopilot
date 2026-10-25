@@ -13,7 +13,7 @@
 
 ## PR inventory and no-merge triage
 
-The live GitHub open-PR list at the checkpoint contained **#803, #693–#698**. #803 draft head `50c0e8992d8c8d12f1da2d3fb294896b74f9571e`, base SHA `a7ee3e951d1d1f1e02e58a62c7951ea1ca5763db`; against reviewed main it was diverged **ahead 7 / behind 4** with changes only to generated blocks in `CURRENT_STATUS.md` and `docs/PROJECT_CONTINUATION_RUNBOOK.md`. The new natural maintenance inspector is correctly refusing to publish on top of this stale draft. Do not merge #803 or relax the ancestry guard. Closing an outdated draft preserves GitHub history; a subsequent *natural* workflow must still be independently verified, not inferred.
+The live GitHub open-PR list at the checkpoint contained **#803, #693–#698**. #803 draft head `50c0e8992d8c8d12f1da2d3fb294896b74f9571e`, base SHA `a7ee3e951d1d1f1e02e58a62c7951ea1ca5763db`; against reviewed main it was diverged **ahead 7 / behind 4** with changes only to generated blocks in `CURRENT_STATUS.md` and `docs/PROJECT_CONTINUATION_RUNBOOK.md`. The new natural maintenance inspector is correctly refusing to publish on top of this stale draft. Do not merge #803 or relax the ancestry guard. **#803 was subsequently CLOSED_UNMERGED** on 2026-10-25 after exact-head recheck and an explanatory preservation comment (GitHub comment #6393124684). No force push, merge, CI bypass, or workflow dispatch occurred. This eliminates the stale open-draft blocker but does **not** establish maintenance recovery; a subsequent *natural* workflow must still be independently verified, not inferred.
 
 | PR | Exact head | Observed check outcome | Action boundary |
 | --- | --- | --- | --- |
@@ -42,7 +42,7 @@ All check outcomes above refer to the listed **PR head**, not the latest main an
 | Research | Dated original-ZIP 16/21 subset, cumulative overlap and gaps; new Shadow job + artifact metadata | Independent original ZIP digest/source/attempt/schema/closed-candle/feature/availability validation for later runs; rolling causal replay |
 | Formal PAPER | Only source/SQLite synthetic infrastructure; 10,000 USD planned genesis | Current account cost/writer admission/D1 authority, controlled actual main run, exact decision trace, zero-trade result and durable readback |
 | Natural PAPER | Versioned schedule proposal exists, activation false | Eligible merged authority + separate distinct authorization, then independent natural slot/attempt persistence acceptance |
-| Maintenance | Fail-closed stale-draft guard working | Supersede/close stale #803 without merge, then observe a *future natural* inspect/propose outcome; preserve old errors |
+| Maintenance | Fail-closed stale-draft guard working | #803 CLOSED_UNMERGED; observe a *future natural* inspect/propose outcome; preserve old errors |
 | Health | Schedule coverage check succeeds, Core100 training alert remains | Treat `RUNTIME_CHANGED` as review-required until distinct runtime evidence resolves it; no unauthorized retraining |
 
 **Deferred P2:** Clef shadow, selective Vibe-Trading learning, derivative/liquidity research and trade-parameter console. Never broaden the critical-path authority while those are in progress. No fake `0` for missing current usage, performance, feature coverage or equity.
