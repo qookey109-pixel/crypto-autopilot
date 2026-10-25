@@ -169,10 +169,38 @@ test("served dashboard content hash matches the exact build", async ({ request, 
   test.skip(!expected, "PLAYWRIGHT_EXPECTED_CONTENT_HASH is not set outside CI");
   expect(expected).toMatch(/^[0-9a-f]{64}$/);
 
+  // Pages may return the previous successful deployment for longer than 30s
+  // after deploy-pages reports success. Keep an exact hash gate, never accept
+  // an older/mismatched/HTTP-error response as successful publication.
+  // Scope the extra time to this one test, not the whole browser suite.
+  test.setTimeout(150_000);
   await expect.poll(() => probePublishedContentHash(request, baseURL), {
-    timeout: 30_000,
-    intervals: [500, 1_000, 2_000],
+    timeout: 120_000,
+    intervals: [500, 1_000, 2_000, 5_000],
   }).toBe(expected);
+});
+
+test("persistent wrong published content never passes the bounded hash gate", async () => {
+  const expected = "a".repeat(64);
+  const stale = "b".repeat(64);
+  let attempts = 0;
+  const request = {
+    get: async () => {
+      attempts += 1;
+      return { ok: () => true, text: async () => stale };
+    },
+  };
+  let rejection;
+  try {
+    await expect.poll(() => probePublishedContentHash(request, "https://example.invalid/"), {
+      timeout: 250,
+      intervals: [10, 20],
+    }).toBe(expected);
+  } catch (error) {
+    rejection = error;
+  }
+  expect(rejection).toBeInstanceOf(Error);
+  expect(attempts).toBeGreaterThan(1);
 });
 
 test("stale cloud metadata is labeled stale and keeps only safe evidence links", async ({ page, baseURL }) => {
