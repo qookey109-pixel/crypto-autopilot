@@ -473,7 +473,7 @@ def observed_shadow_metadata_panel(snapshot: object) -> str:
 
     def strict_utc(value: object) -> datetime | None:
         if not isinstance(value, str) or not re.fullmatch(
-            r"\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z", value
+            r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", value
         ):
             return None
         try:
