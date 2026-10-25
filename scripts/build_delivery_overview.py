@@ -423,7 +423,9 @@ SHADOW_OBSERVED_METADATA = (
 )
 
 
-def observed_shadow_metadata_panel(snapshot: object) -> str:
+def observed_shadow_metadata_panel(
+    snapshot: object, *, verified_count: int | None = None
+) -> str:
     """Render dated GitHub metadata only after exact reviewed bindings are intact.
 
     The metadata layer cannot authenticate original ZIP bytes, raw candles or
@@ -433,7 +435,7 @@ def observed_shadow_metadata_panel(snapshot: object) -> str:
         '<section class="vnext-observed-shadow" aria-label="Shadow 最新觀測來源">'
         '<h4>最近一次自然 Shadow 觀測：UNKNOWN</h4>'
         '<p>GitHub run / artifact 中繼資料缺失或未通過來源格式核對；'
-        '原始 ZIP 內容未驗證，既有 16/21 獨立稽核不變。</p></section>'
+        '原始 ZIP 內容未驗證，已驗證數量仍須由獨立原始 ZIP 稽核裁定。</p></section>'
     )
     if not isinstance(snapshot, dict):
         return unknown
@@ -489,11 +491,15 @@ def observed_shadow_metadata_panel(snapshot: object) -> str:
     # Escaped even for reviewed, exact-bound values: no HTML from JSON.
     run_time = html.escape(run["created_at_utc"])
     archive_time = html.escape(artifact["created_at_utc"])
+    verified_label = (
+        '16/21' if type(verified_count) is int and verified_count == 16
+        else 'UNKNOWN（須獨立原始 ZIP 稽核）'
+    )
     return (
         '<section class="vnext-observed-shadow" aria-label="Shadow 最新觀測來源">'
         '<h4>最新自然 Shadow Run · 僅中繼資料（2026-10-25 查核）</h4>'
         '<p>原始 ZIP 內容：尚未驗證；來源 K 線可用時間：UNKNOWN。'
-        '既有獨立稽核仍為 16/21，連續性 REVIEW_REQUIRED。'
+        f'已驗證批次 {verified_label}，連續性 REVIEW_REQUIRED。'
         'GitHub 自然工作成功與 artifact metadata 存在，不等於第 17 批資料驗證。</p>'
         '<dl class="vnext-evidence-times">'
         f'<div><dt>GitHub Run 建立 UTC</dt><dd>{run_time}</dd></div>'
@@ -1141,7 +1147,9 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
         observed_snapshot = read_json(SHADOW_OBSERVED_METADATA, root)
     except (OSError, ValueError, json.JSONDecodeError):
         observed_snapshot = None
-    observed_panel = observed_shadow_metadata_panel(observed_snapshot)
+    observed_panel = observed_shadow_metadata_panel(
+        observed_snapshot, verified_count=16 if sixteen_verified else None
+    )
     return f"""      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
         <div class="vnext-evidence-head">
           <div><p class="card-kicker">MARKET INTELLIGENCE / RESEARCH-ONLY</p>
