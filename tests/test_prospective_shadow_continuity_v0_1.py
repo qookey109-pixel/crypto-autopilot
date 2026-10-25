@@ -279,7 +279,7 @@ class ShadowFeatureCoverageV01Tests(unittest.TestCase):
         self.assertFalse(feature["complete_coverage_proven"])
 
     def test_reject_future_premature_and_mismatched_feature_lineage(self) -> None:
-        for kind in ("radar_future", "premature", "source_bar_mismatch", "nan"):
+        for kind in ("radar_future", "premature", "source_bar_mismatch", "invalid_value"):
             report = self._with_attested_features()
             row = report["collection"]["market_evidence"][0]
             if kind == "radar_future":
@@ -291,11 +291,8 @@ class ShadowFeatureCoverageV01Tests(unittest.TestCase):
             elif kind == "source_bar_mismatch":
                 row["patterns"]["bar_time_ms"] -= HOUR_MS
             else:
-                row["technical"]["ema20"] = float("inf")
-            # Canonical SHA permits infinities only in malicious payload case:
-            # preserve the old ID there; either hash or feature value must reject.
-            if kind != "nan":
-                resign(report)
+                row["technical"]["ema20"] = [100.0]
+            resign(report)
             with self.subTest(kind=kind), self.assertRaises(ContinuityReviewRequired):
                 inspect_shadow_feature_coverage([report])
 
