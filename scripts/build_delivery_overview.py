@@ -519,16 +519,8 @@ SHADOW_SINGLETON_RECEIPT = (
 )
 
 
-def authenticated_shadow_singleton_panel(
-    receipt: object, *, prior_sixteen_verified: bool = False
-) -> str:
-    """Require exact versioned read-only ZIP receipt, without assuming continuity."""
-    unknown = (
-        '<section class="vnext-observed-shadow vnext-authenticated-shadow" aria-label="原始 ZIP 稽核結果">'
-        '<h4>2026-10-25 原始 ZIP 稽核：UNKNOWN</h4>'
-        '<p>缺少可信的獨立稽核證據；不可新增合格批次或交易資格。</p>'
-        '</section>'
-    )
+def _singleton_receipt_is_authenticated(receipt: object) -> bool:
+    """Exact reviewed source/run/archive/audit binding; no external calls."""
     required = {
         "schema": "qookey-shadow-archived-singleton-authentication-v0.1",
         "review_date_utc": "2026-10-25",
@@ -570,6 +562,21 @@ def authenticated_shadow_singleton_panel(
         or any(type(receipt[k]) is not type(expected) or receipt[k] != expected
                for k, expected in required.items())
     ):
+        return False
+    return True
+
+
+def authenticated_shadow_singleton_panel(
+    receipt: object, *, prior_sixteen_verified: bool = False
+) -> str:
+    """Require exact versioned read-only ZIP receipt, without assuming continuity."""
+    unknown = (
+        '<section class="vnext-observed-shadow vnext-authenticated-shadow" aria-label="原始 ZIP 稽核結果">'
+        '<h4>2026-10-25 原始 ZIP 稽核：UNKNOWN</h4>'
+        '<p>缺少可信的獨立稽核證據；不可新增合格批次或交易資格。</p>'
+        '</section>'
+    )
+    if not _singleton_receipt_is_authenticated(receipt):
         return unknown
     prior = (
         "既有 16 批已通過原始稽核，另新增 1 份獨立 ZIP 驗證；這不是連續 17/21。"
@@ -590,6 +597,75 @@ def authenticated_shadow_singleton_panel(
         '<p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40183609493"'
         ' target="_blank" rel="noopener noreferrer">查看獨立原始 ZIP 稽核 ↗</a></p>'
         '</section>'
+    )
+
+
+def shadow_decision_lineage_panel(
+    receipt: object,
+    *,
+    prior_sixteen_verified: bool = False,
+    production_disabled: bool = False,
+    historical_detail: str = "UNKNOWN",
+) -> str:
+    """A research-evidence trace only, never a formal decision-run receipt.
+
+    Preserve the frozen sixteen/21 context separately from the single later
+    independently authenticated ZIP. Missing or altered ZIP attestation never
+    becomes a pass through UI text or GitHub metadata alone.
+    """
+    audited = _singleton_receipt_is_authenticated(receipt)
+    historical = (
+        "歷史暖機：16/21，連續性 REVIEW_REQUIRED。"
+        + html.escape(historical_detail)
+        if prior_sixteen_verified is True
+        else "歷史暖機：UNKNOWN；未採信凍結批次身分。"
+    )
+    source = (
+        '原始 ZIP 稽核：已驗證的獨立 ZIP（非連續第十七份獨立 ZIP）。'
+        '來源自然 Run #40162915838，Artifact #12586364157；'
+        '<a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40183609493"'
+        ' target="_blank" rel="noopener noreferrer">唯讀稽核 Run #40183609493</a>。'
+        if audited else
+        "原始 ZIP 稽核：UNKNOWN；缺少可驗證的獨立來源證據。"
+    )
+    capture = (
+        "來源資料擷取 UTC：2026-10-25T04:43:38.396000Z；"
+        "來源 K 線可用時間：UNKNOWN；不是即時報價。"
+        if audited else
+        "來源資料擷取 UTC：UNKNOWN；來源 K 線可用時間：UNKNOWN。"
+    )
+    features = (
+        "資料覆蓋：5 市場 × 各 240 根已收盤 60M K 線；"
+        "技術特徵因果可用性：UNKNOWN；15M／4H：UNKNOWN；"
+        "手續費、滑價、資金費率：UNKNOWN。"
+        if audited else
+        "資料覆蓋：UNKNOWN；技術特徵因果可用性：UNKNOWN；"
+        "15M／4H：UNKNOWN；成本：UNKNOWN。"
+    )
+    admission = (
+        "策略准入：REJECT；僅可呈現設計時拒絕原因，不是正式執行結果。"
+        if production_disabled is True else
+        "策略准入：UNKNOWN；禁止推定候選資格。"
+    )
+    cycle = (
+        "正式 PAPER：NOT_RUN（非 NO_TRADE）；沒有可核對的交易、餘額或損益。"
+        if production_disabled is True else
+        "正式 PAPER：UNKNOWN；未核對執行、交易或報告。"
+    )
+    return (
+        '<div class="vnext-trace vnext-decision-lineage" aria-label="Decision Trace 來源譜系">'
+        '<h4>Decision Trace · 證據到正式決策</h4>'
+        '<ol>'
+        f'<li>{historical}</li>'
+        f'<li>{source}</li>'
+        f'<li>{capture}</li>'
+        f'<li>{features}</li>'
+        f'<li>{admission}</li>'
+        f'<li>{cycle}</li>'
+        '</ol>'
+        '<p class="vnext-evidence-note">此追溯鏈是唯讀研究投影，不是交易演算、'
+        'LIVE-PAPER 執行報告或自動策略排名。網站發布時間須由獨立 Pages 部署驗證。</p>'
+        '</div>'
     )
 
 
@@ -1237,6 +1313,12 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
     singleton_panel = authenticated_shadow_singleton_panel(
         singleton_receipt, prior_sixteen_verified=sixteen_verified
     )
+    lineage_panel = shadow_decision_lineage_panel(
+        singleton_receipt,
+        prior_sixteen_verified=sixteen_verified,
+        production_disabled=production_disabled,
+        historical_detail=trace_evidence,
+    )
     return f"""      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
         <div class="vnext-evidence-head">
           <div><p class="card-kicker">MARKET INTELLIGENCE / RESEARCH-ONLY</p>
@@ -1264,15 +1346,7 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
         </div>
         {observed_panel}
         {singleton_panel}
-        <div class="vnext-trace">
-          <h4>Decision Trace · 已核實邊界</h4>
-          <ol>
-            <li>Research Evidence：{trace_evidence}</li>
-            <li>Market Radar／Context：尚無正式市場結論</li>
-            <li>Strategy Admission：{"REJECT，不可晉升" if production_disabled else "UNKNOWN"}</li>
-            <li>Paper Run：{"NOT_RUN（非 NO_TRADE）" if production_disabled else "UNKNOWN"}</li>
-          </ol>
-        </div>
+        {lineage_panel}
         <dl class="vnext-evidence-times">
           <div><dt>來源 K 線時間</dt><dd>UNKNOWN · 尚未投影精確來源時間</dd></div>
           <div><dt>研究執行證據</dt><dd>{execution_source} · 執行時間請查看 Run</dd></div>
