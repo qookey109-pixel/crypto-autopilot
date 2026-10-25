@@ -190,6 +190,10 @@ def inspect_shadow_feature_coverage(
         ),
         "attested_snapshot_family_rows": attested_snapshot_family_rows,
         "no_lookahead_proven_for_unattested_snapshots": False,
+        # Captured research snapshots do not prove that a feature was already
+        # available at an earlier hypothetical signal/entry decision cutoff.
+        "historical_signal_cutoff_no_lookahead_proven": False,
+        "signal_outcome_predictive_edge_proven": False,
         "observed_report_count": continuity["report_count"],
         "market_snapshot_rows": market_observations,
         "closed_60m_input_rows_including_overlap": market_observations * 240,
