@@ -67,6 +67,46 @@ class VNextV3ProvenanceTests(unittest.TestCase):
         self.assertIn("已驗證批次 UNKNOWN", view)
         self.assertNotIn("16/21", view)
 
+    def test_new_original_zip_audit_is_explicitly_isolated_not_continuous(self):
+        receipt = delivery.read_json(delivery.SHADOW_SINGLETON_RECEIPT)
+        card = delivery.authenticated_shadow_singleton_panel(
+            receipt, prior_sixteen_verified=True
+        )
+        self.assertIn("原始 ZIP 獨立驗證：PASS（單批）", card)
+        self.assertIn("2026-10-25T04:43:38.396000Z", card)
+        self.assertIn("40183609493", card)
+        self.assertIn("5 市場 × 各 240 根", card)
+        self.assertIn("這不是連續 17/21", card)
+        self.assertIn("跨批重疊、因果特徵覆蓋與正式 PAPER 資格：UNKNOWN", card)
+        self.assertNotIn("已完成正式 PAPER", card)
+        isolated = delivery.authenticated_shadow_singleton_panel(
+            receipt, prior_sixteen_verified=False
+        )
+        self.assertIn("歷史批次稽核狀態 UNKNOWN", isolated)
+        self.assertNotIn("既有 16 批已通過", isolated)
+
+    def test_original_zip_receipt_mutations_fail_closed(self):
+        original = delivery.read_json(delivery.SHADOW_SINGLETON_RECEIPT)
+        for key, modified in (
+            ("audit_job_conclusion", "failure"),
+            ("original_zip_sha256", "a" * 64),
+            ("source_run_id", 1),
+            ("verified_governed_market_count", 0),
+            ("adjacent_pair_overlap_verified", True),
+            ("multi_timeframe_feature_coverage_verified", True),
+            ("live_paper_cycle_executed", True),
+            ("provider_requests_by_audit", None),
+            ("audit_pr_state", "OPEN"),
+        ):
+            mutated = copy.deepcopy(original)
+            mutated[key] = modified
+            with self.subTest(key=key):
+                html = delivery.authenticated_shadow_singleton_panel(
+                    mutated, prior_sixteen_verified=True
+                )
+                self.assertIn("稽核：UNKNOWN", html)
+                self.assertNotIn("獨立驗證：PASS", html)
+
     def test_false_authority_or_invalid_metadata_falls_back_to_unknown(self):
         fixture = observed_fixture()
         mutants = [
