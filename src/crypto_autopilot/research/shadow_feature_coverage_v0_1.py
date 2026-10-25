@@ -34,6 +34,18 @@ _FEATURES: tuple[tuple[str, str], ...] = (
     ("market_event_radar", "liquidation_imbalance"),
 )
 
+# The collector emits finite numeric observations or fixed categorical states.
+# A string (or bool) in a price/ratio field must not inflate evidence coverage.
+_CATEGORICAL_VALUES: dict[str, frozenset[str]] = {
+    "structure.market_structure_state": frozenset({"UP", "DOWN", "RANGE", "INDETERMINATE"}),
+    "patterns.liquidity_event": frozenset({
+        "NONE", "HIGH_SWEEP_RECLAIM", "LOW_SWEEP_RECLAIM",
+    }),
+    "patterns.fvg_bias": frozenset({"NONE", "BULLISH", "BEARISH"}),
+    "patterns.order_block_bias": frozenset({"NONE", "BULLISH", "BEARISH"}),
+    "patterns.macd_divergence": frozenset({"NONE", "BULLISH", "BEARISH"}),
+}
+
 
 def _time(value: object) -> int | None:
     return value if type(value) is int and value >= 0 else None
@@ -77,12 +89,27 @@ def _value(snapshot: Mapping[str, object], family: str, field: str) -> tuple[str
     value = source[field]
     if value is None:
         return "explicit_null", None
-    if isinstance(value, bool) or isinstance(value, str) and bool(value):
-        return "available", value
-    if isinstance(value, (float, int)) and not isinstance(value, bool):
-        if math.isfinite(float(value)):
+    allowed_states = _CATEGORICAL_VALUES.get(f"{family}.{field}")
+    if allowed_states is not None:
+        if type(value) is str and value in allowed_states:
             return "available", value
-    raise ContinuityReviewRequired("FEATURE_VALUE_INVALID")
+        raise ContinuityReviewRequired("FEATURE_CATEGORICAL_STATE_INVALID")
+
+    # Numeric fields are never truth values or arbitrary nonempty strings.
+    if type(value) not in (int, float):
+        raise ContinuityReviewRequired("FEATURE_NUMERIC_TYPE_INVALID")
+    try:
+        number = float(value)
+    except (OverflowError, ValueError) as exc:
+        raise ContinuityReviewRequired("FEATURE_NUMERIC_VALUE_INVALID") from exc
+    if not math.isfinite(number):
+        raise ContinuityReviewRequired("FEATURE_NUMERIC_VALUE_INVALID")
+    if family == "market_event_radar":
+        if field == "relative_volume" and number < 0:
+            raise ContinuityReviewRequired("FEATURE_RADAR_RANGE_INVALID")
+        if field == "liquidation_imbalance" and not -1.0 <= number <= 1.0:
+            raise ContinuityReviewRequired("FEATURE_RADAR_RANGE_INVALID")
+    return "available", value
 
 
 def inspect_shadow_feature_coverage(
