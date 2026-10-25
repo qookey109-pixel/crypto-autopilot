@@ -54,6 +54,17 @@ class Core100RuntimeManifestFieldReviewTests(unittest.TestCase):
         self.assertEqual(before, original)
         self.assertEqual(after, current)
 
+    def test_updated_runner_and_python_are_two_distinct_changes_not_root_cause(self) -> None:
+        baseline = runtime(version="20260920.314.1")
+        observed = runtime(version="20261012.334.1")
+        observed["version"] = "3.13.16 (test-build)"
+        result = inspect_runtime_manifest_fields(baseline=baseline, observed=observed)
+        self.assertEqual(result["changed_top_level_fields"], ["runner_image", "version"])
+        self.assertEqual(result["changed_distribution_names"], [])
+        self.assertTrue(result["runner_image_version_changed"])
+        self.assertFalse(result["runtime_changed_root_cause_proven"])
+        self.assertFalse(result["complete_source_manifests_authenticated"])
+
     def test_distribution_and_kernel_changes_are_named_without_value_leaks(self) -> None:
         before = runtime()
         after = runtime()
