@@ -45,7 +45,52 @@ def observed_fixture() -> dict[str, object]:
     }
 
 
+def latest_observed_fixture() -> dict[str, object]:
+    return delivery.read_json(delivery.SHADOW_OBSERVED_METADATA)
+
+
 class VNextV3ProvenanceTests(unittest.TestCase):
+    def test_newest_natural_shadow_run_keeps_archive_verification_unknown(self):
+        new = latest_observed_fixture()
+        panel = delivery.observed_shadow_metadata_panel(new, verified_count=16)
+        self.assertEqual(new["run"]["id"], 40196502726)
+        self.assertEqual(new["artifact"]["id"], 12599619291)
+        self.assertEqual(new["run"]["created_at_utc"], "2026-10-25T13:11:49Z")
+        self.assertEqual(new["artifact"]["created_at_utc"], "2026-10-25T13:12:06Z")
+        self.assertIn("40196502726", panel)
+        self.assertIn("12599619291", panel)
+        self.assertIn("2026-10-25T13:11:49Z", panel)
+        self.assertIn("2026-10-25T13:12:06Z", panel)
+        self.assertIn("原始 ZIP 內容：尚未驗證", panel)
+        self.assertIn("16/21", panel)
+        self.assertIn("來源 K 線可用時間：UNKNOWN", panel)
+        self.assertNotIn("正式 NO_TRADE", panel)
+        self.assertNotIn("17/21", panel)
+        # The already-audited older source is intentionally kept separate.
+        old = delivery.authenticated_shadow_singleton_panel(
+            delivery.read_json(delivery.SHADOW_SINGLETON_RECEIPT),
+            prior_sixteen_verified=True,
+        )
+        self.assertIn("40162915838", old)
+        self.assertNotIn("40196502726", old)
+
+    def test_latest_observation_identity_pairing_and_times_fail_closed(self):
+        newest = latest_observed_fixture()
+        for field, path, invalid in (
+            ("run_sha", ("run", "head_sha"), "944895170f80af21e8f9b544ec42b279c45c0d6e"),
+            ("run_time", ("run", "created_at_utc"), "2026-10-25T04:43:22Z"),
+            ("artifact_id", ("artifact", "id"), 12586364157),
+            ("artifact_time", ("artifact", "created_at_utc"), "2026-10-25T04:43:42Z"),
+            ("digest", ("artifact", "digest"), "sha256:191fa626fbddd7f4a2a639618157605ab382a343936584fa2755ec2f6c08f03d"),
+            ("fake_zip_claim", ("assurance", "original_zip_content_authenticated"), True),
+        ):
+            changed = copy.deepcopy(newest)
+            changed[path[0]][path[1]] = invalid
+            with self.subTest(field=field):
+                panel = delivery.observed_shadow_metadata_panel(changed, verified_count=16)
+                self.assertIn("UNKNOWN", panel)
+                self.assertNotIn("40196502726", panel)
+
     def test_latest_observed_run_is_not_a_seventeenth_authenticated_shadow_batch(self):
         panel = delivery.observed_shadow_metadata_panel(observed_fixture(), verified_count=16)
         self.assertIn("40162915838", panel)
