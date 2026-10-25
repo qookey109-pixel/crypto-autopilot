@@ -111,6 +111,20 @@ test("VNext market research is clearly non-live and fits a 390px phone", async (
   await expect(authenticated).toContainText("2026-10-25T04:43:38.396000Z");
   await expect(authenticated.locator('a[href*="/actions/runs/40183609493"]'))
     .toHaveAttribute("rel", "noopener noreferrer");
+  const lineage = panel.locator(".vnext-decision-lineage");
+  await expect(lineage).toBeVisible();
+  await expect(lineage).toContainText("Decision Trace · 證據到正式決策");
+  await expect(lineage).toContainText("歷史暖機：16/21，連續性 REVIEW_REQUIRED");
+  await expect(lineage).toContainText("非連續第十七份獨立 ZIP");
+  await expect(lineage).toContainText("2026-10-25T04:43:38.396000Z");
+  await expect(lineage).toContainText("來源 K 線可用時間：UNKNOWN");
+  await expect(lineage).toContainText("15M／4H：UNKNOWN");
+  await expect(lineage).toContainText("策略准入：REJECT");
+  await expect(lineage).toContainText("正式 PAPER：NOT_RUN（非 NO_TRADE）");
+  await expect(lineage).not.toContainText("正式 PAPER：已執行");
+  await expect(lineage.locator("ol > li")).toHaveCount(6);
+  await expect(lineage.locator('a[href*="/actions/runs/40183609493"]'))
+    .toHaveAttribute("rel", "noopener noreferrer");
   await expect(panel.locator("details.vnext-context-disclosure")).toHaveAttribute("open", "");
 
   await expect(panel).toContainText("來源 K 線時間");
