@@ -24,6 +24,17 @@ The GitHub job setup log explicitly records a changed full image version while P
 
 Current Health [#40165377547](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40165377547) remains ALERT due to the scheduled Core100 training failure. Maintenance [#40165410002](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40165410002) separately succeeded but does **not** clear training Health. The existing `Core100 Model Quality = REJECT` remains unchanged.
 
+## Latest natural weekly check on 2026-10-25 (observed after initial PR)
+
+[Core100 scheduled run #40180181401](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40180181401), job `121129383629`, source main `944895170f80af21e8f9b544ec42b279c45c0d6e`:
+
+- GitHub runner image `ubuntu-24.04`, exact version **`20261012.334.1`**, as recorded in the job setup log.
+- The `actions/setup-python` log reports **CPython `3.13.16`**, compared with the one-time baseline's **`3.13.15`**. The published Runner image and Python patch have both changed since that baseline; their exact manifest field impact and other differences remain unverified.
+- The existing emitted JSON report records `status=REVIEW_REQUIRED`, `reason=RUNTIME_CHANGED`, `dataset_fingerprint=91d5ac26e94fe86d175f2ec6972b648d63851c8727849f92d57f94073e377876` (matches baseline), `runtime_guard_fingerprint=c6733aab1c4f598ce3f4be36fa1b9058757459d1de4ef7394a4d0568c3d41d79` (matches baseline), and `experiment_fingerprint=daa7a660e622fab400d3125ce8b11a030916a9335966119942766bce24ae4b43` (differs). Explicitly `training_performed=false` and `r2_writes_performed=false`; **`r2_access_performed=true` and `r2_reads_performed=true` belong to this preexisting scheduled comparator**, not the current retrospective read-only investigation. No provider calls were reported.
+- This is a *newly observed actual failed natural run*, not additional authorized model training. Health can correctly remain ALERT even when other workflows and Maintenance succeed.
+
+Unit tests additionally model two simultaneous **synthetic** differences (Runner image version and Python version), while preserving `runtime_changed_root_cause_proven=false` until separately authenticated full source manifests are available. This appendix is not an update to frozen baseline or a new execution grant.
+
 ## New purely local-to-the-GitHub-workflow diagnostic contract
 
 `src/crypto_autopilot/training/runtime_manifest_field_review_v0_1.py` is a **pure function** over two complete caller-supplied V0.2 runtime manifests; it imports the pre-existing strict `normalize_runtime_manifest` function. It does not read any source files, network, environment variables, provider API or R2. It rejects missing/invalid manifest fields, produces only changed top-level field names and changed normalized distribution/tool **names** (not their raw values), and never confers source authentication, training authority or `NO_CHANGE` production semantics. All tests are synthetic and specifically assert these limitations.
