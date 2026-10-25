@@ -95,7 +95,7 @@ test("VNext market research is clearly non-live and fits a 390px phone", async (
   await expect(panel).toContainText("僅設計時原因：NO_ELIGIBLE_STRATEGY");
   await expect(panel).toContainText("不是 runtime reason 或已發生的 NO_TRADE");
   await expect(panel).toContainText("技術特徵的有效樣本數");
-  const observed = panel.locator(".vnext-observed-shadow");
+  const observed = panel.locator(".vnext-observed-shadow:not(.vnext-authenticated-shadow)");
   await expect(observed).toBeVisible();
   await expect(observed).toContainText("原始 ZIP 內容：尚未驗證");
   await expect(observed).toContainText("16/21");
