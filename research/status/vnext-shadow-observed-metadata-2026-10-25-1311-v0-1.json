@@ -1,0 +1,29 @@
+{
+  "schema": "qookey-vnext-shadow-observed-metadata-v0.1",
+  "metadata_checked_date_utc": "2026-10-25",
+  "source": "GITHUB_ACTIONS_EXISTING_NATURAL_RUN_METADATA_ONLY",
+  "run": {
+    "id": 40196502726,
+    "attempt": 1,
+    "event": "schedule",
+    "created_at_utc": "2026-10-25T13:11:49Z",
+    "head_sha": "805c43d687a37366f53c50c453679bb179222512",
+    "conclusion": "success"
+  },
+  "artifact": {
+    "id": 12599619291,
+    "name": "prospective-shadow-v0-1-40196502726-1",
+    "created_at_utc": "2026-10-25T13:12:06Z",
+    "digest": "sha256:8c4439e41d0816b9bb6de131e29652d2b499994e5f5c5294c5b9a9d6b61d4fda",
+    "size_bytes": 31514,
+    "expired": false
+  },
+  "assurance": {
+    "original_zip_content_authenticated": false,
+    "source_candle_timestamp_authenticated": false,
+    "feature_coverage_authenticated": false,
+    "production_eligibility_proven": false,
+    "additional_verified_shadow_batch": false,
+    "paper_cycle_executed": false
+  }
+}
