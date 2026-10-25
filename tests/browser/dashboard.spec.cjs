@@ -92,11 +92,51 @@ test("VNext market research is clearly non-live and fits a 390px phone", async (
   await expect(panel.locator('a[href*="/actions/runs/38105742124"]')).toBeVisible();
   await expect(panel.locator('a[href*="/actions/runs/38117712031"]')).toBeVisible();
   await expect(panel).toContainText("NOT_RUN（非 NO_TRADE）");
+  await expect(panel).toContainText("僅設計時原因：NO_ELIGIBLE_STRATEGY");
+  await expect(panel).toContainText("不是 runtime reason 或已發生的 NO_TRADE");
+  await expect(panel).toContainText("技術特徵的有效樣本數");
+  const observed = panel.locator(".vnext-observed-shadow:not(.vnext-authenticated-shadow)");
+  await expect(observed).toBeVisible();
+  await expect(observed).toContainText("原始 ZIP 內容：尚未驗證");
+  await expect(observed).toContainText("16/21");
+  await expect(observed).toContainText("來源 K 線可用時間：UNKNOWN");
+  await expect(observed).toContainText("2026-10-25T13:11:49Z");
+  await expect(observed).toContainText("2026-10-25T13:12:06Z");
+  await expect(observed).toContainText("Artifact #12599619291");
+  await expect(observed).not.toContainText("ZIP 獨立驗證：PASS");
+  await expect(observed.locator('a[href*="/actions/runs/40196502726"]')).toHaveAttribute(
+    "rel", "noopener noreferrer"
+  );
+  const authenticated = panel.locator('section[aria-label="原始 ZIP 稽核結果"]');
+  await expect(authenticated).toContainText("原始 ZIP 獨立驗證：PASS（單批）");
+  await expect(authenticated).toContainText("這不是連續 17/21");
+  await expect(authenticated).toContainText("2026-10-25T04:43:38.396000Z");
+  await expect(authenticated.locator('a[href*="/actions/runs/40183609493"]'))
+    .toHaveAttribute("rel", "noopener noreferrer");
+  const lineage = panel.locator(".vnext-decision-lineage");
+  await expect(lineage).toBeVisible();
+  await expect(lineage).toContainText("Decision Trace · 證據到正式決策");
+  await expect(lineage).toContainText("歷史暖機：16/21，連續性 REVIEW_REQUIRED");
+  await expect(lineage).toContainText("非連續第十七份獨立 ZIP");
+  await expect(lineage).toContainText("2026-10-25T04:43:38.396000Z");
+  await expect(lineage).toContainText("來源 K 線可用時間：UNKNOWN");
+  await expect(lineage).toContainText("15M／4H：UNKNOWN");
+  await expect(lineage).toContainText("策略准入：REJECT");
+  await expect(lineage).toContainText("正式 PAPER：NOT_RUN（非 NO_TRADE）");
+  await expect(lineage).not.toContainText("正式 PAPER：已執行");
+  await expect(lineage.locator("ol > li")).toHaveCount(6);
+  await expect(lineage.locator('a[href*="/actions/runs/40183609493"]'))
+    .toHaveAttribute("rel", "noopener noreferrer");
+  await expect(panel.locator("details.vnext-context-disclosure")).toHaveAttribute("open", "");
+
   await expect(panel).toContainText("來源 K 線時間");
   await expect(panel).toContainText("UNKNOWN");
   const researchContext = panel.locator("details.vnext-context-disclosure");
-  await expect(researchContext).not.toHaveAttribute("open", "");
+  // V3 reveals essential context by default. Test keyboard collapse and reopen.
+  await expect(researchContext).toHaveAttribute("open", "");
   await researchContext.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(researchContext).not.toHaveAttribute("open", "");
   await page.keyboard.press("Enter");
   await expect(researchContext).toHaveAttribute("open", "");
   await expect(researchContext).toContainText("5 個研究市場 · 非排名");

@@ -417,6 +417,314 @@ def overview(root: Path = ROOT) -> tuple[str, str, dict, dict]:
 
 
 
+# Versioned metadata *observation*, not an original ZIP content audit.
+SHADOW_OBSERVED_METADATA = (
+    "research/status/vnext-shadow-observed-metadata-2026-10-25-1311-v0-1.json"
+)
+
+
+def observed_shadow_metadata_panel(
+    snapshot: object, *, verified_count: int | None = None
+) -> str:
+    """Render dated GitHub metadata only after exact reviewed bindings are intact.
+
+    The metadata layer cannot authenticate original ZIP bytes, raw candles or
+    feature coverage; it NEVER increases the verified research count.
+    """
+    unknown = (
+        '<section class="vnext-observed-shadow" aria-label="Shadow 最新觀測來源">'
+        '<h4>最近一次自然 Shadow 觀測：UNKNOWN</h4>'
+        '<p>GitHub run / artifact 中繼資料缺失或未通過來源格式核對；'
+        '原始 ZIP 內容未驗證，已驗證數量仍須由獨立原始 ZIP 稽核裁定。</p></section>'
+    )
+    if not isinstance(snapshot, dict):
+        return unknown
+    run = snapshot.get("run")
+    artifact = snapshot.get("artifact")
+    assurance = snapshot.get("assurance")
+    if not isinstance(run, dict) or not isinstance(artifact, dict) or not isinstance(assurance, dict):
+        return unknown
+    # Dated public GitHub metadata bindings; intentionally separate from original ZIP
+    # authentication. An older artifact remains a distinct historical observation.
+    identities = {
+        40162915838: {
+            "run_time": "2026-10-25T04:43:22Z",
+            "head_sha": "944895170f80af21e8f9b544ec42b279c45c0d6e",
+            "artifact_id": 12586364157,
+            "artifact_name": "prospective-shadow-v0-1-40162915838-1",
+            "artifact_time": "2026-10-25T04:43:42Z",
+            "digest": "sha256:191fa626fbddd7f4a2a639618157605ab382a343936584fa2755ec2f6c08f03d",
+            "size_bytes": 31975,
+        },
+        40196502726: {
+            "run_time": "2026-10-25T13:11:49Z",
+            "head_sha": "805c43d687a37366f53c50c453679bb179222512",
+            "artifact_id": 12599619291,
+            "artifact_name": "prospective-shadow-v0-1-40196502726-1",
+            "artifact_time": "2026-10-25T13:12:06Z",
+            "digest": "sha256:8c4439e41d0816b9bb6de131e29652d2b499994e5f5c5294c5b9a9d6b61d4fda",
+            "size_bytes": 31514,
+        },
+    }
+    binding = identities.get(run.get("id")) if type(run.get("id")) is int else None
+    if binding is None:
+        return unknown
+    required_false = (
+        "original_zip_content_authenticated",
+        "source_candle_timestamp_authenticated",
+        "feature_coverage_authenticated",
+        "production_eligibility_proven",
+        "additional_verified_shadow_batch",
+        "paper_cycle_executed",
+    )
+    if (
+        set(snapshot) != {"schema", "metadata_checked_date_utc", "source", "run", "artifact", "assurance"}
+        or snapshot["schema"] != "qookey-vnext-shadow-observed-metadata-v0.1"
+        or snapshot["metadata_checked_date_utc"] != "2026-10-25"
+        or snapshot["source"] != "GITHUB_ACTIONS_EXISTING_NATURAL_RUN_METADATA_ONLY"
+        or set(run) != {"id", "attempt", "event", "created_at_utc", "head_sha", "conclusion"}
+        or type(run["id"]) is not int or run["id"] not in identities
+        or type(run["attempt"]) is not int or run["attempt"] != 1
+        or run["event"] != "schedule" or run["conclusion"] != "success"
+        or run["head_sha"] != binding["head_sha"]
+        or set(artifact) != {"id", "name", "created_at_utc", "digest", "size_bytes", "expired"}
+        or type(artifact["id"]) is not int or artifact["id"] != binding["artifact_id"]
+        or artifact["name"] != binding["artifact_name"]
+        or artifact["digest"] != binding["digest"]
+        or type(artifact["size_bytes"]) is not int or artifact["size_bytes"] != binding["size_bytes"]
+        or artifact["expired"] is not False
+        or set(assurance) != set(required_false)
+        or any(assurance[name] is not False for name in required_false)
+    ):
+        return unknown
+
+    def strict_utc(value: object) -> datetime | None:
+        if not isinstance(value, str) or not re.fullmatch(
+            r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", value
+        ):
+            return None
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+        return parsed if parsed.strftime("%Y-%m-%dT%H:%M:%SZ") == value else None
+
+    run_utc = strict_utc(run["created_at_utc"])
+    artifact_utc = strict_utc(artifact["created_at_utc"])
+    if (
+        run_utc is None or artifact_utc is None or artifact_utc < run_utc
+        or run["created_at_utc"] != binding["run_time"]
+        or artifact["created_at_utc"] != binding["artifact_time"]
+    ):
+        return unknown
+    # Escaped even for reviewed, exact-bound values: no HTML from JSON.
+    run_time = html.escape(run["created_at_utc"])
+    archive_time = html.escape(artifact["created_at_utc"])
+    run_id = run["id"]
+    artifact_id = artifact["id"]
+    verified_label = (
+        '16/21' if type(verified_count) is int and verified_count == 16
+        else 'UNKNOWN（須獨立原始 ZIP 稽核）'
+    )
+    return (
+        '<section class="vnext-observed-shadow" aria-label="Shadow 最新觀測來源">'
+        '<h4>自然 Shadow Run · 僅中繼資料（2026-10-25 查核）</h4>'
+        '<p>原始 ZIP 內容：尚未驗證；來源 K 線可用時間：UNKNOWN。'
+        f'已驗證批次 {verified_label}，連續性 REVIEW_REQUIRED。'
+        'GitHub 自然工作成功與 artifact metadata 存在，不代表這個 Run 的 ZIP 已認證；'
+        '另一份較早獨立 ZIP 稽核另列，不可併算連續暖機。</p>'
+        '<dl class="vnext-evidence-times">'
+        f'<div><dt>GitHub Run 建立 UTC</dt><dd>{run_time}</dd></div>'
+        f'<div><dt>Artifact 建立 UTC</dt><dd>{archive_time}</dd></div>'
+        '<div><dt>資料來源 K 線／網站發布</dt><dd>UNKNOWN／獨立 Pages 部署</dd></div>'
+        '</dl>'
+        f'<p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/{run_id}" '
+        f'target="_blank" rel="noopener noreferrer">GitHub Run #{run_id} ↗</a>'
+        f' · Artifact #{artifact_id}（僅 GitHub 中繼資料）</p>'
+        '</section>'
+    )
+
+
+# Keep the historical sixteen frozen; separately audit one later, non-adjacent ZIP.
+SHADOW_SINGLETON_RECEIPT = (
+    "research/receipts/2026-10-25-shadow-natural-zip-singleton-authentication-v0-1.json"
+)
+
+
+def _singleton_receipt_is_authenticated(receipt: object) -> bool:
+    """Exact reviewed source/run/archive/audit binding; no external calls."""
+    required = {
+        "schema": "qookey-shadow-archived-singleton-authentication-v0.1",
+        "review_date_utc": "2026-10-25",
+        "validation_mode": "PR_ONLY_GITHUB_HOSTED_READ_ONLY_ORIGINAL_ZIP",
+        "source_run_id": 40162915838,
+        "source_run_attempt": 1,
+        "source_run_number": 69,
+        "source_run_head_sha": "944895170f80af21e8f9b544ec42b279c45c0d6e",
+        "artifact_id": 12586364157,
+        "original_zip_sha256": "191fa626fbddd7f4a2a639618157605ab382a343936584fa2755ec2f6c08f03d",
+        "capture_time_utc": "2026-10-25T04:43:38.396000Z",
+        "audit_run_id": 40183609493,
+        "audit_job_id": 121139641155,
+        "audit_pr_number": 813,
+        "audit_pr_state": "CLOSED_UNMERGED",
+        "audit_head_sha": "53f230d2d92e7ac50d884d5e09a1802b6a8c024b",
+        "audit_job_conclusion": "success",
+        "verified_governed_market_count": 5,
+        "verified_closed_60m_candles_per_market": 240,
+        "single_original_zip_content_verified": True,
+        "prior_independent_original_zip_count": 16,
+        "prior_frozen_receipt_path": "research/receipts/2026-10-11-shadow-sixteen-incremental-audit-v0-1.json",
+        "continuous_sequence_of_17_proven": False,
+        "adjacent_pair_overlap_verified": False,
+        "multi_timeframe_feature_coverage_verified": False,
+        "full_schedule_coverage_proven": False,
+        "production_eligibility_proven": False,
+        "live_paper_cycle_executed": False,
+        "provider_requests_by_audit": 0,
+        "r2_access_by_audit": False,
+        "d1_access_by_audit": False,
+        "source_switch_authorized": False,
+        "model_promotion_authorized": False,
+        "live_trading_authorized": False,
+    }
+    if (
+        not isinstance(receipt, dict)
+        or set(receipt) != set(required)
+        or any(type(receipt[k]) is not type(expected) or receipt[k] != expected
+               for k, expected in required.items())
+    ):
+        return False
+    return True
+
+
+def authenticated_shadow_singleton_panel(
+    receipt: object, *, prior_sixteen_verified: bool = False
+) -> str:
+    """Require exact versioned read-only ZIP receipt, without assuming continuity."""
+    unknown = (
+        '<section class="vnext-observed-shadow vnext-authenticated-shadow" aria-label="原始 ZIP 稽核結果">'
+        '<h4>2026-10-25 原始 ZIP 稽核：UNKNOWN</h4>'
+        '<p>缺少可信的獨立稽核證據；不可新增合格批次或交易資格。</p>'
+        '</section>'
+    )
+    if not _singleton_receipt_is_authenticated(receipt):
+        return unknown
+    prior = (
+        "既有 16 批已通過原始稽核，另新增 1 份獨立 ZIP 驗證；這不是連續 17/21。"
+        if prior_sixteen_verified is True else
+        "歷史批次稽核狀態 UNKNOWN；新 ZIP 不可併算為連續暖機。"
+    )
+    return (
+        '<section class="vnext-observed-shadow vnext-authenticated-shadow" aria-label="原始 ZIP 稽核結果">'
+        '<h4>2026-10-25 原始 ZIP 獨立驗證：PASS（單批）</h4>'
+        '<p>已透過僅限 PR 的 GitHub 雲端工作流程核實原始 ZIP 的 SHA-256、'
+        '原始 Run 身分、內部報告、5 市場 × 各 240 根已收盤 60M K 線。'
+        f'{prior}跨批重疊、因果特徵覆蓋與正式 PAPER 資格：UNKNOWN／未驗證。</p>'
+        '<dl class="vnext-evidence-times">'
+        '<div><dt>來源資料擷取 UTC</dt><dd>2026-10-25T04:43:38.396000Z</dd></div>'
+        '<div><dt>原始 ZIP／來源 Run</dt><dd>Artifact #12586364157 ／ #40162915838</dd></div>'
+        '<div><dt>稽核完成來源</dt><dd>GitHub PR-only Run #40183609493</dd></div>'
+        '</dl>'
+        '<p><a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40183609493"'
+        ' target="_blank" rel="noopener noreferrer">查看獨立原始 ZIP 稽核 ↗</a></p>'
+        '</section>'
+    )
+
+
+def shadow_decision_lineage_panel(
+    receipt: object,
+    *,
+    prior_sixteen_verified: bool = False,
+    production_disabled: bool = False,
+    historical_detail: str = "UNKNOWN",
+) -> str:
+    """A research-evidence trace only, never a formal decision-run receipt.
+
+    Preserve the frozen sixteen/21 context separately from the single later
+    independently authenticated ZIP. Missing or altered ZIP attestation never
+    becomes a pass through UI text or GitHub metadata alone.
+    """
+    audited = _singleton_receipt_is_authenticated(receipt)
+    historical = (
+        "歷史暖機：16/21，連續性 REVIEW_REQUIRED。"
+        + html.escape(historical_detail)
+        if prior_sixteen_verified is True
+        else "歷史暖機：UNKNOWN；未採信凍結批次身分。"
+    )
+    source = (
+        '原始 ZIP 稽核：已驗證的獨立 ZIP（非連續第十七份獨立 ZIP）。'
+        '來源自然 Run #40162915838，Artifact #12586364157；'
+        '<a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40183609493"'
+        ' target="_blank" rel="noopener noreferrer">唯讀稽核 Run #40183609493</a>。'
+        if audited else
+        "原始 ZIP 稽核：UNKNOWN；缺少可驗證的獨立來源證據。"
+    )
+    capture = (
+        "來源資料擷取 UTC：2026-10-25T04:43:38.396000Z；"
+        "來源 K 線可用時間：UNKNOWN；不是即時報價。"
+        if audited else
+        "來源資料擷取 UTC：UNKNOWN；來源 K 線可用時間：UNKNOWN。"
+    )
+    features = (
+        "資料覆蓋：5 市場 × 各 240 根已收盤 60M K 線；"
+        "技術特徵因果可用性：UNKNOWN；15M／4H：UNKNOWN；"
+        "手續費、滑價、資金費率：UNKNOWN。"
+        if audited else
+        "資料覆蓋：UNKNOWN；技術特徵因果可用性：UNKNOWN；"
+        "15M／4H：UNKNOWN；成本：UNKNOWN。"
+    )
+    admission = (
+        "策略准入：REJECT；僅可呈現設計時拒絕原因，不是正式執行結果。"
+        if production_disabled is True else
+        "策略准入：UNKNOWN；禁止推定候選資格。"
+    )
+    cycle = (
+        "正式 PAPER：NOT_RUN（非 NO_TRADE）；沒有可核對的交易、餘額或損益。"
+        if production_disabled is True else
+        "正式 PAPER：UNKNOWN；未核對執行、交易或報告。"
+    )
+    return (
+        '<div class="vnext-trace vnext-decision-lineage" aria-label="Decision Trace 來源譜系">'
+        '<h4>Decision Trace · 證據到正式決策</h4>'
+        '<ol>'
+        f'<li>{historical}</li>'
+        f'<li>{source}</li>'
+        f'<li>{capture}</li>'
+        f'<li>{features}</li>'
+        f'<li>{admission}</li>'
+        f'<li>{cycle}</li>'
+        '</ol>'
+        '<p class="vnext-evidence-note">此追溯鏈是唯讀研究投影，不是交易演算、'
+        'LIVE-PAPER 執行報告或自動策略排名。網站發布時間須由獨立 Pages 部署驗證。</p>'
+        '</div>'
+    )
+
+
+def _vnext_design_time_reason(root: Path) -> str:
+    """A prepared empty registry never constitutes an executed NO_TRADE."""
+    unknown = "正式原因碼：UNKNOWN；缺少可驗證的正式 PAPER 執行與結果報告。"
+    try:
+        registry = read_json("config/cloud_paper_strategy_registry_v0_1.json", root)
+    except (OSError, ValueError, json.JSONDecodeError):
+        return unknown
+    if (
+        isinstance(registry, dict)
+        and registry.get("schema") == "qookey-cloud-paper-strategy-registry-v0.1"
+        and registry.get("status") == "EMPTY_NO_ELIGIBLE_STRATEGIES"
+        and registry.get("provider") == "PIONEX_PUBLIC"
+        and registry.get("strategies") == []
+        and registry.get("model_quality") == "REJECT"
+        and registry.get("production_fixture_admission") is False
+        and registry.get("automatic_promotion") is False
+    ):
+        return (
+            "僅設計時原因：NO_ELIGIBLE_STRATEGY；目前策略登錄為空。"
+            "正式 PAPER 尚未執行，這不是 runtime reason 或已發生的 NO_TRADE。"
+        )
+    return unknown
+
+
 def market_decision_panel(current: dict, root: Path = ROOT) -> str:
     """Expose only verified historical research coverage, never a trade recommendation."""
     checkpoint = current.get("vnext_delivery_checkpoint")
@@ -1011,6 +1319,38 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
         trace_evidence = (
             "十六批資料完整性 PASS，連續性 REVIEW_REQUIRED（9 段缺口）"
         )
+    no_trade_reason = (
+        _vnext_design_time_reason(root)
+        if production_disabled else
+        "正式原因碼：UNKNOWN；缺少可驗證的正式 PAPER 執行與結果報告。"
+    )
+    feature_coverage = (
+        "歷史 K 線結構／Hash 已核實（5 個研究市場，每批 240 根 60M 已收盤資料）；"
+        "技術特徵的有效樣本數、缺值率、因果可用時間、15M/4H 覆蓋及成本：UNKNOWN。"
+        "研究樣本驗證不代表正式策略資格。"
+        if verified else
+        "技術特徵的有效樣本數、缺值率、來源時間及成本：UNKNOWN。"
+    )
+    try:
+        observed_snapshot = read_json(SHADOW_OBSERVED_METADATA, root)
+    except (OSError, ValueError, json.JSONDecodeError):
+        observed_snapshot = None
+    observed_panel = observed_shadow_metadata_panel(
+        observed_snapshot, verified_count=16 if sixteen_verified else None
+    )
+    try:
+        singleton_receipt = read_json(SHADOW_SINGLETON_RECEIPT, root)
+    except (OSError, ValueError, json.JSONDecodeError):
+        singleton_receipt = None
+    singleton_panel = authenticated_shadow_singleton_panel(
+        singleton_receipt, prior_sixteen_verified=sixteen_verified
+    )
+    lineage_panel = shadow_decision_lineage_panel(
+        singleton_receipt,
+        prior_sixteen_verified=sixteen_verified,
+        production_disabled=production_disabled,
+        historical_detail=trace_evidence,
+    )
     return f"""      <section class="panel vnext-market-panel" aria-labelledby="vnext-market-heading">
         <div class="vnext-evidence-head">
           <div><p class="card-kicker">MARKET INTELLIGENCE / RESEARCH-ONLY</p>
@@ -1022,7 +1362,7 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
           <article><p class="card-kicker">CURRENT DECISION</p><h4>正式決策尚未產生</h4><p>{decision}</p></article>
           <article><p class="card-kicker">CANDIDATE FUNNEL</p><h4>候選資格未通過</h4><p>{funnel}</p></article>
         </div>
-        <details class="vnext-context-disclosure">
+        <details class="vnext-context-disclosure" open>
           <summary>研究 Radar · Top Markets · Market Context <span>查看資料覆蓋與缺口</span></summary>
           <div class="vnext-context-grid">
             <article><p class="card-kicker">RADAR / RESEARCH</p><h4>事件資訊未發布</h4><p>{radar_detail}</p></article>
@@ -1031,15 +1371,14 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
           </div>
           <p class="vnext-evidence-note">資料來源、研究時點與網站發布時間獨立；未提供逐市場可用時間、即時行情與正式訊號時，不會補值或產生買賣建議。</p>
         </details>
-        <div class="vnext-trace">
-          <h4>Decision Trace · 已核實邊界</h4>
-          <ol>
-            <li>Research Evidence：{trace_evidence}</li>
-            <li>Market Radar／Context：尚無正式市場結論</li>
-            <li>Strategy Admission：{"REJECT，不可晉升" if production_disabled else "UNKNOWN"}</li>
-            <li>Paper Run：{"NOT_RUN（非 NO_TRADE）" if production_disabled else "UNKNOWN"}</li>
-          </ol>
+        <div class="vnext-trace" aria-label="原因碼與資料缺口">
+          <h4>Reason Code / Feature Coverage · 研究與正式循環分離</h4>
+          <p>{no_trade_reason}</p>
+          <p>{feature_coverage}</p>
         </div>
+        {observed_panel}
+        {singleton_panel}
+        {lineage_panel}
         <dl class="vnext-evidence-times">
           <div><dt>來源 K 線時間</dt><dd>UNKNOWN · 尚未投影精確來源時間</dd></div>
           <div><dt>研究執行證據</dt><dd>{execution_source} · 執行時間請查看 Run</dd></div>
