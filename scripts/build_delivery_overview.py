@@ -524,7 +524,7 @@ def authenticated_shadow_singleton_panel(
 ) -> str:
     """Require exact versioned read-only ZIP receipt, without assuming continuity."""
     unknown = (
-        '<section class="vnext-observed-shadow" aria-label="原始 ZIP 稽核結果">'
+        '<section class="vnext-observed-shadow vnext-authenticated-shadow" aria-label="原始 ZIP 稽核結果">'
         '<h4>2026-10-25 原始 ZIP 稽核：UNKNOWN</h4>'
         '<p>缺少可信的獨立稽核證據；不可新增合格批次或交易資格。</p>'
         '</section>'
@@ -577,7 +577,7 @@ def authenticated_shadow_singleton_panel(
         "歷史批次稽核狀態 UNKNOWN；新 ZIP 不可併算為連續暖機。"
     )
     return (
-        '<section class="vnext-observed-shadow" aria-label="原始 ZIP 稽核結果">'
+        '<section class="vnext-observed-shadow vnext-authenticated-shadow" aria-label="原始 ZIP 稽核結果">'
         '<h4>2026-10-25 原始 ZIP 獨立驗證：PASS（單批）</h4>'
         '<p>已透過僅限 PR 的 GitHub 雲端工作流程核實原始 ZIP 的 SHA-256、'
         '原始 Run 身分、內部報告、5 市場 × 各 240 根已收盤 60M K 線。'
