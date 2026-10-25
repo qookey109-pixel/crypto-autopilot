@@ -100,9 +100,11 @@ test("VNext market research is clearly non-live and fits a 390px phone", async (
   await expect(observed).toContainText("原始 ZIP 內容：尚未驗證");
   await expect(observed).toContainText("16/21");
   await expect(observed).toContainText("來源 K 線可用時間：UNKNOWN");
-  await expect(observed).toContainText("2026-10-25T04:43:22Z");
-  await expect(observed).toContainText("2026-10-25T04:43:42Z");
-  await expect(observed.locator('a[href*="/actions/runs/40162915838"]')).toHaveAttribute(
+  await expect(observed).toContainText("2026-10-25T13:11:49Z");
+  await expect(observed).toContainText("2026-10-25T13:12:06Z");
+  await expect(observed).toContainText("Artifact #12599619291");
+  await expect(observed).not.toContainText("ZIP 獨立驗證：PASS");
+  await expect(observed.locator('a[href*="/actions/runs/40196502726"]')).toHaveAttribute(
     "rel", "noopener noreferrer"
   );
   const authenticated = panel.locator('section[aria-label="原始 ZIP 稽核結果"]');
