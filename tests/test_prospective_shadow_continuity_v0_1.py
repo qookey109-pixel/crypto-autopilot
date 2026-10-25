@@ -247,6 +247,9 @@ class ShadowFeatureCoverageV01Tests(unittest.TestCase):
         self.assertEqual(out["timeframes"]["15M"], "NOT_COLLECTED_IN_THIS_REPORT")
         self.assertIsNone(out["costs"]["fees_bps"])
         self.assertFalse(out["source_archive_digests_authenticated"])
+        self.assertTrue(out["no_lookahead_verified_for_attested_feature_snapshots"])
+        self.assertFalse(out["historical_signal_cutoff_no_lookahead_proven"])
+        self.assertFalse(out["signal_outcome_predictive_edge_proven"])
         self.assertFalse(out["authority"]["paper_submission"])
 
         ema = out["features"]["technical.ema20"]
