@@ -4,6 +4,7 @@ import io
 import json
 import unittest
 from dataclasses import asdict, replace
+from pathlib import Path
 from unittest.mock import patch
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import (
@@ -22,15 +23,10 @@ except ModuleNotFoundError as exc:
         raise
     run_shared_signal_collection = None
 
-SOURCES = [
-    {"source_id": "capafy_category_11", "url": "https://capafy.ai/zh-hant/?category=11",
-     "enabled": True, "parse_mode": "structured_json_only"},
-    {"source_id": "capafy_btc_cycle_radar",
-     "url": "https://capafy.ai/zh-hant/agent/bitcoin-cycle-radar-btc-health-buzz/8672024464",
-     "enabled": True, "parse_mode": "structured_json_only"},
-    {"source_id": "x_aleabitoreddit", "url": "https://x.com/aleabitoreddit",
-     "enabled": True, "parse_mode": "metadata_only"},
-]
+SOURCES = json.loads(
+    (Path(__file__).resolve().parents[1] / "config/research_signal_layer_v0_2.json")
+    .read_text(encoding="utf-8")
+)["sources"]
 
 
 class Response(io.BytesIO):
@@ -190,6 +186,19 @@ class SharedSignalCollectionTests(unittest.TestCase):
         self.assertEqual(got["status"], "REVIEW_REQUIRED")
         self.assertEqual(got["provider_requests_performed"], 3)
         self.assertNotIn("research/signal-layer/v0-2/latest.json", self.backend.objects)
+
+
+    def test_cross_source_forecast_id_revision_stops_before_s3(self):
+        self.body = json.dumps({
+            "forecasts": [{
+                "forecast_id": "same-id", "symbol": "BTC_USDT_PERP",
+                "direction": "long", "confidence": 0.5,
+                "published_at_ms": NOW - 1000, "target_time_ms": NOW + 60000,
+            }],
+        }).encode()
+        got = self.run_cycle()
+        self.assertEqual(got["status"], "REVIEW_REQUIRED")
+        self.mock_factory.assert_not_called()
 
 
 if __name__ == "__main__":

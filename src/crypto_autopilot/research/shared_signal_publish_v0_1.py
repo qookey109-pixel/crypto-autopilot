@@ -165,6 +165,18 @@ def publish_shared_signal_payload(
         reservation=reservation, guard=guard, execute=execute,
         query_meter=query_meter, validate_binding=validate_binding,
     )
+    return _publish_objects(
+        objects=objects, run_id=run_id, generated_at=_timestamp(payload["generated_at_utc"]),
+        budget=budget, credentials=credentials,
+    )
+
+
+def _publish_objects(
+    *, objects: tuple[tuple[str, bytes], ...], run_id: str, generated_at: datetime,
+    budget: SharedWriterR2Budget, credentials: Mapping[str, str],
+) -> dict[str, object]:
+    """Trusted admitted callers only; preserve one publication implementation."""
+    planned_bytes = sum(len(body) for _, body in objects)
     verified = 0
     stage = "CONSTRUCT_STORE"
     try:
@@ -176,7 +188,7 @@ def publish_shared_signal_payload(
         )
         stage = "LATEST_POINTER_PREFLIGHT"
         condition = _latest_condition(
-            store, generated_at=_timestamp(payload["generated_at_utc"]),
+            store, generated_at=generated_at,
         )
         for index, (key, body) in enumerate(objects):
             stage = f"IMMUTABLE_{index + 1}" if index < 2 else "LATEST_POINTER"

@@ -45,4 +45,6 @@ The new module performs admission, sequential metered acquisition, safe payload 
 Ruling: use a short-lived remote GitHub branch and hosted CI instead of local skill workspace/scripts — binding CLOUD_ONLY forbids local files and terminal; commits and this ledger preserve the execution record.
 Ruling: follow existing execution/merge authorization without another design approval — the user has explicitly requested continuous implementation and opted out of repeated approval.
 Pre-flight: collection consumes only a shared admitted budget; publication-only API keeps exact bytes/provider=0 validation. The combined envelope is conservatively retained in full, never refunded.
-Current state: tests first; no combined production implementation yet.
+RED verified: head 4dd87c236aa084ba210724ba4237f12633ff0791, job 121637332164 ran 1962 tests and failed exactly the 10 new missing-runtime assertions. Existing tests introduced no additional failures.
+Current state: implementing GREEN; legacy publication behavior retained through a shared private helper.
+Ruling: publication envelope is 270336 bytes, lower than the legacy 2500000-byte planned maximum, because the existing shared guard limits each object to 262144 bytes; oversized payloads stop before S3 rather than increasing that ceiling.
