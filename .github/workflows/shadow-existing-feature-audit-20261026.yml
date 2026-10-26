@@ -1,0 +1,126 @@
+name: Shadow Existing Feature Coverage Audit 2026-10-26 (temporary PR-only)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/shadow-existing-feature-audit-20261026.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  existing-archive-only:
+    # This audit workflow must not be merged to default main or scheduled.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'codex/shadow-existing-feature-audit-20261026'
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Checkout PR source (no credentials persisted)
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Use reviewed cloud Python runtime
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Audit only existing Shadow run 40162915838 / artifact 12586364157
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONPATH: src
+        run: |
+          set -euo pipefail
+          tmpdir="$(mktemp -d "${RUNNER_TEMP}/shadow-readonly-XXXXXX")"
+          trap 'rm -rf -- "$tmpdir"' EXIT
+
+          # Existing GitHub Actions originals only, no new collection.
+          gh api /repos/qookey109-pixel/crypto-autopilot/actions/runs/40162915838 > "$tmpdir/run.json"
+          gh api /repos/qookey109-pixel/crypto-autopilot/actions/runs/40162915838/jobs > "$tmpdir/jobs.json"
+          gh api /repos/qookey109-pixel/crypto-autopilot/actions/artifacts/12586364157 > "$tmpdir/artifact.json"
+          gh api -H "Accept: application/vnd.github+json" /repos/qookey109-pixel/crypto-autopilot/actions/artifacts/12586364157/zip > "$tmpdir/original.zip"
+
+          python - "$tmpdir" <<'PY'
+          from __future__ import annotations
+          from pathlib import Path
+          import hashlib
+          import json
+          import sys
+          from datetime import datetime, timezone
+
+          from crypto_autopilot.research.shadow_original_zip_audit_v0_1 import (
+              verify_existing_original_zip,
+          )
+          from crypto_autopilot.research.prospective_shadow_continuity_v0_1 import (
+              inspect_shadow_batch_continuity,
+          )
+
+          from crypto_autopilot.research.shadow_feature_coverage_v0_1 import (
+              inspect_shadow_feature_coverage,
+          )
+
+          root = Path(sys.argv[1])
+          run = json.loads((root / "run.json").read_text(encoding="utf-8"))
+          jobs = json.loads((root / "jobs.json").read_text(encoding="utf-8"))["jobs"]
+          artifact = json.loads((root / "artifact.json").read_text(encoding="utf-8"))
+          raw = (root / "original.zip").read_bytes()
+
+          expected = {
+              "run_id": 40162915838,
+              "run_number": 69,
+              "artifact_id": 12586364157,
+              "created_at_utc": "2026-10-25T04:43:22Z",
+              "head_sha": "944895170f80af21e8f9b544ec42b279c45c0d6e",
+              "zip_sha256": "191fa626fbddd7f4a2a639618157605ab382a343936584fa2755ec2f6c08f03d",
+          }
+
+          report = verify_existing_original_zip(raw, expected, run, artifact, jobs)
+          continuity = inspect_shadow_batch_continuity([report])
+          assert continuity["report_count"] == 1
+          assert continuity["execution_authority"] is False
+          assert continuity["production_eligibility_proven"] is False
+          assert report["github"]["run_id"] == str(expected["run_id"])
+          assert report["github"]["sha"] == expected["head_sha"]
+
+          feature_coverage = inspect_shadow_feature_coverage([report])
+          assert feature_coverage["source_archive_digests_authenticated"] is False
+          assert feature_coverage["historical_signal_cutoff_no_lookahead_proven"] is False
+          assert feature_coverage["authority"]["paper_submission"] is False
+
+          record = report["collection"]
+          markets = record["market_evidence"]
+          assert len(markets) == 5
+          assert all(len(row["candles_60m"]) == 240 for row in markets)
+          capture = datetime.fromtimestamp(
+              record["capture_timestamp_ms"] / 1000, tz=timezone.utc
+          ).isoformat().replace("+00:00", "Z")
+          # Do not print or retain the market report, internal prices, account
+          # details, tokens, signed download URL or original archive bytes.
+          print(json.dumps({
+              "schema": "qookey-shadow-existing-zip-pr-only-review-v0.1",
+              "feature_coverage": feature_coverage,
+              "archive_id": expected["artifact_id"],
+              "source_run_id": expected["run_id"],
+              "source_attempt": 1,
+              "source_sha": expected["head_sha"],
+              "original_zip_sha256": hashlib.sha256(raw).hexdigest(),
+              "source_capture_utc": capture,
+              "archive_integrity_and_closed_candles": "PASS",
+              "single_report_continuity": continuity["status"],
+              "verified_market_count": len(markets),
+              "verified_closed_60m_per_market": 240,
+              "github_run_metadata_authenticated_by_live_api": True,
+              "internal_original_zip_content_authenticated": True,
+              "adjacent_batch_continuity_verified": False,
+              "complete_feature_coverage_verified": False,
+              "paper_cycle_executed": False,
+              "production_eligibility_proven": False,
+              "r2_accessed_by_audit": False,
+              "provider_accessed_by_audit": False,
+              "execution_authority": False
+          }, ensure_ascii=False, sort_keys=True))
+          PY
