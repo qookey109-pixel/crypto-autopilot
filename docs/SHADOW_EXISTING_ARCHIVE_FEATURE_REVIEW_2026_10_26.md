@@ -69,3 +69,22 @@ merging the temporary workflow. The receipt does not claim whole-PR CI passed.
 No new provider request, R2/D1 access, collection dispatch, training, bootstrap,
 Billing/Usage rerun, holdout, source switch, promotion or trading occurred.
 Cloud Paper remains NOT_WIRED / NOT_RUN / NOT_CONFIGURED and model quality REJECT.
+
+## Delivery CI dependency-installation incident
+
+The receipt PR's first Pages job `121614252607` completed all **66/66**
+browser tests but the enclosing job was cancelled after the 10-minute budget.
+The system-package mirror transferred 24.9 MB at about 49.3 kB/s; dependency
+installation occupied 8m44s before the browser suite. The single ordinary-CI
+retry, job `121620416981`, also timed out during dependency installation,
+including a retried fonts-wqy-zenhei package download. Both outcomes remain
+recorded under run `40335053006`; neither cancelled job is labeled success.
+
+The bounded handling change increases only the Pages build and production-browser
+job limits from 10 to 15 minutes, allowing installation plus the complete pinned
+Playwright suite. Deployment stays at 10 minutes. Browser tests, exact served
+content hash, dependency pins, permissions, event triggers and concurrency are
+retained. This does not change the PAPER runtime's duration or grant external
+research execution. Repository visibility was checked as public and standard
+GitHub-hosted runners remain in use. The fix requires fresh exact-head hosted
+CI; a prior 66/66 log alone is insufficient to accept a cancelled job.
