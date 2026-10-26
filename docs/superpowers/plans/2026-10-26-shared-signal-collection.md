@@ -48,3 +48,5 @@ Pre-flight: collection consumes only a shared admitted budget; publication-only 
 RED verified: head 4dd87c236aa084ba210724ba4237f12633ff0791, job 121637332164 ran 1962 tests and failed exactly the 10 new missing-runtime assertions. Existing tests introduced no additional failures.
 Current state: implementing GREEN; legacy publication behavior retained through a shared private helper.
 Ruling: publication envelope is 270336 bytes, lower than the legacy 2500000-byte planned maximum, because the existing shared guard limits each object to 262144 bytes; oversized payloads stop before S3 rather than increasing that ceiling.
+
+Compatibility RED verified at head 930c1b56357499abfc3b40279e5acf1412b8b0f0, job 121640895496: 1963 tests, exactly one failure (cross-source forecast-ID revision incorrectly PUBLISHED). Initial ten tests and existing publication regressions passed. Restore existing global deduplicate_kol_forecasts before serialization; this preserves the legacy collector's conflict semantics.

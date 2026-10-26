@@ -19,6 +19,7 @@ from crypto_autopilot.paper.shared_writer_r2_budget_v0_1 import SharedWriterR2Bu
 from crypto_autopilot.research.shared_signal_publish_v0_1 import (
     WRITER, _objects, _publish_objects, _timestamp,
 )
+from crypto_autopilot.research.signal_layer import deduplicate_kol_forecasts
 from crypto_autopilot.research.signal_ingest_v0_2 import (
     build_signal_payload, collect_sources,
 )
@@ -178,7 +179,7 @@ def run_shared_signal_collection(
         ).isoformat().replace("+00:00", "Z")
         payload = build_signal_payload(
             run_id=run_id, generated_at_utc=timestamp,
-            snapshots=snapshots, forecasts=forecasts,
+            snapshots=snapshots, forecasts=deduplicate_kol_forecasts([], forecasts),
         )
         objects = _objects(payload, run_id)
         if (

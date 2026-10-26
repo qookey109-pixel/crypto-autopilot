@@ -1,6 +1,6 @@
 {
   "schema": "qookey-shared-signal-collection-v0.1",
-  "status": "IMPLEMENTED_DISABLED_PENDING_CLOUD_VERIFICATION",
+  "status": "IMPLEMENTED_DISABLED",
   "execution_enabled": false,
   "production_cutover_authorized": false,
   "writer_id": "crypto-autopilot:research-signal-layer-v0-2",
@@ -43,5 +43,6 @@
     "source_switch": false,
     "promotion": false,
     "live_trading": false
-  }
+  },
+  "production_verification": "NOT_RUN"
 }
