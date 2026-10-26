@@ -9,6 +9,9 @@ from crypto_autopilot.research.prospective_shadow_continuity_v0_1 import (
     ContinuityReviewRequired,
     inspect_shadow_batch_continuity,
 )
+from crypto_autopilot.research.shadow_feature_coverage_v0_1 import (
+    inspect_shadow_feature_coverage,
+)
 
 HOUR_MS = 3_600_000
 BASE = HOUR_MS * 500_000
@@ -197,6 +200,142 @@ class ShadowContinuityTests(unittest.TestCase):
         self.assertEqual(got["status"], "PARTIAL_OBSERVATION_ONLY")
         self.assertFalse(got["production_eligibility_proven"])
         self.assertFalse(got["full_schedule_coverage_proven"])
+
+
+class ShadowFeatureCoverageV01Tests(unittest.TestCase):
+    @staticmethod
+    def _with_attested_features(index: int = 0) -> dict[str, object]:
+        report = report_fixture(index)
+        for row in report["collection"]["market_evidence"]:
+            bar_start = row["candles_60m"][-1]["time_ms"]
+            bar_close = bar_start + HOUR_MS
+            for family in ("technical", "structure", "patterns"):
+                row[family]["bar_time_ms"] = bar_start
+                row[family]["available_at_ms"] = bar_close
+            row["technical"].update({
+                "ema20": 100.0,
+                "ema50": None,
+                "atr14": 0.0,
+                "volume_ratio": 1.0,
+            })
+            row["structure"].update({
+                "rolling_previous_high": 110.0,
+                "rolling_previous_low": 90.0,
+                "market_structure_state": "RANGE",
+            })
+            row["patterns"].update({
+                "liquidity_event": "NONE",
+                "fvg_bias": "NONE",
+                "order_block_bias": "NONE",
+                "macd_divergence": "NONE",
+            })
+            row["market_event_radar"].update({
+                "observed_at_ms": bar_start,
+                "available_at_ms": bar_close,
+                "features": {"relative_volume": 0.0, "liquidation_imbalance": None},
+            })
+        resign(report)
+        return report
+
+    def test_confirmed_inputs_count_closed_rows_and_explicit_unknowns(self) -> None:
+        out = inspect_shadow_feature_coverage([self._with_attested_features()])
+        self.assertEqual(out["observed_report_count"], 1)
+        self.assertEqual(out["market_snapshot_rows"], 5)
+        self.assertEqual(out["closed_60m_input_rows_including_overlap"], 1200)
+        self.assertEqual(out["unique_closed_60m_symbol_time_pairs"], 1200)
+        self.assertEqual(out["status"], "PARTIAL_RESEARCH_ONLY")
+        self.assertEqual(out["timeframes"]["15M"], "NOT_COLLECTED_IN_THIS_REPORT")
+        self.assertIsNone(out["costs"]["fees_bps"])
+        self.assertFalse(out["source_archive_digests_authenticated"])
+        self.assertTrue(out["no_lookahead_verified_for_attested_feature_snapshots"])
+        self.assertFalse(out["historical_signal_cutoff_no_lookahead_proven"])
+        self.assertFalse(out["signal_outcome_predictive_edge_proven"])
+        self.assertFalse(out["authority"]["paper_submission"])
+
+        ema = out["features"]["technical.ema20"]
+        self.assertEqual(ema["available"], 5)
+        self.assertTrue(ema["complete_coverage_proven"])
+        self.assertEqual(ema["point_in_time_coverage_fraction"], 1.0)
+        self.assertEqual(
+            out["features"]["market_event_radar.relative_volume"]["available"], 5
+        )
+        self.assertEqual(out["features"]["technical.ema50"]["explicit_null"], 5)
+        self.assertEqual(out["features"]["technical.ema50"]["point_in_time_coverage_fraction"], 0.0)
+        self.assertEqual(out["features"]["technical.macd_histogram"]["missing"], 5)
+        self.assertIsNone(
+            out["features"]["technical.macd_histogram"]["point_in_time_coverage_fraction"]
+        )
+        self.assertEqual(
+            out["features"]["market_event_radar.liquidation_imbalance"]["explicit_null"], 5
+        )
+
+    def test_unattested_timestamps_never_count_as_feature_coverage(self) -> None:
+        report = self._with_attested_features()
+        for row in report["collection"]["market_evidence"]:
+            del row["technical"]["bar_time_ms"]
+        resign(report)
+        result = inspect_shadow_feature_coverage([report])
+        feature = result["features"]["technical.ema20"]
+        self.assertEqual(feature["unattested_time"], 5)
+        self.assertEqual(feature["available"], 0)
+        self.assertIsNone(feature["point_in_time_coverage_fraction"])
+        self.assertFalse(feature["complete_coverage_proven"])
+
+    def test_reject_future_premature_and_mismatched_feature_lineage(self) -> None:
+        for kind in ("radar_future", "premature", "source_bar_mismatch", "invalid_value"):
+            report = self._with_attested_features()
+            row = report["collection"]["market_evidence"][0]
+            if kind == "radar_future":
+                row["market_event_radar"]["available_at_ms"] = (
+                    report["collection"]["capture_timestamp_ms"] + 1
+                )
+            elif kind == "premature":
+                row["technical"]["available_at_ms"] -= 1
+            elif kind == "source_bar_mismatch":
+                row["patterns"]["bar_time_ms"] -= HOUR_MS
+            else:
+                row["technical"]["ema20"] = [100.0]
+            resign(report)
+            with self.subTest(kind=kind), self.assertRaises(ContinuityReviewRequired):
+                inspect_shadow_feature_coverage([report])
+
+    def test_invalid_types_and_states_cannot_inflate_verified_coverage(self) -> None:
+        cases = [
+            ("numeric_as_string", "technical", "ema20", "100.0"),
+            ("numeric_bool", "technical", "atr14", False),
+            ("numeric_giant_int", "technical", "ema20", 10 ** 400),
+            ("enum_as_bool", "structure", "market_structure_state", True),
+            ("enum_unrecognized", "patterns", "fvg_bias", "TO_THE_MOON"),
+            ("enum_blank", "patterns", "liquidity_event", ""),
+            ("radar_numeric_string", "market_event_radar", "relative_volume", "2.0"),
+            ("radar_negative_volume", "market_event_radar", "relative_volume", -1.0),
+            ("radar_imbalance_range", "market_event_radar", "liquidation_imbalance", 1.2),
+        ]
+        for label, family, field, value in cases:
+            report = self._with_attested_features()
+            row = report["collection"]["market_evidence"][0]
+            target = row[family]
+            if family == "market_event_radar":
+                target = target["features"]
+            target[field] = value
+            resign(report)
+            with self.subTest(case=label), self.assertRaises(ContinuityReviewRequired):
+                inspect_shadow_feature_coverage([report])
+
+    def test_overlaps_are_not_counted_as_unique_historical_candles(self) -> None:
+        first = self._with_attested_features(0)
+        second = self._with_attested_features(1)
+        out = inspect_shadow_feature_coverage([first, second])
+        self.assertEqual(out["market_snapshot_rows"], 10)
+        self.assertEqual(out["closed_60m_input_rows_including_overlap"], 2400)
+        self.assertEqual(out["unique_closed_60m_symbol_time_pairs"], 1220)
+        self.assertFalse(out["temporal_continuity"]["full_schedule_coverage_proven"])
+
+    def test_source_revision_and_untrusted_authority_fail_before_coverage(self) -> None:
+        report = self._with_attested_features()
+        report["authority"]["paper_submission_performed"] = True
+        with self.assertRaises(ContinuityReviewRequired):
+            inspect_shadow_feature_coverage([report])
 
 
 if __name__ == "__main__":
