@@ -42,3 +42,5 @@ Ruling: remote short-lived branch and hosted tests replace skill local workspace
 Pre-flight: single task reuses existing verifier and budget interfaces; inspect actual R2 proxy so conditional puts are also metered.
 Design choice: bounded complete namespace scan rather than an operator-supplied ID manifest; an incomplete manifest could hide forks/orphans. This costs fail-closed availability once any kind exceeds four objects; future indexed recovery is a distinct change, not permission to truncate.
 Design choice: every new seal uses IfNoneMatch=* and readback. Existing legacy active writer is unchanged; production cutover and all-writer coverage remain unverified.
+
+RED verified: head b37e9993ab47538e53edf3b7616f4bd923e1567b, job121957172117: Ruff passed; 1977 tests ran with exactly the11 expected missing-composition assertion failures. Existing tests passed.
