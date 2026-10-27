@@ -33,3 +33,13 @@ No active workflow/CLI is switched. Existing registry entries remain unverified.
 Production token validity, D1 provision, prepaid metering, account-wide usage
 and all-writer coverage remain separate prerequisites. No new production
 provider/R2/D1 call or Cloud Paper execution has been performed.
+
+## Verification and remaining coverage
+
+At head f08703e6c68d7b0d6cb42fb71ac8e6185ee87ec9, hosted Python3.12 job
+121958632414 ran1977 tests successfully; Python3.13, Ruff, workflow-static,
+dependency-security and CodeQL passed. Fresh read-only review found no blocking
+issues. Explicit lost-readback after persisted PUT / later multi-seal partial
+failure fixtures remain a deferred non-blocking coverage improvement. These
+states are designed to retain admission and report unknown writes as null.
+No operational R2/D1/provider proof is claimed.
