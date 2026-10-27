@@ -247,7 +247,8 @@ class ShadowFeatureCoverageV01Tests(unittest.TestCase):
         self.assertEqual(out["timeframes"]["15M"], "NOT_COLLECTED_IN_THIS_REPORT")
         self.assertIsNone(out["costs"]["fees_bps"])
         self.assertFalse(out["source_archive_digests_authenticated"])
-        self.assertTrue(out["no_lookahead_verified_for_attested_feature_snapshots"])
+        self.assertTrue(out["feature_timestamp_order_validated_for_attested_snapshots"])
+        self.assertFalse(out["no_lookahead_verified_for_attested_feature_snapshots"])
         self.assertFalse(out["historical_signal_cutoff_no_lookahead_proven"])
         self.assertFalse(out["signal_outcome_predictive_edge_proven"])
         self.assertFalse(out["authority"]["paper_submission"])
@@ -268,6 +269,16 @@ class ShadowFeatureCoverageV01Tests(unittest.TestCase):
         self.assertEqual(
             out["features"]["market_event_radar.liquidation_imbalance"]["explicit_null"], 5
         )
+
+    def test_attested_timestamp_does_not_validate_feature_computation(self) -> None:
+        report = self._with_attested_features()
+        # A fabricated but finite value with plausible timestamps is still unverified.
+        report["collection"]["market_evidence"][0]["technical"]["ema20"] = 999999.0
+        resign(report)
+        out = inspect_shadow_feature_coverage([report])
+        self.assertTrue(out["feature_timestamp_order_validated_for_attested_snapshots"])
+        self.assertFalse(out["no_lookahead_verified_for_attested_feature_snapshots"])
+        self.assertFalse(out["historical_signal_cutoff_no_lookahead_proven"])
 
     def test_unattested_timestamps_never_count_as_feature_coverage(self) -> None:
         report = self._with_attested_features()

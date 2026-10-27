@@ -185,9 +185,11 @@ def inspect_shadow_feature_coverage(
         "source_archive_digests_authenticated": False,
         "github_run_metadata_authenticated": False,
         "production_eligibility_proven": False,
-        "no_lookahead_verified_for_attested_feature_snapshots": (
+        # Timestamp ordering does not validate how caller-supplied values were calculated.
+        "feature_timestamp_order_validated_for_attested_snapshots": (
             attested_snapshot_family_rows > 0
         ),
+        "no_lookahead_verified_for_attested_feature_snapshots": False,
         "attested_snapshot_family_rows": attested_snapshot_family_rows,
         "no_lookahead_proven_for_unattested_snapshots": False,
         # Captured research snapshots do not prove that a feature was already
