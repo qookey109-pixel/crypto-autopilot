@@ -13,6 +13,12 @@ Pages40424318857 on7b63a7e passed build/deploy and66/66 desktop/mobile productio
 CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER / 0 USD / PAPER-LIVE-PAPER ONLY. No new provider/R2/D1 operation, dispatch, schedule or authority is part of this reconciliation. Billing V0.5 deferred; consumed probes, frozen evidence and closed holdout/source-switch/promotion/live gates remain unchanged.
 
 ---
+## Current live checkpoint — 2026-10-04
+
+Evidence basis: GitHub `main=391fc329d75817342f790a787f3e5868c6538996`, re-read before V0.5 preparation; PR #766 is the latest merged status reconciliation. The owner confirms there are no other external projects/services currently writing to this account's R2. Register any future external writer before its first write. This confirmation is limited to external R2 writers: the four repository writers still lack verified shared admission, and it does not prove D1 coverage, complete account costs, or exact headroom. Cloud Paper remains disabled (`NOT_WIRED` / `NOT_RUN` / `NOT_CONFIGURED`), D1 is absent, the production strategy registry is empty, and Core100 remains `REJECT`. The one-time Billing History V0.3 failure remains consumed; V0.5 is preparation only and has made no Cloudflare request. Preserve earlier dated evidence without rewriting it.
+
+---
+
 ## Prepaid D1 runtime gateway checkpoint — 2026-10-03
 
 Scope: successor runtime integration, disabled execution. Evidence basis is parent main `a0c7d8a50527cfb95bb4878ca8f8fa7b07e82c2a`, not a live-main claim.
