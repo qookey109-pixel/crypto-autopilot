@@ -175,7 +175,7 @@
     "current_release_checkpoint": "research/status/vnext-delivery-checkpoint-2026-10-27-v0-1.json",
     "legacy_navigation_snapshot_date": "2026-10-04"
   },
-  "next_decision": "Existing prepaid runtime already wires the coordinator, 10000 USD account continuation, D1 admission and empty-registry NO_TRADE in synthetic CI. Research collection #817 and bounded recovery #819 add disabled shared-budget successors; active legacy workflow cutovers and all-writer coverage remain unverified. Keep production NOT_WIRED/NOT_RUN/NOT_CONFIGURED until fresh complete cost/headroom, calibrated finite D1 budgets, protected query claims, exact merged execution and D1 provisioning authority are verified. Billing V0.5 is undispatched pending distinct confirmation and valid-token confirmation; do not rerun consumed probes. Use the 2026-10-27 current_release_checkpoint; older navigation and snapshots retain their dates.",
+  "next_decision": "Existing prepaid runtime already wires the coordinator, 10000 USD account continuation, D1 admission and empty-registry NO_TRADE in synthetic CI. Research collection #817 and bounded recovery #819 add disabled shared-budget successors; active legacy workflow cutovers and all-writer coverage remain unverified. Keep production NOT_WIRED/NOT_RUN/NOT_CONFIGURED until fresh complete cost/headroom, calibrated finite D1 budgets, protected query claims, exact merged execution and D1 provisioning authority are verified. Billing V0.5 first attempt is approved by the owner's delegated decision; Token validity UNKNOWN. At06:13 UTC the complete68-row dispatch history contained no V0.5 run. The connector cannot dispatch a new workflow; use the existing main workflow once with its explicit one-time input. Do not rerun consumed probes. Use the 2026-10-27 current_release_checkpoint; older navigation and snapshots retain their dates.",
   "notes": [
     "Live checkpoint at parent main 42f8c1cdad46107f5f8f720b9809a7ad71286815: PR #679 stale generated snapshot closed unmerged at 2026-10-01T08:15:20Z; no open PRs. PR #665 persistence compatibility/recovery fixes are merged. This status update grants no provider, R2, D1, runtime, or schedule access.",
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
@@ -1043,5 +1043,12 @@
     "evidence_basis_parent_main_sha": "c42eb8a85fb81fea499ca4a91550c8b5ee02878f",
     "is_latest_main_claim": false,
     "authority_granted": false
+  },
+  "billing_v0_5_owner_decision": {
+    "receipt": "research/receipts/2026-10-27-billing-v0-5-owner-delegated-decision-v0-1.json",
+    "first_attempt_approved": true,
+    "dispatch_status": "NOT_DISPATCHED_AS_OF_2026_10_27_0613_UTC",
+    "token_validity": "UNKNOWN",
+    "cloud_paper_activation": false
   }
 }

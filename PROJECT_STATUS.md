@@ -10,7 +10,7 @@ Maintenance40393490245 and40424318868 each succeeded in inspect/propose; the lat
 
 Pages40424318857 on7b63a7e passed build/deploy and66/66 desktop/mobile production tests. This is website evidence, not PAPER activation. Historical16/21 Shadow remains INSUFFICIENT/REVIEW_REQUIRED; the single-archive13/15 feature audit added no context observations and proved no predictive edge.
 
-CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER / 0 USD / PAPER-LIVE-PAPER ONLY. No new provider/R2/D1 operation, dispatch, schedule or authority is part of this reconciliation. Billing V0.5 deferred; consumed probes, frozen evidence and closed holdout/source-switch/promotion/live gates remain unchanged.
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER / 0 USD / PAPER-LIVE-PAPER ONLY. No new provider/R2/D1 operation, dispatch, schedule or authority is part of this reconciliation. Billing V0.5 first attempt approved through the owner's delegated decision; see [decision receipt](research/receipts/2026-10-27-billing-v0-5-owner-delegated-decision-v0-1.json). Token validity remains UNKNOWN, no dispatch had occurred at06:13 UTC, and the connector lacks first-dispatch capability. Consumed probes, frozen evidence and closed holdout/source-switch/promotion/live gates remain unchanged.
 
 ---
 ## Current live checkpoint — 2026-10-04
