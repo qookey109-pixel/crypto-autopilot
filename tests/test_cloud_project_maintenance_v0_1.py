@@ -591,5 +591,52 @@ class CollectionTests(unittest.TestCase):
         self.assertNotEqual(a["evidence"], b["evidence"])
 
 
+
+class DeliveryObservationTests(unittest.TestCase):
+    def emit(self, observed, delivery):
+        import crypto_autopilot.research.cloud_maintenance as maintenance
+        helper = getattr(maintenance, "delivery_observation", None)
+        self.assertTrue(callable(helper), "per-execution source observation is missing")
+        return helper(observed, delivery)
+
+    def test_no_change_logs_new_source_without_rewriting_retained_record(self):
+        previous = record()
+        api = PublishAPI()
+        api.docs = project_documents(api.docs, previous)
+        retained = copy.deepcopy(api.docs)
+        observed = copy.deepcopy(previous)
+        observed["evidence"]["source"]["id"] = 20
+        observed["evidence"]["source"]["created_at"] = "2026-09-25T00:57:00Z"
+        delivery = publish(api, observed)
+        output = self.emit(observed, delivery)
+        self.assertEqual(output["status"], "NO_CHANGE")
+        self.assertEqual(output["commits_created"], 0)
+        self.assertEqual(output["observation_source"]["id"], 20)
+        self.assertEqual(output["observation_source"]["run_attempt"], 1)
+        self.assertEqual(output["observation_source"]["event"], "schedule")
+        self.assertEqual(output["observed_main_sha"], A)
+        self.assertEqual(api.writes, [])
+        self.assertEqual(api.docs, retained)
+        self.assertEqual(existing_record(api.docs[TARGETS[0]])["evidence"]["source"]["id"], 10)
+        self.assertNotIn("observation_source", delivery)
+
+    def test_failed_source_remains_distinct_from_newer_workflow_success(self):
+        observed = record()
+        observed["evidence"]["source"] = run(conclusion="failure", raw_body="SECRET")
+        observed["evidence"]["workflows"][HEALTH.split("/")[-1]] = run(id=30)
+        output = self.emit(observed, {"status": "READ_ONLY_COMPLETE"})
+        self.assertEqual(output["observation_source"]["id"], 10)
+        self.assertEqual(output["observation_source"]["conclusion"], "failure")
+        self.assertNotIn("SECRET", json.dumps(output))
+
+    def test_invalid_source_identity_is_not_printed_as_verified(self):
+        for changes in ({"event": "workflow_dispatch"}, {"id": True},
+                        {"run_attempt": 0}, {"head_sha": "invalid"}):
+            observed = record()
+            observed["evidence"]["source"].update(changes)
+            with self.subTest(changes=changes), self.assertRaises(Stop):
+                self.emit(observed, {"status": "NO_CHANGE", "commits_created": 0})
+
+
 if __name__ == "__main__":
     unittest.main()
