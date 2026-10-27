@@ -17,3 +17,6 @@ Review focus: metadata must not enter the semantic digest; no raw API field leak
 
 RED verified at head2074a446f5ed5809a3e9e59ddbf8b624b180bac7, job121963765178: Ruff PASS;1980 tests, six expected missing-helper assertions across three new cases/subcases, no other failures.
 Ruling: reconcile bot #818 by preserving its generated blocks byte-for-byte in the new delivery, not merging a no-check stale branch. Close it only after the reviewed reconciliation is merged; preserve the source branch and failed/old records.
+
+Root-cause evidence: head912017a6812cded8cd5162eed8a2fc169f1fa14b/job121965144194 passed the three new source-output cases but existing Shadow documentation gate fixed both top sections to10/11 and read the mutable operations.updated_date as that historical date.1980 tests:8 failures+1 error in that gate only.
+Ruling: preserve the full original10/11 release section verbatim, add clearly separate current top sections, and keep its16/21/15604/60-browser evidence guards scoped to that dated section. Validate the new current checkpoint separately (16/21,66-browser, NOT_RUN, no authority inflation). Do not freeze current operations date to historical evidence or delete old tamper tests.

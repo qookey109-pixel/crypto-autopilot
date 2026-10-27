@@ -22,17 +22,19 @@ RELEASE_AUDIT_RUN = 38117712031
 
 
 def release_header(text: str) -> str:
-    """Validate only the current top release section, not dated old snapshots."""
-    section = text.split("\n---\n", 1)[0]
-    if not section.startswith("## Current merged release checkpoint — 2026-10-11"):
+    """Validate the preserved dated release independently of later checkpoints."""
+    sections = [section for section in text.split("\n---\n")
+                if section.startswith("## Current merged release checkpoint — 2026-10-11")]
+    if len(sections) != 1:
         raise ValueError("MISSING_DATED_RELEASE_CHECKPOINT")
-    return section
+    return sections[0]
 
 
 def require_release_projection(
     documents: dict[str, str],
     operations: dict[str, object],
     receipt: dict[str, object],
+    checkpoint: dict[str, object],
 ) -> None:
     """Raise on inconsistent release docs or upgraded research authority."""
     if set(documents) != set(DOCUMENTS):
@@ -68,12 +70,36 @@ def require_release_projection(
     ):
         raise ValueError("MACHINE_EVIDENCE_OR_AUTHORITY_DRIFT")
 
+    current_shadow = checkpoint["shadow"]
+    engineering = checkpoint["shared_writer_engineering"]
+    if (
+        current_shadow["historical_verified_sequence"] != totals["verified_distinct_observations"]
+        or current_shadow["required_context_observations"] != totals["warmup_target_observations"]
+        or current_shadow["maturity"] != "INSUFFICIENT"
+        or current_shadow["continuity"] != "REVIEW_REQUIRED"
+        or current_shadow["new_context_observations_added_by_feature_audit"] != 0
+        or engineering["production_cycle"] != "NOT_RUN"
+        or engineering["production_schedule"] != "NOT_CONFIGURED"
+        or engineering["production_d1_provisioned"] is not False
+        or engineering["all_repository_writer_admission_verified"] is not False
+        or engineering["model_quality"] != "REJECT"
+        or checkpoint["is_latest_main_claim"] is not False
+    ):
+        raise ValueError("MACHINE_EVIDENCE_OR_AUTHORITY_DRIFT")
+
     expected = (
         f"{totals['verified_distinct_observations']}/"
         f"{totals['warmup_target_observations']}"
     )
     overlaps = f"{totals['overlap_consistent_candles_across_15_adjacent_pairs']:,}"
     for path, text in documents.items():
+        current = text.split("\n---\n", 1)[0]
+        current_counts = set(re.findall(r"\b\d+/21\b", current))
+        if current_counts != {expected} or any(value not in current for value in (
+            operations["updated_date"], "vnext-delivery-checkpoint-2026-10-27-v0-1.json",
+            "NOT_WIRED", "NOT_RUN", "NOT_CONFIGURED", "REJECT", "66/66",
+        )):
+            raise ValueError("DOCUMENT_RELEASE_MISMATCH:" + path)
         top = release_header(text)
         # Every observation count in this top section must agree, not just
         # one correct occurrence alongside a later corrupted duplicate.
@@ -83,7 +109,7 @@ def require_release_projection(
         if observed_counts != {expected}:
             raise ValueError("DOCUMENT_RELEASE_MISMATCH:" + path)
         required = (
-            operations["updated_date"],
+            operations["vnext_delivery_checkpoint"]["reviewed_date"],
             f"main={RELEASE_MAIN}",
             expected,
             overlaps,
@@ -119,6 +145,9 @@ class ShadowReleaseDocumentationTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
+        cls.checkpoint = json.loads(
+            (ROOT / "research/status/vnext-delivery-checkpoint-2026-10-27-v0-1.json").read_text(
+                encoding="utf-8"))
         cls.receipt = json.loads(
             (ROOT / "research/receipts/2026-10-11-shadow-sixteen-incremental-audit-v0-1.json").read_text(
                 encoding="utf-8"
@@ -126,7 +155,7 @@ class ShadowReleaseDocumentationTests(unittest.TestCase):
         )
 
     def test_both_current_handoffs_match_immutable_sixteen_evidence(self):
-        require_release_projection(self.documents, self.operations, self.receipt)
+        require_release_projection(self.documents, self.operations, self.receipt, self.checkpoint)
 
     def test_missing_or_altered_handoff_cannot_look_current(self):
         for path in DOCUMENTS:
@@ -138,13 +167,25 @@ class ShadowReleaseDocumentationTests(unittest.TestCase):
                 ("Core100 model quality", "Core100 model approved"),
             ):
                 with self.subTest(path=path, altered=original):
-                    changed[path] = self.documents[path].replace(original, wrong, 1)
+                    historical = release_header(self.documents[path])
+                    altered = historical.replace(original, wrong, 1)
+                    changed[path] = self.documents[path].replace(historical, altered, 1)
                     with self.assertRaisesRegex(ValueError, "DOCUMENT_RELEASE_MISMATCH"):
-                        require_release_projection(changed, self.operations, self.receipt)
+                        require_release_projection(changed, self.operations, self.receipt, self.checkpoint)
+
+        for path in DOCUMENTS:
+            changed = copy.deepcopy(self.documents)
+            changed[path] = changed[path].replace("16/21", "21/21", 1)
+            with self.subTest(current_path=path), self.assertRaisesRegex(
+                ValueError, "DOCUMENT_RELEASE_MISMATCH"
+            ):
+                require_release_projection(
+                    changed, self.operations, self.receipt, self.checkpoint)
+
         with self.assertRaisesRegex(ValueError, "INCOMPLETE_HANDOFF_SURFACES"):
             require_release_projection(
                 {"CURRENT_STATUS.md": self.documents["CURRENT_STATUS.md"]},
-                self.operations, self.receipt,
+                self.operations, self.receipt, self.checkpoint,
             )
 
     def test_machine_tampering_cannot_promote_context_or_paper(self):
@@ -163,13 +204,13 @@ class ShadowReleaseDocumentationTests(unittest.TestCase):
                     "sixteen_batch_audit"
                 ][key] = wrong
                 with self.assertRaisesRegex(ValueError, "MACHINE_EVIDENCE_OR_AUTHORITY_DRIFT"):
-                    require_release_projection(self.documents, bad, self.receipt)
+                    require_release_projection(self.documents, bad, self.receipt, self.checkpoint)
 
     def test_receipt_revision_must_fail(self):
         changed = copy.deepcopy(self.receipt)
         changed["cumulative"]["overlap_consistent_candles_across_15_adjacent_pairs"] += 1
         with self.assertRaisesRegex(ValueError, "MACHINE_EVIDENCE_OR_AUTHORITY_DRIFT"):
-            require_release_projection(self.documents, self.operations, changed)
+            require_release_projection(self.documents, self.operations, changed, self.checkpoint)
 
 
 if __name__ == "__main__":

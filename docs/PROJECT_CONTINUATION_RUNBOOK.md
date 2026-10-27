@@ -1,3 +1,29 @@
+## Current operating checkpoint — 2026-10-27 Asia/Taipei
+
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER / 0 USD target / PAPER-LIVE-PAPER ONLY.
+Reviewed parent c42eb8a85fb81fea499ca4a91550c8b5ee02878f is not a latest-main claim.
+Read [CURRENT_STATUS](../CURRENT_STATUS.md) and [current machine checkpoint](../research/status/vnext-delivery-checkpoint-2026-10-27-v0-1.json) before older dated instructions.
+
+Merged #817/#819 shared collection/recovery components remain disabled; production
+NOT_WIRED / NOT_RUN / NOT_CONFIGURED, D1 unprovisioned, registry empty, Core100 REJECT.
+Existing prepaid runtime already provides synthetic coordinator/account/D1/NO_TRADE
+assembly; complete legacy cutovers and fresh cost/headroom/finite authority next.
+Historical Shadow16/21 remains INSUFFICIENT / REVIEW_REQUIRED; the13/15 single-capture
+feature audit adds no observations or trading authority. Latest verified Pages40424318857
+passed66/66 desktop/mobile production tests; this does not prove PAPER readiness.
+
+Maintenance40393490245 and40424318868 inspect/propose succeeded; latestNO_CHANGE
+created0commits. Its exact second Health source ID is absent from stdout/no artifact,
+so full two-distinct-source acceptance is not claimed. Future per-execution output
+logs the validated source without rewriting a retained semantically identical block.
+#818 blocks below are copied verbatim; close its stale Draft unmerged only after
+the reconciliation merges, preserving its branch. Other PRs require fresh review.
+The dated10/11 release section below preserves its original16/21 and60/60 evidence.
+
+No consumed probe rerun or new provider/R2/D1 operation, schedule, provision,
+holdout, source switch, promotion or live/real-money activation.
+
+---
 ## Current merged release checkpoint — 2026-10-11 15:10 Asia/Taipei (machine-status version updated_date: 2026-10-09; dated, resolve main afresh)
 
 **Cloud-only evidence, no local files, no new authority.** The release reviewed at `main=a7ee3e951d1d1f1e02e58a62c7951ea1ca5763db` includes merged [#795](https://github.com/qookey109-pixel/crypto-autopilot/pull/795) (15- and 16-artifact versioned receipts), [#796](https://github.com/qookey109-pixel/crypto-autopilot/pull/796) (fail-closed 16/21 dashboard), [#797](https://github.com/qookey109-pixel/crypto-autopilot/pull/797) (read-only stale maintenance draft guard and dated Core100 drift diagnosis) and [#798](https://github.com/qookey109-pixel/crypto-autopilot/pull/798) (pure bounded original ZIP verifier). The subsequent [#800](https://github.com/qookey109-pixel/crypto-autopilot/pull/800) provides bounded deployed-hash retry without accepting a mismatched build. GitHub remains formal authority over this dated snapshot.
