@@ -1,6 +1,6 @@
 {
   "schema": "qookey-current-operations-v0.3",
-  "updated_date": "2026-10-09",
+  "updated_date": "2026-10-27",
   "repository": "qookey109-pixel/crypto-autopilot",
   "repository_authority": "RESOLVE_MAIN_LIVE_AT_READ_TIME",
   "evidence_basis": {
@@ -140,11 +140,13 @@
       "contract": "config/cloud_project_maintenance_v0_1.json",
       "receipt": "research/receipts/2026-09-25-cloud-project-maintenance-v0-1.json",
       "effective_condition": "REVIEWED_MAIN_MERGE",
-      "acceptance": "LATEST_NATURAL_HEALTH_37161610152_SUCCESS; MAINTENANCE_37161635852_INSPECT_SUCCESS_PROPOSE_DELIVERY_BRANCH_NOT_AHEAD_OF_MAIN; NO_ARTIFACT; NOT_ACCEPTANCE",
+      "acceptance": "TWO_SUCCESSFUL_MAINTENANCE_RUNS_OBSERVED; LATEST_NO_CHANGE_COMMITS_0; SECOND_SOURCE_ID_NOT_IN_LOG; FULL_TWO_SOURCE_ACCEPTANCE_NOT_CLAIMED",
       "local_work": "EXCLUDED_BY_USER",
       "model_required": false,
       "automatic_merge": false,
-      "stale_generated_pr_679": "CLOSED_UNMERGED_2026-10-01T08:15:20Z; HISTORICAL_EVIDENCE_PRESERVED"
+      "stale_generated_pr_679": "CLOSED_UNMERGED_2026-10-01T08:15:20Z; HISTORICAL_EVIDENCE_PRESERVED",
+      "historical_acceptance": "LATEST_NATURAL_HEALTH_37161610152_SUCCESS; MAINTENANCE_37161635852_INSPECT_SUCCESS_PROPOSE_DELIVERY_BRANCH_NOT_AHEAD_OF_MAIN; NO_ARTIFACT; NOT_ACCEPTANCE",
+      "current_review": "research/status/vnext-delivery-checkpoint-2026-10-27-v0-1.json"
     },
     "historical_open_pr_triage": {
       "path": "research/status/open-pr-triage-v0-5.json",
@@ -159,7 +161,7 @@
         331
       ]
     },
-    "open_pr_triage_scope": "HISTORICAL_SEPTEMBER_22_USE_LIVE_REPOSITORY_CHECKPOINT",
+    "open_pr_triage_scope": "HISTORICAL_CONTROL_FIELDS_USE_CURRENT_RELEASE_CHECKPOINT_FOR_LATEST_REVIEWED_SCAN",
     "current_type_visibility": {
       "run_id": 36667740375,
       "head_sha": "095aba2c80b9ad710523875b1f45381646e61b75",
@@ -169,9 +171,11 @@
       "blocking": false,
       "classification": "NONBLOCKING_CI_VISIBILITY"
     },
-    "dashboard_pages_validation_state": "NO_PAGES_RUN_OBSERVED_FOR_PR_727_MAIN_HEAD"
+    "dashboard_pages_validation_state": "NO_PAGES_RUN_OBSERVED_FOR_PR_727_MAIN_HEAD",
+    "current_release_checkpoint": "research/status/vnext-delivery-checkpoint-2026-10-27-v0-1.json",
+    "legacy_navigation_snapshot_date": "2026-10-04"
   },
-  "next_decision": "Cloud Paper remains disabled. PR #761 is merged but existing repository R2 writers are not integrated with shared admission. Current external R2 writers are owner-attested none; future writers must register before first write. The account UI shows zero metered usage for the displayed period, but complete account cost and exact headroom remain UNKNOWN; D1 is not provisioned. Calibrate finite D1/shared-admission ceilings and controller costs, prepare separate D1 provisioning authority, migrate every current repository writer, then perform controlled main PAPER acceptance and only afterward configure/verify natural schedule and Dashboard.",
+  "next_decision": "Existing prepaid runtime already wires the coordinator, 10000 USD account continuation, D1 admission and empty-registry NO_TRADE in synthetic CI. Research collection #817 and bounded recovery #819 add disabled shared-budget successors; active legacy workflow cutovers and all-writer coverage remain unverified. Keep production NOT_WIRED/NOT_RUN/NOT_CONFIGURED until fresh complete cost/headroom, calibrated finite D1 budgets, protected query claims, exact merged execution and D1 provisioning authority are verified. Billing V0.5 is undispatched pending distinct confirmation and valid-token confirmation; do not rerun consumed probes. Use the 2026-10-27 current_release_checkpoint; older navigation and snapshots retain their dates.",
   "notes": [
     "Live checkpoint at parent main 42f8c1cdad46107f5f8f720b9809a7ad71286815: PR #679 stale generated snapshot closed unmerged at 2026-10-01T08:15:20Z; no open PRs. PR #665 persistence compatibility/recovery fixes are merged. This status update grants no provider, R2, D1, runtime, or schedule access.",
     "Repository main must be resolved live at read time; evidence_basis.parent_main_sha is intentionally not a latest-main claim.",
@@ -1033,5 +1037,11 @@
       "failed_workflow": "binance-usdm-detailed-training-v0-1.yml"
     },
     "authority": false
+  },
+  "vnext_current_release_checkpoint": {
+    "path": "research/status/vnext-delivery-checkpoint-2026-10-27-v0-1.json",
+    "evidence_basis_parent_main_sha": "c42eb8a85fb81fea499ca4a91550c8b5ee02878f",
+    "is_latest_main_claim": false,
+    "authority_granted": false
   }
 }

@@ -9,7 +9,7 @@ from pathlib import Path
 
 from crypto_autopilot.research.cloud_maintenance import (
     GitHub, REPOSITORY, Stop, collect, digest, preflight_existing_delivery_draft,
-    publish, require, summary,
+    publish, require, summary, delivery_observation,
 )
 
 
@@ -44,6 +44,7 @@ def main():
                 with Path(os.environ["GITHUB_OUTPUT"]).open("a") as output:
                     output.write(f"main_sha={record['evidence']['main_sha']}\n")
                     output.write(f"semantic_digest={semantic}\nready=true\n")
+        result = delivery_observation(record, result)
         report = summary(record, result)
         require(len(report.encode()) <= 900_000, "SUMMARY_SIZE_LIMIT")
         if summary_path:

@@ -496,6 +496,24 @@ def publish(api, record):
             "ci": "WAITING_CI_VERIFICATION"}
 
 
+
+def delivery_observation(record, result):
+    """Per-execution log metadata; never enters semantic dedup or stored blocks."""
+    evidence = record["evidence"]
+    source = run_evidence(evidence["source"])
+    require(
+        source["event"] == "schedule" and source["status"] == "completed"
+        and source["id"] > 0 and source["run_attempt"] == 1
+        and bool(re.fullmatch("[0-9a-f]{40}", evidence.get("main_sha", "")))
+        and source["head_sha"] == evidence["main_sha"],
+        "UNKNOWN_EXECUTION_SOURCE",
+    )
+    return {
+        **result, "observed_main_sha": evidence["main_sha"],
+        "observation_source": source,
+    }
+
+
 def summary(record, result):
     return ("# Cloud Project Maintenance V0.1\n\n"
             f"Result: **{result['status']}**\n\n"
