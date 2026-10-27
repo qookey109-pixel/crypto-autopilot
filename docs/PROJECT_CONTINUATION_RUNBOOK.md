@@ -8,7 +8,7 @@ Merged #817/#819 shared collection/recovery components remain disabled; producti
 NOT_WIRED / NOT_RUN / NOT_CONFIGURED, D1 unprovisioned, registry empty, Core100 REJECT.
 Existing prepaid runtime already provides synthetic coordinator/account/D1/NO_TRADE
 assembly; complete legacy cutovers and fresh cost/headroom/finite authority next.
-Historical Shadow16/21 remains INSUFFICIENT / REVIEW_REQUIRED; the13/15 single-capture
+Historical Shadow 16/21 remains INSUFFICIENT / REVIEW_REQUIRED; the13/15 single-capture
 feature audit adds no observations or trading authority. Latest verified Pages40424318857
 passed66/66 desktop/mobile production tests; this does not prove PAPER readiness.
 
@@ -18,7 +18,7 @@ so full two-distinct-source acceptance is not claimed. Future per-execution outp
 logs the validated source without rewriting a retained semantically identical block.
 #818 blocks below are copied verbatim; close its stale Draft unmerged only after
 the reconciliation merges, preserving its branch. Other PRs require fresh review.
-The dated10/11 release section below preserves its original16/21 and60/60 evidence.
+The dated10/11 release section below preserves its original 16/21 and60/60 evidence.
 
 No consumed probe rerun or new provider/R2/D1 operation, schedule, provision,
 holdout, source switch, promotion or live/real-money activation.
