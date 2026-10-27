@@ -44,3 +44,5 @@ Design choice: bounded complete namespace scan rather than an operator-supplied 
 Design choice: every new seal uses IfNoneMatch=* and readback. Existing legacy active writer is unchanged; production cutover and all-writer coverage remain unverified.
 
 RED verified: head b37e9993ab47538e53edf3b7616f4bd923e1567b, job121957172117: Ruff passed; 1977 tests ran with exactly the11 expected missing-composition assertion failures. Existing tests passed.
+
+Ruling: the first GREEN attempt (head f5ae98f5420e98852368f18847dd3ea39f931453, job121958010237) ran1977 tests with exactly one over-constrained new assertion failure: the seal adapter and existing verifier each read back, so the suffix is PUT/GET/GET rather thanPUT/GET. Preserve both independent checks; assert a write followed by one or more reads and no later write. Existing code and ten other new tests passed. Cost: extra read is charged inside the64-read envelope.

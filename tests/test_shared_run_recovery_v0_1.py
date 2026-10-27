@@ -135,7 +135,10 @@ class SharedRunRecoveryTests(unittest.TestCase):
         self.assertEqual(got["result_seal_writes_performed"], 1)
         self.assertEqual(set(self.backend.objects) - set(before), {key})
         self.assertEqual({k: self.backend.objects[k] for k in before}, before)
-        self.assertEqual(self.backend.events[-2:], [("put", key), ("get", key)])
+        write_index = self.backend.events.index(("put", key))
+        self.assertTrue(all(event == ("get", key)
+                            for event in self.backend.events[write_index + 1:]))
+        self.assertGreater(len(self.backend.events[write_index + 1:]), 0)
         self.assertEqual(got["attempted_usage"]["r2_class_a"], 5)
         self.assertTrue(got["central_reservation_retained"])
 
