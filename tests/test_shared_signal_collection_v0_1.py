@@ -201,5 +201,43 @@ class SharedSignalCollectionTests(unittest.TestCase):
         self.mock_factory.assert_not_called()
 
 
+
+    def test_malformed_declared_json_stops_before_s3(self):
+        for body in (b"{broken", b"[]", b'{"forecasts":null}', b'{"forecasts":{}}'):
+            with self.subTest(body=body):
+                self.claimed = False
+                self.events.clear()
+                self.backend = MemoryS3()
+                self.guard = CloudBudgetGuard(
+                    snapshot=self.snapshot, clock_ms=lambda: self.clock[0])
+                self.mock_factory.reset_mock()
+                self.body = body
+                got = self.run_cycle()
+                self.assertEqual(got["status"], "REVIEW_REQUIRED")
+                self.assertEqual(got["stage"], "SOURCE_ACQUISITION")
+                self.assertEqual(got["provider_requests_performed"], 1)
+                self.assertTrue(got["central_reservation_retained"])
+                self.mock_factory.assert_not_called()
+
+    def test_within_source_revision_returns_retained_summary(self):
+        forecast = {
+            "forecast_id": "same-id", "symbol": "BTC_USDT_PERP",
+            "direction": "long", "confidence": 0.5,
+            "published_at_ms": NOW - 1000, "target_time_ms": NOW + 60000,
+        }
+        self.body = json.dumps({
+            "forecasts": [forecast, dict(forecast, direction="short")],
+        }).encode()
+        try:
+            got = self.run_cycle()
+        except Exception:
+            self.fail("source revision escaped the controlled report boundary")
+        self.assertEqual(got["status"], "REVIEW_REQUIRED")
+        self.assertEqual(got["stage"], "SOURCE_ACQUISITION")
+        self.assertEqual(got["provider_requests_performed"], 1)
+        self.assertTrue(got["central_reservation_retained"])
+        self.mock_factory.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()
