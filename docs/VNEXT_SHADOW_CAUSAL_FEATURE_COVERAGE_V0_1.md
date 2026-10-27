@@ -2,6 +2,10 @@
 
 **Checkpoint:** 2026-10-26 Asia/Taipei. **Reviewed starting main:** `d7f45deadbfe0a835e33a79747ddc854b74f1067` (merged V3 #812). This is a dated branch note; re-resolve actual main before any further change. CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER / 0 USD / PAPER-LIVE-PAPER ONLY. No new execution authority.
 
+## 2026-10-27 correction: timestamp checks are not computation proof
+
+The dated discussion below uses “causally attested” for a source-bar and availability timestamp ordering check. That phrase was too strong: the timestamps are caller-reported and the checker does not independently recompute the feature or prove which inputs were used. Plausible timestamps alone cannot establish that the feature calculation avoided future information. The successor checker records timestamp-order validation separately and leaves computation-level no-lookahead verification false. The frozen 2026-10-26 archive receipt and its legacy `no_lookahead_verified_for_attested_feature_snapshots` flag are preserved as historical outputs of the earlier checker; that flag is not proof of causal computation or of availability at an earlier signal cutoff. Historical replay still requires separately validated point-in-time inputs and calculation logic.
+
 ## Delivery identity and existing evidence
 
 Earlier [PR #809](https://github.com/qookey109-pixel/crypto-autopilot/pull/809) implemented the pure feature-coverage checker, but GitHub now reports its pre-V3 branch as **not mergeable**. This successor ports the code, original synthetic regression tests and additional strict decision-time boundaries on **post-#812 main**, rather than rebasing frozen receipts, forcing a merge or overwriting the V3 dashboard. #809 stays an unmerged historical record.
