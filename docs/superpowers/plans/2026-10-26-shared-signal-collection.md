@@ -46,7 +46,13 @@ Ruling: use a short-lived remote GitHub branch and hosted CI instead of local sk
 Ruling: follow existing execution/merge authorization without another design approval — the user has explicitly requested continuous implementation and opted out of repeated approval.
 Pre-flight: collection consumes only a shared admitted budget; publication-only API keeps exact bytes/provider=0 validation. The combined envelope is conservatively retained in full, never refunded.
 RED verified: head 4dd87c236aa084ba210724ba4237f12633ff0791, job 121637332164 ran 1962 tests and failed exactly the 10 new missing-runtime assertions. Existing tests introduced no additional failures.
-Current state: implementing GREEN; legacy publication behavior retained through a shared private helper.
+Initial GREEN verified at ffd53d0ae68f0834fab0a910890b04b8b76f15de, job 121642666203: Ruff and 1963 tests passed. Legacy publication behavior retained through a shared private helper.
 Ruling: publication envelope is 270336 bytes, lower than the legacy 2500000-byte planned maximum, because the existing shared guard limits each object to 262144 bytes; oversized payloads stop before S3 rather than increasing that ceiling.
 
 Compatibility RED verified at head 930c1b56357499abfc3b40279e5acf1412b8b0f0, job 121640895496: 1963 tests, exactly one failure (cross-source forecast-ID revision incorrectly PUBLISHED). Initial ten tests and existing publication regressions passed. Restore existing global deduplicate_kol_forecasts before serialization; this preserves the legacy collector's conflict semantics.
+
+Fresh whole-branch review: two Important findings accepted after reading the actual legacy parser: malformed declared JSON was silently treated as metadata, and within-source forecast revision escaped the controlled report. Both are successor-only fixes; the active legacy collector is unchanged.
+Review RED verified at 23ceca03b67004bcfa7e448f23c9532e021b2599, job 121953361882: 1965 tests, exactly five failures (four malformed JSON subcases and one controlled-report escape). No other failures.
+Fix pass: validate declared JSON object/explicit forecast-list structure before legacy parsing; catch collection-level conflicts into sanitized REVIEW_REQUIRED with retained admission and attempted counters. HTML metadata and absent forecasts stay supported.
+Review limitations: real provider behavior, credentials, D1/R2 charges and operational writer coverage remain unverified production prerequisites; custom transport injection is a trusted boundary, not a proven production transport.
+Current state: review fix verification pending; no workflow cutover or external diagnostic performed.

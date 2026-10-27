@@ -45,6 +45,7 @@ class SharedSignalCollectionTests(unittest.TestCase):
         self.source_error = False
         self.expire_after_source = False
         self.body = json.dumps({"title": "public fixture"}).encode()
+        self.content_type = "application/json"
         self.snapshot = R2UsageSnapshot(
             account_wide=True, reservation_coverage_complete=True,
             observed_at_ms=NOW, measured_through_ms=NOW, storage_bytes=0,
@@ -86,7 +87,9 @@ class SharedSignalCollectionTests(unittest.TestCase):
             raise RuntimeError("SECRET raw transport diagnostic")
         if self.expire_after_source:
             self.clock[0] += 60_001
-        return Response(self.body)
+        response = Response(self.body)
+        response.headers = {"Content-Type": self.content_type}
+        return response
 
     def make_store(self, **kwargs):
         self.events.append("construct_store")
@@ -237,6 +240,17 @@ class SharedSignalCollectionTests(unittest.TestCase):
         self.assertEqual(got["provider_requests_performed"], 1)
         self.assertTrue(got["central_reservation_retained"])
         self.mock_factory.assert_not_called()
+
+
+    def test_html_metadata_without_forecasts_remains_supported(self):
+        self.content_type = "text/html"
+        self.body = b'<meta property="og:title" content="public metadata">'
+        got = self.run_cycle()
+        self.assertEqual(got["status"], "PUBLISHED")
+        payload = json.loads(self.backend.objects[
+            "research/signal-layer/v0-2/runs/run=123/signals.json"])
+        self.assertEqual(payload["kol_forecasts"], [])
+        self.assertEqual(payload["source_snapshots"][0]["title"], "public metadata")
 
 
 if __name__ == "__main__":

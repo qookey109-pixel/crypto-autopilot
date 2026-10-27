@@ -5,6 +5,7 @@ The injected binding validator is a trusted runtime boundary, not a flag grant.
 """
 from __future__ import annotations
 
+import json
 import re
 from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime
@@ -40,6 +41,33 @@ _APPROVED = {
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
+
+
+
+class _ValidatedResponse:
+    """Validate declared JSON without changing the legacy parser or HTML path."""
+
+    def __init__(self, response):
+        self.response = response
+        self.status = response.status
+        self.headers = response.headers
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, traceback):
+        self.response.close()
+
+    def read(self, limit):
+        body = self.response.read(limit)
+        content_type = self.headers.get("Content-Type", "")
+        if "json" in content_type.lower():
+            value = json.loads(body)
+            if not isinstance(value, dict) or (
+                "forecasts" in value and not isinstance(value["forecasts"], list)
+            ):
+                raise ValueError("invalid structured source evidence")
+        return body
 
 
 def _selected(sources: Sequence[Mapping[str, object]]) -> list[Mapping[str, object]]:
@@ -143,7 +171,7 @@ def run_shared_signal_collection(
         if getattr(response, "status", None) != 200:
             response.close()
             raise BudgetBlocked("BLOCKED_SIGNAL_SOURCE_HTTP_STATUS")
-        return response
+        return _ValidatedResponse(response)
 
     def review(stage: str, reason: str) -> dict[str, object]:
         return {
@@ -156,10 +184,13 @@ def run_shared_signal_collection(
 
     for row in selected:
         captured = guard.clock_ms()
-        items, predictions = collect_sources(
-            [row], timeout_seconds=20, max_bytes=500_000, opener=open_once,
-            retrieved_at_ms=captured,
-        )
+        try:
+            items, predictions = collect_sources(
+                [row], timeout_seconds=20, max_bytes=500_000, opener=open_once,
+                retrieved_at_ms=captured,
+            )
+        except Exception:
+            return review("SOURCE_ACQUISITION", "SOURCE_EVIDENCE_INVALID")
         if len(items) != 1 or items[0].status != "PARSED":
             return review(
                 "SOURCE_ACQUISITION",
