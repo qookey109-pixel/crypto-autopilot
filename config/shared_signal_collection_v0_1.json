@@ -1,0 +1,48 @@
+{
+  "schema": "qookey-shared-signal-collection-v0.1",
+  "status": "IMPLEMENTED_DISABLED",
+  "execution_enabled": false,
+  "production_cutover_authorized": false,
+  "writer_id": "crypto-autopilot:research-signal-layer-v0-2",
+  "legacy_source_config": "config/research_signal_layer_v0_2.json",
+  "implementation": "src/crypto_autopilot/research/shared_signal_collection_v0_1.py",
+  "entrypoint": "run_shared_signal_collection",
+  "max_sources": 3,
+  "source_method": "GET",
+  "source_timeout_seconds": 20,
+  "max_bytes_per_source": 500000,
+  "redirects": false,
+  "retries": 0,
+  "reservation": {
+    "provider_requests": "EXACT_ENABLED_SOURCE_COUNT",
+    "r2_class_a": 3,
+    "r2_class_b": 6,
+    "r2_new_bytes": 270336,
+    "refund_allowed": false
+  },
+  "publication_bounds": {
+    "payload_bytes": 262144,
+    "manifest_bytes": 4096,
+    "pointer_bytes": 4096
+  },
+  "production_prerequisites": [
+    "EXACT_MERGED_FINITE_EXECUTION_AUTHORITY",
+    "FRESH_ACCOUNT_WIDE_COVERAGE_AND_HEADROOM",
+    "DURABLE_PREPAID_QUERY_METER",
+    "RUN_SLOT_AUTHORITY_BINDING",
+    "ALL_WRITER_ADMISSION",
+    "LEGACY_WRITER_CUTOVER_REVIEW"
+  ],
+  "authority": {
+    "provider_access": false,
+    "r2_access": false,
+    "d1_access": false,
+    "schedule_creation": false,
+    "paper_activation": false,
+    "holdout": false,
+    "source_switch": false,
+    "promotion": false,
+    "live_trading": false
+  },
+  "production_verification": "NOT_RUN"
+}
