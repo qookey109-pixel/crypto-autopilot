@@ -1,0 +1,51 @@
+{
+  "schema": "qookey-billing-v0-5-owner-delegated-decision-v0.1",
+  "observed_at_utc": "2026-10-27T06:13:25Z",
+  "evidence_basis_parent_main_sha": "c42eb8a85fb81fea499ca4a91550c8b5ee02878f",
+  "is_latest_main_claim": false,
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "existing_merged_authority": "config/cloud_paper_billing_metadata_diagnostic_v0_5.json",
+  "workflow": ".github/workflows/cloud-paper-billing-metadata-diagnostic-v0-5.yml",
+  "owner_message": "你幫我決定",
+  "message_context": "Reply to the specific question about first V0.5 execution, at most one read-only GET and one-time consumption even on failure.",
+  "agent_decision": "APPROVE_FIRST_V0_5_ATTEMPT_WITHIN_EXISTING_MERGED_SCOPE",
+  "owner_delegated_execution_decision": true,
+  "token_validity": "UNKNOWN_NOT_ASSERTED",
+  "token_value_requested_or_recorded": false,
+  "execution": {
+    "trigger": "workflow_dispatch_on_main_only",
+    "confirm_one_time_read_only": true,
+    "max_workflow_runs": 1,
+    "max_attempts": 1,
+    "max_cloudflare_gets": 1,
+    "retry_allowed": false,
+    "first_dispatch_consumes_even_on_failure": true
+  },
+  "history_observation": {
+    "event": "workflow_dispatch",
+    "total_count": 68,
+    "returned_rows": 68,
+    "matching_v0_5_runs": 0,
+    "dispatch_performed_by_this_change": false
+  },
+  "tool_capability": {
+    "github_connector_first_dispatch_available": false,
+    "rerun_is_not_first_dispatch": true,
+    "workflow_page_open_requested": true,
+    "page_open_result": "QUEUED",
+    "manual_click_required_for_unavailable_dispatch_tool": true
+  },
+  "status": "APPROVED_FIRST_ATTEMPT_NOT_DISPATCHED_AS_OF_HISTORY_OBSERVATION",
+  "prohibited": {
+    "billing_or_usage_rerun": true,
+    "bootstrap_rerun": true,
+    "r2_or_d1": true,
+    "provider_or_training": true,
+    "holdout_or_source_switch": true,
+    "model_promotion": true,
+    "live_or_real_money": true,
+    "schedule_activation": true
+  },
+  "cloud_paper_activation": false,
+  "zero_cost_proven": false
+}

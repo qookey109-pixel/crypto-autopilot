@@ -1,3 +1,18 @@
+## Current delivery checkpoint — 2026-10-27
+
+Reviewed parent main: `c42eb8a85fb81fea499ca4a91550c8b5ee02878f`, not a latest-main claim. Start with [CURRENT_STATUS.md](CURRENT_STATUS.md) and [machine checkpoint](research/status/vnext-delivery-checkpoint-2026-10-27-v0-1.json). Earlier dated sections are historical evidence.
+
+Merged #811/#814/#816/#817/#819 provide runtime-manifest diagnosis, authenticated13/15 single-capture feature coverage, disabled shared research collection and bounded recovery. Latest #819 postmerge CI40434731062 passed1977 tests, Python3.12/3.13, Ruff, CodeQL, dependency security and freeze guard. Existing prepaid runtime already provides synthetic coordinator/D1/account-continuation/NO_TRADE assembly; do not restart it as missing.
+
+Formal product remains NOT_WIRED / NOT_RUN / NOT_CONFIGURED with unprovisioned D1, empty strategy registry and Core100 REJECT. Shared admission for all active legacy writers, current cost/headroom, finite query claims and production execution/provisioning authority remain unverified. A disabled component is not a migrated writer.
+
+Maintenance40393490245 and40424318868 each succeeded in inspect/propose; the latter logged NO_CHANGE/commits_created=0. Its exact second triggering Health ID is not present in stdout and no artifact exists; do not claim full two-source acceptance. Future structured output now includes each validated execution source without changing document semantic dedup. #818 generated blocks are preserved verbatim for reconciliation; close its stale Draft unmerged after this delivery, preserving the branch.
+
+Pages40424318857 on7b63a7e passed build/deploy and66/66 desktop/mobile production tests. This is website evidence, not PAPER activation. Historical16/21 Shadow remains INSUFFICIENT/REVIEW_REQUIRED; the single-archive13/15 feature audit added no context observations and proved no predictive edge.
+
+CLOUD_ONLY / LOCAL_FILES_EXCLUDED_BY_USER / 0 USD / PAPER-LIVE-PAPER ONLY. No new provider/R2/D1 operation, dispatch, schedule or authority is part of this reconciliation. Billing V0.5 first attempt approved through the owner's delegated decision; see [decision receipt](research/receipts/2026-10-27-billing-v0-5-owner-delegated-decision-v0-1.json). Token validity remains UNKNOWN, no dispatch had occurred at06:13 UTC, and the connector lacks first-dispatch capability. Consumed probes, frozen evidence and closed holdout/source-switch/promotion/live gates remain unchanged.
+
+---
 ## Current live checkpoint — 2026-10-04
 
 Evidence basis: GitHub `main=391fc329d75817342f790a787f3e5868c6538996`, re-read before V0.5 preparation; PR #766 is the latest merged status reconciliation. The owner confirms there are no other external projects/services currently writing to this account's R2. Register any future external writer before its first write. This confirmation is limited to external R2 writers: the four repository writers still lack verified shared admission, and it does not prove D1 coverage, complete account costs, or exact headroom. Cloud Paper remains disabled (`NOT_WIRED` / `NOT_RUN` / `NOT_CONFIGURED`), D1 is absent, the production strategy registry is empty, and Core100 remains `REJECT`. The one-time Billing History V0.3 failure remains consumed; V0.5 is preparation only and has made no Cloudflare request. Preserve earlier dated evidence without rewriting it.
