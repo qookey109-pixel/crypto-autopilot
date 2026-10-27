@@ -20,3 +20,5 @@ Ruling: reconcile bot #818 by preserving its generated blocks byte-for-byte in t
 
 Root-cause evidence: head912017a6812cded8cd5162eed8a2fc169f1fa14b/job121965144194 passed the three new source-output cases but existing Shadow documentation gate fixed both top sections to10/11 and read the mutable operations.updated_date as that historical date.1980 tests:8 failures+1 error in that gate only.
 Ruling: preserve the full original10/11 release section verbatim, add clearly separate current top sections, and keep its16/21/15604/60-browser evidence guards scoped to that dated section. Validate the new current checkpoint separately (16/21,66-browser, NOT_RUN, no authority inflation). Do not freeze current operations date to historical evidence or delete old tamper tests.
+
+Second verification at head467dcf1b448d72c0521e985a0852054807575bb0/job121966490879:1980 tests, one remaining documentation error; source-output and tamper cases passed. Root cause was a missing separator after the restored10/11 section, which accidentally included the next9/21 historical section in its boundary. Restore the separator, not loosen the observed-count check.
