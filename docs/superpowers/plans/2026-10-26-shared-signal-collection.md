@@ -34,11 +34,12 @@ Interface: run_shared_signal_collection(*, sources, run_id, reservation, guard, 
 Sources are complete selected rows from the existing configuration, validated against the existing three declared identities. An empty enabled selection is a no-op before admission.
 The new module performs admission, sequential metered acquisition, safe payload construction, bounded serialization, then shared publication. No source or S3 side effect may precede admission; no second reservation is made for publication.
 
-- [ ] Write tests for disabled/no-source, admission ordering, full success counters, duplicate replay, rejected admission, source failure, expiry, unregistered source, wrong envelope and oversized publication.
-- [ ] GitHub CI RED must fail assertions because the combined runtime is absent, with no local execution.
-- [ ] Extract private _publish_objects without changing the strict existing API; implement the successor with one no-redirect transport and sanitized failure summaries.
-- [ ] GitHub CI GREEN must pass the full suite, Ruff and all required governance checks; existing publication regression tests must still pass.
-- [ ] Fresh whole-branch review, address material findings, verify exact head/base/checks, merge and inspect postmerge CI.
+- [x] Write tests for disabled/no-source, admission ordering, full success counters, duplicate replay, rejected admission, source failure, expiry, unregistered source, wrong envelope and oversized publication.
+- [x] GitHub CI RED must fail assertions because the combined runtime is absent, with no local execution.
+- [x] Extract private _publish_objects without changing the strict existing API; implement the successor with one no-redirect transport and sanitized failure summaries.
+- [x] GitHub CI GREEN must pass the full suite, Ruff and all required governance checks; existing publication regression tests must still pass.
+- [x] Fresh whole-branch review and material findings addressed with cloud RED/GREEN.
+- [ ] Verify final exact head/base/checks, merge and inspect postmerge CI.
 
 ## Execution ledger
 
@@ -55,4 +56,6 @@ Fresh whole-branch review: two Important findings accepted after reading the act
 Review RED verified at 23ceca03b67004bcfa7e448f23c9532e021b2599, job 121953361882: 1965 tests, exactly five failures (four malformed JSON subcases and one controlled-report escape). No other failures.
 Fix pass: validate declared JSON object/explicit forecast-list structure before legacy parsing; catch collection-level conflicts into sanitized REVIEW_REQUIRED with retained admission and attempted counters. HTML metadata and absent forecasts stay supported.
 Review limitations: real provider behavior, credentials, D1/R2 charges and operational writer coverage remain unverified production prerequisites; custom transport injection is a trusted boundary, not a proven production transport.
-Current state: review fix verification pending; no workflow cutover or external diagnostic performed.
+Review fix GREEN: head d23402ffc26e0e7a541df3ce6cba8a4b9cc1e6d6, CI run 40432651658, Python 3.12 job 121953802289: Ruff and 1966 tests passed, including malformed JSON, within-source conflict and legitimate HTML metadata. Python 3.13, workflow-static, dependency security and CodeQL also succeeded.
+Integration ruling: use the user's existing explicit merge authorization and cloud-only GitHub squash path; no local merge/worktree/menu is applicable. Final metadata/evidence commit is checked again before merge; postmerge results remain separate.
+Current state: implementation and review verified; final integration pending. No workflow cutover or external diagnostic performed.

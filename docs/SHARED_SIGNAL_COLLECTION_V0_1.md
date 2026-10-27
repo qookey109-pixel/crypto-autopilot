@@ -21,10 +21,13 @@ source row is validated before admission; duplicates and changed routes stop.
 3. Fetch selected sources sequentially, at most three GET attempts, each with a
    20-second timeout and a 500000-byte body bound. Default transport disables
    redirects. There is no automatic retry, login or prose-direction inference.
-4. Recheck binding and fresh budget before each request. Any source failure or
+4. Reject malformed declared JSON, non-object JSON and malformed explicit forecast
+   arrays before the legacy parser. HTML metadata and absent forecasts remain valid.
+   Recheck binding and fresh budget before each request. Any source failure or
    evidence expiry stops publication; reports retain fixed reasons and charged
    usage, never raw transport exception values.
 5. Preserve global forecast-ID deduplication/revision rejection across sources.
+   Within-source conflicts return a controlled report with retained reservation.
    Bound serialized payload to 262144 bytes, manifest and pointer to 4096 each.
    Oversized evidence is rejected without truncation or S3 construction.
 6. Reuse the existing admitted publication body: pointer preflight, conditional
@@ -58,3 +61,5 @@ redirect rejection, immutable conflict and forecast revision. Existing
 publication tests continue to cover ETag pointer races and readback failures.
 See [execution ledger](superpowers/plans/2026-10-26-shared-signal-collection.md)
 and PR checks for exact RED/GREEN outcomes.
+
+Review validation: CI run [40432651658](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40432651658) passed Python 3.12/3.13, Ruff and 1966 tests. This is engineering evidence only; operational provider, D1 and R2 access remain NOT_RUN.
