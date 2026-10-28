@@ -1,0 +1,121 @@
+name: Shadow Recent Pair Read-only Rolling Review (temporary PR-only)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/shadow-recent-pair-review-20261028.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  existing-archives-only:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'codex/shadow-recent-pair-review-20261028'
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.13"
+      - name: Inspect two existing natural Shadow archives only
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONPATH: src
+        run: |
+          set -euo pipefail
+          tmpdir="$(mktemp -d "${RUNNER_TEMP}/shadow-pair-XXXXXX")"
+          trap 'rm -rf -- "$tmpdir"' EXIT
+          for pair in 40522128947:12742995167 40580450824:12768707588; do
+            run="${pair%%:*}"
+            artifact="${pair##*:}"
+            gh api "/repos/qookey109-pixel/crypto-autopilot/actions/runs/$run" > "$tmpdir/$run.run.json"
+            gh api "/repos/qookey109-pixel/crypto-autopilot/actions/runs/$run/jobs" > "$tmpdir/$run.jobs.json"
+            gh api "/repos/qookey109-pixel/crypto-autopilot/actions/artifacts/$artifact" > "$tmpdir/$run.artifact.json"
+            gh api -H "Accept: application/vnd.github+json" "/repos/qookey109-pixel/crypto-autopilot/actions/artifacts/$artifact/zip" > "$tmpdir/$run.zip"
+          done
+          python - "$tmpdir" <<'PY'
+          import hashlib
+          import json
+          import sys
+          from pathlib import Path
+          from crypto_autopilot.models import Candle
+          from crypto_autopilot.research.causal_prefix_replay_v0_1 import replay_60m_at_cutoff
+          from crypto_autopilot.research.shadow_original_zip_audit_v0_1 import (
+              audit_existing_original_zip_batch, verify_existing_original_zip,
+          )
+          from crypto_autopilot.research.shadow_feature_coverage_v0_1 import (
+              inspect_shadow_feature_coverage,
+          )
+
+          root = Path(sys.argv[1])
+          expected_rows = [
+              {"run_id": 40522128947, "run_number": 77, "artifact_id": 12742995167,
+               "created_at_utc": "2026-10-27T14:32:46Z",
+               "head_sha": "50bca831144a4cfd1c01f022a33f3e56dd8f7d6b",
+               "zip_sha256": "3d819c103fc05aa5f635f74cca2e0b5fcaac5a18e13d59c15b6d49d9a8e6d13f"},
+              {"run_id": 40580450824, "run_number": 78, "artifact_id": 12768707588,
+               "created_at_utc": "2026-10-27T20:42:37Z",
+               "head_sha": "50bca831144a4cfd1c01f022a33f3e56dd8f7d6b",
+               "zip_sha256": "9b485eb8ed5c536599a43c8dc06f2ea14ff531943946191c43dac85d48da4f76"},
+          ]
+          inputs, reports = [], []
+          for expected in expected_rows:
+              rid = expected["run_id"]
+              raw = (root / f"{rid}.zip").read_bytes()
+              run = json.loads((root / f"{rid}.run.json").read_text())
+              jobs = json.loads((root / f"{rid}.jobs.json").read_text())["jobs"]
+              artifact = json.loads((root / f"{rid}.artifact.json").read_text())
+              assert hashlib.sha256(raw).hexdigest() == expected["zip_sha256"]
+              item = (raw, expected, run, artifact, jobs)
+              inputs.append(item)
+              reports.append(verify_existing_original_zip(*item))
+          diagnostic = audit_existing_original_zip_batch(inputs)
+          coverage = inspect_shadow_feature_coverage(reports)
+          assert diagnostic["report_count"] == 2
+          assert diagnostic["execution_authority"] is False
+          assert coverage["production_eligibility_proven"] is False
+          assert coverage["historical_signal_cutoff_no_lookahead_proven"] is False
+          checks = 0
+          replays = 0
+          for report in reports:
+              for row in report["collection"]["market_evidence"]:
+                  candles = [Candle(**entry) for entry in row["candles_60m"]]
+                  result = replay_60m_at_cutoff(candles, report["collection"]["capture_timestamp_ms"])
+                  assert result["source"]["point_in_time_source_vintage_verified"] is False
+                  assert result["authority"]["paper_submission"] is False
+                  replays += 1
+                  for count in (60, 100, 150, 200):
+                      cutoff = candles[count - 1].time_ms + 3_600_000
+                      expected = replay_60m_at_cutoff(candles, cutoff)
+                      future = candles[:count] + [
+                          Candle(c.time_ms, 100.0, 101.0, 99.0, 100.0, 100.0)
+                          for c in candles[count:]
+                      ]
+                      assert replay_60m_at_cutoff(future, cutoff) == expected
+                      checks += 1
+          assert replays == 10 and checks == 40
+          print(json.dumps({
+              "schema": "qookey-shadow-recent-pair-readonly-review-v0.1",
+              "source_runs": [row["run_id"] for row in expected_rows],
+              "source_artifacts": [row["artifact_id"] for row in expected_rows],
+              "source_zip_sha256": [row["zip_sha256"] for row in expected_rows],
+              "source_main_sha": expected_rows[0]["head_sha"],
+              "capture_replays": replays, "sampled_prefix_checks": checks,
+              "continuity": diagnostic["continuity"],
+              "feature_coverage": coverage,
+              "github_metadata_and_original_zip_verified": True,
+              "historical_source_vintage_verified": False,
+              "historical_entry_cutoff_proven": False,
+              "returns_or_predictive_edge_proven": False,
+              "paper_cycle_executed": False,
+              "r2_d1_provider_accessed": False,
+              "execution_authority": False
+          }, sort_keys=True))
+          PY
