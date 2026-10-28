@@ -59,6 +59,11 @@ class CausalPrefixReplayTests(unittest.TestCase):
             replay_60m_at_cutoff(future, 70 * HOUR),
         )
 
+    def test_finite_inputs_that_overflow_features_fail_closed(self) -> None:
+        rows = [Candle(i * HOUR, 1e308, 1e308, 1e308, 1e308, 100) for i in range(70)]
+        with self.assertRaises(ValueError):
+            replay_60m_at_cutoff(rows, 70 * HOUR)
+
     def test_missing_latest_closed_bar_stops(self) -> None:
         with self.assertRaises(ValueError):
             replay_60m_at_cutoff(sample(70), 80 * HOUR)

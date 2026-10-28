@@ -58,8 +58,13 @@ def replay_60m_at_cutoff(candles: Sequence[Candle], cutoff_ms: int) -> dict[str,
         if not technical[-1].ready:
             raise ValueError("indicators not warmed")
         patterns = build_technical_pattern_series(prefix, "60M", technical_series=technical)
-    except TechnicalDataError as exc:
-        raise ValueError("invalid or non-contiguous closed bars") from exc
+    except (TechnicalDataError, OverflowError) as exc:
+        raise ValueError("invalid closed bars or indicator overflow") from exc
+
+    for snapshot in (technical[-1], patterns[-1]):
+        for value in asdict(snapshot).values():
+            if type(value) in (int, float) and not math.isfinite(value):
+                raise ValueError("non-finite calculated feature")
 
     source_bytes = json.dumps(
         [asdict(row) for row in prefix], sort_keys=True, separators=(",", ":"), allow_nan=False
