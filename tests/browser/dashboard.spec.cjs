@@ -113,6 +113,13 @@ test("VNext market research is clearly non-live and fits a 390px phone", async (
   await expect(authenticated).toContainText("2026-10-25T04:43:38.396000Z");
   await expect(authenticated.locator('a[href*="/actions/runs/40183609493"]'))
     .toHaveAttribute("rel", "noopener noreferrer");
+  const replay = panel.locator(".vnext-replay-evidence");
+  await expect(replay).toBeVisible();
+  await expect(replay).toContainText("20 次抽樣");
+  await expect(replay).toContainText("歷史資料版本：UNKNOWN");
+  await expect(replay).toContainText("正式 PAPER 未由本次研究執行");
+  await expect(replay.locator('a[href*="/actions/runs/40618806942"]'))
+    .toHaveAttribute("rel", "noopener noreferrer");
   const lineage = panel.locator(".vnext-decision-lineage");
   await expect(lineage).toBeVisible();
   await expect(lineage).toContainText("Decision Trace · 證據到正式決策");
