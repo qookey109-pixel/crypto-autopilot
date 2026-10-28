@@ -142,6 +142,24 @@ class SharedRunRecoveryTests(unittest.TestCase):
         self.assertEqual(got["attempted_usage"]["r2_class_a"], 5)
         self.assertTrue(got["central_reservation_retained"])
 
+    def test_listed_step_disappears_before_read_fails_closed(self):
+        key = self.key("live-run-step", self.committed["run_step"]["step_id"])
+        original_list = self.backend.list_objects_v2
+
+        def disappear_after_list(**kwargs):
+            page = original_list(**kwargs)
+            if kwargs["Prefix"].endswith("/live-run-step/"):
+                del self.backend.objects[key]
+            return page
+
+        with patch.object(self.backend, "list_objects_v2", side_effect=disappear_after_list):
+            result = self.run_recovery()
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["reason_code"], "RECOVERY_EVIDENCE_OR_OPERATION_FAILED")
+        self.assertIsNone(result["result_seal_writes_performed"])
+        self.assertTrue(result["central_reservation_retained"])
+        self.assertFalse(any(kind == "put" for kind, _ in self.backend.events))
+
     def test_missing_tick_cannot_repair(self):
         self.remove_seal()
         del self.backend.objects[self.key("live-tick", self.committed["run_step"]["tick_id"])]
