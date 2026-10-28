@@ -55,6 +55,24 @@ class PrepaidSealRuntimeTests(unittest.TestCase):
                 self.runtime()
         self.assertEqual(unshared.store.calls, [])
 
+    def test_mismatched_or_already_admitted_ledger_is_rejected(self):
+        for field, value in (
+            ("_writer", "wrong-writer"),
+            ("_slot_at_ms", self.f.now + SLOT_MS),
+            ("_meter", object()),
+            ("_admitted", True),
+        ):
+            with self.subTest(field=field):
+                base = fixtures.build_runtime_composition
+                with patch.object(fixtures, "build_runtime_composition", base):
+                    prepared = self.f.runtime()
+                setattr(prepared.reservation_ledger, field, value)
+                self.f.sdk.calls.clear()
+                with patch(MODULE + ".build_prepaid_runtime", return_value=prepared):
+                    with self.assertRaisesRegex(BudgetBlocked, "RUNTIME_BINDING_MISMATCH"):
+                        self.runtime()
+                self.assertEqual(self.f.sdk.calls, [])
+
     def test_shared_admission_continuation_and_reads_are_bound(self):
         db, size, statements, opener = self.transport()
         with patch(fixtures.CLIENT_MODULE + ".build_opener", return_value=opener):
