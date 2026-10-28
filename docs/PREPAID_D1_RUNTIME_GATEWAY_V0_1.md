@@ -59,9 +59,12 @@ prepaid in full; accounting never subtracts a rebate.
 
 Reconstruction for a later current slot uses a new durable ticket and fresh
 workload admission, then verifies and continues the existing R2 account.
-Historical settlement recovery is blocked unless a separately reviewed current
-R2 workload envelope exists. An old reservation cannot fund new-day recovery
-reads. Existing readers/formats stay available unchanged for their authorities.
+This runtime adapter blocks historical settlement recovery even after a normal
+slot has been admitted. A separately versioned successor must implement and
+verify fresh recovery workload admission before enabling recovery; a new budget
+envelope alone does not activate this adapter. An old reservation cannot fund
+recovery reads. Existing readers/formats stay available unchanged for their
+own authorities.
 
 ## Authority and future writers
 
