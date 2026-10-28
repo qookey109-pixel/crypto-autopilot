@@ -193,6 +193,10 @@ class SharedRunRecoveryTests(unittest.TestCase):
         self.assertIn(key, self.backend.objects)
         self.assertEqual(self.backend.events.count(("put", key)), 1)
         self.assertEqual(result["attempted_usage"]["r2_class_a"], 5)
+        self.assertEqual(
+            result["attempted_usage"]["r2_class_b"],
+            sum(kind == "get" for kind, _ in self.backend.events),
+        )
         self.assertTrue(result["central_reservation_retained"])
         self.assertFalse(result["automatic_retry_allowed"])
         self.assertNotIn("SECRET", str(result))
@@ -222,6 +226,10 @@ class SharedRunRecoveryTests(unittest.TestCase):
 
         self.assertEqual(result["status"], "REVIEW_REQUIRED")
         self.assertIsNone(result["result_seal_writes_performed"])
+        self.assertEqual(
+            result["attempted_usage"]["r2_class_b"],
+            sum(kind == "get" for kind, _ in self.backend.events),
+        )
         self.assertTrue(result["central_reservation_retained"])
         self.assertFalse(result["automatic_retry_allowed"])
         self.assertEqual(result["attempted_usage"]["r2_class_a"], 6)
