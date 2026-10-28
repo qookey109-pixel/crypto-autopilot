@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from dataclasses import replace
 
 from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import D1UsageSnapshot
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked, R2UsageSnapshot
@@ -15,6 +16,7 @@ from crypto_autopilot.paper.cloud_seal_guarded_composition_v0_1 import (
 )
 from crypto_autopilot.paper.prepaid_d1_client_v0_1 import DatabaseSizeEvidence
 from crypto_autopilot.paper.prepaid_query_controller_v0_1 import PrepaidQueryMeter
+from crypto_autopilot.paper.validated_tape_client_v0_1 import ValidatedTapeClient
 
 
 def build_runtime_composition(
@@ -49,4 +51,5 @@ def build_runtime_composition(
     ledger.client.validate_runtime_binding(
         meter=query_meter, writer_id=writer_id, slot_id=f"slot:{slot_at_ms}",
     )
+    base = replace(base, client=ValidatedTapeClient(base.client))
     return build_seal_guarded_composition(base, enabled=True)
