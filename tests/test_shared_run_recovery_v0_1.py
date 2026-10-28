@@ -176,6 +176,68 @@ class SharedRunRecoveryTests(unittest.TestCase):
         self.assertTrue(got["central_reservation_retained"])
         self.assertEqual(got["attempted_usage"]["r2_class_a"], 5)
 
+    def test_persisted_seal_with_failed_readback_is_unknown_and_not_retried(self):
+        key = self.remove_seal()
+        original_get = self.backend.get_object
+
+        def fail_after_write(**kwargs):
+            if kwargs["Key"] == key and key in self.backend.objects:
+                self.backend.events.append(("get", key))
+                raise RuntimeError("SECRET readback failure")
+            return original_get(**kwargs)
+
+        with patch.object(self.backend, "get_object", side_effect=fail_after_write):
+            result = self.run_recovery()
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertIsNone(result["result_seal_writes_performed"])
+        self.assertIn(key, self.backend.objects)
+        self.assertEqual(self.backend.events.count(("put", key)), 1)
+        self.assertEqual(result["attempted_usage"]["r2_class_a"], 5)
+        self.assertTrue(result["central_reservation_retained"])
+        self.assertFalse(result["automatic_retry_allowed"])
+        self.assertNotIn("SECRET", str(result))
+
+        events = list(self.backend.events)
+        fresh_guard = CloudBudgetGuard(snapshot=self.snapshot, clock_ms=lambda: NOW)
+        with self.assertRaises(BudgetBlocked):
+            self.run_recovery(guard=fresh_guard)
+        self.assertEqual(self.backend.events, events)
+
+    def test_second_seal_failure_preserves_first_without_retry_or_rewrite(self):
+        store = R2PaperRunStore(BudgetedR2Store(
+            client=self.backend, bucket="fixture", before_external=lambda *args: None))
+        second = coordinate_live_paper_run_step(
+            run_name="shared-recovery", tick_time_ms=6000, candidate_specs=(),
+            feed=_Feed(6000), store=store, previous_step=self.committed["run_step"],
+            policy=LivePaperRunCoordinatorPolicy(compact_tick_reference=True))
+        self.assertEqual(second["run_id"], self.committed["run_id"])
+        first_key = self.remove_seal()
+        second_key = self.key("live-run-result", second["run_step"]["request_id"])
+        del self.backend.objects[second_key]
+        first_written, failing = sorted((first_key, second_key))
+        original = dict(self.backend.objects)
+        self.backend.events.clear()
+        self.backend.fail_key = failing
+        result = self.run_recovery()
+
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertIsNone(result["result_seal_writes_performed"])
+        self.assertTrue(result["central_reservation_retained"])
+        self.assertFalse(result["automatic_retry_allowed"])
+        self.assertEqual(result["attempted_usage"]["r2_class_a"], 6)
+        self.assertEqual(self.backend.events.count(("put", first_written)), 1)
+        self.assertEqual(self.backend.events.count(("put", failing)), 1)
+        self.assertIn(first_written, self.backend.objects)
+        self.assertNotIn(failing, self.backend.objects)
+        self.assertEqual({key: self.backend.objects[key] for key in original}, original)
+        self.assertNotIn("SECRET", str(result))
+
+        events = list(self.backend.events)
+        fresh_guard = CloudBudgetGuard(snapshot=self.snapshot, clock_ms=lambda: NOW)
+        with self.assertRaises(BudgetBlocked):
+            self.run_recovery(guard=fresh_guard)
+        self.assertEqual(self.backend.events, events)
+
     def test_expiry_after_first_list_prevents_more_access_or_writes(self):
         self.remove_seal()
         self.backend.after_call = lambda: self.clock.__setitem__(0, NOW + 60001)
