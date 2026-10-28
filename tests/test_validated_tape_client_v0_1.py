@@ -97,6 +97,28 @@ class ValidatedTapeClientTests(unittest.TestCase):
         self.assertEqual(trades[0].price, 100.0)
         request.assert_called_once()
 
+    def test_raw_timestamps_must_be_exact_positive_integers(self):
+        client = CloudPaperPionexPublicClient(before_send=lambda: None)
+        guarded = ValidatedTapeClient(client)
+        for timestamp in (True, 0, None, 123.9, "123.9", "", -1, "9" * 5000):
+            depth = {"result": True, "data": {
+                "bids": [["100", "2"]], "asks": [["101", "3"]], "updateTime": timestamp,
+            }}
+            trades = {"result": True, "data": {"trades": [
+                {"price": "100", "size": "2", "timestamp": timestamp, "tradeId": "1"},
+            ]}}
+            with self.subTest(timestamp=timestamp), patch.object(client, "_get_json", return_value=depth):
+                with self.assertRaisesRegex(CloudLoopReviewRequired, "ORDER_BOOK_INVALID"):
+                    guarded.get_order_book("BTC_USDT_PERP", limit=20)
+            with self.subTest(timestamp=timestamp), patch.object(client, "_get_json", return_value=trades):
+                with self.assertRaisesRegex(CloudLoopReviewRequired, "TRADE_TAPE_INVALID"):
+                    guarded.get_recent_trades("BTC_USDT_PERP", limit=500)
+        depth = {"result": True, "timestamp": str(TICK), "data": {
+            "bids": [["100", "2"]], "asks": [["101", "3"]],
+        }}
+        with patch.object(client, "_get_json", return_value=depth):
+            self.assertEqual(guarded.get_order_book("BTC_USDT_PERP", limit=20).update_time_ms, TICK)
+
     def test_prepaid_guarded_runtime_uses_validation(self):
         case = fixtures.PrepaidD1RuntimeTests("test_meter_readonly_checks_never_debit_or_refresh")
         case.setUp()
