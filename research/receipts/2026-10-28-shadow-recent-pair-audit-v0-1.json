@@ -59,7 +59,8 @@
     "timeframes_15m_4h_verified": false,
     "costs_known": false,
     "predictive_edge_proven": false,
-    "formal_paper_executed": false
+    "formal_paper_executed": false,
+    "minute_values_are_rounded_down": true
   },
   "authority": {
     "research_only": true,
