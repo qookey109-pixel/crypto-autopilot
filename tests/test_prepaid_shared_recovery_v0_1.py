@@ -44,7 +44,7 @@ class PrepaidSharedRecoveryTests(unittest.TestCase):
             d1_snapshot=self.f.guard.snapshot, query_meter=self.f.meter,
             clock_ms=lambda: self.f.now, slot_at_ms=self.f.now,
             database_evidence=self.f.evidence,
-            credentials={"account_id": "fixture", "bucket": "fixture",
+            credentials={"account_id": "a" * 32, "bucket": "fixture",
                          "access_key_id": "fixture", "secret_access_key": "fixture"},
             repair_missing_result_seals=True, execution_enabled=True,
         )
