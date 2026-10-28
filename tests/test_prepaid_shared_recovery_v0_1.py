@@ -135,6 +135,25 @@ class PrepaidSharedRecoveryTests(unittest.TestCase):
         self.assertEqual(self.rec.backend.events, [])
         self.rec.mock_factory.assert_not_called()
 
+    def test_expiry_after_admission_stops_before_first_r2_operation(self):
+        db, statements, opener = self.transport()
+        original_factory = self.rec.make_store
+        def expire_after_construction(**kwargs):
+            store = original_factory(**kwargs)
+            self.f.now += 60001
+            return store
+        self.rec.mock_factory.side_effect = expire_after_construction
+        env = {"CLOUDFLARE_D1_API_TOKEN": "synthetic-token",
+               "CLOUDFLARE_ACCOUNT_ID": "a" * 32,
+               "CLOUDFLARE_D1_DATABASE_ID": fixtures.DB_ID}
+        with patch.dict("os.environ", env), patch(fixtures.CLIENT_MODULE + ".build_opener", return_value=opener):
+            result = run_prepaid_shared_recovery(**self.args())
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertTrue(result["central_reservation_retained"])
+        self.assertEqual(len(statements), 1)
+        self.assertEqual(db.execute("SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3").fetchone()[0], 1)
+        self.assertEqual(self.rec.backend.events, [])
+
     def test_wrong_writer_ticket_fails_before_client(self):
         with patch(MODULE + ".PrepaidCloudflareD1QueryClient.from_environment") as client:
             self.f.meter._slot_id = "slot:1"
