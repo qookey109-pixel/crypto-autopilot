@@ -144,6 +144,8 @@ class SharedRunRecoveryTests(unittest.TestCase):
 
     def test_listed_step_disappears_before_read_fails_closed(self):
         key = self.key("live-run-step", self.committed["run_step"]["step_id"])
+        self.remove_seal()
+        del self.backend.objects[self.key("live-tick", self.committed["run_step"]["tick_id"])]
         original_list = self.backend.list_objects_v2
 
         def disappear_after_list(**kwargs):

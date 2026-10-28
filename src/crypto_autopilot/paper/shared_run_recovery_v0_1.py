@@ -32,6 +32,7 @@ class _SealOnlyStore(R2PaperRunStore):
         super().__init__(store, prefix=_PREFIX)
         self._repair = repair
         self._seal_attempts = 0
+        self._listed_ids: set[tuple[str, str]] = set()
 
     def _key(self, kind: str, object_id: str) -> str:
         if kind not in _KINDS:
@@ -47,6 +48,8 @@ class _SealOnlyStore(R2PaperRunStore):
             if str(details.get("Error", {}).get("Code", "")) in {
                 "NoSuchKey", "NotFound", "404",
             } or details.get("ResponseMetadata", {}).get("HTTPStatusCode") == 404:
+                if (kind, object_id) in self._listed_ids:
+                    raise ValueError("listed recovery object disappeared") from None
                 return None
             raise
         stream = response["Body"]
@@ -82,6 +85,7 @@ class _SealOnlyStore(R2PaperRunStore):
             if _clean_component(identity, "object id") != identity or identity in identities:
                 raise ValueError("recovery inventory identity is invalid")
             identities.append(identity)
+        self._listed_ids.update((kind, identity) for identity in identities)
         return tuple(sorted(identities))
 
     def put_json(self, kind: str, object_id: str, payload: Mapping[str, object]):
