@@ -43,6 +43,10 @@ class CausalPrefixReplayTests(unittest.TestCase):
             with self.subTest(length=len(damaged)), self.assertRaises(ValueError):
                 replay_60m_at_cutoff(damaged, 70 * HOUR)
 
+    def test_missing_latest_closed_bar_stops(self) -> None:
+        with self.assertRaises(ValueError):
+            replay_60m_at_cutoff(sample(70), 80 * HOUR)
+
     def test_insufficient_and_invalid_cutoff_stop(self) -> None:
         for cutoff in (0, True, -1):
             with self.subTest(cutoff=cutoff), self.assertRaises(ValueError):

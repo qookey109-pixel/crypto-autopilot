@@ -42,6 +42,8 @@ def replay_60m_at_cutoff(candles: Sequence[Candle], cutoff_ms: int) -> dict[str,
             prefix.append(candle)
     if len(prefix) < MIN_CANDLES:
         raise ValueError("insufficient closed bars")
+    if prefix[-1].time_ms != (cutoff_ms // HOUR_MS - 1) * HOUR_MS:
+        raise ValueError("latest closed bar missing or misaligned")
     try:
         technical = build_technical_series(prefix, "60M")
         if not technical[-1].ready:
@@ -61,6 +63,7 @@ def replay_60m_at_cutoff(candles: Sequence[Candle], cutoff_ms: int) -> dict[str,
             "provider": None,
             "symbol": None,
             "externally_authenticated": False,
+            "provider_publication_time_verified": False,
             "candle_count": len(prefix),
             "last_closed_bar_start_ms": prefix[-1].time_ms,
             "prefix_sha256": hashlib.sha256(source_bytes).hexdigest(),
