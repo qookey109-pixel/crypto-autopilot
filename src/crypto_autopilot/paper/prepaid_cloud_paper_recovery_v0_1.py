@@ -52,6 +52,8 @@ def run_prepaid_cloud_paper_recovery(
         raise BudgetBlocked("BLOCKED_RECOVERY_CREDENTIAL_BINDING")
     if credentials["account_id"] != os.environ.get("CLOUDFLARE_ACCOUNT_ID", ""):
         raise BudgetBlocked("BLOCKED_RECOVERY_ACCOUNT_MISMATCH")
+    if credentials["bucket"] != os.environ.get("R2_BUCKET_NAME", ""):
+        raise BudgetBlocked("BLOCKED_RECOVERY_BUCKET_MISMATCH")
     database_id = os.environ.get("CLOUDFLARE_D1_DATABASE_ID", "")
     database_evidence.validate(database_id=database_id, guard=d1_guard)
     client = PrepaidCloudflareD1QueryClient.from_environment(
