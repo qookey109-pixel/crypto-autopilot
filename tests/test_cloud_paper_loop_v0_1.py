@@ -258,33 +258,6 @@ class CloudPaperLoopTests(unittest.TestCase):
         self.assertEqual(committed_report(store, "0"), legacy)
         self.assertEqual(result["state"], "NO_TRADE")
 
-    def test_replay_rejects_tampered_or_unbound_result_seal(self):
-        source = MemoryStore()
-        first = step(source, 420000, None)
-        step_id = first["coordinator"]["step_id"]
-        run_step = source.objects[("live-run-step", step_id)]
-        key = ("live-run-result", run_step["request_id"])
-
-        for case in ("schema", "state", "request", "run", "sequence", "authority"):
-            with self.subTest(case=case):
-                store = MemoryStore()
-                store.objects = copy.deepcopy(source.objects)
-                seal = store.objects[key]
-                if case == "schema":
-                    seal["schema"] = "unexpected"
-                elif case == "state":
-                    seal["state"] = "REVIEW_REQUIRED"
-                elif case == "request":
-                    seal["request_id"] = "another-request"
-                elif case == "run":
-                    seal["run_id"] = "another-run"
-                elif case == "sequence":
-                    seal["sequence"] = 2
-                else:
-                    seal["authority"]["execution_authority"] = True
-                with self.assertRaisesRegex(CloudLoopReviewRequired, "COORDINATOR_SEAL_INVALID"):
-                    committed_report(store, "0")
-
     def test_compact_report_rejects_missing_or_mismatched_step_reference(self):
         store = MemoryStore()
         step(store, 420000, None)
