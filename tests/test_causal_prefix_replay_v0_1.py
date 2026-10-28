@@ -74,6 +74,7 @@ class CausalPrefixReplayTests(unittest.TestCase):
         out = replay_60m_at_cutoff(sample(80), 70 * HOUR)
         self.assertEqual(out["status"], "RESEARCH_ONLY")
         self.assertFalse(out["source"]["externally_authenticated"])
+        self.assertFalse(out["source"]["point_in_time_source_vintage_verified"])
         self.assertFalse(out["authority"]["strategy_qualification"])
         self.assertFalse(out["authority"]["paper_submission"])
         self.assertIsNone(out["costs"]["net_return"])
