@@ -102,6 +102,39 @@ class PrepaidSharedRecoveryTests(unittest.TestCase):
         self.assertEqual(self.rec.backend.events, before)
         self.assertEqual(len(statements), 3)
 
+    def test_account_mismatch_stops_before_d1_or_r2(self):
+        env = {"CLOUDFLARE_ACCOUNT_ID": "a" * 32}
+        wrong = {"account_id": "b" * 32, "bucket": "fixture",
+                 "access_key_id": "fixture", "secret_access_key": "fixture"}
+        with patch.dict("os.environ", env), patch(MODULE + ".PrepaidCloudflareD1QueryClient.from_environment") as client:
+            with self.assertRaisesRegex(BudgetBlocked, "ACCOUNT_MISMATCH"):
+                run_prepaid_shared_recovery(**self.args(credentials=wrong))
+        client.assert_not_called()
+        self.assertEqual(self.rec.backend.events, [])
+
+    def test_lost_admission_response_keeps_reservation_and_never_constructs_r2(self):
+        db, statements, _ = self.transport()
+        def lost(request, timeout):
+            payload = json.loads(request.data)
+            statements.append(payload["sql"])
+            cursor = db.execute(payload["sql"], tuple(payload["params"]))
+            cursor.fetchall()
+            db.commit()
+            raise OSError("synthetic lost response")
+        opener = Mock()
+        opener.open.side_effect = lost
+        env = {"CLOUDFLARE_D1_API_TOKEN": "synthetic-token",
+               "CLOUDFLARE_ACCOUNT_ID": "a" * 32,
+               "CLOUDFLARE_D1_DATABASE_ID": fixtures.DB_ID}
+        with patch.dict("os.environ", env), patch(fixtures.CLIENT_MODULE + ".build_opener", return_value=opener):
+            with self.assertRaises(BudgetBlocked):
+                run_prepaid_shared_recovery(**self.args())
+        self.assertEqual(len(statements), 1)
+        self.assertEqual(self.f.meter.report()["query_attempts_charged"], 2)
+        self.assertEqual(db.execute("SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3").fetchone()[0], 1)
+        self.assertEqual(self.rec.backend.events, [])
+        self.rec.mock_factory.assert_not_called()
+
     def test_wrong_writer_ticket_fails_before_client(self):
         with patch(MODULE + ".PrepaidCloudflareD1QueryClient.from_environment") as client:
             self.f.meter._slot_id = "slot:1"
