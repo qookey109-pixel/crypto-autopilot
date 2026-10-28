@@ -100,8 +100,9 @@ class _SealOnlyStore(R2PaperRunStore):
         return receipt
 
 
-def run_shared_run_recovery(
-    *, run_id: str, reservation: SharedWriterReservation, guard: CloudBudgetGuard,
+def _run_scoped_run_recovery(
+    *, writer_id: str, recovery_store_type: type[_SealOnlyStore],
+    run_id: str, reservation: SharedWriterReservation, guard: CloudBudgetGuard,
     execute: Query, query_meter: AdmissionQueryMeter,
     validate_binding: Callable[[], None], credentials: Mapping[str, str],
     repair_missing_result_seals: bool = False, execution_enabled: bool = False,
@@ -117,7 +118,7 @@ def run_shared_run_recovery(
         raise BudgetBlocked("BLOCKED_RECOVERY_RUN_ID")
     reservation.validate()
     if (
-        reservation.writer_id != WRITER or reservation.provider_requests != 0
+        reservation.writer_id != writer_id or reservation.provider_requests != 0
         or reservation.r2_class_a != 8 or reservation.r2_class_b != 64
         or reservation.r2_new_bytes != 16384
     ):
@@ -147,7 +148,7 @@ def run_shared_run_recovery(
         stage = "VERIFY_AND_REPAIR"
         report = reconcile_live_paper_run(
             run_id=run_id,
-            store=_SealOnlyStore(raw_store, repair=repair_missing_result_seals),
+            store=recovery_store_type(raw_store, repair=repair_missing_result_seals),
             repair_missing_result_seals=repair_missing_result_seals,
         )
         return {
@@ -170,3 +171,18 @@ def run_shared_run_recovery(
             "provider_requests_performed": 0, "central_reservation_retained": True,
             "automatic_retry_allowed": False, "paper_activation_allowed": False,
         }
+
+
+def run_shared_run_recovery(
+    *, run_id: str, reservation: SharedWriterReservation, guard: CloudBudgetGuard,
+    execute: Query, query_meter: AdmissionQueryMeter,
+    validate_binding: Callable[[], None], credentials: Mapping[str, str],
+    repair_missing_result_seals: bool = False, execution_enabled: bool = False,
+) -> dict[str, object]:
+    """Preserve the legacy namespace and writer for existing callers."""
+    return _run_scoped_run_recovery(
+        writer_id=WRITER, recovery_store_type=_SealOnlyStore,
+        run_id=run_id, reservation=reservation, guard=guard, execute=execute,
+        query_meter=query_meter, validate_binding=validate_binding, credentials=credentials,
+        repair_missing_result_seals=repair_missing_result_seals, execution_enabled=execution_enabled,
+    )

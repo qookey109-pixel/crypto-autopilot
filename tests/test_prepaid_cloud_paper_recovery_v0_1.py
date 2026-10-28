@@ -9,6 +9,7 @@ from crypto_autopilot.paper.cloud_loop_v0_1 import SLOT_MS, committed_report
 from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Store
 from crypto_autopilot.paper.cloud_runtime_v0_1 import CLOUD_PAPER_PREFIX
 from crypto_autopilot.paper.cloud_runtime_v0_3 import build_runtime_composition
+from crypto_autopilot.paper.run_store_v0_1 import R2PaperRunStore
 from crypto_autopilot.paper.prepaid_cloud_paper_recovery_v0_1 import run_prepaid_cloud_paper_recovery
 from crypto_autopilot.paper.prepaid_query_controller_v0_1 import AllocationEvidence, claim_prepaid_query_meter
 import test_prepaid_d1_runtime_v0_1 as fixtures
@@ -99,7 +100,11 @@ class CloudPaperRecoveryIntegrationTests(unittest.TestCase):
             self.assertEqual(result["result_seal_writes_performed"], 1)
             self.assertIn(key, self.f.sdk.objects)
             self.assertEqual(self.f.sdk.objects[sentinel], (b"old-namespace-untouched", {}))
-            self.assertIsNotNone(committed_report(runtime.store, report["slot_id"]))
+            readback = R2PaperRunStore(
+                BudgetedR2Store(client=self.f.sdk, bucket="fixture", before_external=lambda *_: None),
+                prefix=CLOUD_PAPER_PREFIX,
+            )
+            self.assertIsNotNone(committed_report(readback, report["slot_id"]))
             self.assertEqual(db.execute("SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3").fetchone()[0], 2)
             self.assertEqual(len(statements), 4)
             self.assertEqual(meter.report()["query_attempts_charged"], 2)

@@ -1,0 +1,37 @@
+{
+  "schema": "qookey-shared-cloud-paper-recovery-v0.1",
+  "status": "IMPLEMENTED_DISABLED",
+  "execution_enabled": false,
+  "production_cutover_authorized": false,
+  "writer_id": "crypto-autopilot:cloud-paper-run-recovery-v0-1",
+  "namespace": "paper-run-store/cloud-loop-v0.1",
+  "reservation": {
+    "provider_requests": 0,
+    "r2_class_a": 8,
+    "r2_class_b": 64,
+    "r2_new_bytes": 16384,
+    "refund_allowed": false
+  },
+  "inventory": {
+    "max_keys_per_kind": 4,
+    "max_pages_per_kind": 1,
+    "partial_inventory_allowed": false
+  },
+  "production_prerequisites": [
+    "EXACT_MERGED_FINITE_EXECUTION_AUTHORITY",
+    "SERIALIZED_NAMESPACE_OWNERSHIP",
+    "FRESH_COMPLETE_ACCOUNT_BUDGET",
+    "DURABLE_PREPAID_QUERY_METER",
+    "ALL_WRITER_CUTOVER"
+  ],
+  "boundaries": {
+    "production_d1": false,
+    "production_r2": false,
+    "paper_activation": false,
+    "holdout": false,
+    "source_switch": false,
+    "promotion": false,
+    "live_trading": false
+  },
+  "production_verification": "NOT_RUN"
+}
