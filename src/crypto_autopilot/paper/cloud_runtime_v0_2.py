@@ -110,17 +110,14 @@ class PrepaidCloudPaperBudgetLedger:
         self._legacy.settle_slot(slot_id=slot_id, completed_at_ms=completed_at_ms, usage=usage)
 
     def get_slot_reservation(self, *, slot_id: str) -> D1SlotReservation | None:
-        self._require_admission(slot_id)
-        return self._legacy.get_slot_reservation(slot_id=slot_id)
+        # An execution admission is not a fresh recovery workload reservation.
+        raise BudgetBlocked("BLOCKED_PREPAID_FRESH_WORKLOAD_ADMISSION_REQUIRED")
 
     def record_verified_result_recovery(
         self, *, slot_id: str, run_id: str, report_id: str, recovered_at_ms: int,
     ) -> None:
-        self._require_admission(slot_id)
-        self._legacy.record_verified_result_recovery(
-            slot_id=slot_id, run_id=run_id, report_id=report_id,
-            recovered_at_ms=recovered_at_ms,
-        )
+        # Recovery requires a separately versioned successor and new envelope.
+        raise BudgetBlocked("BLOCKED_PREPAID_FRESH_WORKLOAD_ADMISSION_REQUIRED")
 
 
 def build_runtime_composition(

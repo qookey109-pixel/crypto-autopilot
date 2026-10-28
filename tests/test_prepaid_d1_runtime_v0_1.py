@@ -383,6 +383,43 @@ class PrepaidD1RuntimeTests(unittest.TestCase):
         network.assert_not_called()
         self.assertEqual(self.sdk.calls, [])
 
+    def test_existing_execution_admission_cannot_fund_historical_recovery(self):
+        db = self.sqlite()
+        size = [1024]
+        statements = []
+
+        def send(request, timeout):
+            payload = json.loads(request.data)
+            statements.append(payload["sql"])
+            cursor = db.execute(payload["sql"], tuple(payload["params"]))
+            columns = tuple(item[0] for item in cursor.description or ())
+            rows = tuple(dict(zip(columns, row, strict=True)) for row in cursor.fetchall())
+            db.commit()
+            size[0] += 64
+            return Response(body(rows=rows, reads=1, writes=7, size=size[0]))
+
+        opener = Mock()
+        opener.open.side_effect = send
+        runtime = self.runtime()
+        with patch(f"{CLIENT_MODULE}.build_opener", return_value=opener):
+            runtime.reservation_ledger.reserve_slot(
+                slot_id=self.slot, run_id="synthetic", now_ms=NOW,
+                snapshot=runtime.budget_guard.snapshot,
+            )
+            statements_before = list(statements)
+            calls_before = list(self.sdk.calls)
+            charged_before = self.meter.report()["query_attempts_charged"]
+            with self.assertRaisesRegex(BudgetBlocked, "FRESH_WORKLOAD"):
+                runtime.recover_completed_slot(slot=self.slot, recovery_enabled=True)
+            with self.assertRaisesRegex(BudgetBlocked, "FRESH_WORKLOAD"):
+                runtime.reservation_ledger.record_verified_result_recovery(
+                    slot_id=self.slot, run_id="synthetic", report_id="fixture",
+                    recovered_at_ms=NOW,
+                )
+        self.assertEqual(statements, statements_before)
+        self.assertEqual(self.sdk.calls, calls_before)
+        self.assertEqual(self.meter.report()["query_attempts_charged"], charged_before)
+
     def test_runtime_rejects_different_client_meter_binding(self):
         self._set_run(102)
         other = self.claim(102)
