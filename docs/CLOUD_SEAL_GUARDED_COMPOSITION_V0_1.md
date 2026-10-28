@@ -17,4 +17,7 @@ Separate versioned authorization, fresh account evidence and immutable namespace
 ownership are required before production use. Prepaid historical recovery remains
 blocked pending its own separately admitted successor.
 
-Shared admission is a trusted caller prerequisite: this builder does not verify\nthat the supplied base has a prepaid/shared ledger. Fake-ledger tests do not\nestablish a production admission or a durable D1 meter. A future runtime\nintegration must validate those bindings before any access.\n
+Shared admission is a trusted caller prerequisite: this builder does not verify
+that the supplied base has a prepaid/shared ledger. Fake-ledger tests do not
+establish a production admission or a durable D1 meter. A future runtime
+integration must validate those bindings before any access.
