@@ -1,4 +1,6 @@
-## 2026-10-28 20:16 Asia/Taipei — recovery and operations checkpoint
+## Current merged release checkpoint — 2026-10-27 Asia/Taipei
+
+**2026-10-28 20:16 Asia/Taipei — recovery and operations checkpoint**
 
 Evidence basis: parent main `e1dbe098cdb3faf2a3ceeba6b7d0cc7d4b455db0`, not a claim about current main after this document is merged. Resolve live main and workflow history before acting.
 
@@ -9,10 +11,6 @@ Evidence basis: parent main `e1dbe098cdb3faf2a3ceeba6b7d0cc7d4b455db0`, not a cl
 - Production PAPER remains NOT_WIRED / NOT_RUN / NOT_CONFIGURED. D1 provisioning, all-writer shared admission, complete current account cost/headroom, protected finite claims, scalable recovery and controlled main acceptance remain unverified. Website deployment and a successful synthetic test do not prove PAPER activation.
 
 CLOUD_ONLY / 0 USD target / PAPER-LIVE-PAPER ONLY. Holdout, source switch, promotion and real-money trading remain closed.
-
----
-
-## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
 **2026-10-28 recent Shadow pair:** [Read-only audit #40630387558](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40630387558), job `122625139161`, independently checked two existing natural archives ([#40522128947](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40522128947), [#40580450824](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40580450824)). Ten capture-time replays and 40 sampled future-mutation checks passed; 1,170 overlapping 60M candles matched. The actual capture interval was approximately 369 minutes (rounded down), so continuity is `REVIEW_REQUIRED`; maximum source lag was approximately 42 minutes (rounded down). OI change and liquidation imbalance were missing in all ten market snapshots. This is a separate two-run subset, not a revised continuous 16/21 count, historical source-vintage proof, P&L, strategy qualification or PAPER execution. Temporary PR #829 overall CI failed its workflow inventory gate (100 recorded / 101 actual); see [dated receipt](research/receipts/2026-10-28-shadow-recent-pair-audit-v0-1.json).
 
