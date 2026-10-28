@@ -1,5 +1,8 @@
 ## Current delivery checkpoint — 2026-10-27
 
+**2026-10-28 maintenance update:** The later distinct natural Health runs [40559516917](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40559516917) and [40596590186](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40596590186) each triggered successful inspect/propose and `NO_CHANGE / commits_created=0` in [40559619536](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40559619536) and [40596672170](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40596672170). Both Health sources failed: the maintenance processing/dedup evidence is met, not overall Health recovery. The earlier checkpoint below retains its as-of uncertainty. Core100 remains REJECT; PAPER remains NOT_RUN. See CURRENT_STATUS for the reconciled generated snapshot and verify live state.
+
+
 Reviewed parent main: `c42eb8a85fb81fea499ca4a91550c8b5ee02878f`, not a latest-main claim. Start with [CURRENT_STATUS.md](CURRENT_STATUS.md) and [machine checkpoint](research/status/vnext-delivery-checkpoint-2026-10-27-v0-1.json). Earlier dated sections are historical evidence.
 
 Merged #811/#814/#816/#817/#819 provide runtime-manifest diagnosis, authenticated13/15 single-capture feature coverage, disabled shared research collection and bounded recovery. Latest #819 postmerge CI40434731062 passed1977 tests, Python3.12/3.13, Ruff, CodeQL, dependency security and freeze guard. Existing prepaid runtime already provides synthetic coordinator/D1/account-continuation/NO_TRADE assembly; do not restart it as missing.
