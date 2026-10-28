@@ -1,0 +1,75 @@
+{
+  "schema": "qookey-shadow-recent-pair-audit-receipt-v0.1",
+  "observed_date": "2026-10-28",
+  "status": "REVIEW_REQUIRED",
+  "scope": "TWO_EXISTING_NATURAL_GITHUB_ARCHIVES_ONLY",
+  "evidence_basis": {
+    "reviewed_parent_main_sha": "0834a5d7701070e1cf056830f347320e7a65f487",
+    "audit_pr": 829,
+    "audit_pr_head": "81d0b401d7a2f9c52bba1d0372427733033b2cae",
+    "audit_run_id": 40630387558,
+    "audit_job_id": 122625139161,
+    "audit_job_conclusion": "success",
+    "whole_pr_ci_passed": false,
+    "whole_pr_ci_failure": "R2_WRITER_INVENTORY_RECORDED_100_ACTUAL_101_TEMPORARY_WORKFLOW"
+  },
+  "sources": {
+    "run_ids": [
+      40522128947,
+      40580450824
+    ],
+    "attempt": 1,
+    "artifact_ids": [
+      12742995167,
+      12768707588
+    ],
+    "zip_sha256": [
+      "3d819c103fc05aa5f635f74cca2e0b5fcaac5a18e13d59c15b6d49d9a8e6d13f",
+      "9b485eb8ed5c536599a43c8dc06f2ea14ff531943946191c43dac85d48da4f76"
+    ],
+    "source_main_sha": "50bca831144a4cfd1c01f022a33f3e56dd8f7d6b",
+    "capture_times_utc": [
+      "2026-10-27T14:32:57.557Z",
+      "2026-10-27T20:42:51.346Z"
+    ],
+    "github_metadata_and_zip_verified_by_hosted_audit": true
+  },
+  "result": {
+    "report_count": 2,
+    "capture_replays": 10,
+    "sampled_prefix_future_mutation_checks": 40,
+    "sampled_prefix_bars": [
+      60,
+      100,
+      150,
+      200
+    ],
+    "overlapping_candles_consistent": 1170,
+    "observed_capture_gap_minutes": 369,
+    "maximum_source_lag_minutes": 42,
+    "continuity": "REVIEW_REQUIRED",
+    "missing_fields_all_market_snapshots": [
+      "market_event_radar.oi_change_pct",
+      "market_event_radar.liquidation_imbalance"
+    ],
+    "historical_16_of_21_checkpoint_unchanged": true,
+    "full_schedule_coverage_proven": false,
+    "historical_source_vintage_verified": false,
+    "historical_entry_cutoff_proven": false,
+    "timeframes_15m_4h_verified": false,
+    "costs_known": false,
+    "predictive_edge_proven": false,
+    "formal_paper_executed": false,
+    "minute_values_are_rounded_down": true
+  },
+  "authority": {
+    "research_only": true,
+    "provider_accessed": false,
+    "r2_accessed": false,
+    "d1_accessed": false,
+    "holdout_accessed": false,
+    "model_promotion": false,
+    "paper_submission": false,
+    "live_trading": false
+  }
+}
