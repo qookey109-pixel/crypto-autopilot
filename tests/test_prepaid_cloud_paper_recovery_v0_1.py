@@ -57,6 +57,7 @@ class CloudPaperRecoveryIntegrationTests(unittest.TestCase):
             class_a_month=a, class_b_month=b, class_a_31_days=a, class_b_31_days=b,
             class_a_day=a, class_b_day=b, new_bytes_day=sent,
             pending_storage_bytes=2_097_152, pending_new_bytes_day=2_097_152,
+            pending_provider_requests_day=18,
             pending_class_a_day=128, pending_class_b_day=128,
             pending_class_a_month=128, pending_class_b_month=128,
             pending_class_a_31_days=128, pending_class_b_31_days=128,
