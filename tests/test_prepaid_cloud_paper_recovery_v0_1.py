@@ -5,7 +5,6 @@ import unittest
 from dataclasses import replace
 from unittest.mock import Mock, patch
 
-from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
 from crypto_autopilot.paper.cloud_loop_v0_1 import SLOT_MS, committed_report
 from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Store
 from crypto_autopilot.paper.cloud_runtime_v0_1 import CLOUD_PAPER_PREFIX
