@@ -13,7 +13,61 @@ CURRENT_OPERATIONS = "research/status/current-operations-v0-3.json"
 
 SHADOW_REPLAY_RECEIPT = "research/receipts/2026-10-28-shadow-existing-causal-replay-audit-v0-1.json"
 # Exact receipt prevents changed numbers, authority or provenance from becoming a UI claim.
-_EXPECTED_SHADOW_REPLAY_RECEIPT = json.loads('''{"schema":"qookey-shadow-existing-causal-replay-audit-receipt-v0.1","observed_date":"2026-10-28","status":"PARTIAL_RESEARCH_ONLY","scope":"SINGLE_PREEXISTING_GITHUB_ARCHIVE_NO_PROVIDER_OR_CLOUD_WRITE","evidence_basis":{"reviewed_parent_main_sha":"e543c3b30237298bef46f54358722063ca780b8f","audit_pr":825,"audit_pr_head":"759f6a07671590ffc007ae7cac36093c0f435f6d","audit_run_id":40618806942,"audit_job_id":122587526045,"audit_job_conclusion":"success","whole_pr_ci_passed":false,"whole_pr_ci_failure":"R2_WRITER_INVENTORY_RECORDED_100_ACTUAL_101_TEMPORARY_WORKFLOW"},"source":{"run_id":40162915838,"run_attempt":1,"artifact_id":12586364157,"head_sha":"944895170f80af21e8f9b544ec42b279c45c0d6e","original_zip_sha256":"191fa626fbddd7f4a2a639618157605ab382a343936584fa2755ec2f6c08f03d","capture_utc":"2026-10-25T04:43:38.396000Z","github_metadata_and_zip_verified_by_hosted_audit":true},"result":{"markets":5,"closed_60m_bars_per_market":240,"capture_cutoff_replays":5,"sampled_prefix_future_mutation_checks":20,"source_lag_minutes":43,"feature_fields_missing":["market_event_radar.oi_change_pct","market_event_radar.liquidation_imbalance"],"new_context_observations_added":0,"earlier_historical_source_vintage_verified":false,"historical_entry_cutoff_proven":false,"timeframes_15m_4h_verified":false,"costs_known":false,"predictive_edge_proven":false,"formal_paper_executed":false},"authority":{"research_only":true,"provider_accessed":false,"r2_accessed":false,"d1_accessed":false,"holdout_accessed":false,"model_promotion":false,"paper_submission":false,"live_trading":false}}''')
+_EXPECTED_SHADOW_REPLAY_RECEIPT = json.loads('''
+{
+  "schema": "qookey-shadow-existing-causal-replay-audit-receipt-v0.1",
+  "observed_date": "2026-10-28",
+  "status": "PARTIAL_RESEARCH_ONLY",
+  "scope": "SINGLE_PREEXISTING_GITHUB_ARCHIVE_NO_PROVIDER_OR_CLOUD_WRITE",
+  "evidence_basis": {
+    "reviewed_parent_main_sha": "e543c3b30237298bef46f54358722063ca780b8f",
+    "audit_pr": 825,
+    "audit_pr_head": "759f6a07671590ffc007ae7cac36093c0f435f6d",
+    "audit_run_id": 40618806942,
+    "audit_job_id": 122587526045,
+    "audit_job_conclusion": "success",
+    "whole_pr_ci_passed": false,
+    "whole_pr_ci_failure": "R2_WRITER_INVENTORY_RECORDED_100_ACTUAL_101_TEMPORARY_WORKFLOW"
+  },
+  "source": {
+    "run_id": 40162915838,
+    "run_attempt": 1,
+    "artifact_id": 12586364157,
+    "head_sha": "944895170f80af21e8f9b544ec42b279c45c0d6e",
+    "original_zip_sha256": "191fa626fbddd7f4a2a639618157605ab382a343936584fa2755ec2f6c08f03d",
+    "capture_utc": "2026-10-25T04:43:38.396000Z",
+    "github_metadata_and_zip_verified_by_hosted_audit": true
+  },
+  "result": {
+    "markets": 5,
+    "closed_60m_bars_per_market": 240,
+    "capture_cutoff_replays": 5,
+    "sampled_prefix_future_mutation_checks": 20,
+    "source_lag_minutes": 43,
+    "feature_fields_missing": [
+      "market_event_radar.oi_change_pct",
+      "market_event_radar.liquidation_imbalance"
+    ],
+    "new_context_observations_added": 0,
+    "earlier_historical_source_vintage_verified": false,
+    "historical_entry_cutoff_proven": false,
+    "timeframes_15m_4h_verified": false,
+    "costs_known": false,
+    "predictive_edge_proven": false,
+    "formal_paper_executed": false
+  },
+  "authority": {
+    "research_only": true,
+    "provider_accessed": false,
+    "r2_accessed": false,
+    "d1_accessed": false,
+    "holdout_accessed": false,
+    "model_promotion": false,
+    "paper_submission": false,
+    "live_trading": false
+  }
+}
+''')
 
 SHADOW_GRID_RECEIPT = "research/receipts/2026-10-09-shadow-nine-run-cron-grid-v0-1.json"
 SHADOW_GRID_CRON = "17 */4 * * *"
