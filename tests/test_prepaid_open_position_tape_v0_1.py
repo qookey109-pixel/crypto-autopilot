@@ -117,6 +117,14 @@ class PrepaidOpenPositionTapeTests(unittest.TestCase):
         with patch.object(fixtures, "build_runtime_composition", build_runtime_composition):
             runtime = self.f.runtime()
         runtime = replace(runtime, client=ValidatedTapeClient(client))
+        runtime.budget_guard.snapshot = replace(
+            runtime.budget_guard.snapshot,
+            pending_storage_bytes=2_097_152, pending_new_bytes_day=2_097_152,
+            pending_provider_requests_day=18,
+            pending_class_a_day=128, pending_class_b_day=128,
+            pending_class_a_month=128, pending_class_b_month=128,
+            pending_class_a_31_days=128, pending_class_b_31_days=128,
+        )
         self.f.sdk.calls.clear()
         with patch(fixtures.CLIENT_MODULE + ".build_opener", return_value=opener):
             with self.assertRaisesRegex(CloudLoopReviewRequired, "TRADE_TAPE_INVALID"):
@@ -131,7 +139,15 @@ class PrepaidOpenPositionTapeTests(unittest.TestCase):
         self.assertEqual(runtime.budget_guard.attempted_usage().provider_requests, 2)
         self.assertEqual(client.calls, ["book", "trades"])
         added = set(self.f.sdk.objects) - set(before)
-        self.assertFalse(any("/cloud-result/" in key or "/cloud-report/" in key for key in added))
+        self.assertFalse(any(
+            f"/{kind}/" in key
+            for key in added
+            for kind in ("cloud-result", "cloud-report", "live-state", "live-tick", "live-run-step")
+        ))
+        self.assertEqual(
+            runtime.budget_guard.attempted_usage().class_b_requests,
+            sum(call["operation"] == "GET" for call in self.f.sdk.calls),
+        )
 
 
 if __name__ == "__main__":
