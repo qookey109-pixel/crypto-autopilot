@@ -11,6 +11,64 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 CURRENT_OPERATIONS = "research/status/current-operations-v0-3.json"
 
+SHADOW_REPLAY_RECEIPT = "research/receipts/2026-10-28-shadow-existing-causal-replay-audit-v0-1.json"
+# Exact receipt prevents changed numbers, authority or provenance from becoming a UI claim.
+_EXPECTED_SHADOW_REPLAY_RECEIPT = json.loads('''
+{
+  "schema": "qookey-shadow-existing-causal-replay-audit-receipt-v0.1",
+  "observed_date": "2026-10-28",
+  "status": "PARTIAL_RESEARCH_ONLY",
+  "scope": "SINGLE_PREEXISTING_GITHUB_ARCHIVE_NO_PROVIDER_OR_CLOUD_WRITE",
+  "evidence_basis": {
+    "reviewed_parent_main_sha": "e543c3b30237298bef46f54358722063ca780b8f",
+    "audit_pr": 825,
+    "audit_pr_head": "759f6a07671590ffc007ae7cac36093c0f435f6d",
+    "audit_run_id": 40618806942,
+    "audit_job_id": 122587526045,
+    "audit_job_conclusion": "success",
+    "whole_pr_ci_passed": false,
+    "whole_pr_ci_failure": "R2_WRITER_INVENTORY_RECORDED_100_ACTUAL_101_TEMPORARY_WORKFLOW"
+  },
+  "source": {
+    "run_id": 40162915838,
+    "run_attempt": 1,
+    "artifact_id": 12586364157,
+    "head_sha": "944895170f80af21e8f9b544ec42b279c45c0d6e",
+    "original_zip_sha256": "191fa626fbddd7f4a2a639618157605ab382a343936584fa2755ec2f6c08f03d",
+    "capture_utc": "2026-10-25T04:43:38.396000Z",
+    "github_metadata_and_zip_verified_by_hosted_audit": true
+  },
+  "result": {
+    "markets": 5,
+    "closed_60m_bars_per_market": 240,
+    "capture_cutoff_replays": 5,
+    "sampled_prefix_future_mutation_checks": 20,
+    "source_lag_minutes": 43,
+    "feature_fields_missing": [
+      "market_event_radar.oi_change_pct",
+      "market_event_radar.liquidation_imbalance"
+    ],
+    "new_context_observations_added": 0,
+    "earlier_historical_source_vintage_verified": false,
+    "historical_entry_cutoff_proven": false,
+    "timeframes_15m_4h_verified": false,
+    "costs_known": false,
+    "predictive_edge_proven": false,
+    "formal_paper_executed": false
+  },
+  "authority": {
+    "research_only": true,
+    "provider_accessed": false,
+    "r2_accessed": false,
+    "d1_accessed": false,
+    "holdout_accessed": false,
+    "model_promotion": false,
+    "paper_submission": false,
+    "live_trading": false
+  }
+}
+''')
+
 SHADOW_GRID_RECEIPT = "research/receipts/2026-10-09-shadow-nine-run-cron-grid-v0-1.json"
 SHADOW_GRID_CRON = "17 */4 * * *"
 SHADOW_NINE_METADATA = (
@@ -701,6 +759,38 @@ def shadow_decision_lineage_panel(
     )
 
 
+def shadow_replay_evidence_panel(receipt: object) -> str:
+    """Project one dated research audit only when every recorded field matches."""
+    unknown = (
+        '<section class="vnext-trace vnext-replay-evidence" aria-label="歷史研究回放">'
+        '<h4>歷史研究回放：UNKNOWN</h4>'
+        '<p>缺少可驗證的回放收據；不推定測試結果或正式交易。</p></section>'
+    )
+    try:
+        actual = json.dumps(receipt, sort_keys=True, separators=(",", ":"), allow_nan=False)
+        expected = json.dumps(
+            _EXPECTED_SHADOW_REPLAY_RECEIPT, sort_keys=True, separators=(",", ":"),
+            allow_nan=False,
+        )
+    except (TypeError, ValueError):
+        return unknown
+    if actual != expected:
+        return unknown
+    return (
+        '<section class="vnext-trace vnext-replay-evidence" aria-label="歷史研究回放">'
+        '<h4>歷史研究回放 · 單份資料，非正式決策</h4>'
+        '<p>5 市場 × 各 240 根 60M K 線；5 次採集時回放，'
+        '20 次抽樣後續行情變更檢查。僅測試指定前綴，不代表全面無前視。</p>'
+        '<p>歷史資料版本：UNKNOWN；15M／4H、成本、入場時點與策略績效未驗證。'
+        '正式 PAPER 未由本次研究執行。</p>'
+        '<p>來源擷取 UTC：2026-10-25T04:43:38.396000Z；'
+        '來源 Run #40162915838／Artifact #12586364157。'
+        '<a href="https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40618806942"'
+        ' target="_blank" rel="noopener noreferrer">查看唯讀稽核 Run #40618806942 ↗</a>。'
+        '稽核工作成功；臨時 PR 整體 CI 未通過。</p></section>'
+    )
+
+
 def _vnext_design_time_reason(root: Path) -> str:
     """A prepared empty registry never constitutes an executed NO_TRADE."""
     unknown = "正式原因碼：UNKNOWN；缺少可驗證的正式 PAPER 執行與結果報告。"
@@ -1345,6 +1435,11 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
     singleton_panel = authenticated_shadow_singleton_panel(
         singleton_receipt, prior_sixteen_verified=sixteen_verified
     )
+    try:
+        replay_receipt = read_json(SHADOW_REPLAY_RECEIPT, root)
+    except (OSError, ValueError, json.JSONDecodeError):
+        replay_receipt = None
+    replay_panel = shadow_replay_evidence_panel(replay_receipt)
     lineage_panel = shadow_decision_lineage_panel(
         singleton_receipt,
         prior_sixteen_verified=sixteen_verified,
@@ -1378,6 +1473,7 @@ def market_decision_panel(current: dict, root: Path = ROOT) -> str:
         </div>
         {observed_panel}
         {singleton_panel}
+        {replay_panel}
         {lineage_panel}
         <dl class="vnext-evidence-times">
           <div><dt>來源 K 線時間</dt><dd>UNKNOWN · 尚未投影精確來源時間</dd></div>
