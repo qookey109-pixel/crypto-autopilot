@@ -31,6 +31,27 @@ class CloudPaperRecoveryIntegrationTests(unittest.TestCase):
         self.f = fixtures.PrepaidD1RuntimeTests("test_meter_readonly_checks_never_debit_or_refresh")
         self.f.setUp()
         self.addCleanup(self.f.doCleanups)
+        for method in ("get_object", "put_object", "list_objects_v2"):
+            original_method = getattr(self.f.sdk, method)
+            def bound_call(_original=original_method, **kwargs):
+                if kwargs.get("Bucket") != "synthetic-only":
+                    raise AssertionError("unexpected synthetic bucket")
+                return _original(**kwargs)
+            active = patch.object(self.f.sdk, method, side_effect=bound_call)
+            active.start()
+            self.addCleanup(active.stop)
+
+    def snapshot(self, runtime):
+        calls = self.f.sdk.calls
+        a = sum(call["operation"] in {"PUT", "LIST"} for call in calls)
+        b = sum(call["operation"] == "GET" for call in calls)
+        size = sum(len(body) for body, _ in self.f.sdk.objects.values())
+        return replace(
+            runtime.budget_guard.snapshot, observed_at_ms=self.f.now,
+            measured_through_ms=self.f.now, storage_bytes=size,
+            class_a_month=a, class_b_month=b, class_a_31_days=a, class_b_31_days=b,
+            class_a_day=a, class_b_day=b, new_bytes_day=size,
+        )
 
     def transport(self):
         db = self.f.sqlite()
@@ -79,8 +100,7 @@ class CloudPaperRecoveryIntegrationTests(unittest.TestCase):
             self.f.sdk.objects[sentinel] = (b"old-namespace-untouched", {})
             self.f.now += SLOT_MS
             meter = self.recovery_meter()
-            snapshot = replace(runtime.budget_guard.snapshot, observed_at_ms=self.f.now,
-                               measured_through_ms=self.f.now)
+            snapshot = self.snapshot(runtime)
             env = {"CLOUDFLARE_D1_API_TOKEN": "synthetic-token",
                    "CLOUDFLARE_ACCOUNT_ID": "a" * 32,
                    "CLOUDFLARE_D1_DATABASE_ID": fixtures.DB_ID,
@@ -108,7 +128,7 @@ class CloudPaperRecoveryIntegrationTests(unittest.TestCase):
             self.assertIn(key, self.f.sdk.objects)
             self.assertEqual(self.f.sdk.objects[sentinel], (b"old-namespace-untouched", {}))
             readback = R2PaperRunStore(
-                BudgetedR2Store(client=self.f.sdk, bucket="fixture", before_external=lambda *_: None),
+                BudgetedR2Store(client=self.f.sdk, bucket="synthetic-only", before_external=lambda *_: None),
                 prefix=CLOUD_PAPER_PREFIX,
             )
             self.assertIsNotNone(committed_report(readback, report["slot_id"]))
@@ -139,7 +159,8 @@ class CloudPaperRecoveryIntegrationTests(unittest.TestCase):
             with self.assertRaisesRegex(BudgetBlocked, "BUCKET_MISMATCH"):
                 run_prepaid_cloud_paper_recovery(**args)
             args["query_meter"] = self.f.meter
-            with self.assertRaises(BudgetBlocked):
+            args["credentials"]["bucket"] = "synthetic-only"
+            with self.assertRaisesRegex(BudgetBlocked, "TICKET_IDENTITY_MISMATCH"):
                 run_prepaid_cloud_paper_recovery(**args)
         client.assert_not_called()
         self.assertEqual(self.f.sdk.calls, [])
