@@ -43,6 +43,22 @@ class CausalPrefixReplayTests(unittest.TestCase):
             with self.subTest(length=len(damaged)), self.assertRaises(ValueError):
                 replay_60m_at_cutoff(damaged, 70 * HOUR)
 
+    def test_bad_closed_bar_numbers_fail_but_future_values_are_not_consumed(self) -> None:
+        rows = sample(80)
+        for value in (True, float("nan"), float("inf"), "100"):
+            damaged = list(rows)
+            row = damaged[30]
+            damaged[30] = Candle(row.time_ms, row.open, row.high, row.low, row.close, value)
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                replay_60m_at_cutoff(damaged, 70 * HOUR)
+        future = list(rows)
+        row = future[75]
+        future[75] = Candle(row.time_ms, row.open, row.high, row.low, row.close, True)
+        self.assertEqual(
+            replay_60m_at_cutoff(rows, 70 * HOUR),
+            replay_60m_at_cutoff(future, 70 * HOUR),
+        )
+
     def test_missing_latest_closed_bar_stops(self) -> None:
         with self.assertRaises(ValueError):
             replay_60m_at_cutoff(sample(70), 80 * HOUR)

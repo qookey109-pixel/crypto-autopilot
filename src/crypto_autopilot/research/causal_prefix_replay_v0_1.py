@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from collections.abc import Sequence
 from dataclasses import asdict
 
@@ -39,6 +40,14 @@ def replay_60m_at_cutoff(candles: Sequence[Candle], cutoff_ms: int) -> dict[str,
             raise ValueError("unordered, invalid or duplicate candle")
         previous = candle.time_ms
         if candle.time_ms + HOUR_MS <= cutoff_ms:
+            for value in (candle.open, candle.high, candle.low, candle.close, candle.volume):
+                if type(value) not in (int, float):
+                    raise ValueError("invalid candle numeric type")
+                try:
+                    if not math.isfinite(value):
+                        raise ValueError("non-finite candle value")
+                except OverflowError as exc:
+                    raise ValueError("non-finite candle value") from exc
             prefix.append(candle)
     if len(prefix) < MIN_CANDLES:
         raise ValueError("insufficient closed bars")
