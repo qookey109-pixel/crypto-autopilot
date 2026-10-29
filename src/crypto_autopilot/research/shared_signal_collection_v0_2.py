@@ -229,6 +229,25 @@ def run_shared_signal_collection(
         objects=objects, run_id=run_id, generated_at=_timestamp(timestamp),
         budget=budget, credentials=credentials,
     )
+    # A successful readback can itself finish after the slot or evidence expires.
+    # The objects may already exist, so retain the observed write/readback fields.
+    if result.get("status") == "PUBLISHED":
+        try:
+            validate_binding()
+            now = guard.clock_ms()
+            if (
+                type(now) is not int or now < reservation.reserved_at_ms
+                or now - reservation.slot_at_ms > 600_000
+                or guard.storage_capacity_state() == "HARD_STOP"
+            ):
+                raise BudgetBlocked("BLOCKED_SIGNAL_FINAL_VALIDATION")
+        except Exception:
+            result.update({
+                "status": "REVIEW_REQUIRED", "stage": "FINAL_VALIDATION",
+                "reason_code": "FINAL_GUARD_UNVERIFIED",
+                "partial_writes_possible": True,
+                "automatic_retry_allowed": False,
+            })
     result["provider_requests_performed"] = used
     result["source_count"] = len(snapshots)
     result["reserved_new_bytes"] = RESERVED_BYTES
