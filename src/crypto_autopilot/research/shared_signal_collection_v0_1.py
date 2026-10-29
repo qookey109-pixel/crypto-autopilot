@@ -18,7 +18,7 @@ from crypto_autopilot.paper.shared_writer_budget_gate_v0_4 import (
 )
 from crypto_autopilot.paper.shared_writer_r2_budget_v0_1 import SharedWriterR2Budget
 from crypto_autopilot.research.shared_signal_publish_v0_1 import (
-    WRITER, _objects, _publish_objects, _timestamp,
+    WRITER, _objects, _publish_objects, _timestamp, _validate_target,
 )
 from crypto_autopilot.research.signal_layer import deduplicate_kol_forecasts
 from crypto_autopilot.research.signal_ingest_v0_2 import (
@@ -118,10 +118,13 @@ def run_shared_signal_collection(
         or reservation.r2_new_bytes != RESERVED_BYTES
     ):
         raise BudgetBlocked("BLOCKED_SIGNAL_ENVELOPE_MISMATCH")
-    if set(credentials) != {"account_id", "bucket", "access_key_id", "secret_access_key"} or any(
-        not isinstance(value, str) or not value.strip() for value in credentials.values()
-    ):
-        raise BudgetBlocked("BLOCKED_SIGNAL_CREDENTIAL_BINDING")
+    _validate_target(credentials)
+    credentials = dict(credentials)
+    original_validate_binding = validate_binding
+
+    def validate_binding() -> None:
+        _validate_target(credentials)
+        original_validate_binding()
     if transport is not None and not callable(transport):
         raise BudgetBlocked("BLOCKED_SIGNAL_TRANSPORT")
     if guard.storage_capacity_state() == "HARD_STOP" or (
