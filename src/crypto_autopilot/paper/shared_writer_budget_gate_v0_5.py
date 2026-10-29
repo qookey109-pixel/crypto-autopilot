@@ -278,9 +278,10 @@ def reserve_shared_writer_envelope(
             raise BudgetBlocked("BLOCKED_SHARED_WRITER_TIME_INVALID")
         try:
             current_day = datetime.fromtimestamp(now_ms / 1000, tz=UTC).date().isoformat()
+            slot_day = datetime.fromtimestamp(reservation.slot_at_ms / 1000, tz=UTC).date().isoformat()
         except (ValueError, OverflowError, OSError):
             raise BudgetBlocked("BLOCKED_SHARED_WRITER_TIME_INVALID") from None
-        if reservation.utc_day != current_day:
+        if reservation.utc_day != current_day or slot_day != current_day:
             raise BudgetBlocked("BLOCKED_SHARED_WRITER_TIME_INVALID")
 
     def guarded_execute(sql: str, query_params: tuple[object, ...]) -> QueryResult:
