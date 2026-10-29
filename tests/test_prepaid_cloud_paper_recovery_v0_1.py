@@ -222,6 +222,24 @@ class CloudPaperRecoveryIntegrationTests(unittest.TestCase):
         self.assertEqual(len(statements), 4)
         self.assertEqual(db.execute("SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3").fetchone()[0], 2)
 
+    def test_runtime_rejects_unexpected_inventory_before_state_writes(self):
+        db, size, statements, opener = self.transport()
+        unexpected = CLOUD_PAPER_PREFIX + "/live-state/unknown.txt"
+        self.f.sdk.objects[unexpected] = (b"fixture", {})
+        with patch(fixtures.CLIENT_MODULE + ".build_opener", return_value=opener):
+            with patch.object(fixtures, "build_runtime_composition", build_runtime_composition):
+                runtime = self.f.runtime()
+            with self.assertRaises(ValueError):
+                runtime.run_slot(
+                    tick_ms=self.f.now, previous_slot=None,
+                    activation_enabled=True, run_id="fixture-101",
+                )
+        self.assertFalse(any(call["operation"] == "PUT" for call in self.f.sdk.calls))
+        self.assertEqual(db.execute(
+            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3"
+        ).fetchone()[0], 1)
+        self.assertTrue(statements)
+
     def test_disabled_does_not_touch_cloud(self):
         result = run_prepaid_cloud_paper_recovery(
             run_id="", r2_snapshot=None, d1_snapshot=None, query_meter=None,
