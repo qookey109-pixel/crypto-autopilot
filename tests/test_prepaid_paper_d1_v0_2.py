@@ -8,6 +8,7 @@ from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked, CloudBudgetP
 from crypto_autopilot.paper.shared_writer_budget_gate_v0_4 import RESERVE_SHARED_WRITER_SQL as OLD_SQL
 from crypto_autopilot.paper.shared_writer_budget_gate_v0_5 import (
     READ_SHARED_WRITER_SQL, RESERVE_SHARED_WRITER_SQL, SharedWriterReservation, reservation_params,
+    reserve_shared_writer_envelope,
 )
 import test_prepaid_d1_runtime_v0_1 as fixtures
 
@@ -63,6 +64,30 @@ class PaperV05PrepaidD1Tests(unittest.TestCase):
                 client.query(OLD_SQL, params)
         self.assertEqual(request.call_count, 1)
         self.assertEqual(self.f.meter.report()["query_attempts_charged"], 1)
+
+    def test_v05_helper_with_prepaid_client_and_sqlite_replays_without_double_insert(self):
+        db = self.f.sqlite()
+        client = self.client(True)
+
+        def sqlite_request(sql, params):
+            cursor = db.execute(sql, params)
+            columns = tuple(item[0] for item in cursor.description or ())
+            rows = tuple(dict(zip(columns, row, strict=True)) for row in cursor.fetchall())
+            db.commit()
+            writes = 0 if sql == READ_SHARED_WRITER_SQL else 7
+            return D1QueryResult(rows, 1, writes), 1024
+
+        with patch("crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+                   side_effect=sqlite_request):
+            for expected in ("RESERVED", "EXISTING_RESERVATION"):
+                actual = reserve_shared_writer_envelope(
+                    execute=client.query, reservation=self.reservation, query_meter=self.f.meter,
+                    clock_ms=lambda: self.f.now, execution_enabled=True,
+                )
+                self.assertEqual(actual, expected)
+        count = db.execute("SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3").fetchone()[0]
+        self.assertEqual(count, 1)
+        self.assertEqual(self.f.meter.report()["query_attempts_charged"], 6)
 
     def test_off_grid_slot_cannot_read_or_reserve(self):
         self.f.now += 1
