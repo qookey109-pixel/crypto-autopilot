@@ -74,3 +74,8 @@ class ResearchPrepaidD1Client(PrepaidCloudflareD1QueryClient):
         if not bound:
             raise BudgetBlocked("BLOCKED_PREPAID_SQL_IDENTITY_MISMATCH")
         return operation
+
+    def _request(self, sql: str, params: tuple[object, ...]):
+        # Recheck immediately before the inherited transport, after prepaid debit.
+        self._validate_statement(sql, params)
+        return super()._request(sql, params)
