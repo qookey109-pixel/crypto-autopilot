@@ -11,7 +11,7 @@ from crypto_autopilot.paper.prepaid_query_controller_v0_1 import (
 )
 from crypto_autopilot.paper.shared_writer_budget_gate_v0_5 import (
     READ_SHARED_WRITER_SQL, RESERVE_SHARED_WRITER_SQL,
-    SharedWriterReservation, reservation_params,
+    SharedWriterReservation, reservation_params, reserve_shared_writer_envelope,
 )
 from test_prepaid_d1_runtime_v0_1 import DB_ID, NOW, PrepaidD1RuntimeTests
 from test_prepaid_query_controller_v0_1 import FakeGitHub
@@ -52,6 +52,45 @@ class DailyResearchD1Tests(unittest.TestCase):
             writer_id=WRITER, slot_id=self.slot,
             database_evidence=self.f.database_evidence(),
         )
+
+    def test_v05_admission_uses_prepaid_research_client_and_deduplicates(self):
+        db = self.f.sqlite()
+        db.execute("INSERT INTO cloudflare_shared_writer_identities_v0_3 VALUES (?, 'ACTIVE', ?, ?)",
+                   (WRITER, "a" * 64, self.f.now))
+        envelope = self.meter.report()["ticket_envelope_charged_in_full"]
+        reservation = SharedWriterReservation(
+            writer_id=WRITER, slot_id=self.slot, idempotency_key=self.slot,
+            slot_at_ms=self.f.now, reserved_at_ms=self.f.now, provider_requests=3,
+            r2_class_a=3, r2_class_b=6, r2_new_bytes=270336,
+            d1_queries=envelope["queries"], d1_rows_read=envelope["rows_read"],
+            d1_rows_written=envelope["rows_written"],
+            d1_storage_growth_bytes=envelope["storage_bytes"],
+        )
+        def sqlite_request(sql, params):
+            cursor = db.execute(sql, params)
+            columns = tuple(column[0] for column in cursor.description or ())
+            rows = tuple(dict(zip(columns, row, strict=True)) for row in cursor.fetchall())
+            db.commit()
+            return D1QueryResult(rows, 1, 7), 1024
+        with patch(
+            "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+            side_effect=sqlite_request,
+        ):
+            result = reserve_shared_writer_envelope(
+                execute=self.client.query, query_meter=self.meter, reservation=reservation,
+                clock_ms=lambda: self.f.now, execution_enabled=True,
+            )
+            duplicate = reserve_shared_writer_envelope(
+                execute=self.client.query, query_meter=self.meter, reservation=reservation,
+                clock_ms=lambda: self.f.now, execution_enabled=True,
+            )
+        self.assertEqual(result, "RESERVED")
+        self.assertEqual(duplicate, "EXISTING_RESERVATION")
+        self.assertEqual(db.execute(
+            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3 WHERE writer_id=?",
+            (WRITER,),
+        ).fetchone()[0], 1)
+        self.assertEqual(self.meter.report()["query_attempts_charged"], 6)
 
     def test_daily_shared_read_debits_before_transport(self):
         def response(sql, params):
