@@ -64,6 +64,26 @@ class PaperV05PrepaidD1Tests(unittest.TestCase):
         self.assertEqual(request.call_count, 1)
         self.assertEqual(self.f.meter.report()["query_attempts_charged"], 1)
 
+    def test_off_grid_slot_cannot_read_or_reserve(self):
+        self.f.now += 1
+        self.f._set_run(102)
+        self.f.meter = self.f.claim(102)
+        self.f.guard = self.f.make_guard()
+        self.f.evidence = self.f.database_evidence()
+        slot = f"slot:{self.f.now}"
+        self.reservation = replace(self.reservation, slot_id=slot, idempotency_key=slot,
+                                   slot_at_ms=self.f.now, reserved_at_ms=self.f.now)
+        client = self.client(True)
+        with patch("crypto_autopilot.paper.prepaid_d1_client_v0_1.build_opener") as network:
+            for sql, params in (
+                (READ_SHARED_WRITER_SQL, (fixtures.WRITER, slot)),
+                (RESERVE_SHARED_WRITER_SQL, reservation_params(self.reservation)),
+            ):
+                with self.subTest(sql=sql), self.assertRaises(BudgetBlocked):
+                    client.query(sql, params)
+        network.assert_not_called()
+        self.assertEqual(self.f.meter.report()["query_attempts_charged"], 0)
+
     def test_tampered_envelope_rejected_before_debit(self):
         client = self.client(True)
         for reservation in (replace(self.reservation, r2_new_bytes=1),
