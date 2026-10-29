@@ -1,5 +1,17 @@
 ## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
+**2026-10-29 — configured-target and recovery checkpoint**
+
+Evidence basis: parent main `fbbecc953488fbeac02c38e78160071125f6acf0`, not a latest-main claim. Resolve live main before acting.
+
+- [#838](https://github.com/qookey109-pixel/crypto-autopilot/pull/838) prepares a separate disabled prepaid recovery writer for the Cloud Paper namespace; it can repair a verified missing coordinator result seal, not reconstruct a missing Cloud Paper result pointer or recover an old settlement. Complete inventory, serialized ownership and fresh workload authority remain prerequisites; each listed kind is limited to four objects.
+- [#839](https://github.com/qookey109-pixel/crypto-autopilot/pull/839) adds fail-closed Pionex tape validation to the disabled prepaid composition; [#840](https://github.com/qookey109-pixel/crypto-autopilot/pull/840) tests invalid tape in a synthetic prepaid-admitted second slot after an open position was seeded directly. These are mocked engineering evidence, not a production D1 or market proof.
+- [#841](https://github.com/qookey109-pixel/crypto-autopilot/pull/841) binds disabled shared research signal adapters to configured R2 account and bucket before admission and rechecks the target before later operations. Its PR and postmerge Python 3.12/3.13, CodeQL and dependency checks passed; postmerge freeze guard passed. PR workflow-static passed and push workflow-static was skipped. Target equality does not prove R2 usage evidence, D1 and the prepaid meter belong to the same account.
+- Latest observed Health [40771464779](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40771464779) reports Core100 training FAILED; model quality remains REJECT. Do not rerun the consumed bootstrap.
+- Billing Metadata Diagnostic V0.5 remains pending an updated, currently valid Billing Read Token. The earlier token screenshot had expiry 2026-10-07; whether the secret was subsequently updated is UNKNOWN. The owner's delegated first-attempt decision is already recorded. First dispatch consumes the scope even on failure; do not repeat it or treat the value-free diagnostic as proof of zero cost.
+- PAPER remains NOT_WIRED / NOT_RUN / NOT_CONFIGURED; D1 is not provisioned. All-writer shared admission, complete account cost/headroom, protected finite claims, bounded long-term recovery and controlled main acceptance remain unverified. No production activation or Cloudflare request is included in this checkpoint.
+
+
 **2026-10-28 20:16 Asia/Taipei — recovery and operations checkpoint**
 
 Evidence basis: parent main `e1dbe098cdb3faf2a3ceeba6b7d0cc7d4b455db0`, not a claim about current main after this document is merged. Resolve live main and workflow history before acting.
