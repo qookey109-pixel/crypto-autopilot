@@ -86,4 +86,6 @@ class ResearchPrepaidD1Client(PrepaidCloudflareD1QueryClient):
     def _request(self, sql: str, params: tuple[object, ...]):
         # Recheck immediately before the inherited transport, after prepaid debit.
         self._validate_statement(sql, params)
-        return super()._request(sql, params)
+        result = super()._request(sql, params)
+        self._validate_statement(sql, params)
+        return result
