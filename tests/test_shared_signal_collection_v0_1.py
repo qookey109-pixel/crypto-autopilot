@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import unittest
 from dataclasses import asdict, replace
 from pathlib import Path
@@ -36,6 +37,9 @@ class Response(io.BytesIO):
 
 class SharedSignalCollectionTests(unittest.TestCase):
     def setUp(self):
+        environment = patch.dict("os.environ", {"CLOUDFLARE_ACCOUNT_ID": "fixture", "R2_BUCKET_NAME": "fixture"})
+        environment.start()
+        self.addCleanup(environment.stop)
         self.assertTrue(callable(run_shared_signal_collection),
                         "combined shared-admitted source/publication runtime is missing")
         self.clock = [NOW]
@@ -177,6 +181,39 @@ class SharedSignalCollectionTests(unittest.TestCase):
         self.assertEqual(got["status"], "REVIEW_REQUIRED")
         self.assertEqual(got["stage"], "PAYLOAD_BOUNDS")
         self.assertEqual(got["provider_requests_performed"], 3)
+        self.mock_factory.assert_not_called()
+
+    def test_missing_target_configuration_blocks_before_admission(self):
+        for key in ("CLOUDFLARE_ACCOUNT_ID", "R2_BUCKET_NAME"):
+            with self.subTest(key=key), patch.dict(os.environ, {key: ""}):
+                with self.assertRaises(BudgetBlocked):
+                    self.run_cycle()
+        self.assertNotIn("query", self.events)
+        self.assertNotIn("admission_query", self.events)
+        self.mock_factory.assert_not_called()
+
+    def test_target_change_after_source_stops_before_next_source(self):
+        def change_target(request, *, timeout):
+            response = self.transport(request, timeout=timeout)
+            os.environ["R2_BUCKET_NAME"] = "other-fixture"
+            return response
+
+        result = self.run_cycle(transport=change_target)
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["provider_requests_performed"], 1)
+        self.assertTrue(result["central_reservation_retained"])
+        self.mock_factory.assert_not_called()
+
+    def test_target_account_and_bucket_mismatch_stop_before_admission(self):
+        for key in ("account_id", "bucket"):
+            credentials = dict(account_id="fixture", bucket="fixture",
+                               access_key_id="fixture", secret_access_key="fixture")
+            credentials[key] = "different-target"
+            with self.subTest(key=key), self.assertRaises(BudgetBlocked):
+                self.run_cycle(credentials=credentials)
+        self.assertNotIn("query", self.events)
+        self.assertNotIn("admission_query", self.events)
+        self.assertNotIn("source", self.events)
         self.mock_factory.assert_not_called()
 
     def test_default_transport_rejects_redirects(self):

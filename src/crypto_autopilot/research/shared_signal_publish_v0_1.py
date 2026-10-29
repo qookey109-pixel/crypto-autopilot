@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
@@ -21,6 +22,18 @@ from crypto_autopilot.paper.shared_writer_r2_budget_v0_1 import SharedWriterR2Bu
 WRITER = "crypto-autopilot:research-signal-layer-v0-2"
 NAMESPACE = "research/signal-layer/v0-2"
 MAX_BYTES = 2_500_000
+
+
+def _validate_target(credentials: Mapping[str, str]) -> None:
+    required = {"account_id", "bucket", "access_key_id", "secret_access_key"}
+    if not isinstance(credentials, Mapping) or set(credentials) != required or any(
+        not isinstance(value, str) or not value.strip() for value in credentials.values()
+    ):
+        raise BudgetBlocked("BLOCKED_SIGNAL_CREDENTIAL_BINDING")
+    if credentials["account_id"] != os.environ.get("CLOUDFLARE_ACCOUNT_ID", ""):
+        raise BudgetBlocked("BLOCKED_SIGNAL_ACCOUNT_MISMATCH")
+    if credentials["bucket"] != os.environ.get("R2_BUCKET_NAME", ""):
+        raise BudgetBlocked("BLOCKED_SIGNAL_BUCKET_MISMATCH")
 
 
 def _encode(value: Mapping[str, object]) -> bytes:
@@ -156,14 +169,16 @@ def publish_shared_signal_payload(
         or reservation.r2_new_bytes != planned_bytes
     ):
         raise BudgetBlocked("BLOCKED_SIGNAL_ENVELOPE_MISMATCH")
-    required = {"account_id", "bucket", "access_key_id", "secret_access_key"}
-    if set(credentials) != required or any(
-        not isinstance(value, str) or not value.strip() for value in credentials.values()
-    ):
-        raise BudgetBlocked("BLOCKED_SIGNAL_CREDENTIAL_BINDING")
+    _validate_target(credentials)
+    credentials = dict(credentials)
+
+    def validate_target_binding() -> None:
+        _validate_target(credentials)
+        validate_binding()
+
     budget = SharedWriterR2Budget.admit(
         reservation=reservation, guard=guard, execute=execute,
-        query_meter=query_meter, validate_binding=validate_binding,
+        query_meter=query_meter, validate_binding=validate_target_binding,
     )
     return _publish_objects(
         objects=objects, run_id=run_id, generated_at=_timestamp(payload["generated_at_utc"]),
