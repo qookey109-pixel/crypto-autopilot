@@ -9,7 +9,7 @@ from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
 from crypto_autopilot.paper.prepaid_query_controller_v0_1 import (
     AllocationEvidence, claim_prepaid_query_meter,
 )
-from crypto_autopilot.paper.shared_writer_budget_gate_v0_4 import (
+from crypto_autopilot.paper.shared_writer_budget_gate_v0_5 import (
     READ_SHARED_WRITER_SQL, RESERVE_SHARED_WRITER_SQL,
     SharedWriterReservation, reservation_params,
 )

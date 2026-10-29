@@ -7,7 +7,7 @@ from __future__ import annotations
 from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import D1LedgerUnavailable
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
 from crypto_autopilot.paper.prepaid_d1_client_v0_1 import PrepaidCloudflareD1QueryClient
-from crypto_autopilot.paper.shared_writer_budget_gate_v0_4 import (
+from crypto_autopilot.paper.shared_writer_budget_gate_v0_5 import (
     READ_SHARED_WRITER_SQL, RESERVE_SHARED_WRITER_SQL, QueryOperation,
     SharedWriterReservation, reservation_params,
 )
