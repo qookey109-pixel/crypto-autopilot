@@ -61,6 +61,36 @@ class DailyResearchD1Tests(unittest.TestCase):
             self.client.query(READ_SHARED_WRITER_SQL, (WRITER, self.slot))
         send.assert_called_once()
 
+    def test_valid_reservation_is_accepted_once_with_prepaid_debit(self):
+        envelope = self.meter.report()["ticket_envelope_charged_in_full"]
+        reservation = SharedWriterReservation(
+            writer_id=WRITER, slot_id=self.slot, idempotency_key=self.slot,
+            slot_at_ms=self.f.now, reserved_at_ms=self.f.now, provider_requests=3,
+            r2_class_a=3, r2_class_b=6, r2_new_bytes=270336,
+            d1_queries=envelope["queries"], d1_rows_read=envelope["rows_read"],
+            d1_rows_written=envelope["rows_written"],
+            d1_storage_growth_bytes=envelope["storage_bytes"],
+        )
+        def response(sql, params):
+            self.assertEqual(self.meter.report()["query_attempts_charged"], 1)
+            return D1QueryResult(({"writer_id": WRITER, "slot_id": self.slot},), 1, 7), 1024
+        with patch.object(self.client, "_request", side_effect=response) as send:
+            result = self.client.query(RESERVE_SHARED_WRITER_SQL, reservation_params(reservation))
+        self.assertEqual(result.rows[0]["slot_id"], self.slot)
+        send.assert_called_once()
+
+    def test_daily_slot_rejects_future_or_wrong_grid_before_network(self):
+        for value in (self.f.now - 86_400_000, self.f.now + 86_400_000, self.f.now + 60_000):
+            other_slot = f"slot:{value}"
+            with self.subTest(slot=other_slot), self.assertRaises(BudgetBlocked):
+                ResearchPrepaidD1Client(
+                    api_token="synthetic-token", account_id="a" * 32, database_id=DB_ID,
+                    usage_guard=self.f.make_guard(), query_meter=self.meter,
+                    writer_id=WRITER, slot_id=other_slot,
+                    database_evidence=self.f.database_evidence(),
+                )
+        self.assertEqual(self.meter.report()["query_attempts_charged"], 0)
+
     def test_reservation_rejects_tampered_windows_and_envelope_before_debit(self):
         envelope = self.meter.report()["ticket_envelope_charged_in_full"]
         reservation = SharedWriterReservation(
