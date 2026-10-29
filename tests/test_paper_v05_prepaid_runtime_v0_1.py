@@ -46,13 +46,16 @@ class PaperV05RuntimeTests(unittest.TestCase):
 
     def test_external_io_before_shared_admission_is_blocked(self):
         runtime = self.runtime()
-        with patch(fixtures.CLIENT_MODULE + ".build_opener") as network:
+        with patch(fixtures.CLIENT_MODULE + ".build_opener") as network, patch(
+            "crypto_autopilot.paper.cloud_pionex_client_v0_1.build_opener"
+        ) as provider:
             with self.assertRaises(BudgetBlocked):
                 runtime.store.list_json_ids("live-run-result")
             with self.assertRaises(BudgetBlocked):
                 runtime.client._get_json("/api/v1/market/depth", {})
         self.assertEqual(self.f.sdk.calls, [])
         network.assert_not_called()
+        provider.assert_not_called()
         self.assertEqual(self.f.meter.report()["query_attempts_charged"], 0)
 
     def test_direct_provider_attempts_are_metered_after_admission(self):
