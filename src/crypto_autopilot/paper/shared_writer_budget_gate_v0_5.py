@@ -7,7 +7,7 @@ authority. Limits are read from D1, never supplied by the calling writer.
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Literal, Protocol
@@ -257,13 +257,29 @@ def _execute_admission_query(
 
 def reserve_shared_writer_envelope(
     *, execute: Query, reservation: SharedWriterReservation,
-    query_meter: AdmissionQueryMeter | None = None,
+    clock_ms: Callable[[], int], query_meter: AdmissionQueryMeter | None = None,
 ) -> Literal["RESERVED", "EXISTING_RESERVATION"]:
-    """Reserve workload usage; separately charge every attempted gate/read.
+    """Use a trusted clock to reject stale/future slots before any D1 query.
 
     Successful reservations alone cannot meter rejected or repeated queries.
-    A verified production prepaid controller is required before D1 execution.
+    Production must bind the clock to its runtime and independently verify account evidence.
     """
+    if not callable(clock_ms):
+        raise BudgetBlocked("BLOCKED_SHARED_WRITER_CLOCK_REQUIRED")
+    reservation.validate()
+    now_ms = clock_ms()
+    if (
+        type(now_ms) is not int or now_ms <= 0
+        or not 0 <= now_ms - reservation.slot_at_ms <= 600_000
+        or not reservation.slot_at_ms <= reservation.reserved_at_ms <= now_ms
+    ):
+        raise BudgetBlocked("BLOCKED_SHARED_WRITER_TIME_INVALID")
+    try:
+        current_day = datetime.fromtimestamp(now_ms / 1000, tz=UTC).date().isoformat()
+    except (ValueError, OverflowError, OSError):
+        raise BudgetBlocked("BLOCKED_SHARED_WRITER_TIME_INVALID") from None
+    if reservation.utc_day != current_day:
+        raise BudgetBlocked("BLOCKED_SHARED_WRITER_TIME_INVALID")
     params = reservation_params(reservation)
     inserted = _execute_admission_query(
         execute=execute, query_meter=query_meter, reservation=reservation,
