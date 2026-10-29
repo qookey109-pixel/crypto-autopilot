@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import os
 import unittest
 from dataclasses import replace
 from unittest.mock import patch
@@ -127,6 +128,15 @@ class SharedSignalPublisherTests(unittest.TestCase):
         )
         args.update(overrides)
         return publish_shared_signal_payload(**args)
+
+    def test_missing_target_configuration_blocks_before_admission(self):
+        for key in ("CLOUDFLARE_ACCOUNT_ID", "R2_BUCKET_NAME"):
+            with self.subTest(key=key), patch.dict(os.environ, {key: ""}):
+                with self.assertRaises(BudgetBlocked):
+                    self.publish()
+        self.assertNotIn("query", self.events)
+        self.assertNotIn("admission_query", self.events)
+        self.mock_factory.assert_not_called()
 
     def test_target_account_and_bucket_mismatch_stop_before_admission(self):
         for key in ("account_id", "bucket"):
