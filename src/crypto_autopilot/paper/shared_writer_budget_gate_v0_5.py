@@ -267,19 +267,31 @@ def reserve_shared_writer_envelope(
     if not callable(clock_ms):
         raise BudgetBlocked("BLOCKED_SHARED_WRITER_CLOCK_REQUIRED")
     reservation.validate()
-    now_ms = clock_ms()
-    if (
-        type(now_ms) is not int or now_ms <= 0
-        or not 0 <= now_ms - reservation.slot_at_ms <= 600_000
-        or not reservation.slot_at_ms <= reservation.reserved_at_ms <= now_ms
-    ):
-        raise BudgetBlocked("BLOCKED_SHARED_WRITER_TIME_INVALID")
-    try:
-        current_day = datetime.fromtimestamp(now_ms / 1000, tz=UTC).date().isoformat()
-    except (ValueError, OverflowError, OSError):
-        raise BudgetBlocked("BLOCKED_SHARED_WRITER_TIME_INVALID") from None
-    if reservation.utc_day != current_day:
-        raise BudgetBlocked("BLOCKED_SHARED_WRITER_TIME_INVALID")
+
+    def validate_time() -> None:
+        now_ms = clock_ms()
+        if (
+            type(now_ms) is not int or now_ms <= 0
+            or not 0 <= now_ms - reservation.slot_at_ms <= 600_000
+            or not reservation.slot_at_ms <= reservation.reserved_at_ms <= now_ms
+        ):
+            raise BudgetBlocked("BLOCKED_SHARED_WRITER_TIME_INVALID")
+        try:
+            current_day = datetime.fromtimestamp(now_ms / 1000, tz=UTC).date().isoformat()
+        except (ValueError, OverflowError, OSError):
+            raise BudgetBlocked("BLOCKED_SHARED_WRITER_TIME_INVALID") from None
+        if reservation.utc_day != current_day:
+            raise BudgetBlocked("BLOCKED_SHARED_WRITER_TIME_INVALID")
+
+    def guarded_execute(sql: str, query_params: tuple[object, ...]) -> QueryResult:
+        # Meter has already debited. On either failure the debit is retained.
+        validate_time()
+        result = execute(sql, query_params)
+        # A committed but late/ambiguous result cannot authorize workload.
+        validate_time()
+        return result
+
+    validate_time()
     params = reservation_params(reservation)
     inserted = _execute_admission_query(
         execute=execute, query_meter=query_meter, reservation=reservation,
