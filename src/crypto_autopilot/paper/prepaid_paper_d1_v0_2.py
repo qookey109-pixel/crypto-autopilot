@@ -88,8 +88,11 @@ class PaperPrepaidD1Client(PrepaidCloudflareD1QueryClient):
         # retains the prepaid debit; no caller may retry automatically.
         self._validate_statement(sql, params)
         result = super()._request(sql, params)
-        self._validate_statement(sql, params)
-        self._guard.validate_evidence()
-        self.validate_runtime_binding(meter=self._meter, writer_id=self._writer, slot_id=self._slot)
-        self._database_evidence.validate(database_id=self._database_id, guard=self._guard)
+        try:
+            self._validate_statement(sql, params)
+            self._guard.validate_evidence()
+            self.validate_runtime_binding(meter=self._meter, writer_id=self._writer, slot_id=self._slot)
+            self._database_evidence.validate(database_id=self._database_id, guard=self._guard)
+        except Exception:
+            raise D1LedgerUnavailable("D1_LEDGER_RESPONSE_UNVERIFIED") from None
         return result
