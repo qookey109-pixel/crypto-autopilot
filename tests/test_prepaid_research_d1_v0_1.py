@@ -71,7 +71,8 @@ class DailyResearchD1Tests(unittest.TestCase):
             columns = tuple(column[0] for column in cursor.description or ())
             rows = tuple(dict(zip(columns, row, strict=True)) for row in cursor.fetchall())
             db.commit()
-            return D1QueryResult(rows, 1, 7), 1024
+            writes = 0 if sql == READ_SHARED_WRITER_SQL else 7
+            return D1QueryResult(rows, 1, writes), 1024
         with patch(
             "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
             side_effect=sqlite_request,
