@@ -1,0 +1,34 @@
+{
+  "schema": "qookey-cloudflare-shared-writer-budget-gate-v0.5",
+  "status": "PREPARED_SYNTHETIC_ONLY",
+  "activation_enabled": false,
+  "implementation": "src/crypto_autopilot/paper/shared_writer_budget_gate_v0_5.py",
+  "production_writers_migrated": false,
+  "existing_v0_4_authority_changed": false,
+  "rolling_rule": "INCLUDE_ALL_COMMITTED_ROWS_AT_OR_AFTER_LOWER_BOUND",
+  "freshness": {
+    "max_slot_age_ms": 600000,
+    "future_or_cross_utc_day": "BLOCK",
+    "recheck": "BEFORE_AND_AFTER_EACH_SQL_AFTER_PREPAID_DEBIT"
+  },
+  "failure": "RETAIN_PREPAID_DEBIT_AND_ANY_COMMITTED_RESERVATION",
+  "limitations": [
+    "TRUSTED_CLOCK_AND_TRANSPORT_BINDING_UNPROVEN",
+    "D1_INFLIGHT_CROSS_DAY_COST_UNPROVEN",
+    "PRODUCTION_D1_ATOMICITY_AND_CALIBRATION_UNPROVEN",
+    "ALL_WRITERS_AND_D1_SQL_WHITELIST_NOT_MIGRATED",
+    "ACCOUNT_COST_AND_HEADROOM_UNPROVEN"
+  ],
+  "authority": {
+    "d1_access": false,
+    "r2_access": false,
+    "provider_access": false,
+    "production_activation": false,
+    "schedule_activation": false,
+    "holdout": false,
+    "source_switch": false,
+    "promotion": false,
+    "real_money_orders": false,
+    "live_trading": false
+  }
+}
