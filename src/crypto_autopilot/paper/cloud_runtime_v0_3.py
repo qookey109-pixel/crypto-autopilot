@@ -7,6 +7,8 @@ from dataclasses import replace
 from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import D1UsageSnapshot
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked, R2UsageSnapshot
 from crypto_autopilot.paper.cloud_composition_v0_1 import CloudPaperNoTradeComposition
+from crypto_autopilot.paper.cloud_run_store_v0_1 import CloudPaperRunStore
+from crypto_autopilot.paper.run_store_v0_1 import R2PaperRunStore
 from crypto_autopilot.paper.cloud_runtime_v0_2 import (
     PrepaidCloudPaperBudgetLedger,
     build_runtime_composition as build_prepaid_runtime,
@@ -51,5 +53,8 @@ def build_runtime_composition(
     ledger.client.validate_runtime_binding(
         meter=query_meter, writer_id=writer_id, slot_id=f"slot:{slot_at_ms}",
     )
-    base = replace(base, client=ValidatedTapeClient(base.client))
+    if not isinstance(base.store, R2PaperRunStore):
+        raise BudgetBlocked("BLOCKED_CLOUD_PAPER_RUN_STORE_REQUIRED")
+    strict_store = CloudPaperRunStore(base.store.store, prefix=base.store.prefix)
+    base = replace(base, client=ValidatedTapeClient(base.client), store=strict_store)
     return build_seal_guarded_composition(base, enabled=True)
