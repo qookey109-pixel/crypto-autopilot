@@ -28,10 +28,12 @@ class RollingOrderTests(unittest.TestCase):
         earlier = self.f.reservation("project-a:writer", NOW_MS)
         reserve_shared_writer_envelope(
             execute=self.f.query, query_meter=self.f.meter, reservation=later,
+            clock_ms=lambda: later.reserved_at_ms,
         )
         with self.assertRaisesRegex(BudgetBlocked, "POLICY_OR_WRITER_GATE"):
             reserve_shared_writer_envelope(
                 execute=self.f.query, query_meter=self.f.meter, reservation=earlier,
+                clock_ms=lambda: later.reserved_at_ms,
             )
         self.assertEqual(self.f.db.execute(
             "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3"
@@ -47,19 +49,34 @@ class RollingOrderTests(unittest.TestCase):
         earlier = self.f.reservation("project-a:writer", boundary - 1000)
         reserve_shared_writer_envelope(
             execute=self.f.query, query_meter=self.f.meter, reservation=later,
+            clock_ms=lambda: later.reserved_at_ms,
         )
-        with self.assertRaisesRegex(BudgetBlocked, "POLICY_OR_WRITER_GATE"):
+        with self.assertRaisesRegex(BudgetBlocked, "TIME_INVALID"):
             reserve_shared_writer_envelope(
                 execute=self.f.query, query_meter=self.f.meter, reservation=earlier,
+                clock_ms=lambda: later.reserved_at_ms,
             )
+
+    def test_future_and_stale_timestamps_reject_before_query(self):
+        for value in (NOW_MS + 32 * 86_400_000, NOW_MS - 600_001):
+            reservation = self.f.reservation("project-a:writer", value)
+            with self.subTest(value=value), self.assertRaisesRegex(BudgetBlocked, "TIME_INVALID"):
+                reserve_shared_writer_envelope(
+                    execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
+                    clock_ms=lambda: NOW_MS,
+                )
+        self.assertEqual(self.f.query.calls, 0)
+        self.assertEqual(self.f.meter.charges, [])
 
     def test_exact_replay_does_not_create_second_reservation(self):
         reservation = self.f.reservation("project-a:writer", NOW_MS)
         self.assertEqual(reserve_shared_writer_envelope(
             execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
+            clock_ms=lambda: reservation.reserved_at_ms,
         ), "RESERVED")
         self.assertEqual(reserve_shared_writer_envelope(
             execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
+            clock_ms=lambda: reservation.reserved_at_ms,
         ), "EXISTING_RESERVATION")
 
 
