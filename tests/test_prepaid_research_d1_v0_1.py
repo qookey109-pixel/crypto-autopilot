@@ -53,8 +53,30 @@ class DailyResearchD1Tests(unittest.TestCase):
             api_token="synthetic-token", account_id="a" * 32, database_id=DB_ID,
             usage_guard=self.f.make_guard(), query_meter=self.meter,
             writer_id=WRITER, slot_id=self.slot,
-            database_evidence=self.f.database_evidence(),
+            database_evidence=self.f.database_evidence(), execution_enabled=True,
         )
+
+    def test_disabled_client_stops_before_debit_and_network(self):
+        self.client._execution_enabled = False
+        with patch.object(self.client, "_request") as send:
+            with self.assertRaisesRegex(BudgetBlocked, "EXECUTION_DISABLED"):
+                self.client.query(READ_SHARED_WRITER_SQL, (WRITER, self.slot))
+        send.assert_not_called()
+        self.assertEqual(self.meter.report()["query_attempts_charged"], 0)
+
+    def test_late_d1_response_keeps_debit_and_blocks_success(self):
+        def late_result(sql, params):
+            self.f.now += 600_001
+            return D1QueryResult((), 1, 0), 1024
+        with patch(
+            "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+            side_effect=late_result,
+        ) as send:
+            with self.assertRaises(D1LedgerUnavailable):
+                self.client.query(READ_SHARED_WRITER_SQL, (WRITER, self.slot))
+            send.assert_called_once()
+        self.assertEqual(self.meter.report()["query_attempts_charged"], 1)
+        self.assertTrue(self.client.diagnostics()["review_required"])
 
     def test_v05_admission_uses_prepaid_research_client_and_deduplicates(self):
         db = self.f.sqlite()
@@ -124,7 +146,7 @@ class DailyResearchD1Tests(unittest.TestCase):
             client = ResearchPrepaidD1Client(
                 api_token="synthetic-token", account_id="a" * 32, database_id=DB_ID,
                 usage_guard=self.f.make_guard(), query_meter=meter, writer_id=WRITER,
-                slot_id=slot, database_evidence=self.f.database_evidence(),
+                slot_id=slot, database_evidence=self.f.database_evidence(), execution_enabled=True,
             )
             with self.subTest(slot=slot), patch.object(client, "_request") as send:
                 with self.assertRaises(BudgetBlocked):
@@ -151,7 +173,7 @@ class DailyResearchD1Tests(unittest.TestCase):
         client = ResearchPrepaidD1Client(
             api_token="synthetic-token", account_id="a" * 32, database_id=DB_ID,
             usage_guard=self.f.make_guard(), query_meter=meter, writer_id=WRITER,
-            slot_id=self.slot, database_evidence=self.f.database_evidence(),
+            slot_id=self.slot, database_evidence=self.f.database_evidence(), execution_enabled=True,
         )
         charge = meter.charge_before_query
         def cross_cutoff(**kwargs):
@@ -193,7 +215,7 @@ class DailyResearchD1Tests(unittest.TestCase):
                     api_token="synthetic-token", account_id="a" * 32, database_id=DB_ID,
                     usage_guard=self.f.make_guard(), query_meter=self.meter,
                     writer_id=WRITER, slot_id=other_slot,
-                    database_evidence=self.f.database_evidence(),
+                    database_evidence=self.f.database_evidence(), execution_enabled=True,
                 )
         self.assertEqual(self.meter.report()["query_attempts_charged"], 0)
 
