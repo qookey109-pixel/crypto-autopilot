@@ -58,13 +58,18 @@ class PaperV05RuntimeTests(unittest.TestCase):
     def test_direct_provider_attempts_are_metered_after_admission(self):
         runtime = self.runtime()
         runtime.reservation_ledger._admitted = True  # synthetic admitted envelope only
-        with patch("crypto_autopilot.exchanges.pionex_public.PionexPublicClient._get_json",
-                   return_value={}) as provider:
+        with patch("crypto_autopilot.paper.cloud_pionex_client_v0_1.build_opener") as factory, patch(
+            "crypto_autopilot.paper.cloud_pionex_client_v0_1.CloudPaperPionexPublicClient._pace"
+        ):
+            response = factory.return_value.open.return_value.__enter__.return_value
+            response.getcode.return_value = 200
+            response.headers = {}
+            response.read.return_value = b'{"result": true, "data": {}}'
             for _ in range(18):
                 runtime.client._get_json("/api/v1/market/depth", {})
             with self.assertRaises(BudgetBlocked):
                 runtime.client._get_json("/api/v1/market/depth", {})
-        self.assertEqual(provider.call_count, 18)
+        self.assertEqual(factory.return_value.open.call_count, 18)
         self.assertEqual(runtime.budget_guard.attempted_usage().provider_requests, 18)
 
     def test_two_no_trade_slots_use_v05_and_recover_account(self):
