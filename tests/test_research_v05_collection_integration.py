@@ -81,6 +81,33 @@ class ResearchV05CollectionTests(unittest.TestCase):
             transport=self.source, execution_enabled=True,
         )
 
+    def test_disabled_returns_before_credentials_or_transport(self):
+        result = run_shared_signal_collection(
+            sources=[], run_id="", reservation=None, guard=None, execute=None,
+            query_meter=None, validate_binding=None, credentials={}, execution_enabled=False,
+        )
+        self.assertEqual(result["status"], "SKIPPED_DISABLED")
+        self.assertEqual(self.sql_called, [])
+        self.assertEqual(self.sdk.events, [])
+
+    def test_source_failure_retains_admission_and_no_r2_write(self):
+        def fail_source(request, *, timeout):
+            self.sources_called.append(request.full_url)
+            raise OSError("synthetic source failure")
+        with patch.dict("os.environ", {"CLOUDFLARE_ACCOUNT_ID": "a" * 32, "R2_BUCKET_NAME": "fixture"}), patch(
+            "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+            side_effect=self.sqlite_request,
+        ), patch.object(self, "source", side_effect=fail_source):
+            result = self.run_collection()
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertTrue(result["central_reservation_retained"])
+        self.assertEqual(len(self.sources_called), 1)
+        self.assertEqual(self.sdk.events, [])
+        self.assertEqual(self.db.execute(
+            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3 WHERE writer_id=?",
+            (research_fixture.WRITER,),
+        ).fetchone()[0], 1)
+
     def test_v05_prepaid_collection_publishes_once_and_blocks_duplicate(self):
         def store_factory(**kwargs):
             return BudgetedR2Store(client=self.sdk, bucket=kwargs["bucket"],
