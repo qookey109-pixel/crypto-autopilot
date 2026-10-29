@@ -34,6 +34,11 @@ class CloudR2ListingIntegrityTests(unittest.TestCase):
     def test_unproven_or_invalid_inventory_is_rejected(self):
         cases = (
             {"Contents": []},
+            {"IsTruncated": False},
+            {"IsTruncated": False, "KeyCount": 1},
+            {"Contents": [], "IsTruncated": False, "KeyCount": 1},
+            {"Contents": [], "IsTruncated": False, "KeyCount": False},
+            {"Contents": [], "IsTruncated": False, "NextContinuationToken": "extra"},
             {"Contents": [], "IsTruncated": None},
             {"Contents": [], "IsTruncated": 0},
             {"Contents": [{"Key": "other/a"}], "IsTruncated": False},
@@ -46,6 +51,10 @@ class CloudR2ListingIntegrityTests(unittest.TestCase):
                 store, _ = self.store([page])
                 with self.assertRaises(ValueError):
                     store.list_keys("p/")
+
+    def test_proven_empty_page_without_contents_is_accepted(self):
+        store, _ = self.store([{"IsTruncated": False, "KeyCount": 0}])
+        self.assertEqual(store.list_keys("p/"), ())
 
     def test_repeated_key_across_pages_is_rejected(self):
         store, _ = self.store([
