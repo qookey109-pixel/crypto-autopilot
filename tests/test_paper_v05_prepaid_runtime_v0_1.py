@@ -55,6 +55,18 @@ class PaperV05RuntimeTests(unittest.TestCase):
         network.assert_not_called()
         self.assertEqual(self.f.meter.report()["query_attempts_charged"], 0)
 
+    def test_direct_provider_attempts_are_metered_after_admission(self):
+        runtime = self.runtime()
+        runtime.reservation_ledger._admitted = True  # synthetic admitted envelope only
+        with patch("crypto_autopilot.exchanges.pionex_public.PionexPublicClient._get_json",
+                   return_value={}) as provider:
+            for _ in range(18):
+                runtime.client._get_json("/api/v1/market/depth", {})
+            with self.assertRaises(BudgetBlocked):
+                runtime.client._get_json("/api/v1/market/depth", {})
+        self.assertEqual(provider.call_count, 18)
+        self.assertEqual(runtime.budget_guard.attempted_usage().provider_requests, 18)
+
     def test_two_no_trade_slots_use_v05_and_recover_account(self):
         db, size, statements, opener = self.outer.transport()
         with patch(fixtures.CLIENT_MODULE + ".build_opener", return_value=opener):
@@ -62,6 +74,10 @@ class PaperV05RuntimeTests(unittest.TestCase):
             report = first.run_slot(tick_ms=self.f.now, previous_slot=None,
                                     activation_enabled=True, run_id="fixture-101")
             self.assertEqual(report["state"], "NO_TRADE")
+            calls_after_settlement = list(self.f.sdk.calls)
+            with self.assertRaises(BudgetBlocked):
+                first.store.list_json_ids("live-run-result")
+            self.assertEqual(self.f.sdk.calls, calls_after_settlement)
             with self.assertRaises(BudgetBlocked):
                 first.run_slot(tick_ms=self.f.now, previous_slot=None,
                                activation_enabled=True, run_id="duplicate")
