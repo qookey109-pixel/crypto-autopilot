@@ -20,6 +20,16 @@ class RollingOrderTests(unittest.TestCase):
         self.f.setUp()
         self.addCleanup(self.f.tearDown)
 
+    def test_default_disabled_blocks_before_meter_and_sql(self):
+        reservation = self.f.reservation("project-a:writer", NOW_MS)
+        with self.assertRaisesRegex(BudgetBlocked, "EXECUTION_DISABLED"):
+            reserve_shared_writer_envelope(
+                execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
+                clock_ms=lambda: NOW_MS,
+            )
+        self.assertEqual(self.f.query.calls, 0)
+        self.assertEqual(self.f.meter.charges, [])
+
     def test_later_timestamp_committed_first_counts_towards_cap(self):
         self.f.db.execute(
             "UPDATE cloudflare_shared_writer_budget_policy_v0_4 "
@@ -29,12 +39,12 @@ class RollingOrderTests(unittest.TestCase):
         earlier = self.f.reservation("project-a:writer", NOW_MS)
         reserve_shared_writer_envelope(
             execute=self.f.query, query_meter=self.f.meter, reservation=later,
-            clock_ms=lambda: later.reserved_at_ms,
+            clock_ms=lambda: later.reserved_at_ms, execution_enabled=True,
         )
         with self.assertRaisesRegex(BudgetBlocked, "POLICY_OR_WRITER_GATE"):
             reserve_shared_writer_envelope(
                 execute=self.f.query, query_meter=self.f.meter, reservation=earlier,
-                clock_ms=lambda: later.reserved_at_ms,
+                clock_ms=lambda: later.reserved_at_ms, execution_enabled=True,
             )
         self.assertEqual(self.f.db.execute(
             "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3"
@@ -50,12 +60,12 @@ class RollingOrderTests(unittest.TestCase):
         earlier = self.f.reservation("project-a:writer", boundary - 1000)
         reserve_shared_writer_envelope(
             execute=self.f.query, query_meter=self.f.meter, reservation=later,
-            clock_ms=lambda: later.reserved_at_ms,
+            clock_ms=lambda: later.reserved_at_ms, execution_enabled=True,
         )
         with self.assertRaisesRegex(BudgetBlocked, "TIME_INVALID"):
             reserve_shared_writer_envelope(
                 execute=self.f.query, query_meter=self.f.meter, reservation=earlier,
-                clock_ms=lambda: later.reserved_at_ms,
+                clock_ms=lambda: later.reserved_at_ms, execution_enabled=True,
             )
 
     def test_prior_day_slot_with_current_day_reservation_is_blocked(self):
@@ -65,7 +75,7 @@ class RollingOrderTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "TIME_INVALID"):
             reserve_shared_writer_envelope(
                 execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
-                clock_ms=lambda: boundary + 1000,
+                clock_ms=lambda: boundary + 1000, execution_enabled=True,
             )
         self.assertEqual(self.f.query.calls, 0)
         self.assertEqual(self.f.meter.charges, [])
@@ -76,7 +86,7 @@ class RollingOrderTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaisesRegex(BudgetBlocked, "TIME_INVALID"):
                 reserve_shared_writer_envelope(
                     execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
-                    clock_ms=lambda: NOW_MS,
+                    clock_ms=lambda: NOW_MS, execution_enabled=True,
                 )
         self.assertEqual(self.f.query.calls, 0)
         self.assertEqual(self.f.meter.charges, [])
@@ -94,7 +104,7 @@ class RollingOrderTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_UNVERIFIED"):
             reserve_shared_writer_envelope(
                 execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
-                clock_ms=lambda: current[0],
+                clock_ms=lambda: current[0], execution_enabled=True,
             )
         self.assertEqual(self.f.query.calls, 0)
         self.assertEqual(len(self.f.meter.charges), 1)
@@ -109,7 +119,7 @@ class RollingOrderTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_UNVERIFIED"):
             reserve_shared_writer_envelope(
                 execute=late_result, query_meter=self.f.meter, reservation=reservation,
-                clock_ms=lambda: current[0],
+                clock_ms=lambda: current[0], execution_enabled=True,
             )
         self.assertEqual(self.f.query.calls, 1)
         self.assertEqual(len(self.f.meter.charges), 1)
@@ -122,7 +132,7 @@ class RollingOrderTests(unittest.TestCase):
         reservation = self.f.reservation("project-a:writer", NOW_MS)
         self.assertEqual(reserve_shared_writer_envelope(
             execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
-            clock_ms=lambda: current[0],
+            clock_ms=lambda: current[0], execution_enabled=True,
         ), "RESERVED")
         charge = self.f.meter.charge_before_query
         def crossing_meter(**kwargs):
@@ -134,7 +144,7 @@ class RollingOrderTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "REPLAY_UNVERIFIED"):
             reserve_shared_writer_envelope(
                 execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
-                clock_ms=lambda: current[0],
+                clock_ms=lambda: current[0], execution_enabled=True,
             )
         self.assertEqual(self.f.query.calls, 2)
         self.assertEqual(len(self.f.meter.charges), 3)
@@ -146,11 +156,11 @@ class RollingOrderTests(unittest.TestCase):
         reservation = self.f.reservation("project-a:writer", NOW_MS)
         self.assertEqual(reserve_shared_writer_envelope(
             execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
-            clock_ms=lambda: reservation.reserved_at_ms,
+            clock_ms=lambda: reservation.reserved_at_ms, execution_enabled=True,
         ), "RESERVED")
         self.assertEqual(reserve_shared_writer_envelope(
             execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
-            clock_ms=lambda: reservation.reserved_at_ms,
+            clock_ms=lambda: reservation.reserved_at_ms, execution_enabled=True,
         ), "EXISTING_RESERVATION")
 
 
