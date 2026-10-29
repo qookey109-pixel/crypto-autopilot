@@ -9,6 +9,9 @@ from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
 from crypto_autopilot.paper.prepaid_query_controller_v0_1 import (
     AllocationEvidence, claim_prepaid_query_meter,
 )
+from crypto_autopilot.paper.shared_writer_budget_gate_v0_4 import (
+    RESERVE_SHARED_WRITER_SQL as LEGACY_RESERVE_SQL,
+)
 from crypto_autopilot.paper.shared_writer_budget_gate_v0_5 import (
     READ_SHARED_WRITER_SQL, RESERVE_SHARED_WRITER_SQL,
     SharedWriterReservation, reservation_params, reserve_shared_writer_envelope,
@@ -223,6 +226,7 @@ class DailyResearchD1Tests(unittest.TestCase):
             (READ_SHARED_WRITER_SQL, ("other", self.slot)),
             (READ_SHARED_WRITER_SQL, (WRITER, "slot:1")),
             (READ_SLOT_RESERVATION_SQL, ("1",)),
+            (LEGACY_RESERVE_SQL, tuple(None for _ in range(LEGACY_RESERVE_SQL.count("?")))),
         )
         with patch.object(self.client, "_request") as send:
             for sql, params in invalid:
