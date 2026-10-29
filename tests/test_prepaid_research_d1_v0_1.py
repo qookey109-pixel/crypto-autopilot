@@ -9,7 +9,10 @@ from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
 from crypto_autopilot.paper.prepaid_query_controller_v0_1 import (
     AllocationEvidence, claim_prepaid_query_meter,
 )
-from crypto_autopilot.paper.shared_writer_budget_gate_v0_4 import READ_SHARED_WRITER_SQL
+from crypto_autopilot.paper.shared_writer_budget_gate_v0_4 import (
+    READ_SHARED_WRITER_SQL, RESERVE_SHARED_WRITER_SQL,
+    SharedWriterReservation, reservation_params,
+)
 from test_prepaid_d1_runtime_v0_1 import DB_ID, NOW, PrepaidD1RuntimeTests
 from test_prepaid_query_controller_v0_1 import FakeGitHub
 
@@ -57,6 +60,30 @@ class DailyResearchD1Tests(unittest.TestCase):
         with patch.object(self.client, "_request", side_effect=response) as send:
             self.client.query(READ_SHARED_WRITER_SQL, (WRITER, self.slot))
         send.assert_called_once()
+
+    def test_reservation_rejects_tampered_windows_and_envelope_before_debit(self):
+        envelope = self.meter.report()["ticket_envelope_charged_in_full"]
+        reservation = SharedWriterReservation(
+            writer_id=WRITER, slot_id=self.slot, idempotency_key=self.slot,
+            slot_at_ms=self.f.now, reserved_at_ms=self.f.now, provider_requests=3,
+            r2_class_a=3, r2_class_b=6, r2_new_bytes=270336,
+            d1_queries=envelope["queries"], d1_rows_read=envelope["rows_read"],
+            d1_rows_written=envelope["rows_written"],
+            d1_storage_growth_bytes=envelope["storage_bytes"],
+        )
+        good = reservation_params(reservation)
+        for index in (0, 1, 2, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16):
+            params = list(good)
+            params[index] = "invalid" if isinstance(params[index], str) else params[index] + 1
+            with self.subTest(index=index), self.assertRaises((BudgetBlocked, D1LedgerUnavailable)):
+                self.client.query(RESERVE_SHARED_WRITER_SQL, tuple(params))
+        self.assertEqual(self.meter.report()["query_attempts_charged"], 0)
+
+    def test_stale_slot_blocks_before_debit(self):
+        self.f.now += 600_001
+        with self.assertRaises((BudgetBlocked, D1LedgerUnavailable)):
+            self.client._validate_statement(READ_SHARED_WRITER_SQL, (WRITER, self.slot))
+        self.assertEqual(self.meter.report()["query_attempts_charged"], 0)
 
     def test_other_slot_writer_or_legacy_sql_is_blocked_before_debit(self):
         invalid = (
