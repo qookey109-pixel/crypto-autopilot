@@ -1,5 +1,6 @@
 """Synthetic regression for shared budget V0.5 timestamp ordering."""
 import unittest
+from dataclasses import replace
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
 from test_shared_writer_budget_gate_v0_4 import NOW_MS, SharedWriterBudgetGateTests
@@ -56,6 +57,18 @@ class RollingOrderTests(unittest.TestCase):
                 execute=self.f.query, query_meter=self.f.meter, reservation=earlier,
                 clock_ms=lambda: later.reserved_at_ms,
             )
+
+    def test_prior_day_slot_with_current_day_reservation_is_blocked(self):
+        boundary = (NOW_MS // 86_400_000 + 1) * 86_400_000
+        reservation = self.f.reservation("project-a:writer", boundary - 1000)
+        reservation = replace(reservation, reserved_at_ms=boundary + 1000)
+        with self.assertRaisesRegex(BudgetBlocked, "TIME_INVALID"):
+            reserve_shared_writer_envelope(
+                execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
+                clock_ms=lambda: boundary + 1000,
+            )
+        self.assertEqual(self.f.query.calls, 0)
+        self.assertEqual(self.f.meter.charges, [])
 
     def test_future_and_stale_timestamps_reject_before_query(self):
         for value in (NOW_MS + 32 * 86_400_000, NOW_MS - 600_001):
