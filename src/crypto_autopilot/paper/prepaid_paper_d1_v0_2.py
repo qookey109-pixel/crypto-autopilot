@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import D1LedgerUnavailable
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked, CloudBudgetPolicy
+from crypto_autopilot.paper.cloud_loop_v0_1 import SLOT_MS, SLOT_OFFSET_MS
 from crypto_autopilot.paper.prepaid_d1_client_v0_1 import PrepaidCloudflareD1QueryClient
 from crypto_autopilot.paper.shared_writer_budget_gate_v0_4 import (
     RESERVE_SHARED_WRITER_SQL as OLD_RESERVE_SQL,
@@ -36,6 +37,8 @@ class PaperPrepaidD1Client(PrepaidCloudflareD1QueryClient):
         if not slot_value.isascii() or not slot_value.isdigit() or str(int(slot_value)) != slot_value:
             raise BudgetBlocked("BLOCKED_PREPAID_SLOT_INVALID")
         slot_at_ms = int(slot_value)
+        if slot_at_ms <= 0 or (slot_at_ms - SLOT_OFFSET_MS) % SLOT_MS:
+            raise BudgetBlocked("BLOCKED_PREPAID_SLOT_INVALID")
         now_ms = self._guard.clock_ms()
         if (
             type(now_ms) is not int or not 0 <= now_ms - slot_at_ms <= 600_000
