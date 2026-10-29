@@ -135,6 +135,23 @@ class PaperV05PositionLifecycleTests(unittest.TestCase):
         self.assertEqual(result["account"]["closed_position_count"], 1)
         self.assertGreater(result["account"]["realized_closed_net_pnl_usd"], 0)
         self.assertGreater(result["account"]["equity_usd"], 10000)
+        step_id = result["coordinator"]["step_id"]
+        step = next(json.loads(body) for key, (body, _) in self.f.sdk.objects.items()
+                    if key.endswith(f"/live-run-step/{step_id}.json"))
+        state_id = step["next_state_id"]
+        state = next(json.loads(body) for key, (body, _) in self.f.sdk.objects.items()
+                     if key.endswith(f"/live-state/{state_id}.json"))
+        checkpoint = state["checkpoint_report"]
+        self.assertEqual(checkpoint["account_snapshot"], result["account"])
+        records = checkpoint["next_account_input"]["records"]
+        self.assertEqual(len(records), 1)
+        lifecycle = records[0]["paper_lifecycle_report"]["result"]
+        self.assertEqual(lifecycle["status"], "CLOSED")
+        self.assertIn(lifecycle["reason"], {"TARGET", "TARGET_GAP"})
+        self.assertEqual(lifecycle["raw_exit_price"], 105.0)
+        self.assertGreater(lifecycle["exit_price"], 100.0)
+        self.assertGreater(lifecycle["exit_fee_usd"], 0)
+        self.assertEqual(lifecycle["net_pnl_usd"], result["account"]["realized_closed_net_pnl_usd"])
         self.assertEqual(db.execute(
             "SELECT COUNT(*) FROM cloud_paper_budget_reservations WHERE state='SETTLED'"
         ).fetchone()[0], 1)
