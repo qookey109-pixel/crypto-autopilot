@@ -38,9 +38,12 @@ class PrepaidPaperV05Ledger(PrepaidCloudPaperBudgetLedger):
             raise BudgetBlocked("BLOCKED_PAPER_V05_CLIENT_OR_CLOCK")
         super().__init__(client=client, meter=meter, writer_id=writer_id, slot_at_ms=slot_at_ms)
         self._clock_ms = clock_ms
+        self._closed = False
 
     def reserve_slot(self, *, slot_id: str, run_id: str, now_ms: int,
                      snapshot: R2UsageSnapshot) -> None:
+        if self._closed:
+            raise BudgetBlocked("BLOCKED_PREPAID_ADMISSION_CLOSED")
         self._legacy._validate_inputs(slot_id, run_id, now_ms, snapshot)
         if slot_id != self._slot or self._admitted:
             raise BudgetBlocked("BLOCKED_PREPAID_SLOT_ALREADY_USED_OR_MISMATCH")
@@ -62,6 +65,26 @@ class PrepaidPaperV05Ledger(PrepaidCloudPaperBudgetLedger):
             raise BudgetBlocked("BLOCKED_PREPAID_SHARED_SLOT_ALREADY_RESERVED")
         self._legacy.reserve_slot(slot_id=slot_id, run_id=run_id, now_ms=now_ms, snapshot=snapshot)
         self._admitted = True
+
+
+    def close_workload(self) -> None:
+        self._admitted = False
+        self._closed = True
+
+
+class V05PaperComposition(CloudPaperNoTradeComposition):
+    """Charge provider at actual send and close the envelope after a run."""
+
+    def _reserve_provider_request(self) -> None:
+        # Actual provider transport charges once in its before-send callback.
+        self.before_external()
+
+    def run_slot(self, **kwargs):
+        try:
+            return super().run_slot(**kwargs)
+        finally:
+            if kwargs.get("activation_enabled") is True:
+                self.reservation_ledger.close_workload()
 
 
 def build_runtime_composition(
@@ -121,8 +144,12 @@ def build_runtime_composition(
         secret_access_key=os.environ.get("R2_SECRET_ACCESS_KEY", ""),
         budget_guard=r2_guard, freshness_check=check_admitted,
     )
-    base = CloudPaperNoTradeComposition(
-        client=ValidatedTapeClient(CloudPaperPionexPublicClient(before_send=check_admitted)),
+    def before_provider_send() -> None:
+        check_admitted()
+        r2_guard.reserve_provider_request()
+
+    base = V05PaperComposition(
+        client=ValidatedTapeClient(CloudPaperPionexPublicClient(before_send=before_provider_send)),
         store=CloudPaperRunStore(r2, prefix=CLOUD_PAPER_PREFIX),
         strategy_registry=strategy_registry, allowed_base_assets=allowed_base_assets,
         paper_policy=LivePaperPolicy(), budget_guard=r2_guard,
