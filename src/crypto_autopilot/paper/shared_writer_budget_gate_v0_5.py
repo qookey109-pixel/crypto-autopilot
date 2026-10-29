@@ -294,7 +294,7 @@ def reserve_shared_writer_envelope(
     validate_time()
     params = reservation_params(reservation)
     inserted = _execute_admission_query(
-        execute=execute, query_meter=query_meter, reservation=reservation,
+        execute=guarded_execute, query_meter=query_meter, reservation=reservation,
         operation="RESERVATION", sql=RESERVE_SHARED_WRITER_SQL, params=params,
         failure_reason="BLOCKED_SHARED_WRITER_RESERVATION_UNVERIFIED",
     )
@@ -306,7 +306,7 @@ def reserve_shared_writer_envelope(
         return "RESERVED"
 
     existing = _execute_admission_query(
-        execute=execute, query_meter=query_meter, reservation=reservation,
+        execute=guarded_execute, query_meter=query_meter, reservation=reservation,
         operation="REPLAY_READ", sql=READ_SHARED_WRITER_SQL,
         params=(reservation.writer_id, reservation.slot_id),
         failure_reason="BLOCKED_SHARED_WRITER_REPLAY_UNVERIFIED",
