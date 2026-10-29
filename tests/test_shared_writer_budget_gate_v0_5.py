@@ -104,6 +104,31 @@ class RollingOrderTests(unittest.TestCase):
             "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3"
         ).fetchone()[0], 1)
 
+    def test_replay_cutoff_after_debit_blocks_second_query_and_keeps_row(self):
+        current = [NOW_MS]
+        reservation = self.f.reservation("project-a:writer", NOW_MS)
+        self.assertEqual(reserve_shared_writer_envelope(
+            execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
+            clock_ms=lambda: current[0],
+        ), "RESERVED")
+        charge = self.f.meter.charge_before_query
+        def crossing_meter(**kwargs):
+            result = charge(**kwargs)
+            if kwargs["operation"] == "REPLAY_READ":
+                current[0] += 600_001
+            return result
+        self.f.meter.charge_before_query = crossing_meter
+        with self.assertRaisesRegex(BudgetBlocked, "REPLAY_UNVERIFIED"):
+            reserve_shared_writer_envelope(
+                execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
+                clock_ms=lambda: current[0],
+            )
+        self.assertEqual(self.f.query.calls, 2)
+        self.assertEqual(len(self.f.meter.charges), 3)
+        self.assertEqual(self.f.db.execute(
+            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3"
+        ).fetchone()[0], 1)
+
     def test_exact_replay_does_not_create_second_reservation(self):
         reservation = self.f.reservation("project-a:writer", NOW_MS)
         self.assertEqual(reserve_shared_writer_envelope(
