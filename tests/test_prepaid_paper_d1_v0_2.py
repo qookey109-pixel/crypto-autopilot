@@ -130,6 +130,7 @@ class PaperV05PrepaidD1Tests(unittest.TestCase):
                 client.query(RESERVE_SHARED_WRITER_SQL, reservation_params(self.reservation))
         self.assertEqual(request.call_count, 1)
         self.assertTrue(client.diagnostics()["review_required"])
+        self.assertEqual(client.diagnostics()["review_reason"], "D1_LEDGER_RESPONSE_UNVERIFIED")
         self.assertEqual(self.f.meter.report()["query_attempts_charged"], 1)
 
     def test_late_committed_response_is_review_required_without_retry(self):
@@ -145,6 +146,7 @@ class PaperV05PrepaidD1Tests(unittest.TestCase):
                 client.query(RESERVE_SHARED_WRITER_SQL, reservation_params(self.reservation))
         self.assertEqual(request.call_count, 1)
         self.assertTrue(client.diagnostics()["review_required"])
+        self.assertEqual(client.diagnostics()["review_reason"], "D1_LEDGER_RESPONSE_UNVERIFIED")
         self.assertEqual(self.f.meter.report()["query_attempts_charged"], 1)
 
 
