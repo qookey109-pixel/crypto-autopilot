@@ -72,6 +72,9 @@ class MemoryS3:
 
 class SharedSignalPublisherTests(unittest.TestCase):
     def setUp(self):
+        environment = patch.dict("os.environ", {"CLOUDFLARE_ACCOUNT_ID": "fixture", "R2_BUCKET_NAME": "fixture"})
+        environment.start()
+        self.addCleanup(environment.stop)
         self.payload = {
             "schema": "research-signal-layer-run-v0.2", "mode": "RESEARCH_ONLY",
             "run_id": "123", "generated_at_utc": "2027-01-15T08:00:00Z",
@@ -124,6 +127,18 @@ class SharedSignalPublisherTests(unittest.TestCase):
         )
         args.update(overrides)
         return publish_shared_signal_payload(**args)
+
+    def test_target_account_and_bucket_mismatch_stop_before_admission(self):
+        for key in ("account_id", "bucket"):
+            credentials = dict(account_id="fixture", bucket="fixture",
+                               access_key_id="fixture", secret_access_key="fixture")
+            credentials[key] = "different-target"
+            with self.subTest(key=key), self.assertRaises(BudgetBlocked):
+                self.publish(credentials=credentials)
+        self.assertNotIn("query", self.events)
+        self.assertNotIn("admission_query", self.events)
+        self.assertNotIn("source", self.events)
+        self.mock_factory.assert_not_called()
 
     def test_default_disabled_before_credentials_and_queries(self):
         result = self.publish(execution_enabled=False, credentials={})
