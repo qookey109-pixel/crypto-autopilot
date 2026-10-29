@@ -68,6 +68,42 @@ class RollingOrderTests(unittest.TestCase):
         self.assertEqual(self.f.query.calls, 0)
         self.assertEqual(self.f.meter.charges, [])
 
+    def test_crossing_midnight_after_debit_blocks_before_sql(self):
+        boundary = (NOW_MS // 86_400_000 + 1) * 86_400_000
+        current = [boundary - 1]
+        reservation = self.f.reservation("project-a:writer", current[0])
+        charge = self.f.meter.charge_before_query
+        def crossing_meter(**kwargs):
+            result = charge(**kwargs)
+            current[0] += 2
+            return result
+        self.f.meter.charge_before_query = crossing_meter
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_UNVERIFIED"):
+            reserve_shared_writer_envelope(
+                execute=self.f.query, query_meter=self.f.meter, reservation=reservation,
+                clock_ms=lambda: current[0],
+            )
+        self.assertEqual(self.f.query.calls, 0)
+        self.assertEqual(len(self.f.meter.charges), 1)
+
+    def test_late_sql_result_keeps_insert_and_does_not_authorize_work(self):
+        current = [NOW_MS]
+        reservation = self.f.reservation("project-a:writer", NOW_MS)
+        def late_result(sql, params):
+            result = self.f.query(sql, params)
+            current[0] += 600_001
+            return result
+        with self.assertRaisesRegex(BudgetBlocked, "RESERVATION_UNVERIFIED"):
+            reserve_shared_writer_envelope(
+                execute=late_result, query_meter=self.f.meter, reservation=reservation,
+                clock_ms=lambda: current[0],
+            )
+        self.assertEqual(self.f.query.calls, 1)
+        self.assertEqual(len(self.f.meter.charges), 1)
+        self.assertEqual(self.f.db.execute(
+            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3"
+        ).fetchone()[0], 1)
+
     def test_exact_replay_does_not_create_second_reservation(self):
         reservation = self.f.reservation("project-a:writer", NOW_MS)
         self.assertEqual(reserve_shared_writer_envelope(
