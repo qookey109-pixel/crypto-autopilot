@@ -169,6 +169,7 @@ class BudgetedR2Store:
         token: str | None = None
         seen_tokens: set[str] = set()
         keys: list[str] = []
+        seen_keys: set[str] = set()
         for _ in range(self.policy.maximum_list_pages):
             request: dict[str, object] = {
                 "Bucket": self.bucket,
@@ -178,16 +179,26 @@ class BudgetedR2Store:
             if token is not None:
                 request["ContinuationToken"] = token
             page = self.client.list_objects_v2(**request)
+            if not isinstance(page, dict) or type(page.get("IsTruncated")) is not bool:
+                raise ValueError("R2 list response truncation status is unknown")
             contents = page.get("Contents", [])
-            if not isinstance(contents, list):
-                raise ValueError("R2 list response Contents must be an array")
+            if not isinstance(contents, list) or len(contents) > self.policy.maximum_list_keys_per_page:
+                raise ValueError("R2 list response Contents is invalid or oversized")
+            count = page.get("KeyCount")
+            if "KeyCount" in page and (type(count) is not int or count != len(contents)):
+                raise ValueError("R2 list response key count is invalid")
+            if "Contents" not in page and count != 0:
+                raise ValueError("R2 list response empty page is unproven")
+            if page["IsTruncated"] is False and "NextContinuationToken" in page:
+                raise ValueError("R2 list response pagination is contradictory")
             for row in contents:
                 key = row.get("Key") if isinstance(row, dict) else None
-                if not isinstance(key, str) or not key:
-                    raise ValueError("R2 list response object key is invalid")
+                if not isinstance(key, str) or not key.startswith(prefix) or key in seen_keys:
+                    raise ValueError("R2 list response object key is invalid or repeated")
                 keys.append(key)
-            if not page.get("IsTruncated", False):
-                return tuple(sorted(set(keys)))
+                seen_keys.add(key)
+            if page["IsTruncated"] is False:
+                return tuple(sorted(keys))
             next_token = page.get("NextContinuationToken")
             if not isinstance(next_token, str) or not next_token or next_token in seen_tokens:
                 raise ValueError("R2 list continuation token is missing or repeated")
