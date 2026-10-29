@@ -20,7 +20,10 @@ _SLOT_OFFSET_MS = (2 * 60 + 17) * 60_000
 class ResearchPrepaidD1Client(PrepaidCloudflareD1QueryClient):
     """Share only admission statements; never expose Paper ledger statements."""
 
-    def __init__(self, *, writer_id: str, slot_id: str, **kwargs):
+    def __init__(self, *, writer_id: str, slot_id: str, execution_enabled: bool = False, **kwargs):
+        if type(execution_enabled) is not bool:
+            raise BudgetBlocked("BLOCKED_RESEARCH_EXECUTION_FLAG")
+        self._execution_enabled = execution_enabled
         if writer_id != WRITER or not isinstance(slot_id, str) or not slot_id.startswith("slot:"):
             raise BudgetBlocked("BLOCKED_RESEARCH_SLOT_OR_WRITER")
         value = slot_id.removeprefix("slot:")
@@ -30,6 +33,11 @@ class ResearchPrepaidD1Client(PrepaidCloudflareD1QueryClient):
         ):
             raise BudgetBlocked("BLOCKED_RESEARCH_SLOT_OR_WRITER")
         super().__init__(writer_id=writer_id, slot_id=slot_id, **kwargs)
+
+    def query(self, sql: str, params: tuple[object, ...]):
+        if not self._execution_enabled:
+            raise BudgetBlocked("BLOCKED_RESEARCH_EXECUTION_DISABLED")
+        return super().query(sql, params)
 
     def _validate_statement(self, sql: str, params: tuple[object, ...]) -> QueryOperation:
         if (
