@@ -184,6 +184,13 @@ class BudgetedR2Store:
             contents = page.get("Contents", [])
             if not isinstance(contents, list) or len(contents) > self.policy.maximum_list_keys_per_page:
                 raise ValueError("R2 list response Contents is invalid or oversized")
+            count = page.get("KeyCount")
+            if "KeyCount" in page and (type(count) is not int or count != len(contents)):
+                raise ValueError("R2 list response key count is invalid")
+            if "Contents" not in page and count != 0:
+                raise ValueError("R2 list response empty page is unproven")
+            if page["IsTruncated"] is False and "NextContinuationToken" in page:
+                raise ValueError("R2 list response pagination is contradictory")
             for row in contents:
                 key = row.get("Key") if isinstance(row, dict) else None
                 if not isinstance(key, str) or not key.startswith(prefix) or key in seen_keys:
