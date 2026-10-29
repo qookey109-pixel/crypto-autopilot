@@ -86,6 +86,10 @@ class PaperV05RuntimeTests(unittest.TestCase):
             with self.assertRaises(BudgetBlocked):
                 first.store.list_json_ids("live-run-result")
             self.assertEqual(self.f.sdk.calls, calls_after_settlement)
+            with patch("crypto_autopilot.paper.cloud_pionex_client_v0_1.build_opener") as provider:
+                with self.assertRaises(BudgetBlocked):
+                    first.client._get_json("/api/v1/market/depth", {})
+            provider.assert_not_called()
             with self.assertRaises(BudgetBlocked):
                 first.run_slot(tick_ms=self.f.now, previous_slot=None,
                                activation_enabled=True, run_id="duplicate")
@@ -102,6 +106,24 @@ class PaperV05RuntimeTests(unittest.TestCase):
         self.assertEqual(db.execute(
             "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3"
         ).fetchone()[0], 2)
+
+    def test_exception_after_admission_closes_workload(self):
+        db, _, _, opener = self.outer.transport()
+        with patch(fixtures.CLIENT_MODULE + ".build_opener", return_value=opener):
+            runtime = self.runtime()
+            with patch.object(runtime.store, "list_json_ids", side_effect=OSError("synthetic")):
+                with self.assertRaises(Exception):
+                    runtime.run_slot(tick_ms=self.f.now, previous_slot=None,
+                                     activation_enabled=True, run_id="fixture-101")
+        self.assertEqual(db.execute(
+            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3"
+        ).fetchone()[0], 1)
+        with patch("crypto_autopilot.paper.cloud_pionex_client_v0_1.build_opener") as provider:
+            with self.assertRaises(BudgetBlocked):
+                runtime.client._get_json("/api/v1/market/depth", {})
+        provider.assert_not_called()
+        with self.assertRaises(BudgetBlocked):
+            runtime.store.list_json_ids("live-run-result")
 
     def test_lost_admission_response_stops_before_r2(self):
         db, _, _, _ = self.outer.transport()
