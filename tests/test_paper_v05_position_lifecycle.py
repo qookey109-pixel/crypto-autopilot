@@ -2,7 +2,7 @@
 import json
 import unittest
 from dataclasses import asdict, replace
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from crypto_autopilot.paper.cloud_loop_v0_1 import SLOT_MS, CloudLoopReviewRequired, run_cloud_step
 from crypto_autopilot.paper.cloud_runtime_v0_3 import build_runtime_composition as build_seed_runtime
@@ -132,6 +132,9 @@ class PaperV05PositionLifecycleTests(unittest.TestCase):
     def test_position_exits_on_complete_synthetic_tape(self):
         result, db = self.advance(invalid=False)
         self.assertEqual(result["account"]["open_position_count"], 0)
+        self.assertEqual(result["account"]["closed_position_count"], 1)
+        self.assertGreater(result["account"]["realized_closed_net_pnl_usd"], 0)
+        self.assertGreater(result["account"]["equity_usd"], 10000)
         self.assertEqual(db.execute(
             "SELECT COUNT(*) FROM cloud_paper_budget_reservations WHERE state='SETTLED'"
         ).fetchone()[0], 1)
