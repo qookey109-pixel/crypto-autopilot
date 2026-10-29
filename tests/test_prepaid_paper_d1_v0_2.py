@@ -74,6 +74,19 @@ class PaperV05PrepaidD1Tests(unittest.TestCase):
                     client.query(RESERVE_SHARED_WRITER_SQL, reservation_params(reservation))
         self.assertEqual(self.f.meter.report()["query_attempts_charged"], 0)
 
+    def test_response_after_usage_evidence_expires_needs_review(self):
+        client = self.client(True)
+        def late(*args):
+            self.f.now += 50_001
+            return D1QueryResult(({"writer_id": fixtures.WRITER, "slot_id": self.reservation.slot_id},), 1, 7), 1024
+        with patch("crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+                   side_effect=late) as request:
+            with self.assertRaises(D1LedgerUnavailable):
+                client.query(RESERVE_SHARED_WRITER_SQL, reservation_params(self.reservation))
+        self.assertEqual(request.call_count, 1)
+        self.assertTrue(client.diagnostics()["review_required"])
+        self.assertEqual(self.f.meter.report()["query_attempts_charged"], 1)
+
     def test_late_committed_response_is_review_required_without_retry(self):
         client = self.client(True)
         def late(*args):
