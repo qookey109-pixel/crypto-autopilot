@@ -39,7 +39,7 @@ class RollingOrderTests(unittest.TestCase):
             "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3"
         ).fetchone()[0], 1)
 
-    def test_cross_day_out_of_order_still_counts_newer_commit(self):
+    def test_previous_day_delayed_reservation_is_blocked(self):
         self.f.db.execute(
             "UPDATE cloudflare_shared_writer_budget_policy_v0_4 "
             "SET r2_class_a_per_rolling_31_days=1, r2_class_a_per_utc_day=10"
