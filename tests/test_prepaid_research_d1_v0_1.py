@@ -11,6 +11,7 @@ from crypto_autopilot.paper.prepaid_query_controller_v0_1 import (
 )
 from crypto_autopilot.paper.shared_writer_budget_gate_v0_4 import READ_SHARED_WRITER_SQL
 from test_prepaid_d1_runtime_v0_1 import DB_ID, NOW, PrepaidD1RuntimeTests
+from test_prepaid_query_controller_v0_1 import FakeGitHub
 
 try:
     from crypto_autopilot.research.prepaid_research_d1_v0_1 import ResearchPrepaidD1Client, WRITER
@@ -29,6 +30,7 @@ class DailyResearchD1Tests(unittest.TestCase):
         self.addCleanup(self.f.doCleanups)
         self.f.now = NOW + 600_000  # 02:17 UTC, not a Cloud Paper 15-minute slot.
         self.f.authority["writers"][0]["writer_id"] = WRITER
+        self.f.github = FakeGitHub(self.f.authority)
         self.f._set_run(101)
         self.slot = f"slot:{self.f.now}"
         self.meter = claim_prepaid_query_meter(
