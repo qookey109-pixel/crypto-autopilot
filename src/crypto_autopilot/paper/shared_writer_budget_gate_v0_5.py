@@ -258,12 +258,15 @@ def _execute_admission_query(
 def reserve_shared_writer_envelope(
     *, execute: Query, reservation: SharedWriterReservation,
     clock_ms: Callable[[], int], query_meter: AdmissionQueryMeter | None = None,
+    execution_enabled: bool = False,
 ) -> Literal["RESERVED", "EXISTING_RESERVATION"]:
     """Use a trusted clock to reject stale/future slots before any D1 query.
 
     Successful reservations alone cannot meter rejected or repeated queries.
     Production must bind the clock to its runtime and independently verify account evidence.
     """
+    if execution_enabled is not True:
+        raise BudgetBlocked("BLOCKED_SHARED_WRITER_EXECUTION_DISABLED")
     if not callable(clock_ms):
         raise BudgetBlocked("BLOCKED_SHARED_WRITER_CLOCK_REQUIRED")
     reservation.validate()
