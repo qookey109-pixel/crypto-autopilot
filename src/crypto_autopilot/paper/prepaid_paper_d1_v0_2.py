@@ -86,4 +86,7 @@ class PaperPrepaidD1Client(PrepaidCloudflareD1QueryClient):
         self._validate_statement(sql, params)
         result = super()._request(sql, params)
         self._validate_statement(sql, params)
+        self._guard.validate_evidence()
+        self.validate_runtime_binding(meter=self._meter, writer_id=self._writer, slot_id=self._slot)
+        self._database_evidence.validate(database_id=self._database_id, guard=self._guard)
         return result
