@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import unittest
 from dataclasses import asdict, replace
 from pathlib import Path
@@ -180,6 +181,27 @@ class SharedSignalCollectionTests(unittest.TestCase):
         self.assertEqual(got["status"], "REVIEW_REQUIRED")
         self.assertEqual(got["stage"], "PAYLOAD_BOUNDS")
         self.assertEqual(got["provider_requests_performed"], 3)
+        self.mock_factory.assert_not_called()
+
+    def test_missing_target_configuration_blocks_before_admission(self):
+        for key in ("CLOUDFLARE_ACCOUNT_ID", "R2_BUCKET_NAME"):
+            with self.subTest(key=key), patch.dict(os.environ, {key: ""}):
+                with self.assertRaises(BudgetBlocked):
+                    self.run_cycle()
+        self.assertNotIn("query", self.events)
+        self.assertNotIn("admission_query", self.events)
+        self.mock_factory.assert_not_called()
+
+    def test_target_change_after_source_stops_before_next_source(self):
+        def change_target(request, *, timeout):
+            response = self.transport(request, timeout=timeout)
+            os.environ["R2_BUCKET_NAME"] = "other-fixture"
+            return response
+
+        result = self.run_cycle(transport=change_target)
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["provider_requests_performed"], 1)
+        self.assertTrue(result["central_reservation_retained"])
         self.mock_factory.assert_not_called()
 
     def test_target_account_and_bucket_mismatch_stop_before_admission(self):
