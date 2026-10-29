@@ -57,10 +57,14 @@ class DailyResearchD1Tests(unittest.TestCase):
         )
 
     def test_disabled_client_stops_before_debit_and_network(self):
-        self.client._execution_enabled = False
-        with patch.object(self.client, "_request") as send:
+        client = ResearchPrepaidD1Client(
+            api_token="synthetic-token", account_id="a" * 32, database_id=DB_ID,
+            usage_guard=self.f.make_guard(), query_meter=self.meter, writer_id=WRITER,
+            slot_id=self.slot, database_evidence=self.f.database_evidence(),
+        )
+        with patch.object(client, "_request") as send:
             with self.assertRaisesRegex(BudgetBlocked, "EXECUTION_DISABLED"):
-                self.client.query(READ_SHARED_WRITER_SQL, (WRITER, self.slot))
+                client.query(READ_SHARED_WRITER_SQL, (WRITER, self.slot))
         send.assert_not_called()
         self.assertEqual(self.meter.report()["query_attempts_charged"], 0)
 
