@@ -108,6 +108,33 @@ class ResearchV05CollectionTests(unittest.TestCase):
             (research_fixture.WRITER,),
         ).fetchone()[0], 1)
 
+    def test_final_pointer_read_that_expires_needs_review(self):
+        original_get = self.sdk.get_object
+
+        def delayed_get(**kwargs):
+            response = original_get(**kwargs)
+            if kwargs["Key"].endswith("/latest.json"):
+                self.f.f.now += 600_001
+            return response
+
+        def store_factory(**kwargs):
+            return BudgetedR2Store(client=self.sdk, bucket=kwargs["bucket"],
+                                   before_external=kwargs["before_external"])
+
+        with patch.dict("os.environ", {"CLOUDFLARE_ACCOUNT_ID": "a" * 32, "R2_BUCKET_NAME": "fixture"}), patch(
+            "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+            side_effect=self.sqlite_request,
+        ), patch.object(BudgetedR2Store, "from_credentials", side_effect=store_factory), patch.object(
+            self.sdk, "get_object", side_effect=delayed_get,
+        ):
+            result = self.run_collection()
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["stage"], "FINAL_VALIDATION")
+        self.assertTrue(result["central_reservation_retained"])
+        self.assertTrue(result["partial_writes_possible"])
+        self.assertFalse(result["automatic_retry_allowed"])
+        self.assertIn("research/signal-layer/v0-2/latest.json", self.sdk.objects)
+
     def test_v05_prepaid_collection_publishes_once_and_blocks_duplicate(self):
         def store_factory(**kwargs):
             return BudgetedR2Store(client=self.sdk, bucket=kwargs["bucket"],
