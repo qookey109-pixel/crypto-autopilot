@@ -112,7 +112,7 @@ class PaperV05RuntimeTests(unittest.TestCase):
         with patch(fixtures.CLIENT_MODULE + ".build_opener", return_value=opener):
             runtime = self.runtime()
             with patch.object(runtime.store, "list_json_ids", side_effect=OSError("synthetic")):
-                with self.assertRaises(Exception):
+                with self.assertRaisesRegex(OSError, "synthetic"):
                     runtime.run_slot(tick_ms=self.f.now, previous_slot=None,
                                      activation_enabled=True, run_id="fixture-101")
         self.assertEqual(db.execute(
