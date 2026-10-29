@@ -61,6 +61,69 @@ class DailyResearchD1Tests(unittest.TestCase):
             self.client.query(READ_SHARED_WRITER_SQL, (WRITER, self.slot))
         send.assert_called_once()
 
+    def test_fresh_ticket_cannot_fund_historical_or_future_slot(self):
+        for value in (self.f.now - 86_400_000, self.f.now + 86_400_000):
+            slot = f"slot:{value}"
+            github = FakeGitHub(self.f.authority)
+            stamp = "2026-10-03T02:17:00Z"
+            github.runs[101]["run_started_at"] = stamp
+            github.runs[101]["created_at"] = stamp
+            meter = claim_prepaid_query_meter(
+                authority_document=self.f.authority, writer_id=WRITER, slot_id=slot,
+                run_id=101, transport=github, clock_ms=lambda: self.f.now,
+                evidence=AllocationEvidence(
+                    account_coverage_complete=True, zero_cost_verified=True,
+                    observed_at_ms=self.f.now, measured_through_ms=self.f.now,
+                    available={"queries": 1000, "rows_read": 1000000,
+                               "rows_written": 10000, "storage_bytes": 10000000},
+                ),
+            )
+            client = ResearchPrepaidD1Client(
+                api_token="synthetic-token", account_id="a" * 32, database_id=DB_ID,
+                usage_guard=self.f.make_guard(), query_meter=meter, writer_id=WRITER,
+                slot_id=slot, database_evidence=self.f.database_evidence(),
+            )
+            with self.subTest(slot=slot), patch.object(client, "_request") as send:
+                with self.assertRaises(BudgetBlocked):
+                    client.query(READ_SHARED_WRITER_SQL, (WRITER, slot))
+                send.assert_not_called()
+            self.assertEqual(meter.report()["query_attempts_charged"], 0)
+
+    def test_crossing_cutoff_after_debit_never_sends_d1_request(self):
+        self.f.now += 599_999
+        github = FakeGitHub(self.f.authority)
+        stamp = "2026-10-03T02:26:59.999000Z"
+        github.runs[101]["run_started_at"] = stamp
+        github.runs[101]["created_at"] = stamp
+        meter = claim_prepaid_query_meter(
+            authority_document=self.f.authority, writer_id=WRITER, slot_id=self.slot,
+            run_id=101, transport=github, clock_ms=lambda: self.f.now,
+            evidence=AllocationEvidence(
+                account_coverage_complete=True, zero_cost_verified=True,
+                observed_at_ms=self.f.now, measured_through_ms=self.f.now,
+                available={"queries": 1000, "rows_read": 1000000,
+                           "rows_written": 10000, "storage_bytes": 10000000},
+            ),
+        )
+        client = ResearchPrepaidD1Client(
+            api_token="synthetic-token", account_id="a" * 32, database_id=DB_ID,
+            usage_guard=self.f.make_guard(), query_meter=meter, writer_id=WRITER,
+            slot_id=self.slot, database_evidence=self.f.database_evidence(),
+        )
+        charge = meter.charge_before_query
+        def cross_cutoff(**kwargs):
+            result = charge(**kwargs)
+            self.f.now += 2
+            return result
+        with patch.object(meter, "charge_before_query", side_effect=cross_cutoff), patch(
+            "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request"
+        ) as send:
+            with self.assertRaises(D1LedgerUnavailable):
+                client.query(READ_SHARED_WRITER_SQL, (WRITER, self.slot))
+            send.assert_not_called()
+        self.assertEqual(meter.report()["query_attempts_charged"], 1)
+        self.assertTrue(client.diagnostics()["review_required"])
+
     def test_valid_reservation_is_accepted_once_with_prepaid_debit(self):
         envelope = self.meter.report()["ticket_envelope_charged_in_full"]
         reservation = SharedWriterReservation(
