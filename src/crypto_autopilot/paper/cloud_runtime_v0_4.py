@@ -6,13 +6,21 @@ from __future__ import annotations
 
 import os
 from collections.abc import Callable, Mapping
-from dataclasses import replace
 
+from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import D1UsageGuard
+from crypto_autopilot.paper.cloud_budget_v0_1 import CloudBudgetGuard
+from crypto_autopilot.paper.cloud_candidate_adapter_v0_1 import validate_strategy_registry
+from crypto_autopilot.paper.cloud_pionex_client_v0_1 import CloudPaperPionexPublicClient
+from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Store
+from crypto_autopilot.paper.cloud_runtime_v0_1 import CLOUD_PAPER_PREFIX
+from crypto_autopilot.paper.cloud_run_store_v0_1 import CloudPaperRunStore
+from crypto_autopilot.paper.cloud_seal_guarded_composition_v0_1 import build_seal_guarded_composition
+from crypto_autopilot.paper.live_v0_1 import LivePaperPolicy
+from crypto_autopilot.paper.validated_tape_client_v0_1 import ValidatedTapeClient
 from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import D1UsageSnapshot
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked, R2UsageSnapshot
 from crypto_autopilot.paper.cloud_composition_v0_1 import CloudPaperNoTradeComposition
 from crypto_autopilot.paper.cloud_runtime_v0_2 import PrepaidCloudPaperBudgetLedger
-from crypto_autopilot.paper.cloud_runtime_v0_3 import build_runtime_composition as build_guarded_runtime
 from crypto_autopilot.paper.prepaid_d1_client_v0_1 import DatabaseSizeEvidence
 from crypto_autopilot.paper.prepaid_paper_d1_v0_2 import PaperPrepaidD1Client
 from crypto_autopilot.paper.prepaid_query_controller_v0_1 import PrepaidQueryMeter
@@ -68,33 +76,57 @@ def build_runtime_composition(
         raise ValueError("construction_enabled must be boolean")
     if not construction_enabled:
         return None
-    base = build_guarded_runtime(
-        r2_snapshot=r2_snapshot, d1_snapshot=d1_snapshot,
-        strategy_registry=strategy_registry, allowed_base_assets=allowed_base_assets,
-        clock_ms=clock_ms, query_meter=query_meter, writer_id=writer_id,
-        slot_at_ms=slot_at_ms, database_evidence=database_evidence, construction_enabled=True,
-    )
-    if not isinstance(base, CloudPaperNoTradeComposition) or not isinstance(
-        base.reservation_ledger, PrepaidCloudPaperBudgetLedger,
-    ):
-        raise BudgetBlocked("BLOCKED_PREPAID_SHARED_LEDGER_REQUIRED")
-    prior = base.reservation_ledger
+    if not isinstance(query_meter, PrepaidQueryMeter) or query_meter._clock_ms is not clock_ms:
+        raise BudgetBlocked("BLOCKED_PREPAID_RUNTIME_CLOCK_MISMATCH")
+    if not isinstance(r2_snapshot, R2UsageSnapshot) or not isinstance(d1_snapshot, D1UsageSnapshot):
+        raise ValueError("typed R2 and D1 evidence is required")
     if (
-        prior._meter is not query_meter or prior._writer != writer_id
-        or prior._slot_at_ms != slot_at_ms or prior._admitted
-        or base.d1_usage_guard.clock_ms is not clock_ms
+        not isinstance(allowed_base_assets, frozenset) or not allowed_base_assets
+        or any(not isinstance(asset, str) or not asset for asset in allowed_base_assets)
     ):
-        raise BudgetBlocked("BLOCKED_PREPAID_RUNTIME_BINDING_MISMATCH")
+        raise ValueError("a governed base-asset allowlist is required")
+    validate_strategy_registry(strategy_registry)
+    r2_guard = CloudBudgetGuard(snapshot=r2_snapshot, clock_ms=clock_ms)
+    d1_guard = D1UsageGuard(snapshot=d1_snapshot, clock_ms=clock_ms)
+    shared_slot = f"slot:{slot_at_ms}"
+
+    def check_freshness() -> None:
+        if r2_guard.storage_capacity_state() == "HARD_STOP":
+            raise BudgetBlocked("BLOCKED_BUDGET_STORAGE_HARD_STOP")
+        PaperPrepaidD1Client.validate_inputs(
+            usage_guard=d1_guard, query_meter=query_meter, writer_id=writer_id, slot_id=shared_slot,
+        )
+
+    check_freshness()
     client = PaperPrepaidD1Client(
         api_token=os.environ.get("CLOUDFLARE_D1_API_TOKEN", ""),
         account_id=os.environ.get("CLOUDFLARE_ACCOUNT_ID", ""),
         database_id=os.environ.get("CLOUDFLARE_D1_DATABASE_ID", ""),
-        usage_guard=base.d1_usage_guard, query_meter=query_meter, writer_id=writer_id,
-        slot_id=f"slot:{slot_at_ms}", database_evidence=database_evidence,
-        execution_enabled=True,
+        usage_guard=d1_guard, query_meter=query_meter, writer_id=writer_id,
+        slot_id=shared_slot, database_evidence=database_evidence, execution_enabled=True,
     )
     ledger = PrepaidPaperV05Ledger(
         client=client, meter=query_meter, writer_id=writer_id,
         slot_at_ms=slot_at_ms, clock_ms=clock_ms,
     )
-    return replace(base, reservation_ledger=ledger)
+
+    def check_admitted() -> None:
+        check_freshness()
+        ledger._require_admission(ledger._slot)
+
+    r2 = BudgetedR2Store.from_credentials(
+        account_id=os.environ.get("CLOUDFLARE_ACCOUNT_ID", ""),
+        bucket=os.environ.get("R2_BUCKET_NAME", ""),
+        access_key_id=os.environ.get("R2_ACCESS_KEY_ID", ""),
+        secret_access_key=os.environ.get("R2_SECRET_ACCESS_KEY", ""),
+        budget_guard=r2_guard, freshness_check=check_admitted,
+    )
+    base = CloudPaperNoTradeComposition(
+        client=ValidatedTapeClient(CloudPaperPionexPublicClient(before_send=check_admitted)),
+        store=CloudPaperRunStore(r2, prefix=CLOUD_PAPER_PREFIX),
+        strategy_registry=strategy_registry, allowed_base_assets=allowed_base_assets,
+        paper_policy=LivePaperPolicy(), budget_guard=r2_guard,
+        before_external=check_freshness, completion_clock_ms=clock_ms,
+        reservation_ledger=ledger, d1_usage_guard=d1_guard,
+    )
+    return build_seal_guarded_composition(base, enabled=True)
