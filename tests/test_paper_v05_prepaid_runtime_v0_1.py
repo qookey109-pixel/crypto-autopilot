@@ -26,7 +26,10 @@ class PaperV05RuntimeTests(unittest.TestCase):
         self.f = self.outer.f
 
     def runtime(self, **kwargs):
-        with patch.object(seal_fixtures, "build_runtime_composition", build_runtime_composition):
+        def same_clock(**params):
+            params["clock_ms"] = params["query_meter"]._clock_ms
+            return build_runtime_composition(**params)
+        with patch.object(seal_fixtures, "build_runtime_composition", same_clock):
             return self.outer.runtime(**kwargs)
 
     def test_default_disabled_has_no_requests(self):
@@ -34,6 +37,23 @@ class PaperV05RuntimeTests(unittest.TestCase):
             self.assertIsNone(self.runtime(enabled=False))
         network.assert_not_called()
         self.assertEqual(self.f.sdk.calls, [])
+
+    def test_different_meter_clock_is_rejected_before_clients(self):
+        with patch.object(seal_fixtures, "build_runtime_composition", build_runtime_composition):
+            with self.assertRaisesRegex(BudgetBlocked, "CLOCK"):
+                self.outer.runtime()
+        self.assertEqual(self.f.sdk.calls, [])
+
+    def test_external_io_before_shared_admission_is_blocked(self):
+        runtime = self.runtime()
+        with patch(fixtures.CLIENT_MODULE + ".build_opener") as network:
+            with self.assertRaises(BudgetBlocked):
+                runtime.store.list_json_ids("live-run-result")
+            with self.assertRaises(BudgetBlocked):
+                runtime.client._get_json("/api/v1/market/depth", {})
+        self.assertEqual(self.f.sdk.calls, [])
+        network.assert_not_called()
+        self.assertEqual(self.f.meter.report()["query_attempts_charged"], 0)
 
     def test_two_no_trade_slots_use_v05_and_recover_account(self):
         db, size, statements, opener = self.outer.transport()
