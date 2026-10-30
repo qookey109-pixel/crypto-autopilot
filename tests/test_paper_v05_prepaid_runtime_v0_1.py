@@ -1,4 +1,5 @@
 """Synthetic V0.5 shared admission through existing seal-guarded Paper runtime."""
+import socket
 import unittest
 from unittest.mock import patch
 
@@ -19,6 +20,11 @@ except ModuleNotFoundError as exc:
 
 class PaperV05RuntimeTests(unittest.TestCase):
     def setUp(self):
+        # Defense in depth: a missing provider/D1 mock must never reach DNS or a socket.
+        for target in ("socket.getaddrinfo", "socket.socket.connect", "socket.socket.connect_ex"):
+            blocker = patch(target, side_effect=AssertionError("unexpected network access"))
+            blocker.start()
+            self.addCleanup(blocker.stop)
         self.assertIsNotNone(build_runtime_composition)
         self.outer = seal_fixtures.PrepaidSealRuntimeTests("test_disabled_stops_before_prepaid_factory")
         self.outer.setUp()
@@ -31,6 +37,15 @@ class PaperV05RuntimeTests(unittest.TestCase):
             return build_runtime_composition(**params)
         with patch.object(seal_fixtures, "build_runtime_composition", same_clock):
             return self.outer.runtime(**kwargs)
+
+    def test_real_network_is_blocked_even_without_transport_mock(self):
+        with self.assertRaisesRegex(AssertionError, "unexpected network access"):
+            socket.getaddrinfo("example.invalid", 443)
+        with socket.socket() as sock:
+            with self.assertRaisesRegex(AssertionError, "unexpected network access"):
+                sock.connect(("127.0.0.1", 1))
+            with self.assertRaisesRegex(AssertionError, "unexpected network access"):
+                sock.connect_ex(("127.0.0.1", 1))
 
     def test_default_disabled_has_no_requests(self):
         with patch(fixtures.CLIENT_MODULE + ".build_opener") as network:
