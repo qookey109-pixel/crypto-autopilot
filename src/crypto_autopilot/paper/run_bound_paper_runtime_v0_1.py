@@ -1,4 +1,4 @@
-"""Prepared binding from a verified GitHub ticket claim to one PAPER run.
+"""Unverified prototype: caller-supplied run identity is not authenticated.
 
 No production workflow, runtime or external access is enabled here. Trusted
 transport and protection behavior must be established by a merged authority.
@@ -22,7 +22,7 @@ _CLAIMED = object()
 
 @dataclass(frozen=True, slots=True, init=False)
 class RunBoundMeter:
-    """Ticket whose run identity is captured by the claim operation."""
+    """Caller-supplied run ID captured after claim, not current-job proof."""
 
     meter: PrepaidQueryMeter
     run_id: int
@@ -47,7 +47,7 @@ def claim_bound_meter(
     clock_ms: Callable[[], int], authority_path: str = CONFIG_PATH,
     execution_enabled: bool = False,
 ) -> RunBoundMeter:
-    """Return a bound claim only after the existing verification and readback."""
+    """Prototype only: GitHub metadata lookup does not authenticate this caller."""
     if type(execution_enabled) is not bool or not execution_enabled:
         raise BudgetBlocked("BLOCKED_RUN_BOUND_CLAIM_DISABLED")
     if type(run_id) is not int or run_id <= 0:
