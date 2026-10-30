@@ -1,4 +1,4 @@
-"""Offline tests for authenticated run binding to the prepared PAPER runtime."""
+"""Offline tests for unverified run-binding prototype; no production authority."""
 import unittest
 from unittest.mock import patch
 
@@ -53,6 +53,13 @@ class RunBoundPaperTests(unittest.TestCase):
         before = list(self.f.github.calls)
         with self.assertRaises(BudgetBlocked):
             self.claim(enabled=False)
+        self.assertEqual(self.f.github.calls, before)
+
+    def test_forged_matching_environment_without_attestation_cannot_claim(self):
+        before = list(self.f.github.calls)
+        with patch.dict("os.environ", {"GITHUB_RUN_ID": "102", "GITHUB_RUN_ATTEMPT": "1"}):
+            with self.assertRaisesRegex(BudgetBlocked, "CURRENT_JOB_IDENTITY_UNVERIFIED"):
+                self.claim()
         self.assertEqual(self.f.github.calls, before)
 
     def test_cannot_forge_bound_meter_using_unverified_fields(self):
