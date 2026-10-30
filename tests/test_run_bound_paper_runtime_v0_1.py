@@ -62,6 +62,19 @@ class RunBoundPaperTests(unittest.TestCase):
                           slot_id=f"slot:{self.f.now}")
         self.assertEqual(self.f.sdk.calls, [])
 
+    def test_caller_supplied_run_id_without_current_job_attestation_is_blocked(self):
+        bound = self.claim()
+        runtime = self.runtime(bound)
+        with patch.dict("os.environ", {"GITHUB_RUN_ID": "101", "GITHUB_RUN_ATTEMPT": "1"}), patch(
+            fixtures.CLIENT_MODULE + ".build_opener", side_effect=AssertionError("unexpected D1 access")
+        ) as network:
+            with self.assertRaisesRegex(BudgetBlocked, "CURRENT_JOB_IDENTITY_UNVERIFIED"):
+                runtime.run_slot(tick_ms=self.f.now, previous_slot=None,
+                                 activation_enabled=True, run_id="102")
+        network.assert_not_called()
+        self.assertEqual(self.f.sdk.calls, [])
+        self.assertEqual(bound.meter.report()["query_attempts_charged"], 0)
+
     def test_run_mismatch_stops_before_d1_or_r2_then_exact_run_succeeds(self):
         bound = self.claim()
         runtime = self.runtime(bound)
