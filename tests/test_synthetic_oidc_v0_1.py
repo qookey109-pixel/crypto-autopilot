@@ -7,7 +7,7 @@ from unittest.mock import patch
 import jwt
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from crypto_autopilot.synthetic_oidc_v0_1 import verify_synthetic_oidc
+from crypto_autopilot.paper.synthetic_oidc_v0_1 import verify_synthetic_oidc
 
 
 class SyntheticOidcTests(unittest.TestCase):
