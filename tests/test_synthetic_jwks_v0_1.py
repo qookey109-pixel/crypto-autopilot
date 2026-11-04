@@ -36,7 +36,7 @@ class SyntheticJwksTests(unittest.TestCase):
         self.assertIsNone(self.select([], kid="missing"))
         self.assertIsNone(self.select([self.jwk, self.jwk]))
         for changes in ({"alg": "HS256"}, {"use": "enc"}, {"kty": "EC"},
-                        {"x5u": "https://invalid"}, {"d": "private"}, {"key_ops": ["sign"]}):
+                        {"x5u": "https://invalid"}, {"d": "private"}, {"key_ops": ["sign"]}, {"key_ops": ["verify", "sign"]}):
             with self.subTest(changes=changes):
                 self.assertIsNone(self.select([self.jwk | changes]))
 
