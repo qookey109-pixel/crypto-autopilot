@@ -55,7 +55,9 @@ def select_synthetic_rsa_key(document, *, kid):
                 or len(set(identifiers)) != len(identifiers) or kid not in identifiers):
             return None
         item = keys[identifiers.index(kid)]
-        if (set(item) != {"kty", "kid", "alg", "use", "n", "e"}
+        required = {"kty", "kid", "alg", "use", "n", "e"}
+        if (not required <= set(item) or set(item) - required - {"key_ops"}
+                or item.get("key_ops", ["verify"]) != ["verify"]
                 or item["kty"] != "RSA" or item["alg"] != "RS256"
                 or item["use"] != "sig"):
             return None
