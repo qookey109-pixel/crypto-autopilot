@@ -40,6 +40,12 @@ class SyntheticJwksTests(unittest.TestCase):
             with self.subTest(changes=changes):
                 self.assertIsNone(self.select([self.jwk | changes]))
 
+    def test_weak_rsa_key_is_rejected(self):
+        weak = rsa.generate_private_key(public_exponent=65537, key_size=1024)
+        jwk = json.loads(RSAAlgorithm.to_jwk(weak.public_key()))
+        jwk.update(kid="synthetic-key", alg="RS256", use="sig")
+        self.assertIsNone(self.select([jwk]))
+
     def test_malformed_and_excessive_input_rejected(self):
         for value in ("", "{}", '{"keys":[],"keys":[]}', "x" * 50000):
             with self.subTest(size=len(value)):
