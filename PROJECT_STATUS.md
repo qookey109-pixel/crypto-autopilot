@@ -1,3 +1,13 @@
+## Billing metadata diagnostic result — 2026-11-04
+
+Evidence basis: reviewed parent main `cfefbf4c19d3a327b52c09f20f9a1eb710ca3ee5`, not a claim about live main.
+
+- [Billing Metadata Diagnostic V0.5 run 41841230890](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/41841230890), attempt 1, performed one read-only Cloudflare request and returned `REVIEW_REQUIRED / PAGINATION_METADATA_INVALID`. The response indicated success, but `per_page` did not match the request and `count` / `total_count` were absent. The seven-day artifact and value-free [result receipt](research/receipts/2026-11-04-billing-metadata-v0-5-result-v0-1.json) preserve the observed result.
+- The one-time V0.5 authority is consumed; never rerun or infer complete billing coverage or zero cost from this diagnostic. A changed diagnostic or billing-history operation requires a separately versioned authority. No raw billing values or account identity are in the receipt.
+- PAPER remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 provisioning, trusted runtime identity and all-writer admission remain unproven. Holdout, source switch, promotion and live trading remain closed.
+
+---
+
 ## Maintenance evidence reconciliation — 2026-11-04
 
 Evidence basis: reviewed parent main `391a2bb52ee1c43b5c5ed5901833f30be1b8efab`, not a claim about live main. Re-read main, open PRs and checks before acting.
