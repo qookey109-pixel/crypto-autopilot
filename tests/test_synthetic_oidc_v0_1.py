@@ -1,5 +1,6 @@
 """Synthetic-only OIDC verification tests. No GitHub token or network is used."""
 
+import json
 import socket
 import unittest
 from unittest.mock import patch
@@ -94,6 +95,27 @@ class SyntheticOidcTests(unittest.TestCase):
         ):
             with self.subTest(changes=changes):
                 self.assertFalse(self.verify(dict(self.claims, **changes)))
+
+    def test_signed_duplicate_claims_are_rejected(self):
+        original = json.dumps(self.claims, separators=(",", ":"))
+        for duplicate in ('"sub":"forged"', '"aud":"forged"', '"exp":9999'):
+            payload = (original[:-1] + "," + duplicate + "}").encode()
+            token = jwt.api_jws.encode(
+                payload, self.key, algorithm="RS256", headers={"kid": "synthetic-key"},
+            )
+            with self.subTest(duplicate=duplicate):
+                self.assertFalse(verify_synthetic_oidc(
+                    token, self.key.public_key(), expected=self.expected,
+                    expected_kid="synthetic-key", now=1100,
+                ))
+
+    def test_missing_claims_and_unexpected_audience_are_rejected(self):
+        for name in self.expected:
+            claims = self.claims.copy()
+            del claims[name]
+            with self.subTest(missing=name):
+                self.assertFalse(self.verify(claims))
+        self.assertFalse(self.verify(dict(self.claims, aud=["synthetic-paper-test", "other"])))
 
     def test_invalid_input_returns_false_without_token_contents(self):
         for token in ("", "not.a.jwt", "x" * 20000):
