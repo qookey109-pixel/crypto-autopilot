@@ -37,6 +37,36 @@ def _decode_object(segment):
     return value
 
 
+def select_synthetic_rsa_key(document, *, kid):
+    """Select only from synthetic input; origin and key trust are NOT verified."""
+    try:
+        if (not isinstance(document, str) or len(document) > 32768
+                or not isinstance(kid, str) or not kid or len(kid) > 256):
+            return None
+        body = json.loads(document, object_pairs_hook=_unique_object)
+        if not isinstance(body, dict) or set(body) != {"keys"}:
+            return None
+        keys = body["keys"]
+        if not isinstance(keys, list) or not 1 <= len(keys) <= 32:
+            return None
+        identifiers = [key.get("kid") if isinstance(key, dict) else None for key in keys]
+        if (any(not isinstance(value, str) or not value or len(value) > 256
+                for value in identifiers)
+                or len(set(identifiers)) != len(identifiers) or kid not in identifiers):
+            return None
+        item = keys[identifiers.index(kid)]
+        if (set(item) != {"kty", "kid", "alg", "use", "n", "e"}
+                or item["kty"] != "RSA" or item["alg"] != "RS256"
+                or item["use"] != "sig"):
+            return None
+        key = jwt.PyJWK.from_dict(item, algorithm="RS256").key
+        if not isinstance(key, rsa.RSAPublicKey) or key.key_size < 2048:
+            return None
+        return key
+    except (ValueError, TypeError, KeyError, UnicodeError, jwt.PyJWTError, OverflowError):
+        return None
+
+
 def verify_synthetic_oidc(token, public_key, *, expected, expected_kid, now):
     """Verify only synthetic fixtures against caller-provided synthetic inputs.
 
