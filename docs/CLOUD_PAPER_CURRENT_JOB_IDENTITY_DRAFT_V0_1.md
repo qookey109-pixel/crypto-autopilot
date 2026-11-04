@@ -18,7 +18,13 @@ does not itself identify its owner. Python private names, frozen dataclasses and
 1. A separately approved successor defines exact issuer, audience, repository
    immutable ID and name, workflow path and approved commit, branch, events,
    run attempt, job/check ID, time bounds, and a finite run/slot scope.
-2. Verify a GitHub-signed job identity with a maintained cryptographic library.
+2. GitHub documents `check_run_id`, `run_id`, `run_attempt`, `workflow_ref`,
+   `workflow_sha`, `ref_type` and `runner_environment` as claims; its docs also
+   emphasize validating `sub` and `aud` together. Validate the exact subject
+   format and hosted-runner condition against the eventual reviewed authority;
+   do not infer a privileged job merely from the workflow or a caller-provided
+   expected value. Reusable-workflow claims are conditional and must not be
+   assumed in a normal workflow.\n\n   Verify a GitHub-signed job identity with a maintained cryptographic library.
    Reject algorithm confusion, unrecognized key ID, wrong signature, missing or
    duplicated claims, wrong issuer/audience/repository/workflow/commit/ref/event,
    invalid time bounds and unexpected attempt. Never print or persist tokens.
