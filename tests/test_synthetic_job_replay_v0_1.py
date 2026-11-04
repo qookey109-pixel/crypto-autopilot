@@ -1,6 +1,7 @@
 """Synthetic replay tests: in-memory SQLite, never production Cloudflare."""
 import socket
 import sqlite3
+import threading
 import unittest
 from unittest.mock import patch
 
@@ -48,6 +49,30 @@ class SyntheticJobReplayTests(unittest.TestCase):
         self.assertFalse(self.claim())
         self.db.rollback()
         self.assertEqual(self.db.execute("SELECT COUNT(*) FROM synthetic_job_claim").fetchone()[0], 0)
+
+    def test_concurrent_connections_do_not_both_claim(self):
+        uri = "file:synthetic-replay-test?mode=memory&cache=shared"
+        anchor = sqlite3.connect(uri, uri=True)
+        self.addCleanup(anchor.close)
+        initialize_synthetic_replay_ledger(anchor)
+        barrier = threading.Barrier(2)
+        outcomes = []
+        def attempt():
+            connection = sqlite3.connect(uri, uri=True, timeout=1)
+            try:
+                barrier.wait(timeout=5)
+                outcomes.append(claim_synthetic_job(connection, **self.identity))
+            finally:
+                connection.close()
+        threads = [threading.Thread(target=attempt) for _ in range(2)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(timeout=10)
+            self.assertFalse(thread.is_alive())
+        self.assertEqual(len(outcomes), 2)
+        self.assertEqual(sum(outcomes), 1)
+        self.assertEqual(anchor.execute("SELECT COUNT(*) FROM synthetic_job_claim").fetchone()[0], 1)
 
     def test_rollback_after_ambiguous_response_never_reclaims_committed_key(self):
         class LostResponse:
