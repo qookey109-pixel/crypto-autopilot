@@ -72,6 +72,30 @@ claim semantics, operation budget and failure/readback behavior have all been
 verified under a merged successor. OIDC only verifies a signed bearer; it is not
 a trusted-clock, slot, account-headroom or source-integrity proof.
 
+## Cloudflare Worker candidate: constraints, not a selected deployment
+
+A Worker holding D1/R2 bindings is one possible independent enforcement
+boundary, subject to a separate reviewed successor and complete inventory of
+existing credentials. This is a design candidate, not an enabled service and not
+evidence that existing direct credentials have been removed.
+
+Cloudflare's current [Workers limits](https://developers.cloudflare.com/workers/platform/limits/)
+list 100,000 daily requests at the account level, 10 ms CPU per request on
+Workers Free and bounded subrequests. Other projects share the account budget.
+JWT verification and any key-fetch or storage work must be measured within
+these constraints; do not assume a cache hit, free capacity, or successful
+execution. For security-critical routes the documented fail-closed behavior
+must be established rather than relying on a route that bypasses the Worker.
+
+Cloudflare's [D1 free-tier enforcement](https://developers.cloudflare.com/changelog/post/2026-09-01-d1-free-tier-limit-enforcement/)
+states that daily row-read/write overages cause queries to fail, including
+binding and REST access. This does not establish the account plan, current
+usage, remaining R2 capacity, or zero projected fees. Any D1-backed replay claim
+also consumes queries and rows, so an independently bounded bootstrap/admission
+budget and ambiguous-commit handling are required before deployment. Paid-plan
+behavior, direct legacy writers and all other account activity must be included
+in the account-wide evidence; no paid fallback is authorized.
+
 ## Validation and authority frontier
 
 - Cloud CI only: synthetic RSA signatures, fake GitHub responses and controlled
