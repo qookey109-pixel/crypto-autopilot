@@ -28,6 +28,9 @@ class SyntheticOidcTests(unittest.TestCase):
         self.claims = {
             "iss": "https://token.actions.githubusercontent.com",
             "aud": "synthetic-paper-test",
+            "sub": "repo:example/repo:ref:refs/heads/main",
+            "ref_type": "branch",
+            "runner_environment": "github-hosted",
             "repository_id": "123",
             "repository": "example/repo",
             "ref": "refs/heads/main",
@@ -44,7 +47,7 @@ class SyntheticOidcTests(unittest.TestCase):
             "exp": 1300,
         }
         self.expected = {k: self.claims[k] for k in (
-            "aud", "repository_id", "repository", "ref", "sha",
+            "aud", "sub", "ref_type", "runner_environment", "repository_id", "repository", "ref", "sha",
             "workflow_ref", "workflow_sha", "event_name", "run_id",
             "run_attempt", "check_run_id",
         )}
