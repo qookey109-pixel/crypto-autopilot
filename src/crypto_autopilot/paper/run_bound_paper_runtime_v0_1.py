@@ -52,6 +52,9 @@ def claim_bound_meter(
         raise BudgetBlocked("BLOCKED_RUN_BOUND_CLAIM_DISABLED")
     if type(run_id) is not int or run_id <= 0:
         raise BudgetBlocked("BLOCKED_RUN_BOUND_ID_INVALID")
+    # No trusted current-job attestation or replay ledger exists yet. Never
+    # contact the ticket transport until both are established and reviewed.
+    raise BudgetBlocked("CURRENT_JOB_IDENTITY_UNVERIFIED")
     meter = claim_prepaid_query_meter(
         authority_document=authority_document, writer_id=writer_id,
         slot_id=slot_id, run_id=run_id, transport=transport, evidence=evidence,
