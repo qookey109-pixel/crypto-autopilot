@@ -50,6 +50,28 @@ does not itself identify its owner. Python private names, frozen dataclasses and
    factories remain callable Python code and are not automatically secured by
    a wrapper. Unknown identity or bypassable entry stops before D1/R2/provider.
 
+## Required independent enforcement boundary
+
+The OIDC JWT is a bearer assertion. A signature establishes who issued an
+assertion and what it says, not that arbitrary Python code submitting it is the
+job named in it. Local verification plus private attributes cannot prevent a
+copied token or another callable gateway from spending. A production successor
+therefore needs an independently enforced credential boundary: the component
+holding D1/R2 credentials must validate the signed identity, bind its accepted
+job and slot, and atomically consume a protected claim before releasing a bounded
+operation. The authorized workflow and every other writer must be unable to
+bypass that component with the same credentials. A stolen token can still win
+a race; that residual risk must be included in the threat model.
+
+The SQLite experiment in this draft has no such independent boundary and is not
+an implementation of this requirement. The existing GitHub ticket reference
+points to a commit rather than an authenticated job; it also cannot by itself
+attest that an object writer lacks another credential. No proposed identity
+adapter may activate until the credential inventory, sole entrypoint, protected
+claim semantics, operation budget and failure/readback behavior have all been
+verified under a merged successor. OIDC only verifies a signed bearer; it is not
+a trusted-clock, slot, account-headroom or source-integrity proof.
+
 ## Validation and authority frontier
 
 - Cloud CI only: synthetic RSA signatures, fake GitHub responses and controlled
