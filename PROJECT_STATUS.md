@@ -1,3 +1,14 @@
+## Maintenance evidence reconciliation — 2026-11-04
+
+Evidence basis: reviewed parent main `391a2bb52ee1c43b5c5ed5901833f30be1b8efab`, not a claim about live main. Re-read main, open PRs and checks before acting.
+
+- The generated maintenance blocks in [draft PR #844](https://github.com/qookey109-pixel/crypto-autopilot/pull/844) at head `d977a1df4f8f60283a26ddd77ac1eee3ecf53ec1` were identical in both target documents. An exact archival copy is preserved in [the historical snapshot](docs/archive/cloud-maintenance-pr-844-snapshot.md); it is not current state or authority. Do not merge the stale draft or overwrite current generated blocks with it.
+- Natural [Health 41762788223](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/41762788223) failed; subsequent [Maintenance 41762857095](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/41762857095) failed inspect with `STALE_DRAFT_REVIEW_REQUIRED` for #844 and skipped propose. Preserve the failure and wait for a new natural chain after reconciliation; do not rerun or claim Health recovery.
+- Draft #844 remains open pending review after this reconciliation; its head and branch must be preserved. This archive is not authorization to change research, runtime or cloud-access boundaries.
+- Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 provisioning, fresh account-wide cost and capacity, writer coverage and trusted runtime identity remain unproven. Core100 remains `REJECT`. One-shot billing/bootstrap authorities are not rerun. FREE-ONLY / CLOUD-ONLY / PAPER-LIVE-PAPER ONLY; holdout, source switch, promotion and real trading remain closed.
+
+---
+
 ## Current delivery checkpoint — 2026-10-29
 
 Evidence basis: reviewed parent main `c096ca57bbcdafa2f33da59fa38ed0a9459720f8`, not a claim about live main. Re-read main, PRs and checks before acting.
