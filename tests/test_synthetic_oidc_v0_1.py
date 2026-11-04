@@ -7,8 +7,11 @@ from unittest.mock import patch
 
 import jwt
 from cryptography.hazmat.primitives.asymmetric import rsa
+from jwt.algorithms import RSAAlgorithm
 
-from crypto_autopilot.paper.synthetic_oidc_v0_1 import verify_synthetic_oidc
+from crypto_autopilot.paper.synthetic_oidc_v0_1 import (
+    select_synthetic_rsa_key, verify_synthetic_oidc,
+)
 
 
 class SyntheticOidcTests(unittest.TestCase):
@@ -67,6 +70,20 @@ class SyntheticOidcTests(unittest.TestCase):
 
     def test_valid_synthetic_signature_and_claims(self):
         self.assertTrue(self.verify())
+
+    def test_selected_synthetic_key_verifies_only_its_signature(self):
+        public_jwk = json.loads(RSAAlgorithm.to_jwk(self.key.public_key()))
+        public_jwk.update(kid="synthetic-key", alg="RS256", use="sig")
+        selected = select_synthetic_rsa_key(json.dumps({"keys": [public_jwk]}),
+                                            kid="synthetic-key")
+        self.assertIsNotNone(selected)
+        for signer, allowed in ((self.key, True), (self.other_key, False)):
+            token = jwt.encode(self.claims, signer, algorithm="RS256",
+                               headers={"kid": "synthetic-key"})
+            self.assertEqual(verify_synthetic_oidc(
+                token, selected, expected=self.expected,
+                expected_kid="synthetic-key", now=1100,
+            ), allowed)
 
     def test_mismatched_bound_claims_rejected(self):
         for field in self.expected:
