@@ -12,7 +12,8 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 
 _ISSUER = "https://token.actions.githubusercontent.com"
 _FIELDS = (
-    "aud", "repository_id", "repository", "ref", "sha", "workflow_ref",
+    "aud", "sub", "ref_type", "runner_environment", "repository_id",
+    "repository", "ref", "sha", "workflow_ref",
     "workflow_sha", "event_name", "run_id", "run_attempt", "check_run_id",
 )
 
