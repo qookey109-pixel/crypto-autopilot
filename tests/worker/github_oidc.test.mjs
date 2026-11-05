@@ -5,7 +5,7 @@ import { DatabaseSync } from "node:sqlite";
 import { claimJobSlot } from "../../workers/paper-gateway/d1-job-claim.mjs";
 import { checkJobMetadata } from "../../workers/paper-gateway/github-metadata.mjs";
 import { readJobMetadata } from "../../workers/paper-gateway/github-metadata-reader.mjs";
-import { admitScheduledJob } from "../../workers/paper-gateway/synthetic-admission.mjs";
+import { admitScheduledJob, processingSlot } from "../../workers/paper-gateway/synthetic-admission.mjs";
 import { verifyGithubJob } from "../../workers/paper-gateway/github-oidc.mjs";
 import { readGithubKeys } from "../../workers/paper-gateway/github-keys.mjs";
 
@@ -275,4 +275,15 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   assert.equal((await admitScheduledJob({ ...config, reserve: async () => true })).status, "DUPLICATE_OR_CONFLICT");
   assert.equal(writes, 2);
   sql.close();
+});
+
+test("processing slot honors V0.5 freshness, UTC boundary and clock continuity", () => {
+  const at = s => Date.parse(s);
+  const start = at("2026-01-01T00:07:00Z");
+  assert.equal(processingSlot(start + 600000, start + 600000), start);
+  assert.equal(processingSlot(start + 600001, start + 600001), null);
+  assert.equal(processingSlot(at("2026-01-01T00:00:00Z"), at("2026-01-01T00:00:00Z")), null);
+  assert.equal(processingSlot(start + 10000, start + 9999), null);
+  assert.equal(processingSlot(start + 899999, start + 900000), null);
+  assert.equal(processingSlot(NaN, start), null);
 });
