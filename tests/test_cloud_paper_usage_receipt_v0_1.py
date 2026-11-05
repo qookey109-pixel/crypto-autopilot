@@ -92,3 +92,42 @@ class PaperUsageReceiptTests(unittest.TestCase):
         self.assertEqual(data["d1_transport_attempts"], 1)
         self.assertIsNone(data["report_id"])
         self.assertNotIn("fixture-secret", body)
+
+
+    def test_symlink_destination_and_failed_publication_do_not_replace_evidence(self):
+        report, observation = self.completed()
+        destination = self.directory / "cloud-paper-usage-observation.json"
+        target = self.directory / "prior.txt"
+        target.write_text("preserve", encoding="utf-8")
+        destination.symlink_to(target)
+        with self.assertRaises(FileExistsError):
+            write_usage_receipt(self.directory, observation, report=report)
+        self.assertEqual(target.read_text(encoding="utf-8"), "preserve")
+        destination.unlink()
+        target.unlink()
+        with patch("crypto_autopilot.paper.cloud_paper_usage_receipt_v0_1.os.link",
+                   side_effect=OSError("synthetic failure")):
+            with self.assertRaises(OSError):
+                write_usage_receipt(self.directory, observation, report=report)
+        self.assertEqual(list(self.directory.iterdir()), [])
+
+    def test_ambiguous_post_publish_failure_is_not_retried_or_overwritten(self):
+        report, observation = self.completed()
+        import os
+        real_fsync = os.fsync
+        calls = []
+        def fsync_then_fail(fd):
+            calls.append(fd)
+            if len(calls) == 2:
+                raise OSError("synthetic directory sync failure")
+            return real_fsync(fd)
+        with patch("crypto_autopilot.paper.cloud_paper_usage_receipt_v0_1.os.fsync",
+                   side_effect=fsync_then_fail):
+            with self.assertRaises(OSError):
+                write_usage_receipt(self.directory, observation, report=report)
+        destination = self.directory / "cloud-paper-usage-observation.json"
+        self.assertTrue(destination.is_file())
+        original = destination.read_bytes()
+        with self.assertRaises(FileExistsError):
+            write_usage_receipt(self.directory, observation, report=report)
+        self.assertEqual(destination.read_bytes(), original)
