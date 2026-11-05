@@ -5,6 +5,7 @@ import { DatabaseSync } from "node:sqlite";
 import { claimJobSlot } from "../../workers/paper-gateway/d1-job-claim.mjs";
 import { checkJobMetadata } from "../../workers/paper-gateway/github-metadata.mjs";
 import { readJobMetadata } from "../../workers/paper-gateway/github-metadata-reader.mjs";
+import { admitScheduledJob } from "../../workers/paper-gateway/synthetic-admission.mjs";
 import { verifyGithubJob } from "../../workers/paper-gateway/github-oidc.mjs";
 import { readGithubKeys } from "../../workers/paper-gateway/github-keys.mjs";
 
@@ -214,4 +215,62 @@ test("metadata reader makes only fixed signed-ID GitHub requests", async () => {
     failures++; return new Response("", { status: 302, headers: { Location: "https://attacker.example" } });
   } }), null);
   assert.equal(failures, 1);
+});
+
+test("signed identity and metadata precede a prepaid one-time slot claim", async () => {
+  const base = Date.parse("2026-01-01T00:07:00Z");
+  const now = base + 60000;
+  const pair = await crypto.subtle.generateKey(
+    { name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
+    true, ["sign", "verify"]);
+  const jwk = { ...await crypto.subtle.exportKey("jwk", pair.publicKey), kid: "fixture", alg: "RS256", use: "sig" };
+  const sha = "a".repeat(40);
+  const policy = { repository: "owner/repo", repositoryId: "123", workflowId: "456",
+    workflowPath: ".github/workflows/paper.yml", workflowRef: "owner/repo/.github/workflows/paper.yml@refs/heads/main",
+    workflowSha: sha, sha, jobName: "paper", audience: "paper-test",
+    subject: "repo:owner/repo:ref:refs/heads/main", writerId: "paper", maxAgeSeconds: 600,
+    maxScheduleDelaySeconds: 180 };
+  const claims = { iss: "https://token.actions.githubusercontent.com", aud: policy.audience, sub: policy.subject,
+    repository: policy.repository, repository_id: policy.repositoryId, workflow_ref: policy.workflowRef,
+    workflow_sha: sha, sha, ref: "refs/heads/main", ref_type: "branch", runner_environment: "github-hosted",
+    event_name: "schedule", run_id: "100", run_attempt: "1", check_run_id: "101",
+    iat: Math.floor(base / 1000), nbf: Math.floor(base / 1000), exp: Math.floor(base / 1000) + 300, jti: "fixture" };
+  const enc = x => Buffer.from(JSON.stringify(x)).toString("base64url");
+  const message = enc({ alg: "RS256", typ: "JWT", kid: "fixture" }) + "." + enc(claims);
+  const signature = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", pair.privateKey, new TextEncoder().encode(message));
+  const token = message + "." + Buffer.from(signature).toString("base64url");
+  const run = { id: 100, workflow_id: 456, path: policy.workflowPath, head_sha: sha, head_branch: "main",
+    run_attempt: 1, status: "in_progress", event: "schedule", created_at: "2026-01-01T00:07:30Z", repository: { id: 123 } };
+  const job = { id: 101, run_id: 100, run_attempt: 1, head_sha: sha, name: "paper",
+    status: "in_progress", started_at: "2026-01-01T00:07:40Z", completed_at: null };
+  let fetches = 0, writes = 0;
+  let invalidRun = false;
+  const fetcher = async url => {
+    fetches++;
+    if (url === "https://token.actions.githubusercontent.com/.well-known/jwks")
+      return new Response(JSON.stringify({ keys: [jwk] }));
+    if (url.endsWith("/actions/runs/100")) return new Response(JSON.stringify(invalidRun ? { ...run, head_sha: "b".repeat(40) } : run));
+    if (url.endsWith("/actions/jobs/101")) return new Response(JSON.stringify(job));
+    throw Error("unexpected path");
+  };
+  const sql = new DatabaseSync(":memory:");
+  sql.exec(`CREATE TABLE paper_job_claim_v0_1 (repository_id TEXT NOT NULL, run_id TEXT NOT NULL,
+    attempt TEXT NOT NULL, check_run_id TEXT NOT NULL, writer_id TEXT NOT NULL, slot_id TEXT NOT NULL,
+    PRIMARY KEY (repository_id, run_id, attempt, check_run_id, writer_id), UNIQUE (repository_id, writer_id, slot_id))`);
+  const db = { prepare: statement => ({ bind: (...args) => ({ run: async () => {
+    writes++; return { success: true, meta: { changes: Number(sql.prepare(statement).run(...args).changes), total_attempts: 1 } };
+  } }) }) };
+  const config = { policy, token, githubToken: "synthetic-only-token", fetcher, db, clock: () => now };
+  assert.equal((await admitScheduledJob({ ...config, reserve: async () => false })).status, "BUDGET_BLOCKED");
+  assert.equal(fetches, 0); assert.equal(writes, 0);
+  invalidRun = true;
+  assert.equal((await admitScheduledJob({ ...config, reserve: async () => true })).status, "IDENTITY_BLOCKED");
+  assert.equal(writes, 0);
+  invalidRun = false;
+  const accepted = await admitScheduledJob({ ...config, reserve: async () => true });
+  assert.equal(accepted.status, "CLAIMED");
+  assert.equal(accepted.slotId, "slot:" + base);
+  assert.equal((await admitScheduledJob({ ...config, reserve: async () => true })).status, "DUPLICATE_OR_CONFLICT");
+  assert.equal(writes, 2);
+  sql.close();
 });
