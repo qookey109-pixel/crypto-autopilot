@@ -24,9 +24,16 @@ export async function admitScheduledJob({ enabled = false, policy, token, github
     const fixed = structuredClone(policy);
     if (typeof fixed.writerId !== "string" ||
         !/^[a-z0-9][a-z0-9:._/-]{0,127}$/.test(fixed.writerId)) return { status: "INVALID" };
-    // Synthetic reservation: production must independently prepay the full
-    // account-wide worst case, including claim and possible retries.
-    if (await reserve({ githubReads: 3, d1Writes: 1 }) !== true) return { status: "BUDGET_BLOCKED" };
+    // Values are synthetic upper bounds. Real ceilings must be independently
+    // measured, account-scoped, server-owned and prepaid before any access.
+    const costs = fixed.admissionCosts;
+    const minimum = { workerRequests: 1, githubRequests: 3, d1Queries: 1,
+      d1RowsRead: 1, d1RowsWritten: 1, d1StorageBytes: 1 };
+    if (!costs || typeof costs !== "object" || Array.isArray(costs) ||
+        Object.keys(costs).length !== Object.keys(minimum).length ||
+        Object.entries(minimum).some(([key, min]) =>
+          !Number.isSafeInteger(costs[key]) || costs[key] < min)) return { status: "INVALID" };
+    if (await reserve(Object.freeze({ ...costs })) !== true) return { status: "BUDGET_BLOCKED" };
     const now = clock();
     if (!Number.isSafeInteger(now)) return { status: "INVALID" };
     const identity = await verifyGithubJob(token, {
