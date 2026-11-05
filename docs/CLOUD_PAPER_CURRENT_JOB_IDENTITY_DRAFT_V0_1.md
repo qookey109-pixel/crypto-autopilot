@@ -235,6 +235,14 @@ allowance or permission to provision. Calling Workers and rejected requests
 also consume their own resources; platform enforcement may stop unrelated
 services sharing the account.
 
+The synthetic entrypoint requires explicit Worker, GitHub, D1 query, row and
+storage envelope fields before invoking its fake reservation. These fixture
+numbers are not calibrated ceilings. In a real HTTP deployment, the incoming
+Worker invocation has already consumed a request before Worker code can reserve
+anything; rejected/unauthenticated requests therefore need an independently
+bounded account allocation. Calling a boolean callback before other operations
+does not solve that ordering or prove a durable prepaid budget.
+
 A single account-scoped SQLite-backed Durable Object is a candidate to
 serialize identity/slot claims and prepaid envelopes, provided the successor
 first proves Free-plan status, all existing and future writers, request and
