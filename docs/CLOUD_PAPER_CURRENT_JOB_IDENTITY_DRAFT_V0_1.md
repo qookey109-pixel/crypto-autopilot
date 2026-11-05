@@ -203,6 +203,26 @@ clock, and this approach needs review against the final runtime semantics,
 concurrency and fresh-account budget before deployment. Manual controlled
 acceptance is not implemented in the synthetic composition.
 
+## Public admission and global request limits
+
+Do not expose the synthetic composition as a public Worker route or replace
+its injected reservation with D1 queries without a separately funded and
+enforced admission boundary. Invalid, repeated or compromised-job requests
+can consume Worker invocations, key/metadata fetches or D1 claim attempts even
+when no slot is admitted. A per-process counter, JWT `jti`, or a cap on
+successful slot claims cannot bound those rejected attempts account-wide.
+
+Cloudflare documents that [Worker rate limiting bindings](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)
+are approximate, apply per location, and may exceed configured thresholds;
+they cannot independently prove a strict global budget. The same documentation
+suggests Durable Objects for strict global limiting, but the frozen
+`cloud_free_tier_policy_v0_1.json` does not authorize them for this project.
+A future successor must evaluate a zero-cost strict limiter and account-wide
+writer coverage under its own authority, including the limiter's own
+invocations, storage, recovery and refusal cost. No Durable Object is created
+or enabled by this draft. Whether a different architecture can meet the same
+bound remains open.
+
 ## Prepared D1 claim adapter and retry accounting
 
 The draft Worker adapter issues one parameterized insert and accepts only an
