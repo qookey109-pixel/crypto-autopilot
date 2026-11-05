@@ -63,7 +63,8 @@ export async function verifyGithubJob(token, { enabled = false, policy, now, fet
     if (!header || !claims || Array.isArray(header) || Array.isArray(claims) ||
         header.alg !== "RS256" || header.typ !== "JWT" ||
         typeof header.kid !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(header.kid) ||
-        Object.keys(header).some(k => !["alg", "typ", "kid"].includes(k))) return null;
+        ("x5t" in header && (typeof header.x5t !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(header.x5t))) ||
+        Object.keys(header).some(k => !["alg", "typ", "kid", "x5t"].includes(k))) return null;
     const pairs = [
       ["iss", "https://token.actions.githubusercontent.com"], ["aud", policy.audience],
       ["sub", policy.subject], ["repository", policy.repository],
