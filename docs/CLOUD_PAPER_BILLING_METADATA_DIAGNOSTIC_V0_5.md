@@ -1,4 +1,4 @@
-# Billing metadata diagnostic V0.5 — one-time execution prepared
+# Billing metadata diagnostic V0.5 — one-time execution consumed
 
 ## Reason
 
@@ -16,4 +16,6 @@ The report retains only fixed reason codes, field names, field presence, JSON ty
 
 ## Execution gate
 
-The workflow is prepared but has not been dispatched. Dispatch only after this authority is merged to main and the owner explicitly confirms the one-time read in the workflow input. Never rerun V0.3 or V0.5.
+The one-time workflow was dispatched on 2026-11-04 in [run 41841230890](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/41841230890), attempt 1. It returned `REVIEW_REQUIRED / PAGINATION_METADATA_INVALID` after one read-only Cloudflare request. The response reported a different `per_page` from the request, while `count` and `total_count` were absent. See the [versioned result receipt](../research/receipts/2026-11-04-billing-metadata-v0-5-result-v0-1.json) for the evidence and limits. The exact returned page size was not retained; absence of these fields does not establish complete history coverage.
+
+**The V0.5 one-time authority is consumed. Never dispatch it again or rerun V0.3 or V0.5.** Any further external investigation requires its own merged versioned authority. Billing readiness and the zero-cost conclusion remain `UNKNOWN`; Cloud Paper remains disabled.
