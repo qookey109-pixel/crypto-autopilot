@@ -1,0 +1,37 @@
+{
+  "schema": "qookey-cloud-paper-usage-observation-v0.1",
+  "status": "PREPARED_SYNTHETIC_ONLY",
+  "implementation": "src/crypto_autopilot/paper/cloud_paper_usage_observation_v0_1.py",
+  "behavior": {
+    "entrypoint": "run_observed_slot",
+    "default_enabled": false,
+    "immutable_report_rewritten": false,
+    "success": "OBSERVED_RETURNED",
+    "failure": "REVIEW_REQUIRED_WITH_REDACTED_PARTIAL_OBSERVATION",
+    "r2_counts": "SDK_INVOCATIONS_NOT_SERVICE_CONFIRMED",
+    "provider_counts": "CONSERVATIVE_RESERVATIONS",
+    "d1_counts": "TRANSPORT_ATTEMPTS_AND_PREPAID_DEBITS",
+    "d1_rows_read": null,
+    "d1_rows_written": null,
+    "process_crash_receipt_guaranteed": false,
+    "caller_identity_verified": false,
+    "account_wide_usage_proven": false
+  },
+  "execution": {
+    "workflow": null,
+    "artifact_upload_authorized": false,
+    "cloud_paper_activation": false,
+    "provider_access": false,
+    "r2_access": false,
+    "d1_access": false,
+    "schedule": false
+  },
+  "boundary": {
+    "monthly_budget_usd": 0,
+    "paper_only": true,
+    "holdout": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false
+  }
+}
