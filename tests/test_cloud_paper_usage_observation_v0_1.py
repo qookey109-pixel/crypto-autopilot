@@ -82,3 +82,21 @@ class PaperUsageObservationTests(unittest.TestCase):
             run_observed_slot(runtime, tick_ms=self.f.now, previous_slot=None,
                               activation_enabled=True, run_id="github-101-1")
         self.assertEqual(self.f.sdk.calls, [])
+
+
+    def test_r2_transport_failure_is_counted_once_without_secret_leak(self):
+        _, _, _, opener = self.outer.outer.transport()
+        with patch(fixtures.CLIENT_MODULE + ".build_opener", return_value=opener):
+            runtime = self.outer.runtime()
+            with patch.object(self.f.sdk, "put_object",
+                              side_effect=OSError("fixture-secret-r2-error")) as write:
+                with self.assertRaises(PaperObservationError) as raised:
+                    run_observed_slot(runtime, tick_ms=self.f.now, previous_slot=None,
+                                      activation_enabled=True, run_id="github-101-1")
+        receipt = raised.exception.receipt
+        self.assertEqual(receipt["status"], "REVIEW_REQUIRED")
+        self.assertEqual(receipt["r2_sdk_attempts"]["PUT"], 1)
+        self.assertEqual(write.call_count, 1)
+        self.assertGreaterEqual(receipt["r2_reserved_class_a"], 1)
+        self.assertIsNone(receipt["report_id"])
+        self.assertNotIn("fixture-secret", json.dumps(receipt))
