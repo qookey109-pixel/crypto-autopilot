@@ -1,7 +1,9 @@
 """Prepared in-process Paper run observation; not an execution authority.
 
-No workflow, artifact upload, service request or credential is created here.
-The runtime remains responsible for admission, settlement and result readback.
+Importing this module creates no workflow, request or credential. If explicitly
+invoked with activation enabled, the supplied runtime can make external calls;
+a separately merged authority remains required. The runtime remains responsible
+for admission, settlement and result readback.
 Counters measure SDK invocations and conservative reservations, not Cloudflare
 billing. A terminated process may leave no receipt.
 """
