@@ -139,6 +139,24 @@ budget and ambiguous-commit handling are required before deployment. Paid-plan
 behavior, direct legacy writers and all other account activity must be included
 in the account-wide evidence; no paid fallback is authorized.
 
+## Runtime compatibility discovered 2026-11-05
+
+The current candidate verifier and key loader are CPython runner code; they are
+not a Cloudflare Worker implementation. The existing prepaid controller uses
+`threading.Lock`, while [Cloudflare's Python Worker standard-library limits](https://developers.cloudflare.com/workers/languages/python/stdlib/)
+say `threading` is nonfunctional in that runtime. CPython CI cannot establish
+Worker package, networking, concurrency, Web Crypto or D1 binding behavior. In
+particular, do not deploy or wire this controller in a Python Worker unchanged.
+
+An independent Worker boundary would need a Worker-native asynchronous transport
+and cryptographic verification, durable atomic claim and budget admission via
+supported bindings, and a separately reviewed credential migration for *all*
+relevant readers and writers. [D1 batch documentation](https://developers.cloudflare.com/d1/worker-api/d1-database/)
+describes transactional batches, but [D1 accounting](https://developers.cloudflare.com/d1/observability/find-expensive-queries/)
+still counts individual statements and their rows. Neither statement proves
+that this account has enough headroom or that an ambiguous response is safe to
+replay. A design that bypasses these boundaries must stay disabled.
+
 ## Validation and authority frontier
 
 - Cloud CI only: synthetic RSA signatures, fake GitHub responses and controlled
