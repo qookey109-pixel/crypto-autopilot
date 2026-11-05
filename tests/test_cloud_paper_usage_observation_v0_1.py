@@ -41,7 +41,7 @@ class PaperUsageObservationTests(unittest.TestCase):
         for operation in ("PUT", "GET", "LIST"):
             self.assertEqual(receipt["r2_sdk_attempts"][operation],
                              sum(call["operation"] == operation for call in calls))
-        self.assertEqual(receipt["d1_http_attempts"], len(statements))
+        self.assertEqual(receipt["d1_transport_attempts"], len(statements))
         self.assertEqual(receipt["d1_ticket_debits"], 4)
         self.assertEqual(receipt["provider_reserved_attempts"], 0)
         self.assertFalse(receipt["provider_confirmed_billing"])
@@ -62,7 +62,7 @@ class PaperUsageObservationTests(unittest.TestCase):
                                   activation_enabled=True, run_id="github-101-1")
         receipt = raised.exception.receipt
         self.assertEqual(receipt["status"], "REVIEW_REQUIRED")
-        self.assertEqual(receipt["d1_http_attempts"], 1)
+        self.assertEqual(receipt["d1_transport_attempts"], 1)
         self.assertEqual(receipt["d1_ticket_debits"], 2)
         self.assertEqual(receipt["r2_sdk_attempts"], {"PUT": 0, "GET": 0, "LIST": 0})
         self.assertNotIn("fixture-credential", json.dumps(receipt))
