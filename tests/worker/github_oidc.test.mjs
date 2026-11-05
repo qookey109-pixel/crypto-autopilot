@@ -76,7 +76,11 @@ test("signature, repository and run claims must agree", async () => {
   assert.equal(await verifyGithubJob(await sign(header, duplicate), options), null);
   const forbidden = encode({ alg: "RS256", typ: "JWT", kid: "fixture", jku: "https://attacker.example/keys" });
   assert.equal(await verifyGithubJob(await sign(forbidden, payload), options), null);
+  const escapedDuplicate = Buffer.from(JSON.stringify(claims).replace('"run_id":"100"', '"run_id":"100","run\\u005fid":"100"')).toString("base64url");
+  assert.equal(await verifyGithubJob(await sign(header, escapedDuplicate), options), null);
   assert.equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => ({ keys: [jwk, jwk] }) }), null);
+  assert.equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => ({ keys: [{ ...jwk, n: "AQ" }] }) }), null);
+  assert.equal((await verifyGithubJob(token, { ...options, fetchKeys: async () => ({ keys: [{ ...jwk, x5c: ["fixture"] }] }) }))?.runId, "100");
   assert.equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => { throw Error("offline"); } }), null);
 });
 
@@ -98,6 +102,7 @@ test("key reader rejects redirects, malformed JSON, oversize and failures", asyn
   for (const fakeFetch of [
     async () => new Response("", { status: 302, headers: { Location: "https://attacker.example" } }),
     async () => new Response("{broken"),
+    async () => new Response('{"keys":[],"keys":[]}'),
     async () => new Response("x".repeat(65537)),
     async () => { throw Error("unavailable"); },
   ]) assert.equal(await readGithubKeys({ enabled: true, fetcher: fakeFetch }), null);
