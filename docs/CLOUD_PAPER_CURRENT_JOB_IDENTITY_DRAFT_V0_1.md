@@ -192,13 +192,16 @@ database in cloud CI. Its injected reservation is a fixture, not a real shared
 budget; it is not a Worker request handler and must never receive production
 bindings. A green composition test proves only the tested sequencing.
 
-The test computes a candidate quarter-hour slot from run creation time. GitHub
-does not sign the nominal scheduled slot in OIDC, and a delayed run may have a
-creation timestamp close to a later nominal slot. Therefore the calculation
-cannot prove slot identity, even with a three-minute window. It must not be
-used to authorize production. A successor needs a separately verified slot
-assignment or must fail closed when the slot cannot be established. Manual
-controlled acceptance is also not implemented in the synthetic composition.
+The synthetic composition now assigns the current processing interval from its
+injected clock, rather than inferring a historical scheduler slot from run
+creation time. It rejects a clock reversal or crossing an interval while
+admission is in progress. This labels the current processing interval only; it
+does not identify the nominal GitHub schedule that triggered the run. GitHub
+does not sign that nominal slot in OIDC, and delayed runs must not be counted
+as proof of another slot. The injected clock is not a trusted production
+clock, and this approach needs review against the final runtime semantics,
+concurrency and fresh-account budget before deployment. Manual controlled
+acceptance is not implemented in the synthetic composition.
 
 ## Prepared D1 claim adapter and retry accounting
 
