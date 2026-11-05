@@ -11,9 +11,7 @@ export async function admitScheduledJob({ policy, token, githubToken, fetcher, d
   try {
     if (!policy || typeof clock !== "function" || typeof reserve !== "function") return { status: "INVALID" };
     const fixed = structuredClone(policy);
-    if (!Number.isSafeInteger(fixed.maxScheduleDelaySeconds) ||
-        fixed.maxScheduleDelaySeconds < 1 || fixed.maxScheduleDelaySeconds > 300 ||
-        typeof fixed.writerId !== "string" ||
+    if (typeof fixed.writerId !== "string" ||
         !/^[a-z0-9][a-z0-9:._/-]{0,127}$/.test(fixed.writerId)) return { status: "INVALID" };
     // Synthetic reservation: production must independently prepay the full
     // account-wide worst case, including claim and possible retries.
@@ -32,10 +30,11 @@ export async function admitScheduledJob({ policy, token, githubToken, fetcher, d
     if (!metadata || !Number.isSafeInteger(after) || Math.floor(after / 1000) >= identity.expiresAt ||
         !checkJobMetadata(identity, metadata.run, metadata.job,
           { ...fixed, allowedEvents: ["schedule"] }, after)) return { status: "IDENTITY_BLOCKED" };
-    const created = Date.parse(metadata.run.created_at);
+    // Processing time only; never claim to know the scheduler's nominal slot.
     const quarter = 15 * 60 * 1000, offset = 7 * 60 * 1000;
-    const slot = Math.floor((created - offset) / quarter) * quarter + offset;
-    if (!Number.isSafeInteger(slot) || slot < 0 || created - slot > fixed.maxScheduleDelaySeconds * 1000)
+    const slot = Math.floor((now - offset) / quarter) * quarter + offset;
+    const afterSlot = Math.floor((after - offset) / quarter) * quarter + offset;
+    if (!Number.isSafeInteger(slot) || slot < 0 || after < now || afterSlot !== slot)
       return { status: "SLOT_BLOCKED" };
     const slotId = "slot:" + slot;
     const status = await claimJobSlot(db, { repositoryId: identity.repositoryId, runId: identity.runId,
