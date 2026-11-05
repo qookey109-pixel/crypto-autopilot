@@ -283,6 +283,12 @@
     "guard_sequence": "LOCAL_USAGE_RESERVATION_THEN_SHARED_ADMISSION_THEN_TARGET_D1_QUERY",
     "scope": "REPOSITORY_SOURCE_ONLY",
     "account_wide_coverage": "NOT_PROVEN",
-    "note": "The CI scan prevents a second in-repository D1 REST client from appearing outside the guarded client. It does not enumerate external account writers or prove fresh account-wide usage evidence."
+    "note": "The CI scan prevents a second in-repository D1 REST client from appearing outside the guarded client. It does not enumerate external account writers or prove fresh account-wide usage evidence.",
+    "worker_source_marker_guard": {
+      "scope": "REPOSITORY_SRC_SCRIPTS_INFRA_WORKERS_ONLY",
+      "guard": "scripts/validate_cloud_paper_r2_writer_inventory.py",
+      "interpretation": "HEURISTIC_MARKER_SCAN_NOT_ACCOUNT_WIDE_PROOF; dynamic access and other roots require review",
+      "unreviewed_worker_d1_markers": "FAIL_CLOSED_UNTIL_VERSIONED_SUCCESSOR"
+    }
   }
 }

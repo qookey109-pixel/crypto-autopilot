@@ -55,6 +55,24 @@ def find_d1_rest_source_paths(source_files: dict[str, str]) -> set[str]:
     }
 
 
+# Marker inventory, not a parser or an account-wide access proof. Unknown JS
+# sources must receive separate review before an authorized Worker is wired.
+WORKER_D1_MARKER = re.compile(
+    r"\.\s*prepare\s*\(|\b(?:database|db|env\.[A-Za-z_$][\w$]*)\s*\.\s*(?:batch|exec)\s*\("
+    r"|\bD1Database\b|\bd1_databases\b",
+    re.IGNORECASE,
+)
+WORKER_SOURCE_SUFFIXES = {
+    ".js", ".mjs", ".cjs", ".ts", ".mts", ".cts", ".tsx", ".json", ".jsonc",
+    ".toml", ".yaml", ".yml",
+}
+
+
+def find_worker_d1_source_paths(source_files: dict[str, str]) -> set[str]:
+    """Find obvious unreviewed Worker D1 markers; dynamic access can be missed."""
+    return {path for path, contents in source_files.items() if WORKER_D1_MARKER.search(contents)}
+
+
 PREPAID_D1_CLIENT_PATH = "src/crypto_autopilot/paper/prepaid_d1_client_v0_1.py"
 PREPAID_D1_QUERY_GUARD_ORDER = (
     "if self._poisoned:",
@@ -325,6 +343,19 @@ def main() -> int:
         or successor.get("implementation") != PREPAID_D1_CLIENT_PATH
     ):
         raise RuntimeError("D1 prepaid implementation inventory contract is invalid")
+    worker_sources = {
+        path.relative_to(ROOT).as_posix(): path.read_text(encoding="utf-8")
+        for source_root in (ROOT / "src", ROOT / "scripts", ROOT / "infra", ROOT / "workers")
+        if source_root.is_dir()
+        for path in source_root.rglob("*")
+        if path.is_file() and path.suffix.lower() in WORKER_SOURCE_SUFFIXES
+    }
+    worker_d1_paths = find_worker_d1_source_paths(worker_sources)
+    if worker_d1_paths:
+        raise RuntimeError(
+            "Unreviewed Worker D1 markers require a versioned successor: "
+            f"{sorted(worker_d1_paths)}"
+        )
     d1_client_paths = validate_d1_source_boundary(
         source_files, expected_d1_client_path,
         successor_client_path=successor["implementation"],
