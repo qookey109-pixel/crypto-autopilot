@@ -67,6 +67,8 @@ test("signature, repository and run claims must agree", async () => {
   const accepted = await verifyGithubJob(token, options);
   assert.equal(accepted?.runId, "100");
   assert.equal(accepted?.checkRunId, "101");
+  assert.equal(accepted?.eventName, "schedule");
+  assert.equal(accepted?.repositoryId, "123");
   assert.equal(await verifyGithubJob(token, { ...options, policy: { ...policy, repositoryId: "999" } }), null);
   assert.equal(await verifyGithubJob(header + "." + encode({ ...claims, run_id: "102" }) + "." + signature, options), null);
   assert.equal(await verifyGithubJob(token, { ...options, now: 1400 }), null);
@@ -163,7 +165,7 @@ test("signed job identity must match current exact run and job metadata", () => 
   const sha = "a".repeat(40);
   const policy = { repositoryId: "123", workflowId: "456", workflowPath: ".github/workflows/paper.yml", jobName: "paper",
     sha, maxAgeSeconds: 600, allowedEvents: ["schedule", "workflow_dispatch"] };
-  const identity = { runId: "100", checkRunId: "101" };
+  const identity = { runId: "100", checkRunId: "101", eventName: "schedule", repositoryId: "123" };
   const run = { id: 100, workflow_id: 456, path: policy.workflowPath, head_sha: sha, head_branch: "main",
     run_attempt: 1, status: "in_progress", event: "schedule", created_at: "2026-01-01T00:00:00Z",
     repository: { id: 123 } };
@@ -171,6 +173,8 @@ test("signed job identity must match current exact run and job metadata", () => 
     status: "in_progress", started_at: "2026-01-01T00:00:10Z", completed_at: null };
   const now = Date.parse("2026-01-01T00:02:00Z");
   assert.equal(checkJobMetadata(identity, run, job, policy, now), true);
+  assert.equal(checkJobMetadata({ ...identity, eventName: "workflow_dispatch" }, run, job, policy, now), false);
+  assert.equal(checkJobMetadata({ ...identity, repositoryId: "999" }, run, job, policy, now), false);
   for (const alteredRun of [
     { ...run, id: 102 }, { ...run, workflow_id: 999 }, { ...run, head_sha: "b".repeat(40) },
     { ...run, head_branch: "other" }, { ...run, status: "completed" }, { ...run, run_attempt: 2 },
