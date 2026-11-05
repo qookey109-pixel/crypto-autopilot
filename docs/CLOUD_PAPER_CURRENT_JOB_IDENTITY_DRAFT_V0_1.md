@@ -72,6 +72,40 @@ claim semantics, operation budget and failure/readback behavior have all been
 verified under a merged successor. OIDC only verifies a signed bearer; it is not
 a trusted-clock, slot, account-headroom or source-integrity proof.
 
+## Direct credential paths observed on main
+
+On main `ae9faa2032af6f2d2b5cfc14123b7229b992d2d2`, static workflow
+inspection found direct R2 credential injection outside the proposed broker.
+This is a capability and migration inventory, not evidence that a given run
+actually accessed R2 or that all account users and secret aliases are known.
+The following paths must be independently classified and their active authority
+and actual read/write operations verified before any sole-gateway claim:
+
+- `.github/workflows/research-signal-layer-v0-2.yml`: scheduled and manually
+  dispatched research publication explicitly invokes `--publish-r2`.
+- `.github/workflows/research-signal-quality-v0-1.yml`: scheduled,
+  workflow-run and manual quality check declares R2 writes forbidden but reads
+  evidence; reads also consume shared account resources and must be budgeted.
+- `.github/workflows/binance-usdm-detailed-training-v0-1.yml`: scheduled
+  fingerprint comparison and manual execution receive R2 credentials; current
+  runtime guards and consumed bootstrap prevent assuming new training or writes.
+- `.github/workflows/live-paper-run-coordinator-v0-1.yml` and
+  `.github/workflows/live-paper-run-recovery-v0-1.yml`: manual paths receive
+  the same credential names; recovery exposes an optional repair mode. They
+  cannot be assumed to share the new broker's admission or replay claim.
+- Spot training/monthly governance, historical repair, Pionex pilot and
+  materialization, forward context capture, alternative-assets observability,
+  and provider-equivalence capture workflows also contain direct secret bindings.
+  Some are historically constrained, retired, read-only or past their fixed
+  windows; secret binding alone does not establish current execution authority.
+
+The repository secret scope and provider-side key privileges have not been
+verified by this static review. A safe cutover needs verified least-privilege
+credential separation, inventory of external and future users, read and write
+budgets, treatment of retired workflows, and evidence that no legacy path can
+use the broker's protected credential. Do not revoke existing credentials or
+change historical workflows solely on this inventory.
+
 ## Cloudflare Worker candidate: constraints, not a selected deployment
 
 A Worker holding D1/R2 bindings is one possible independent enforcement
