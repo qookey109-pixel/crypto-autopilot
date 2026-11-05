@@ -1,0 +1,40 @@
+{
+  "schema": "qookey-cloud-paper-operation-evidence-v0.3",
+  "status": "PREPARED_IMPLEMENTATION_ONLY_NO_RUNTIME_AUTHORITY",
+  "supersedes": "qookey-cloud-paper-loop-report-v0.2",
+  "implementation": "src/crypto_autopilot/paper/cloud_loop_v0_3.py",
+  "reader": "src/crypto_autopilot/paper/cloud_report_reader_v0_3.py",
+  "behavior": {
+    "report_schema": "qookey-cloud-paper-loop-report-v0.3",
+    "provider_requests": "OBSERVED_BY_EXISTING_ADAPTER",
+    "r2_write_attempts": null,
+    "r2_write_replays": null,
+    "status": "PARTIAL",
+    "reason": "FINAL_ATTEMPTS_NOT_AVAILABLE_AT_REPORT_CREATION",
+    "read_v0_1": true,
+    "read_v0_2": true,
+    "read_v0_3": true,
+    "legacy_receipts_and_files_unchanged": true,
+    "live_budget_guard_remains_authoritative_for_attempt_reservation": true
+  },
+  "limitations": [
+    "NULL_DOES_NOT_PROVIDE_FINAL_USAGE_EVIDENCE",
+    "ACCOUNT_WIDE_BUDGET_AND_ALL_WRITERS_NOT_PROVEN",
+    "R2_AND_D1_PRODUCTION_BEHAVIOR_NOT_TESTED"
+  ],
+  "runtime": {
+    "activation_enabled": false,
+    "schedule_enabled": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "d1_access_authorized": false
+  },
+  "boundaries": {
+    "monthly_budget_usd": 0,
+    "paper_only": true,
+    "holdout_access": false,
+    "source_switch": false,
+    "model_promotion": false,
+    "real_money_orders": false
+  }
+}
