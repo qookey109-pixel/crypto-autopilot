@@ -96,11 +96,17 @@ class D1WorkflowInventoryTests(unittest.TestCase):
             "workers/paper/index.mjs": "return database.prepare(sql).bind(x).run();",
             "infra/paper/wrangler.jsonc": '{"d1_databases": [{"binding": "DB"}]}',
             "workers/other/index.ts": "const db: D1Database = env.DB;",
+            "workers/dynamic/index.js": 'env["DB"].prepare(sql).run();',
+            "workers/other/adapter.mts": "client.prepare(sql);",
             "workers/safe/index.js": "return new Response('ok');",
         }
         self.assertEqual(
             find_worker_d1_source_paths(sources),
-            {"workers/paper/index.mjs", "infra/paper/wrangler.jsonc", "workers/other/index.ts"},
+            {
+                "workers/paper/index.mjs", "infra/paper/wrangler.jsonc",
+                "workers/other/index.ts", "workers/dynamic/index.js",
+                "workers/other/adapter.mts",
+            },
         )
 
     def test_detects_d1_secret_reference(self) -> None:
