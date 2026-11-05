@@ -129,6 +129,36 @@ class SharedSignalPublisherTests(unittest.TestCase):
         args.update(overrides)
         return publish_shared_signal_payload(**args)
 
+    def test_legacy_github_run_identity_and_previous_pointer_remain_compatible(self):
+        previous_run = "github-122-2"
+        previous = {
+            "schema": "research-signal-layer-latest-v0.2",
+            "run_id": previous_run,
+            "manifest_key": f"{NAMESPACE}/runs/run={previous_run}/manifest.json",
+            "manifest_sha256": "a" * 64,
+            "generated_at_utc": "2027-01-15T07:59:00Z",
+        }
+        self.backend.objects[f"{NAMESPACE}/latest.json"] = json.dumps(previous).encode()
+        run_id = "github-123-1"
+        self.payload["run_id"] = run_id
+        self.reservation = replace(
+            self.reservation,
+            r2_new_bytes=sum(len(body) for _, body in _objects(self.payload, run_id)),
+        )
+        result = self.publish(run_id=run_id)
+        self.assertEqual(result["status"], "PUBLISHED")
+        self.assertEqual(result["attempted_usage"]["r2_class_a"], 3)
+        self.assertEqual(result["attempted_usage"]["r2_class_b"], 6)
+        latest = json.loads(self.backend.objects[f"{NAMESPACE}/latest.json"])
+        self.assertEqual(latest["run_id"], run_id)
+        self.assertEqual(latest["manifest_key"], f"{NAMESPACE}/runs/run={run_id}/manifest.json")
+
+    def test_malformed_github_run_ids_fail_before_io(self):
+        for run_id in ("github-0-1", "github-123-0", "github-123-1/extra", "github-123-01"):
+            with self.subTest(run_id=run_id), self.assertRaises(BudgetBlocked):
+                _objects({**self.payload, "run_id": run_id}, run_id)
+        self.assertEqual(self.events, [])
+
     def test_missing_target_configuration_blocks_before_admission(self):
         for key in ("CLOUDFLARE_ACCOUNT_ID", "R2_BUCKET_NAME"):
             with self.subTest(key=key), patch.dict(os.environ, {key: ""}):
