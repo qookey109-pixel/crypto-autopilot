@@ -20,7 +20,7 @@ class SyntheticUsageEvidenceTests(unittest.TestCase):
             manifest = produce_evidence(output, run_id="github-101-1", source_sha="a" * 40)
             self.assertEqual(manifest["evidence_type"], "SYNTHETIC_CI_ONLY")
             self.assertEqual(manifest["source_sha_unattested"], "a" * 40)
-            self.assertFalse(manifest["external_service_access"])
+            self.assertFalse(manifest["production_data_service_access"])
             success = json.loads((output / "completed" / "cloud-paper-usage-observation.json").read_text())
             failure = json.loads((output / "ambiguous" / "cloud-paper-usage-observation.json").read_text())
             self.assertEqual(success["status"], "OBSERVED_RETURNED")
