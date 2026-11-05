@@ -17,7 +17,8 @@ export function processingSlot(now, after) {
   return slot;
 }
 
-export async function admitScheduledJob({ policy, token, githubToken, fetcher, db, clock, reserve } = {}) {
+export async function admitScheduledJob({ enabled = false, policy, token, githubToken, fetcher, db, clock, reserve } = {}) {
+  if (enabled !== true) return { status: "DISABLED" };
   try {
     if (!policy || typeof clock !== "function" || typeof reserve !== "function") return { status: "INVALID" };
     const fixed = structuredClone(policy);
