@@ -1,11 +1,44 @@
 """Strict namespace inventory for the disabled Cloud Paper runtime."""
 from __future__ import annotations
 
-from crypto_autopilot.paper.run_store_v0_1 import R2PaperRunStore, _clean_component
+from collections.abc import Mapping
+
+from crypto_autopilot.paper.run_store_v0_1 import (
+    PaperRunObjectAlreadyExistsError,
+    PaperRunStoreReceipt,
+    R2PaperRunStore,
+    _canonical_bytes,
+    _clean_component,
+)
 
 
 class CloudPaperRunStore(R2PaperRunStore):
     """Never silently filter unexpected objects from a scanned namespace."""
+
+    def put_json(
+        self, kind: str, object_id: str, payload: Mapping[str, object],
+    ) -> PaperRunStoreReceipt:
+        """Create atomically; identical existing objects are read-only replays."""
+        key = self._key(kind, object_id)
+        body = _canonical_bytes(payload)
+
+        def replay(existing: bytes | None) -> PaperRunStoreReceipt:
+            if existing is None or existing != body:
+                raise ValueError("paper run store id collision or unverified object")
+            return PaperRunStoreReceipt(
+                backend="R2_JSON", kind=kind, object_id=object_id,
+                location=key, bytes=len(body), replayed=True,
+            )
+
+        existing = self.store.get_bytes_if_exists(key)
+        if existing is not None:
+            return replay(existing)
+        try:
+            return self.put_json_if_absent(kind, object_id, payload)
+        except PaperRunObjectAlreadyExistsError:
+            # Only a definitive 412 permits readback. A timeout or other
+            # ambiguous write outcome propagates and is never retried here.
+            return replay(self.store.get_bytes_if_exists(key))
 
     def list_json_ids(self, kind: str) -> tuple[str, ...]:
         clean_kind = _clean_component(kind, "kind")
