@@ -223,6 +223,31 @@ invocations, storage, recovery and refusal cost. No Durable Object is created
 or enabled by this draft. Whether a different architecture can meet the same
 bound remains open.
 
+### Candidate for a later strict-limiter successor
+
+Cloudflare's current [Durable Objects pricing](https://developers.cloudflare.com/durable-objects/platform/pricing/)
+states that SQLite-backed Durable Objects are available on Workers Free and
+that exceeding a Free-plan dimension makes further operations of that type
+fail. Published Free allowances include 100,000 requests/day, 13,000 GB-s/day,
+5 million rows read/day, 100,000 rows written/day and 5 GB stored. These are
+account-level published limits, not this account's measured remaining
+allowance or permission to provision. Calling Workers and rejected requests
+also consume their own resources; platform enforcement may stop unrelated
+services sharing the account.
+
+A single account-scoped SQLite-backed Durable Object is a candidate to
+serialize identity/slot claims and prepaid envelopes, provided the successor
+first proves Free-plan status, all existing and future writers, request and
+storage overhead, durable recovery after ambiguous responses, replay behavior,
+and credential non-bypass. It must also model denial-of-service and budget
+exhaustion from requests rejected before admission. A GitHub-protected claim
+service remains another candidate; compare its protection, attempt quotas,
+failure semantics and own overhead against the same requirements. Neither
+option is selected by this draft, and neither permits relaxing the existing
+shared gate or consuming a historical authority. The frozen V0.1 policy
+continues to disallow Durable Objects until a separately reviewed successor
+changes that rule.
+
 ## Prepared D1 claim adapter and retry accounting
 
 The draft Worker adapter issues one parameterized insert and accepts only an
