@@ -142,3 +142,18 @@ test("D1 claim adapter rejects duplicates and preserves ambiguous committed writ
   assert.equal(calls, before);
   sql.close();
 });
+
+test("D1 claim rejects unknown or repeated attempt metadata", async () => {
+  const claim = { repositoryId: "123", runId: "100", attempt: "1", checkRunId: "101", writerId: "paper", slotId: "slot:1000" };
+  for (const result of [
+    { success: true, meta: { changes: 1 } },
+    { success: true, meta: { changes: 1, total_attempts: 2 } },
+    { success: true, meta: { changes: 2, total_attempts: 1 } },
+    { success: false, meta: { changes: 1, total_attempts: 1 } },
+  ]) {
+    let calls = 0;
+    const db = { prepare: () => ({ bind: () => ({ run: async () => { calls++; return result; } }) }) };
+    assert.equal(await claimJobSlot(db, claim, { enabled: true }), "REVIEW_REQUIRED");
+    assert.equal(calls, 1);
+  }
+});
