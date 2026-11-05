@@ -184,6 +184,22 @@ slot/replay claims, budget admission or all-writer coverage. A successful Node
 test is not a live GitHub OIDC or Cloudflare validation. No bearer token,
 production service or paid capability is used by this prototype.
 
+## Synthetic admission composition
+
+The draft composes the verifier, fixed key reader, bounded metadata reader,
+metadata comparison and D1 claim using fake credentials and an in-memory
+database in cloud CI. Its injected reservation is a fixture, not a real shared
+budget; it is not a Worker request handler and must never receive production
+bindings. A green composition test proves only the tested sequencing.
+
+The test computes a candidate quarter-hour slot from run creation time. GitHub
+does not sign the nominal scheduled slot in OIDC, and a delayed run may have a
+creation timestamp close to a later nominal slot. Therefore the calculation
+cannot prove slot identity, even with a three-minute window. It must not be
+used to authorize production. A successor needs a separately verified slot
+assignment or must fail closed when the slot cannot be established. Manual
+controlled acceptance is also not implemented in the synthetic composition.
+
 ## Prepared D1 claim adapter and retry accounting
 
 The draft Worker adapter issues one parameterized insert and accepts only an
