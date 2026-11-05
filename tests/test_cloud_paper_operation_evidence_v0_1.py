@@ -95,3 +95,26 @@ class PaperOperationReaderTests(unittest.TestCase):
         report["operation_counts"]["r2_write_attempts"] = 0
         with self.assertRaisesRegex(CloudLoopReviewRequired, "RESULT_REPORT_MISMATCH"):
             committed_report(store, "0")
+
+
+    def test_new_report_seal_verification_rejects_tampering(self):
+        from crypto_autopilot.paper.cloud_loop_v0_1 import CloudLoopReviewRequired
+        from crypto_autopilot.paper.cloud_loop_v0_3 import run_cloud_step
+        from crypto_autopilot.paper.cloud_result_seal_validation_v0_2 import (
+            committed_report_with_seal_validation,
+        )
+        from test_cloud_paper_loop_v0_1 import MemoryStore, NeverCalledFeed, REGISTRY
+
+        store = MemoryStore()
+        result = run_cloud_step(
+            tick_ms=420000, previous_slot=None, store=store, feed=NeverCalledFeed(),
+            market_supplier=lambda: {"provider_requests_performed": 0},
+            candidate_supplier=lambda market, state: (), strategy_registry=REGISTRY,
+            before_external=lambda: None,
+        )
+        self.assertEqual(committed_report_with_seal_validation(store, "0"), result)
+        step_id = result["coordinator"]["step_id"]
+        request_id = store.objects[("live-run-step", step_id)]["request_id"]
+        store.objects[("live-run-result", request_id)]["sequence"] = 999
+        with self.assertRaises(CloudLoopReviewRequired):
+            committed_report_with_seal_validation(store, "0")
