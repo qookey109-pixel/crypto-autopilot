@@ -166,6 +166,15 @@ as metadata rather than as a trust source. The reader is disabled by default,
 pins the issuer's published JWKS URL, refuses redirects, bounds response bytes,
 and makes no retry. Tests use generated signing keys and a fake fetcher.
 
+The draft also contains a bounded, no-redirect GitHub metadata reader and a
+comparison of the signed run/check identifiers, repository, event, workflow,
+commit, attempt, job, status and time. Only fixture responses have been used.
+The comparison does not prove that a job is still active when a later operation
+runs, that a bearer has not been copied, or that an unsigned slot belongs to
+the run. Policy, token and endpoints must be server-owned, never supplied by a
+request. The proposed two metadata GETs plus JWKS GET and all retry/overhead
+must be reserved separately; none is covered by the existing ticket ceiling.
+
 These are separate synthetic primitives, not an independent gateway. The
 verifier currently accepts a caller-provided policy, time and key callback;
 a future deployment must instead enforce server-owned values and protect the
