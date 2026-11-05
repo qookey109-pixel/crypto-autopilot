@@ -99,6 +99,15 @@ and actual read/write operations verified before any sole-gateway claim:
   Some are historically constrained, retired, read-only or past their fixed
   windows; secret binding alone does not establish current execution authority.
 
+A read-only Cloudflare R2 token-list observation on 2026-11-05 showed at least
+one active account token scoped to the project bucket with object read/write,
+and two active user tokens with administrator read/write across all buckets.
+The observation does not identify which token supplies the GitHub secret, who
+holds each credential, whether other services use it, or whether the visible
+list covers every account access method. It is not proof of shared-budget
+admission, actual usage, a zero-cost guarantee, or a reason to revoke a token.
+No token values or account identifiers are recorded here.
+
 The repository secret scope and provider-side key privileges have not been
 verified by this static review. A safe cutover needs verified least-privilege
 credential separation, inventory of external and future users, read and write
