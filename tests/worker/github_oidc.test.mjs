@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { webcrypto } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { claimJobSlot } from "../../workers/paper-gateway/d1-job-claim.mjs";
+import { checkJobMetadata } from "../../workers/paper-gateway/github-metadata.mjs";
 import { verifyGithubJob } from "../../workers/paper-gateway/github-oidc.mjs";
 import { readGithubKeys } from "../../workers/paper-gateway/github-keys.mjs";
 
@@ -156,4 +157,30 @@ test("D1 claim rejects unknown or repeated attempt metadata", async () => {
     assert.equal(await claimJobSlot(db, claim, { enabled: true }), "REVIEW_REQUIRED");
     assert.equal(calls, 1);
   }
+});
+
+test("signed job identity must match current exact run and job metadata", () => {
+  const sha = "a".repeat(40);
+  const policy = { repositoryId: "123", workflowId: "456", workflowPath: ".github/workflows/paper.yml", jobName: "paper",
+    sha, maxAgeSeconds: 600, allowedEvents: ["schedule", "workflow_dispatch"] };
+  const identity = { runId: "100", checkRunId: "101" };
+  const run = { id: 100, workflow_id: 456, path: policy.workflowPath, head_sha: sha, head_branch: "main",
+    run_attempt: 1, status: "in_progress", event: "schedule", created_at: "2026-01-01T00:00:00Z",
+    repository: { id: 123 } };
+  const job = { id: 101, run_id: 100, run_attempt: 1, head_sha: sha, name: "paper",
+    status: "in_progress", started_at: "2026-01-01T00:00:10Z", completed_at: null };
+  const now = Date.parse("2026-01-01T00:02:00Z");
+  assert.equal(checkJobMetadata(identity, run, job, policy, now), true);
+  for (const alteredRun of [
+    { ...run, id: 102 }, { ...run, workflow_id: 999 }, { ...run, head_sha: "b".repeat(40) },
+    { ...run, head_branch: "other" }, { ...run, status: "completed" }, { ...run, run_attempt: 2 },
+    { ...run, event: "pull_request" }, { ...run, repository: { id: 999 } },
+    { ...run, created_at: "invalid" }, { ...run, created_at: "2025-12-31T23:00:00Z" },
+  ]) assert.equal(checkJobMetadata(identity, alteredRun, job, policy, now), false);
+  for (const alteredJob of [
+    { ...job, id: 999 }, { ...job, run_id: 999 }, { ...job, run_attempt: 2 },
+    { ...job, head_sha: "b".repeat(40) }, { ...job, status: "completed" },
+    { ...job, name: "other" }, { ...job, started_at: "2026-01-01T00:05:00Z" },
+  ]) assert.equal(checkJobMetadata(identity, run, alteredJob, policy, now), false);
+  assert.equal(checkJobMetadata(identity, run, job, policy, now + 3600000), false);
 });
