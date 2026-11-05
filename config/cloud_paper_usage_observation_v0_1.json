@@ -21,10 +21,10 @@
     "workflow": null,
     "artifact_upload_authorized": false,
     "cloud_paper_activation": false,
-    "provider_access": false,
-    "r2_access": false,
-    "d1_access": false,
-    "schedule": false
+    "schedule": false,
+    "provider_access_authorized": false,
+    "r2_access_authorized": false,
+    "d1_access_authorized": false
   },
   "boundary": {
     "monthly_budget_usd": 0,
