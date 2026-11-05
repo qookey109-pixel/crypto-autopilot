@@ -58,11 +58,14 @@ def find_d1_rest_source_paths(source_files: dict[str, str]) -> set[str]:
 # Marker inventory, not a parser or an account-wide access proof. Unknown JS
 # sources must receive separate review before an authorized Worker is wired.
 WORKER_D1_MARKER = re.compile(
-    r"\b(?:database|db|env\.[A-Za-z_$][\w$]*)\s*\.\s*(?:prepare|batch|exec)\s*\("
+    r"\.\s*prepare\s*\(|\b(?:database|db|env\.[A-Za-z_$][\w$]*)\s*\.\s*(?:batch|exec)\s*\("
     r"|\bD1Database\b|\bd1_databases\b",
     re.IGNORECASE,
 )
-WORKER_SOURCE_SUFFIXES = {".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsonc", ".toml"}
+WORKER_SOURCE_SUFFIXES = {
+    ".js", ".mjs", ".cjs", ".ts", ".mts", ".cts", ".tsx", ".json", ".jsonc",
+    ".toml", ".yaml", ".yml",
+}
 
 
 def find_worker_d1_source_paths(source_files: dict[str, str]) -> set[str]:
