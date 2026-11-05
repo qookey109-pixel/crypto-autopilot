@@ -142,6 +142,17 @@ jobs:
           path: cloud-paper-full-cycle-r2/report.json
           retention-days: 30
           if-no-files-found: error
+      - name: Produce synthetic Paper usage receipts (Python 3.12 only)
+        if: ${{ matrix.python-version == '3.12' }}
+        run: python scripts/cloud_paper_usage_synthetic_evidence_v0_1.py --synthetic-only --output cloud-paper-synthetic-usage
+      - name: Upload synthetic Paper usage receipts
+        if: ${{ matrix.python-version == '3.12' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: cloud-paper-synthetic-usage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: cloud-paper-synthetic-usage
+          retention-days: 7
+          if-no-files-found: error
       - name: R2 cost and budget gate
         run: python scripts/check_r2_budget.py
       - name: Observed Binance R2 budget gate
