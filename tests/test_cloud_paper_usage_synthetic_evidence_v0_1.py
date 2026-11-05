@@ -43,3 +43,23 @@ class SyntheticUsageEvidenceTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 produce_evidence(output, run_id="not-a-run", source_sha="a" * 40)
             self.assertFalse(output.exists())
+
+
+    def test_artifact_readback_requires_identical_complete_file_set(self):
+        import shutil
+        from scripts.cloud_paper_usage_synthetic_evidence_v0_1 import verify_downloaded_evidence
+
+        with tempfile.TemporaryDirectory() as temp:
+            expected = Path(temp) / "expected"
+            downloaded = Path(temp) / "downloaded"
+            produce_evidence(expected, run_id="github-101-1", source_sha="a" * 40)
+            shutil.copytree(expected, downloaded)
+            self.assertEqual(verify_downloaded_evidence(expected, downloaded)["status"],
+                             "SYNTHETIC_ARTIFACT_READBACK_VERIFIED")
+            receipt = downloaded / "completed" / "cloud-paper-usage-observation.json"
+            receipt.write_text("changed")
+            with self.assertRaisesRegex(ValueError, "READBACK_MISMATCH"):
+                verify_downloaded_evidence(expected, downloaded)
+            receipt.unlink()
+            with self.assertRaisesRegex(ValueError, "FILE_SET_MISMATCH"):
+                verify_downloaded_evidence(expected, downloaded)
