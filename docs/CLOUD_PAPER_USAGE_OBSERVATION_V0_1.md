@@ -20,5 +20,7 @@ crash can lose them. It does not include the cost of any future artifact upload
 or external evidence storage. The future controlled-main entrypoint must
 separately define bounded persistence, account for its own cost, reconcile
 provider-side usage and protect against bypass before claiming operational
-acceptance. The current code creates no workflow, schedule, credentials, R2 or
-D1 operation and grants no execution authority.
+acceptance. Importing the code creates no workflow, schedule, credentials or
+external operation. An explicit enabled call invokes the supplied runtime and
+may perform its provider, R2 and D1 operations; a separate merged execution
+authority is still required.
