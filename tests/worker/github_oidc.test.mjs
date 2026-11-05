@@ -123,7 +123,7 @@ test("D1 claim adapter rejects duplicates and preserves ambiguous committed writ
     calls++;
     const result = sql.prepare(statement).run(...args);
     if (loseResponse) throw Error("response lost after commit");
-    return { success: true, meta: { changes: Number(result.changes) } };
+    return { success: true, meta: { changes: Number(result.changes), total_attempts: 1 } };
   } }) }) };
   const claim = { repositoryId: "123", runId: "100", attempt: "1", checkRunId: "101", writerId: "paper", slotId: "slot:1000" };
   assert.equal(await claimJobSlot(binding, claim), "DISABLED");
