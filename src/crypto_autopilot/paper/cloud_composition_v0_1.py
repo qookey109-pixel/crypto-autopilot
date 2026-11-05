@@ -26,11 +26,11 @@ from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
 )
 from crypto_autopilot.paper.cloud_loop_v0_1 import (
     CompleteTapePionexFeed,
-    committed_report,
     digest,
     validate_slot_start,
 )
-from crypto_autopilot.paper.cloud_loop_v0_2 import run_cloud_step
+from crypto_autopilot.paper.cloud_report_reader_v0_3 import committed_report
+from crypto_autopilot.paper.cloud_loop_v0_3 import run_cloud_step
 from crypto_autopilot.paper.cloud_market_v0_1 import (
     PublicMarketClient,
     analyze_capture,
