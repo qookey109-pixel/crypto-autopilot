@@ -103,7 +103,7 @@ def produce_evidence(output, *, run_id, source_sha):
             "evidence_type": "SYNTHETIC_CI_ONLY",
             "run_id_unattested": run_id,
             "source_sha_unattested": source_sha,
-            "external_service_access": False,
+            "production_data_service_access": False,
             "provider_access": False, "r2_access": False, "d1_access": False,
             "production_readiness_proven": False,
             "scenarios": {
