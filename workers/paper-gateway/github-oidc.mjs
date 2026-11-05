@@ -93,6 +93,6 @@ export async function verifyGithubJob(token, { enabled = false, policy, now, fet
     const valid = await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, decode(parts[2]),
       new TextEncoder().encode(parts[0] + "." + parts[1]));
     if (!valid) return null;
-    return { runId: claims.run_id, checkRunId: claims.check_run_id, jti: claims.jti };
+    return { runId: claims.run_id, checkRunId: claims.check_run_id, repositoryId: claims.repository_id, eventName: claims.event_name, jti: claims.jti };
   } catch { return null; }
 }
