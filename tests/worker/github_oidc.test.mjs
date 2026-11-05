@@ -260,7 +260,9 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   const db = { prepare: statement => ({ bind: (...args) => ({ run: async () => {
     writes++; return { success: true, meta: { changes: Number(sql.prepare(statement).run(...args).changes), total_attempts: 1 } };
   } }) }) };
-  const config = { policy, token, githubToken: "synthetic-only-token", fetcher, db, clock: () => now };
+  const config = { enabled: true, policy, token, githubToken: "synthetic-only-token", fetcher, db, clock: () => now };
+  assert.equal((await admitScheduledJob({ ...config, enabled: false, reserve: async () => { throw Error("must not reserve"); } })).status, "DISABLED");
+  assert.equal(fetches, 0); assert.equal(writes, 0);
   assert.equal((await admitScheduledJob({ ...config, reserve: async () => false })).status, "BUDGET_BLOCKED");
   assert.equal(fetches, 0); assert.equal(writes, 0);
   invalidRun = true;
