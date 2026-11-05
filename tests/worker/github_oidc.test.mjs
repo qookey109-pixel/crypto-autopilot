@@ -52,7 +52,7 @@ test("signature, repository and run claims must agree", async () => {
     iat: 1000, nbf: 1000, exp: 1300, jti: "fixture-jti",
   };
   const encode = (value) => Buffer.from(JSON.stringify(value)).toString("base64url");
-  const header = encode({ alg: "RS256", typ: "JWT", kid: "fixture" });
+  const header = encode({ alg: "RS256", typ: "JWT", kid: "fixture", x5t: "fixture-thumbprint" });
   const payload = encode(claims);
   const input = header + "." + payload;
   const signature = Buffer.from(await crypto.subtle.sign(
@@ -66,4 +66,15 @@ test("signature, repository and run claims must agree", async () => {
   assert.equal(await verifyGithubJob(token, { ...options, policy: { ...policy, repositoryId: "999" } }), null);
   assert.equal(await verifyGithubJob(header + "." + encode({ ...claims, run_id: "102" }) + "." + signature, options), null);
   assert.equal(await verifyGithubJob(token, { ...options, now: 1400 }), null);
+  const sign = async (h, p) => {
+    const data = h + "." + p;
+    const signed = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key.privateKey, new TextEncoder().encode(data));
+    return data + "." + Buffer.from(signed).toString("base64url");
+  };
+  const duplicate = Buffer.from(JSON.stringify(claims).replace('"run_id":"100"', '"run_id":"100","run_id":"100"')).toString("base64url");
+  assert.equal(await verifyGithubJob(await sign(header, duplicate), options), null);
+  const forbidden = encode({ alg: "RS256", typ: "JWT", kid: "fixture", jku: "https://attacker.example/keys" });
+  assert.equal(await verifyGithubJob(await sign(forbidden, payload), options), null);
+  assert.equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => ({ keys: [jwk, jwk] }) }), null);
+  assert.equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => { throw Error("offline"); } }), null);
 });
