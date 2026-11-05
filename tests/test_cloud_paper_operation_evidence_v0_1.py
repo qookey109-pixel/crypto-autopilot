@@ -118,3 +118,30 @@ class PaperOperationReaderTests(unittest.TestCase):
         store.objects[("live-run-result", request_id)]["sequence"] = 999
         with self.assertRaises(CloudLoopReviewRequired):
             committed_report_with_seal_validation(store, "0")
+
+
+    def test_successor_reader_accepts_v0_1_embedded_step(self):
+        from unittest.mock import patch
+
+        from crypto_autopilot.paper.cloud_loop_v0_1 import digest
+        from crypto_autopilot.paper.cloud_report_reader_v0_3 import committed_report
+        from crypto_autopilot.paper.run_coordinator_v0_3 import LivePaperRunCoordinatorPolicy
+        from test_cloud_paper_loop_v0_1 import MemoryStore, step
+
+        store = MemoryStore()
+        with patch(
+            "crypto_autopilot.paper.cloud_loop_v0_1.LivePaperRunCoordinatorPolicy",
+            return_value=LivePaperRunCoordinatorPolicy(run_slot_claim_required=True),
+        ):
+            step(store, 420000, None)
+        pointer = store.objects[("cloud-result", "0")]
+        compact = store.objects.pop(("cloud-report", pointer["report_id"]))
+        step_id = compact["coordinator"]["step_id"]
+        legacy = dict(compact)
+        legacy["schema"] = "qookey-cloud-paper-loop-report-v0.1"
+        legacy["coordinator"] = {
+            **compact["coordinator"], "run_step": store.objects[("live-run-step", step_id)],
+        }
+        pointer["report_id"] = digest(legacy)
+        store.objects[("cloud-report", pointer["report_id"])] = legacy
+        self.assertEqual(committed_report(store, "0"), legacy)
