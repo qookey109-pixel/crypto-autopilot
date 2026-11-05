@@ -157,6 +157,24 @@ still counts individual statements and their rows. Neither statement proves
 that this account has enough headroom or that an ambiguous response is safe to
 replay. A design that bypasses these boundaries must stay disabled.
 
+## Worker-native identity prototype
+
+This draft contains a Web Crypto RS256 verifier and a fixed GitHub JWKS reader.
+The verifier is disabled by default, rejects duplicate JSON keys and unrecognized
+headers, checks signed claims, and treats the optional documented `x5t` header
+as metadata rather than as a trust source. The reader is disabled by default,
+pins the issuer's published JWKS URL, refuses redirects, bounds response bytes,
+and makes no retry. Tests use generated signing keys and a fake fetcher.
+
+These are separate synthetic primitives, not an independent gateway. The
+verifier currently accepts a caller-provided policy, time and key callback;
+a future deployment must instead enforce server-owned values and protect the
+whole credential boundary. The code has not established Worker-runtime
+compatibility in Cloudflare, key rotation, job metadata cross-checks, atomic
+slot/replay claims, budget admission or all-writer coverage. A successful Node
+test is not a live GitHub OIDC or Cloudflare validation. No bearer token,
+production service or paid capability is used by this prototype.
+
 ## Validation and authority frontier
 
 - Cloud CI only: synthetic RSA signatures, fake GitHub responses and controlled
