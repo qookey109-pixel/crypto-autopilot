@@ -7,6 +7,16 @@ import { readJobMetadata } from "./github-metadata-reader.mjs";
 import { checkJobMetadata } from "./github-metadata.mjs";
 import { claimJobSlot } from "./d1-job-claim.mjs";
 
+export function processingSlot(now, after) {
+  if (!Number.isSafeInteger(now) || !Number.isSafeInteger(after) || after < now) return null;
+  const quarter = 15 * 60 * 1000, offset = 7 * 60 * 1000, day = 86400000;
+  const slot = Math.floor((now - offset) / quarter) * quarter + offset;
+  const afterSlot = Math.floor((after - offset) / quarter) * quarter + offset;
+  if (!Number.isSafeInteger(slot) || slot < 0 || afterSlot !== slot ||
+      after - slot > 600000 || Math.floor(slot / day) !== Math.floor(after / day)) return null;
+  return slot;
+}
+
 export async function admitScheduledJob({ policy, token, githubToken, fetcher, db, clock, reserve } = {}) {
   try {
     if (!policy || typeof clock !== "function" || typeof reserve !== "function") return { status: "INVALID" };
@@ -31,11 +41,8 @@ export async function admitScheduledJob({ policy, token, githubToken, fetcher, d
         !checkJobMetadata(identity, metadata.run, metadata.job,
           { ...fixed, allowedEvents: ["schedule"] }, after)) return { status: "IDENTITY_BLOCKED" };
     // Processing time only; never claim to know the scheduler's nominal slot.
-    const quarter = 15 * 60 * 1000, offset = 7 * 60 * 1000;
-    const slot = Math.floor((now - offset) / quarter) * quarter + offset;
-    const afterSlot = Math.floor((after - offset) / quarter) * quarter + offset;
-    if (!Number.isSafeInteger(slot) || slot < 0 || after < now || afterSlot !== slot)
-      return { status: "SLOT_BLOCKED" };
+    const slot = processingSlot(now, after);
+    if (slot === null) return { status: "SLOT_BLOCKED" };
     const slotId = "slot:" + slot;
     const status = await claimJobSlot(db, { repositoryId: identity.repositoryId, runId: identity.runId,
       attempt: "1", checkRunId: identity.checkRunId, writerId: fixed.writerId, slotId }, { enabled: true });
