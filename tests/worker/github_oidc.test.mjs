@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { webcrypto } from "node:crypto";
 import { verifyGithubJob } from "../../workers/paper-gateway/github-oidc.mjs";
+import { readGithubKeys } from "../../workers/paper-gateway/github-keys.mjs";
 
 globalThis.crypto ??= webcrypto;
 
@@ -77,4 +78,27 @@ test("signature, repository and run claims must agree", async () => {
   assert.equal(await verifyGithubJob(await sign(forbidden, payload), options), null);
   assert.equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => ({ keys: [jwk, jwk] }) }), null);
   assert.equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => { throw Error("offline"); } }), null);
+});
+
+test("key reader stays closed until enabled and pins HTTPS origin", async () => {
+  let count = 0;
+  const fakeFetch = async (url, options) => {
+    count++;
+    assert.equal(url, "https://token.actions.githubusercontent.com/.well-known/jwks");
+    assert.equal(options.redirect, "manual");
+    return new Response(JSON.stringify({ keys: [{ kid: "fixture" }] }), { status: 200 });
+  };
+  assert.equal(await readGithubKeys({ enabled: false, fetcher: fakeFetch }), null);
+  assert.equal(count, 0);
+  assert.deepEqual(await readGithubKeys({ enabled: true, fetcher: fakeFetch }), { keys: [{ kid: "fixture" }] });
+  assert.equal(count, 1);
+});
+
+test("key reader rejects redirects, malformed JSON, oversize and failures", async () => {
+  for (const fakeFetch of [
+    async () => new Response("", { status: 302, headers: { Location: "https://attacker.example" } }),
+    async () => new Response("{broken"),
+    async () => new Response("x".repeat(65537)),
+    async () => { throw Error("unavailable"); },
+  ]) assert.equal(await readGithubKeys({ enabled: true, fetcher: fakeFetch }), null);
 });
