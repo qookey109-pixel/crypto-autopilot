@@ -4,6 +4,7 @@ import { webcrypto } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { claimJobSlot } from "../../workers/paper-gateway/d1-job-claim.mjs";
 import { checkJobMetadata } from "../../workers/paper-gateway/github-metadata.mjs";
+import { readJobMetadata } from "../../workers/paper-gateway/github-metadata-reader.mjs";
 import { verifyGithubJob } from "../../workers/paper-gateway/github-oidc.mjs";
 import { readGithubKeys } from "../../workers/paper-gateway/github-keys.mjs";
 
@@ -187,4 +188,30 @@ test("signed job identity must match current exact run and job metadata", () => 
     { ...job, name: "other" }, { ...job, started_at: "2026-01-01T00:05:00Z" },
   ]) assert.equal(checkJobMetadata(identity, run, alteredJob, policy, now), false);
   assert.equal(checkJobMetadata(identity, run, job, policy, now + 3600000), false);
+});
+
+test("metadata reader makes only fixed signed-ID GitHub requests", async () => {
+  const calls = [];
+  const fetcher = async (url, options) => {
+    calls.push(url);
+    assert.equal(options.method, "GET");
+    assert.equal(options.redirect, "manual");
+    assert.equal(options.headers.Authorization, "Bearer synthetic-only-token");
+    return new Response(JSON.stringify({ id: calls.length }), { status: 200 });
+  };
+  const config = { repository: "owner/repo", identity: { runId: "100", checkRunId: "101" }, token: "synthetic-only-token", fetcher };
+  assert.equal(await readJobMetadata({ ...config, enabled: false }), null);
+  assert.deepEqual(calls, []);
+  assert.deepEqual(await readJobMetadata({ ...config, enabled: true }), { run: { id: 1 }, job: { id: 2 } });
+  assert.deepEqual(calls, [
+    "https://api.github.com/repos/owner/repo/actions/runs/100",
+    "https://api.github.com/repos/owner/repo/actions/jobs/101",
+  ]);
+  assert.equal(await readJobMetadata({ ...config, enabled: true, identity: { runId: "../bad", checkRunId: "101" } }), null);
+  assert.equal(calls.length, 2);
+  let failures = 0;
+  assert.equal(await readJobMetadata({ ...config, enabled: true, fetcher: async () => {
+    failures++; return new Response("", { status: 302, headers: { Location: "https://attacker.example" } });
+  } }), null);
+  assert.equal(failures, 1);
 });
