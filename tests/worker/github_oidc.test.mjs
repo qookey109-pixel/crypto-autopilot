@@ -267,6 +267,14 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   assert.equal((await admitScheduledJob({ ...config, reserve: async () => true })).status, "IDENTITY_BLOCKED");
   assert.equal(writes, 0);
   invalidRun = false;
+  let clockReads = 0, lateWrites = 0;
+  const delayedDb = { prepare: () => ({ bind: () => ({ run: async () => {
+    lateWrites++; return { success: true, meta: { changes: 1, total_attempts: 1 } };
+  } }) }) };
+  const lateResult = await admitScheduledJob({ ...config, db: delayedDb,
+    clock: () => (++clockReads < 3 ? now : base + 301000), reserve: async () => true });
+  assert.equal(lateResult.status, "REVIEW_REQUIRED");
+  assert.equal(lateWrites, 1);
   run.created_at = "2026-01-01T00:06:30Z";
   job.started_at = "2026-01-01T00:07:00Z";
   const accepted = await admitScheduledJob({ ...config, reserve: async () => true });
