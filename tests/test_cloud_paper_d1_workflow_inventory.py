@@ -89,6 +89,20 @@ class D1WorkflowInventoryTests(unittest.TestCase):
             validate_d1_source_boundary({path: source}, path)
 
 
+    def test_detects_worker_d1_binding_and_query_markers(self) -> None:
+        from scripts.validate_cloud_paper_r2_writer_inventory import find_worker_d1_source_paths
+
+        sources = {
+            "workers/paper/index.mjs": "return database.prepare(sql).bind(x).run();",
+            "infra/paper/wrangler.jsonc": '{"d1_databases": [{"binding": "DB"}]}',
+            "workers/other/index.ts": "const db: D1Database = env.DB;",
+            "workers/safe/index.js": "return new Response('ok');",
+        }
+        self.assertEqual(
+            find_worker_d1_source_paths(sources),
+            {"workers/paper/index.mjs", "infra/paper/wrangler.jsonc", "workers/other/index.ts"},
+        )
+
     def test_detects_d1_secret_reference(self) -> None:
         self.assertTrue(contains_d1_access_reference("env: ${{ secrets.D1_DATABASE_ID }}"))
 
