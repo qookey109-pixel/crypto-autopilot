@@ -229,7 +229,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     workflowPath: ".github/workflows/paper.yml", workflowRef: "owner/repo/.github/workflows/paper.yml@refs/heads/main",
     workflowSha: sha, sha, jobName: "paper", audience: "paper-test",
     subject: "repo:owner/repo:ref:refs/heads/main", writerId: "paper", maxAgeSeconds: 600,
-    maxScheduleDelaySeconds: 180 };
+    maxScheduleDelaySeconds: 180, admissionCosts: { workerRequests: 1, githubRequests: 3, d1Queries: 1, d1RowsRead: 8, d1RowsWritten: 1, d1StorageBytes: 4096 } };
   const claims = { iss: "https://token.actions.githubusercontent.com", aud: policy.audience, sub: policy.subject,
     repository: policy.repository, repository_id: policy.repositoryId, workflow_ref: policy.workflowRef,
     workflow_sha: sha, sha, ref: "refs/heads/main", ref_type: "branch", runner_environment: "github-hosted",
@@ -263,7 +263,11 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   const config = { enabled: true, policy, token, githubToken: "synthetic-only-token", fetcher, db, clock: () => now };
   assert.equal((await admitScheduledJob({ ...config, enabled: false, reserve: async () => { throw Error("must not reserve"); } })).status, "DISABLED");
   assert.equal(fetches, 0); assert.equal(writes, 0);
-  assert.equal((await admitScheduledJob({ ...config, reserve: async () => false })).status, "BUDGET_BLOCKED");
+  const incomplete = { ...policy, admissionCosts: { ...policy.admissionCosts, d1RowsRead: undefined } };
+  assert.equal((await admitScheduledJob({ ...config, policy: incomplete, reserve: async () => { throw Error("must not reserve"); } })).status, "INVALID");
+  let reserved;
+  assert.equal((await admitScheduledJob({ ...config, reserve: async envelope => { reserved = envelope; return false; } })).status, "BUDGET_BLOCKED");
+  assert.deepEqual(reserved, policy.admissionCosts);
   assert.equal(fetches, 0); assert.equal(writes, 0);
   invalidRun = true;
   assert.equal((await admitScheduledJob({ ...config, reserve: async () => true })).status, "IDENTITY_BLOCKED");
