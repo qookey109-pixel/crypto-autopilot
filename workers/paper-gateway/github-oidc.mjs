@@ -1,6 +1,6 @@
 // Prototype only: never connect this verifier to a credential-holding service
 // until server-owned policy, key retrieval, replay prevention and budgets are authorized.
-function parseUnique(text) {
+export function parseUnique(text) {
   let i = 0;
   function ws() { while (/\s/.test(text[i] || "") && i < text.length) i++; }
   function string() {
