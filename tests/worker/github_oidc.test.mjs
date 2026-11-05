@@ -267,6 +267,8 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   assert.equal((await admitScheduledJob({ ...config, reserve: async () => true })).status, "IDENTITY_BLOCKED");
   assert.equal(writes, 0);
   invalidRun = false;
+  run.created_at = "2026-01-01T00:06:30Z";
+  job.started_at = "2026-01-01T00:07:00Z";
   const accepted = await admitScheduledJob({ ...config, reserve: async () => true });
   assert.equal(accepted.status, "CLAIMED");
   assert.equal(accepted.slotId, "slot:" + base);
