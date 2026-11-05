@@ -46,3 +46,52 @@ class PaperOperationEvidenceTests(unittest.TestCase):
         else:
             self.assertIsNone(observed["r2_write_attempts"])
             self.assertIsNone(observed["r2_write_replays"])
+
+
+class PaperOperationReaderTests(unittest.TestCase):
+    def test_old_then_new_reports_recover_and_chain(self):
+        from crypto_autopilot.paper.cloud_loop_v0_2 import run_cloud_step as old_step
+        from crypto_autopilot.paper.cloud_loop_v0_3 import run_cloud_step as new_step
+        from crypto_autopilot.paper.cloud_report_reader_v0_3 import committed_report
+        from test_cloud_paper_loop_v0_1 import MemoryStore, NeverCalledFeed, REGISTRY
+
+        store = MemoryStore()
+        def run(fn, tick, previous):
+            return fn(
+                tick_ms=tick, previous_slot=previous, store=store,
+                feed=NeverCalledFeed(),
+                market_supplier=lambda: {"provider_requests_performed": 0},
+                candidate_supplier=lambda market, state: (),
+                strategy_registry=REGISTRY, before_external=lambda: None,
+            )
+
+        first = run(old_step, 420000, None)
+        second = run(new_step, 1320000, "0")
+        third = run(new_step, 2220000, "1")
+        self.assertEqual(first["schema"], "qookey-cloud-paper-loop-report-v0.2")
+        self.assertEqual(second["schema"], "qookey-cloud-paper-loop-report-v0.3")
+        self.assertEqual(third["coordinator"]["sequence"], 3)
+        self.assertEqual(committed_report(store, "0"), first)
+        self.assertEqual(committed_report(store, "1"), second)
+        self.assertEqual(second["operation_counts"]["status"], "PARTIAL")
+        self.assertIsNone(second["operation_counts"]["r2_write_attempts"])
+        self.assertIsNone(second["operation_counts"]["r2_write_replays"])
+
+    def test_tampered_new_report_fails_digest_validation(self):
+        from crypto_autopilot.paper.cloud_loop_v0_1 import CloudLoopReviewRequired
+        from crypto_autopilot.paper.cloud_loop_v0_3 import run_cloud_step
+        from crypto_autopilot.paper.cloud_report_reader_v0_3 import committed_report
+        from test_cloud_paper_loop_v0_1 import MemoryStore, NeverCalledFeed, REGISTRY
+
+        store = MemoryStore()
+        run_cloud_step(
+            tick_ms=420000, previous_slot=None, store=store, feed=NeverCalledFeed(),
+            market_supplier=lambda: {"provider_requests_performed": 0},
+            candidate_supplier=lambda market, state: (), strategy_registry=REGISTRY,
+            before_external=lambda: None,
+        )
+        pointer = store.objects[("cloud-result", "0")]
+        report = store.objects[("cloud-report", pointer["report_id"])]
+        report["operation_counts"]["r2_write_attempts"] = 0
+        with self.assertRaisesRegex(CloudLoopReviewRequired, "RESULT_REPORT_MISMATCH"):
+            committed_report(store, "0")
