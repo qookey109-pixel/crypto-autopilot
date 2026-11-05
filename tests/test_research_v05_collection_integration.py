@@ -70,9 +70,9 @@ class ResearchV05CollectionTests(unittest.TestCase):
     def guard(self):
         return CloudBudgetGuard(snapshot=self.snapshot, clock_ms=lambda: self.f.f.now)
 
-    def run_collection(self):
+    def run_collection(self, run_id="101"):
         return run_shared_signal_collection(
-            sources=SOURCES, run_id="101", reservation=self.reservation,
+            sources=SOURCES, run_id=run_id, reservation=self.reservation,
             guard=self.guard(), execute=self.f.client.query, query_meter=self.f.meter,
             validate_binding=lambda: self.f.client.validate_runtime_binding(
                 meter=self.f.meter, writer_id=research_fixture.WRITER, slot_id=self.f.slot,
@@ -81,6 +81,21 @@ class ResearchV05CollectionTests(unittest.TestCase):
                          "access_key_id": "fixture", "secret_access_key": "fixture"},
             transport=self.source, execution_enabled=True,
         )
+
+    def test_existing_github_run_identity_survives_shared_collection(self):
+        def store_factory(**kwargs):
+            return BudgetedR2Store(client=self.sdk, bucket=kwargs["bucket"],
+                                   before_external=kwargs["before_external"])
+        with patch.dict("os.environ", {"CLOUDFLARE_ACCOUNT_ID": "a" * 32, "R2_BUCKET_NAME": "fixture"}), patch(
+            "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+            side_effect=self.sqlite_request,
+        ), patch.object(BudgetedR2Store, "from_credentials", side_effect=store_factory):
+            result = self.run_collection(run_id="github-101-1")
+        self.assertEqual(result["status"], "PUBLISHED")
+        self.assertEqual(result["run_id"], "github-101-1")
+        latest = json.loads(self.sdk.objects["research/signal-layer/v0-2/latest.json"])
+        self.assertEqual(latest["run_id"], "github-101-1")
+        self.assertEqual(result["attempted_usage"]["r2_class_b"], 6)
 
     def test_disabled_returns_before_credentials_or_transport(self):
         result = run_shared_signal_collection(
