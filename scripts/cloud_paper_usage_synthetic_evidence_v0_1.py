@@ -6,6 +6,7 @@ harness, never a PAPER execution entrypoint or a source of production authority.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -119,19 +120,59 @@ def produce_evidence(output, *, run_id, source_sha):
             sys.path.remove(test_dir)
 
 
+
+def verify_downloaded_evidence(expected, downloaded):
+    """Require exact artifact file set and byte-for-byte uploaded readback."""
+    expected, downloaded = Path(expected), Path(downloaded)
+    names = (
+        "manifest.json",
+        "completed/cloud-paper-usage-observation.json",
+        "ambiguous/cloud-paper-usage-observation.json",
+    )
+    for root in (expected, downloaded):
+        if root.is_symlink() or not root.is_dir():
+            raise ValueError("SYNTHETIC_ARTIFACT_DIRECTORY_INVALID")
+        actual = []
+        for item in root.rglob("*"):
+            if item.is_symlink():
+                raise ValueError("SYNTHETIC_ARTIFACT_SYMLINK")
+            if item.is_file():
+                actual.append(item.relative_to(root).as_posix())
+            elif not item.is_dir():
+                raise ValueError("SYNTHETIC_ARTIFACT_OBJECT_INVALID")
+        if sorted(actual) != sorted(names):
+            raise ValueError("SYNTHETIC_ARTIFACT_FILE_SET_MISMATCH")
+    for name in names:
+        before = (expected / name).read_bytes()
+        after = (downloaded / name).read_bytes()
+        if len(before) > 8192 or before != after:
+            raise ValueError("SYNTHETIC_ARTIFACT_READBACK_MISMATCH")
+    manifest = json.loads((downloaded / "manifest.json").read_bytes())
+    if manifest.get("evidence_type") != "SYNTHETIC_CI_ONLY":
+        raise ValueError("SYNTHETIC_ARTIFACT_LABEL_MISSING")
+    for scenario in ("completed", "ambiguous"):
+        body = (downloaded / scenario / "cloud-paper-usage-observation.json").read_bytes()
+        if hashlib.sha256(body).hexdigest() != manifest["scenarios"][scenario]["receipt_sha256"]:
+            raise ValueError("SYNTHETIC_ARTIFACT_DIGEST_MISMATCH")
+    return {"status": "SYNTHETIC_ARTIFACT_READBACK_VERIFIED", "files": len(names)}
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", required=True)
     parser.add_argument("--synthetic-only", action="store_true", required=True)
+    parser.add_argument("--verify-dir")
     args = parser.parse_args()
     if (os.environ.get("GITHUB_ACTIONS") != "true"
             or os.environ.get("GITHUB_REPOSITORY") != "qookey109-pixel/crypto-autopilot"
             or os.environ.get("GITHUB_EVENT_NAME") not in ("pull_request", "push")):
         raise SystemExit("SYNTHETIC_EVIDENCE_GITHUB_CI_REQUIRED")
     run_id = f'github-{os.environ.get("GITHUB_RUN_ID", "")}-{os.environ.get("GITHUB_RUN_ATTEMPT", "")}'
-    manifest = produce_evidence(args.output, run_id=run_id,
-                                source_sha=os.environ.get("GITHUB_SHA", ""))
-    print(json.dumps(manifest, sort_keys=True))
+    if args.verify_dir:
+        print(json.dumps(verify_downloaded_evidence(args.output, args.verify_dir), sort_keys=True))
+    else:
+        manifest = produce_evidence(args.output, run_id=run_id,
+                                    source_sha=os.environ.get("GITHUB_SHA", ""))
+        print(json.dumps(manifest, sort_keys=True))
 
 
 if __name__ == "__main__":
