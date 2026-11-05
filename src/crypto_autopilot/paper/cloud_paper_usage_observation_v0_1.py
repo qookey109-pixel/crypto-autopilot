@@ -107,7 +107,7 @@ def run_observed_slot(runtime, *, tick_ms, previous_slot, activation_enabled=Fal
             "r2_reserved_class_b": reserved.class_b_requests,
             "r2_reserved_payload_bytes": reserved.new_bytes,
             "provider_reserved_attempts": reserved.provider_requests,
-            "d1_http_attempts": diagnostic["http_attempts"],
+            "d1_transport_attempts": diagnostic["http_attempts"],
             "d1_ticket_debits": meter.report()["query_attempts_charged"],
             "d1_rows_read": None,
             "d1_rows_written": None,
