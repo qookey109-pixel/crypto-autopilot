@@ -175,6 +175,25 @@ slot/replay claims, budget admission or all-writer coverage. A successful Node
 test is not a live GitHub OIDC or Cloudflare validation. No bearer token,
 production service or paid capability is used by this prototype.
 
+## Prepared D1 claim adapter and retry accounting
+
+The draft Worker adapter issues one parameterized insert and accepts only an
+unambiguous single-attempt D1 success; duplicate constraints stop progression,
+and an exception or uncertain metadata returns `REVIEW_REQUIRED`. The table
+schema is a synthetic test fixture only. Node's in-memory SQLite test is not
+evidence of actual D1 concurrency, D1 schema deployment, isolated credentials,
+a prepaid claim or a valid policy. The adapter must not receive caller-chosen
+job IDs or slot IDs in a deployed route, and its enabled flag is not authority.
+
+Cloudflare documents that [D1 read-only queries may be retried automatically
+up to twice](https://developers.cloudflare.com/d1/best-practices/retry-queries/).
+Any Worker binding successor must budget up to three attempts for each such read,
+including admission and readback, and must treat missing or unexpected
+`meta.total_attempts` as unknown rather than assuming one request. The claim
+adapter itself performs a write and does not perform application retries. This
+observation does not prove retry behavior of the existing REST path, account
+allowance, or actual usage; each transport needs its own verified accounting.
+
 ## Validation and authority frontier
 
 - Cloud CI only: synthetic RSA signatures, fake GitHub responses and controlled
