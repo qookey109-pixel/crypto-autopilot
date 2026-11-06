@@ -1,3 +1,15 @@
+## Current safety clarification — 2026-11-06
+
+Evidence basis: reviewed parent `90501bf923c7a53bd06166367fcc69d83f9a12aa`; resolve live main and run history before acting.
+
+**Billing Metadata Diagnostic V0.5 is CONSUMED. Do not dispatch or rerun it.** [Run 41841230890](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/41841230890), attempt 1, made one read-only Cloudflare request and returned `REVIEW_REQUIRED / PAGINATION_METADATA_INVALID`. Its [result receipt](research/receipts/2026-11-04-billing-metadata-v0-5-result-v0-1.json) is authoritative for the observed run; the contract describes the pre-execution authorization, not its current consumption state. Older October checkpoints below that say V0.5 is pending or suggest a first dispatch are historical and superseded. A further external billing investigation needs a distinct merged versioned authority. Billing completeness, account-wide zero cost, usage freshness and headroom remain UNKNOWN.
+
+[#874](https://github.com/qookey109-pixel/crypto-autopilot/pull/874) and [#875](https://github.com/qookey109-pixel/crypto-autopilot/pull/875) prepared disabled Live-Paper and Core100 V0.5 shared-admission compositions. [#876](https://github.com/qookey109-pixel/crypto-autopilot/pull/876) tested the Core100 frozen metadata loaders and comparator with synthetic data; the catalog validator and host-specific inputs were mocked. These are not production identity, all-writer coverage, live D1 or cost proof; existing legacy workflows are not cut over.
+
+Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`, D1 is unprovisioned, and the formal strategy registry is empty. Independent current-job identity, all-writer budget coverage, fresh account evidence and controlled main acceptance remain incomplete. Core100 model quality remains `REJECT`; no bootstrap rerun, holdout, source switch, promotion or real-money trading follows from these engineering checks.
+
+---
+
 ## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
 **2026-10-29 — configured-target and recovery checkpoint**
