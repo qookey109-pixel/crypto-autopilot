@@ -1,7 +1,8 @@
 {
   "schema": "qookey-cloud-paper-r2-writer-inventory-v0.1",
   "updated_date": "2026-11-06",
-  "evidence_basis_main_sha": "48e2d3c1aea72d6f4fb349d6f3a9e366c408c410",
+  "evidence_basis_main_sha": "391fc329d75817342f790a787f3e5868c6538996",
+  "billing_lifecycle_evidence_basis_main_sha": "48e2d3c1aea72d6f4fb349d6f3a9e366c408c410",
   "is_latest_main_claim": false,
   "scan": {
     "workflow_file_count": 100,
