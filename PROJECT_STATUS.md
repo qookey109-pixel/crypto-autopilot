@@ -1,3 +1,14 @@
+## Cloud PAPER evidence and recovery checkpoint — 2026-11-06
+
+Evidence basis: reviewed parent main `f697b3749fe929843f956919a12b4083e3e96728`; re-read live main and current checks before acting.
+
+- [PR #869](https://github.com/qookey109-pixel/crypto-autopilot/pull/869) prepared disabled V0.5 prepaid result-seal recovery for both Cloud Paper and Live-Paper, with synthetic namespace, SQL, replay and failure checks. Existing V0.4 callers retain their default behavior. This is not a production recovery run or proof of account-wide admission.
+- [PR #870](https://github.com/qookey109-pixel/crypto-autopilot/pull/870) bounded synthetic CI artifact-download retries after transient visibility failures. It does not change runtime authorization; PR-head and post-merge CI passed, and the previous failed attempts remain historical evidence.
+- The [billing diagnostic interpretation](docs/CLOUD_PAPER_BILLING_METADATA_DIAGNOSTIC_V0_5.md#provider-contract-and-cost-scope--2026-11-06) distinguishes provider-optional history metadata from this project's stricter completeness requirement. Cloudflare's usage-cost dashboard excludes fixed subscription fees. Neither a successful response nor a zero usage subtotal proves full cost coverage or future zero cost.
+- Production PAPER remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; D1 provisioning, fresh account-wide cost/headroom, all-writer admission and trusted current-job identity remain unproven. The one-shot billing diagnostic and bootstrap are consumed and must not be rerun. No additional Cloudflare query or production operation is authorized by this checkpoint.
+
+---
+
 ## Billing metadata diagnostic result — 2026-11-04
 
 Evidence basis: reviewed parent main `cfefbf4c19d3a327b52c09f20f9a1eb710ca3ee5`, not a claim about live main.
