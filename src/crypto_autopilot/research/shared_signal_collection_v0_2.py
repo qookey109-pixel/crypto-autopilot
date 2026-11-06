@@ -6,7 +6,6 @@ The injected binding validator is a trusted runtime boundary, not a flag grant.
 from __future__ import annotations
 
 import json
-import re
 from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime
 from typing import Any
@@ -18,7 +17,7 @@ from crypto_autopilot.paper.shared_writer_budget_gate_v0_5 import (
 )
 from crypto_autopilot.paper.shared_writer_r2_budget_v0_2 import SharedWriterR2BudgetV05
 from crypto_autopilot.research.shared_signal_publish_v0_1 import (
-    WRITER, _objects, _publish_objects, _timestamp, _validate_target,
+    WRITER, _objects, _publish_objects, _timestamp, _validate_target, _valid_signal_run_id,
 )
 from crypto_autopilot.research.signal_layer import deduplicate_kol_forecasts
 from crypto_autopilot.research.signal_ingest_v0_2 import (
@@ -108,7 +107,7 @@ def run_shared_signal_collection(
     selected = _selected(sources)
     if not selected:
         return {"status": "SKIPPED_NO_ENABLED_SOURCES", "external_access_performed": False}
-    if not isinstance(run_id, str) or not re.fullmatch(r"[1-9][0-9]{0,19}", run_id):
+    if not _valid_signal_run_id(run_id):
         raise BudgetBlocked("BLOCKED_SIGNAL_RUN_ID")
     reservation.validate()
     if (
