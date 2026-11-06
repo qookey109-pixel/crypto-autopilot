@@ -146,6 +146,11 @@ class SharedLiveCoordinatorTests(unittest.TestCase):
         self.assertEqual(result["status"], "COMMITTED", (result, errors))
         self.assertEqual(result["provider_requests_performed"], 2)
         self.assertEqual(provider.open.call_count, 2)
+        tick_body = next(body for key, (body, _) in self.f.sdk.objects.items()
+                         if "/live-tick/" in key)
+        tick = json.loads(tick_body)
+        self.assertIsNotNone(tick["session_id"])
+        self.assertIn(tick["state"], {"LIVE_PAPER_POSITION_OPEN", "LIVE_PAPER_ROUND_TERMINAL"})
 
     def test_missing_seal_blocks_continuation_without_new_writes(self):
         first = run_prepaid_live_coordinator(**self.args())
