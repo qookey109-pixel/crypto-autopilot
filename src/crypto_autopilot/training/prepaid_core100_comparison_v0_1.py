@@ -250,6 +250,7 @@ def compare_prepaid_core100(
             "provider_requests_performed": 0, "central_reservation_retained": True,
             "attempted_usage": budget.attempted_usage(), "source_main_sha": source_sha,
             "automatic_retry_allowed": False, "paper_activation_allowed": False,
+            "independent_job_identity_verified": False, "production_authority_verified": False,
         }
     except Exception:
         return {
