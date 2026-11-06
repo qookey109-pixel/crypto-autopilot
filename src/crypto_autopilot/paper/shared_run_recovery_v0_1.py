@@ -15,6 +15,7 @@ from crypto_autopilot.paper.shared_writer_budget_gate_v0_4 import (
     AdmissionQueryMeter, Query, SharedWriterReservation,
 )
 from crypto_autopilot.paper.shared_writer_r2_budget_v0_1 import SharedWriterR2Budget
+from crypto_autopilot.paper.shared_writer_r2_budget_v0_2 import SharedWriterR2BudgetV05
 
 WRITER = "crypto-autopilot:live-paper-run-recovery-v0-1"
 _PREFIX = "paper-run-store/v0.1"
@@ -106,6 +107,7 @@ def _run_scoped_run_recovery(
     execute: Query, query_meter: AdmissionQueryMeter,
     validate_binding: Callable[[], None], credentials: Mapping[str, str],
     repair_missing_result_seals: bool = False, execution_enabled: bool = False,
+    budget_version: str = "V0.4",
 ) -> dict[str, object]:
     """Caller must prove finite authority and serialized namespace ownership."""
     if type(execution_enabled) is not bool:
@@ -132,10 +134,18 @@ def _run_scoped_run_recovery(
         >= guard.policy.r2_hard_stop_bytes
     ):
         raise BudgetBlocked("BLOCKED_BUDGET_STORAGE_HARD_STOP")
-    budget = SharedWriterR2Budget.admit(
-        reservation=reservation, guard=guard, execute=execute,
-        query_meter=query_meter, validate_binding=validate_binding,
-    )
+    if budget_version == "V0.4":
+        budget = SharedWriterR2Budget.admit(
+            reservation=reservation, guard=guard, execute=execute,
+            query_meter=query_meter, validate_binding=validate_binding,
+        )
+    elif budget_version == "V0.5":
+        budget = SharedWriterR2BudgetV05.admit(
+            reservation=reservation, guard=guard, execute=execute,
+            query_meter=query_meter, validate_binding=validate_binding, execution_enabled=True,
+        )
+    else:
+        raise BudgetBlocked("BLOCKED_RECOVERY_BUDGET_VERSION")
     stage = "CONSTRUCT_STORE"
     try:
         raw_store = BudgetedR2Store.from_credentials(
