@@ -164,6 +164,7 @@ def run_prepaid_live_coordinator(
         return {
             "status": "COMMITTED", "run_id": report["run_id"], "step_id": report["step_id"],
             "state": report["state"], "provider_requests_performed": provider_count,
+            "provider_requests_attempted": provider_count,
             "attempted_usage": budget.attempted_usage(), "central_reservation_retained": True,
             "automatic_retry_allowed": False, "paper_activation_allowed": False,
         }
@@ -171,7 +172,8 @@ def run_prepaid_live_coordinator(
         return {
             "status": "REVIEW_REQUIRED", "stage": stage,
             "reason_code": "COORDINATOR_EVIDENCE_OR_OPERATION_FAILED",
-            "run_id": run_id, "provider_requests_performed": provider_count,
+            "run_id": run_id, "provider_requests_performed": 0 if provider_count == 0 else None,
+            "provider_requests_attempted": provider_count,
             "attempted_usage": budget.attempted_usage(), "central_reservation_retained": True,
             "automatic_retry_allowed": False, "paper_activation_allowed": False,
         }
