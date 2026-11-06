@@ -152,6 +152,25 @@ class SharedLiveCoordinatorTests(unittest.TestCase):
         self.assertIsNotNone(tick["session_id"])
         self.assertIn(tick["state"], {"LIVE_PAPER_POSITION_OPEN", "LIVE_PAPER_ROUND_TERMINAL"})
 
+    def test_ambiguous_provider_failure_retains_attempt_and_reservation(self):
+        state, spec = _bootstrap_state()
+        spec["candidate"]["as_of_ms"] = self.f.now - 2_000
+        provider = Mock()
+        provider.open.side_effect = OSError("synthetic failure")
+        with patch("crypto_autopilot.paper.cloud_pionex_client_v0_1.build_opener",
+                   return_value=provider), patch(
+            "crypto_autopilot.paper.cloud_pionex_client_v0_1.CloudPaperPionexPublicClient._pace"
+        ):
+            result = run_prepaid_live_coordinator(**self.args(
+                initial_state=state, candidate_specs=(spec,),
+            ))
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertIsNone(result["provider_requests_performed"])
+        self.assertEqual(result["provider_requests_attempted"], 1)
+        self.assertEqual(provider.open.call_count, 1)
+        self.assertTrue(result["central_reservation_retained"])
+        self.assertFalse(result["automatic_retry_allowed"])
+
     def test_missing_seal_blocks_continuation_without_new_writes(self):
         first = run_prepaid_live_coordinator(**self.args())
         self.assertEqual(first["status"], "COMMITTED")
