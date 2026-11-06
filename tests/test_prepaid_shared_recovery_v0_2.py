@@ -6,6 +6,7 @@ from dataclasses import replace
 from unittest.mock import Mock, patch
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
+from crypto_autopilot.paper.shared_writer_budget_gate_v0_5 import RESERVE_SHARED_WRITER_SQL
 from crypto_autopilot.paper.prepaid_shared_recovery_v0_2 import run_prepaid_shared_recovery_v0_2
 import test_prepaid_d1_runtime_v0_1 as fixtures
 from test_shared_run_recovery_v0_1 import SharedRunRecoveryTests
@@ -95,7 +96,7 @@ class PrepaidSharedRecoveryTests(unittest.TestCase):
             result = run_prepaid_shared_recovery_v0_2(**self.args())
             self.assertEqual(result["state"], "MISSING_RESULT_SEALS_REPAIRED")
             self.assertEqual(result["result_seal_writes_performed"], 1)
-            self.assertEqual(len(statements), 1)
+            self.assertEqual(statements, [RESERVE_SHARED_WRITER_SQL])
             self.assertEqual(self.f.meter.report()["query_attempts_charged"], 2)
             self.assertIn(key, self.rec.backend.objects)
             self.assertEqual(db.execute("SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3").fetchone()[0], 1)

@@ -7,6 +7,7 @@ from dataclasses import replace
 from unittest.mock import Mock, patch
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
+from crypto_autopilot.paper.shared_writer_budget_gate_v0_5 import RESERVE_SHARED_WRITER_SQL
 from crypto_autopilot.paper.cloud_loop_v0_1 import SLOT_MS
 from crypto_autopilot.paper.cloud_report_reader_v0_3 import committed_report
 from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Store
@@ -146,6 +147,7 @@ class CloudPaperRecoveryIntegrationTests(unittest.TestCase):
             self.assertIsNotNone(committed_report(readback, report["slot_id"]))
             self.assertEqual(db.execute("SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3").fetchone()[0], 2)
             self.assertEqual(len(statements), 6)
+            self.assertEqual(statements.count(RESERVE_SHARED_WRITER_SQL), 2)
             self.assertEqual(meter.report()["query_attempts_charged"], 6)
 
     def test_bucket_change_after_admission_requires_review_without_r2(self):
