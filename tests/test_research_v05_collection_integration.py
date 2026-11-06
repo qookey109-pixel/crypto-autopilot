@@ -3,10 +3,12 @@ import io
 import json
 import os
 import unittest
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked, CloudBudgetGuard, R2UsageSnapshot
 from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Store
+from crypto_autopilot.research.signal_quality import evaluate_research_signal_quality
 from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import D1QueryResult
 from crypto_autopilot.paper.shared_writer_budget_gate_v0_5 import READ_SHARED_WRITER_SQL, SharedWriterReservation
 from test_shared_signal_collection_v0_1 import SOURCES
@@ -96,6 +98,15 @@ class ResearchV05CollectionTests(unittest.TestCase):
         latest = json.loads(self.sdk.objects["research/signal-layer/v0-2/latest.json"])
         self.assertEqual(latest["run_id"], "github-101-1")
         self.assertEqual(result["attempted_usage"]["r2_class_b"], 6)
+        reader = BudgetedR2Store(client=self.sdk, bucket="fixture", before_external=lambda *_: None)
+        quality = evaluate_research_signal_quality(
+            reader, namespace="research/signal-layer/v0-2",
+            now=datetime.fromtimestamp(self.f.f.now / 1000, UTC), expected_run_id="github-101-1",
+        )
+        self.assertEqual(quality["status"], "PASS")
+        self.assertEqual(quality["source_binding"], "MATCHED_TRIGGERING_RUN")
+        self.assertEqual(quality["run_id"], "github-101-1")
+        self.assertEqual(quality["lineage"], "PASS")
 
     def test_disabled_returns_before_credentials_or_transport(self):
         result = run_shared_signal_collection(
