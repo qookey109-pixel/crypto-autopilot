@@ -111,7 +111,7 @@ class Core100SharedComparisonTests(unittest.TestCase):
             "status": "NO_CHANGE", "reason": "SYNTHETIC_MATCH",
         }):
             result = compare_prepaid_core100(**self.args())
-            self.assertEqual(result["status"], "NO_CHANGE")
+            self.assertEqual(result["status"], "NO_CHANGE", result)
             self.assertFalse(result["training_performed"])
             self.assertFalse(result["r2_writes_performed"])
             self.assertEqual(result["provider_requests_performed"], 0)
