@@ -104,6 +104,40 @@ class SharedLiveCoordinatorTests(unittest.TestCase):
             "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3"
         ).fetchone()[0], 2)
 
+    def test_public_market_requests_are_metered_after_admission(self):
+        state, spec = _bootstrap_state()
+        spec["candidate"]["as_of_ms"] = self.f.now
+        provider = Mock()
+        def response(request, timeout):
+            self.assertEqual(self.statements, [RESERVE_SHARED_WRITER_SQL])
+            url = request.full_url
+            if "/depth?" in url:
+                data = {"bids": [["100", "100"]], "asks": [["101", "100"]],
+                        "updateTime": self.f.now - 1}
+            elif "/trades?" in url:
+                data = {"trades": [{"price": "100.5", "size": "1",
+                                    "side": "BUY", "timestamp": self.f.now - 1}]}
+            else:
+                raise AssertionError("unexpected provider path")
+            result = Mock()
+            result.getcode.return_value = 200
+            result.headers = {}
+            result.read.return_value = json.dumps({"result": True, "data": data}).encode()
+            result.__enter__ = Mock(return_value=result)
+            result.__exit__ = Mock(return_value=False)
+            return result
+        provider.open.side_effect = response
+        with patch("crypto_autopilot.paper.cloud_pionex_client_v0_1.build_opener",
+                   return_value=provider), patch(
+            "crypto_autopilot.paper.cloud_pionex_client_v0_1.CloudPaperPionexPublicClient._pace"
+        ):
+            result = run_prepaid_live_coordinator(**self.args(
+                initial_state=state, candidate_specs=(spec,),
+            ))
+        self.assertEqual(result["status"], "COMMITTED")
+        self.assertEqual(result["provider_requests_performed"], 2)
+        self.assertEqual(provider.open.call_count, 2)
+
     def test_missing_seal_blocks_continuation_without_new_writes(self):
         first = run_prepaid_live_coordinator(**self.args())
         self.assertEqual(first["status"], "COMMITTED")
