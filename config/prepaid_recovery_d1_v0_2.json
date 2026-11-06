@@ -1,0 +1,42 @@
+{
+  "schema": "qookey-prepaid-recovery-d1-v0.2",
+  "status": "PREPARED_DISABLED",
+  "implementation": "src/crypto_autopilot/paper/prepaid_recovery_d1_v0_2.py",
+  "execution_enabled_default": false,
+  "explicit_true_is_not_execution_authority": true,
+  "writers": [
+    "crypto-autopilot:live-paper-run-recovery-v0-1",
+    "crypto-autopilot:cloud-paper-run-recovery-v0-1"
+  ],
+  "statements": [
+    "V0_5_RESERVATION",
+    "V0_5_REPLAY_READ"
+  ],
+  "fixed_workload_envelope": {
+    "provider_requests": 0,
+    "r2_class_a": 8,
+    "r2_class_b": 64,
+    "r2_new_bytes": 16384
+  },
+  "requirements": [
+    "FRESH_ACCOUNT_WIDE_HEADROOM",
+    "TRUSTED_JOB_AND_SLOT_BINDING",
+    "PREPAID_DURABLE_ATTEMPTS",
+    "SERIALIZED_NAMESPACE_OWNERSHIP",
+    "ALL_WRITERS_MIGRATED",
+    "SEPARATE_MERGED_EXECUTION_AUTHORITY"
+  ],
+  "authority": {
+    "d1_access": false,
+    "r2_access": false,
+    "provider_access": false,
+    "workflow_cutover": false,
+    "schedule_activation": false,
+    "paper_activation": false,
+    "holdout": false,
+    "source_switch": false,
+    "promotion": false,
+    "live_trading": false
+  },
+  "production_verification": "NOT_RUN"
+}
