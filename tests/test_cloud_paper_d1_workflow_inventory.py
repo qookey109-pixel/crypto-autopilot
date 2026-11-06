@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import unittest
 from pathlib import Path
 
@@ -324,6 +325,32 @@ class ScopedOwnerAttestationTests(unittest.TestCase):
         registry["production_gate"]["account_wide_coverage_proven"] = True
         with self.assertRaisesRegex(RuntimeError, "repository admission"):
             validate_shared_account_writer_registry(inventory, registry)
+
+
+class ConsumedBillingInventoryTests(unittest.TestCase):
+    def test_consumed_diagnostics_are_not_listed_as_pending(self):
+        root = Path(__file__).parents[1]
+        inventory = json.loads(
+            (root / "research/status/cloud-paper-r2-writer-inventory-v0-1.json").read_text()
+        )
+        entries = {item["workflow"]: item for item in inventory["workflows"]}
+        expected = {
+            ".github/workflows/cloud-paper-billing-history-v0-3.yml":
+                ("CONSUMED_ONE_TIME_FAILED_METADATA_MISMATCH_NO_RERUN", "37183381165"),
+            ".github/workflows/cloud-paper-billing-metadata-diagnostic-v0-5.yml":
+                ("CONSUMED_ONE_TIME_REVIEW_REQUIRED_NO_RERUN", "41841230890"),
+        }
+        for path, (lifecycle, run_id) in expected.items():
+            with self.subTest(path=path):
+                self.assertEqual(entries[path]["lifecycle"], lifecycle)
+                self.assertIn(run_id, entries[path]["evidence"])
+                self.assertIn("no rerun", entries[path]["evidence"].lower())
+        receipt = json.loads(
+            (root / "research/receipts/2026-11-04-billing-metadata-v0-5-result-v0-1.json").read_text()
+        )
+        self.assertEqual(receipt["run"]["id"], 41841230890)
+        self.assertTrue(receipt["boundary"]["one_time_authority_consumed"])
+        self.assertFalse(receipt["boundary"]["rerun_allowed"])
 
 
 if __name__ == "__main__":
