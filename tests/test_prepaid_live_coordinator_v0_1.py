@@ -106,7 +106,7 @@ class SharedLiveCoordinatorTests(unittest.TestCase):
 
     def test_public_market_requests_are_metered_after_admission(self):
         state, spec = _bootstrap_state()
-        spec["candidate"]["as_of_ms"] = self.f.now
+        spec["candidate"]["as_of_ms"] = self.f.now - 2_000
         provider = Mock()
         def response(request, timeout):
             self.assertEqual(self.statements, [RESERVE_SHARED_WRITER_SQL])
