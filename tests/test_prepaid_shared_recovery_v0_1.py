@@ -16,6 +16,9 @@ MODULE = "crypto_autopilot.paper.prepaid_shared_recovery_v0_1"
 
 class PrepaidSharedRecoveryTests(unittest.TestCase):
     def setUp(self):
+        bucket_env = patch.dict("os.environ", {"R2_BUCKET_NAME": "fixture"})
+        bucket_env.start()
+        self.addCleanup(bucket_env.stop)
         original = fixtures.authority_fixture
 
         def authority():
@@ -110,6 +113,40 @@ class PrepaidSharedRecoveryTests(unittest.TestCase):
             with self.assertRaisesRegex(BudgetBlocked, "ACCOUNT_MISMATCH"):
                 run_prepaid_shared_recovery(**self.args(credentials=wrong))
         client.assert_not_called()
+        self.assertEqual(self.rec.backend.events, [])
+
+    def test_bucket_mismatch_or_missing_stops_before_d1_and_r2(self):
+        for configured in ("different", ""):
+            with self.subTest(configured=configured), patch.dict(
+                "os.environ", {"CLOUDFLARE_ACCOUNT_ID": "a" * 32, "R2_BUCKET_NAME": configured}
+            ), patch(MODULE + ".PrepaidCloudflareD1QueryClient.from_environment") as client:
+                with self.assertRaisesRegex(BudgetBlocked, "BUCKET_MISMATCH"):
+                    run_prepaid_shared_recovery(**self.args())
+                client.assert_not_called()
+        self.assertEqual(self.rec.backend.events, [])
+
+    def test_bucket_change_after_admission_stops_before_r2(self):
+        import os
+
+        db, statements, opener = self.transport()
+        original_factory = self.rec.make_store
+
+        def change_target(**kwargs):
+            store = original_factory(**kwargs)
+            os.environ["R2_BUCKET_NAME"] = "changed"
+            return store
+
+        self.rec.mock_factory.side_effect = change_target
+        env = {"CLOUDFLARE_D1_API_TOKEN": "synthetic-token",
+               "CLOUDFLARE_ACCOUNT_ID": "a" * 32,
+               "CLOUDFLARE_D1_DATABASE_ID": fixtures.DB_ID,
+               "R2_BUCKET_NAME": "fixture"}
+        with patch.dict("os.environ", env), patch(fixtures.CLIENT_MODULE + ".build_opener", return_value=opener):
+            result = run_prepaid_shared_recovery(**self.args())
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertTrue(result["central_reservation_retained"])
+        self.assertEqual(len(statements), 1)
+        self.assertEqual(db.execute("SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3").fetchone()[0], 1)
         self.assertEqual(self.rec.backend.events, [])
 
     def test_lost_admission_response_keeps_reservation_and_never_constructs_r2(self):

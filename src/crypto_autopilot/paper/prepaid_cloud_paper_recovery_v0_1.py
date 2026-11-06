@@ -50,10 +50,15 @@ def run_prepaid_cloud_paper_recovery(
         "account_id", "bucket", "access_key_id", "secret_access_key",
     } or any(not isinstance(value, str) or not value.strip() for value in credentials.values()):
         raise BudgetBlocked("BLOCKED_RECOVERY_CREDENTIAL_BINDING")
-    if credentials["account_id"] != os.environ.get("CLOUDFLARE_ACCOUNT_ID", ""):
-        raise BudgetBlocked("BLOCKED_RECOVERY_ACCOUNT_MISMATCH")
-    if credentials["bucket"] != os.environ.get("R2_BUCKET_NAME", ""):
-        raise BudgetBlocked("BLOCKED_RECOVERY_BUCKET_MISMATCH")
+    credentials = dict(credentials)
+
+    def validate_target() -> None:
+        if credentials["account_id"] != os.environ.get("CLOUDFLARE_ACCOUNT_ID", ""):
+            raise BudgetBlocked("BLOCKED_RECOVERY_ACCOUNT_MISMATCH")
+        if credentials["bucket"] != os.environ.get("R2_BUCKET_NAME", ""):
+            raise BudgetBlocked("BLOCKED_RECOVERY_BUCKET_MISMATCH")
+
+    validate_target()
     database_id = os.environ.get("CLOUDFLARE_D1_DATABASE_ID", "")
     database_evidence.validate(database_id=database_id, guard=d1_guard)
     client = PrepaidCloudflareD1QueryClient.from_environment(
@@ -61,6 +66,7 @@ def run_prepaid_cloud_paper_recovery(
         slot_id=slot_id, database_evidence=database_evidence,
     )
     def validate_binding() -> None:
+        validate_target()
         PrepaidCloudflareD1QueryClient.validate_inputs(
             usage_guard=d1_guard, query_meter=query_meter, writer_id=WRITER, slot_id=slot_id,
         )
