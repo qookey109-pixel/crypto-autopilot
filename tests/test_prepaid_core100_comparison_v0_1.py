@@ -49,6 +49,7 @@ class Core100SharedComparisonTests(unittest.TestCase):
         original_list = self.f.sdk.list_objects_v2
 
         def list_objects(**kwargs):
+            kwargs.setdefault("Prefix", "")
             page = original_list(**kwargs)
             for row in page["Contents"]:
                 row["Size"] = len(self.f.sdk.objects[row["Key"]][0])
