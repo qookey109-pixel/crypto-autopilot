@@ -24,16 +24,18 @@ CLIENT = "crypto_autopilot.paper.prepaid_d1_client_v0_1"
 
 
 class RecoveryV05PrepaidD1Tests(unittest.TestCase):
+    writer = WRITER
+
     def setUp(self):
         self.assertIsNotNone(RecoveryPrepaidD1Client)
         original = fixtures.authority_fixture
 
         def authority():
             data = original()
-            data["writers"][0]["writer_id"] = WRITER
+            data["writers"][0]["writer_id"] = self.writer
             return data
 
-        for active in (patch.object(fixtures, "WRITER", WRITER),
+        for active in (patch.object(fixtures, "WRITER", self.writer),
                        patch.object(fixtures, "authority_fixture", side_effect=authority)):
             active.start()
             self.addCleanup(active.stop)
@@ -42,7 +44,7 @@ class RecoveryV05PrepaidD1Tests(unittest.TestCase):
         self.addCleanup(self.f.doCleanups)
         t = self.f.meter.report()["ticket_envelope_charged_in_full"]
         self.reservation = SharedWriterReservation(
-            writer_id=WRITER, slot_id=f"slot:{self.f.now}", idempotency_key=f"slot:{self.f.now}",
+            writer_id=self.writer, slot_id=f"slot:{self.f.now}", idempotency_key=f"slot:{self.f.now}",
             slot_at_ms=self.f.now, reserved_at_ms=self.f.now, provider_requests=0,
             r2_class_a=8, r2_class_b=64, r2_new_bytes=16384,
             d1_queries=t["queries"], d1_rows_read=t["rows_read"],
@@ -52,7 +54,7 @@ class RecoveryV05PrepaidD1Tests(unittest.TestCase):
     def client(self, enabled=False):
         return RecoveryPrepaidD1Client(
             api_token="synthetic-only", account_id="a" * 32, database_id=fixtures.DB_ID,
-            usage_guard=self.f.guard, query_meter=self.f.meter, writer_id=WRITER,
+            usage_guard=self.f.guard, query_meter=self.f.meter, writer_id=self.writer,
             slot_id=self.reservation.slot_id, database_evidence=self.f.evidence,
             execution_enabled=enabled,
         )
@@ -60,7 +62,7 @@ class RecoveryV05PrepaidD1Tests(unittest.TestCase):
     def test_disabled_rejects_before_debit_and_network(self):
         client = self.client()
         with patch(CLIENT + ".build_opener") as network, self.assertRaises(BudgetBlocked):
-            client.query(READ_SHARED_WRITER_SQL, (WRITER, self.reservation.slot_id))
+            client.query(READ_SHARED_WRITER_SQL, (self.writer, self.reservation.slot_id))
         self.assertEqual(self.f.meter.report()["query_attempts_charged"], 0)
         network.assert_not_called()
 
@@ -99,7 +101,7 @@ class RecoveryV05PrepaidD1Tests(unittest.TestCase):
         client = self.client(True)
         def late(*args):
             self.f.now += 600001
-            return D1QueryResult(({"writer_id": WRITER, "slot_id": self.reservation.slot_id},), 1, 7), 1024
+            return D1QueryResult(({"writer_id": self.writer, "slot_id": self.reservation.slot_id},), 1, 7), 1024
         with patch(CLIENT + ".PrepaidCloudflareD1QueryClient._request", side_effect=late) as request:
             for _ in range(2):
                 with self.assertRaises(D1LedgerUnavailable):
@@ -107,3 +109,7 @@ class RecoveryV05PrepaidD1Tests(unittest.TestCase):
         self.assertEqual(request.call_count, 1)
         self.assertTrue(client.diagnostics()["review_required"])
         self.assertEqual(self.f.meter.report()["query_attempts_charged"], 1)
+
+
+class CloudRecoveryV05PrepaidD1Tests(RecoveryV05PrepaidD1Tests):
+    writer = "crypto-autopilot:cloud-paper-run-recovery-v0-1"
