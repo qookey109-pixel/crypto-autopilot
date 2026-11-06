@@ -123,6 +123,106 @@ class Core100SharedComparisonTests(unittest.TestCase):
             self.assertEqual(self.f.sdk.calls, before)
         self.assertFalse(any(call["operation"] == "PUT" for call in self.f.sdk.calls))
 
+
+    def test_real_frozen_loaders_and_comparator_use_only_metadata(self):
+        from crypto_autopilot.training import prepaid_core100_comparison_v0_1 as module
+        from crypto_autopilot.training.fingerprint_v0_2_execution import build_fingerprint
+        import test_core100_training_fingerprint_v0_2_execution as fp_fixture
+
+        def put_json(key, value):
+            payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
+            self.f.sdk.objects[key] = (payload, {})
+            return hashlib.sha256(payload).hexdigest()
+
+        storage = module.frozen.runner.load_authority_pair(
+            module.frozen.ROOT / module.frozen.DATA_CONFIG_PATH,
+            module.frozen.ROOT / module.frozen.DATA_AUTHORITY_PATH,
+        )[0]["storage"]
+        catalog_key = storage["catalog_runs_namespace"] + "/fixture/catalog.json"
+        catalog_sha = put_json(catalog_key, {
+            "markets": [{"symbol": f"FAKE{i}"} for i in range(100)],
+            "selected_market_count": 100,
+        })
+        shards = []
+        for i in range(10):
+            key = storage["shard_receipt_namespace"] + f"/fixture/shard-{i}.json"
+            count = 1427 if i < 6 else 1428
+            digest = put_json(key, {
+                "schema": "binance-usdm-detailed-history-shard-receipt-v0.1",
+                "status": "PASS", "catalog_sha256": catalog_sha,
+                "authority": {"holdout_accessed": False},
+                "objects": [{"r2_key": f"fake/{i}/{n}"} for n in range(count)],
+            })
+            shards.append({"shard_index": i, "receipt_key": key, "receipt_sha256": digest})
+        put_json(storage["catalog_latest_pointer_key"], {
+            "schema": "binance-usdm-detailed-history-catalog-latest-v0.1",
+            "catalog_key": catalog_key, "catalog_sha256": catalog_sha,
+        })
+        put_json(storage["backfill_state_key"], {
+            "schema": "binance-usdm-detailed-history-backfill-state-v0.1",
+            "status": "COMPLETE", "catalog_key": catalog_key, "catalog_sha256": catalog_sha,
+            "holdout_accessed": False, "shard_count": 10, "total_partition_objects": 14274,
+            "completed_shards": shards,
+        })
+        dataset_fingerprint = module.frozen.runner.sha256_bytes(
+            module.frozen.runner.canonical_json_bytes({
+                "catalog_key": catalog_key, "catalog_sha256": catalog_sha,
+                "shard_receipts": shards,
+            })
+        )
+        contract = fp_fixture.contract()
+        identity = contract["identity_contract"]
+        paths = set(identity["code_paths"] + identity["support_paths"] + identity["runtime_guard_paths"])
+        paths |= {contract["execution_context"]["workflow_path"],
+                  contract["execution_context"]["current_training_authority_receipt_path"]}
+        blobs = {path: "a" * 40 for path in paths}
+        blobs[contract["execution_context"]["workflow_path"]] = contract["execution_context"][
+            "workflow_blob_sha_at_preparation"
+        ]
+        fingerprint = build_fingerprint(
+            contract=contract, dataset_fingerprint=dataset_fingerprint,
+            git_blobs=blobs, runtime_manifest=fp_fixture.runtime(),
+        )
+        root = module.frozen.V02_NAMESPACE
+        run = "github-17-1"
+        manifest_key = f"{root}/runs/run={run}/manifest.json"
+        model_key = f"{root}/runs/run={run}/model.json"
+        metrics_key = f"{root}/runs/run={run}/metrics.json"
+        common = {
+            "provider": "binance_usdm", "namespace": root, "run_id": run,
+            "dataset_fingerprint": dataset_fingerprint,
+            "experiment_fingerprint": fingerprint["experiment_fingerprint"],
+            "implementation_receipt_git_blob_sha": "b" * 40,
+        }
+        manifest_sha = put_json(manifest_key, {
+            **common, "schema": "binance-usdm-core100-fingerprint-v0.2-manifest-v0.1",
+            "status": "PASS", "runtime_guard_fingerprint": fingerprint["runtime_guard_fingerprint"],
+            "training_fingerprint_v0_2": fingerprint,
+            "objects": [
+                {"role": "model", "key": model_key, "sha256": "1" * 64},
+                {"role": "metrics", "key": metrics_key, "sha256": "2" * 64},
+            ],
+        })
+        put_json(root + "/latest.json", {
+            **common, "schema": "binance-usdm-core100-fingerprint-v0.2-latest-v0.1",
+            "manifest_key": manifest_key, "manifest_sha256": manifest_sha,
+            "model_key": model_key, "model_sha256": "1" * 64,
+            "metrics_key": metrics_key, "metrics_sha256": "2" * 64,
+        })
+        # Only catalog content validation and host-specific inputs are synthetic seams.
+        with patch.object(module.frozen.runner, "require_execution_window"), patch.object(
+            module.frozen, "_validate_authority_and_implementation", return_value=({}, "b" * 40),
+        ), patch.object(module.frozen.runner, "validate_catalog"), patch.object(
+            module.frozen, "_current_fingerprint", return_value=fingerprint,
+        ):
+            result = compare_prepaid_core100(**self.args())
+        self.assertEqual(result["status"], "NO_CHANGE", result)
+        self.assertEqual(result["reason"], "EXACT_V0_2_FINGERPRINT_MATCH")
+        self.assertEqual(result["attempted_usage"]["r2_class_b"], 15)
+        self.assertFalse(result["independent_job_identity_verified"])
+        self.assertFalse(any(call["operation"] == "PUT" for call in self.f.sdk.calls))
+        self.assertFalse(any(call.get("key") in {model_key, metrics_key} for call in self.f.sdk.calls))
+
     def test_read_facade_rejects_holdout_partitions_and_model_before_access(self):
         store = _Core100ReadOnlyStore(BudgetedR2Store(
             client=self.f.sdk, bucket="fixture", before_external=lambda *_: None,
