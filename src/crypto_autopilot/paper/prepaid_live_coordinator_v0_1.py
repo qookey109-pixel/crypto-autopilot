@@ -91,6 +91,8 @@ def run_prepaid_live_coordinator(
         current = clock_ms()
         if type(current) is not int or current < tick_time_ms or current - tick_time_ms > 60_000:
             raise BudgetBlocked("BLOCKED_COORDINATOR_TICK_STALE")
+        if not 0 <= current - slot_at_ms <= 600_000 or current // 86_400_000 != slot_at_ms // 86_400_000:
+            raise BudgetBlocked("BLOCKED_COORDINATOR_SLOT_STALE")
 
     validate_binding()
     client = PaperPrepaidD1Client(
