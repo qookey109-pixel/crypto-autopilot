@@ -82,6 +82,22 @@ class DailyResearchD1Tests(unittest.TestCase):
         self.assertEqual(self.meter.report()["query_attempts_charged"], 1)
         self.assertTrue(self.client.diagnostics()["review_required"])
 
+    def test_evidence_expiry_during_response_poisoned_without_retry(self):
+        def response_after_expiry(sql, params):
+            self.f.now += 60_001  # Still within slot, but evidence/ticket are stale.
+            return D1QueryResult((), 1, 0), 1024
+
+        with patch(
+            "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+            side_effect=response_after_expiry,
+        ) as send:
+            for _ in range(2):
+                with self.assertRaises(D1LedgerUnavailable):
+                    self.client.query(READ_SHARED_WRITER_SQL, (WRITER, self.slot))
+            self.assertEqual(send.call_count, 1)
+        self.assertEqual(self.meter.report()["query_attempts_charged"], 1)
+        self.assertTrue(self.client.diagnostics()["review_required"])
+
     def test_v05_admission_uses_prepaid_research_client_and_deduplicates(self):
         db = self.f.sqlite()
         db.execute("INSERT INTO cloudflare_shared_writer_identities_v0_3 VALUES (?, 'ACTIVE', ?, ?)",
