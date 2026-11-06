@@ -127,14 +127,23 @@ class SharedLiveCoordinatorTests(unittest.TestCase):
             result.__exit__ = Mock(return_value=False)
             return result
         provider.open.side_effect = response
-        with patch("crypto_autopilot.paper.cloud_pionex_client_v0_1.build_opener",
+        from crypto_autopilot.paper.run_coordinator_v0_3 import coordinate_live_paper_run_step
+        errors = []
+        def capture(**kwargs):
+            try:
+                return coordinate_live_paper_run_step(**kwargs)
+            except Exception as exc:
+                errors.append(repr(exc))
+                raise
+        with patch("crypto_autopilot.paper.prepaid_live_coordinator_v0_1.coordinate_live_paper_run_step",
+                   side_effect=capture), patch("crypto_autopilot.paper.cloud_pionex_client_v0_1.build_opener",
                    return_value=provider), patch(
             "crypto_autopilot.paper.cloud_pionex_client_v0_1.CloudPaperPionexPublicClient._pace"
         ):
             result = run_prepaid_live_coordinator(**self.args(
                 initial_state=state, candidate_specs=(spec,),
             ))
-        self.assertEqual(result["status"], "COMMITTED")
+        self.assertEqual(result["status"], "COMMITTED", (result, errors))
         self.assertEqual(result["provider_requests_performed"], 2)
         self.assertEqual(provider.open.call_count, 2)
 
