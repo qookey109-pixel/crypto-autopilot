@@ -13,6 +13,13 @@ binding validator and S3 credentials. Only the three declared source identities,
 URLs and parse modes from the current V0.2 configuration are supported. Every
 source row is validated before admission; duplicates and changed routes stop.
 
+Prepared V0.5 collection also accepts the existing workflow identity
+`github-<run-id>-<attempt>` as well as the previously tested numeric identity.
+The publication reader accepts an existing pointer using either validated
+format. This is format compatibility only: trusted job binding and the legacy
+writer cutover remain separate prerequisites. The publication envelope is
+unchanged.
+
 ## Operation sequence and bounds
 
 1. Validate input identity, envelope, credentials and projected storage headroom.

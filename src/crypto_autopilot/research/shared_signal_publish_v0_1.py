@@ -24,6 +24,15 @@ NAMESPACE = "research/signal-layer/v0-2"
 MAX_BYTES = 2_500_000
 
 
+
+def _valid_signal_run_id(value: object) -> bool:
+    """Accept prepared numeric IDs and the existing GitHub workflow identity."""
+    return isinstance(value, str) and re.fullmatch(
+        r"(?:[1-9][0-9]{0,19}|github-[1-9][0-9]{0,19}-[1-9][0-9]{0,9})",
+        value,
+    ) is not None
+
+
 def _validate_target(credentials: Mapping[str, str]) -> None:
     required = {"account_id", "bucket", "access_key_id", "secret_access_key"}
     if not isinstance(credentials, Mapping) or set(credentials) != required or any(
@@ -84,8 +93,7 @@ def _latest_condition(
     previous_run = previous.get("run_id")
     if (
         previous.get("schema") != "research-signal-layer-latest-v0.2"
-        or not isinstance(previous_run, str)
-        or not re.fullmatch(r"[1-9][0-9]{0,19}", previous_run)
+        or not _valid_signal_run_id(previous_run)
         or previous.get("manifest_key") !=
         f"{NAMESPACE}/runs/run={previous_run}/manifest.json"
         or not isinstance(previous.get("manifest_sha256"), str)
@@ -101,7 +109,7 @@ def _latest_condition(
 
 
 def _objects(payload: Mapping[str, object], run_id: str) -> tuple[tuple[str, bytes], ...]:
-    if not isinstance(run_id, str) or not re.fullmatch(r"[1-9][0-9]{0,19}", run_id):
+    if not _valid_signal_run_id(run_id):
         raise BudgetBlocked("BLOCKED_SIGNAL_RUN_ID")
     authority = payload.get("authority")
     if (
