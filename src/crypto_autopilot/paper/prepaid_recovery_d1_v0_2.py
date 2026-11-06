@@ -30,7 +30,7 @@ class RecoveryPrepaidD1Client(PrepaidCloudflareD1QueryClient):
             raise BudgetBlocked("BLOCKED_RECOVERY_SLOT_OR_WRITER")
         value = slot_id.removeprefix("slot:")
         if (
-            slot_id != f"slot:{value}" or not value.isascii() or not value.isdigit()
+            slot_id != f"slot:{value}" or len(value) > 16 or not value.isascii() or not value.isdigit()
             or str(int(value)) != value or int(value) <= 0
             or (int(value) - SLOT_OFFSET_MS) % SLOT_MS
         ):
