@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { webcrypto } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
+import { readFileSync } from "node:fs";
 import { claimJobSlot } from "../../workers/paper-gateway/d1-job-claim.mjs";
 import { checkJobMetadata } from "../../workers/paper-gateway/github-metadata.mjs";
 import { readJobMetadata } from "../../workers/paper-gateway/github-metadata-reader.mjs";
@@ -117,11 +118,7 @@ test("key reader rejects redirects, malformed JSON, oversize and failures", asyn
 
 test("D1 claim adapter rejects duplicates and preserves ambiguous committed writes", async () => {
   const sql = new DatabaseSync(":memory:");
-  sql.exec(`CREATE TABLE paper_job_claim_v0_1 (
-    repository_id TEXT NOT NULL, run_id TEXT NOT NULL, attempt TEXT NOT NULL,
-    check_run_id TEXT NOT NULL, writer_id TEXT NOT NULL, slot_id TEXT NOT NULL,
-    PRIMARY KEY (repository_id, run_id, attempt, check_run_id, writer_id),
-    UNIQUE (repository_id, writer_id, slot_id))`);
+  sql.exec(readFileSync(new URL("../../migrations/paper_gateway_job_claim_candidate_v0_1.sql", import.meta.url), "utf8"));
   let calls = 0;
   let loseResponse = false;
   const binding = { prepare: statement => ({ bind: (...args) => ({ run: async () => {
