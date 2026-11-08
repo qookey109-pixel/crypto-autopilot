@@ -139,6 +139,9 @@ test("D1 claim adapter rejects duplicates and preserves ambiguous committed writ
   loseResponse = false;
   assert.equal(await claimJobSlot(binding, next, { enabled: true }), "DUPLICATE_OR_CONFLICT");
   assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1").get().n, 2);
+  assert.throws(() => sql.exec("UPDATE paper_job_claim_v0_1 SET slot_id='slot:3000'"), /PAPER_JOB_CLAIM_IMMUTABLE/);
+  assert.throws(() => sql.exec("DELETE FROM paper_job_claim_v0_1"), /PAPER_JOB_CLAIM_IMMUTABLE/);
+  assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1").get().n, 2);
   const before = calls;
   assert.equal(await claimJobSlot(binding, { ...claim, writerId: "bad';drop" }, { enabled: true }), "INVALID");
   assert.equal(calls, before);
