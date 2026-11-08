@@ -22,7 +22,7 @@ export async function claimJobSlot(database, claim, { enabled = false, limits } 
         !Number.isSafeInteger(result.meta?.rows_read) || result.meta.rows_read < 0 ||
         result.meta.rows_read > limits.rowsRead || !Number.isSafeInteger(result.meta?.rows_written) ||
         result.meta.rows_written < 0 || result.meta.rows_written > limits.rowsWritten) return "REVIEW_REQUIRED";
-    if (result.meta.changes === 1) return "CLAIMED";
+    if (result.meta.changes === 1 && result.meta.rows_written >= 1) return "CLAIMED";
     if (result.meta.changes === 0) return "DUPLICATE_OR_CONFLICT";
     return "REVIEW_REQUIRED";
   } catch { return "REVIEW_REQUIRED"; }
