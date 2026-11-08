@@ -1,3 +1,5 @@
+## Current merged release checkpoint — 2026-10-27 Asia/Taipei
+
 ## Current safety clarification — 2026-11-06
 
 Evidence basis: reviewed parent `90501bf923c7a53bd06166367fcc69d83f9a12aa`; resolve live main and run history before acting.
@@ -8,9 +10,7 @@ Evidence basis: reviewed parent `90501bf923c7a53bd06166367fcc69d83f9a12aa`; reso
 
 Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`, D1 is unprovisioned, and the formal strategy registry is empty. Independent current-job identity, all-writer budget coverage, fresh account evidence and controlled main acceptance remain incomplete. Core100 model quality remains `REJECT`; no bootstrap rerun, holdout, source switch, promotion or real-money trading follows from these engineering checks.
 
----
 
-## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
 **2026-10-29 — configured-target and recovery checkpoint**
 
