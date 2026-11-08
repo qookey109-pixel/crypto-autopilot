@@ -46,5 +46,7 @@ export async function readJobMetadata({ enabled = false, repository, identity, t
   const run = await readOne(fetcher, base + "runs/" + identity.runId, token);
   if (!run) return null;
   const job = await readOne(fetcher, base + "jobs/" + identity.checkRunId, token);
-  return job ? { run, job } : null;
+  if (!job) return null;
+  const main = await readOne(fetcher, "https://api.github.com/repos/" + repository + "/branches/main", token);
+  return main ? { run, job, main } : null;
 }
