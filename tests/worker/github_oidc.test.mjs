@@ -172,6 +172,7 @@ test("D1 claim rejects unknown or repeated attempt metadata", async () => {
     { success: true, meta: { changes: 1 } },
     { success: true, meta: { changes: 1, total_attempts: 1, rows_read: 9, rows_written: 1 } },
     { success: true, meta: { changes: 1, total_attempts: 1, rows_read: 1, rows_written: 0 } },
+    { success: true, meta: { changes: 0, total_attempts: 1, rows_read: 1, rows_written: 1, size_after: 1024 } },
     { success: true, meta: { changes: 1, total_attempts: 1, rows_read: 1, rows_written: 1, size_after: 2049 } },
     { success: true, meta: { changes: 1, total_attempts: 1, rows_read: 1, rows_written: 2 } },
     { success: true, meta: { changes: 1, total_attempts: 2 } },
@@ -280,7 +281,9 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   const sql = new DatabaseSync(":memory:");
   sql.exec(readFileSync(new URL("../../migrations/paper_gateway_job_claim_candidate_v0_1.sql", import.meta.url), "utf8"));
   const db = { prepare: statement => ({ bind: (...args) => ({ run: async () => {
-    writes++; return { success: true, meta: { changes: Number(sql.prepare(statement).run(...args).changes), total_attempts: 1, rows_read: 1, rows_written: 1, size_after: 1024 } };
+    writes++;
+    const changes = Number(sql.prepare(statement).run(...args).changes);
+    return { success: true, meta: { changes, total_attempts: 1, rows_read: 1, rows_written: changes, size_after: 1024 } };
   } }) }) };
   const config = { enabled: true, policy, token, githubToken: "synthetic-only-token", fetcher, db, clock: () => now };
   assert.equal((await admitScheduledJob({ ...config, enabled: false, reserve: async () => { throw Error("must not reserve"); } })).status, "DISABLED");
