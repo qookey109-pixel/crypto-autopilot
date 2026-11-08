@@ -22,3 +22,22 @@ BEFORE DELETE ON paper_job_claim_v0_1
 BEGIN
   SELECT RAISE(ABORT, 'PAPER_JOB_CLAIM_IMMUTABLE');
 END;
+
+-- Prevent INSERT OR REPLACE from deleting an existing claim, even where
+-- SQLite recursive delete triggers are disabled. The two indexed probes add
+-- D1 cost; production row-read/write ceilings remain unmeasured.
+CREATE TRIGGER paper_job_claim_no_replace_v0_1
+BEFORE INSERT ON paper_job_claim_v0_1
+WHEN EXISTS (
+  SELECT 1 FROM paper_job_claim_v0_1
+  WHERE repository_id = NEW.repository_id AND run_id = NEW.run_id
+    AND attempt = NEW.attempt AND check_run_id = NEW.check_run_id
+    AND writer_id = NEW.writer_id
+) OR EXISTS (
+  SELECT 1 FROM paper_job_claim_v0_1
+  WHERE repository_id = NEW.repository_id AND writer_id = NEW.writer_id
+    AND slot_id = NEW.slot_id
+)
+BEGIN
+  SELECT RAISE(IGNORE);
+END;
