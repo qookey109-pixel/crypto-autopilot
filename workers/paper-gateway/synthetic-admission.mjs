@@ -26,9 +26,11 @@ export async function admitScheduledJob({ enabled = false, policy, token, github
         !/^[a-z0-9][a-z0-9:._/-]{0,127}$/.test(fixed.writerId)) return { status: "INVALID" };
     // Values are synthetic upper bounds. Real ceilings must be independently
     // measured, account-scoped, server-owned and prepaid before any access.
+    // Three written rows is only a fixture floor for table plus two indexes;
+    // it is not an upper bound or a substitute for real D1 calibration.
     const costs = fixed.admissionCosts;
     const minimum = { workerRequests: 1, githubRequests: 4, d1Queries: 1,
-      d1RowsRead: 1, d1RowsWritten: 1, d1StorageBytes: 1 };
+      d1RowsRead: 1, d1RowsWritten: 3, d1StorageBytes: 1 };
     if (!costs || typeof costs !== "object" || Array.isArray(costs) ||
         Object.keys(costs).length !== Object.keys(minimum).length ||
         Object.entries(minimum).some(([key, min]) =>
