@@ -1,12 +1,12 @@
+## Current operating checkpoint — 2026-10-27 Asia/Taipei
+
 ## Current billing safety clarification — 2026-11-06
 
 [Billing Metadata Diagnostic V0.5 run 41841230890](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/41841230890), attempt 1, consumed its one-time authorization and returned `REVIEW_REQUIRED / PAGINATION_METADATA_INVALID` after one read-only request. See the [result receipt](../research/receipts/2026-11-04-billing-metadata-v0-5-result-v0-1.json) and [interpretation](CLOUD_PAPER_BILLING_METADATA_DIAGNOSTIC_V0_5.md). **Do not dispatch or rerun V0.5.** Older statements describing a pending first dispatch are historical. Any further external investigation requires a new merged versioned scope; billing completeness, account-wide zero cost and headroom remain UNKNOWN.
 
 Resolve live main and read [CURRENT_STATUS](../CURRENT_STATUS.md) and [PROJECT_STATUS](../PROJECT_STATUS.md) before older checkpoints. Paper remains disabled and all identity, budget and execution gates remain in force.
 
----
 
-## Current operating checkpoint — 2026-10-27 Asia/Taipei
 
 **2026-10-28 maintenance update:** Two distinct natural Health sources [40559516917](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40559516917) and [40596590186](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40596590186), both attempt 1 and concluded failure, led to Maintenance [40559619536](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40559619536) and [40596672170](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/40596672170). Both inspect and propose succeeded; each structured output records its exact source, `NO_CHANGE` and `commits_created=0`. This satisfies the two-distinct-natural-source maintenance/dedup evidence criterion only; Health remains ALERT with Core100 training failure and model quality REJECT. The previous checkpoint below is historical. The generated blocks are reconciled byte-for-byte from PR #822 at head `178cab76d8d91a3f51c40e416167a1acceb1e40f`, a 2026-10-27 snapshot; that bot PR had no check runs and its contents are validated by this successor's CI. Read live main and fresh runs for current state.
 
