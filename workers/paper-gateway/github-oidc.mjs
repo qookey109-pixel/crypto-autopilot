@@ -79,7 +79,7 @@ export async function verifyGithubJob(token, { enabled = false, policy, now, fet
         typeof claims.jti !== "string" || !claims.jti || claims.jti.length > 256 ||
         !["iat", "nbf", "exp"].every(k => Number.isSafeInteger(claims[k])) ||
         claims.iat > now + 30 || claims.nbf > now + 30 || claims.exp <= now ||
-        claims.exp <= claims.iat || claims.exp - claims.iat > 600) return null;
+        claims.exp <= claims.iat || claims.nbf >= claims.exp || claims.exp - claims.iat > 600) return null;
     const set = await fetchKeys();
     if (!set || !Array.isArray(set.keys) || set.keys.length > 32) return null;
     const keys = set.keys.filter(k => k && k.kid === header.kid);
