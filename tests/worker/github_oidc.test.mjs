@@ -137,19 +137,19 @@ test("D1 claim adapter rejects duplicates and preserves ambiguous committed writ
     calls++;
     const result = sql.prepare(statement).run(...args);
     if (loseResponse) throw Error("response lost after commit");
-    return { success: true, meta: { changes: Number(result.changes), total_attempts: 1 } };
+    return { success: true, meta: { changes: Number(result.changes), total_attempts: 1, rows_read: 1, rows_written: Number(result.changes) } };
   } }) }) };
   const claim = { repositoryId: "123", runId: "100", attempt: "1", checkRunId: "101", writerId: "paper", slotId: "slot:1000" };
   assert.equal(await claimJobSlot(binding, claim), "DISABLED");
   assert.equal(calls, 0);
-  assert.equal(await claimJobSlot(binding, claim, { enabled: true }), "CLAIMED");
-  assert.equal(await claimJobSlot(binding, claim, { enabled: true }), "DUPLICATE_OR_CONFLICT");
-  assert.equal(await claimJobSlot(binding, { ...claim, runId: "102", checkRunId: "103" }, { enabled: true }), "DUPLICATE_OR_CONFLICT");
+  assert.equal(await claimJobSlot(binding, claim, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1 } }), "CLAIMED");
+  assert.equal(await claimJobSlot(binding, claim, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1 } }), "DUPLICATE_OR_CONFLICT");
+  assert.equal(await claimJobSlot(binding, { ...claim, runId: "102", checkRunId: "103" }, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1 } }), "DUPLICATE_OR_CONFLICT");
   loseResponse = true;
   const next = { ...claim, runId: "104", checkRunId: "105", slotId: "slot:2000" };
-  assert.equal(await claimJobSlot(binding, next, { enabled: true }), "REVIEW_REQUIRED");
+  assert.equal(await claimJobSlot(binding, next, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1 } }), "REVIEW_REQUIRED");
   loseResponse = false;
-  assert.equal(await claimJobSlot(binding, next, { enabled: true }), "DUPLICATE_OR_CONFLICT");
+  assert.equal(await claimJobSlot(binding, next, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1 } }), "DUPLICATE_OR_CONFLICT");
   assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1").get().n, 2);
   assert.throws(() => sql.exec("UPDATE paper_job_claim_v0_1 SET slot_id='slot:3000'"), /PAPER_JOB_CLAIM_IMMUTABLE/);
   assert.throws(() => sql.exec("DELETE FROM paper_job_claim_v0_1"), /PAPER_JOB_CLAIM_IMMUTABLE/);
@@ -161,7 +161,7 @@ test("D1 claim adapter rejects duplicates and preserves ambiguous committed writ
   assert.equal(sql.prepare("SELECT slot_id FROM paper_job_claim_v0_1 WHERE run_id = ?").get("100").slot_id, "slot:1000");
   assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1").get().n, 2);
   const before = calls;
-  assert.equal(await claimJobSlot(binding, { ...claim, writerId: "bad';drop" }, { enabled: true }), "INVALID");
+  assert.equal(await claimJobSlot(binding, { ...claim, writerId: "bad';drop" }, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1 } }), "INVALID");
   assert.equal(calls, before);
   sql.close();
 });
@@ -176,7 +176,7 @@ test("D1 claim rejects unknown or repeated attempt metadata", async () => {
   ]) {
     let calls = 0;
     const db = { prepare: () => ({ bind: () => ({ run: async () => { calls++; return result; } }) }) };
-    assert.equal(await claimJobSlot(db, claim, { enabled: true }), "REVIEW_REQUIRED");
+    assert.equal(await claimJobSlot(db, claim, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1 } }), "REVIEW_REQUIRED");
     assert.equal(calls, 1);
   }
 });
@@ -276,7 +276,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   const sql = new DatabaseSync(":memory:");
   sql.exec(readFileSync(new URL("../../migrations/paper_gateway_job_claim_candidate_v0_1.sql", import.meta.url), "utf8"));
   const db = { prepare: statement => ({ bind: (...args) => ({ run: async () => {
-    writes++; return { success: true, meta: { changes: Number(sql.prepare(statement).run(...args).changes), total_attempts: 1 } };
+    writes++; return { success: true, meta: { changes: Number(sql.prepare(statement).run(...args).changes), total_attempts: 1, rows_read: 1, rows_written: 1 } };
   } }) }) };
   const config = { enabled: true, policy, token, githubToken: "synthetic-only-token", fetcher, db, clock: () => now };
   assert.equal((await admitScheduledJob({ ...config, enabled: false, reserve: async () => { throw Error("must not reserve"); } })).status, "DISABLED");
@@ -297,7 +297,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   staleMain = false;
   let clockReads = 0, lateWrites = 0;
   const delayedDb = { prepare: () => ({ bind: () => ({ run: async () => {
-    lateWrites++; return { success: true, meta: { changes: 1, total_attempts: 1 } };
+    lateWrites++; return { success: true, meta: { changes: 1, total_attempts: 1, rows_read: 1, rows_written: 1 } };
   } }) }) };
   const lateResult = await admitScheduledJob({ ...config, db: delayedDb,
     clock: () => (++clockReads < 3 ? now : base + 301000), reserve: async () => true });
