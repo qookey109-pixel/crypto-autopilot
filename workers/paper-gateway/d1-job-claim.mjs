@@ -26,7 +26,7 @@ export async function claimJobSlot(database, claim, { enabled = false, limits } 
         !Number.isSafeInteger(result.meta.size_after) || result.meta.size_after < 0 ||
         result.meta.size_after > limits.maxDatabaseBytes) return "REVIEW_REQUIRED";
     if (result.meta.changes === 1 && result.meta.rows_written >= 1) return "CLAIMED";
-    if (result.meta.changes === 0) return "DUPLICATE_OR_CONFLICT";
+    if (result.meta.changes === 0 && result.meta.rows_written === 0) return "DUPLICATE_OR_CONFLICT";
     return "REVIEW_REQUIRED";
   } catch { return "REVIEW_REQUIRED"; }
 }
