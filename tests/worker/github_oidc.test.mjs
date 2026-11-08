@@ -119,6 +119,16 @@ test("key reader rejects redirects, malformed JSON, oversize and failures", asyn
 test("D1 claim adapter rejects duplicates and preserves ambiguous committed writes", async () => {
   const sql = new DatabaseSync(":memory:");
   sql.exec(readFileSync(new URL("../../migrations/paper_gateway_job_claim_candidate_v0_1.sql", import.meta.url), "utf8"));
+  // Synthetic SQLite query plans are engineering evidence, not D1 billing.
+  const queryPlans = [
+    ["SELECT 1 FROM paper_job_claim_v0_1 WHERE repository_id=? AND run_id=? AND attempt=? AND check_run_id=? AND writer_id=?", ["123", "100", "1", "101", "paper"]],
+    ["SELECT 1 FROM paper_job_claim_v0_1 WHERE repository_id=? AND writer_id=? AND slot_id=?", ["123", "paper", "slot:1000"]],
+  ];
+  for (const [query, params] of queryPlans) {
+    const plan = sql.prepare("EXPLAIN QUERY PLAN " + query).all(...params);
+    assert.ok(plan.some(row => /SEARCH .* USING (?:COVERING )?INDEX/i.test(row.detail)), JSON.stringify(plan));
+    assert.ok(!plan.some(row => /SCAN paper_job_claim_v0_1/i.test(row.detail)), JSON.stringify(plan));
+  }
   let calls = 0;
   let loseResponse = false;
   const binding = { prepare: statement => ({ bind: (...args) => ({ run: async () => {
