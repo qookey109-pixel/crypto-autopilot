@@ -27,7 +27,7 @@ export async function admitScheduledJob({ enabled = false, policy, token, github
     // Values are synthetic upper bounds. Real ceilings must be independently
     // measured, account-scoped, server-owned and prepaid before any access.
     const costs = fixed.admissionCosts;
-    const minimum = { workerRequests: 1, githubRequests: 3, d1Queries: 1,
+    const minimum = { workerRequests: 1, githubRequests: 4, d1Queries: 1,
       d1RowsRead: 1, d1RowsWritten: 1, d1StorageBytes: 1 };
     if (!costs || typeof costs !== "object" || Array.isArray(costs) ||
         Object.keys(costs).length !== Object.keys(minimum).length ||
@@ -45,7 +45,7 @@ export async function admitScheduledJob({ enabled = false, policy, token, github
       enabled: true, repository: fixed.repository, identity, token: githubToken, fetcher,
     });
     const after = clock();
-    if (!metadata || !Number.isSafeInteger(after) || Math.floor(after / 1000) >= identity.expiresAt ||
+    if (!metadata || metadata.main?.commit?.sha !== fixed.sha || !Number.isSafeInteger(after) || Math.floor(after / 1000) >= identity.expiresAt ||
         !checkJobMetadata(identity, metadata.run, metadata.job,
           { ...fixed, allowedEvents: ["schedule"] }, after)) return { status: "IDENTITY_BLOCKED" };
     // Processing time only; never claim to know the scheduler's nominal slot.
