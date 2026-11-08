@@ -171,6 +171,7 @@ test("D1 claim rejects unknown or repeated attempt metadata", async () => {
   for (const result of [
     { success: true, meta: { changes: 1 } },
     { success: true, meta: { changes: 1, total_attempts: 1, rows_read: 9, rows_written: 1 } },
+    { success: true, meta: { changes: 1, total_attempts: 1, rows_read: 1, rows_written: 0 } },
     { success: true, meta: { changes: 1, total_attempts: 1, rows_read: 1, rows_written: 2 } },
     { success: true, meta: { changes: 1, total_attempts: 2 } },
     { success: true, meta: { changes: 2, total_attempts: 1 } },
