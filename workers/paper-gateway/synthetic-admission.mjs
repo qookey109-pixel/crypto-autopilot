@@ -35,6 +35,8 @@ export async function admitScheduledJob({ enabled = false, policy, token, github
         Object.keys(costs).length !== Object.keys(minimum).length ||
         Object.entries(minimum).some(([key, min]) =>
           !Number.isSafeInteger(costs[key]) || costs[key] < min)) return { status: "INVALID" };
+    if (!Number.isSafeInteger(fixed.databaseBytesBefore) || fixed.databaseBytesBefore < 0 ||
+        !Number.isSafeInteger(fixed.databaseBytesBefore + costs.d1StorageBytes)) return { status: "INVALID" };
     if (await reserve(Object.freeze({ ...costs })) !== true) return { status: "BUDGET_BLOCKED" };
     const now = clock();
     if (!Number.isSafeInteger(now)) return { status: "INVALID" };
@@ -56,7 +58,8 @@ export async function admitScheduledJob({ enabled = false, policy, token, github
     const slotId = "slot:" + slot;
     const status = await claimJobSlot(db, { repositoryId: identity.repositoryId, runId: identity.runId,
       attempt: "1", checkRunId: identity.checkRunId, writerId: fixed.writerId, slotId }, { enabled: true,
-      limits: { rowsRead: costs.d1RowsRead, rowsWritten: costs.d1RowsWritten } });
+      limits: { rowsRead: costs.d1RowsRead, rowsWritten: costs.d1RowsWritten,
+        maxDatabaseBytes: fixed.databaseBytesBefore + costs.d1StorageBytes } });
     if (status !== "CLAIMED") return { status };
     // A commit can succeed after identity or processing-window expiry.
     // Keep the consumed claim and require review; never release work.
