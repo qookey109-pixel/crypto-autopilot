@@ -80,6 +80,8 @@ test("signature, repository and run claims must agree", async () => {
     const signed = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key.privateKey, new TextEncoder().encode(data));
     return data + "." + Buffer.from(signed).toString("base64url");
   };
+  const impossibleInterval = encode({ ...claims, nbf: 1105, exp: 1103 });
+  assert.equal(await verifyGithubJob(await sign(header, impossibleInterval), options), null);
   const duplicate = Buffer.from(JSON.stringify(claims).replace('"run_id":"100"', '"run_id":"100","run_id":"100"')).toString("base64url");
   assert.equal(await verifyGithubJob(await sign(header, duplicate), options), null);
   const forbidden = encode({ alg: "RS256", typ: "JWT", kid: "fixture", jku: "https://attacker.example/keys" });
