@@ -221,13 +221,14 @@ test("metadata reader makes only fixed signed-ID GitHub requests", async () => {
   const config = { repository: "owner/repo", identity: { runId: "100", checkRunId: "101" }, token: "synthetic-only-token", fetcher };
   assert.equal(await readJobMetadata({ ...config, enabled: false }), null);
   assert.deepEqual(calls, []);
-  assert.deepEqual(await readJobMetadata({ ...config, enabled: true }), { run: { id: 1 }, job: { id: 2 } });
+  assert.deepEqual(await readJobMetadata({ ...config, enabled: true }), { run: { id: 1 }, job: { id: 2 }, main: { id: 3 } });
   assert.deepEqual(calls, [
     "https://api.github.com/repos/owner/repo/actions/runs/100",
     "https://api.github.com/repos/owner/repo/actions/jobs/101",
+    "https://api.github.com/repos/owner/repo/branches/main",
   ]);
   assert.equal(await readJobMetadata({ ...config, enabled: true, identity: { runId: "../bad", checkRunId: "101" } }), null);
-  assert.equal(calls.length, 2);
+  assert.equal(calls.length, 3);
   let failures = 0;
   assert.equal(await readJobMetadata({ ...config, enabled: true, fetcher: async () => {
     failures++; return new Response("", { status: 302, headers: { Location: "https://attacker.example" } });
@@ -247,7 +248,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     workflowPath: ".github/workflows/paper.yml", workflowRef: "owner/repo/.github/workflows/paper.yml@refs/heads/main",
     workflowSha: sha, sha, jobName: "paper", audience: "paper-test",
     subject: "repo:owner/repo:ref:refs/heads/main", writerId: "paper", maxAgeSeconds: 600,
-    maxScheduleDelaySeconds: 180, admissionCosts: { workerRequests: 1, githubRequests: 3, d1Queries: 1, d1RowsRead: 8, d1RowsWritten: 1, d1StorageBytes: 4096 } };
+    maxScheduleDelaySeconds: 180, admissionCosts: { workerRequests: 1, githubRequests: 4, d1Queries: 1, d1RowsRead: 8, d1RowsWritten: 1, d1StorageBytes: 4096 } };
   const claims = { iss: "https://token.actions.githubusercontent.com", aud: policy.audience, sub: policy.subject,
     repository: policy.repository, repository_id: policy.repositoryId, workflow_ref: policy.workflowRef,
     workflow_sha: sha, sha, ref: "refs/heads/main", ref_type: "branch", runner_environment: "github-hosted",
@@ -262,13 +263,14 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   const job = { id: 101, run_id: 100, run_attempt: 1, head_sha: sha, name: "paper",
     status: "in_progress", started_at: "2026-01-01T00:07:40Z", completed_at: null };
   let fetches = 0, writes = 0;
-  let invalidRun = false;
+  let invalidRun = false, staleMain = false;
   const fetcher = async url => {
     fetches++;
     if (url === "https://token.actions.githubusercontent.com/.well-known/jwks")
       return new Response(JSON.stringify({ keys: [jwk] }));
     if (url.endsWith("/actions/runs/100")) return new Response(JSON.stringify(invalidRun ? { ...run, head_sha: "b".repeat(40) } : run));
     if (url.endsWith("/actions/jobs/101")) return new Response(JSON.stringify(job));
+    if (url.endsWith("/branches/main")) return new Response(JSON.stringify({ commit: { sha: staleMain ? "b".repeat(40) : sha } }));
     throw Error("unexpected path");
   };
   const sql = new DatabaseSync(":memory:");
@@ -291,6 +293,10 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   assert.equal((await admitScheduledJob({ ...config, reserve: async () => true })).status, "IDENTITY_BLOCKED");
   assert.equal(writes, 0);
   invalidRun = false;
+  staleMain = true;
+  assert.equal((await admitScheduledJob({ ...config, reserve: async () => true })).status, "IDENTITY_BLOCKED");
+  assert.equal(writes, 0);
+  staleMain = false;
   let clockReads = 0, lateWrites = 0;
   const delayedDb = { prepare: () => ({ bind: () => ({ run: async () => {
     lateWrites++; return { success: true, meta: { changes: 1, total_attempts: 1 } };
