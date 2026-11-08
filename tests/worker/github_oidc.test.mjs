@@ -274,9 +274,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     throw Error("unexpected path");
   };
   const sql = new DatabaseSync(":memory:");
-  sql.exec(`CREATE TABLE paper_job_claim_v0_1 (repository_id TEXT NOT NULL, run_id TEXT NOT NULL,
-    attempt TEXT NOT NULL, check_run_id TEXT NOT NULL, writer_id TEXT NOT NULL, slot_id TEXT NOT NULL,
-    PRIMARY KEY (repository_id, run_id, attempt, check_run_id, writer_id), UNIQUE (repository_id, writer_id, slot_id))`);
+  sql.exec(readFileSync(new URL("../../migrations/paper_gateway_job_claim_candidate_v0_1.sql", import.meta.url), "utf8"));
   const db = { prepare: statement => ({ bind: (...args) => ({ run: async () => {
     writes++; return { success: true, meta: { changes: Number(sql.prepare(statement).run(...args).changes), total_attempts: 1 } };
   } }) }) };
