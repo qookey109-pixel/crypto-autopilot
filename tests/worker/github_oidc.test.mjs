@@ -251,7 +251,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     workflowPath: ".github/workflows/paper.yml", workflowRef: "owner/repo/.github/workflows/paper.yml@refs/heads/main",
     workflowSha: sha, sha, jobName: "paper", audience: "paper-test",
     subject: "repo:owner/repo:ref:refs/heads/main", writerId: "paper", maxAgeSeconds: 600,
-    maxScheduleDelaySeconds: 180, admissionCosts: { workerRequests: 1, githubRequests: 4, d1Queries: 1, d1RowsRead: 8, d1RowsWritten: 1, d1StorageBytes: 4096 } };
+    maxScheduleDelaySeconds: 180, admissionCosts: { workerRequests: 1, githubRequests: 4, d1Queries: 1, d1RowsRead: 8, d1RowsWritten: 3, d1StorageBytes: 4096 } };
   const claims = { iss: "https://token.actions.githubusercontent.com", aud: policy.audience, sub: policy.subject,
     repository: policy.repository, repository_id: policy.repositoryId, workflow_ref: policy.workflowRef,
     workflow_sha: sha, sha, ref: "refs/heads/main", ref_type: "branch", runner_environment: "github-hosted",
@@ -286,6 +286,8 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   assert.equal(fetches, 0); assert.equal(writes, 0);
   const incomplete = { ...policy, admissionCosts: { ...policy.admissionCosts, d1RowsRead: undefined } };
   assert.equal((await admitScheduledJob({ ...config, policy: incomplete, reserve: async () => { throw Error("must not reserve"); } })).status, "INVALID");
+  const underfunded = { ...policy, admissionCosts: { ...policy.admissionCosts, d1RowsWritten: 1 } };
+  assert.equal((await admitScheduledJob({ ...config, policy: underfunded, reserve: async () => { throw Error("must not reserve"); } })).status, "INVALID");
   let reserved;
   assert.equal((await admitScheduledJob({ ...config, reserve: async envelope => { reserved = envelope; return false; } })).status, "BUDGET_BLOCKED");
   assert.deepEqual(reserved, policy.admissionCosts);
