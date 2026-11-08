@@ -53,7 +53,8 @@ export async function admitScheduledJob({ enabled = false, policy, token, github
     if (slot === null) return { status: "SLOT_BLOCKED" };
     const slotId = "slot:" + slot;
     const status = await claimJobSlot(db, { repositoryId: identity.repositoryId, runId: identity.runId,
-      attempt: "1", checkRunId: identity.checkRunId, writerId: fixed.writerId, slotId }, { enabled: true });
+      attempt: "1", checkRunId: identity.checkRunId, writerId: fixed.writerId, slotId }, { enabled: true,
+      limits: { rowsRead: costs.d1RowsRead, rowsWritten: costs.d1RowsWritten } });
     if (status !== "CLAIMED") return { status };
     // A commit can succeed after identity or processing-window expiry.
     // Keep the consumed claim and require review; never release work.
