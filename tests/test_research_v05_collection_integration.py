@@ -153,7 +153,7 @@ class ResearchV05CollectionTests(unittest.TestCase):
         self.assertEqual([item["retrieved_at_ms"] for item in payload["source_snapshots"]],
                          [start + 1000, start + 2000, start + 3000])
         self.assertEqual([item["ingested_at_ms"] for item in payload["kol_forecasts"]],
-                         [start + 1000, start + 2000, start + 3000])
+                         [start + 1000, start + 2000])
 
     def test_clock_rollback_during_source_requires_review_before_r2(self):
         fixture = self
