@@ -5,6 +5,7 @@ import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
 import { claimJobSlot } from "../../workers/paper-gateway/d1-job-claim.mjs";
 import { createIngressReservation, prepareEnvelopeSchema, reserveEnvelope } from "../../workers/paper-gateway/atomic-envelope.mjs";
+import { conservativeRemaining } from "../../workers/paper-gateway/lagged-usage.mjs";
 import { checkJobMetadata } from "../../workers/paper-gateway/github-metadata.mjs";
 import { readJobMetadata } from "../../workers/paper-gateway/github-metadata-reader.mjs";
 import { admitScheduledJob, processingSlot } from "../../workers/paper-gateway/synthetic-admission.mjs";
@@ -426,4 +427,33 @@ test("atomic finite envelope rejects duplicate, overrun and policy drift", async
   assert.equal(run(alternate), "RESERVED");
   assert.equal(db.prepare("SELECT r2a FROM envelope_scope").get().r2a, 3);
   db.close();
+});
+
+test("lagged account counters charge every open or watermark-spanning reservation", () => {
+  const names = ["worker", "github", "provider", "r2a", "r2b", "bytes", "d1queries", "d1read", "d1write", "d1bytes"];
+  const envelope = n => Object.fromEntries(names.map(k => [k, n]));
+  const counters = Object.fromEntries(names.map(k => [k, { used: 10, cap: 100, margin: 5,
+    periodStartMs: 0, periodEndMs: 2000, measuredThroughMs: 1000 }]));
+  const reservations = [
+    { id: "before", reservedMs: 100, closedMs: 999, envelope: envelope(20) },
+    { id: "spanning", reservedMs: 500, closedMs: 1100, envelope: envelope(7) },
+    { id: "open", reservedMs: 100, closedMs: null, envelope: envelope(11) },
+    { id: "new", reservedMs: 1100, closedMs: 1200, envelope: envelope(3) },
+  ];
+  const args = { enabled: true, nowMs: 1500, observedAtMs: 1490,
+    maxObservationAgeMs: 100, maxDataLagMs: 1000, ledgerAsOfMs: 1500,
+    completeCoverage: true, counters, reservations };
+  assert.deepEqual(conservativeRemaining(args), { status: "READY_FOR_REVIEW", remaining: envelope(64) });
+  assert.equal(conservativeRemaining({ ...args, ledgerAsOfMs: 1499 }).status, "INVALID");
+  assert.equal(conservativeRemaining({ ...args, completeCoverage: false }).status, "INVALID");
+  assert.equal(conservativeRemaining({ ...args, maxDataLagMs: 100 }).status, "INVALID");
+  assert.equal(conservativeRemaining({ ...args, reservations: [...reservations, reservations[0]] }).status, "INVALID");
+  const limited = structuredClone(counters);
+  limited.r2a.cap = 35;
+  assert.equal(conservativeRemaining({ ...args, counters: limited }).status, "BUDGET_BLOCKED");
+  limited.r2a.cap = 100;
+  limited.r2a.measuredThroughMs = 1600;
+  assert.equal(conservativeRemaining({ ...args, counters: limited }).status, "INVALID");
+  assert.equal(conservativeRemaining({ ...args, nowMs: 2000, ledgerAsOfMs: 2000, observedAtMs: 2000 }).status, "INVALID");
+  assert.equal(conservativeRemaining({ ...args, enabled: false }).status, "DISABLED");
 });
