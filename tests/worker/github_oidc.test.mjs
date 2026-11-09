@@ -4,7 +4,7 @@ import { webcrypto } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
 import { claimJobSlot } from "../../workers/paper-gateway/d1-job-claim.mjs";
-import { prepareEnvelopeSchema, reserveEnvelope } from "../../workers/paper-gateway/atomic-envelope.mjs";
+import { createIngressReservation, prepareEnvelopeSchema, reserveEnvelope } from "../../workers/paper-gateway/atomic-envelope.mjs";
 import { checkJobMetadata } from "../../workers/paper-gateway/github-metadata.mjs";
 import { readJobMetadata } from "../../workers/paper-gateway/github-metadata-reader.mjs";
 import { admitScheduledJob, processingSlot } from "../../workers/paper-gateway/synthetic-admission.mjs";
@@ -296,6 +296,34 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     return { success: true, meta: { changes, total_attempts: 1, rows_read: 1, rows_written: changes, size_after: 1024 } };
   } }) }) };
   const config = { enabled: true, policy, token, githubToken: "synthetic-only-token", fetcher, db, clock: () => now };
+  // Integrate the finite envelope with admission. The SQLite and clock are synthetic.
+  const ingressSql = new DatabaseSync(":memory:");
+  const ingressStorage = {
+    sql: { exec: (statement, ...args) => {
+      const stmt = ingressSql.prepare(statement);
+      if (/^SELECT/.test(statement)) return { toArray: () => stmt.all(...args) };
+      stmt.run(...args); return { toArray: () => [] };
+    } },
+    transactionSync: fn => {
+      ingressSql.exec("BEGIN");
+      try { const value = fn(); ingressSql.exec("COMMIT"); return value; }
+      catch (error) { ingressSql.exec("ROLLBACK"); throw error; }
+    },
+  };
+  assert.equal(prepareEnvelopeSchema(ingressStorage, true), "PREPARED");
+  let ingressId = 0;
+  const ingressPolicy = { scope: "ingress", policyHash: "c".repeat(64), startsMs: base, endsMs: base + 300000,
+    caps: { worker: 2, github: 8, provider: 0, r2a: 0, r2b: 0, bytes: 0,
+      d1queries: 2, d1read: 16, d1write: 6, d1bytes: 8192 } };
+  const ingress = createIngressReservation({ enabled: true, storage: ingressStorage,
+    policy: ingressPolicy, clock: () => now, nextId: () => "attempt-" + (++ingressId), admissionCosts: policy.admissionCosts });
+  assert.equal((await admitScheduledJob({ ...config, token: "invalid", reserve: ingress })).status, "IDENTITY_BLOCKED");
+  assert.equal((await admitScheduledJob({ ...config, token: "invalid", reserve: ingress })).status, "IDENTITY_BLOCKED");
+  assert.equal((await admitScheduledJob({ ...config, reserve: ingress })).status, "BUDGET_BLOCKED");
+  assert.equal(fetches, 0); assert.equal(writes, 0);
+  assert.equal(ingressSql.prepare("SELECT COUNT(*) AS n FROM envelope_claim").get().n, 2);
+  assert.equal(ingressSql.prepare("SELECT github FROM envelope_scope").get().github, 8);
+  ingressSql.close();
   assert.equal((await admitScheduledJob({ ...config, enabled: false, reserve: async () => { throw Error("must not reserve"); } })).status, "DISABLED");
   assert.equal(fetches, 0); assert.equal(writes, 0);
   const incomplete = { ...policy, admissionCosts: { ...policy.admissionCosts, d1RowsRead: undefined } };
