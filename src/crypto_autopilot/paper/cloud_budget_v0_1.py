@@ -125,6 +125,8 @@ class CloudBudgetGuard:
         )
         if any(type(value) is not int or value < 0 for value in numeric):
             raise BudgetBlocked("BLOCKED_BUDGET_USAGE_UNKNOWN")
+        if s.measured_through_ms > s.observed_at_ms:
+            raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_TIME_ORDER")
         age = current_time_ms - s.observed_at_ms
         coverage_age = current_time_ms - s.measured_through_ms
         if age < 0 or coverage_age < 0:
