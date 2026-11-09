@@ -26,7 +26,7 @@ export function checkJobMetadata(identity, run, job, policy, nowMs) {
     if (!matchId(run.id, identity.runId) || !matchId(job.run_id, identity.runId) ||
         !matchId(job.id, identity.checkRunId) ||
         !matchId(run.repository?.id, policy.repositoryId) || !matchId(run.workflow_id, policy.workflowId) ||
-        run.run_attempt !== 1 || job.run_attempt !== 1 ||
+        run.run_attempt !== 1 || ("run_attempt" in job && job.run_attempt !== 1) ||
         run.path !== policy.workflowPath || run.head_branch !== "main" ||
         run.head_sha !== policy.sha || job.head_sha !== policy.sha ||
         run.status !== "in_progress" || job.status !== "in_progress" || job.completed_at !== null ||
