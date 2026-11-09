@@ -1,13 +1,3 @@
-## Cloud account and maintenance observation — 2026-11-09 Asia/Taipei
-
-Evidence basis: parent main `10da9ce2e58c6ba84b683d5b7c224b38aa492398`; resolve live main before acting.
-
-- A read-only Cloudflare dashboard observation on 2026-11-08 showed one R2 bucket, approximately 616.66 MB and 16.38k objects; D1 showed zero databases. Its usage-cost view showed USD 0.00 for the displayed period, not complete fixed-subscription or future-cost evidence. Dashboard counters have distinct aggregation periods and can differ; their freshness and whole-account headroom are not proven.
-- On 2026-11-09 the subscription page listed Workers Free as active and R2 Paid with a November 17 renewal. This is a subscription observation, not evidence of a fixed charge or authorization to exceed the free allowance. Shared-account writers, exact costs, current capacity and sustainable budget enforcement remain unverified. Do not record credentials or account identifiers.
-- [PR #844](https://github.com/qookey109-pixel/crypto-autopilot/pull/844) was closed unmerged after verifying both generated blocks match the [archival copy](docs/archive/cloud-maintenance-pr-844-snapshot.md) byte-for-byte. Its branch and historical failures remain preserved. [Natural Health 42538556057](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42538556057) reported Core100 failure; its [Maintenance 42538614554](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42538614554) stopped on the stale draft. Closure is not evidence of a successful later natural chain.
-- [PR #878](https://github.com/qookey109-pixel/crypto-autopilot/pull/878) adds a synthetic V0.5 recovery readback-failure integration test; it is not live D1/R2 evidence. Production PAPER remains NOT_WIRED / NOT_RUN / NOT_CONFIGURED, model quality REJECT and the consumed billing diagnostic must not be repeated.
-
----
 
 ## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
@@ -73,6 +63,17 @@ The generated blocks from Draft [#818](https://github.com/qookey109-pixel/crypto
 **Next:** finish route-specific writer cutovers and finite shared budgets, complete fresh account cost/headroom and protected D1 metering/provision authority, then controlled main PAPER and separately verified natural schedule. Billing V0.5 first attempt is approved by the owner's delegated decision; the [decision receipt](research/receipts/2026-10-27-billing-v0-5-owner-delegated-decision-v0-1.json) records the scope and UNKNOWN Token validity. It was still undispatched at the06:13 UTC history check; the connector lacks first-dispatch capability, so the owner must click the existing main workflow once. No consumed Billing/Usage/bootstrap is rerun. Existing runtime guards, frozen evidence, holdout, source switch, promotion and real-money/live closure remain binding.
 
 Recovery's explicit persisted-PUT/failed-readback and later multi-seal partial-failure fixtures remain deferred coverage; the bounded successor reports unknown writes as null and retains the full envelope.
+
+---
+
+## Cloud account and maintenance observation — 2026-11-09 Asia/Taipei
+
+Evidence basis: parent main `10da9ce2e58c6ba84b683d5b7c224b38aa492398`; resolve live main before acting.
+
+- A read-only Cloudflare dashboard observation on 2026-11-08 showed one R2 bucket, approximately 616.66 MB and 16.38k objects; D1 showed zero databases. Its usage-cost view showed USD 0.00 for the displayed period, not complete fixed-subscription or future-cost evidence. Dashboard counters have distinct aggregation periods and can differ; their freshness and whole-account headroom are not proven.
+- On 2026-11-09 the subscription page listed Workers Free as active and R2 Paid with a November 17 renewal. This is a subscription observation, not evidence of a fixed charge or authorization to exceed the free allowance. Shared-account writers, exact costs, current capacity and sustainable budget enforcement remain unverified. Do not record credentials or account identifiers.
+- [PR #844](https://github.com/qookey109-pixel/crypto-autopilot/pull/844) was closed unmerged after verifying both generated blocks match the [archival copy](docs/archive/cloud-maintenance-pr-844-snapshot.md) byte-for-byte. Its branch and historical failures remain preserved. [Natural Health 42538556057](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42538556057) reported Core100 failure; its [Maintenance 42538614554](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42538614554) stopped on the stale draft. Closure is not evidence of a successful later natural chain.
+- [PR #878](https://github.com/qookey109-pixel/crypto-autopilot/pull/878) adds a synthetic V0.5 recovery readback-failure integration test; it is not live D1/R2 evidence. Production PAPER remains NOT_WIRED / NOT_RUN / NOT_CONFIGURED, model quality REJECT and the consumed billing diagnostic must not be repeated.
 
 ---
 ## Current merged release checkpoint — 2026-10-11 15:10 Asia/Taipei (machine-status version updated_date: 2026-10-09; dated, resolve main afresh)
