@@ -52,6 +52,15 @@ class CloudBudgetGuardTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_INCOMPLETE"):
             guard.reserve_r2_class_a()
 
+    def test_non_boolean_evidence_flags_block_before_any_reservation(self):
+        for field in ("account_wide", "reservation_coverage_complete"):
+            for value in ("false", "true", 1, None):
+                with self.subTest(field=field, value=value):
+                    guard = CloudBudgetGuard(snapshot=snapshot(**{field: value}), clock_ms=lambda: NOW)
+                    with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_INCOMPLETE"):
+                        guard.reserve_provider_request()
+                    self.assertEqual(guard.attempted_usage().provider_requests, 0)
+
     def test_stale_observation_and_stale_measurement_block(self):
         policy = CloudBudgetPolicy(max_evidence_age_ms=60_000)
         for values in (
