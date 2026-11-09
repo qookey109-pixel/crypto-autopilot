@@ -8,7 +8,7 @@ const id = x => typeof x === "string" && /^[1-9][0-9]{0,19}$/.test(x);
 export async function claimJobSlot(database, claim, { enabled = false, limits } = {}) {
   if (enabled !== true) return "DISABLED";
   if (!limits || !Number.isSafeInteger(limits.rowsRead) || limits.rowsRead < 0 ||
-      !Number.isSafeInteger(limits.rowsWritten) || limits.rowsWritten < 0 ||
+      !Number.isSafeInteger(limits.rowsWritten) || limits.rowsWritten < 1 ||
       !Number.isSafeInteger(limits.maxDatabaseBytes) || limits.maxDatabaseBytes < 0) return "INVALID";
   if (!claim || !id(claim.repositoryId) || !id(claim.runId) || claim.attempt !== "1" ||
       !id(claim.checkRunId) || typeof claim.writerId !== "string" ||
