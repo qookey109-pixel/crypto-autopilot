@@ -33,10 +33,10 @@ export function reserveEnvelope(storage, { enabled = false, policy, claim, nowMs
         policy.scope, policy.policyHash);
       const prior = sql.exec("SELECT policy_hash, r2a, r2b, bytes, provider, d1read, d1write FROM envelope_scope WHERE scope = ?", policy.scope).toArray();
       if (prior.length !== 1 || prior[0].policy_hash !== policy.policyHash) return "POLICY_MISMATCH";
-      const totals = metrics.map(k => prior[0][k] + claim.cost[k]);
-      if (totals.some((v, i) => !integer(v) || v > policy.caps[metrics[i]])) return "BUDGET_BLOCKED";
       const duplicate = sql.exec("SELECT 1 FROM envelope_claim WHERE scope = ? AND writer = ? AND (slot = ? OR run = ?) LIMIT 1", policy.scope, claim.writer, claim.slot, claim.run).toArray();
       if (duplicate.length) return "DUPLICATE";
+      const totals = metrics.map(k => prior[0][k] + claim.cost[k]);
+      if (totals.some((v, i) => !integer(v) || v > policy.caps[metrics[i]])) return "BUDGET_BLOCKED";
       sql.exec("INSERT INTO envelope_claim VALUES (?, ?, ?, ?)", policy.scope, claim.writer, claim.slot, claim.run);
       sql.exec("UPDATE envelope_scope SET r2a=?, r2b=?, bytes=?, provider=?, d1read=?, d1write=? WHERE scope=?",
         ...totals, policy.scope);
