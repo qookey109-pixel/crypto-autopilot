@@ -364,8 +364,8 @@ test("atomic finite envelope rejects duplicate, overrun and policy drift", async
   assert.equal(prepareEnvelopeSchema(storage), "DISABLED");
   assert.equal(calls, 0);
   assert.equal(prepareEnvelopeSchema(storage, true), "PREPARED");
-  const caps = { r2a: 3, r2b: 6, bytes: 100, provider: 2, d1read: 4, d1write: 3 };
-  const cost = { r2a: 2, r2b: 2, bytes: 20, provider: 1, d1read: 2, d1write: 1 };
+  const caps = { worker: 5, github: 8, provider: 2, r2a: 3, r2b: 6, bytes: 100, d1queries: 4, d1read: 4, d1write: 3, d1bytes: 100 };
+  const cost = { worker: 2, github: 4, provider: 1, r2a: 2, r2b: 2, bytes: 20, d1queries: 2, d1read: 2, d1write: 1, d1bytes: 20 };
   const policy = { scope: "test", policyHash: "a".repeat(64), startsMs: 1000, endsMs: 2000, caps };
   const claim = { writer: "paper", slot: "slot:1", run: "run:1", cost };
   const run = (c = claim, p = policy, nowMs = 1500) =>
@@ -379,8 +379,18 @@ test("atomic finite envelope rejects duplicate, overrun and policy drift", async
   assert.equal(run(claim, { ...policy, scope: "other-scope" }), "SCOPE_MISMATCH");
   assert.equal(db.prepare("SELECT COUNT(*) AS n FROM envelope_scope").get().n, 1);
   assert.equal(run(claim, policy, 2000), "INVALID");
+  for (const key of Object.keys(caps)) {
+    const zero = Object.fromEntries(Object.keys(caps).map(k => [k, 0]));
+    zero[key] = caps[key] - cost[key] + 1;
+    const extraClaim = { ...claim, writer: "over-" + key, slot: "s-" + key, run: "r-" + key, cost: zero };
+    assert.equal(run(extraClaim), "BUDGET_BLOCKED", key);
+  }
+  const missing = { ...cost };
+  delete missing.d1queries;
+  assert.equal(run({ ...claim, cost: missing }), "INVALID");
+
   const alternate = { ...claim, writer: "other", slot: "slot:2", run: "run:2",
-    cost: { r2a: 1, r2b: 1, bytes: 1, provider: 0, d1read: 0, d1write: 0 } };
+    cost: { worker: 1, github: 1, provider: 0, r2a: 1, r2b: 1, bytes: 1, d1queries: 1, d1read: 0, d1write: 0, d1bytes: 1 } };
   failUpdate = true;
   assert.equal(run(alternate), "REVIEW_REQUIRED");
   assert.equal(db.prepare("SELECT COUNT(*) AS n FROM envelope_claim").get().n, 1);
