@@ -3,11 +3,11 @@
 // trusted time, fresh account-wide headroom, and a uniquely owned storage namespace.
 // Incoming invocation and ledger operations need separate prepaid allowances.
 const integer = x => Number.isSafeInteger(x) && x >= 0;
-const metrics = ["r2a", "r2b", "bytes", "provider", "d1read", "d1write"];
+const metrics = Object.freeze(["worker", "github", "provider", "r2a", "r2b", "bytes", "d1queries", "d1read", "d1write", "d1bytes"]);
 const identity = x => typeof x === "string" && /^[a-zA-Z0-9:._/-]{1,128}$/.test(x);
 const schema = [
   "CREATE TABLE IF NOT EXISTS envelope_namespace (id INTEGER PRIMARY KEY CHECK (id = 1), scope TEXT NOT NULL)",
-  "CREATE TABLE IF NOT EXISTS envelope_scope (scope TEXT PRIMARY KEY, policy_hash TEXT NOT NULL, policy_contract TEXT NOT NULL, r2a INTEGER NOT NULL, r2b INTEGER NOT NULL, bytes INTEGER NOT NULL, provider INTEGER NOT NULL, d1read INTEGER NOT NULL, d1write INTEGER NOT NULL)",
+  "CREATE TABLE IF NOT EXISTS envelope_scope (scope TEXT PRIMARY KEY, policy_hash TEXT NOT NULL, policy_contract TEXT NOT NULL, " + metrics.map(k => k + " INTEGER NOT NULL").join(", ") + ")",
   "CREATE TABLE IF NOT EXISTS envelope_claim (scope TEXT NOT NULL, writer TEXT NOT NULL, slot TEXT NOT NULL, run TEXT NOT NULL, PRIMARY KEY(scope,writer,slot), UNIQUE(scope,writer,run))",
 ];
 export function prepareEnvelopeSchema(storage, enabled = false) {
@@ -34,16 +34,16 @@ export function reserveEnvelope(storage, { enabled = false, policy, claim, nowMs
       sql.exec("INSERT INTO envelope_namespace VALUES (1, ?) ON CONFLICT(id) DO NOTHING", policy.scope);
       const namespace = sql.exec("SELECT scope FROM envelope_namespace WHERE id = 1").toArray();
       if (namespace.length !== 1 || namespace[0].scope !== policy.scope) return "SCOPE_MISMATCH";
-      sql.exec("INSERT INTO envelope_scope VALUES (?, ?, ?, 0, 0, 0, 0, 0, 0) ON CONFLICT(scope) DO NOTHING",
+      sql.exec("INSERT INTO envelope_scope VALUES (?, ?, ?, " + metrics.map(() => "0").join(", ") + ") ON CONFLICT(scope) DO NOTHING",
         policy.scope, policy.policyHash, contract);
-      const prior = sql.exec("SELECT policy_hash, policy_contract, r2a, r2b, bytes, provider, d1read, d1write FROM envelope_scope WHERE scope = ?", policy.scope).toArray();
+      const prior = sql.exec("SELECT policy_hash, policy_contract, " + metrics.join(", ") + " FROM envelope_scope WHERE scope = ?", policy.scope).toArray();
       if (prior.length !== 1 || (prior[0].policy_hash !== policy.policyHash || prior[0].policy_contract !== contract)) return "POLICY_MISMATCH";
       const duplicate = sql.exec("SELECT 1 FROM envelope_claim WHERE scope = ? AND writer = ? AND (slot = ? OR run = ?) LIMIT 1", policy.scope, claim.writer, claim.slot, claim.run).toArray();
       if (duplicate.length) return "DUPLICATE";
       const totals = metrics.map(k => prior[0][k] + claim.cost[k]);
       if (totals.some((v, i) => !integer(v) || v > policy.caps[metrics[i]])) return "BUDGET_BLOCKED";
       sql.exec("INSERT INTO envelope_claim VALUES (?, ?, ?, ?)", policy.scope, claim.writer, claim.slot, claim.run);
-      sql.exec("UPDATE envelope_scope SET r2a=?, r2b=?, bytes=?, provider=?, d1read=?, d1write=? WHERE scope=?",
+      sql.exec("UPDATE envelope_scope SET " + metrics.map(k => k + "=?").join(", ") + " WHERE scope=?",
         ...totals, policy.scope);
       return "RESERVED";
     });
