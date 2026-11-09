@@ -14,7 +14,7 @@ const dateMs = x => {
 export function checkJobMetadata(identity, run, job, policy, nowMs) {
   try {
     if (!identity || !run || !job || !policy || !Number.isSafeInteger(nowMs) ||
-        !numberId(identity.runId) || !numberId(identity.checkRunId) ||
+        identity.runAttempt !== "1" || !numberId(identity.runId) || !numberId(identity.checkRunId) ||
         !numberId(policy.repositoryId) || identity.repositoryId !== policy.repositoryId || !numberId(policy.workflowId) ||
         typeof policy.workflowPath !== "string" ||
         !/^\.github\/workflows\/[A-Za-z0-9_.-]+\.ya?ml$/.test(policy.workflowPath) ||
