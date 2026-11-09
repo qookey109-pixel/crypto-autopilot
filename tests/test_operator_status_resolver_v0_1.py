@@ -21,6 +21,20 @@ class OperatorStatusResolverV01Tests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.current = json.loads(CURRENT.read_text(encoding="utf-8"))
 
+    def test_current_billing_navigation_matches_consumed_result_receipt(self) -> None:
+        checkpoint = self.current["billing_v0_5_consumption_checkpoint"]
+        receipt = json.loads((ROOT / checkpoint["result_receipt"]).read_text(encoding="utf-8"))
+        self.assertEqual(checkpoint["run_id"], receipt["run"]["id"])
+        self.assertEqual(checkpoint["attempt"], receipt["run"]["attempt"])
+        self.assertEqual(checkpoint["result"], receipt["result"]["status"])
+        self.assertEqual(checkpoint["reason"], receipt["result"]["reason_code"])
+        self.assertTrue(receipt["boundary"]["one_time_authority_consumed"])
+        self.assertFalse(checkpoint["rerun_allowed"])
+        self.assertEqual(self.current["billing_v0_5_owner_decision"]["dispatch_status"],
+                         "CONSUMED_REVIEW_REQUIRED_NO_RERUN")
+        self.assertIn("Do not dispatch or rerun", self.current["next_decision"])
+        self.assertNotIn("use the existing main workflow once", self.current["next_decision"])
+
     def test_help_is_small_read_only_capability_list(self) -> None:
         result = resolve_operator_status(
             command_request=parse_operator_command_request("help"),
