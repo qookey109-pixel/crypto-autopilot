@@ -73,7 +73,7 @@ class CloudBudgetGuardTests(unittest.TestCase):
     def test_stale_observation_and_stale_measurement_block(self):
         policy = CloudBudgetPolicy(max_evidence_age_ms=60_000)
         for values in (
-            {"observed_at_ms": NOW - 60_001},
+            {"observed_at_ms": NOW - 60_001, "measured_through_ms": NOW - 60_001},
             {"measured_through_ms": NOW - 60_001},
         ):
             guard = CloudBudgetGuard(
