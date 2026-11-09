@@ -130,7 +130,12 @@ class ResearchV05CollectionTests(unittest.TestCase):
         def delayed_source(request, *, timeout):
             self.assertTrue(self.sql_called)
             self.sources_called.append(request.full_url)
-            return DelayedResponse(json.dumps({"title": "public synthetic"}).encode())
+            payload = {"title": "public synthetic", "forecasts": [{
+                "forecast_id": "forecast-" + str(len(self.sources_called)),
+                "symbol": "BTC_USDT_PERP", "direction": "long", "confidence": 0.5,
+                "published_at_ms": start - 1000, "target_time_ms": start + 60000,
+            }]}
+            return DelayedResponse(json.dumps(payload).encode())
 
         def store_factory(**kwargs):
             return BudgetedR2Store(client=self.sdk, bucket=kwargs["bucket"],
@@ -146,6 +151,8 @@ class ResearchV05CollectionTests(unittest.TestCase):
         self.assertEqual(result["status"], "PUBLISHED")
         payload = json.loads(self.sdk.objects["research/signal-layer/v0-2/runs/run=101/signals.json"])
         self.assertEqual([item["retrieved_at_ms"] for item in payload["source_snapshots"]],
+                         [start + 1000, start + 2000, start + 3000])
+        self.assertEqual([item["ingested_at_ms"] for item in payload["kol_forecasts"]],
                          [start + 1000, start + 2000, start + 3000])
 
     def test_clock_rollback_during_source_requires_review_before_r2(self):
