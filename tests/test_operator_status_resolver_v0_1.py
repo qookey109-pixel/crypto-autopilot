@@ -30,6 +30,8 @@ class OperatorStatusResolverV01Tests(unittest.TestCase):
         self.assertEqual(checkpoint["reason"], receipt["result"]["reason_code"])
         self.assertTrue(receipt["boundary"]["one_time_authority_consumed"])
         self.assertFalse(checkpoint["rerun_allowed"])
+        self.assertEqual(self.current["billing_v0_5_owner_decision"]["dispatch_status"],
+                         "CONSUMED_REVIEW_REQUIRED_NO_RERUN")
         self.assertIn("Do not dispatch or rerun", self.current["next_decision"])
         self.assertNotIn("use the existing main workflow once", self.current["next_decision"])
 
