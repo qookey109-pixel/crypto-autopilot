@@ -4,7 +4,7 @@ import { webcrypto } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
 import { claimJobSlot } from "../../workers/paper-gateway/d1-job-claim.mjs";
-import { createIngressReservation, prepareEnvelopeSchema, reserveEnvelope } from "../../workers/paper-gateway/atomic-envelope.mjs";
+import { createIngressReservation, prepareEnvelopeSchema, reserveEnvelope, snapshotEnvelopes } from "../../workers/paper-gateway/atomic-envelope.mjs";
 import { conservativeRemaining } from "../../workers/paper-gateway/lagged-usage.mjs";
 import { checkJobMetadata } from "../../workers/paper-gateway/github-metadata.mjs";
 import { readJobMetadata } from "../../workers/paper-gateway/github-metadata-reader.mjs";
@@ -426,6 +426,21 @@ test("atomic finite envelope rejects duplicate, overrun and policy drift", async
   failUpdate = false;
   assert.equal(run(alternate), "RESERVED");
   assert.equal(db.prepare("SELECT r2a FROM envelope_scope").get().r2a, 3);
+  const snap = snapshotEnvelopes(storage, { enabled: true, scope: "test", nowMs: 1500 });
+  assert.equal(snap.status, "READY_FOR_REVIEW");
+  assert.equal(snap.reservations.length, 2);
+  assert.deepEqual(snap.reservations[0].envelope, cost);
+  assert.equal(snap.reservations[0].closedMs, null);
+  const counters = Object.fromEntries(Object.keys(caps).map(k => [k, { used: 0, cap: 10000, margin: 0,
+    periodStartMs: 0, periodEndMs: 2000, measuredThroughMs: 1400 }]));
+  const reconciled = conservativeRemaining({ enabled: true, nowMs: 1500, observedAtMs: 1490,
+    maxObservationAgeMs: 100, maxDataLagMs: 1000, completeCoverage: true, counters, ...snap });
+  assert.equal(reconciled.status, "READY_FOR_REVIEW");
+  assert.equal(reconciled.remaining.r2a, 9997);
+  assert.throws(() => db.exec("UPDATE envelope_claim SET reserved_ms=0"), /IMMUTABLE/);
+  assert.throws(() => db.exec("DELETE FROM envelope_claim"), /IMMUTABLE/);
+  db.exec("UPDATE envelope_scope SET r2a=0");
+  assert.equal(snapshotEnvelopes(storage, { enabled: true, scope: "test", nowMs: 1500 }).status, "REVIEW_REQUIRED");
   db.close();
 });
 
