@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable, Mapping, Sequence
+from dataclasses import replace
 from datetime import UTC, datetime
 from typing import Any
 from urllib.request import HTTPRedirectHandler, build_opener
@@ -198,8 +199,23 @@ def run_shared_signal_collection(
                 "SOURCE_ACQUISITION",
                 "BUDGET_BLOCKED" if budget_blocked else "SOURCE_FETCH_FAILED",
             )
-        snapshots.extend(items)
-        forecasts.extend(predictions)
+        # The body and parser are complete only after collect_sources returns.
+        # Request-start time is not evidence that content was already available.
+        received = guard.clock_ms()
+        if (
+            type(captured) is not int or type(received) is not int
+            or received < captured or received < reservation.reserved_at_ms
+            or received - reservation.slot_at_ms > 600_000
+        ):
+            return review("SOURCE_ACQUISITION", "SOURCE_RECEIPT_TIME_INVALID")
+        try:
+            validate_binding()
+            if guard.storage_capacity_state() == "HARD_STOP":
+                raise BudgetBlocked("BLOCKED_BUDGET_STORAGE_HARD_STOP")
+            snapshots.extend(replace(item, retrieved_at_ms=received) for item in items)
+            forecasts.extend(replace(item, ingested_at_ms=received) for item in predictions)
+        except Exception:
+            return review("SOURCE_ACQUISITION", "SOURCE_RECEIPT_EVIDENCE_INVALID")
     try:
         validate_binding()
         if guard.storage_capacity_state() == "HARD_STOP":
