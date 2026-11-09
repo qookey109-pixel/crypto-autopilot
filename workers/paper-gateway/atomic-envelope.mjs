@@ -3,7 +3,7 @@
 // trusted time, fresh account-wide headroom, and a uniquely owned storage namespace.
 // Incoming invocation and ledger operations need separate prepaid allowances.
 const integer = x => Number.isSafeInteger(x) && x >= 0;
-const metrics = Object.freeze(["worker", "github", "provider", "r2a", "r2b", "bytes", "d1queries", "d1read", "d1write", "d1bytes"]);
+const metrics = Object.freeze(["worker", "github", "provider", "r2a", "r2b", "bytes", "d1queries", "d1read", "d1write", "d1bytes", "doReq", "doGbMs", "doRead", "doWrite", "doBytes"]);
 const identity = x => typeof x === "string" && /^[a-zA-Z0-9:._/-]{1,128}$/.test(x);
 const schema = [
   "CREATE TABLE IF NOT EXISTS envelope_namespace (id INTEGER PRIMARY KEY CHECK (id = 1), scope TEXT NOT NULL)",
@@ -86,12 +86,16 @@ export function snapshotEnvelopes(storage, { scope, nowMs, enabled = false } = {
  * The incoming invocation and the ledger's own operations are already underway;
  * they need a separate account-scoped allocation outside this function.
  */
-export function createIngressReservation({ storage, policy, clock, nextId, admissionCosts, enabled = false } = {}) {
+export function createIngressReservation({ storage, policy, clock, nextId, admissionCosts, ledgerOverhead, enabled = false } = {}) {
   if (enabled !== true) return async () => false;
   if (!storage || !policy || typeof clock !== "function" || typeof nextId !== "function" || !admissionCosts)
     throw new TypeError("invalid synthetic ingress configuration");
   const fixedPolicy = structuredClone(policy);
   const fixedCosts = structuredClone(admissionCosts);
+  const overhead = structuredClone(ledgerOverhead);
+  const overheadFields = ["doReq", "doGbMs", "doRead", "doWrite", "doBytes"];
+  if (!overhead || Object.keys(overhead).length !== overheadFields.length || overheadFields.some(k => !integer(overhead[k]) || overhead[k] < 1))
+    throw new TypeError("synthetic ledger overhead required");
   const fields = ["workerRequests", "githubRequests", "d1Queries", "d1RowsRead", "d1RowsWritten", "d1StorageBytes"];
   if (Object.keys(fixedCosts).length !== fields.length || fields.some(k => !integer(fixedCosts[k]) || fixedCosts[k] < 1))
     throw new TypeError("invalid synthetic ingress costs");
@@ -103,7 +107,7 @@ export function createIngressReservation({ storage, policy, clock, nextId, admis
       if (!identity(id)) return false;
       const cost = { worker: fixedCosts.workerRequests, github: fixedCosts.githubRequests,
         provider: 0, r2a: 0, r2b: 0, bytes: 0, d1queries: fixedCosts.d1Queries,
-        d1read: fixedCosts.d1RowsRead, d1write: fixedCosts.d1RowsWritten, d1bytes: fixedCosts.d1StorageBytes };
+        d1read: fixedCosts.d1RowsRead, d1write: fixedCosts.d1RowsWritten, d1bytes: fixedCosts.d1StorageBytes, ...overhead };
       return reserveEnvelope(storage, { enabled: true, policy: fixedPolicy, nowMs: clock(),
         claim: { writer: "gateway-ingress", slot: id, run: id, cost } }) === "RESERVED";
     } catch { return false; }
