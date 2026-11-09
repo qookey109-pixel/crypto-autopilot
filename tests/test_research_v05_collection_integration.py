@@ -117,6 +117,60 @@ class ResearchV05CollectionTests(unittest.TestCase):
         self.assertEqual(self.sql_called, [])
         self.assertEqual(self.sdk.events, [])
 
+    def test_source_receipt_time_is_after_response_body_is_read(self):
+        start = self.f.f.now
+        fixture = self
+
+        class DelayedResponse(Response):
+            def read(self, size=-1):
+                result = super().read(size)
+                fixture.f.f.now += 1000
+                return result
+
+        def delayed_source(request, *, timeout):
+            self.assertTrue(self.sql_called)
+            self.sources_called.append(request.full_url)
+            return DelayedResponse(json.dumps({"title": "public synthetic"}).encode())
+
+        def store_factory(**kwargs):
+            return BudgetedR2Store(client=self.sdk, bucket=kwargs["bucket"],
+                                   before_external=kwargs["before_external"])
+
+        with patch.dict("os.environ", {"CLOUDFLARE_ACCOUNT_ID": "a" * 32, "R2_BUCKET_NAME": "fixture"}), patch(
+            "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+            side_effect=self.sqlite_request,
+        ), patch.object(BudgetedR2Store, "from_credentials", side_effect=store_factory), patch.object(
+            self, "source", side_effect=delayed_source,
+        ):
+            result = self.run_collection()
+        self.assertEqual(result["status"], "PUBLISHED")
+        payload = json.loads(self.sdk.objects["research/signal-layer/v0-2/runs/run=101/signals.json"])
+        self.assertEqual([item["retrieved_at_ms"] for item in payload["source_snapshots"]],
+                         [start + 1000, start + 2000, start + 3000])
+
+    def test_clock_rollback_during_source_requires_review_before_r2(self):
+        fixture = self
+
+        class RollbackResponse(Response):
+            def read(self, size=-1):
+                result = super().read(size)
+                fixture.f.f.now -= 1
+                return result
+
+        def rollback_source(request, *, timeout):
+            self.sources_called.append(request.full_url)
+            return RollbackResponse(json.dumps({"title": "synthetic"}).encode())
+
+        with patch.dict("os.environ", {"CLOUDFLARE_ACCOUNT_ID": "a" * 32, "R2_BUCKET_NAME": "fixture"}), patch(
+            "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+            side_effect=self.sqlite_request,
+        ), patch.object(self, "source", side_effect=rollback_source):
+            result = self.run_collection()
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["reason_code"], "SOURCE_RECEIPT_TIME_INVALID")
+        self.assertEqual(result["provider_requests_performed"], 1)
+        self.assertEqual(self.sdk.events, [])
+
     def test_source_failure_retains_admission_and_no_r2_write(self):
         def fail_source(request, *, timeout):
             self.sources_called.append(request.full_url)
