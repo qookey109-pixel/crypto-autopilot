@@ -376,6 +376,8 @@ test("atomic finite envelope rejects duplicate, overrun and policy drift", async
   assert.equal(run(claim, { ...policy, policyHash: "b".repeat(64) }), "POLICY_MISMATCH");
   assert.equal(run(claim, { ...policy, caps: { ...caps, r2a: 99 } }), "POLICY_MISMATCH");
   assert.equal(run(claim, { ...policy, endsMs: 3000 }), "POLICY_MISMATCH");
+  assert.equal(run(claim, { ...policy, scope: "other-scope" }), "SCOPE_MISMATCH");
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM envelope_scope").get().n, 1);
   assert.equal(run(claim, policy, 2000), "INVALID");
   const alternate = { ...claim, writer: "other", slot: "slot:2", run: "run:2",
     cost: { r2a: 1, r2b: 1, bytes: 1, provider: 0, d1read: 0, d1write: 0 } };
