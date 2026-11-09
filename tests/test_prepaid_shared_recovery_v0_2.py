@@ -106,6 +106,40 @@ class PrepaidSharedRecoveryTests(unittest.TestCase):
         self.assertEqual(self.rec.backend.events, before)
         self.assertEqual(len(statements), 3)
 
+    def test_persisted_seal_readback_failure_keeps_prepaid_reservation(self):
+        db, statements, opener = self.transport()
+        key = self.rec.remove_seal()
+        original_get = self.rec.backend.get_object
+
+        def fail_after_write(**kwargs):
+            if kwargs["Key"] == key and key in self.rec.backend.objects:
+                self.rec.backend.events.append(("get", key))
+                raise RuntimeError("synthetic readback failure")
+            return original_get(**kwargs)
+
+        env = {"CLOUDFLARE_D1_API_TOKEN": "synthetic-token",
+               "CLOUDFLARE_ACCOUNT_ID": "a" * 32,
+               "CLOUDFLARE_D1_DATABASE_ID": fixtures.DB_ID}
+        with patch.dict("os.environ", env), patch(
+            fixtures.CLIENT_MODULE + ".build_opener", return_value=opener
+        ), patch.object(self.rec.backend, "get_object", side_effect=fail_after_write):
+            result = run_prepaid_shared_recovery_v0_2(**self.args())
+            self.assertEqual(result["status"], "REVIEW_REQUIRED")
+            self.assertIsNone(result["result_seal_writes_performed"])
+            self.assertTrue(result["central_reservation_retained"])
+            self.assertFalse(result["automatic_retry_allowed"])
+            self.assertIn(key, self.rec.backend.objects)
+            self.assertEqual(self.rec.backend.events.count(("put", key)), 1)
+            self.assertEqual(statements, [RESERVE_SHARED_WRITER_SQL])
+            self.assertEqual(
+                db.execute("SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3").fetchone()[0],
+                1,
+            )
+            before = list(self.rec.backend.events)
+            with self.assertRaises(BudgetBlocked):
+                run_prepaid_shared_recovery_v0_2(**self.args())
+            self.assertEqual(self.rec.backend.events, before)
+
     def test_account_mismatch_stops_before_d1_or_r2(self):
         env = {"CLOUDFLARE_ACCOUNT_ID": "a" * 32}
         wrong = {"account_id": "b" * 32, "bucket": "fixture",
