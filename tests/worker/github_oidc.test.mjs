@@ -71,6 +71,7 @@ test("signature, repository and run claims must agree", async () => {
   const options = { enabled: true, policy, now: 1100, fetchKeys: async () => ({ keys: [jwk] }) };
   const accepted = await verifyGithubJob(token, options);
   assert.equal(accepted?.runId, "100");
+  assert.equal(accepted?.runAttempt, "1");
   assert.equal(accepted?.checkRunId, "101");
   assert.equal(accepted?.eventName, "schedule");
   assert.equal(accepted?.repositoryId, "123");
@@ -201,7 +202,7 @@ test("signed job identity must match current exact run and job metadata", () => 
   const sha = "a".repeat(40);
   const policy = { repositoryId: "123", workflowId: "456", workflowPath: ".github/workflows/paper.yml", jobName: "paper",
     sha, maxAgeSeconds: 600, allowedEvents: ["schedule", "workflow_dispatch"] };
-  const identity = { runId: "100", checkRunId: "101", eventName: "schedule", repositoryId: "123" };
+  const identity = { runId: "100", runAttempt: "1", checkRunId: "101", eventName: "schedule", repositoryId: "123" };
   const run = { id: 100, workflow_id: 456, path: policy.workflowPath, head_sha: sha, head_branch: "main",
     run_attempt: 1, status: "in_progress", event: "schedule", created_at: "2026-01-01T00:00:00Z",
     repository: { id: 123 } };
@@ -209,6 +210,11 @@ test("signed job identity must match current exact run and job metadata", () => 
     status: "in_progress", started_at: "2026-01-01T00:00:10Z", completed_at: null };
   const now = Date.parse("2026-01-01T00:02:00Z");
   assert.equal(checkJobMetadata(identity, run, job, policy, now), true);
+  const { run_attempt: omittedAttempt, ...documentedJob } = job;
+  assert.equal(omittedAttempt, 1);
+  assert.equal(checkJobMetadata(identity, run, documentedJob, policy, now), true);
+  assert.equal(checkJobMetadata({ ...identity, runAttempt: "2" }, run, documentedJob, policy, now), false);
+  assert.equal(checkJobMetadata({ ...identity, runAttempt: undefined }, run, documentedJob, policy, now), false);
   assert.equal(checkJobMetadata({ ...identity, eventName: "workflow_dispatch" }, run, job, policy, now), false);
   assert.equal(checkJobMetadata({ ...identity, repositoryId: "999" }, run, job, policy, now), false);
   for (const alteredRun of [
@@ -218,7 +224,7 @@ test("signed job identity must match current exact run and job metadata", () => 
     { ...run, created_at: "invalid" }, { ...run, created_at: "2025-12-31T23:00:00Z" },
   ]) assert.equal(checkJobMetadata(identity, alteredRun, job, policy, now), false);
   for (const alteredJob of [
-    { ...job, id: 999 }, { ...job, run_id: 999 }, { ...job, run_attempt: 2 },
+    { ...job, id: 999 }, { ...job, run_id: 999 }, { ...job, run_attempt: 2 }, { ...job, run_attempt: null },
     { ...job, head_sha: "b".repeat(40) }, { ...job, status: "completed" },
     { ...job, name: "other" }, { ...job, started_at: "2026-01-01T00:05:00Z" },
   ]) assert.equal(checkJobMetadata(identity, run, alteredJob, policy, now), false);
@@ -276,7 +282,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   const token = message + "." + Buffer.from(signature).toString("base64url");
   const run = { id: 100, workflow_id: 456, path: policy.workflowPath, head_sha: sha, head_branch: "main",
     run_attempt: 1, status: "in_progress", event: "schedule", created_at: "2026-01-01T00:07:30Z", repository: { id: 123 } };
-  const job = { id: 101, run_id: 100, run_attempt: 1, head_sha: sha, name: "paper",
+  const job = { id: 101, run_id: 100, head_sha: sha, name: "paper",
     status: "in_progress", started_at: "2026-01-01T00:07:40Z", completed_at: null };
   let fetches = 0, writes = 0;
   let invalidRun = false, staleMain = false;
