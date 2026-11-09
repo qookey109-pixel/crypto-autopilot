@@ -1,4 +1,3 @@
-
 ## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
 ## Current safety clarification — 2026-11-06
