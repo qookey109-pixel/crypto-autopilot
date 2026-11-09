@@ -1058,7 +1058,8 @@
   "billing_v0_5_owner_decision": {
     "receipt": "research/receipts/2026-10-27-billing-v0-5-owner-delegated-decision-v0-1.json",
     "first_attempt_approved": true,
-    "dispatch_status": "NOT_DISPATCHED_AS_OF_2026_10_27_0613_UTC",
+    "dispatch_status": "CONSUMED_REVIEW_REQUIRED_NO_RERUN",
+    "dispatch_status_as_of_2026_10_27": "NOT_DISPATCHED_AS_OF_2026_10_27_0613_UTC",
     "token_validity": "UNKNOWN",
     "cloud_paper_activation": false
   }
