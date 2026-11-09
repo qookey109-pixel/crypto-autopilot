@@ -4,7 +4,7 @@
 // This module does not fetch usage, verify the source, claim budgets or spend.
 const integer = n => Number.isSafeInteger(n) && n >= 0;
 const keys = Object.freeze(["worker", "github", "provider", "r2a", "r2b", "bytes",
-  "d1queries", "d1read", "d1write", "d1bytes"]);
+  "d1queries", "d1read", "d1write", "d1bytes", "doReq", "doGbMs", "doRead", "doWrite", "doBytes"]);
 const ident = x => typeof x === "string" && /^[a-zA-Z0-9:._/-]{1,128}$/.test(x);
 
 export function conservativeRemaining({ enabled = false, nowMs, observedAtMs, maxObservationAgeMs,
