@@ -49,3 +49,32 @@ export function reserveEnvelope(storage, { enabled = false, policy, claim, nowMs
     });
   } catch { return "REVIEW_REQUIRED"; }
 }
+
+/** Synthetic ingress prepayment only; not a Worker handler or authority.
+ * Policy, clock and attempt IDs must be independently protected in production.
+ * The incoming invocation and the ledger's own operations are already underway;
+ * they need a separate account-scoped allocation outside this function.
+ */
+export function createIngressReservation({ storage, policy, clock, nextId, admissionCosts, enabled = false } = {}) {
+  if (enabled !== true) return async () => false;
+  if (!storage || !policy || typeof clock !== "function" || typeof nextId !== "function" || !admissionCosts)
+    throw new TypeError("invalid synthetic ingress configuration");
+  const fixedPolicy = structuredClone(policy);
+  const fixedCosts = structuredClone(admissionCosts);
+  const fields = ["workerRequests", "githubRequests", "d1Queries", "d1RowsRead", "d1RowsWritten", "d1StorageBytes"];
+  if (Object.keys(fixedCosts).length !== fields.length || fields.some(k => !integer(fixedCosts[k]) || fixedCosts[k] < 1))
+    throw new TypeError("invalid synthetic ingress costs");
+  return async actual => {
+    try {
+      if (!actual || Object.keys(actual).length !== fields.length || fields.some(k => actual[k] !== fixedCosts[k]))
+        return false;
+      const id = nextId();
+      if (!identity(id)) return false;
+      const cost = { worker: fixedCosts.workerRequests, github: fixedCosts.githubRequests,
+        provider: 0, r2a: 0, r2b: 0, bytes: 0, d1queries: fixedCosts.d1Queries,
+        d1read: fixedCosts.d1RowsRead, d1write: fixedCosts.d1RowsWritten, d1bytes: fixedCosts.d1StorageBytes };
+      return reserveEnvelope(storage, { enabled: true, policy: fixedPolicy, nowMs: clock(),
+        claim: { writer: "gateway-ingress", slot: id, run: id, cost } }) === "RESERVED";
+    } catch { return false; }
+  };
+}
