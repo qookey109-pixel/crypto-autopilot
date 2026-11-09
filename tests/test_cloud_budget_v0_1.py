@@ -61,10 +61,19 @@ class CloudBudgetGuardTests(unittest.TestCase):
                         guard.reserve_provider_request()
                     self.assertEqual(guard.attempted_usage().provider_requests, 0)
 
+    def test_measurement_after_observation_blocks_before_reservation(self):
+        guard = CloudBudgetGuard(
+            snapshot=snapshot(observed_at_ms=NOW - 1, measured_through_ms=NOW),
+            clock_ms=lambda: NOW,
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_TIME_ORDER"):
+            guard.reserve_provider_request()
+        self.assertEqual(guard.attempted_usage().provider_requests, 0)
+
     def test_stale_observation_and_stale_measurement_block(self):
         policy = CloudBudgetPolicy(max_evidence_age_ms=60_000)
         for values in (
-            {"observed_at_ms": NOW - 60_001},
+            {"observed_at_ms": NOW - 60_001, "measured_through_ms": NOW - 60_001},
             {"measured_through_ms": NOW - 60_001},
         ):
             guard = CloudBudgetGuard(

@@ -330,6 +330,8 @@ class D1UsageGuard:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_UNKNOWN")
         if type(now_ms) is not int or now_ms < 0:
             raise BudgetBlocked("BLOCKED_D1_USAGE_CLOCK_INVALID")
+        if s.measured_through_ms > s.observed_at_ms:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_TIME_ORDER")
         observed_age = now_ms - s.observed_at_ms
         coverage_age = now_ms - s.measured_through_ms
         if observed_age < 0 or coverage_age < 0:
@@ -401,6 +403,8 @@ class D1SharedRowsBudgetGuard:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_UNKNOWN")
         if type(now_ms) is not int or now_ms < 0:
             raise BudgetBlocked("BLOCKED_D1_USAGE_CLOCK_INVALID")
+        if snapshot.measured_through_ms > snapshot.observed_at_ms:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_TIME_ORDER")
         age = now_ms - snapshot.observed_at_ms
         coverage_age = now_ms - snapshot.measured_through_ms
         if age < 0 or coverage_age < 0:
@@ -897,6 +901,8 @@ class D1CloudBudgetLedger:
         )
         if any(type(value) is not int or value < 0 for value in numeric):
             raise BudgetBlocked("BLOCKED_BUDGET_USAGE_UNKNOWN")
+        if snapshot.measured_through_ms > snapshot.observed_at_ms:
+            raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_TIME_ORDER")
         age = now_ms - snapshot.observed_at_ms
         coverage_age = now_ms - snapshot.measured_through_ms
         if age < 0 or coverage_age < 0:
