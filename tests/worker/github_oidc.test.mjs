@@ -4,6 +4,7 @@ import { webcrypto } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
 import { claimJobSlot } from "../../workers/paper-gateway/d1-job-claim.mjs";
+import { prepareEnvelopeSchema, reserveEnvelope } from "../../workers/paper-gateway/atomic-envelope.mjs";
 import { checkJobMetadata } from "../../workers/paper-gateway/github-metadata.mjs";
 import { readJobMetadata } from "../../workers/paper-gateway/github-metadata-reader.mjs";
 import { admitScheduledJob, processingSlot } from "../../workers/paper-gateway/synthetic-admission.mjs";
@@ -340,4 +341,47 @@ test("processing slot honors V0.5 freshness, UTC boundary and clock continuity",
   assert.equal(processingSlot(start + 10000, start + 9999), null);
   assert.equal(processingSlot(start + 899999, start + 900000), null);
   assert.equal(processingSlot(NaN, start), null);
+});
+
+test("atomic finite envelope rejects duplicate, overrun and policy drift", async () => {
+  const db = new DatabaseSync(":memory:");
+  let failUpdate = false, calls = 0;
+  const storage = {
+    sql: { exec: (sql, ...args) => {
+      calls++;
+      if (failUpdate && sql.startsWith("UPDATE")) throw new Error("synthetic commit failure");
+      const stmt = db.prepare(sql);
+      if (/^SELECT/.test(sql)) return { toArray: () => stmt.all(...args) };
+      stmt.run(...args);
+      return { toArray: () => [] };
+    } },
+    transactionSync: fn => {
+      db.exec("BEGIN");
+      try { const value = fn(); db.exec("COMMIT"); return value; }
+      catch (error) { db.exec("ROLLBACK"); throw error; }
+    },
+  };
+  assert.equal(prepareEnvelopeSchema(storage), "DISABLED");
+  assert.equal(calls, 0);
+  assert.equal(prepareEnvelopeSchema(storage, true), "PREPARED");
+  const caps = { r2a: 3, r2b: 6, bytes: 100, provider: 2, d1read: 4, d1write: 3 };
+  const cost = { r2a: 2, r2b: 2, bytes: 20, provider: 1, d1read: 2, d1write: 1 };
+  const policy = { scope: "test", policyHash: "a".repeat(64), startsMs: 1000, endsMs: 2000, caps };
+  const claim = { writer: "paper", slot: "slot:1", run: "run:1", cost };
+  const run = (c = claim, p = policy, nowMs = 1500) =>
+    reserveEnvelope(storage, { enabled: true, policy: p, claim: c, nowMs });
+  assert.equal(run(), "RESERVED");
+  assert.equal(run(), "DUPLICATE");
+  assert.equal(run({ ...claim, slot: "slot:2", run: "run:2" }), "BUDGET_BLOCKED");
+  assert.equal(run(claim, { ...policy, policyHash: "b".repeat(64) }), "POLICY_MISMATCH");
+  assert.equal(run(claim, policy, 2000), "INVALID");
+  const alternate = { ...claim, writer: "other", slot: "slot:2", run: "run:2",
+    cost: { r2a: 1, r2b: 1, bytes: 1, provider: 0, d1read: 0, d1write: 0 } };
+  failUpdate = true;
+  assert.equal(run(alternate), "REVIEW_REQUIRED");
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM envelope_claim").get().n, 1);
+  failUpdate = false;
+  assert.equal(run(alternate), "RESERVED");
+  assert.equal(db.prepare("SELECT r2a FROM envelope_scope").get().r2a, 3);
+  db.close();
 });
