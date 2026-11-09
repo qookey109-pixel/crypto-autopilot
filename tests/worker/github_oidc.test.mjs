@@ -315,15 +315,17 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   let ingressId = 0;
   const ingressPolicy = { scope: "ingress", policyHash: "c".repeat(64), startsMs: base, endsMs: base + 300000,
     caps: { worker: 2, github: 8, provider: 0, r2a: 0, r2b: 0, bytes: 0,
-      d1queries: 2, d1read: 16, d1write: 6, d1bytes: 8192 } };
+      d1queries: 2, d1read: 16, d1write: 6, d1bytes: 8192, doReq: 2, doGbMs: 2, doRead: 2, doWrite: 2, doBytes: 2 } };
   const ingress = createIngressReservation({ enabled: true, storage: ingressStorage,
-    policy: ingressPolicy, clock: () => now, nextId: () => "attempt-" + (++ingressId), admissionCosts: policy.admissionCosts });
+    policy: ingressPolicy, clock: () => now, nextId: () => "attempt-" + (++ingressId), admissionCosts: policy.admissionCosts,
+    ledgerOverhead: { doReq: 1, doGbMs: 1, doRead: 1, doWrite: 1, doBytes: 1 } });
   assert.equal((await admitScheduledJob({ ...config, token: "invalid", reserve: ingress })).status, "IDENTITY_BLOCKED");
   assert.equal((await admitScheduledJob({ ...config, token: "invalid", reserve: ingress })).status, "IDENTITY_BLOCKED");
   assert.equal((await admitScheduledJob({ ...config, reserve: ingress })).status, "BUDGET_BLOCKED");
   assert.equal(fetches, 0); assert.equal(writes, 0);
   assert.equal(ingressSql.prepare("SELECT COUNT(*) AS n FROM envelope_claim").get().n, 2);
   assert.equal(ingressSql.prepare("SELECT github FROM envelope_scope").get().github, 8);
+  assert.equal(ingressSql.prepare("SELECT doWrite FROM envelope_scope").get().doWrite, 2);
   ingressSql.close();
   assert.equal((await admitScheduledJob({ ...config, enabled: false, reserve: async () => { throw Error("must not reserve"); } })).status, "DISABLED");
   assert.equal(fetches, 0); assert.equal(writes, 0);
@@ -393,8 +395,8 @@ test("atomic finite envelope rejects duplicate, overrun and policy drift", async
   assert.equal(prepareEnvelopeSchema(storage), "DISABLED");
   assert.equal(calls, 0);
   assert.equal(prepareEnvelopeSchema(storage, true), "PREPARED");
-  const caps = { worker: 5, github: 8, provider: 2, r2a: 3, r2b: 6, bytes: 100, d1queries: 4, d1read: 4, d1write: 3, d1bytes: 100 };
-  const cost = { worker: 2, github: 4, provider: 1, r2a: 2, r2b: 2, bytes: 20, d1queries: 2, d1read: 2, d1write: 1, d1bytes: 20 };
+  const caps = { worker: 5, github: 8, provider: 2, r2a: 3, r2b: 6, bytes: 100, d1queries: 4, d1read: 4, d1write: 3, d1bytes: 100, doReq: 5, doGbMs: 5, doRead: 5, doWrite: 5, doBytes: 5 };
+  const cost = { worker: 2, github: 4, provider: 1, r2a: 2, r2b: 2, bytes: 20, d1queries: 2, d1read: 2, d1write: 1, d1bytes: 20, doReq: 2, doGbMs: 2, doRead: 2, doWrite: 2, doBytes: 2 };
   const policy = { scope: "test", policyHash: "a".repeat(64), startsMs: 1000, endsMs: 2000, caps };
   const claim = { writer: "paper", slot: "slot:1", run: "run:1", cost };
   const run = (c = claim, p = policy, nowMs = 1500) =>
@@ -419,7 +421,7 @@ test("atomic finite envelope rejects duplicate, overrun and policy drift", async
   assert.equal(run({ ...claim, cost: missing }), "INVALID");
 
   const alternate = { ...claim, writer: "other", slot: "slot:2", run: "run:2",
-    cost: { worker: 1, github: 1, provider: 0, r2a: 1, r2b: 1, bytes: 1, d1queries: 1, d1read: 0, d1write: 0, d1bytes: 1 } };
+    cost: { worker: 1, github: 1, provider: 0, r2a: 1, r2b: 1, bytes: 1, d1queries: 1, d1read: 0, d1write: 0, d1bytes: 1, doReq: 1, doGbMs: 1, doRead: 1, doWrite: 1, doBytes: 1 } };
   failUpdate = true;
   assert.equal(run(alternate), "REVIEW_REQUIRED");
   assert.equal(db.prepare("SELECT COUNT(*) AS n FROM envelope_claim").get().n, 1);
@@ -445,7 +447,7 @@ test("atomic finite envelope rejects duplicate, overrun and policy drift", async
 });
 
 test("lagged account counters charge every open or watermark-spanning reservation", () => {
-  const names = ["worker", "github", "provider", "r2a", "r2b", "bytes", "d1queries", "d1read", "d1write", "d1bytes"];
+  const names = ["worker", "github", "provider", "r2a", "r2b", "bytes", "d1queries", "d1read", "d1write", "d1bytes", "doReq", "doGbMs", "doRead", "doWrite", "doBytes"];
   const envelope = n => Object.fromEntries(names.map(k => [k, n]));
   const counters = Object.fromEntries(names.map(k => [k, { used: 10, cap: 100, margin: 5,
     periodStartMs: 0, periodEndMs: 2000, measuredThroughMs: 1000 }]));
