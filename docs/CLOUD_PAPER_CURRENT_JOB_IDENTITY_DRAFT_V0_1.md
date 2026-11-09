@@ -294,3 +294,9 @@ allowance, or actual usage; each transport needs its own verified accounting.
 - No new workflow, OIDC permission, GitHub claim, Cloudflare operation, data
   source, holdout, source switch, promotion or trading authority is created by
   this record.
+
+## Atomic finite-envelope experiment — disabled
+
+The draft includes `workers/paper-gateway/atomic-envelope.mjs`, a prepared-only SQLite transaction primitive. Within one isolated storage namespace and finite scope it reserves cumulative request and byte envelopes, pins the policy window and caps, prevents duplicate writer/slot or writer/run claims, and retains committed reservations. The cloud Node test uses an in-memory SQLite adapter; it verifies cap rejection, policy drift and rollback after a synthetic write failure. It is not a Worker deployment or proof of Durable Object platform concurrency, durability, account-wide coverage, or actual costs.
+
+This experiment has no route, protected policy or trusted clock. Its policy, identity and storage are injected; the owner must implement and verify an independent boundary before live use. Ledger initialization, refused calls, reads, writes, indexes, retries, storage growth and inbound Worker invocations consume resources outside the candidate's own envelope. A changed scope can evade prior totals unless a separate immutable account-wide authority and namespace owner prevent it. An ambiguous commit must be treated as consumed; never retry under a new scope. Free-tier policy V0.1 still disallows Durable Objects. No migration, provisioning, credential change, provider request, R2/D1 operation or schedule is authorized by this experiment.
