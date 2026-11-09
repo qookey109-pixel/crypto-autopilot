@@ -108,7 +108,7 @@ class CloudBudgetGuard:
 
     def _validate_evidence(self) -> None:
         s = self.snapshot
-        if not s.account_wide or not s.reservation_coverage_complete:
+        if s.account_wide is not True or s.reservation_coverage_complete is not True:
             raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_INCOMPLETE")
         current_time_ms = self.clock_ms()
         if type(current_time_ms) is not int or current_time_ms < 0:
