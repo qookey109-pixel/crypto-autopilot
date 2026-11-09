@@ -316,6 +316,9 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   const ingressPolicy = { scope: "ingress", policyHash: "c".repeat(64), startsMs: base, endsMs: base + 300000,
     caps: { worker: 2, github: 8, provider: 0, r2a: 0, r2b: 0, bytes: 0,
       d1queries: 2, d1read: 16, d1write: 6, d1bytes: 8192, doReq: 2, doGbMs: 2, doRead: 2, doWrite: 2, doBytes: 2 } };
+  assert.throws(() => createIngressReservation({ enabled: true, storage: ingressStorage,
+    policy: ingressPolicy, clock: () => now, nextId: () => "attempt-x",
+    admissionCosts: policy.admissionCosts }), /overhead required/);
   const ingress = createIngressReservation({ enabled: true, storage: ingressStorage,
     policy: ingressPolicy, clock: () => now, nextId: () => "attempt-" + (++ingressId), admissionCosts: policy.admissionCosts,
     ledgerOverhead: { doReq: 1, doGbMs: 1, doRead: 1, doWrite: 1, doBytes: 1 } });
