@@ -166,6 +166,15 @@ test("D1 claim adapter rejects duplicates and preserves ambiguous committed writ
   sql.close();
 });
 
+test("D1 claim rejects an empty write allowance before accessing the binding", async () => {
+  const claim = { repositoryId: "123", runId: "100", attempt: "1", checkRunId: "101", writerId: "paper", slotId: "slot:1000" };
+  let calls = 0;
+  const db = { prepare: () => { calls++; throw new Error("unexpected database access"); } };
+  const limits = { rowsRead: 8, rowsWritten: 0, maxDatabaseBytes: 2048 };
+  assert.equal(await claimJobSlot(db, claim, { enabled: true, limits }), "INVALID");
+  assert.equal(calls, 0);
+});
+
 test("D1 claim rejects unknown or repeated attempt metadata", async () => {
   const claim = { repositoryId: "123", runId: "100", attempt: "1", checkRunId: "101", writerId: "paper", slotId: "slot:1000" };
   for (const result of [
