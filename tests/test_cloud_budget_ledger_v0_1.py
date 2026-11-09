@@ -403,6 +403,19 @@ class D1CloudBudgetLedgerTests(unittest.TestCase):
         ).fetchone()[0]
         self.assertEqual(count, 0)
 
+    def test_non_boolean_r2_evidence_flags_block_before_io(self):
+        client = SQLiteQueryClient()
+        ledger = self.make_ledger(client)
+        for field in ("account_wide", "reservation_coverage_complete"):
+            for value in ("false", "true", 1, None):
+                with self.subTest(field=field, value=value):
+                    with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_INCOMPLETE"):
+                        ledger.reserve_slot(
+                            slot_id=paper_slot_id(NOW), run_id="bad-evidence",
+                            now_ms=NOW, snapshot=snapshot(**{field: value}),
+                        )
+        self.assertEqual(client.query_plans, [])
+
     def test_exhausted_ledger_row_ceiling_fails_closed(self):
         client = SQLiteQueryClient()
         client.connection.execute(
@@ -543,6 +556,15 @@ class D1UsageGuardTests(unittest.TestCase):
             clock_ms=lambda: clock_ms,
             policy=limits,
         )
+
+    def test_non_boolean_d1_evidence_flags_block_before_reservation(self):
+        for field in ("account_wide", "reservation_coverage_complete"):
+            for value in ("false", "true", 1, None):
+                with self.subTest(field=field, value=value):
+                    guard = self.make_guard(snapshot_changes={field: value})
+                    with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_INCOMPLETE"):
+                        guard.reserve_query()
+                    self.assertEqual(guard._reserved_reads_day, 0)
 
     def test_query_reservations_accumulate_within_guard(self):
         guard = self.make_guard()
@@ -728,6 +750,14 @@ class D1SharedRowsBudgetGuardTests(unittest.TestCase):
             storage_bytes=0,
         )
         return replace(base, **changes)
+
+    def test_non_boolean_d1_evidence_flags_block_before_query(self):
+        guard = D1SharedRowsBudgetGuard(policy=D1SharedRowsBudgetPolicy())
+        for field in ("account_wide", "reservation_coverage_complete"):
+            for value in ("false", "true", 1, None):
+                with self.subTest(field=field, value=value):
+                    with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_INCOMPLETE"):
+                        guard.validate_evidence(snapshot=self.make_snapshot(**{field: value}), now_ms=NOW)
 
     def test_shared_daily_reservations_coordinate_independent_guard_instances(self):
         client = SQLiteQueryClient()
