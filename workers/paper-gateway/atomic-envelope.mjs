@@ -6,6 +6,7 @@ const integer = x => Number.isSafeInteger(x) && x >= 0;
 const metrics = ["r2a", "r2b", "bytes", "provider", "d1read", "d1write"];
 const identity = x => typeof x === "string" && /^[a-zA-Z0-9:._/-]{1,128}$/.test(x);
 const schema = [
+  "CREATE TABLE IF NOT EXISTS envelope_namespace (id INTEGER PRIMARY KEY CHECK (id = 1), scope TEXT NOT NULL)",
   "CREATE TABLE IF NOT EXISTS envelope_scope (scope TEXT PRIMARY KEY, policy_hash TEXT NOT NULL, policy_contract TEXT NOT NULL, r2a INTEGER NOT NULL, r2b INTEGER NOT NULL, bytes INTEGER NOT NULL, provider INTEGER NOT NULL, d1read INTEGER NOT NULL, d1write INTEGER NOT NULL)",
   "CREATE TABLE IF NOT EXISTS envelope_claim (scope TEXT NOT NULL, writer TEXT NOT NULL, slot TEXT NOT NULL, run TEXT NOT NULL, PRIMARY KEY(scope,writer,slot), UNIQUE(scope,writer,run))",
 ];
@@ -30,6 +31,9 @@ export function reserveEnvelope(storage, { enabled = false, policy, claim, nowMs
     const contract = JSON.stringify([policy.startsMs, policy.endsMs, ...metrics.map(k => policy.caps[k])]);
     return storage.transactionSync(() => {
       const sql = storage.sql;
+      sql.exec("INSERT INTO envelope_namespace VALUES (1, ?) ON CONFLICT(id) DO NOTHING", policy.scope);
+      const namespace = sql.exec("SELECT scope FROM envelope_namespace WHERE id = 1").toArray();
+      if (namespace.length !== 1 || namespace[0].scope !== policy.scope) return "SCOPE_MISMATCH";
       sql.exec("INSERT INTO envelope_scope VALUES (?, ?, ?, 0, 0, 0, 0, 0, 0) ON CONFLICT(scope) DO NOTHING",
         policy.scope, policy.policyHash, contract);
       const prior = sql.exec("SELECT policy_hash, policy_contract, r2a, r2b, bytes, provider, d1read, d1write FROM envelope_scope WHERE scope = ?", policy.scope).toArray();
