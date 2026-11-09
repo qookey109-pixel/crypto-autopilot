@@ -314,7 +314,7 @@ class D1UsageGuard:
             raise BudgetBlocked("BLOCKED_D1_USAGE_POLICY_INVALID")
         if p.max_evidence_age_ms <= p.request_timeout_reserve_ms:
             raise BudgetBlocked("BLOCKED_D1_USAGE_POLICY_INVALID")
-        if not s.account_wide or not s.reservation_coverage_complete:
+        if s.account_wide is not True or s.reservation_coverage_complete is not True:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_INCOMPLETE")
         evidence_values = (
             s.observed_at_ms,
@@ -389,7 +389,7 @@ class D1SharedRowsBudgetGuard:
             raise BudgetBlocked("BLOCKED_D1_SHARED_POLICY_INVALID")
         if p.max_evidence_age_ms <= p.request_timeout_reserve_ms:
             raise BudgetBlocked("BLOCKED_D1_SHARED_POLICY_INVALID")
-        if not snapshot.account_wide or not snapshot.reservation_coverage_complete:
+        if snapshot.account_wide is not True or snapshot.reservation_coverage_complete is not True:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_INCOMPLETE")
         evidence_values = (
             snapshot.observed_at_ms, snapshot.measured_through_ms,
@@ -871,7 +871,7 @@ class D1CloudBudgetLedger:
             raise BudgetBlocked("BLOCKED_BUDGET_SLOT_ID_INVALID") from None
         if slot_id != expected_slot_id:
             raise BudgetBlocked("BLOCKED_BUDGET_SLOT_ID_INVALID")
-        if not snapshot.account_wide or not snapshot.reservation_coverage_complete:
+        if snapshot.account_wide is not True or snapshot.reservation_coverage_complete is not True:
             raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_INCOMPLETE")
         numeric = (
             snapshot.observed_at_ms,
