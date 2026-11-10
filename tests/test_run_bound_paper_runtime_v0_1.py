@@ -80,20 +80,26 @@ class RunBoundPaperTests(unittest.TestCase):
         self.assertEqual(self.f.github.calls, before)
         self.assertEqual(self.f.sdk.calls, [])
 
-    def test_run_mismatch_stops_before_d1_or_r2_then_exact_run_succeeds(self):
-        bound = self.claim()
+    def test_synthetic_bound_runtime_checks_run_before_d1_and_r2(self):
+        # This bypasses the unresolved identity boundary only inside this offline
+        # fixture. A matching caller ID must still fail in claim_bound_meter.
+        from crypto_autopilot.paper import run_bound_paper_runtime_v0_1 as candidate
+        bound = candidate.RunBoundMeter(
+            meter=self.f.meter, run_id=101, writer_id=fixtures.WRITER,
+            slot_id=f"slot:{self.f.now}", _claim_proof=candidate._CLAIMED,
+        )
         runtime = self.runtime(bound)
         with patch(fixtures.CLIENT_MODULE + ".build_opener") as opener:
             with self.assertRaises(BudgetBlocked):
                 runtime.run_slot(tick_ms=self.f.now, previous_slot=None,
-                                 activation_enabled=True, run_id="101")
+                                 activation_enabled=True, run_id="102")
         opener.assert_not_called()
         self.assertEqual(self.f.sdk.calls, [])
         self.assertEqual(bound.meter.report()["query_attempts_charged"], 0)
         db, _, statements, fake_opener = self.outer.outer.transport()
         with patch(fixtures.CLIENT_MODULE + ".build_opener", return_value=fake_opener):
             result = runtime.run_slot(tick_ms=self.f.now, previous_slot=None,
-                                      activation_enabled=True, run_id="102")
+                                      activation_enabled=True, run_id="101")
         self.assertEqual(result["state"], "NO_TRADE")
         self.assertEqual(len(statements), 3)
         self.assertEqual(db.execute(
