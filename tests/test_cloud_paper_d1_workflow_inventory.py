@@ -110,6 +110,30 @@ class D1WorkflowInventoryTests(unittest.TestCase):
             },
         )
 
+    def test_versioned_synthetic_worker_inventory_fails_closed_on_drift(self) -> None:
+        from scripts.validate_cloud_paper_r2_writer_inventory import (
+            validate_synthetic_worker_d1_boundary,
+        )
+        root = Path(__file__).parents[1]
+        path = "workers/paper-gateway/d1-job-claim.mjs"
+        source = (root / path).read_text(encoding="utf-8")
+        contract = json.loads((root / "config/synthetic_worker_d1_inventory_v0_1.json").read_text())
+        self.assertEqual(validate_synthetic_worker_d1_boundary({path: source}, contract), [path])
+        bad_cases = (
+            ({path: source + "\\n// changed"}, contract),
+            ({path: source, "workers/extra.mjs": "db.prepare(sql)"}, contract),
+            ({}, contract),
+            ({path: source}, {**contract, "cloudflare_execution_authorized": True}),
+            ({path: source}, {**contract, "activation_enabled": True}),
+            ({path: source}, {**contract, "source_sha256": "0" * 64}),
+            ({path: source}, {**contract, "source_path": "workers/extra.mjs"}),
+            ({path: source}, {**contract, "schema": "unexpected"}),
+        )
+        for sources, altered in bad_cases:
+            with self.subTest(sources=list(sources), contract=altered):
+                with self.assertRaises(RuntimeError):
+                    validate_synthetic_worker_d1_boundary(sources, altered)
+
     def test_detects_d1_secret_reference(self) -> None:
         self.assertTrue(contains_d1_access_reference("env: ${{ secrets.D1_DATABASE_ID }}"))
 
