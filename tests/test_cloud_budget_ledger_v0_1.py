@@ -584,6 +584,22 @@ class D1UsageGuardTests(unittest.TestCase):
             guard.reserve_query()
         self.assertEqual(guard._reserved_reads_day, 0)
 
+    def test_clock_rollback_cannot_revive_stale_d1_evidence(self):
+        clock = [NOW]
+        guard = self.make_guard()
+        guard.clock_ms = lambda: clock[0]
+        guard.reserve_query()
+        clock[0] = NOW + 50_001
+        with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_STALE"):
+            guard.reserve_query()
+        clock[0] = NOW + 1
+        with self.assertRaisesRegex(BudgetBlocked, "CLOCK_ROLLBACK"):
+            guard.reserve_query()
+        clock[0] = NOW + 50_002
+        with self.assertRaisesRegex(BudgetBlocked, "CLOCK_ROLLBACK"):
+            guard.validate_evidence()
+        self.assertEqual(guard._reserved_reads_day, 100)
+
     def test_query_reservations_accumulate_within_guard(self):
         guard = self.make_guard()
         guard.reserve_query()
