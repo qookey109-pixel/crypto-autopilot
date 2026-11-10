@@ -1,5 +1,13 @@
 ## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
+## GitHub job identity diagnostic — 2026-11-10
+
+[One-time GitHub identity diagnostic run 42773327782](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42773327782), attempt 1 on `d87d739609cbdba4a56e2be861a4ed6c16db9e42`, failed with `BLOCKED_CONTEXT`. The precise failing local precondition is unknown. The status is returned before any diagnostic fetch, so no OIDC token was requested; see the [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-1-result.json). **This one-time authority is consumed; do not rerun.** Any further live investigation requires a separately versioned scope.
+
+Production current-job identity, replay prevention, all-writer budget and account headroom remain unverified. This result does not enable Cloud Paper, D1, provider access, a schedule, promotion or trading.
+
+
+
 ## Billing UI observation — 2026-11-10 Asia/Taipei
 
 A read-only Cloudflare dashboard review recorded the observed 2026-10-17–2026-11-09 usage cost as USD 0.00 and two visible past invoice totals as USD 0.00. Workers shows Free and R2 shows Paid; the current cycle is not final and the view does not prove complete fixed charges, account-wide writer coverage, fresh capacity, or future zero cost. Details and scope are in the [redacted observation](research/receipts/2026-11-10-cloudflare-billing-ui-observation-v0-1.json). No credential, payment identifier or invoice identifier was recorded. Billing V0.5 remains consumed; do not rerun.
