@@ -1,0 +1,9 @@
+{
+  "schema": "qookey-worker-d1-synthetic-inventory-v0.1",
+  "source_path": "workers/paper-gateway/d1-job-claim.mjs",
+  "source_sha256": "91555240c0d7dc5dda525badeac21c8fc4fed1b8db134e36f3cc2856730ab21d",
+  "disposition": "SYNTHETIC_ONLY_NOT_PRODUCTION_AUTHORITY",
+  "activation_enabled": false,
+  "cloudflare_execution_authorized": false,
+  "account_wide_coverage_proven": false
+}
