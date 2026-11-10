@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -71,6 +72,34 @@ WORKER_SOURCE_SUFFIXES = {
 def find_worker_d1_source_paths(source_files: dict[str, str]) -> set[str]:
     """Find obvious unreviewed Worker D1 markers; dynamic access can be missed."""
     return {path for path, contents in source_files.items() if WORKER_D1_MARKER.search(contents)}
+
+
+# This is a narrowly pinned source inventory, not a credential, route, runtime,
+# account-wide or production-admission boundary. Changes require a successor.
+_SYNTHETIC_WORKER_D1_CONTRACT = {
+    "schema": "qookey-worker-d1-synthetic-inventory-v0.1",
+    "source_path": "workers/paper-gateway/d1-job-claim.mjs",
+    "source_sha256": "91555240c0d7dc5dda525badeac21c8fc4fed1b8db134e36f3cc2856730ab21d",
+    "disposition": "SYNTHETIC_ONLY_NOT_PRODUCTION_AUTHORITY",
+    "activation_enabled": False,
+    "cloudflare_execution_authorized": False,
+    "account_wide_coverage_proven": False,
+}
+
+
+def validate_synthetic_worker_d1_boundary(
+    sources: dict[str, str], contract: object,
+) -> list[str]:
+    """Inventory the exact disabled prototype; unknown markers still fail closed."""
+    if type(contract) is not dict or contract != _SYNTHETIC_WORKER_D1_CONTRACT:
+        raise RuntimeError("Synthetic Worker D1 inventory contract invalid")
+    path = _SYNTHETIC_WORKER_D1_CONTRACT["source_path"]
+    if find_worker_d1_source_paths(sources) != {path} or path not in sources:
+        raise RuntimeError("Synthetic Worker D1 source boundary mismatch")
+    digest = hashlib.sha256(sources[path].encode("utf-8")).hexdigest()
+    if digest != _SYNTHETIC_WORKER_D1_CONTRACT["source_sha256"]:
+        raise RuntimeError("Synthetic Worker D1 source digest mismatch")
+    return [path]
 
 
 PREPAID_D1_CLIENT_PATH = "src/crypto_autopilot/paper/prepaid_d1_client_v0_1.py"
@@ -350,12 +379,10 @@ def main() -> int:
         for path in source_root.rglob("*")
         if path.is_file() and path.suffix.lower() in WORKER_SOURCE_SUFFIXES
     }
-    worker_d1_paths = find_worker_d1_source_paths(worker_sources)
-    if worker_d1_paths:
-        raise RuntimeError(
-            "Unreviewed Worker D1 markers require a versioned successor: "
-            f"{sorted(worker_d1_paths)}"
-        )
+    worker_contract = json.loads(
+        (ROOT / "config/synthetic_worker_d1_inventory_v0_1.json").read_text(encoding="utf-8")
+    )
+    validate_synthetic_worker_d1_boundary(worker_sources, worker_contract)
     d1_client_paths = validate_d1_source_boundary(
         source_files, expected_d1_client_path,
         successor_client_path=successor["implementation"],
