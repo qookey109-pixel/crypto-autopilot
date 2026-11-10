@@ -1,8 +1,8 @@
+## Current merged release checkpoint — 2026-10-27 Asia/Taipei
+
 ## Billing UI observation — 2026-11-10 Asia/Taipei
 
 A read-only Cloudflare dashboard review recorded the observed 2026-10-17–2026-11-09 usage cost as USD 0.00 and two visible past invoice totals as USD 0.00. Workers shows Free and R2 shows Paid; the current cycle is not final and the view does not prove complete fixed charges, account-wide writer coverage, fresh capacity, or future zero cost. Details and scope are in the [redacted observation](research/receipts/2026-11-10-cloudflare-billing-ui-observation-v0-1.json). No credential, payment identifier or invoice identifier was recorded. Billing V0.5 remains consumed; do not rerun.
-
-## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
 ## Current safety clarification — 2026-11-06
 
