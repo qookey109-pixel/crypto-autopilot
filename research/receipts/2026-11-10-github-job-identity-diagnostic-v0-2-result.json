@@ -1,0 +1,25 @@
+{
+  "schema": "github-job-identity-diagnostic-result-v0.2",
+  "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42778013998",
+  "run_id": 42778013998,
+  "attempt": 1,
+  "event": "workflow_dispatch",
+  "head_sha": "6e10c91db3bcc6e02f414b772ee1fe366ab027f8",
+  "workflow_conclusion": "failure",
+  "job_id": 129701011491,
+  "reported_status": "BLOCKED_CONTEXT",
+  "failed_checks": ["github_token"],
+  "interpretation": "The GitHub token failed the combined presence/type/length/character check. The result does not distinguish these causes. This status is returned before the diagnostic makes a fetch.",
+  "compatibility_evidence": {
+    "github_actions_token_is_installation_token": "https://docs.github.com/en/actions/concepts/security/github_token",
+    "github_describes_longer_stateless_jwt_format": "https://github.blog/changelog/2026-04-24-notice-about-upcoming-new-format-for-github-app-installation-tokens/",
+    "assessment": "POSSIBLE_FORMAT_OR_LENGTH_MISMATCH_NOT_CONFIRMED_FOR_THIS_RUN"
+  },
+  "github_requests_performed_by_diagnostic": 0,
+  "oidc_token_requests_performed": 0,
+  "cloudflare_r2_d1_provider_access_performed": false,
+  "authority_consumed": true,
+  "rerun_authorized": false,
+  "raw_credentials_or_claims_persisted": false,
+  "paper_activation_authorized": false
+}
