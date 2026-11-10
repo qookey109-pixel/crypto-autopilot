@@ -84,7 +84,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Test disabled GitHub identity primitives (Python 3.12 only)
         if: ${{ matrix.python-version == '3.12' }}
-        run: node --test tests/worker/identity_reference.test.mjs tests/worker/github_identity_diagnostic.test.mjs tests/worker/github_identity_diagnostic_v0_2.test.mjs tests/worker/github_identity_diagnostic_v0_3.test.mjs
+        run: node --test tests/worker/identity_reference.test.mjs tests/worker/github_identity_diagnostic.test.mjs tests/worker/github_identity_diagnostic_v0_2.test.mjs tests/worker/github_identity_diagnostic_v0_3.test.mjs tests/worker/github_identity_diagnostic_v0_4.test.mjs
       - name: Install package
         run: python -m pip install -c requirements/ci-constraints.txt -e .
       - name: Install lint tool
