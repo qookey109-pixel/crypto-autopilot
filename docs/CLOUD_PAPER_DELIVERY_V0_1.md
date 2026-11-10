@@ -1,4 +1,6 @@
-## Live repository checkpoint — 2026-10-02 06:24 Asia/Taipei
+> **Historical checkpoints below:** The October 2 observations and proposed next steps are preserved as they were at the time; they are not current execution instructions. Billing Metadata Diagnostic V0.5 was subsequently consumed with `REVIEW_REQUIRED` in [run 41841230890](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/41841230890) and must not be rerun. Consult [CURRENT_STATUS.md](../CURRENT_STATUS.md) and current versioned authority before any external operation. Cloud Paper activation, complete account cost/headroom, and all-writer admission remain unproven.
+
+## Historical repository checkpoint — 2026-10-02 06:24 Asia/Taipei
 
 Evidence basis: GitHub `main=2de48f8cb8488304487b50abcaa2489b58f45c27`. This is the reviewed parent SHA; the diagnostic successor below is prepared on a short-lived delivery branch and has not been merged or executed.
 
@@ -11,7 +13,7 @@ CLOUD-ONLY / FREE-ONLY / 0 USD / PAPER-LIVE-PAPER ONLY. Holdout, source switch, 
 
 ---
 
-## Live Cloud Paper delivery checkpoint — 2026-10-02 05:54 Asia/Taipei
+## Historical Cloud Paper delivery checkpoint — 2026-10-02 05:54 Asia/Taipei
 
 Evidence: Billing History run [36931736281](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281), attempt 1, dispatched from main SHA 0543815905d75aa26a188d2d9e861d4929e2570c. Final conclusion `failure`; uploaded report `REVIEW_REQUIRED / BILLING_HISTORY_PAGE_METADATA_INVALID`. The report recorded exactly 1 Cloudflare HTTP request, `page_count_read=0`, `returned_row_count=0`, incomplete coverage, `zero_cost_conclusion=UNKNOWN`, and `cloud_paper_activation=REMAINS_DISABLED`. Artifact [11196466171](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36931736281/artifacts/11196466171), SHA-256 `884a65a30f4a87c1e2b90f4b42ab07427b9e51baa3835ab24d7f3574b2505524`, expires 2026-10-08T21:54:37Z. The secret-free report persisted no account identity, item identifiers, invoice identifiers/URLs, descriptions, or raw response.
 
