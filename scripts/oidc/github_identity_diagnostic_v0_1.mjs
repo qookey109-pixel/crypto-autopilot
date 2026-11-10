@@ -53,7 +53,7 @@ export async function runDiagnostic({ enabled = false, env = {}, fetcher = fetch
         typeof fetcher !== "function" || typeof clock !== "function") return { status: "BLOCKED_CONTEXT" };
     const tokenUrl = new URL(env.ACTIONS_ID_TOKEN_REQUEST_URL);
     if (tokenUrl.protocol !== "https:" || tokenUrl.port || tokenUrl.username || tokenUrl.password ||
-        !/^[a-z0-9-]+(?:\\.[a-z0-9-]+)*\\.actions\\.githubusercontent\\.com$/.test(tokenUrl.hostname))
+        !/^[a-z0-9-]+(?:\.[a-z0-9-]+)*\.actions\.githubusercontent\.com$/.test(tokenUrl.hostname))
       return { status: "BLOCKED_CONTEXT" };
     const githubHeaders = { Authorization: "Bearer " + env.GITHUB_TOKEN, Accept: "application/vnd.github+json",
       "X-GitHub-Api-Version": "2022-11-28" };
@@ -95,6 +95,6 @@ export async function runDiagnostic({ enabled = false, env = {}, fetcher = fetch
 if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) {
   const report = await runDiagnostic({ enabled: true, env: process.env });
   // Fixed status only. Never log tokens, headers, URLs, claims, or responses.
-  process.stdout.write(JSON.stringify(report) + "\\n");
+  process.stdout.write(JSON.stringify(report) + "\n");
   if (report.status !== "IDENTITY_CORRELATION_OBSERVED") process.exitCode = 1;
 }
