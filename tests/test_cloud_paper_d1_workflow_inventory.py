@@ -125,6 +125,7 @@ class D1WorkflowInventoryTests(unittest.TestCase):
             ({**sources, caller: sources[caller] + "\\n// changed"}, contract),
             ({**sources, "workers/extra.mjs": "db.prepare(sql)"}, contract),
             ({**sources, "workers/new-route.mjs": 'import "./d1-job-claim.mjs";'}, contract),
+            ({**sources, "workers/new-route.mjs": 'import "./synthetic-admission.mjs";'}, contract),
             ({path: sources[path]}, contract),
             ({}, contract),
             (sources, {**contract, "cloudflare_execution_authorized": True}),
