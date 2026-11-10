@@ -476,6 +476,15 @@ test("atomic finite envelope rejects duplicate, overrun and policy drift", async
   assert.equal(reconciled.remaining.r2a, 9997);
   assert.throws(() => db.exec("UPDATE envelope_claim SET reserved_ms=0"), /IMMUTABLE/);
   assert.throws(() => db.exec("DELETE FROM envelope_claim"), /IMMUTABLE/);
+  // SQLite REPLACE may bypass DELETE triggers when recursive_triggers is off.
+  // Each uniqueness conflict must preserve the original immutable reservation.
+  db.exec("PRAGMA recursive_triggers=OFF");
+  const columns = Object.keys(cost).join(", ");
+  db.exec(`INSERT OR REPLACE INTO envelope_claim SELECT scope, writer, 'slot:attacker', run, reserved_ms, ${columns} FROM envelope_claim WHERE writer='paper'`);
+  assert.equal(db.prepare("SELECT slot FROM envelope_claim WHERE writer='paper'").get().slot, "slot:1");
+  db.exec(`INSERT OR REPLACE INTO envelope_claim SELECT scope, writer, slot, 'run:attacker', reserved_ms, ${columns} FROM envelope_claim WHERE writer='paper'`);
+  assert.equal(db.prepare("SELECT run FROM envelope_claim WHERE writer='paper'").get().run, "run:1");
+  assert.equal(snapshotEnvelopes(storage, { enabled: true, scope: "test", nowMs: 1500 }).status, "READY_FOR_REVIEW");
   db.exec("UPDATE envelope_scope SET r2a=0");
   assert.equal(snapshotEnvelopes(storage, { enabled: true, scope: "test", nowMs: 1500 }).status, "REVIEW_REQUIRED");
   db.close();
