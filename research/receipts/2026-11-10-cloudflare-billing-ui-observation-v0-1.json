@@ -1,0 +1,41 @@
+{
+  "schema": "qookey-cloudflare-billing-ui-observation-v0.1",
+  "recorded_at_utc": "2026-11-10T01:15:24Z",
+  "source": "OWNER_AUTHORIZED_CLOUDFLARE_DASHBOARD_READ_ONLY",
+  "scope": "DISPLAYED_ACCOUNT_BILLABLE_USAGE_SUBSCRIPTIONS_AND_VISIBLE_INVOICE_LIST_ONLY",
+  "usage": {
+    "observed_start": "2026-10-17",
+    "observed_through_display": "2026-11-09",
+    "billing_cycle_end_display": "2026-11-16",
+    "displayed_observed_cost_usd": 0,
+    "displayed_estimated_cycle_cost_usd": 0,
+    "visible_product_usage": "R2_CLASS_A_CLASS_B_AND_STORAGE",
+    "metrics_displayed_as_rounded": true
+  },
+  "subscriptions": {
+    "workers": "FREE",
+    "r2": "PAID_LABEL",
+    "r2_renewal_display": "2026-11-17",
+    "fixed_fee_determined": false
+  },
+  "visible_invoice_list": {
+    "count": 2,
+    "invoice_dates": [
+      "2026-09-17",
+      "2026-10-17"
+    ],
+    "each_total_usd": 0,
+    "complete_account_history_proven": false
+  },
+  "limitations": [
+    "CURRENT_CYCLE_NOT_FINAL",
+    "OTHER_CHARGES_AND_FUTURE_USAGE_NOT_PROVEN_ZERO",
+    "USAGE_DATA_FRESHNESS_AND_COMPLETE_ACCOUNT_WRITERS_NOT_PROVEN",
+    "NO_D1_SQL_OR_R2_OBJECT_ACCESS",
+    "BILLING_V0_5_NOT_REEXECUTED",
+    "NO_PERSONAL_PAYMENT_INVOICE_IDENTIFIERS_OR_CREDENTIALS_RECORDED"
+  ],
+  "cloud_paper_activation": false,
+  "zero_cost_conclusion": "UNKNOWN",
+  "authority": false
+}
