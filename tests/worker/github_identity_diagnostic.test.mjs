@@ -28,7 +28,7 @@ test("disabled or incorrect context performs no network operations", async () =>
 test("history rejection happens before requesting an identity token", async () => {
   let calls = 0;
   const fetcher = async url => {
-    calls++; assert.match(url, /actions\\/workflows\\//);
+    calls++; assert.match(url, /actions\/workflows\//);
     return new Response(JSON.stringify({ total_count: 2, workflow_runs: [] }));
   };
   assert.equal((await runDiagnostic({ enabled: true, env, fetcher, clock: () => now })).status, "BLOCKED_HISTORY");
