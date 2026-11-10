@@ -131,6 +131,12 @@ class CloudBudgetGuard:
         coverage_age = current_time_ms - s.measured_through_ms
         if age < 0 or coverage_age < 0:
             raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_FROM_FUTURE")
+        # Daily counters are only valid for the UTC day they cover.
+        # A nearly fresh snapshot from before midnight cannot fund today.
+        day_ms = 86_400_000
+        if (s.observed_at_ms // day_ms != current_time_ms // day_ms
+                or s.measured_through_ms // day_ms != current_time_ms // day_ms):
+            raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_PERIOD_MISMATCH")
         if max(age, coverage_age) > self.policy.max_evidence_age_ms:
             raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_STALE")
 
