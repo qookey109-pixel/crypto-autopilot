@@ -1,0 +1,21 @@
+{
+  "schema": "github-job-identity-diagnostic-result-v0.4",
+  "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42784410610",
+  "run_id": 42784410610,
+  "attempt": 1,
+  "event": "workflow_dispatch",
+  "head_sha": "5a06f2c1db4c5c0008cce39361cfd6fa4ee7a3ea",
+  "workflow_conclusion": "success",
+  "job_id": 129721958310,
+  "reported_status": "IDENTITY_CORRELATION_OBSERVED",
+  "interpretation": "The diagnostic verified one GitHub-issued RS256 OIDC token against the configured immutable subject, audience, repository, commit and run/check identifiers, then matched the current GitHub run, job and main metadata. The result is a single-run observation, not a production credential boundary, replay prevention, global budget, account headroom or Paper activation proof.",
+  "github_history_gets_performed": 1,
+  "oidc_token_requests_performed": 1,
+  "jwks_gets_performed": 1,
+  "github_run_job_branch_gets_performed": 3,
+  "cloudflare_r2_d1_provider_access_performed": false,
+  "authority_consumed": true,
+  "rerun_authorized": false,
+  "raw_credentials_or_claims_persisted": false,
+  "paper_activation_authorized": false
+}
