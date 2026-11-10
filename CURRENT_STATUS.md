@@ -1,5 +1,11 @@
 ## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
+## GitHub job identity diagnostic V0.4 — 2026-11-10
+
+[Run 42784410610](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42784410610), attempt 1 on `5a06f2c1db4c5c0008cce39361cfd6fa4ee7a3ea`, completed with `IDENTITY_CORRELATION_OBSERVED`. One GitHub-signed token passed the configured immutable subject, audience, repository, commit, run and job checks and matched current GitHub metadata. The [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-4-result.json) records the bounded observation. **V0.4 is consumed; do not rerun.** Earlier V0.1–V0.3 failures remain historical evidence.
+
+This is one manually triggered GitHub job, not proof of an independent credential-holding gateway, durable replay prevention, all-writer budget admission, Cloudflare runtime compatibility, fresh account headroom or PAPER activation. No Cloudflare/R2/D1/provider access occurred.
+
 ## GitHub job identity diagnostic V0.3 — 2026-11-10
 
 [Run 42781787782](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42781787782), attempt 1 on `46790a3268895a826e198b8cdacc7149af214e50`, passed context and history checks and received an OIDC string response, then stopped at `REVIEW_REQUIRED / signed_identity`. The precise signature, claim or correlation failure is unknown; whether a JWKS request occurred is unknown. No run/job/branch metadata or Cloudflare/R2/D1/provider access followed. See the [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-3-result.json). **V0.3 is consumed; do not rerun.**
