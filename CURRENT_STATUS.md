@@ -4,7 +4,7 @@
 
 [Run 42781787782](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42781787782), attempt 1 on `46790a3268895a826e198b8cdacc7149af214e50`, passed context and history checks and received an OIDC string response, then stopped at `REVIEW_REQUIRED / signed_identity`. The precise signature, claim or correlation failure is unknown; whether a JWKS request occurred is unknown. No run/job/branch metadata or Cloudflare/R2/D1/provider access followed. See the [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-3-result.json). **V0.3 is consumed; do not rerun.**
 
-The token-format successor passed its context check, but this does not prove why the separate V0.2 token check failed or establish production identity. Any further live investigation requires a separately versioned scope. Shared budget coverage and PAPER activation remain unverified.
+The token-format successor passed its context check, but this does not prove why the separate V0.2 token check failed or establish production identity. GitHub documents an immutable OIDC subject for repositories created after 2026-07-15; this repository was created 2026-08-17 and the V0.3 verifier expected the older subject format. This is a documented compatibility concern, not proof of the actual token claim or the exact failure. Any further live investigation requires a separately versioned scope. Shared budget coverage and PAPER activation remain unverified.
 
 ## GitHub job identity diagnostic V0.2 — 2026-11-10
 
