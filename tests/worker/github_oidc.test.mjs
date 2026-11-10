@@ -269,7 +269,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   const policy = { repository: "owner/repo", repositoryId: "123", workflowId: "456",
     workflowPath: ".github/workflows/paper.yml", workflowRef: "owner/repo/.github/workflows/paper.yml@refs/heads/main",
     workflowSha: sha, sha, jobName: "paper", audience: "paper-test",
-    subject: "repo:owner/repo:ref:refs/heads/main", writerId: "paper", databaseBytesBefore: 1024, maxAgeSeconds: 600,
+    subject: "repo:owner@77/repo@123:ref:refs/heads/main", writerId: "paper", databaseBytesBefore: 1024, maxAgeSeconds: 600,
     maxScheduleDelaySeconds: 180, admissionCosts: { workerRequests: 1, githubRequests: 4, d1Queries: 1, d1RowsRead: 8, d1RowsWritten: 3, d1StorageBytes: 4096 } };
   const claims = { iss: "https://token.actions.githubusercontent.com", aud: policy.audience, sub: policy.subject,
     repository: policy.repository, repository_id: policy.repositoryId, workflow_ref: policy.workflowRef,
@@ -286,8 +286,11 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     status: "in_progress", started_at: "2026-01-01T00:07:40Z", completed_at: null };
   let fetches = 0, writes = 0;
   let invalidRun = false, staleMain = false;
-  const fetcher = async url => {
+  const githubToken = "ghs_fixture." + "x".repeat(700) + ".signature";
+  const fetcher = async (url, options) => {
     fetches++;
+    if (url.startsWith("https://api.github.com/"))
+      assert.equal(options.headers.Authorization, "Bearer " + githubToken);
     if (url === "https://token.actions.githubusercontent.com/.well-known/jwks")
       return new Response(JSON.stringify({ keys: [jwk] }));
     if (url.endsWith("/actions/runs/100")) return new Response(JSON.stringify(invalidRun ? { ...run, head_sha: "b".repeat(40) } : run));
@@ -302,7 +305,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     const changes = Number(sql.prepare(statement).run(...args).changes);
     return { success: true, meta: { changes, total_attempts: 1, rows_read: 1, rows_written: changes, size_after: 1024 } };
   } }) }) };
-  const config = { enabled: true, policy, token, githubToken: "synthetic-only-token", fetcher, db, clock: () => now };
+  const config = { enabled: true, policy, token, githubToken, fetcher, db, clock: () => now };
   // Integrate the finite envelope with admission. The SQLite and clock are synthetic.
   const ingressSql = new DatabaseSync(":memory:");
   const ingressStorage = {
