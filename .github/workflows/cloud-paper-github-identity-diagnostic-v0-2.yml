@@ -1,0 +1,37 @@
+name: Cloud Paper GitHub Identity Diagnostic V0.2
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_one_time:
+        description: 'Consume the one-time GitHub-only identity diagnostic'
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: cloud-paper-github-identity-diagnostic-v0-2
+  cancel-in-progress: false
+
+jobs:
+  diagnostic:
+    if: github.ref == 'refs/heads/main' && inputs.confirm_one_time == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Observe signed GitHub job correlation
+        env:
+          CONFIRM_DIAGNOSTIC: ${{ inputs.confirm_one_time }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/oidc/github_identity_diagnostic_v0_2.mjs >> "$GITHUB_STEP_SUMMARY"
