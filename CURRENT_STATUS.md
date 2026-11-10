@@ -1,5 +1,9 @@
 ## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
+## Cloudflare billable-usage UI observation — 2026-11-10
+
+At 13:25 UTC, the authorized read-only dashboard displayed the 2026-10-17 through 2026-11-10 usage cost and projected cycle cost as USD 0.00. Displayed R2 totals were approximately 1.38k Class A operations, 253 Class B operations and 0.47 GB-months. The values are rounded and the actual data watermark is unknown; GB-months are not current stored bytes. This incomplete-period view does not establish full account charges, current storage headroom, writer coverage or future zero cost. The [bounded observation](research/receipts/2026-11-10-cloudflare-billable-usage-ui-observation-v0-2.json) grants no execution authority. Billing V0.5 remains consumed.
+
 ## GitHub job identity diagnostic V0.4 — 2026-11-10
 
 [Run 42784410610](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42784410610), attempt 1 on `5a06f2c1db4c5c0008cce39361cfd6fa4ee7a3ea`, completed with `IDENTITY_CORRELATION_OBSERVED`. One GitHub-signed token passed the configured immutable subject, audience, repository, commit, run and job checks and matched current GitHub metadata. The [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-4-result.json) records the bounded observation. **V0.4 is consumed; do not rerun.** Earlier V0.1–V0.3 failures remain historical evidence.
