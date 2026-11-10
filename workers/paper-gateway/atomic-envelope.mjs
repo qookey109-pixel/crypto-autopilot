@@ -11,6 +11,12 @@ const schema = [
   "CREATE TABLE IF NOT EXISTS envelope_claim (scope TEXT NOT NULL, writer TEXT NOT NULL, slot TEXT NOT NULL, run TEXT NOT NULL, reserved_ms INTEGER NOT NULL, " + metrics.map(k => k + " INTEGER NOT NULL").join(", ") + ", PRIMARY KEY(scope,writer,slot), UNIQUE(scope,writer,run))",
   "CREATE TRIGGER IF NOT EXISTS envelope_claim_no_update BEFORE UPDATE ON envelope_claim BEGIN SELECT RAISE(ABORT, 'IMMUTABLE'); END",
   "CREATE TRIGGER IF NOT EXISTS envelope_claim_no_delete BEFORE DELETE ON envelope_claim BEGIN SELECT RAISE(ABORT, 'IMMUTABLE'); END",
+  // REPLACE can bypass DELETE triggers when recursive triggers are disabled.
+  // Reject both unique-key collisions before SQLite can delete the old row.
+  "CREATE TRIGGER IF NOT EXISTS envelope_claim_no_replace BEFORE INSERT ON envelope_claim " +
+  "WHEN EXISTS (SELECT 1 FROM envelope_claim WHERE scope=NEW.scope AND writer=NEW.writer AND slot=NEW.slot) " +
+  "OR EXISTS (SELECT 1 FROM envelope_claim WHERE scope=NEW.scope AND writer=NEW.writer AND run=NEW.run) " +
+  "BEGIN SELECT RAISE(IGNORE); END",
 ];
 export function prepareEnvelopeSchema(storage, enabled = false) {
   if (enabled !== true) return "DISABLED";
