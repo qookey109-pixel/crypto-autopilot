@@ -157,6 +157,12 @@ still counts individual statements and their rows. Neither statement proves
 that this account has enough headroom or that an ambiguous response is safe to
 replay. A design that bypasses these boundaries must stay disabled.
 
+## Read-only GitHub metadata cross-check — 2026-11-10
+
+For natural Health run [42681369796](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42681369796), the GitHub REST run response reports event `schedule`, branch `main`, and a workflow path without a ref suffix. The run's job-list response reports job ID 129376474288, run ID 42681369796, attempt 1, and a `check_run_url` ending in that same job ID. A separate pull-request CI run [42738625907](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42738625907) similarly returned matching job and check-run URL IDs for its three listed jobs. These are existing public metadata observations, not new workflow dispatches.
+
+This supports the fixture's job/check-run ID mapping for these samples and the existing path comparison for the observed scheduled run. It does **not** verify the signed OIDC `check_run_id` claim, an in-progress job, job-attempt race handling, or production authentication. GitHub's [workflow-job API example](https://docs.github.com/en/rest/actions/workflow-jobs) shows a matching job ID and check-run URL, while its [OIDC claim reference](https://docs.github.com/en/actions/reference/security/oidc) describes `check_run_id` as the current job's check-run ID. The [workflow-run API example](https://docs.github.com/en/rest/actions/workflow-runs) includes a path with a ref suffix, so exact path semantics must be validated for the eventual authorized workflow; unknown forms remain blocked rather than normalized speculatively.
+
 ## Worker-native identity prototype
 
 This draft contains a Web Crypto RS256 verifier and a fixed GitHub JWKS reader.
