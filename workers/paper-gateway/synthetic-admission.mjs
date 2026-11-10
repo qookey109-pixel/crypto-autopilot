@@ -3,7 +3,7 @@
 // production trust boundary. Never connect real credentials or bindings here.
 import { readGithubKeys } from "./github-keys.mjs";
 import { verifyGithubJob } from "./github-oidc.mjs";
-import { readJobMetadata } from "./github-metadata-reader.mjs";
+import { readJobMetadata } from "./github-metadata-reader-v0-2.mjs";
 import { checkJobMetadata } from "./github-metadata.mjs";
 import { claimJobSlot } from "./d1-job-claim.mjs";
 
