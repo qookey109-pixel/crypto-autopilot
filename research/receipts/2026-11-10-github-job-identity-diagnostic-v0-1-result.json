@@ -1,0 +1,20 @@
+{
+  "schema": "github-job-identity-diagnostic-result-v0.1",
+  "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42773327782",
+  "run_id": 42773327782,
+  "attempt": 1,
+  "event": "workflow_dispatch",
+  "head_sha": "d87d739609cbdba4a56e2be861a4ed6c16db9e42",
+  "workflow_conclusion": "failure",
+  "job": "diagnostic",
+  "job_id": 129685991291,
+  "reported_status": "BLOCKED_CONTEXT",
+  "interpretation": "At least one local context precondition failed. The status does not identify which precondition failed. The code returns this status before any fetch; signed OIDC claims, job correlation and production identity remain unverified.",
+  "github_requests_performed_by_diagnostic": 0,
+  "oidc_token_requests_performed": 0,
+  "cloudflare_r2_d1_provider_access_performed": false,
+  "authority_consumed": true,
+  "rerun_authorized": false,
+  "raw_credentials_or_claims_persisted": false,
+  "paper_activation_authorized": false
+}
