@@ -5,5 +5,7 @@
   "disposition": "SYNTHETIC_ONLY_NOT_PRODUCTION_AUTHORITY",
   "activation_enabled": false,
   "cloudflare_execution_authorized": false,
-  "account_wide_coverage_proven": false
+  "account_wide_coverage_proven": false,
+  "caller_path": "workers/paper-gateway/synthetic-admission.mjs",
+  "caller_sha256": "4e607359538f2c500a638f7f6b834a7b3dfb468845a40b465f2af08c4644c2e1"
 }
