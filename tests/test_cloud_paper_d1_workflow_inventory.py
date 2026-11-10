@@ -125,6 +125,7 @@ class D1WorkflowInventoryTests(unittest.TestCase):
             ({}, contract),
             ({path: source}, {**contract, "cloudflare_execution_authorized": True}),
             ({path: source}, {**contract, "activation_enabled": True}),
+            ({path: source}, {**contract, "activation_enabled": 0}),
             ({path: source}, {**contract, "source_sha256": "0" * 64}),
             ({path: source}, {**contract, "source_path": "workers/extra.mjs"}),
             ({path: source}, {**contract, "schema": "unexpected"}),
