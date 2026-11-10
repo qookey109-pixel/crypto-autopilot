@@ -1,0 +1,177 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { webcrypto } from "node:crypto";
+import { checkJobMetadata } from "../../workers/paper-gateway/github-metadata.mjs";
+import { readJobMetadata } from "../../workers/paper-gateway/github-metadata-reader.mjs";
+import { verifyGithubJob } from "../../workers/paper-gateway/github-oidc.mjs";
+import { readGithubKeys } from "../../workers/paper-gateway/github-keys.mjs";
+
+globalThis.crypto ??= webcrypto;
+
+test("unconfigured verifier fails closed without fetching keys", async () => {
+  let calls = 0;
+  const result = await verifyGithubJob("invalid", {
+    enabled: false,
+    fetchKeys: async () => { calls++; throw new Error("unexpected fetch"); },
+  });
+  assert.equal(result, null);
+  assert.equal(calls, 0);
+});
+
+test("malformed tokens fail closed without fetching keys", async () => {
+  let calls = 0;
+  const result = await verifyGithubJob("not-a-jwt", {
+    enabled: true,
+    policy: {},
+    now: 0,
+    fetchKeys: async () => { calls++; throw new Error("unexpected fetch"); },
+  });
+  assert.equal(result, null);
+  assert.equal(calls, 0);
+});
+
+test("signature, repository and run claims must agree", async () => {
+  const key = await crypto.subtle.generateKey(
+    { name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
+    true, ["sign", "verify"],
+  );
+  const jwk = { ...await crypto.subtle.exportKey("jwk", key.publicKey), kid: "fixture", alg: "RS256", use: "sig" };
+  const policy = {
+    audience: "paper-test",
+    repository: "owner/repo",
+    repositoryId: "123",
+    workflowRef: "owner/repo/.github/workflows/paper.yml@refs/heads/main",
+    workflowSha: "a".repeat(40),
+    sha: "a".repeat(40),
+    subject: "repo:owner/repo:ref:refs/heads/main",
+  };
+  const claims = {
+    iss: "https://token.actions.githubusercontent.com",
+    aud: policy.audience, sub: policy.subject,
+    repository: policy.repository, repository_id: policy.repositoryId,
+    workflow_ref: policy.workflowRef, workflow_sha: policy.workflowSha, sha: policy.sha,
+    ref: "refs/heads/main", ref_type: "branch", runner_environment: "github-hosted",
+    event_name: "schedule", run_id: "100", run_attempt: "1", check_run_id: "101",
+    iat: 1000, nbf: 1000, exp: 1300, jti: "fixture-jti",
+  };
+  const encode = (value) => Buffer.from(JSON.stringify(value)).toString("base64url");
+  const header = encode({ alg: "RS256", typ: "JWT", kid: "fixture", x5t: "fixture-thumbprint" });
+  const payload = encode(claims);
+  const input = header + "." + payload;
+  const signature = Buffer.from(await crypto.subtle.sign(
+    "RSASSA-PKCS1-v1_5", key.privateKey, new TextEncoder().encode(input),
+  )).toString("base64url");
+  const token = input + "." + signature;
+  const options = { enabled: true, policy, now: 1100, fetchKeys: async () => ({ keys: [jwk] }) };
+  const accepted = await verifyGithubJob(token, options);
+  assert.equal(accepted?.runId, "100");
+  assert.equal(accepted?.runAttempt, "1");
+  assert.equal(accepted?.checkRunId, "101");
+  assert.equal(accepted?.eventName, "schedule");
+  assert.equal(accepted?.repositoryId, "123");
+  assert.equal(await verifyGithubJob(token, { ...options, policy: { ...policy, repositoryId: "999" } }), null);
+  assert.equal(await verifyGithubJob(header + "." + encode({ ...claims, run_id: "102" }) + "." + signature, options), null);
+  assert.equal(await verifyGithubJob(token, { ...options, now: 1400 }), null);
+  const sign = async (h, p) => {
+    const data = h + "." + p;
+    const signed = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key.privateKey, new TextEncoder().encode(data));
+    return data + "." + Buffer.from(signed).toString("base64url");
+  };
+  const impossibleInterval = encode({ ...claims, nbf: 1105, exp: 1103 });
+  assert.equal(await verifyGithubJob(await sign(header, impossibleInterval), options), null);
+  const duplicate = Buffer.from(JSON.stringify(claims).replace('"run_id":"100"', '"run_id":"100","run_id":"100"')).toString("base64url");
+  assert.equal(await verifyGithubJob(await sign(header, duplicate), options), null);
+  const forbidden = encode({ alg: "RS256", typ: "JWT", kid: "fixture", jku: "https://attacker.example/keys" });
+  assert.equal(await verifyGithubJob(await sign(forbidden, payload), options), null);
+  const escapedDuplicate = Buffer.from(JSON.stringify(claims).replace('"run_id":"100"', '"run_id":"100","run\\u005fid":"100"')).toString("base64url");
+  assert.equal(await verifyGithubJob(await sign(header, escapedDuplicate), options), null);
+  assert.equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => ({ keys: [jwk, jwk] }) }), null);
+  assert.equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => ({ keys: [{ ...jwk, n: "AQ" }] }) }), null);
+  assert.equal((await verifyGithubJob(token, { ...options, fetchKeys: async () => ({ keys: [{ ...jwk, x5c: ["fixture"] }] }) }))?.runId, "100");
+  assert.equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => { throw Error("offline"); } }), null);
+});
+
+test("key reader stays closed until enabled and pins HTTPS origin", async () => {
+  let count = 0;
+  const fakeFetch = async (url, options) => {
+    count++;
+    assert.equal(url, "https://token.actions.githubusercontent.com/.well-known/jwks");
+    assert.equal(options.redirect, "manual");
+    return new Response(JSON.stringify({ keys: [{ kid: "fixture" }] }), { status: 200 });
+  };
+  assert.equal(await readGithubKeys({ enabled: false, fetcher: fakeFetch }), null);
+  assert.equal(count, 0);
+  assert.deepEqual(await readGithubKeys({ enabled: true, fetcher: fakeFetch }), { keys: [{ kid: "fixture" }] });
+  assert.equal(count, 1);
+});
+
+test("key reader rejects redirects, malformed JSON, oversize and failures", async () => {
+  for (const fakeFetch of [
+    async () => new Response("", { status: 302, headers: { Location: "https://attacker.example" } }),
+    async () => new Response("{broken"),
+    async () => new Response('{"keys":[],"keys":[]}'),
+    async () => new Response("x".repeat(65537)),
+    async () => { throw Error("unavailable"); },
+  ]) assert.equal(await readGithubKeys({ enabled: true, fetcher: fakeFetch }), null);
+});
+
+test("signed job identity must match current exact run and job metadata", () => {
+  const sha = "a".repeat(40);
+  const policy = { repositoryId: "123", workflowId: "456", workflowPath: ".github/workflows/paper.yml", jobName: "paper",
+    sha, maxAgeSeconds: 600, allowedEvents: ["schedule", "workflow_dispatch"] };
+  const identity = { runId: "100", runAttempt: "1", checkRunId: "101", eventName: "schedule", repositoryId: "123" };
+  const run = { id: 100, workflow_id: 456, path: policy.workflowPath, head_sha: sha, head_branch: "main",
+    run_attempt: 1, status: "in_progress", event: "schedule", created_at: "2026-01-01T00:00:00Z",
+    repository: { id: 123 } };
+  const job = { id: 101, run_id: 100, run_attempt: 1, head_sha: sha, name: "paper",
+    status: "in_progress", started_at: "2026-01-01T00:00:10Z", completed_at: null };
+  const now = Date.parse("2026-01-01T00:02:00Z");
+  assert.equal(checkJobMetadata(identity, run, job, policy, now), true);
+  const { run_attempt: omittedAttempt, ...documentedJob } = job;
+  assert.equal(omittedAttempt, 1);
+  assert.equal(checkJobMetadata(identity, run, documentedJob, policy, now), true);
+  assert.equal(checkJobMetadata({ ...identity, runAttempt: "2" }, run, documentedJob, policy, now), false);
+  assert.equal(checkJobMetadata({ ...identity, runAttempt: undefined }, run, documentedJob, policy, now), false);
+  assert.equal(checkJobMetadata({ ...identity, eventName: "workflow_dispatch" }, run, job, policy, now), false);
+  assert.equal(checkJobMetadata({ ...identity, repositoryId: "999" }, run, job, policy, now), false);
+  for (const alteredRun of [
+    { ...run, id: 102 }, { ...run, workflow_id: 999 }, { ...run, head_sha: "b".repeat(40) },
+    { ...run, head_branch: "other" }, { ...run, status: "completed" }, { ...run, run_attempt: 2 },
+    { ...run, event: "pull_request" }, { ...run, repository: { id: 999 } },
+    { ...run, created_at: "invalid" }, { ...run, created_at: "2025-12-31T23:00:00Z" },
+  ]) assert.equal(checkJobMetadata(identity, alteredRun, job, policy, now), false);
+  for (const alteredJob of [
+    { ...job, id: 999 }, { ...job, run_id: 999 }, { ...job, run_attempt: 2 }, { ...job, run_attempt: null },
+    { ...job, head_sha: "b".repeat(40) }, { ...job, status: "completed" },
+    { ...job, name: "other" }, { ...job, started_at: "2026-01-01T00:05:00Z" },
+  ]) assert.equal(checkJobMetadata(identity, run, alteredJob, policy, now), false);
+  assert.equal(checkJobMetadata(identity, run, job, policy, now + 3600000), false);
+});
+
+test("metadata reader makes only fixed signed-ID GitHub requests", async () => {
+  const calls = [];
+  const fetcher = async (url, options) => {
+    calls.push(url);
+    assert.equal(options.method, "GET");
+    assert.equal(options.redirect, "manual");
+    assert.equal(options.headers.Authorization, "Bearer synthetic-only-token");
+    return new Response(JSON.stringify({ id: calls.length }), { status: 200 });
+  };
+  const config = { repository: "owner/repo", identity: { runId: "100", checkRunId: "101" }, token: "synthetic-only-token", fetcher };
+  assert.equal(await readJobMetadata({ ...config, enabled: false }), null);
+  assert.deepEqual(calls, []);
+  assert.deepEqual(await readJobMetadata({ ...config, enabled: true }), { run: { id: 1 }, job: { id: 2 }, main: { id: 3 } });
+  assert.deepEqual(calls, [
+    "https://api.github.com/repos/owner/repo/actions/runs/100",
+    "https://api.github.com/repos/owner/repo/actions/jobs/101",
+    "https://api.github.com/repos/owner/repo/branches/main",
+  ]);
+  assert.equal(await readJobMetadata({ ...config, enabled: true, identity: { runId: "../bad", checkRunId: "101" } }), null);
+  assert.equal(calls.length, 3);
+  let failures = 0;
+  assert.equal(await readJobMetadata({ ...config, enabled: true, fetcher: async () => {
+    failures++; return new Response("", { status: 302, headers: { Location: "https://attacker.example" } });
+  } }), null);
+  assert.equal(failures, 1);
+});
+

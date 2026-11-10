@@ -265,6 +265,8 @@ class D1UsageGuard:
         self._reserved_reads_day = 0
         self._reserved_writes_day = 0
         self._reserved_storage_bytes = 0
+        self._clock_high_water_ms: int | None = None
+        self._clock_rollback_detected = False
         self._lock = threading.Lock()
 
     def validate_evidence(self) -> None:
@@ -314,7 +316,7 @@ class D1UsageGuard:
             raise BudgetBlocked("BLOCKED_D1_USAGE_POLICY_INVALID")
         if p.max_evidence_age_ms <= p.request_timeout_reserve_ms:
             raise BudgetBlocked("BLOCKED_D1_USAGE_POLICY_INVALID")
-        if not s.account_wide or not s.reservation_coverage_complete:
+        if s.account_wide is not True or s.reservation_coverage_complete is not True:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_INCOMPLETE")
         evidence_values = (
             s.observed_at_ms,
@@ -330,6 +332,14 @@ class D1UsageGuard:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_UNKNOWN")
         if type(now_ms) is not int or now_ms < 0:
             raise BudgetBlocked("BLOCKED_D1_USAGE_CLOCK_INVALID")
+        if (self._clock_rollback_detected or
+                (self._clock_high_water_ms is not None
+                 and now_ms < self._clock_high_water_ms)):
+            self._clock_rollback_detected = True
+            raise BudgetBlocked("BLOCKED_D1_USAGE_CLOCK_ROLLBACK")
+        self._clock_high_water_ms = now_ms
+        if s.measured_through_ms > s.observed_at_ms:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_TIME_ORDER")
         observed_age = now_ms - s.observed_at_ms
         coverage_age = now_ms - s.measured_through_ms
         if observed_age < 0 or coverage_age < 0:
@@ -389,7 +399,7 @@ class D1SharedRowsBudgetGuard:
             raise BudgetBlocked("BLOCKED_D1_SHARED_POLICY_INVALID")
         if p.max_evidence_age_ms <= p.request_timeout_reserve_ms:
             raise BudgetBlocked("BLOCKED_D1_SHARED_POLICY_INVALID")
-        if not snapshot.account_wide or not snapshot.reservation_coverage_complete:
+        if snapshot.account_wide is not True or snapshot.reservation_coverage_complete is not True:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_INCOMPLETE")
         evidence_values = (
             snapshot.observed_at_ms, snapshot.measured_through_ms,
@@ -401,6 +411,8 @@ class D1SharedRowsBudgetGuard:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_UNKNOWN")
         if type(now_ms) is not int or now_ms < 0:
             raise BudgetBlocked("BLOCKED_D1_USAGE_CLOCK_INVALID")
+        if snapshot.measured_through_ms > snapshot.observed_at_ms:
+            raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_TIME_ORDER")
         age = now_ms - snapshot.observed_at_ms
         coverage_age = now_ms - snapshot.measured_through_ms
         if age < 0 or coverage_age < 0:
@@ -871,7 +883,7 @@ class D1CloudBudgetLedger:
             raise BudgetBlocked("BLOCKED_BUDGET_SLOT_ID_INVALID") from None
         if slot_id != expected_slot_id:
             raise BudgetBlocked("BLOCKED_BUDGET_SLOT_ID_INVALID")
-        if not snapshot.account_wide or not snapshot.reservation_coverage_complete:
+        if snapshot.account_wide is not True or snapshot.reservation_coverage_complete is not True:
             raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_INCOMPLETE")
         numeric = (
             snapshot.observed_at_ms,
@@ -897,6 +909,8 @@ class D1CloudBudgetLedger:
         )
         if any(type(value) is not int or value < 0 for value in numeric):
             raise BudgetBlocked("BLOCKED_BUDGET_USAGE_UNKNOWN")
+        if snapshot.measured_through_ms > snapshot.observed_at_ms:
+            raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_TIME_ORDER")
         age = now_ms - snapshot.observed_at_ms
         coverage_age = now_ms - snapshot.measured_through_ms
         if age < 0 or coverage_age < 0:

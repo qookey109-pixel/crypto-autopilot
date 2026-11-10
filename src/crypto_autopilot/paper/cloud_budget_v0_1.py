@@ -92,6 +92,8 @@ class CloudBudgetGuard:
         self._class_b_run = 0
         self._new_bytes_run = 0
         self._new_bytes_day = 0
+        self._clock_high_water_ms: int | None = None
+        self._clock_rollback_detected = False
 
     def attempted_usage(self) -> CloudBudgetUsage:
         """Return operation counts reserved immediately before external calls.
@@ -108,11 +110,17 @@ class CloudBudgetGuard:
 
     def _validate_evidence(self) -> None:
         s = self.snapshot
-        if not s.account_wide or not s.reservation_coverage_complete:
+        if s.account_wide is not True or s.reservation_coverage_complete is not True:
             raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_INCOMPLETE")
         current_time_ms = self.clock_ms()
         if type(current_time_ms) is not int or current_time_ms < 0:
             raise BudgetBlocked("BLOCKED_BUDGET_CLOCK_INVALID")
+        if (self._clock_rollback_detected or
+                (self._clock_high_water_ms is not None
+                 and current_time_ms < self._clock_high_water_ms)):
+            self._clock_rollback_detected = True
+            raise BudgetBlocked("BLOCKED_BUDGET_CLOCK_ROLLBACK")
+        self._clock_high_water_ms = current_time_ms
         numeric = (
             s.observed_at_ms, s.measured_through_ms, s.storage_bytes,
             s.class_a_month, s.class_b_month, s.class_a_31_days,
@@ -125,10 +133,18 @@ class CloudBudgetGuard:
         )
         if any(type(value) is not int or value < 0 for value in numeric):
             raise BudgetBlocked("BLOCKED_BUDGET_USAGE_UNKNOWN")
+        if s.measured_through_ms > s.observed_at_ms:
+            raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_TIME_ORDER")
         age = current_time_ms - s.observed_at_ms
         coverage_age = current_time_ms - s.measured_through_ms
         if age < 0 or coverage_age < 0:
             raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_FROM_FUTURE")
+        # Daily counters are only valid for the UTC day they cover.
+        # A nearly fresh snapshot from before midnight cannot fund today.
+        day_ms = 86_400_000
+        if (s.observed_at_ms // day_ms != current_time_ms // day_ms
+                or s.measured_through_ms // day_ms != current_time_ms // day_ms):
+            raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_PERIOD_MISMATCH")
         if max(age, coverage_age) > self.policy.max_evidence_age_ms:
             raise BudgetBlocked("BLOCKED_BUDGET_EVIDENCE_STALE")
 

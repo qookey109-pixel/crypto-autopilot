@@ -3,10 +3,12 @@ import io
 import json
 import os
 import unittest
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked, CloudBudgetGuard, R2UsageSnapshot
 from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Store
+from crypto_autopilot.research.signal_quality import evaluate_research_signal_quality
 from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import D1QueryResult
 from crypto_autopilot.paper.shared_writer_budget_gate_v0_5 import READ_SHARED_WRITER_SQL, SharedWriterReservation
 from test_shared_signal_collection_v0_1 import SOURCES
@@ -70,9 +72,9 @@ class ResearchV05CollectionTests(unittest.TestCase):
     def guard(self):
         return CloudBudgetGuard(snapshot=self.snapshot, clock_ms=lambda: self.f.f.now)
 
-    def run_collection(self):
+    def run_collection(self, run_id="101"):
         return run_shared_signal_collection(
-            sources=SOURCES, run_id="101", reservation=self.reservation,
+            sources=SOURCES, run_id=run_id, reservation=self.reservation,
             guard=self.guard(), execute=self.f.client.query, query_meter=self.f.meter,
             validate_binding=lambda: self.f.client.validate_runtime_binding(
                 meter=self.f.meter, writer_id=research_fixture.WRITER, slot_id=self.f.slot,
@@ -82,6 +84,30 @@ class ResearchV05CollectionTests(unittest.TestCase):
             transport=self.source, execution_enabled=True,
         )
 
+    def test_existing_github_run_identity_survives_shared_collection(self):
+        def store_factory(**kwargs):
+            return BudgetedR2Store(client=self.sdk, bucket=kwargs["bucket"],
+                                   before_external=kwargs["before_external"])
+        with patch.dict("os.environ", {"CLOUDFLARE_ACCOUNT_ID": "a" * 32, "R2_BUCKET_NAME": "fixture"}), patch(
+            "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+            side_effect=self.sqlite_request,
+        ), patch.object(BudgetedR2Store, "from_credentials", side_effect=store_factory):
+            result = self.run_collection(run_id="github-101-1")
+        self.assertEqual(result["status"], "PUBLISHED")
+        self.assertEqual(result["run_id"], "github-101-1")
+        latest = json.loads(self.sdk.objects["research/signal-layer/v0-2/latest.json"])
+        self.assertEqual(latest["run_id"], "github-101-1")
+        self.assertEqual(result["attempted_usage"]["r2_class_b"], 6)
+        reader = BudgetedR2Store(client=self.sdk, bucket="fixture", before_external=lambda *_: None)
+        quality = evaluate_research_signal_quality(
+            reader, namespace="research/signal-layer/v0-2",
+            now=datetime.fromtimestamp(self.f.f.now / 1000, UTC), expected_run_id="github-101-1",
+        )
+        self.assertEqual(quality["status"], "PASS")
+        self.assertEqual(quality["source_binding"], "MATCHED_TRIGGERING_RUN")
+        self.assertEqual(quality["run_id"], "github-101-1")
+        self.assertEqual(quality["lineage"], "PASS")
+
     def test_disabled_returns_before_credentials_or_transport(self):
         result = run_shared_signal_collection(
             sources=[], run_id="", reservation=None, guard=None, execute=None,
@@ -89,6 +115,67 @@ class ResearchV05CollectionTests(unittest.TestCase):
         )
         self.assertEqual(result["status"], "SKIPPED_DISABLED")
         self.assertEqual(self.sql_called, [])
+        self.assertEqual(self.sdk.events, [])
+
+    def test_source_receipt_time_is_after_response_body_is_read(self):
+        start = self.f.f.now
+        fixture = self
+
+        class DelayedResponse(Response):
+            def read(self, size=-1):
+                result = super().read(size)
+                fixture.f.f.now += 1000
+                return result
+
+        def delayed_source(request, *, timeout):
+            self.assertTrue(self.sql_called)
+            self.sources_called.append(request.full_url)
+            payload = {"title": "public synthetic", "forecasts": [{
+                "forecast_id": "forecast-" + str(len(self.sources_called)),
+                "symbol": "BTC_USDT_PERP", "direction": "long", "confidence": 0.5,
+                "published_at_ms": start - 1000, "target_time_ms": start + 60000,
+            }]}
+            return DelayedResponse(json.dumps(payload).encode())
+
+        def store_factory(**kwargs):
+            return BudgetedR2Store(client=self.sdk, bucket=kwargs["bucket"],
+                                   before_external=kwargs["before_external"])
+
+        with patch.dict("os.environ", {"CLOUDFLARE_ACCOUNT_ID": "a" * 32, "R2_BUCKET_NAME": "fixture"}), patch(
+            "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+            side_effect=self.sqlite_request,
+        ), patch.object(BudgetedR2Store, "from_credentials", side_effect=store_factory), patch.object(
+            self, "source", side_effect=delayed_source,
+        ):
+            result = self.run_collection()
+        self.assertEqual(result["status"], "PUBLISHED")
+        payload = json.loads(self.sdk.objects["research/signal-layer/v0-2/runs/run=101/signals.json"])
+        self.assertEqual([item["retrieved_at_ms"] for item in payload["source_snapshots"]],
+                         [start + 1000, start + 2000, start + 3000])
+        self.assertEqual([item["ingested_at_ms"] for item in payload["kol_forecasts"]],
+                         [start + 1000, start + 2000])
+
+    def test_clock_rollback_during_source_requires_review_before_r2(self):
+        fixture = self
+
+        class RollbackResponse(Response):
+            def read(self, size=-1):
+                result = super().read(size)
+                fixture.f.f.now -= 1
+                return result
+
+        def rollback_source(request, *, timeout):
+            self.sources_called.append(request.full_url)
+            return RollbackResponse(json.dumps({"title": "synthetic"}).encode())
+
+        with patch.dict("os.environ", {"CLOUDFLARE_ACCOUNT_ID": "a" * 32, "R2_BUCKET_NAME": "fixture"}), patch(
+            "crypto_autopilot.paper.prepaid_d1_client_v0_1.PrepaidCloudflareD1QueryClient._request",
+            side_effect=self.sqlite_request,
+        ), patch.object(self, "source", side_effect=rollback_source):
+            result = self.run_collection()
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["reason_code"], "SOURCE_RECEIPT_TIME_INVALID")
+        self.assertEqual(result["provider_requests_performed"], 1)
         self.assertEqual(self.sdk.events, [])
 
     def test_source_failure_retains_admission_and_no_r2_write(self):

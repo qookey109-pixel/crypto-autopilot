@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import json
+import os
 import unittest
 from dataclasses import replace
 from unittest.mock import Mock, patch
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
-from crypto_autopilot.paper.cloud_loop_v0_1 import SLOT_MS, committed_report
+from crypto_autopilot.paper.cloud_loop_v0_1 import SLOT_MS
+from crypto_autopilot.paper.cloud_report_reader_v0_3 import committed_report
 from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Store
 from crypto_autopilot.paper.cloud_runtime_v0_1 import CLOUD_PAPER_PREFIX
 from crypto_autopilot.paper.cloud_runtime_v0_3 import build_runtime_composition
@@ -145,6 +147,43 @@ class CloudPaperRecoveryIntegrationTests(unittest.TestCase):
             self.assertEqual(db.execute("SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3").fetchone()[0], 2)
             self.assertEqual(len(statements), 6)
             self.assertEqual(meter.report()["query_attempts_charged"], 6)
+
+    def test_bucket_change_after_admission_requires_review_without_r2(self):
+        db, _, statements, opener = self.transport()
+        meter = self.recovery_meter()
+        snapshot = fixtures.R2UsageSnapshot(
+            account_wide=True, reservation_coverage_complete=True,
+            observed_at_ms=self.f.now, measured_through_ms=self.f.now, storage_bytes=0,
+            class_a_month=0, class_b_month=0, class_a_31_days=0, class_b_31_days=0,
+            class_a_day=0, class_b_day=0, provider_requests_day=0, new_bytes_day=0,
+        )
+        def changed_target_store(**kwargs):
+            store = BudgetedR2Store(client=self.f.sdk, bucket=kwargs["bucket"],
+                                    before_external=kwargs["before_external"], policy=kwargs["policy"])
+            os.environ["R2_BUCKET_NAME"] = "changed"
+            return store
+
+        env = {"CLOUDFLARE_D1_API_TOKEN": "synthetic-token",
+               "CLOUDFLARE_ACCOUNT_ID": "a" * 32, "CLOUDFLARE_D1_DATABASE_ID": fixtures.DB_ID,
+               "R2_BUCKET_NAME": "synthetic-only"}
+        with patch.dict("os.environ", env), patch(
+            fixtures.CLIENT_MODULE + ".build_opener", return_value=opener,
+        ), patch.object(BudgetedR2Store, "from_credentials", side_effect=changed_target_store):
+            result = run_prepaid_cloud_paper_recovery(
+                run_id="test", r2_snapshot=snapshot, d1_snapshot=self.f.guard.snapshot,
+                query_meter=meter, clock_ms=lambda: self.f.now, slot_at_ms=self.f.now,
+                database_evidence=self.f.evidence,
+                credentials={"account_id": "a" * 32, "bucket": "synthetic-only",
+                             "access_key_id": "fixture", "secret_access_key": "fixture"},
+                repair_missing_result_seals=True, execution_enabled=True,
+            )
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertTrue(result["central_reservation_retained"])
+        self.assertEqual(self.f.sdk.calls, [])
+        self.assertEqual(len(statements), 1)
+        self.assertEqual(db.execute(
+            "SELECT COUNT(*) FROM cloudflare_shared_writer_reservations_v0_3"
+        ).fetchone()[0], 1)
 
     def test_wrong_writer_or_bucket_blocks_before_client_and_r2(self):
         meter = self.recovery_meter()

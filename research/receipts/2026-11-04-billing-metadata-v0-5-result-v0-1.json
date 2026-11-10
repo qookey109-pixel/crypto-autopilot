@@ -1,0 +1,54 @@
+{
+  "schema": "qookey-cloud-paper-billing-metadata-diagnostic-v0-5-result-v0.1",
+  "observed_at_utc": "2026-11-04T13:47:02.549994+00:00",
+  "repository": "qookey109-pixel/crypto-autopilot",
+  "authority": "config/cloud_paper_billing_metadata_diagnostic_v0_5.json",
+  "run": {
+    "id": 41841230890,
+    "attempt": 1,
+    "event": "workflow_dispatch",
+    "head_sha": "cfefbf4c19d3a327b52c09f20f9a1eb710ca3ee5",
+    "job_conclusion": "failure",
+    "url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/41841230890"
+  },
+  "result": {
+    "status": "REVIEW_REQUIRED",
+    "reason_code": "PAGINATION_METADATA_INVALID",
+    "response_object": true,
+    "success_is_true": true,
+    "errors_present": false,
+    "result_is_array": true,
+    "result_info_is_object": true,
+    "requested_page": 1,
+    "requested_per_page": 100,
+    "page_matches_request": true,
+    "per_page_present": true,
+    "per_page_json_type": "integer",
+    "per_page_matches_request": false,
+    "count_present": false,
+    "total_count_present": false,
+    "cloudflare_http_requests_performed": 1,
+    "raw_response_persisted": false,
+    "account_identity_persisted": false,
+    "billing_values_persisted": false,
+    "billing_readiness": "UNKNOWN",
+    "zero_cost_conclusion": "UNKNOWN",
+    "cloud_paper_activation": "REMAINS_DISABLED"
+  },
+  "artifact": {
+    "id": 13330105366,
+    "name": "cloud-paper-billing-metadata-v0-5-41841230890-1",
+    "sha256": "2d98bc95b5730bba47de08ce8169fe6e9f50336d4d3487666516ce6e2277c322",
+    "expires_at": "2026-11-11T13:47:04Z"
+  },
+  "boundary": {
+    "one_time_authority_consumed": true,
+    "rerun_allowed": false,
+    "report_is_full_billing_coverage": false,
+    "opens_paper": false,
+    "opens_holdout": false,
+    "opens_source_switch": false,
+    "opens_promotion": false,
+    "opens_live_trading": false
+  }
+}

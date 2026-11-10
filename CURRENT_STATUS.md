@@ -1,5 +1,47 @@
 ## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
+## GitHub job identity diagnostic V0.4 — 2026-11-10
+
+[Run 42784410610](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42784410610), attempt 1 on `5a06f2c1db4c5c0008cce39361cfd6fa4ee7a3ea`, completed with `IDENTITY_CORRELATION_OBSERVED`. One GitHub-signed token passed the configured immutable subject, audience, repository, commit, run and job checks and matched current GitHub metadata. The [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-4-result.json) records the bounded observation. **V0.4 is consumed; do not rerun.** Earlier V0.1–V0.3 failures remain historical evidence.
+
+This is one manually triggered GitHub job, not proof of an independent credential-holding gateway, durable replay prevention, all-writer budget admission, Cloudflare runtime compatibility, fresh account headroom or PAPER activation. No Cloudflare/R2/D1/provider access occurred.
+
+## GitHub job identity diagnostic V0.3 — 2026-11-10
+
+[Run 42781787782](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42781787782), attempt 1 on `46790a3268895a826e198b8cdacc7149af214e50`, passed context and history checks and received an OIDC string response, then stopped at `REVIEW_REQUIRED / signed_identity`. The precise signature, claim or correlation failure is unknown; whether a JWKS request occurred is unknown. No run/job/branch metadata or Cloudflare/R2/D1/provider access followed. See the [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-3-result.json). **V0.3 is consumed; do not rerun.**
+
+The token-format successor passed its context check, but this does not prove why the separate V0.2 token check failed or establish production identity. GitHub documents an immutable OIDC subject for repositories created after 2026-07-15; this repository was created 2026-08-17 and the V0.3 verifier expected the older subject format. This is a documented compatibility concern, not proof of the actual token claim or the exact failure. Any further live investigation requires a separately versioned scope. Shared budget coverage and PAPER activation remain unverified.
+
+## GitHub job identity diagnostic V0.2 — 2026-11-10
+
+[Run 42778013998](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42778013998), attempt 1 on `6e10c91db3bcc6e02f414b772ee1fe366ab027f8`, returned `BLOCKED_CONTEXT` for the combined `github_token` check before any diagnostic fetch. This does not distinguish a missing token from a format or length mismatch. The [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-2-result.json) records the limited evidence. **V0.2 is consumed; do not rerun.** GitHub documents longer stateless installation tokens that are compatible with the observed check failure; whether this caused the failure is unconfirmed. Treat tokens as opaque in a reviewed successor, without logging them.
+
+Production identity, replay prevention, account-wide shared budgeting and PAPER activation remain unverified.
+
+## GitHub job identity diagnostic — 2026-11-10
+
+[One-time GitHub identity diagnostic run 42773327782](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42773327782), attempt 1 on `d87d739609cbdba4a56e2be861a4ed6c16db9e42`, failed with `BLOCKED_CONTEXT`. The precise failing local precondition is unknown. The status is returned before any diagnostic fetch, so no OIDC token was requested; see the [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-1-result.json). **This one-time authority is consumed; do not rerun.** Any further live investigation requires a separately versioned scope.
+
+Production current-job identity, replay prevention, all-writer budget and account headroom remain unverified. This result does not enable Cloud Paper, D1, provider access, a schedule, promotion or trading.
+
+
+
+## Billing UI observation — 2026-11-10 Asia/Taipei
+
+A read-only Cloudflare dashboard review recorded the observed 2026-10-17–2026-11-09 usage cost as USD 0.00 and two visible past invoice totals as USD 0.00. Workers shows Free and R2 shows Paid; the current cycle is not final and the view does not prove complete fixed charges, account-wide writer coverage, fresh capacity, or future zero cost. Details and scope are in the [redacted observation](research/receipts/2026-11-10-cloudflare-billing-ui-observation-v0-1.json). No credential, payment identifier or invoice identifier was recorded. Billing V0.5 remains consumed; do not rerun.
+
+## Current safety clarification — 2026-11-06
+
+Evidence basis: reviewed parent `90501bf923c7a53bd06166367fcc69d83f9a12aa`; resolve live main and run history before acting.
+
+**Billing Metadata Diagnostic V0.5 is CONSUMED. Do not dispatch or rerun it.** [Run 41841230890](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/41841230890), attempt 1, made one read-only Cloudflare request and returned `REVIEW_REQUIRED / PAGINATION_METADATA_INVALID`. Its [result receipt](research/receipts/2026-11-04-billing-metadata-v0-5-result-v0-1.json) is authoritative for the observed run; the contract describes the pre-execution authorization, not its current consumption state. Older October checkpoints below that say V0.5 is pending or suggest a first dispatch are historical and superseded. A further external billing investigation needs a distinct merged versioned authority. Billing completeness, account-wide zero cost, usage freshness and headroom remain UNKNOWN.
+
+[#874](https://github.com/qookey109-pixel/crypto-autopilot/pull/874) and [#875](https://github.com/qookey109-pixel/crypto-autopilot/pull/875) prepared disabled Live-Paper and Core100 V0.5 shared-admission compositions. [#876](https://github.com/qookey109-pixel/crypto-autopilot/pull/876) tested the Core100 frozen metadata loaders and comparator with synthetic data; the catalog validator and host-specific inputs were mocked. These are not production identity, all-writer coverage, live D1 or cost proof; existing legacy workflows are not cut over.
+
+Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`, D1 is unprovisioned, and the formal strategy registry is empty. Independent current-job identity, all-writer budget coverage, fresh account evidence and controlled main acceptance remain incomplete. Core100 model quality remains `REJECT`; no bootstrap rerun, holdout, source switch, promotion or real-money trading follows from these engineering checks.
+
+
+
 **2026-10-29 — configured-target and recovery checkpoint**
 
 Evidence basis: parent main `fbbecc953488fbeac02c38e78160071125f6acf0`, not a latest-main claim. Resolve live main before acting.
@@ -50,6 +92,18 @@ The generated blocks from Draft [#818](https://github.com/qookey109-pixel/crypto
 **Next:** finish route-specific writer cutovers and finite shared budgets, complete fresh account cost/headroom and protected D1 metering/provision authority, then controlled main PAPER and separately verified natural schedule. Billing V0.5 first attempt is approved by the owner's delegated decision; the [decision receipt](research/receipts/2026-10-27-billing-v0-5-owner-delegated-decision-v0-1.json) records the scope and UNKNOWN Token validity. It was still undispatched at the06:13 UTC history check; the connector lacks first-dispatch capability, so the owner must click the existing main workflow once. No consumed Billing/Usage/bootstrap is rerun. Existing runtime guards, frozen evidence, holdout, source switch, promotion and real-money/live closure remain binding.
 
 Recovery's explicit persisted-PUT/failed-readback and later multi-seal partial-failure fixtures remain deferred coverage; the bounded successor reports unknown writes as null and retains the full envelope.
+
+---
+
+## Cloud account and maintenance observation — 2026-11-09 Asia/Taipei
+
+Evidence basis: parent main `10da9ce2e58c6ba84b683d5b7c224b38aa492398`; resolve live main before acting.
+
+- A read-only Cloudflare dashboard observation on 2026-11-08 showed one R2 bucket, approximately 616.66 MB and 16.38k objects; D1 showed zero databases. Its usage-cost view showed USD 0.00 for the displayed period, not complete fixed-subscription or future-cost evidence. Dashboard counters have distinct aggregation periods and can differ; their freshness and whole-account headroom are not proven.
+- On 2026-11-09 the subscription page listed Workers Free as active and R2 Paid with a November 17 renewal. This is a subscription observation, not evidence of a fixed charge or authorization to exceed the free allowance. Shared-account writers, exact costs, current capacity and sustainable budget enforcement remain unverified. Do not record credentials or account identifiers.
+- [PR #844](https://github.com/qookey109-pixel/crypto-autopilot/pull/844) was closed unmerged after verifying both generated blocks match the [archival copy](docs/archive/cloud-maintenance-pr-844-snapshot.md) byte-for-byte. Its branch and historical failures remain preserved. [Natural Health 42538556057](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42538556057) reported Core100 failure; its [Maintenance 42538614554](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42538614554) stopped on the stale draft. Closure is not evidence of a successful later natural chain.
+- [PR #878](https://github.com/qookey109-pixel/crypto-autopilot/pull/878) adds a synthetic V0.5 recovery readback-failure integration test; it is not live D1/R2 evidence. Production PAPER remains NOT_WIRED / NOT_RUN / NOT_CONFIGURED, model quality REJECT and the consumed billing diagnostic must not be repeated.
+- Core100 runtime review: the consumed [bootstrap 36110721415, attempt 1](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/36110721415) setup log reports CPython 3.13.15; [natural comparator 42475859467, attempt 1](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42475859467) reports 3.13.18. Both logs show the selected interpreter creating the fingerprint venv. The collector records `sys.version`, and the comparator checks the complete runtime manifest; the Python version difference is therefore a supported cause of runtime mismatch. Full baseline/observed manifest comparison is unavailable from these logs, so additional changed fields remain UNKNOWN. The latter report is REVIEW_REQUIRED / RUNTIME_CHANGED, with no training, provider request, R2 write or holdout access. Do not rebaseline, rerun bootstrap or change the gate based on this observation.
 
 ---
 ## Current merged release checkpoint — 2026-10-11 15:10 Asia/Taipei (machine-status version updated_date: 2026-10-09; dated, resolve main afresh)

@@ -1,0 +1,32 @@
+{
+  "schema": "qookey-cloud-paper-usage-receipt-export-v0.1",
+  "status": "PREPARED_SYNTHETIC_ONLY_NO_EXECUTION_AUTHORITY",
+  "implementation": "src/crypto_autopilot/paper/cloud_paper_usage_receipt_v0_1.py",
+  "output": {
+    "basename": "cloud-paper-usage-observation.json",
+    "max_bytes": 8192,
+    "write_mode": "EXCLUSIVE_ATOMIC_SAME_DIRECTORY_LINK",
+    "raw_report_persisted": false,
+    "credentials_persisted": false,
+    "report_digest_rechecked": true,
+    "ambiguous_publication": "REVIEW_REQUIRED_NO_OVERWRITE_OR_AUTOMATIC_RETRY"
+  },
+  "artifact": {
+    "upload_workflow_configured": false,
+    "retention_days": null,
+    "upload_success_required_before_cloud_copy_claim": true,
+    "missing_after_crash": "UNKNOWN"
+  },
+  "authority": {
+    "provider_access": false,
+    "r2_access": false,
+    "d1_access": false,
+    "schedule": false,
+    "production_paper": false,
+    "holdout": false,
+    "source_switch": false,
+    "promotion": false,
+    "real_money_orders": false,
+    "monthly_budget_usd": 0
+  }
+}

@@ -4,6 +4,7 @@ import json
 import unittest
 from io import BytesIO
 from pathlib import Path
+from unittest.mock import patch
 
 from crypto_autopilot.research.signal_ingest_v0_2 import (
     ResearchSignalIngestError,
@@ -89,6 +90,29 @@ class ResearchSignalIngestTests(unittest.TestCase):
             [item.source for item in forecasts],
             ["capafy_category_11", "capafy_btc_cycle_radar"],
         )
+
+    def test_default_retrieval_time_is_after_response_body(self) -> None:
+        response = _Response(json.dumps({"forecasts": [_forecast_row()]}).encode(), "application/json")
+        with patch("crypto_autopilot.research.signal_ingest_v0_2._now_ms",
+                   side_effect=[1_500, 1_600]):
+            snapshot, forecasts = fetch_public_source(
+                source_id="synthetic", source_url="https://example.test/forecast",
+                timeout_seconds=1, max_bytes=1000, opener=lambda *_a, **_kw: response,
+            )
+        self.assertEqual(snapshot.status, "PARSED")
+        self.assertEqual(snapshot.retrieved_at_ms, 1_600)
+        self.assertEqual(forecasts[0].ingested_at_ms, 1_600)
+
+    def test_clock_rollback_during_fetch_discards_source(self) -> None:
+        response = _Response(json.dumps({"forecasts": [_forecast_row()]}).encode(), "application/json")
+        with patch("crypto_autopilot.research.signal_ingest_v0_2._now_ms",
+                   side_effect=[1_500, 1_499]):
+            snapshot, forecasts = fetch_public_source(
+                source_id="synthetic", source_url="https://example.test/forecast",
+                timeout_seconds=1, max_bytes=1000, opener=lambda *_a, **_kw: response,
+            )
+        self.assertEqual(snapshot.status, "FETCH_FAILED")
+        self.assertEqual(forecasts, ())
 
     def test_missing_or_invalid_parse_mode_blocks_before_any_request(self) -> None:
         def opener(*_args: object, **_kwargs: object) -> _Response:

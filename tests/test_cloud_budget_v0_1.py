@@ -52,10 +52,28 @@ class CloudBudgetGuardTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_INCOMPLETE"):
             guard.reserve_r2_class_a()
 
+    def test_non_boolean_evidence_flags_block_before_any_reservation(self):
+        for field in ("account_wide", "reservation_coverage_complete"):
+            for value in ("false", "true", 1, None):
+                with self.subTest(field=field, value=value):
+                    guard = CloudBudgetGuard(snapshot=snapshot(**{field: value}), clock_ms=lambda: NOW)
+                    with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_INCOMPLETE"):
+                        guard.reserve_provider_request()
+                    self.assertEqual(guard.attempted_usage().provider_requests, 0)
+
+    def test_measurement_after_observation_blocks_before_reservation(self):
+        guard = CloudBudgetGuard(
+            snapshot=snapshot(observed_at_ms=NOW - 1, measured_through_ms=NOW),
+            clock_ms=lambda: NOW,
+        )
+        with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_TIME_ORDER"):
+            guard.reserve_provider_request()
+        self.assertEqual(guard.attempted_usage().provider_requests, 0)
+
     def test_stale_observation_and_stale_measurement_block(self):
         policy = CloudBudgetPolicy(max_evidence_age_ms=60_000)
         for values in (
-            {"observed_at_ms": NOW - 60_001},
+            {"observed_at_ms": NOW - 60_001, "measured_through_ms": NOW - 60_001},
             {"measured_through_ms": NOW - 60_001},
         ):
             guard = CloudBudgetGuard(
@@ -73,6 +91,40 @@ class CloudBudgetGuardTests(unittest.TestCase):
         current_time[0] += 60_001
         with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_STALE"):
             guard.reserve_r2_class_b()
+
+    def test_previous_utc_day_evidence_blocks_even_when_only_one_ms_old(self):
+        midnight = 86_400_000
+        for values in (
+            {"observed_at_ms": midnight - 1, "measured_through_ms": midnight - 1},
+            {"observed_at_ms": midnight, "measured_through_ms": midnight - 1},
+        ):
+            for method in ("reserve_provider_request", "reserve_r2_class_a", "reserve_r2_class_b"):
+                with self.subTest(values=values, operation=method):
+                    guard = CloudBudgetGuard(
+                        snapshot=snapshot(**values), clock_ms=lambda: midnight,
+                    )
+                    with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_PERIOD_MISMATCH"):
+                        getattr(guard, method)()
+                    usage = guard.attempted_usage()
+                    self.assertEqual(usage.provider_requests, 0)
+                    self.assertEqual(usage.class_a_requests, 0)
+                    self.assertEqual(usage.class_b_requests, 0)
+
+    def test_clock_rollback_cannot_revive_stale_evidence(self):
+        clock = [NOW]
+        guard = CloudBudgetGuard(snapshot=snapshot(), clock_ms=lambda: clock[0])
+        guard.reserve_provider_request()
+        clock[0] = NOW + 60_001
+        with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_STALE"):
+            guard.reserve_r2_class_b()
+        clock[0] = NOW + 1
+        with self.assertRaisesRegex(BudgetBlocked, "CLOCK_ROLLBACK"):
+            guard.reserve_r2_class_a()
+        clock[0] = NOW + 60_002
+        with self.assertRaisesRegex(BudgetBlocked, "CLOCK_ROLLBACK"):
+            guard.reserve_r2_class_b()
+        self.assertEqual(guard.attempted_usage().class_a_requests, 0)
+        self.assertEqual(guard.attempted_usage().class_b_requests, 0)
 
     def test_invalid_current_clock_blocks_before_reservation(self):
         for current_time in (None, -1, True):

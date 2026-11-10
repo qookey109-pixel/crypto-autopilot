@@ -87,5 +87,13 @@ class ResearchPrepaidD1Client(PrepaidCloudflareD1QueryClient):
         # Recheck immediately before the inherited transport, after prepaid debit.
         self._validate_statement(sql, params)
         result = super()._request(sql, params)
-        self._validate_statement(sql, params)
+        try:
+            self._validate_statement(sql, params)
+            self._guard.validate_evidence()
+            self.validate_runtime_binding(
+                meter=self._meter, writer_id=self._writer, slot_id=self._slot,
+            )
+            self._database_evidence.validate(database_id=self._database_id, guard=self._guard)
+        except Exception:
+            raise D1LedgerUnavailable("D1_LEDGER_RESPONSE_UNVERIFIED") from None
         return result
