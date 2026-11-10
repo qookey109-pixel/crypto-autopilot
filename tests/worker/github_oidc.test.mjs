@@ -356,12 +356,35 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   staleMain = false;
   let clockReads = 0, lateWrites = 0;
   const delayedDb = { prepare: () => ({ bind: () => ({ run: async () => {
-    lateWrites++; return { success: true, meta: { changes: 1, total_attempts: 1, rows_read: 1, rows_written: 1 } };
+    lateWrites++; return { success: true, meta: { changes: 1, total_attempts: 1, rows_read: 1, rows_written: 1, size_after: 1024 } };
   } }) }) };
   const lateResult = await admitScheduledJob({ ...config, db: delayedDb,
     clock: () => (++clockReads < 3 ? now : base + 301000), reserve: async () => true });
   assert.equal(lateResult.status, "REVIEW_REQUIRED");
   assert.equal(lateWrites, 1);
+  assert.equal(clockReads, 3);
+
+  // A backwards step after the committed claim cannot release work.
+  const rollbackSql = new DatabaseSync(":memory:");
+  rollbackSql.exec(readFileSync(new URL("../../migrations/paper_gateway_job_claim_candidate_v0_1.sql", import.meta.url), "utf8"));
+  let rollbackWrites = 0, rollbackReads = 0;
+  const rollbackDb = { prepare: statement => ({ bind: (...args) => ({ run: async () => {
+    rollbackWrites++;
+    const changes = Number(rollbackSql.prepare(statement).run(...args).changes);
+    return { success: true, meta: { changes, total_attempts: 1, rows_read: 1,
+      rows_written: changes, size_after: 1024 } };
+  } }) }) };
+  const times = [now, now + 1000, now + 500];
+  const rolledBack = await admitScheduledJob({ ...config, db: rollbackDb,
+    clock: () => times[rollbackReads++], reserve: async () => true });
+  assert.equal(rolledBack.status, "REVIEW_REQUIRED");
+  assert.equal(rollbackReads, 3);
+  assert.equal(rollbackWrites, 1);
+  assert.equal(rollbackSql.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1").get().n, 1);
+  assert.equal((await admitScheduledJob({ ...config, db: rollbackDb, reserve: async () => true })).status,
+    "DUPLICATE_OR_CONFLICT");
+  assert.equal(rollbackSql.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1").get().n, 1);
+  rollbackSql.close();
   run.created_at = "2026-01-01T00:06:30Z";
   job.started_at = "2026-01-01T00:07:00Z";
   const accepted = await admitScheduledJob({ ...config, reserve: async () => true });
