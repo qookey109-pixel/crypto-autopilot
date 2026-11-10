@@ -1,0 +1,32 @@
+{
+  "schema": "qookey-cloudflare-r2-overview-ui-observation-v0.1",
+  "recorded_at_utc": "2026-11-10T13:37:39Z",
+  "source": "OWNER_AUTHORIZED_CLOUDFLARE_DASHBOARD_READ_ONLY",
+  "scope": "VISIBLE_ACCOUNT_R2_OVERVIEW_ONLY",
+  "display": {
+    "total_storage": "616.66 MB",
+    "visible_bucket_count": 1,
+    "visible_bucket_object_count": "16.39k",
+    "visible_bucket_storage": "616.66 MB",
+    "cycle_start": "2026-10-17",
+    "cycle_end": "2026-11-17",
+    "class_a_operations": "1.44k",
+    "class_b_operations": "261",
+    "billable_usage_usd": 0,
+    "data_watermark_utc": null,
+    "counts_are_rounded": true
+  },
+  "limitations": [
+    "DASHBOARD_DATA_FRESHNESS_UNKNOWN",
+    "ROUNDED_DISPLAY_IS_NOT_AN_EXACT_BYTE_OR_OBJECT_COUNT",
+    "NO_ATOMIC_ALL_WRITERS_SNAPSHOT",
+    "NOT_COMPLETE_ACCOUNT_BILLING_OR_FIXED_FEES",
+    "NO_D1_SQL_OR_R2_OBJECT_ACCESS",
+    "NO_STORAGE_WRITE",
+    "NO_ACCOUNT_OR_BUCKET_IDENTIFIERS_RECORDED"
+  ],
+  "account_headroom": "UNKNOWN",
+  "zero_cost_conclusion": "UNKNOWN",
+  "cloud_paper_activation": false,
+  "authority": false
+}
