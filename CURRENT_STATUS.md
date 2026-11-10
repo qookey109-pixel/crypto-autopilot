@@ -1,5 +1,11 @@
 ## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
+## GitHub job identity diagnostic V0.3 — 2026-11-10
+
+[Run 42781787782](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42781787782), attempt 1 on `46790a3268895a826e198b8cdacc7149af214e50`, passed context and history checks and received an OIDC string response, then stopped at `REVIEW_REQUIRED / signed_identity`. The precise signature, claim or correlation failure is unknown; whether a JWKS request occurred is unknown. No run/job/branch metadata or Cloudflare/R2/D1/provider access followed. See the [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-3-result.json). **V0.3 is consumed; do not rerun.**
+
+The token-format successor passed its context check, but this does not prove why the separate V0.2 token check failed or establish production identity. Any further live investigation requires a separately versioned scope. Shared budget coverage and PAPER activation remain unverified.
+
 ## GitHub job identity diagnostic V0.2 — 2026-11-10
 
 [Run 42778013998](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42778013998), attempt 1 on `6e10c91db3bcc6e02f414b772ee1fe366ab027f8`, returned `BLOCKED_CONTEXT` for the combined `github_token` check before any diagnostic fetch. This does not distinguish a missing token from a format or length mismatch. The [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-2-result.json) records the limited evidence. **V0.2 is consumed; do not rerun.** GitHub documents longer stateless installation tokens that are compatible with the observed check failure; whether this caused the failure is unconfirmed. Treat tokens as opaque in a reviewed successor, without logging them.
