@@ -265,6 +265,8 @@ class D1UsageGuard:
         self._reserved_reads_day = 0
         self._reserved_writes_day = 0
         self._reserved_storage_bytes = 0
+        self._clock_high_water_ms: int | None = None
+        self._clock_rollback_detected = False
         self._lock = threading.Lock()
 
     def validate_evidence(self) -> None:
@@ -330,6 +332,12 @@ class D1UsageGuard:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_UNKNOWN")
         if type(now_ms) is not int or now_ms < 0:
             raise BudgetBlocked("BLOCKED_D1_USAGE_CLOCK_INVALID")
+        if (self._clock_rollback_detected or
+                (self._clock_high_water_ms is not None
+                 and now_ms < self._clock_high_water_ms)):
+            self._clock_rollback_detected = True
+            raise BudgetBlocked("BLOCKED_D1_USAGE_CLOCK_ROLLBACK")
+        self._clock_high_water_ms = now_ms
         if s.measured_through_ms > s.observed_at_ms:
             raise BudgetBlocked("BLOCKED_D1_USAGE_EVIDENCE_TIME_ORDER")
         observed_age = now_ms - s.observed_at_ms

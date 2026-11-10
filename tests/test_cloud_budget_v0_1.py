@@ -110,6 +110,22 @@ class CloudBudgetGuardTests(unittest.TestCase):
                     self.assertEqual(usage.class_a_requests, 0)
                     self.assertEqual(usage.class_b_requests, 0)
 
+    def test_clock_rollback_cannot_revive_stale_evidence(self):
+        clock = [NOW]
+        guard = CloudBudgetGuard(snapshot=snapshot(), clock_ms=lambda: clock[0])
+        guard.reserve_provider_request()
+        clock[0] = NOW + 60_001
+        with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_STALE"):
+            guard.reserve_r2_class_b()
+        clock[0] = NOW + 1
+        with self.assertRaisesRegex(BudgetBlocked, "CLOCK_ROLLBACK"):
+            guard.reserve_r2_class_a()
+        clock[0] = NOW + 60_002
+        with self.assertRaisesRegex(BudgetBlocked, "CLOCK_ROLLBACK"):
+            guard.reserve_r2_class_b()
+        self.assertEqual(guard.attempted_usage().class_a_requests, 0)
+        self.assertEqual(guard.attempted_usage().class_b_requests, 0)
+
     def test_invalid_current_clock_blocks_before_reservation(self):
         for current_time in (None, -1, True):
             guard = CloudBudgetGuard(
