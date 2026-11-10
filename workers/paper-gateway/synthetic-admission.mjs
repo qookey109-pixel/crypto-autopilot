@@ -64,7 +64,7 @@ export async function admitScheduledJob({ enabled = false, policy, token, github
     // A commit can succeed after identity or processing-window expiry.
     // Keep the consumed claim and require review; never release work.
     const finished = clock();
-    if (!Number.isSafeInteger(finished) || Math.floor(finished / 1000) >= identity.expiresAt ||
+    if (!Number.isSafeInteger(finished) || finished < after || Math.floor(finished / 1000) >= identity.expiresAt ||
         processingSlot(now, finished) !== slot) return { status: "REVIEW_REQUIRED" };
     return { status, slotId };
   } catch { return { status: "REVIEW_REQUIRED" }; }
