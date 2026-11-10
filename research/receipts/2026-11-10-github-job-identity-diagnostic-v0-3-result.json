@@ -18,5 +18,11 @@
   "authority_consumed": true,
   "rerun_authorized": false,
   "raw_credentials_or_claims_persisted": false,
-  "paper_activation_authorized": false
+  "paper_activation_authorized": false,
+  "compatibility_evidence": {
+    "repository_created_at": "2026-08-17T07:45:41Z",
+    "repository_creation_metadata": "https://api.github.com/repos/qookey109-pixel/crypto-autopilot",
+    "github_immutable_subject_reference": "https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims",
+    "assessment": "DOCUMENTED_IMMUTABLE_SUBJECT_DEFAULT_CONFLICTS_WITH_LEGACY_EXPECTATION; ACTUAL_CLAIM_AND_EXACT_FAILURE_UNCONFIRMED"
+  }
 }
