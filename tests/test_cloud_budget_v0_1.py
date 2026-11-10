@@ -92,6 +92,21 @@ class CloudBudgetGuardTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_STALE"):
             guard.reserve_r2_class_b()
 
+    def test_previous_utc_day_evidence_blocks_even_when_only_one_ms_old(self):
+        midnight = 86_400_000
+        for values in (
+            {"observed_at_ms": midnight - 1, "measured_through_ms": midnight - 1},
+            {"observed_at_ms": midnight, "measured_through_ms": midnight - 1},
+        ):
+            with self.subTest(values=values):
+                guard = CloudBudgetGuard(
+                    snapshot=snapshot(**values), clock_ms=lambda: midnight,
+                )
+                with self.assertRaisesRegex(BudgetBlocked, "EVIDENCE_PERIOD_MISMATCH"):
+                    guard.reserve_provider_request()
+                self.assertEqual(guard.attempted_usage().provider_requests, 0)
+                self.assertEqual(guard.attempted_usage().class_a_requests, 0)
+
     def test_invalid_current_clock_blocks_before_reservation(self):
         for current_time in (None, -1, True):
             guard = CloudBudgetGuard(
