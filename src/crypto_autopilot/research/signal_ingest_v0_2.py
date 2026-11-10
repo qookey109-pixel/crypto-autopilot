@@ -210,6 +210,11 @@ def fetch_public_source(
             body = response.read(max_bytes + 1)
             if len(body) > max_bytes:
                 raise ResearchSignalIngestError("source response exceeds configured byte limit")
+            if retrieved_at_ms is None:
+                received = _now_ms()
+                if type(received) is not int or received < retrieved:
+                    raise ResearchSignalIngestError("source receipt clock invalid")
+                retrieved = received
             return parse_source_payload(
                 source_id=source_id,
                 source_url=url,
