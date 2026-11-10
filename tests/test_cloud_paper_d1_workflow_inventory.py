@@ -116,24 +116,29 @@ class D1WorkflowInventoryTests(unittest.TestCase):
         )
         root = Path(__file__).parents[1]
         path = "workers/paper-gateway/d1-job-claim.mjs"
-        source = (root / path).read_text(encoding="utf-8")
+        caller = "workers/paper-gateway/synthetic-admission.mjs"
+        sources = {p: (root / p).read_text(encoding="utf-8") for p in (path, caller)}
         contract = json.loads((root / "config/synthetic_worker_d1_inventory_v0_1.json").read_text())
-        self.assertEqual(validate_synthetic_worker_d1_boundary({path: source}, contract), [path])
+        self.assertEqual(validate_synthetic_worker_d1_boundary(sources, contract), [path, caller])
         bad_cases = (
-            ({path: source + "\\n// changed"}, contract),
-            ({path: source, "workers/extra.mjs": "db.prepare(sql)"}, contract),
+            ({**sources, path: sources[path] + "\\n// changed"}, contract),
+            ({**sources, caller: sources[caller] + "\\n// changed"}, contract),
+            ({**sources, "workers/extra.mjs": "db.prepare(sql)"}, contract),
+            ({**sources, "workers/new-route.mjs": 'import "./d1-job-claim.mjs";'}, contract),
+            ({path: sources[path]}, contract),
             ({}, contract),
-            ({path: source}, {**contract, "cloudflare_execution_authorized": True}),
-            ({path: source}, {**contract, "activation_enabled": True}),
-            ({path: source}, {**contract, "activation_enabled": 0}),
-            ({path: source}, {**contract, "source_sha256": "0" * 64}),
-            ({path: source}, {**contract, "source_path": "workers/extra.mjs"}),
-            ({path: source}, {**contract, "schema": "unexpected"}),
+            (sources, {**contract, "cloudflare_execution_authorized": True}),
+            (sources, {**contract, "activation_enabled": True}),
+            (sources, {**contract, "activation_enabled": 0}),
+            (sources, {**contract, "source_sha256": "0" * 64}),
+            (sources, {**contract, "source_path": "workers/extra.mjs"}),
+            (sources, {**contract, "caller_sha256": "0" * 64}),
+            (sources, {**contract, "schema": "unexpected"}),
         )
-        for sources, altered in bad_cases:
-            with self.subTest(sources=list(sources), contract=altered):
+        for contents, altered in bad_cases:
+            with self.subTest(sources=list(contents), contract=altered):
                 with self.assertRaises(RuntimeError):
-                    validate_synthetic_worker_d1_boundary(sources, altered)
+                    validate_synthetic_worker_d1_boundary(contents, altered)
 
     def test_detects_d1_secret_reference(self) -> None:
         self.assertTrue(contains_d1_access_reference("env: ${{ secrets.D1_DATABASE_ID }}"))
