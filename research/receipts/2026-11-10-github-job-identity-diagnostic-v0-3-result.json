@@ -1,0 +1,22 @@
+{
+  "schema": "github-job-identity-diagnostic-result-v0.3",
+  "run_url": "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42781787782",
+  "run_id": 42781787782,
+  "attempt": 1,
+  "event": "workflow_dispatch",
+  "head_sha": "46790a3268895a826e198b8cdacc7149af214e50",
+  "workflow_conclusion": "failure",
+  "job_id": 129713324884,
+  "reported_status": "REVIEW_REQUIRED",
+  "reported_stage": "signed_identity",
+  "interpretation": "The context and history checks passed and the OIDC endpoint returned a string value. Signature or claim verification or correlation did not complete. The exact failing condition and whether a JWKS request occurred are unknown.",
+  "github_history_gets_performed": 1,
+  "oidc_token_requests_performed": 1,
+  "github_run_job_branch_gets_performed": 0,
+  "jwks_gets_performed": "UNKNOWN_ZERO_OR_ONE",
+  "cloudflare_r2_d1_provider_access_performed": false,
+  "authority_consumed": true,
+  "rerun_authorized": false,
+  "raw_credentials_or_claims_persisted": false,
+  "paper_activation_authorized": false
+}
