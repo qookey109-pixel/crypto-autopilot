@@ -1,5 +1,11 @@
 ## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
+## GitHub job identity diagnostic V0.2 — 2026-11-10
+
+[Run 42778013998](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42778013998), attempt 1 on `6e10c91db3bcc6e02f414b772ee1fe366ab027f8`, returned `BLOCKED_CONTEXT` for the combined `github_token` check before any diagnostic fetch. This does not distinguish a missing token from a format or length mismatch. The [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-2-result.json) records the limited evidence. **V0.2 is consumed; do not rerun.** GitHub documents longer stateless installation tokens that are compatible with the observed check failure; whether this caused the failure is unconfirmed. Treat tokens as opaque in a reviewed successor, without logging them.
+
+Production identity, replay prevention, account-wide shared budgeting and PAPER activation remain unverified.
+
 ## GitHub job identity diagnostic — 2026-11-10
 
 [One-time GitHub identity diagnostic run 42773327782](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/42773327782), attempt 1 on `d87d739609cbdba4a56e2be861a4ed6c16db9e42`, failed with `BLOCKED_CONTEXT`. The precise failing local precondition is unknown. The status is returned before any diagnostic fetch, so no OIDC token was requested; see the [result receipt](research/receipts/2026-11-10-github-job-identity-diagnostic-v0-1-result.json). **This one-time authority is consumed; do not rerun.** Any further live investigation requires a separately versioned scope.
