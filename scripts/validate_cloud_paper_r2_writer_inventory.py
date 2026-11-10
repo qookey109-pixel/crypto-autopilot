@@ -91,7 +91,10 @@ def validate_synthetic_worker_d1_boundary(
     sources: dict[str, str], contract: object,
 ) -> list[str]:
     """Inventory the exact disabled prototype; unknown markers still fail closed."""
-    if type(contract) is not dict or contract != _SYNTHETIC_WORKER_D1_CONTRACT:
+    if (type(contract) is not dict or contract != _SYNTHETIC_WORKER_D1_CONTRACT
+            or any(contract.get(key) is not False for key in (
+                "activation_enabled", "cloudflare_execution_authorized", "account_wide_coverage_proven",
+            ))):
         raise RuntimeError("Synthetic Worker D1 inventory contract invalid")
     path = _SYNTHETIC_WORKER_D1_CONTRACT["source_path"]
     if find_worker_d1_source_paths(sources) != {path} or path not in sources:
