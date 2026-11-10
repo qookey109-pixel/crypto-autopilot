@@ -1,0 +1,29 @@
+{
+  "schema": "qookey-github-job-identity-diagnostic-v0.3",
+  "status": "ONE_TIME_GITHUB_ONLY_ON_MERGED_MAIN",
+  "purpose": "Observe whether an actual GitHub-signed OIDC job claim correlates with current run, job and main metadata.",
+  "execution": {
+    "event": "workflow_dispatch",
+    "ref": "refs/heads/main",
+    "confirmed_input_required": true,
+    "max_workflow_dispatch_runs": 1,
+    "max_attempts": 1,
+    "first_dispatch_consumes_authority": true,
+    "max_github_history_gets": 1,
+    "max_oidc_token_requests": 1,
+    "max_jwks_gets": 1,
+    "max_run_job_branch_gets": 3,
+    "retries": 0,
+    "redirects": false,
+    "timeout_seconds_per_request": 5,
+    "maximum_response_bytes": 131072
+  },
+  "allowed_output": ["fixed status code", "fixed names of failed local precondition checks", "fixed diagnostic stage"],
+  "never_persist": ["tokens", "raw responses", "claims", "headers", "request URLs"],
+  "interpretation": {
+    "IDENTITY_CORRELATION_OBSERVED": "One GitHub-hosted job had matching signed job/run claims and metadata at observation time. This is not an independent credential boundary or proof of replay, cost, writer coverage, Worker runtime, D1 or PAPER readiness.",
+    "otherwise": "No activation; preserve failure and do not rerun."
+  },
+  "forbidden": ["Cloudflare", "R2", "D1", "market provider", "training", "holdout", "source switch", "model promotion", "real orders", "schedule"],
+  "monthly_budget_usd": 0
+}
