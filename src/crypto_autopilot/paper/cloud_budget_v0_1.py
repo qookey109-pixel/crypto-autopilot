@@ -92,6 +92,8 @@ class CloudBudgetGuard:
         self._class_b_run = 0
         self._new_bytes_run = 0
         self._new_bytes_day = 0
+        self._clock_high_water_ms: int | None = None
+        self._clock_rollback_detected = False
 
     def attempted_usage(self) -> CloudBudgetUsage:
         """Return operation counts reserved immediately before external calls.
@@ -113,6 +115,12 @@ class CloudBudgetGuard:
         current_time_ms = self.clock_ms()
         if type(current_time_ms) is not int or current_time_ms < 0:
             raise BudgetBlocked("BLOCKED_BUDGET_CLOCK_INVALID")
+        if (self._clock_rollback_detected or
+                (self._clock_high_water_ms is not None
+                 and current_time_ms < self._clock_high_water_ms)):
+            self._clock_rollback_detected = True
+            raise BudgetBlocked("BLOCKED_BUDGET_CLOCK_ROLLBACK")
+        self._clock_high_water_ms = current_time_ms
         numeric = (
             s.observed_at_ms, s.measured_through_ms, s.storage_bytes,
             s.class_a_month, s.class_b_month, s.class_a_31_days,
