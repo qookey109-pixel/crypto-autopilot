@@ -80,6 +80,8 @@ _SYNTHETIC_WORKER_D1_CONTRACT = {
     "schema": "qookey-worker-d1-synthetic-inventory-v0.1",
     "source_path": "workers/paper-gateway/d1-job-claim.mjs",
     "source_sha256": "91555240c0d7dc5dda525badeac21c8fc4fed1b8db134e36f3cc2856730ab21d",
+    "caller_path": "workers/paper-gateway/synthetic-admission.mjs",
+    "caller_sha256": "4e607359538f2c500a638f7f6b834a7b3dfb468845a40b465f2af08c4644c2e1",
     "disposition": "SYNTHETIC_ONLY_NOT_PRODUCTION_AUTHORITY",
     "activation_enabled": False,
     "cloudflare_execution_authorized": False,
@@ -99,10 +101,18 @@ def validate_synthetic_worker_d1_boundary(
     path = _SYNTHETIC_WORKER_D1_CONTRACT["source_path"]
     if find_worker_d1_source_paths(sources) != {path} or path not in sources:
         raise RuntimeError("Synthetic Worker D1 source boundary mismatch")
-    digest = hashlib.sha256(sources[path].encode("utf-8")).hexdigest()
-    if digest != _SYNTHETIC_WORKER_D1_CONTRACT["source_sha256"]:
-        raise RuntimeError("Synthetic Worker D1 source digest mismatch")
-    return [path]
+    caller = _SYNTHETIC_WORKER_D1_CONTRACT["caller_path"]
+    direct_callers = {p for p, text in sources.items() if "d1-job-claim.mjs" in text}
+    entry_refs = {p for p, text in sources.items() if "synthetic-admission.mjs" in text}
+    if direct_callers != {caller} or entry_refs:
+        raise RuntimeError("Synthetic Worker D1 caller boundary mismatch")
+    for key, item in (("source_sha256", path), ("caller_sha256", caller)):
+        if item not in sources:
+            raise RuntimeError("Synthetic Worker D1 reviewed source missing")
+        digest = hashlib.sha256(sources[item].encode("utf-8")).hexdigest()
+        if digest != _SYNTHETIC_WORKER_D1_CONTRACT[key]:
+            raise RuntimeError("Synthetic Worker D1 source digest mismatch")
+    return [path, caller]
 
 
 PREPAID_D1_CLIENT_PATH = "src/crypto_autopilot/paper/prepaid_d1_client_v0_1.py"
