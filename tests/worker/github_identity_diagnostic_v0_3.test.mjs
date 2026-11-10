@@ -33,6 +33,17 @@ test("context failure returns only fixed field names, never values", async () =>
   assert.equal(JSON.stringify(result).includes(privateValue), false);
 });
 
+test("header-injection and oversized tokens stop before a request", async () => {
+  let calls = 0;
+  const fetcher = async () => { calls++; throw Error("unexpected"); };
+  for (const token of ["", "bad\\r\\nInjected: value", "x".repeat(8193)]) {
+    const report = await runDiagnostic({ enabled: true, env: { ...env, GITHUB_TOKEN: token }, fetcher });
+    assert.equal(report.status, "BLOCKED_CONTEXT");
+    assert.ok(report.failed.includes("github_token"));
+  }
+  assert.equal(calls, 0);
+});
+
 test("history rejection happens before requesting an identity token", async () => {
   let calls = 0;
   const fetcher = async url => {
