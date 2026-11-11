@@ -7,6 +7,7 @@ from crypto_autopilot.features.regime import build_alt_breadth_series
 from crypto_autopilot.models import Candle
 from crypto_autopilot.paper.cloud_multiframe_inputs_v0_1 import (
     MultiframeInputs,
+    _BREADTH,
     _closed_bars,
     validate_multiframe_inputs as validate_short_window,
 )
@@ -23,6 +24,8 @@ def validate_multiframe_inputs(
     """
     if type(as_of_ms) is not int or as_of_ms < 0 or not isinstance(breadth, Mapping):
         raise ValueError("INPUT_INVALID")
+    if len(breadth) != len(_BREADTH) or set(breadth) != _BREADTH:
+        raise ValueError("BREADTH_MEMBERSHIP_INVALID")
     checked = {
         symbol: _closed_bars(rows, interval_ms=14_400_000, count=40, as_of_ms=as_of_ms)
         for symbol, rows in breadth.items()
