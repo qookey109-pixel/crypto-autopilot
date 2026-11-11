@@ -45,6 +45,9 @@ def test_aligned_closed_bars_produce_only_offline_breadth_and_technical_evidence
     result = module.validate_multiframe_inputs(
         as_of_ms=AS_OF, breadth=breadth, references=references, candidates=candidates,
     )
+    assert result.reference_bars["BTC_USDT_PERP"] == references["BTC_USDT_PERP"]
+    assert len(result.breadth_series) == 21
+    assert result.breadth_series[-1] == result.breadth
     assert result.breadth.universe_size == 23
     assert result.breadth.available_at_ms == AS_OF // 14_400_000 * 14_400_000
     assert set(result.candidate_technical) == {"SOL_USDT_PERP"}
@@ -74,3 +77,21 @@ def test_missing_member_stale_reference_and_gapped_entry_fail_closed():
         module.validate_multiframe_inputs(
             as_of_ms=AS_OF, breadth=breadth, references=references, candidates=gapped,
         )
+
+
+def test_future_misaligned_nonfinite_and_holdout_bars_fail_closed():
+    module = _module()
+    breadth, references, candidates = _fixture()
+    invalid = list(candidates["SOL_USDT_PERP"])
+    last = invalid[-1]
+    invalid[-1] = Candle(last.time_ms + 900_000, last.open, last.high, last.low, last.close, last.volume)
+    with pytest.raises(ValueError):
+        module.validate_multiframe_inputs(as_of_ms=AS_OF, breadth=breadth, references=references,
+                                          candidates={"SOL_USDT_PERP": invalid})
+    invalid[-1] = Candle(last.time_ms, last.open, last.high, last.low, float("nan"), last.volume)
+    with pytest.raises(ValueError):
+        module.validate_multiframe_inputs(as_of_ms=AS_OF, breadth=breadth, references=references,
+                                          candidates={"SOL_USDT_PERP": invalid})
+    with pytest.raises(ValueError):
+        module.validate_multiframe_inputs(as_of_ms=1_788_480_000_000, breadth=breadth,
+                                          references=references, candidates=candidates)
