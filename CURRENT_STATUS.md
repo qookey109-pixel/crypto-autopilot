@@ -1,5 +1,9 @@
 ## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
+## Offline 4H regime warmup successor — prepared
+
+The offline multi-timeframe V0.2 validator requires 40 closed 4H bars per fixed breadth market to produce 21 EMA20-ready observations for the existing 20-bar regime lookback. BTC/ETH references remain 21 aligned bars; macro values in CI are synthetic. The [V0.4 prepared budget](config/cloud_paper_market_request_budget_v0_4.json) corrects the assumed direct-fetch candle count to 2,962 per slot. See [warmup details](docs/CLOUD_PAPER_MULTIFRAME_REGIME_WARMUP_V0_2.md). This is not provider-coverage, quota, cost or strategy evidence; no source access, runtime, or schedule is enabled.
+
 ## Cloudflare billable-usage UI observation — 2026-11-10
 
 At 13:25 UTC, the authorized read-only dashboard displayed the 2026-10-17 through 2026-11-10 usage cost and projected cycle cost as USD 0.00. Displayed R2 totals were approximately 1.38k Class A operations, 253 Class B operations and 0.47 GB-months. The values are rounded and the actual data watermark is unknown; GB-months are not current stored bytes. This incomplete-period view does not establish full account charges, current storage headroom, writer coverage or future zero cost. The [bounded observation](research/receipts/2026-11-10-cloudflare-billable-usage-ui-observation-v0-2.json) grants no execution authority. Billing V0.5 remains consumed.
