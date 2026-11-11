@@ -29,10 +29,15 @@ _SYMBOL = re.compile(r"^[A-Z0-9]{1,20}_USDT_PERP$")
 
 @dataclass(frozen=True, slots=True)
 class MultiframeInputs:
-    breadth: AltBreadthSnapshot
+    breadth_series: tuple[AltBreadthSnapshot, ...]
+    reference_bars: Mapping[str, tuple[Candle, ...]]
     candidate_technical: Mapping[str, TechnicalSnapshot]
     source_verified: bool = False
     strategy_authorized: bool = False
+
+    @property
+    def breadth(self) -> AltBreadthSnapshot:
+        return self.breadth_series[-1]
 
 
 def _closed_bars(
@@ -80,8 +85,10 @@ def validate_multiframe_inputs(
         symbol: _closed_bars(rows, interval_ms=four_hour, count=21, as_of_ms=as_of_ms)
         for symbol, rows in breadth.items()
     }
-    for rows in references.values():
-        _closed_bars(rows, interval_ms=four_hour, count=21, as_of_ms=as_of_ms)
+    checked_references = {
+        symbol: _closed_bars(rows, interval_ms=four_hour, count=21, as_of_ms=as_of_ms)
+        for symbol, rows in references.items()
+    }
     series = build_alt_breadth_series(checked, "4H")
     if not series or series[-1].above_ema20_ratio is None or series[-1].positive_momentum_ratio is None:
         raise ValueError("BREADTH_NOT_READY")
@@ -93,4 +100,4 @@ def validate_multiframe_inputs(
         if latest is None or not latest.ready_v0_2:
             raise ValueError("CANDIDATE_NOT_READY")
         technical[symbol] = latest
-    return MultiframeInputs(breadth=series[-1], candidate_technical=technical)
+    return MultiframeInputs(breadth_series=series, reference_bars=checked_references,\n                            candidate_technical=technical)
