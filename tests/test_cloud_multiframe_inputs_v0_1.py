@@ -95,3 +95,21 @@ def test_future_misaligned_nonfinite_and_holdout_bars_fail_closed():
     with pytest.raises(ValueError):
         module.validate_multiframe_inputs(as_of_ms=1_788_480_000_000, breadth=breadth,
                                           references=references, candidates=candidates)
+
+
+def test_result_constructor_cannot_claim_source_or_strategy_authority():
+    module = _module()
+    breadth, references, candidates = _fixture()
+    result = module.validate_multiframe_inputs(
+        as_of_ms=AS_OF, breadth=breadth, references=references, candidates=candidates,
+    )
+    with pytest.raises(TypeError):
+        module.MultiframeInputs(
+            breadth_series=result.breadth_series, reference_bars=result.reference_bars,
+            candidate_technical=result.candidate_technical, source_verified=True,
+        )
+    with pytest.raises(TypeError):
+        module.MultiframeInputs(
+            breadth_series=result.breadth_series, reference_bars=result.reference_bars,
+            candidate_technical=result.candidate_technical, strategy_authorized=True,
+        )
