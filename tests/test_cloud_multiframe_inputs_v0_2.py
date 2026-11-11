@@ -60,3 +60,17 @@ def test_missing_warmup_bar_is_rejected():
         module.validate_multiframe_inputs(
             as_of_ms=AS_OF, breadth=breadth, references=references, candidates=candidates,
         )
+
+
+def test_unexpected_membership_stops_before_processing_bars(monkeypatch):
+    module = importlib.import_module("crypto_autopilot.paper.cloud_multiframe_inputs_v0_2")
+    breadth, references, candidates = _fixture()
+    breadth["UNREVIEWED_USDT_PERP"] = breadth[next(iter(breadth))]
+    monkeypatch.setattr(
+        module, "_closed_bars",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("unexpected processing")),
+    )
+    with pytest.raises(ValueError, match="BREADTH_MEMBERSHIP_INVALID"):
+        module.validate_multiframe_inputs(
+            as_of_ms=AS_OF, breadth=breadth, references=references, candidates=candidates,
+        )
