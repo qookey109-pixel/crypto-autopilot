@@ -100,4 +100,5 @@ def validate_multiframe_inputs(
         if latest is None or not latest.ready_v0_2:
             raise ValueError("CANDIDATE_NOT_READY")
         technical[symbol] = latest
-    return MultiframeInputs(breadth_series=series, reference_bars=checked_references,\n                            candidate_technical=technical)
+    return MultiframeInputs(breadth_series=series, reference_bars=checked_references,
+                            candidate_technical=technical)
