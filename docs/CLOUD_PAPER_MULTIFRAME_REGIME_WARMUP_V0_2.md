@@ -25,3 +25,11 @@ These components run entirely on supplied in-memory fixtures. They do not
 fetch or authenticate market data, alter strategy eligibility, call R2 or D1,
 open holdout, change source, promote a model, or authorize runtime or a
 schedule. Current provider and shared-budget gates remain closed.
+
+## Pionex documented request constraints — 2026-11-11
+
+The official [Klines documentation](https://pionex-doc.gitbook.io/apidocs/restful/markets/get-klines) specifies one mandatory symbol and interval per request, includes 15M, 60M and 4H intervals, and documents a maximum limit of 500 bars (default 100). Thus the 40- and 200-bar windows fit the documented per-response limit when explicitly requested, but the documented endpoint does not establish multi-symbol batching. This does not verify availability of any perpetual symbol, response freshness, gaps, current inclusion, live behavior or exact semantics; actual responses remain untested. The 48-call estimate remains conditional and above the existing 18-call per-run limit.
+
+The provider [rate-limit documentation](https://pionex-doc.gitbook.io/apidocs/restful/general/rate-limit) states a shared IP limit of 10 weighted requests per second and that exceeding limits can result in a 429 and temporary ban. The Klines endpoint is documented with weight 1, while other endpoints may have different weights. The IP limit is not a daily allocation, a guarantee for a shared GitHub runner IP, or evidence that the project's own 18-call limit may be exceeded. Any future execution must account for concurrent workloads and fail closed on limits and incomplete data.
+
+Possible request reduction by reusing previously validated closed 4H windows is a design candidate only: it requires separately verified freshness, integrity, restart behavior, missed-slot handling, budgets and authorization. No cache, provider request, new schedule, additional budget, or source switch is authorized by this note.
