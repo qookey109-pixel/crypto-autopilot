@@ -8,7 +8,7 @@ from __future__ import annotations
 import math
 import re
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from crypto_autopilot.features.regime import AltBreadthSnapshot, build_alt_breadth_series
 from crypto_autopilot.models import Candle
@@ -32,8 +32,8 @@ class MultiframeInputs:
     breadth_series: tuple[AltBreadthSnapshot, ...]
     reference_bars: Mapping[str, tuple[Candle, ...]]
     candidate_technical: Mapping[str, TechnicalSnapshot]
-    source_verified: bool = False
-    strategy_authorized: bool = False
+    source_verified: bool = field(init=False, default=False)
+    strategy_authorized: bool = field(init=False, default=False)
 
     @property
     def breadth(self) -> AltBreadthSnapshot:
