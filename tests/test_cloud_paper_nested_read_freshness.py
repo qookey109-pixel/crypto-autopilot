@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from crypto_autopilot.paper.cloud_loop_v0_3 import run_cloud_step
 from test_cloud_paper_loop_v0_1 import MemoryStore, NeverCalledFeed, REGISTRY
 
@@ -33,3 +35,34 @@ def test_replay_checks_freshness_before_every_nested_read():
     result = run_cloud_step(store=guarded, before_external=guarded.check, **kwargs)
     assert result["state"] == "REPLAYED"
     assert guarded.reads > 1
+
+
+def test_expired_budget_stops_before_second_replay_read():
+    store = MemoryStore()
+    kwargs = dict(
+        tick_ms=420000, previous_slot=None, feed=NeverCalledFeed(),
+        market_supplier=lambda: {"provider_requests_performed": 0},
+        candidate_supplier=lambda market, state: (),
+        strategy_registry=REGISTRY,
+    )
+    run_cloud_step(store=store, before_external=lambda: None, **kwargs)
+
+    class ExpiringStore:
+        def __init__(self, delegate):
+            self.delegate = delegate
+            self.checks = 0
+            self.reads = 0
+
+        def check(self):
+            self.checks += 1
+            if self.checks == 2:
+                raise RuntimeError("budget evidence expired")
+
+        def get_json(self, kind, object_id):
+            self.reads += 1
+            return self.delegate.get_json(kind, object_id)
+
+    guarded = ExpiringStore(store)
+    with pytest.raises(RuntimeError, match="budget evidence expired"):
+        run_cloud_step(store=guarded, before_external=guarded.check, **kwargs)
+    assert guarded.reads == 1
