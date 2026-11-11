@@ -48,7 +48,7 @@ def test_full_regime_warmup_requires_forty_aligned_breadth_bars():
         )
 
 
-def test_missing_warmup_bar_and_pre_holdout_boundary_are_rejected():
+def test_missing_warmup_bar_is_rejected():
     name = "crypto_autopilot.paper.cloud_multiframe_inputs_v0_2"
     assert importlib.util.find_spec(name) is not None, "full regime warmup successor missing"
     module = importlib.import_module(name)
