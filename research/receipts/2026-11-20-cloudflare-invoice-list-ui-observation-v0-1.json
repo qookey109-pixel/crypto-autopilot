@@ -1,0 +1,18 @@
+{
+  "schema": "qookey-cloudflare-invoice-list-ui-observation-v0.1",
+  "observed_date_asia_taipei": "2026-11-20",
+  "source": "OWNER_AUTHORIZED_CLOUDFLARE_DASHBOARD_READ_ONLY",
+  "scope": "LATEST_VISIBLE_INVOICE_LIST_ENTRY",
+  "listed_invoice_date": "2026-11-17",
+  "displayed_total_classification": "ZERO_USD",
+  "invoice_line_items_reviewed": false,
+  "service_period_verified": false,
+  "fixed_fee_breakdown_verified": false,
+  "credits_verified": false,
+  "complete_account_history_proven": false,
+  "current_free_tier_headroom": "UNKNOWN",
+  "zero_cost_conclusion": "UNKNOWN",
+  "previous_observation": "research/receipts/2026-11-10-cloudflare-billing-ui-observation-v0-1.json",
+  "cloud_paper_activation": false,
+  "authority": false
+}
