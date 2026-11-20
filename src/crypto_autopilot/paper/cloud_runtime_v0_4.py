@@ -11,7 +11,7 @@ from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import D1UsageGuard
 from crypto_autopilot.paper.cloud_budget_v0_1 import CloudBudgetGuard
 from crypto_autopilot.paper.cloud_candidate_adapter_v0_1 import validate_strategy_registry
 from crypto_autopilot.paper.cloud_pionex_client_v0_1 import CloudPaperPionexPublicClient
-from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Store
+from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Policy, BudgetedR2Store
 from crypto_autopilot.paper.cloud_runtime_v0_1 import CLOUD_PAPER_PREFIX
 from crypto_autopilot.paper.cloud_run_store_v0_1 import CloudPaperRunStore
 from crypto_autopilot.paper.cloud_seal_guarded_composition_v0_1 import build_seal_guarded_composition
@@ -143,6 +143,7 @@ def build_runtime_composition(
         access_key_id=os.environ.get("R2_ACCESS_KEY_ID", ""),
         secret_access_key=os.environ.get("R2_SECRET_ACCESS_KEY", ""),
         budget_guard=r2_guard, freshness_check=check_admitted,
+        policy=BudgetedR2Policy(maximum_read_bytes=r2_guard.policy.r2_object_max_bytes),
     )
     def before_provider_send() -> None:
         check_admitted()
