@@ -8,7 +8,7 @@
 # PR with the full relevant regression suite passing.
 
 boto3==1.43.75
-botocore==1.43.75
+botocore==1.43.103
 jmespath==1.1.0
 pyarrow==21.0.0
 python-dateutil==2.9.0.post0
