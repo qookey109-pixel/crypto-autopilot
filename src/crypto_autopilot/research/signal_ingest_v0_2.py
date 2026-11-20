@@ -321,16 +321,6 @@ def publish_signal_payload(
 ) -> dict[str, Any]:
     """Publish immutable run evidence and a mutable latest pointer after gates."""
 
-    current = current_bucket_bytes(store)
-    if current + planned_reservation_bytes > hard_stop_bytes:
-        return {
-            "status": "BLOCKED",
-            "stage": "R2_FREE_ONLY_HEADROOM_GATE_BLOCKED_BEFORE_WRITE",
-            "current_bucket_bytes": current,
-            "planned_reservation_bytes": planned_reservation_bytes,
-            "hard_stop_bytes": hard_stop_bytes,
-            "r2_writes_performed": False,
-        }
     prefix = f"{namespace.rstrip('/')}/runs/run={run_id}"
     payload_bytes = _json_bytes(payload)
     manifest = {
@@ -354,12 +344,21 @@ def publish_signal_payload(
     }
     objects[latest_key] = _json_bytes(latest)
     planned = sum(len(item) for item in objects.values())
+    if planned > planned_reservation_bytes:
+        return {
+            "status": "BLOCKED",
+            "stage": "R2_PLANNED_WRITE_BYTES_EXCEED_RESERVATION",
+            "planned_write_bytes": planned,
+            "planned_reservation_bytes": planned_reservation_bytes,
+            "r2_writes_performed": False,
+        }
     current = current_bucket_bytes(store)
-    if current + planned > hard_stop_bytes:
+    if current + planned_reservation_bytes > hard_stop_bytes:
         return {
             "status": "BLOCKED",
             "stage": "R2_FREE_ONLY_HEADROOM_GATE_BLOCKED_BEFORE_WRITE",
             "current_bucket_bytes": current,
+            "planned_reservation_bytes": planned_reservation_bytes,
             "planned_write_bytes": planned,
             "hard_stop_bytes": hard_stop_bytes,
             "r2_writes_performed": False,
