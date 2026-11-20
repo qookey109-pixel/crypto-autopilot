@@ -1,0 +1,35 @@
+{
+  "schema": "qookey-cloudflare-storage-ui-observation-v0.1",
+  "observed_date_asia_taipei": "2026-11-20",
+  "source": "OWNER_AUTHORIZED_CLOUDFLARE_DASHBOARD_READ_ONLY",
+  "scope": "VISIBLE_R2_AND_D1_OVERVIEW_ONLY",
+  "r2": {
+    "displayed_period_start": "2026-11-17",
+    "displayed_period_end": "2026-12-17",
+    "displayed_class_a_operations": 197,
+    "displayed_class_b_operations": 69,
+    "displayed_storage": "616.69 MB",
+    "visible_bucket_count": 1,
+    "displayed_bucket_objects": "16.41k",
+    "displayed_current_period_billable_usd": 0
+  },
+  "d1": {
+    "displayed_utc_date": "2026-11-20",
+    "displayed_database_count": 0,
+    "displayed_daily_rows_read": 0,
+    "displayed_daily_rows_written": 0,
+    "displayed_total_storage": "0 B",
+    "displayed_current_period_billable_usd": 0
+  },
+  "limitations": [
+    "DISPLAYED_VALUES_CAN_BE_ROUNDED",
+    "METRIC_WATERMARK_AND_LAG_UNKNOWN",
+    "NO_ACCOUNT_WIDE_FIXED_FEE_OR_FUTURE_COST_CONCLUSION",
+    "ACCOUNT_WRITER_COVERAGE_UNVERIFIED",
+    "NO_R2_OBJECT_OR_D1_QUERY_ACCESS",
+    "BILLING_V0_5_NOT_REEXECUTED"
+  ],
+  "zero_cost_conclusion": "UNKNOWN",
+  "cloud_paper_activation": false,
+  "authority": false
+}
