@@ -59,6 +59,14 @@ class PaperV05RuntimeTests(unittest.TestCase):
                 self.outer.runtime()
         self.assertEqual(self.f.sdk.calls, [])
 
+    def test_runtime_uses_the_configured_object_read_limit(self):
+        runtime = self.runtime()
+        self.assertEqual(
+            runtime.store.store.policy.maximum_read_bytes,
+            runtime.budget_guard.policy.r2_object_max_bytes,
+        )
+        self.assertEqual(runtime.store.store.policy.maximum_read_bytes, 262_144)
+
     def test_external_io_before_shared_admission_is_blocked(self):
         runtime = self.runtime()
         with patch(fixtures.CLIENT_MODULE + ".build_opener") as network, patch(

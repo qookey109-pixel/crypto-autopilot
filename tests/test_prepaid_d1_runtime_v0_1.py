@@ -18,7 +18,7 @@ from crypto_autopilot.paper.cloud_budget_ledger_v0_1 import (
 )
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked, R2UsageSnapshot
 from crypto_autopilot.paper.cloud_loop_v0_1 import SLOT_MS, SLOT_OFFSET_MS
-from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Store
+from crypto_autopilot.paper.cloud_r2_store_v0_1 import BudgetedR2Policy, BudgetedR2Store
 from crypto_autopilot.paper.cloud_runtime_v0_2 import (
     PrepaidCloudPaperBudgetLedger,
     build_runtime_composition,
@@ -253,6 +253,7 @@ class PrepaidD1RuntimeTests(unittest.TestCase):
             return BudgetedR2Store(
                 client=self.sdk, bucket="synthetic-only",
                 budget_guard=kwargs["budget_guard"], freshness_check=kwargs["freshness_check"],
+                policy=kwargs.get("policy", BudgetedR2Policy()),
             )
         size = sum(len(value[0]) for value in self.sdk.objects.values())
         a = sum(call["operation"] in {"PUT", "LIST"} for call in self.sdk.calls)
