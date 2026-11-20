@@ -4,7 +4,9 @@ import json
 import unittest
 from io import BytesIO
 from pathlib import Path
-from unittest.mock import Mock, patch\nfrom urllib.error import HTTPError\nfrom urllib.request import Request
+from unittest.mock import Mock, patch
+from urllib.error import HTTPError
+from urllib.request import Request
 
 from crypto_autopilot.research.signal_ingest_v0_2 import (
     ResearchSignalIngestError,

@@ -257,7 +257,7 @@ def collect_sources(
     *,
     timeout_seconds: float,
     max_bytes: int,
-    opener: Callable[..., Any] = urlopen,
+    opener: Callable[..., Any] = _open_configured_source,
     retrieved_at_ms: int | None = None,
 ) -> tuple[tuple[SourceSnapshot, ...], tuple[KOLForecast, ...]]:
     snapshots: list[SourceSnapshot] = []
