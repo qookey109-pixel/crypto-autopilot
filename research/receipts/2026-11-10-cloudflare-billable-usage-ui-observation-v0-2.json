@@ -1,0 +1,30 @@
+{
+  "schema": "qookey-cloudflare-billable-usage-ui-observation-v0.2",
+  "recorded_at_utc": "2026-11-10T13:25:38Z",
+  "source": "OWNER_AUTHORIZED_CLOUDFLARE_DASHBOARD_READ_ONLY",
+  "scope": "DISPLAYED_ACCOUNT_BILLABLE_USAGE_ONLY",
+  "usage": {
+    "billing_cycle_start_display": "2026-10-17",
+    "observed_through_display": "2026-11-10",
+    "billing_cycle_end_display": "2026-11-16",
+    "displayed_observed_cost_usd": 0,
+    "displayed_estimated_cycle_cost_usd": 0,
+    "r2_class_a_operations_display": "1.38k",
+    "r2_class_b_operations_display": "253",
+    "r2_storage_gb_months_display": "0.47",
+    "data_watermark_utc": null,
+    "values_are_displayed_rounded": true
+  },
+  "limitations": [
+    "CURRENT_CYCLE_NOT_FINAL",
+    "DATA_WATERMARK_AND_REFRESH_LATENCY_UNKNOWN",
+    "GB_MONTHS_IS_NOT_CURRENT_STORED_BYTES",
+    "OTHER_WRITERS_AND_TOTAL_FIXED_FEES_NOT_PROVEN",
+    "NO_D1_SQL_OR_R2_OBJECT_ACCESS",
+    "BILLING_V0_5_NOT_REEXECUTED",
+    "NO_ACCOUNT_IDENTIFIERS_OR_CREDENTIALS_RECORDED"
+  ],
+  "cloud_paper_activation": false,
+  "zero_cost_conclusion": "UNKNOWN",
+  "authority": false
+}

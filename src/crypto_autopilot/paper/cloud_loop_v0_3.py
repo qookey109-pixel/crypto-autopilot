@@ -55,8 +55,7 @@ def run_cloud_step(
     registrations = strategy_registry.get("strategies")
     if not isinstance(registrations, list):
         raise CloudLoopReviewRequired("INVALID_STRATEGY_REGISTRY")
-    before_external()
-    prior_result = committed_report(store, slot)
+    prior_result = committed_report(store, slot, before_external=before_external)
     if prior_result is not None:
         return {"state": "REPLAYED", "slot_id": slot, "report": prior_result,
                 "provider_requests_performed": 0}
@@ -75,7 +74,7 @@ def run_cloud_step(
         raise CloudLoopReviewRequired(reason)
     previous = None
     if latest_slot is not None:
-        old = committed_report(store, latest_slot)
+        old = committed_report(store, latest_slot, before_external=before_external)
         if old is None:
             raise CloudLoopReviewRequired("PREVIOUS_RESULT_MISSING")
         previous = _report_step(store, old, before_external=before_external)
@@ -172,6 +171,7 @@ def run_cloud_step(
     report_id = digest(outcome)
     before_external()
     store.put_json("cloud-report", report_id, outcome)
+    before_external()
     if store.get_json("cloud-report", report_id) != outcome:
         raise CloudLoopReviewRequired("REPORT_READBACK_MISMATCH")
     before_external()
@@ -179,6 +179,6 @@ def run_cloud_step(
         "slot_id": slot, "report_id": report_id,
         "previous_slot": previous_slot, "state": "COMMITTED",
     })
-    if committed_report(store, slot) != outcome:
+    if committed_report(store, slot, before_external=before_external) != outcome:
         raise CloudLoopReviewRequired("RESULT_READBACK_MISMATCH")
     return outcome

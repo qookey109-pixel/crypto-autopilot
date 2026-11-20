@@ -143,8 +143,7 @@ def latest_committed_slot(
         raise CloudLoopReviewRequired("LEDGER_STATE_RESULT_COVERAGE_MISMATCH")
 
     latest_slot = max(result_slots, key=int)
-    before_external()
-    latest = committed_report(store, latest_slot)
+    latest = committed_report(store, latest_slot, before_external=before_external)
     if latest is None:
         raise CloudLoopReviewRequired("LEDGER_COMMITTED_RESULT_MISSING")
     step = _report_step(store, latest, before_external=before_external)

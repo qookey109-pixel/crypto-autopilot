@@ -1,0 +1,63 @@
+{
+  "schema": "qookey-cloud-paper-market-request-budget-v0.3",
+  "status": "PREPARED_REQUIREMENT_NOT_EXECUTION_AUTHORITY",
+  "supersedes_analysis": "config/cloud_paper_market_request_budget_v0_2.json",
+  "assumptions": {
+    "reference_4h_symbols": [
+      "BTC_USDT_PERP",
+      "ETH_USDT_PERP"
+    ],
+    "breadth_market_count": 23,
+    "candidate_limit": 5,
+    "schedule_slots_per_day": 96,
+    "requests_per_symbol_interval": 1,
+    "reuse_60m_as_4h_assumed": false,
+    "automatic_retries": 0,
+    "missed_slots_backfilled": false,
+    "reference_source": "PIONEX_PUBLIC_PERPETUAL_CANDLES_CANDIDATE_NOT_VERIFIED",
+    "macro_provider_requests_included": false
+  },
+  "requests": {
+    "shared_market_calls_per_slot": 3,
+    "four_hour_breadth_calls_per_slot": 23,
+    "four_hour_reference_calls_per_slot": 2,
+    "sixty_minute_candidate_calls_per_slot": 5,
+    "fifteen_minute_candidate_calls_per_slot": 5,
+    "execution_frame_calls_per_slot_max": 10,
+    "total_calls_per_slot": 48,
+    "minimum_shared_and_fixed_4h_calls_per_slot": 28,
+    "maximum_calls_per_utc_day": 4608,
+    "maximum_calls_per_rolling_30_days": 138240,
+    "existing_per_run_limit": 18,
+    "fits_existing_contract": false,
+    "interpretation": "Direct-fetch design bound under stated assumptions only; excludes macro-provider calls, retries and other writers. Reference reuse or endpoint batching requires separate verified evidence."
+  },
+  "warmup": {
+    "four_hour_closed_bars_per_symbol": 21,
+    "sixty_minute_closed_bars_per_candidate": 200,
+    "fifteen_minute_closed_bars_per_candidate": 200,
+    "maximum_closed_bars_per_slot": 2525,
+    "exact_strategy_warmup_requirements": "UNVERIFIED"
+  },
+  "unresolved": [
+    "PIONEX_REFERENCE_SYMBOL_COVERAGE_AND_PRICE_SEMANTICS",
+    "ALIGNMENT_FRESHNESS_AND_COMPLETE_23_MARKET_BREADTH",
+    "TOTAL3_BTC_DOMINANCE_SOURCE_AND_RETENTION",
+    "PROVIDER_ALLOWANCE_AND_OTHER_WRITERS",
+    "R2_D1_ACCOUNT_WIDE_HEADROOM_AND_RETRY_COST",
+    "STRATEGY_SPECIFIC_WARMUP"
+  ],
+  "authority": {
+    "provider_fetch_authorized": false,
+    "r2_access_authorized": false,
+    "d1_access_authorized": false,
+    "runtime_activation_authorized": false,
+    "schedule_activation_authorized": false,
+    "strategy_change_authorized": false,
+    "source_switch_authorized": false,
+    "holdout_access_authorized": false,
+    "model_promotion_authorized": false,
+    "real_money_orders_authorized": false,
+    "live_trading_authorized": false
+  }
+}
