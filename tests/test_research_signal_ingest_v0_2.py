@@ -4,7 +4,7 @@ import json
 import unittest
 from io import BytesIO
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch\nfrom urllib.error import HTTPError\nfrom urllib.request import Request
 
 from crypto_autopilot.research.signal_ingest_v0_2 import (
     ResearchSignalIngestError,
@@ -319,6 +319,36 @@ class ResearchSignalIngestTests(unittest.TestCase):
             self.assertEqual(publish(actual, actual + 1)["status"], "PUBLISHED")
             inventory.assert_called_once_with(store)
             self.assertTrue(store.put_bytes.call_args.args[0].endswith("/latest.json"))
+
+
+    def test_default_source_opener_rejects_redirect_and_records_failure(self) -> None:
+        from crypto_autopilot.research.signal_ingest_v0_2 import (
+            _open_configured_source, _RejectRedirects,
+        )
+
+        request = Request("https://example.test/source")
+        handler = _RejectRedirects()
+        self.assertIsNone(handler.redirect_request(
+            request, None, 302, "Found", {}, "https://other.test/target",
+        ))
+        fake_opener = Mock()
+        fake_opener.open.side_effect = HTTPError(
+            request.full_url, 302, "Found", {}, None,
+        )
+        with patch(
+            "crypto_autopilot.research.signal_ingest_v0_2.build_opener",
+            return_value=fake_opener,
+        ) as builder:
+            snapshot, forecasts = fetch_public_source(
+                source_id="test", source_url=request.full_url,
+                timeout_seconds=1, max_bytes=100, retrieved_at_ms=1000,
+            )
+        self.assertEqual(snapshot.status, "FETCH_FAILED")
+        self.assertEqual(snapshot.source_url, request.full_url)
+        self.assertEqual(forecasts, ())
+        self.assertIsInstance(builder.call_args.args[0], _RejectRedirects)
+        fake_opener.open.assert_called_once()
+        self.assertIsNotNone(_open_configured_source)
 
 
 if __name__ == "__main__":
