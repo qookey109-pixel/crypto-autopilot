@@ -32,6 +32,11 @@ class PaperV05PositionLifecycleTests(unittest.TestCase):
         self.outer.setUp()
         self.addCleanup(self.outer.doCleanups)
         self.f = self.outer.f
+        # This lifecycle exercises three distinct synthetic scheduled runs.
+        self.f.authority["writers"][0]["daily_tickets"] = 3
+        self.f.github = fixtures.FakeGitHub(self.f.authority)
+        self.f._set_run(101)
+        self.f.meter = self.f.claim(101)
         self.provider_patch = patch("crypto_autopilot.paper.cloud_pionex_client_v0_1.build_opener")
         self.provider = self.provider_patch.start()
         self.addCleanup(self.provider_patch.stop)
@@ -91,7 +96,7 @@ class PaperV05PositionLifecycleTests(unittest.TestCase):
         self.f.now += SLOT_MS
         self.f._set_run(102)
         self.f.meter = self.f.claim(102)
-        db, _, statements, opener = self.outer.outer.transport()
+        db, size, statements, opener = self.outer.outer.transport()
         def send_provider(request, timeout):
             if "/market/depth" in request.full_url:
                 data = {"bids": [["106", "100"]], "asks": [["107", "100"]],
@@ -127,10 +132,10 @@ class PaperV05PositionLifecycleTests(unittest.TestCase):
         ).fetchone()[0], 1)
         self.assertEqual(len(statements), 2 if invalid else 3)
         self.assertEqual({key: self.f.sdk.objects[key] for key in before}, before)
-        return result, db
+        return result, db, size, opener
 
     def test_position_exits_on_complete_synthetic_tape(self):
-        result, db = self.advance(invalid=False)
+        result, db, size, opener = self.advance(invalid=False)
         self.assertEqual(result["account"]["open_position_count"], 0)
         self.assertEqual(result["account"]["closed_position_count"], 1)
         self.assertGreater(result["account"]["realized_closed_net_pnl_usd"], 0)
@@ -156,8 +161,33 @@ class PaperV05PositionLifecycleTests(unittest.TestCase):
             "SELECT COUNT(*) FROM cloud_paper_budget_reservations WHERE state='SETTLED'"
         ).fetchone()[0], 1)
 
+        # A fresh runtime must recover the closed trade and virtual balance
+        # without replaying the exit or generating a new test strategy.
+        self.f.now += SLOT_MS
+        self.f._set_run(103)
+        self.f.meter = self.f.claim(103)
+        self.provider.reset_mock()
+        with patch(fixtures.CLIENT_MODULE + ".build_opener", return_value=opener):
+            resumed_runtime = self.outer.runtime(database_size=size[0])
+            resumed = resumed_runtime.run_slot(
+                tick_ms=self.f.now, previous_slot=result["slot_id"],
+                activation_enabled=True, run_id="synthetic-after-exit",
+            )
+        self.assertEqual(resumed["state"], "NO_TRADE")
+        self.assertEqual(resumed["account"]["open_position_count"], 0)
+        self.assertEqual(resumed["account"]["closed_position_count"], 1)
+        self.assertEqual(
+            resumed["account"]["realized_closed_net_pnl_usd"],
+            result["account"]["realized_closed_net_pnl_usd"],
+        )
+        self.assertEqual(resumed["account"]["equity_usd"], result["account"]["equity_usd"])
+        self.provider.assert_not_called()
+        self.assertEqual(db.execute(
+            "SELECT COUNT(*) FROM cloud_paper_budget_reservations WHERE state='SETTLED'"
+        ).fetchone()[0], 2)
+
     def test_invalid_tape_keeps_reservation_for_review(self):
-        _, db = self.advance(invalid=True)
+        _, db, _, _ = self.advance(invalid=True)
         self.assertEqual(db.execute(
             "SELECT COUNT(*) FROM cloud_paper_budget_reservations WHERE state='RESERVED'"
         ).fetchone()[0], 1)
