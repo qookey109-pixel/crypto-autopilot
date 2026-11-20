@@ -32,6 +32,11 @@ class PaperV05PositionLifecycleTests(unittest.TestCase):
         self.outer.setUp()
         self.addCleanup(self.outer.doCleanups)
         self.f = self.outer.f
+        # This lifecycle exercises three distinct synthetic scheduled runs.
+        self.f.authority["writers"][0]["daily_tickets"] = 3
+        self.f.github = fixtures.FakeGitHub(self.f.authority)
+        self.f._set_run(101)
+        self.f.meter = self.f.claim(101)
         self.provider_patch = patch("crypto_autopilot.paper.cloud_pionex_client_v0_1.build_opener")
         self.provider = self.provider_patch.start()
         self.addCleanup(self.provider_patch.stop)
