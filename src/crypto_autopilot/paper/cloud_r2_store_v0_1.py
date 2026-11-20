@@ -145,13 +145,20 @@ class BudgetedR2Store:
         limit = self.policy.maximum_read_bytes
         if limit is None:
             return stream.read()
+        chunks: list[bytes] = []
+        total = 0
         try:
-            payload = stream.read(limit + 1)
+            while total <= limit:
+                chunk = stream.read(limit + 1 - total)
+                if not isinstance(chunk, bytes):
+                    raise ValueError("R2 object returned invalid bytes")
+                if not chunk:
+                    return b"".join(chunks)
+                chunks.append(chunk)
+                total += len(chunk)
+            raise ValueError("R2 object exceeds the configured read limit")
         finally:
             stream.close()
-        if not isinstance(payload, bytes) or len(payload) > limit:
-            raise ValueError("R2 object exceeds the configured read limit")
-        return payload
 
     def get_bytes_verified(self, key: str, *, expected_sha256: str) -> bytes:
         response = self.client.get_object(Bucket=self.bucket, Key=key)
