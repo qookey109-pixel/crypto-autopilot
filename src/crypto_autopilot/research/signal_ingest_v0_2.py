@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping
 from urllib.parse import urlsplit
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from crypto_autopilot.research.signal_layer import (
     KOLForecast,
@@ -180,13 +180,24 @@ def parse_source_payload(
     return snapshot, forecasts
 
 
+class _RejectRedirects(HTTPRedirectHandler):
+    """Keep each source fetch to its configured URL and one HTTP request."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def _open_configured_source(request: Request, *, timeout: float):
+    return build_opener(_RejectRedirects()).open(request, timeout=timeout)
+
+
 def fetch_public_source(
     *,
     source_id: str,
     source_url: str,
     timeout_seconds: float,
     max_bytes: int,
-    opener: Callable[..., Any] = urlopen,
+    opener: Callable[..., Any] = _open_configured_source,
     retrieved_at_ms: int | None = None,
     parse_mode: str = "structured_json_only",
 ) -> tuple[SourceSnapshot, tuple[KOLForecast, ...]]:
@@ -246,7 +257,7 @@ def collect_sources(
     *,
     timeout_seconds: float,
     max_bytes: int,
-    opener: Callable[..., Any] = urlopen,
+    opener: Callable[..., Any] = _open_configured_source,
     retrieved_at_ms: int | None = None,
 ) -> tuple[tuple[SourceSnapshot, ...], tuple[KOLForecast, ...]]:
     snapshots: list[SourceSnapshot] = []
