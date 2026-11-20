@@ -274,7 +274,6 @@ class ResearchSignalIngestTests(unittest.TestCase):
         self.assertFalse(payload["authority"]["direct_trade_trigger"])
         self.assertFalse(payload["authority"]["automatic_model_promotion"])
 
-
     def test_publication_bounds_all_encoded_objects_before_r2_access(self) -> None:
         payload = build_signal_payload(
             run_id="run-1", generated_at_utc="2026-11-20T00:00:00Z",
@@ -309,6 +308,10 @@ class ResearchSignalIngestTests(unittest.TestCase):
 
             inventory.return_value = 1
             blocked = publish(actual, actual)
+            self.assertFalse(blocked["r2_writes_performed"])
+            store.put_bytes.assert_not_called()
+
+            blocked = publish(actual + 1, actual + 1)
             self.assertFalse(blocked["r2_writes_performed"])
             store.put_bytes.assert_not_called()
 
