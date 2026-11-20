@@ -20,7 +20,6 @@ from typing import Any, Callable, Iterable, Mapping
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
-from crypto_autopilot.training.online_r2 import current_bucket_bytes
 from crypto_autopilot.research.signal_layer import (
     KOLForecast,
     deduplicate_kol_forecasts,
@@ -310,6 +309,50 @@ def _json_bytes(payload: Mapping[str, Any]) -> bytes:
     return (json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
 
 
+def current_bucket_bytes(store: R2Store) -> int:
+    """Return the whole-bucket byte count only after a bounded, complete listing."""
+    total = 0
+    seen_keys: set[str] = set()
+    seen_tokens: set[str] = set()
+    request = {"Bucket": store.bucket, "MaxKeys": 1000}
+    for _ in range(32):
+        page = store.client.list_objects_v2(**request)
+        if not isinstance(page, dict) or type(page.get("IsTruncated")) is not bool:
+            raise ResearchSignalIngestError("R2 inventory has unknown completion status")
+        if (
+            page.get("Name", store.bucket) != store.bucket
+            or page.get("Prefix") or page.get("Delimiter") or page.get("CommonPrefixes")
+            or page.get("StartAfter")
+        ):
+            raise ResearchSignalIngestError("R2 inventory does not cover the whole bucket")
+        rows = page.get("Contents", [])
+        if not isinstance(rows, list) or len(rows) > 1000:
+            raise ResearchSignalIngestError("R2 inventory has invalid contents")
+        count = page.get("KeyCount", len(rows))
+        if type(count) is not int or count != len(rows) or not ("Contents" in page or "KeyCount" in page):
+            raise ResearchSignalIngestError("R2 inventory has inconsistent object count")
+        for row in rows:
+            if not isinstance(row, dict):
+                raise ResearchSignalIngestError("R2 inventory has invalid object metadata")
+            key, size = row.get("Key"), row.get("Size")
+            if not isinstance(key, str) or not key or key in seen_keys:
+                raise ResearchSignalIngestError("R2 inventory has missing or repeated object key")
+            if type(size) is not int or size < 0:
+                raise ResearchSignalIngestError("R2 inventory has invalid object size")
+            seen_keys.add(key)
+            total += size
+        if not page["IsTruncated"]:
+            if "NextContinuationToken" in page:
+                raise ResearchSignalIngestError("R2 inventory has conflicting continuation evidence")
+            return total
+        token = page.get("NextContinuationToken")
+        if not isinstance(token, str) or not token or token in seen_tokens:
+            raise ResearchSignalIngestError("R2 inventory has missing or repeated continuation token")
+        seen_tokens.add(token)
+        request["ContinuationToken"] = token
+    raise ResearchSignalIngestError("R2 inventory exceeded the 32-page scan limit")
+
+
 def publish_signal_payload(
     store: R2Store,
     *,
@@ -321,16 +364,6 @@ def publish_signal_payload(
 ) -> dict[str, Any]:
     """Publish immutable run evidence and a mutable latest pointer after gates."""
 
-    current = current_bucket_bytes(store)
-    if current + planned_reservation_bytes > hard_stop_bytes:
-        return {
-            "status": "BLOCKED",
-            "stage": "R2_FREE_ONLY_HEADROOM_GATE_BLOCKED_BEFORE_WRITE",
-            "current_bucket_bytes": current,
-            "planned_reservation_bytes": planned_reservation_bytes,
-            "hard_stop_bytes": hard_stop_bytes,
-            "r2_writes_performed": False,
-        }
     prefix = f"{namespace.rstrip('/')}/runs/run={run_id}"
     payload_bytes = _json_bytes(payload)
     manifest = {
@@ -354,12 +387,21 @@ def publish_signal_payload(
     }
     objects[latest_key] = _json_bytes(latest)
     planned = sum(len(item) for item in objects.values())
+    if planned > planned_reservation_bytes:
+        return {
+            "status": "BLOCKED",
+            "stage": "R2_PLANNED_WRITE_BYTES_EXCEED_RESERVATION",
+            "planned_write_bytes": planned,
+            "planned_reservation_bytes": planned_reservation_bytes,
+            "r2_writes_performed": False,
+        }
     current = current_bucket_bytes(store)
-    if current + planned > hard_stop_bytes:
+    if current + planned_reservation_bytes > hard_stop_bytes:
         return {
             "status": "BLOCKED",
             "stage": "R2_FREE_ONLY_HEADROOM_GATE_BLOCKED_BEFORE_WRITE",
             "current_bucket_bytes": current,
+            "planned_reservation_bytes": planned_reservation_bytes,
             "planned_write_bytes": planned,
             "hard_stop_bytes": hard_stop_bytes,
             "r2_writes_performed": False,

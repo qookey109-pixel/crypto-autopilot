@@ -4,7 +4,7 @@ import json
 import unittest
 from io import BytesIO
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from crypto_autopilot.research.signal_ingest_v0_2 import (
     ResearchSignalIngestError,
@@ -12,8 +12,10 @@ from crypto_autopilot.research.signal_ingest_v0_2 import (
     collect_sources,
     fetch_public_source,
     parse_source_payload,
+    publish_signal_payload,
 )
 from crypto_autopilot.research.signal_layer import ResearchSignalLayerError
+from crypto_autopilot.storage.r2 import R2Store
 
 
 class _Response:
@@ -271,6 +273,52 @@ class ResearchSignalIngestTests(unittest.TestCase):
         self.assertEqual(payload["mode"], "RESEARCH_ONLY")
         self.assertFalse(payload["authority"]["direct_trade_trigger"])
         self.assertFalse(payload["authority"]["automatic_model_promotion"])
+
+    def test_publication_bounds_all_encoded_objects_before_r2_access(self) -> None:
+        payload = build_signal_payload(
+            run_id="run-1", generated_at_utc="2026-11-20T00:00:00Z",
+            snapshots=(), forecasts=(),
+        )
+        store = Mock(spec=R2Store)
+        store.get_bytes_if_exists.return_value = None
+
+        def publish(reserved: int, hard_stop: int):
+            return publish_signal_payload(
+                store, payload=payload, namespace="research/test", run_id="run-1",
+                hard_stop_bytes=hard_stop, planned_reservation_bytes=reserved,
+            )
+
+        with patch(
+            "crypto_autopilot.research.signal_ingest_v0_2.current_bucket_bytes", return_value=0,
+        ) as inventory:
+            result = publish(100_000, 100_000)
+            self.assertEqual(result["status"], "PUBLISHED")
+            self.assertEqual(store.put_bytes.call_count, 3)
+            actual = sum(len(call.args[1]) for call in store.put_bytes.call_args_list)
+            self.assertEqual(result["planned_write_bytes"], actual)
+
+            store.reset_mock()
+            inventory.reset_mock()
+            blocked = publish(actual - 1, 100_000)
+            self.assertEqual(blocked["stage"], "R2_PLANNED_WRITE_BYTES_EXCEED_RESERVATION")
+            self.assertFalse(blocked["r2_writes_performed"])
+            inventory.assert_not_called()
+            store.get_bytes_if_exists.assert_not_called()
+            store.put_bytes.assert_not_called()
+
+            inventory.return_value = 1
+            blocked = publish(actual, actual)
+            self.assertFalse(blocked["r2_writes_performed"])
+            store.put_bytes.assert_not_called()
+
+            blocked = publish(actual + 1, actual + 1)
+            self.assertFalse(blocked["r2_writes_performed"])
+            store.put_bytes.assert_not_called()
+
+            inventory.reset_mock()
+            self.assertEqual(publish(actual, actual + 1)["status"], "PUBLISHED")
+            inventory.assert_called_once_with(store)
+            self.assertTrue(store.put_bytes.call_args.args[0].endswith("/latest.json"))
 
 
 if __name__ == "__main__":
