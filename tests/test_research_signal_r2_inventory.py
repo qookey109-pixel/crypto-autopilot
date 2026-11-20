@@ -8,7 +8,6 @@ from crypto_autopilot.research.signal_ingest_v0_2 import current_bucket_bytes
 def store_for(*pages):
     store = Mock(bucket="fixture")
     store.client.list_objects_v2.side_effect = pages
-    store.client.get_paginator.return_value.paginate.return_value = iter(pages)
     return store
 
 
@@ -30,6 +29,8 @@ class ResearchInventoryTests(unittest.TestCase):
     def test_incomplete_or_inconsistent_page_cannot_establish_headroom(self):
         cases = (
             {}, {"IsTruncated": False},
+            {"IsTruncated": False, "Prefix": "only/", "KeyCount": 0},
+            {"IsTruncated": False, "Name": "other", "KeyCount": 0},
             {"IsTruncated": False, "KeyCount": False},
             {"IsTruncated": False, "Contents": [], "KeyCount": 1},
             {"IsTruncated": True, "Contents": []},
