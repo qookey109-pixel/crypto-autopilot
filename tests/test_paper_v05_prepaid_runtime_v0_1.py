@@ -62,10 +62,10 @@ class PaperV05RuntimeTests(unittest.TestCase):
     def test_runtime_uses_the_configured_object_read_limit(self):
         runtime = self.runtime()
         self.assertEqual(
-            runtime.store.store.policy.maximum_read_bytes,
+            runtime.store._inner.store.policy.maximum_read_bytes,
             runtime.budget_guard.policy.r2_object_max_bytes,
         )
-        self.assertEqual(runtime.store.store.policy.maximum_read_bytes, 262_144)
+        self.assertEqual(runtime.store._inner.store.policy.maximum_read_bytes, 262_144)
 
     def test_external_io_before_shared_admission_is_blocked(self):
         runtime = self.runtime()
