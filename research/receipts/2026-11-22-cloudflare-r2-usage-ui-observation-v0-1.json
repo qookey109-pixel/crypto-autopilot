@@ -1,0 +1,33 @@
+{
+  "schema": "qookey-cloudflare-r2-usage-ui-observation-v0.1",
+  "recorded_at_utc": "2026-11-22T05:29:20Z",
+  "source": "OWNER_AUTHORIZED_CLOUDFLARE_DASHBOARD_READ_ONLY",
+  "scope": "DISPLAYED_R2_OVERVIEW_AND_FILTERED_R2_BILLABLE_USAGE_ONLY",
+  "usage": {
+    "billing_cycle_start_display": "2026-11-17",
+    "billing_cycle_end_display": "2026-12-17",
+    "bucket_count_display": 1,
+    "bucket_objects_display": "16.41k",
+    "bucket_size_display": "616.69 MB",
+    "r2_total_storage_display": "616.69 MB",
+    "r2_class_a_operations_display": "273",
+    "r2_class_b_operations_display": "86",
+    "r2_storage_gb_months_display": "0.08",
+    "r2_filtered_usage_cost_usd_display": "0.00",
+    "data_watermark_utc": null,
+    "values_are_displayed_rounded": true
+  },
+  "limitations": [
+    "CURRENT_CYCLE_NOT_FINAL",
+    "DATA_WATERMARK_AND_REFRESH_LATENCY_UNKNOWN",
+    "GB_MONTHS_IS_NOT_CURRENT_STORED_BYTES",
+    "R2_FILTERED_USAGE_COST_EXCLUDES_OTHER_PRODUCTS_AND_FIXED_FEES",
+    "OTHER_WRITERS_AND_ACCOUNT_WIDE_HEADROOM_NOT_PROVEN",
+    "NO_D1_SQL_OR_R2_OBJECT_ACCESS",
+    "BILLING_V0_5_NOT_REEXECUTED",
+    "NO_ACCOUNT_IDENTIFIERS_OR_CREDENTIALS_RECORDED"
+  ],
+  "cloud_paper_activation": false,
+  "zero_cost_conclusion": "UNKNOWN",
+  "authority": false
+}
