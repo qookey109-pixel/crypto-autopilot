@@ -1,4 +1,4 @@
-"""Regression: clock rollback after admission must not release an R2 call."""
+"""Confirm existing budget guard blocks a rollback after shared admission."""
 import unittest
 
 from crypto_autopilot.paper.cloud_budget_v0_1 import BudgetBlocked
@@ -21,7 +21,10 @@ class R2AdmissionClockLifetimeTests(unittest.TestCase):
         clock[0] = NOW + 50
         backend = Backend()
         store = BudgetedR2Store(client=backend, bucket="fixture", before_external=budget.reserve)
-        with self.assertRaises(BudgetBlocked):
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_BUDGET_CLOCK_ROLLBACK"):
+            store.put_bytes("key", b"1")
+        clock[0] = NOW + 101
+        with self.assertRaisesRegex(BudgetBlocked, "BLOCKED_BUDGET_CLOCK_ROLLBACK"):
             store.put_bytes("key", b"1")
         self.assertEqual(backend.calls, 0)
         self.assertEqual(len(meter.charges), 1)
