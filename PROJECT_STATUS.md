@@ -1,3 +1,16 @@
+## Delivery checkpoint — 2026-11-22 Asia/Taipei
+
+Evidence basis: reviewed parent main `36dde684ef90687f2d98c778f49083a0ca0489d2`; resolve live main, checks, and PRs before acting. Older dated entries below remain historical.
+
+- [#925](https://github.com/qookey109-pixel/crypto-autopilot/pull/925) records a read-only, rounded R2 dashboard observation. It is R2-filtered, with an unknown data watermark; it is not complete account billing or headroom evidence. Account-wide zero-cost readiness remains UNKNOWN.
+- [#926](https://github.com/qookey109-pixel/crypto-autopilot/pull/926) prepares a default-disabled V0.6 shared admission clock guard. Synthetic CI reproduced a backward-step gap in V0.5 after a committed reservation; V0.6 blocks a backward step observed within one admission call and retains the claim and prepaid debit. It does not prove trusted or persistent time across calls.
+- [#927](https://github.com/qookey109-pixel/crypto-autopilot/pull/927), [#928](https://github.com/qookey109-pixel/crypto-autopilot/pull/928), [#929](https://github.com/qookey109-pixel/crypto-autopilot/pull/929), [#930](https://github.com/qookey109-pixel/crypto-autopilot/pull/930) and [#931](https://github.com/qookey109-pixel/crypto-autopilot/pull/931) prepare disabled guarded successors for Cloud Paper, research, Live-Paper, Core100 comparison, and bounded result-seal recovery. Their tests are synthetic; existing scheduled workflows have not been cut over. [#932](https://github.com/qookey109-pixel/crypto-autopilot/pull/932) separately verifies the existing in-process CloudBudgetGuard rollback latch before R2 operations; it adds no runtime change.
+- [#924](https://github.com/qookey109-pixel/crypto-autopilot/pull/924) archived stale maintenance draft #912 before it was closed unmerged. This does not establish recovery of Health or a new natural maintenance chain. Earlier natural Health [44967951272](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/44967951272) reported Core100 failure; maintenance [44968005048](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/44968005048) failed inspect on the stale draft. Re-read latest natural runs before claiming convergence.
+- Formal Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; production D1, protected identity and clock, account-wide writer admission, fresh account cost/headroom and controlled main acceptance are unproven. The two all-bucket R2 administrator credentials remain active at the owner's direction. Do not infer full coverage from owner observations or synthetic tests.
+- Core100 quality remains `REJECT`; the observed `RUNTIME_CHANGED / REVIEW_REQUIRED` is not cleared. Billing V0.5 and the one-time bootstrap remain consumed. Do not rerun them. FREE-ONLY / CLOUD-ONLY / PAPER-LIVE-PAPER ONLY; holdout, source switch, promotion and real-money orders remain closed.
+
+---
+
 ## Cloud PAPER evidence and recovery checkpoint — 2026-11-06
 
 Evidence basis: reviewed parent main `f697b3749fe929843f956919a12b4083e3e96728`; re-read live main and current checks before acting.
