@@ -1,5 +1,9 @@
 ## Current operating checkpoint — 2026-10-27 Asia/Taipei
 
+## Delivery update — 2026-11-22
+
+Read the 2026-11-22 delivery checkpoint in [CURRENT_STATUS](../CURRENT_STATUS.md) before older sections below. Its prepared clock-guarded successors are disabled and do not prove production identity, complete shared admission, zero-cost headroom or a running Paper cycle. Existing workflows and consumed one-time authorities are unchanged.
+
 ## Current billing safety clarification — 2026-11-06
 
 [Billing Metadata Diagnostic V0.5 run 41841230890](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/41841230890), attempt 1, consumed its one-time authorization and returned `REVIEW_REQUIRED / PAGINATION_METADATA_INVALID` after one read-only request. See the [result receipt](../research/receipts/2026-11-04-billing-metadata-v0-5-result-v0-1.json) and [interpretation](CLOUD_PAPER_BILLING_METADATA_DIAGNOSTIC_V0_5.md). **Do not dispatch or rerun V0.5.** Older statements describing a pending first dispatch are historical. Any further external investigation requires a new merged versioned scope; billing completeness, account-wide zero cost and headroom remain UNKNOWN.
