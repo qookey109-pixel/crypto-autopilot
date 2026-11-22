@@ -1,3 +1,5 @@
+## Current merged release checkpoint — 2026-10-27 Asia/Taipei
+
 ## Delivery checkpoint — 2026-11-22 Asia/Taipei
 
 Evidence basis: reviewed parent main `36dde684ef90687f2d98c778f49083a0ca0489d2`; resolve live main, checks, and PRs before acting. Older dated entries below remain historical.
@@ -8,10 +10,6 @@ Evidence basis: reviewed parent main `36dde684ef90687f2d98c778f49083a0ca0489d2`;
 - [#924](https://github.com/qookey109-pixel/crypto-autopilot/pull/924) archived stale maintenance draft #912 before it was closed unmerged. This does not establish recovery of Health or a new natural maintenance chain. Earlier natural Health [44967951272](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/44967951272) reported Core100 failure; maintenance [44968005048](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/44968005048) failed inspect on the stale draft. Re-read latest natural runs before claiming convergence.
 - Formal Cloud Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`; production D1, protected identity and clock, account-wide writer admission, fresh account cost/headroom and controlled main acceptance are unproven. The two all-bucket R2 administrator credentials remain active at the owner's direction. Do not infer full coverage from owner observations or synthetic tests.
 - Core100 quality remains `REJECT`; the observed `RUNTIME_CHANGED / REVIEW_REQUIRED` is not cleared. Billing V0.5 and the one-time bootstrap remain consumed. Do not rerun them. FREE-ONLY / CLOUD-ONLY / PAPER-LIVE-PAPER ONLY; holdout, source switch, promotion and real-money orders remain closed.
-
----
-
-## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
 ## Offline 4H regime warmup successor — prepared
 
