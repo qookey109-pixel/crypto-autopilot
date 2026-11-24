@@ -417,18 +417,25 @@ def publish_signal_payload(
             "hard_stop_bytes": hard_stop_bytes,
             "r2_writes_performed": False,
         }
+    metadata = {"provider": "public_research", "version": "v0.2"}
     for key, body in objects.items():
-        immutable = key != latest_key
-        existing = store.get_bytes_if_exists(key) if immutable else None
-        if immutable and existing is not None and existing != body:
-            raise ResearchSignalIngestError(f"immutable signal object conflict: {key}")
-        if existing == body:
+        if key == latest_key:
+            store.put_bytes(key, body, content_type="application/json", metadata=metadata)
             continue
-        store.put_bytes(
-            key,
-            body,
-            content_type="application/json",
-            metadata={"provider": "public_research", "version": "v0.2"},
+        existing = store.get_bytes_if_exists(key)
+        if existing is not None:
+            if existing != body:
+                raise ResearchSignalIngestError(f"immutable signal object conflict: {key}")
+            continue
+        # Another writer can create this key after the read. Let R2 enforce
+        # create-only publication before proceeding to the latest pointer.
+        store.client.put_object(
+            Bucket=store.bucket,
+            Key=key,
+            Body=body,
+            IfNoneMatch="*",
+            ContentType="application/json",
+            Metadata={**metadata, "sha256": _sha256(body)},
         )
     return {
         "status": "PUBLISHED",
