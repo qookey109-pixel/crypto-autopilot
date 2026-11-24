@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import unittest
 from io import BytesIO
@@ -282,6 +283,8 @@ class ResearchSignalIngestTests(unittest.TestCase):
             snapshots=(), forecasts=(),
         )
         store = Mock(spec=R2Store)
+        store.bucket = "test"
+        store.client = Mock()
         store.get_bytes_if_exists.return_value = None
 
         def publish(reserved: int, hard_stop: int):
@@ -295,8 +298,11 @@ class ResearchSignalIngestTests(unittest.TestCase):
         ) as inventory:
             result = publish(100_000, 100_000)
             self.assertEqual(result["status"], "PUBLISHED")
-            self.assertEqual(store.put_bytes.call_count, 3)
-            actual = sum(len(call.args[1]) for call in store.put_bytes.call_args_list)
+            store.put_bytes.assert_called_once()
+            creates = store.client.put_object.call_args_list
+            self.assertEqual(len(creates), 2)
+            actual = sum(len(call.kwargs["Body"]) for call in creates)
+            actual += len(store.put_bytes.call_args.args[1])
             self.assertEqual(result["planned_write_bytes"], actual)
 
             store.reset_mock()
@@ -307,21 +313,65 @@ class ResearchSignalIngestTests(unittest.TestCase):
             inventory.assert_not_called()
             store.get_bytes_if_exists.assert_not_called()
             store.put_bytes.assert_not_called()
+            store.client.put_object.assert_not_called()
 
             inventory.return_value = 1
             blocked = publish(actual, actual)
             self.assertFalse(blocked["r2_writes_performed"])
             store.put_bytes.assert_not_called()
+            store.client.put_object.assert_not_called()
 
             blocked = publish(actual + 1, actual + 1)
             self.assertFalse(blocked["r2_writes_performed"])
             store.put_bytes.assert_not_called()
+            store.client.put_object.assert_not_called()
 
             inventory.reset_mock()
             self.assertEqual(publish(actual, actual + 1)["status"], "PUBLISHED")
             inventory.assert_called_once_with(store)
             self.assertTrue(store.put_bytes.call_args.args[0].endswith("/latest.json"))
 
+    def test_concurrent_create_preserves_winner_and_previous_pointer(self) -> None:
+        namespace = "research/test"
+        run = f"{namespace}/runs/run=run-1"
+        latest = f"{namespace}/latest.json"
+        payload = build_signal_payload(
+            run_id="run-1", generated_at_utc="2026-11-20T00:00:00Z",
+            snapshots=(), forecasts=(),
+        )
+
+        for name in ("signals.json", "manifest.json"):
+            with self.subTest(name=name):
+                raced_key = f"{run}/{name}"
+                objects = {latest: b"previous pointer"}
+                store = Mock(spec=R2Store)
+                store.bucket = "test"
+                store.client = Mock()
+                store.get_bytes_if_exists.side_effect = objects.get
+
+                def put_object(*, Bucket, Key, Body, IfNoneMatch, ContentType, Metadata):
+                    self.assertEqual((Bucket, IfNoneMatch, ContentType),
+                                     ("test", "*", "application/json"))
+                    self.assertEqual(Metadata["sha256"], hashlib.sha256(Body).hexdigest())
+                    if Key == raced_key:
+                        objects[Key] = b"concurrent winner"
+                        raise FileExistsError(Key)
+                    objects[Key] = Body
+                    return {}
+
+                store.client.put_object.side_effect = put_object
+                with patch("crypto_autopilot.research.signal_ingest_v0_2.current_bucket_bytes",
+                           return_value=0):
+                    with self.assertRaises(FileExistsError):
+                        publish_signal_payload(
+                            store, namespace=namespace, run_id="run-1", payload=payload,
+                            hard_stop_bytes=100_000, planned_reservation_bytes=100_000,
+                        )
+                self.assertEqual(objects[raced_key], b"concurrent winner")
+                self.assertEqual(objects[latest], b"previous pointer")
+                self.assertEqual(f"{run}/manifest.json" in objects, name == "manifest.json")
+                self.assertEqual(store.client.put_object.call_count, 1 if name == "signals.json" else 2)
+                store.put_bytes.assert_not_called()
 
     def test_default_source_opener_rejects_redirect_and_records_failure(self) -> None:
         from crypto_autopilot.research.signal_ingest_v0_2 import (
