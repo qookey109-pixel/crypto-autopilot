@@ -14,6 +14,7 @@ from crypto_autopilot.research.signal_ingest_v0_2 import (
     publish_signal_payload,
     utc_now_iso,
 )
+from crypto_autopilot.research.signal_r2_attempts import SignalR2Attempts
 from crypto_autopilot.storage.r2 import R2Store
 
 
@@ -33,17 +34,29 @@ def main() -> int:
     args = parser.parse_args()
 
     config = load_config(args.config)
-    store = None
-    if args.publish_r2:
+    if not args.publish_r2:
+        return _collect_and_publish(args, config, None)
+
+    storage = config["storage"]
+    if storage.get("r2_write_authorized") is not True:
+        raise ResearchSignalIngestError("V0.2 R2 write authority is not active")
+    store = R2Store(
+        account_id=_required("CLOUDFLARE_ACCOUNT_ID"),
+        bucket=_required("R2_BUCKET_NAME"),
+        access_key_id=_required("R2_ACCESS_KEY_ID"),
+        secret_access_key=_required("R2_SECRET_ACCESS_KEY"),
+    )
+    attempts = SignalR2Attempts(storage["max_planned_write_bytes"])
+    store.client.meta.events.register("before-send.s3", attempts.before_send)
+    try:
+        return _collect_and_publish(args, config, store)
+    finally:
+        print(json.dumps(attempts.report(), sort_keys=True), flush=True)
+
+
+def _collect_and_publish(args: argparse.Namespace, config: dict, store: R2Store | None) -> int:
+    if store is not None:
         storage = config["storage"]
-        if storage.get("r2_write_authorized") is not True:
-            raise ResearchSignalIngestError("V0.2 R2 write authority is not active")
-        store = R2Store(
-            account_id=_required("CLOUDFLARE_ACCOUNT_ID"),
-            bucket=_required("R2_BUCKET_NAME"),
-            access_key_id=_required("R2_ACCESS_KEY_ID"),
-            secret_access_key=_required("R2_SECRET_ACCESS_KEY"),
-        )
         current = current_bucket_bytes(store)
         reservation = int(storage["max_planned_write_bytes"])
         hard_stop = int(storage["hard_stop_bytes"])
@@ -67,11 +80,10 @@ def main() -> int:
         json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
         encoding="utf-8",
     )
-    if not args.publish_r2:
+    if store is None:
         print(json.dumps({"status": "DRY_RUN", "forecasts": len(forecasts)}, ensure_ascii=False))
         return 0
     storage = config["storage"]
-    assert store is not None
     result = publish_signal_payload(
         store,
         payload=payload,
