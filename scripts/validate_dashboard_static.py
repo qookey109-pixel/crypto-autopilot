@@ -296,8 +296,18 @@ def main() -> int:
         raise RuntimeError("checked-in Cloud Paper projection must not invent a formal run")
     if latest_cloud_run.get("decision_trace_status") != "NOT_AVAILABLE_NO_OFFICIAL_RUN":
         raise RuntimeError("Cloud Paper trace must remain unavailable without an official run")
-    if (cloud_paper.get("strategy") or {}).get("registry_status") != "EMPTY_NO_ELIGIBLE_STRATEGIES":
+    if any(key not in latest_cloud_run or latest_cloud_run[key] is not None for key in (
+        "run_id", "attempt", "head_sha", "report_status", "report_artifact",
+    )):
+        raise RuntimeError("an unrun Cloud Paper projection requires null run and report evidence")
+    strategy = cloud_paper.get("strategy") or {}
+    if strategy.get("registry_status") != "EMPTY_NO_ELIGIBLE_STRATEGIES":
         raise RuntimeError("Cloud Paper strategy registry fixture changed")
+    eligible_count = strategy.get("eligible_count")
+    if type(eligible_count) is not int or eligible_count != 0:
+        raise RuntimeError("an empty Cloud Paper strategy registry requires zero eligible strategies")
+    if strategy.get("runtime_result") != "NOT_RUN_NO_FORMAL_NO_TRADE_RESULT":
+        raise RuntimeError("an unrun Cloud Paper projection cannot report a strategy outcome")
     if cloud_paper.get("model_quality") != "REJECT":
         raise RuntimeError("Cloud Paper model quality must remain REJECT")
     account = cloud_paper.get("account") or {}
