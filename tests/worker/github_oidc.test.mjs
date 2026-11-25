@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 import signedJobCases from "./signed_job_cases.mjs";
 import { webcrypto } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { claimJobSlot } from "../../workers/paper-gateway/d1-job-claim.mjs";
 import { createIngressReservation, prepareEnvelopeSchema, reserveEnvelope, snapshotEnvelopes } from "../../workers/paper-gateway/atomic-envelope.mjs";
 import { conservativeRemaining } from "../../workers/paper-gateway/lagged-usage.mjs";
@@ -14,6 +16,14 @@ import { verifyGithubJob } from "../../workers/paper-gateway/github-oidc.mjs";
 import { readGithubKeys } from "../../workers/paper-gateway/github-keys.mjs";
 
 globalThis.crypto ??= webcrypto;
+
+const legacySchema = readFileSync(new URL("../../migrations/paper_gateway_job_claim_candidate_v0_1.sql", import.meta.url), "utf8");
+const clockSchema = readFileSync(new URL("../../migrations/paper_gateway_job_claim_clock_candidate_v0_2.sql", import.meta.url), "utf8");
+
+function installJobClaimSchema(db) {
+  db.exec(legacySchema);
+  db.exec(clockSchema);
+}
 
 test("unconfigured verifier fails closed without fetching keys", async () => {
   let calls = 0;
@@ -65,7 +75,7 @@ test("key reader rejects redirects, malformed JSON, oversize and failures", asyn
 
 test("D1 claim adapter rejects duplicates and preserves ambiguous committed writes", async () => {
   const sql = new DatabaseSync(":memory:");
-  sql.exec(readFileSync(new URL("../../migrations/paper_gateway_job_claim_candidate_v0_1.sql", import.meta.url), "utf8"));
+  installJobClaimSchema(sql);
   // Synthetic SQLite query plans are engineering evidence, not D1 billing.
   const queryPlans = [
     ["SELECT 1 FROM paper_job_claim_v0_1 WHERE repository_id=? AND run_id=? AND attempt=? AND check_run_id=? AND writer_id=?", ["123", "100", "1", "101", "paper"]],
@@ -84,35 +94,86 @@ test("D1 claim adapter rejects duplicates and preserves ambiguous committed writ
     if (loseResponse) throw Error("response lost after commit");
     return { success: true, meta: { changes: Number(result.changes), total_attempts: 1, rows_read: 1, rows_written: Number(result.changes), size_after: 1024 } };
   } }) }) };
-  const claim = { repositoryId: "123", runId: "100", attempt: "1", checkRunId: "101", writerId: "paper", slotId: "slot:1000" };
+  const claim = { repositoryId: "123", runId: "100", attempt: "1", checkRunId: "101", writerId: "paper", slotId: "slot:1000", observedAtMs: 1000 };
   assert.equal(await claimJobSlot(binding, claim), "DISABLED");
   assert.equal(calls, 0);
-  assert.equal(await claimJobSlot(binding, claim, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1, maxDatabaseBytes: 2048 } }), "CLAIMED");
-  assert.equal(await claimJobSlot(binding, claim, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1, maxDatabaseBytes: 2048 } }), "DUPLICATE_OR_CONFLICT");
-  assert.equal(await claimJobSlot(binding, { ...claim, runId: "102", checkRunId: "103" }, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1, maxDatabaseBytes: 2048 } }), "DUPLICATE_OR_CONFLICT");
+  assert.equal(await claimJobSlot(binding, claim, { enabled: true, limits: { rowsRead: 8, rowsWritten: 4, maxDatabaseBytes: 2048 } }), "CLAIMED");
+  assert.equal(await claimJobSlot(binding, claim, { enabled: true, limits: { rowsRead: 8, rowsWritten: 4, maxDatabaseBytes: 2048 } }), "DUPLICATE_OR_CONFLICT");
+  assert.equal(await claimJobSlot(binding, { ...claim, runId: "102", checkRunId: "103" }, { enabled: true, limits: { rowsRead: 8, rowsWritten: 4, maxDatabaseBytes: 2048 } }), "DUPLICATE_OR_CONFLICT");
   loseResponse = true;
-  const next = { ...claim, runId: "104", checkRunId: "105", slotId: "slot:2000" };
-  assert.equal(await claimJobSlot(binding, next, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1, maxDatabaseBytes: 2048 } }), "REVIEW_REQUIRED");
+  const next = { ...claim, runId: "104", checkRunId: "105", slotId: "slot:2000", observedAtMs: 2000 };
+  assert.equal(await claimJobSlot(binding, next, { enabled: true, limits: { rowsRead: 8, rowsWritten: 4, maxDatabaseBytes: 2048 } }), "REVIEW_REQUIRED");
   loseResponse = false;
-  assert.equal(await claimJobSlot(binding, next, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1, maxDatabaseBytes: 2048 } }), "DUPLICATE_OR_CONFLICT");
+  assert.equal(await claimJobSlot(binding, next, { enabled: true, limits: { rowsRead: 8, rowsWritten: 4, maxDatabaseBytes: 2048 } }), "DUPLICATE_OR_CONFLICT");
   assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1").get().n, 2);
   assert.throws(() => sql.exec("UPDATE paper_job_claim_v0_1 SET slot_id='slot:3000'"), /PAPER_JOB_CLAIM_IMMUTABLE/);
   assert.throws(() => sql.exec("DELETE FROM paper_job_claim_v0_1"), /PAPER_JOB_CLAIM_IMMUTABLE/);
-  sql.prepare("INSERT OR REPLACE INTO paper_job_claim_v0_1 VALUES (?, ?, ?, ?, ?, ?)")
-    .run("123", "999", "1", "998", "paper", "slot:1000");
+  sql.prepare("INSERT OR REPLACE INTO paper_job_claim_v0_1 VALUES (?, ?, ?, ?, ?, ?, ?)")
+    .run("123", "999", "1", "998", "paper", "slot:1000", 2000);
   assert.equal(sql.prepare("SELECT run_id FROM paper_job_claim_v0_1 WHERE slot_id = ?").get("slot:1000").run_id, "100");
-  sql.prepare("INSERT OR REPLACE INTO paper_job_claim_v0_1 VALUES (?, ?, ?, ?, ?, ?)")
-    .run("123", "100", "1", "101", "paper", "slot:9999");
+  sql.prepare("INSERT OR REPLACE INTO paper_job_claim_v0_1 VALUES (?, ?, ?, ?, ?, ?, ?)")
+    .run("123", "100", "1", "101", "paper", "slot:9999", 9999);
   assert.equal(sql.prepare("SELECT slot_id FROM paper_job_claim_v0_1 WHERE run_id = ?").get("100").slot_id, "slot:1000");
   assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1").get().n, 2);
   const before = calls;
-  assert.equal(await claimJobSlot(binding, { ...claim, writerId: "bad';drop" }, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1, maxDatabaseBytes: 2048 } }), "INVALID");
+  assert.equal(await claimJobSlot(binding, { ...claim, writerId: "bad';drop" }, { enabled: true, limits: { rowsRead: 8, rowsWritten: 4, maxDatabaseBytes: 2048 } }), "INVALID");
   assert.equal(calls, before);
   sql.close();
 });
 
+test("a reopened claim database rejects clock rollback across writers", async t => {
+  const directory = mkdtempSync(join(tmpdir(), "paper-claim-clock-"));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const file = join(directory, "claims.sqlite");
+  const limits = { rowsRead: 8, rowsWritten: 4, maxDatabaseBytes: 2048 };
+  const claim = { repositoryId: "123", runId: "11", attempt: "1", checkRunId: "12",
+    writerId: "paper", slotId: "slot:1000", observedAtMs: 1300 };
+  function submit(db, data) {
+    const binding = { prepare: sql => ({ bind: (...args) => ({ run: async () => {
+      const { changes } = db.prepare(sql).run(...args);
+      return { success: true, meta: { changes, total_attempts: 1,
+        rows_read: 2, rows_written: changes ? 4 : 0, size_after: 1024 } };
+    } }) }) };
+    return claimJobSlot(binding, data, { enabled: true, limits });
+  }
+
+  const first = new DatabaseSync(file);
+  try {
+    first.exec(legacySchema);
+    assert.equal(await submit(first, claim), "REVIEW_REQUIRED");
+    first.exec(clockSchema);
+    assert.equal(await submit(first, claim), "CLAIMED");
+  } finally { first.close(); }
+
+  const restarted = new DatabaseSync(file);
+  try {
+    const other = { ...claim, writerId: "second", runId: "21", checkRunId: "22" };
+    assert.equal(await submit(restarted, { ...other, observedAtMs: 1299 }), "DUPLICATE_OR_CONFLICT");
+    assert.equal(restarted.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1").get().n, 1);
+    assert.equal(await submit(restarted, other), "CLAIMED");
+    assert.equal(await submit(restarted, other), "DUPLICATE_OR_CONFLICT");
+    for (const predicate of ["observed_at_ms > 1300", "observed_at_ms IS NULL"]) {
+      const plan = restarted.prepare("EXPLAIN QUERY PLAN SELECT 1 FROM paper_job_claim_v0_1 " +
+        "INDEXED BY paper_job_observed_clock_v0_2 WHERE " + predicate).all();
+      assert.ok(plan.some(row => /SEARCH .* USING COVERING INDEX paper_job_observed_clock_v0_2/.test(row.detail)));
+    }
+  } finally { restarted.close(); }
+
+  const legacy = new DatabaseSync(":memory:");
+  try {
+    legacy.exec(legacySchema);
+    legacy.exec("INSERT INTO paper_job_claim_v0_1 VALUES ('123','5','1','6','paper','slot:500')");
+    legacy.exec(clockSchema);
+    assert.equal(await submit(legacy, claim), "DUPLICATE_OR_CONFLICT");
+    assert.equal(legacy.prepare("SELECT observed_at_ms FROM paper_job_claim_v0_1").get().observed_at_ms, null);
+    assert.throws(() => legacy.exec("INSERT INTO paper_job_claim_v0_1 " +
+      "(repository_id,run_id,attempt,check_run_id,writer_id,slot_id) VALUES ('123','7','1','8','paper','slot:700')"),
+      /PAPER_JOB_CLOCK_REQUIRED/);
+  } finally { legacy.close(); }
+});
+
 test("D1 claim rejects an empty write allowance before accessing the binding", async () => {
-  const claim = { repositoryId: "123", runId: "100", attempt: "1", checkRunId: "101", writerId: "paper", slotId: "slot:1000" };
+  const claim = { repositoryId: "123", runId: "100", attempt: "1", checkRunId: "101", writerId: "paper", slotId: "slot:1000", observedAtMs: 1000 };
   let calls = 0;
   const db = { prepare: () => { calls++; throw new Error("unexpected database access"); } };
   const limits = { rowsRead: 8, rowsWritten: 0, maxDatabaseBytes: 2048 };
@@ -121,7 +182,7 @@ test("D1 claim rejects an empty write allowance before accessing the binding", a
 });
 
 test("D1 claim rejects unknown or repeated attempt metadata", async () => {
-  const claim = { repositoryId: "123", runId: "100", attempt: "1", checkRunId: "101", writerId: "paper", slotId: "slot:1000" };
+  const claim = { repositoryId: "123", runId: "100", attempt: "1", checkRunId: "101", writerId: "paper", slotId: "slot:1000", observedAtMs: 1000 };
   for (const result of [
     { success: true, meta: { changes: 1 } },
     { success: true, meta: { changes: 1, total_attempts: 1, rows_read: 9, rows_written: 1 } },
@@ -135,7 +196,7 @@ test("D1 claim rejects unknown or repeated attempt metadata", async () => {
   ]) {
     let calls = 0;
     const db = { prepare: () => ({ bind: () => ({ run: async () => { calls++; return result; } }) }) };
-    assert.equal(await claimJobSlot(db, claim, { enabled: true, limits: { rowsRead: 8, rowsWritten: 1, maxDatabaseBytes: 2048 } }), "REVIEW_REQUIRED");
+    assert.equal(await claimJobSlot(db, claim, { enabled: true, limits: { rowsRead: 8, rowsWritten: 4, maxDatabaseBytes: 2048 } }), "REVIEW_REQUIRED");
     assert.equal(calls, 1);
   }
 });
@@ -212,7 +273,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     workflowPath: ".github/workflows/paper.yml", workflowRef: "owner/repo/.github/workflows/paper.yml@refs/heads/main",
     workflowSha: sha, sha, jobName: "paper", audience: "paper-test",
     subject: "repo:owner@77/repo@123:ref:refs/heads/main", writerId: "paper", databaseBytesBefore: 1024, maxAgeSeconds: 600,
-    maxScheduleDelaySeconds: 180, admissionCosts: { workerRequests: 1, githubRequests: 4, d1Queries: 1, d1RowsRead: 8, d1RowsWritten: 3, d1StorageBytes: 4096 } };
+    maxScheduleDelaySeconds: 180, admissionCosts: { workerRequests: 1, githubRequests: 4, d1Queries: 1, d1RowsRead: 8, d1RowsWritten: 4, d1StorageBytes: 4096 } };
   const claims = { iss: "https://token.actions.githubusercontent.com", aud: policy.audience, sub: policy.subject,
     repository: policy.repository, repository_id: policy.repositoryId, workflow_ref: policy.workflowRef,
     workflow_sha: sha, sha, ref: "refs/heads/main", ref_type: "branch", runner_environment: "github-hosted",
@@ -241,7 +302,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     throw Error("unexpected path");
   };
   const sql = new DatabaseSync(":memory:");
-  sql.exec(readFileSync(new URL("../../migrations/paper_gateway_job_claim_candidate_v0_1.sql", import.meta.url), "utf8"));
+  installJobClaimSchema(sql);
   const db = { prepare: statement => ({ bind: (...args) => ({ run: async () => {
     writes++;
     const changes = Number(sql.prepare(statement).run(...args).changes);
@@ -266,7 +327,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   let ingressId = 0;
   const ingressPolicy = { scope: "ingress", policyHash: "c".repeat(64), startsMs: base, endsMs: base + 300000,
     caps: { worker: 2, github: 8, provider: 0, r2a: 0, r2b: 0, bytes: 0,
-      d1queries: 2, d1read: 16, d1write: 6, d1bytes: 8192, doReq: 2, doGbMs: 2, doRead: 2, doWrite: 2, doBytes: 2 } };
+      d1queries: 2, d1read: 16, d1write: 8, d1bytes: 8192, doReq: 2, doGbMs: 2, doRead: 2, doWrite: 2, doBytes: 2 } };
   assert.throws(() => createIngressReservation({ enabled: true, storage: ingressStorage,
     policy: ingressPolicy, clock: () => now, nextId: () => "attempt-x",
     admissionCosts: policy.admissionCosts }), /overhead required/);
@@ -311,7 +372,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
 
   // A backwards step after the committed claim cannot release work.
   const rollbackSql = new DatabaseSync(":memory:");
-  rollbackSql.exec(readFileSync(new URL("../../migrations/paper_gateway_job_claim_candidate_v0_1.sql", import.meta.url), "utf8"));
+  installJobClaimSchema(rollbackSql);
   let rollbackWrites = 0, rollbackReads = 0;
   const rollbackDb = { prepare: statement => ({ bind: (...args) => ({ run: async () => {
     rollbackWrites++;

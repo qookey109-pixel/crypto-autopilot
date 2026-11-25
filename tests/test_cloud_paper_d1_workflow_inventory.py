@@ -118,7 +118,7 @@ class D1WorkflowInventoryTests(unittest.TestCase):
         path = "workers/paper-gateway/d1-job-claim.mjs"
         caller = "workers/paper-gateway/synthetic-admission.mjs"
         sources = {p: (root / p).read_text(encoding="utf-8") for p in (path, caller)}
-        contract = json.loads((root / "config/synthetic_worker_d1_inventory_v0_1.json").read_text())
+        contract = json.loads((root / "config/synthetic_worker_d1_inventory_v0_2.json").read_text())
         self.assertEqual(validate_synthetic_worker_d1_boundary(sources, contract), [path, caller])
         bad_cases = (
             ({**sources, path: sources[path] + "\\n// changed"}, contract),
@@ -134,6 +134,7 @@ class D1WorkflowInventoryTests(unittest.TestCase):
             (sources, {**contract, "source_sha256": "0" * 64}),
             (sources, {**contract, "source_path": "workers/extra.mjs"}),
             (sources, {**contract, "caller_sha256": "0" * 64}),
+            (sources, {**contract, "clock_migration_sha256": "0" * 64}),
             (sources, {**contract, "schema": "unexpected"}),
         )
         for contents, altered in bad_cases:
