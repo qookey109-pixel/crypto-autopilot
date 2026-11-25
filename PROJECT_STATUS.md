@@ -1,3 +1,5 @@
+For the November 25 Research Signal, Worker identity and natural Health evidence, see the [Cloud Paper delivery checkpoint](CURRENT_STATUS.md). Earlier dated checkpoints retain their observation scope.
+
 ## Delivery checkpoint — 2026-11-22 Asia/Taipei
 
 Evidence basis: reviewed parent main `36dde684ef90687f2d98c778f49083a0ca0489d2`; resolve live main, checks, and PRs before acting. Older dated entries below remain historical.
