@@ -11,7 +11,7 @@ import { createIngressReservation, prepareEnvelopeSchema, reserveEnvelope, snaps
 import { conservativeRemaining } from "../../workers/paper-gateway/lagged-usage.mjs";
 import { checkJobMetadata } from "../../workers/paper-gateway/github-metadata.mjs";
 import { readJobMetadata } from "../../workers/paper-gateway/github-metadata-reader.mjs";
-import { admitScheduledJob, processingSlot } from "../../workers/paper-gateway/synthetic-admission.mjs";
+import { admitScheduledJob, processingSlot, processingSlotForJob } from "../../workers/paper-gateway/synthetic-admission.mjs";
 import { verifyGithubJob } from "../../workers/paper-gateway/github-oidc.mjs";
 import { readGithubKeys } from "../../workers/paper-gateway/github-keys.mjs";
 
@@ -398,6 +398,55 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   assert.equal(accepted.slotId, "slot:" + base);
   assert.equal((await admitScheduledJob({ ...config, reserve: async () => true })).status, "DUPLICATE_OR_CONFLICT");
   assert.equal(writes, 2);
+
+  const project = "qookey109-pixel/crypto-autopilot";
+  for (const [writer, workflowId, file, jobName, start] of [
+    ["research-signal-layer-v0-2", "340924790", "research-signal-layer-v0-2.yml", "collect", "2026-11-22T02:17:00Z"],
+    ["binance-usdm-detailed-training-v0-1", "340899183", "binance-usdm-detailed-training-v0-1.yml", "train", "2026-11-22T04:37:00Z"],
+  ]) {
+    const at = Date.parse(start);
+    const path = ".github/workflows/" + file;
+    const fixed = { ...policy, repository: project, repositoryId: "1336841226", workflowId,
+      workflowPath: path, workflowRef: project + "/" + path + "@refs/heads/main", jobName,
+      subject: "repo:qookey109-pixel@297143956/crypto-autopilot@1336841226:ref:refs/heads/main",
+      writerId: "crypto-autopilot:" + writer };
+    const seconds = at / 1000;
+    const identity = { ...claims, sub: fixed.subject, repository: project, repository_id: fixed.repositoryId,
+      workflow_ref: fixed.workflowRef, run_id: workflowId, check_run_id: workflowId,
+      iat: seconds, nbf: seconds, exp: seconds + 300 };
+    const signed = enc({ alg: "RS256", typ: "JWT", kid: "fixture" }) + "." + enc(identity);
+    const sig = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", pair.privateKey, new TextEncoder().encode(signed));
+    const observed = { ...run, id: Number(workflowId), workflow_id: Number(workflowId), path,
+      repository: { id: Number(fixed.repositoryId) }, created_at: start };
+    const activeJob = { ...job, id: Number(workflowId), run_id: Number(workflowId), name: jobName, started_at: start };
+    const registered = { ...config, policy: fixed, token: signed + "." + Buffer.from(sig).toString("base64url"),
+      clock: () => at + 60000, reserve: async () => true,
+      fetcher: async url => {
+        if (url.endsWith("/jwks")) return Response.json({ keys: [jwk] });
+        if (url.endsWith("/actions/runs/" + workflowId)) return Response.json(observed);
+        if (url.endsWith("/actions/jobs/" + workflowId)) return Response.json(activeJob);
+        if (url.endsWith("/branches/main")) return Response.json({ commit: { sha } });
+        throw Error("unexpected fixture path");
+      } };
+    assert.equal(processingSlotForJob(fixed, at + 600000, at + 600000, start), at);
+    assert.equal(processingSlotForJob(fixed, at, at + 600001, start), null);
+    assert.equal(processingSlotForJob(fixed, at, at, new Date(at - 1000).toISOString()), null);
+    assert.equal(processingSlotForJob(fixed, at, at, new Date(at + 1000).toISOString()), null);
+    if (jobName === "train") {
+      const monday = at + 86400000;
+      assert.equal(processingSlotForJob(fixed, monday, monday, new Date(monday).toISOString()), null);
+    }
+    const before = writes;
+    for (const other of ["unknown", "crypto-autopilot:live-paper-run-recovery-v0-1", "crypto-autopilot:live-paper-run-coordinator-v0-1"]) {
+      assert.equal((await admitScheduledJob({ ...registered, policy: { ...fixed, writerId: other } })).status, "SLOT_BLOCKED");
+    }
+    assert.equal(writes, before);
+    assert.deepEqual(await admitScheduledJob(registered), { status: "CLAIMED", slotId: "slot:" + at });
+    const row = sql.prepare("SELECT slot_id FROM paper_job_claim_v0_1 WHERE writer_id=?").get(fixed.writerId);
+    assert.equal(row.slot_id, "slot:" + at);
+    assert.equal((await admitScheduledJob(registered)).status, "DUPLICATE_OR_CONFLICT");
+  }
+
   sql.close();
 });
 

@@ -17,6 +17,45 @@ export function processingSlot(now, after) {
   return slot;
 }
 
+
+const repository = "qookey109-pixel/crypto-autopilot";
+const repositoryId = "1336841226";
+const scheduledWriters = new Map([
+  ["crypto-autopilot:research-signal-layer-v0-2", {
+    workflowId: "340924790", file: "research-signal-layer-v0-2.yml", job: "collect",
+    minuteOfDay: 2 * 60 + 17, sundayOnly: false,
+  }],
+  ["crypto-autopilot:binance-usdm-detailed-training-v0-1", {
+    workflowId: "340899183", file: "binance-usdm-detailed-training-v0-1.yml", job: "train",
+    minuteOfDay: 4 * 60 + 37, sundayOnly: true,
+  }],
+]);
+
+export function processingSlotForJob(policy, now, after, createdAt) {
+  if (typeof policy?.writerId !== "string" || typeof policy.workflowRef !== "string") return null;
+  // Preserve the generic synthetic Paper fixture. This path cannot select
+  // a project writer, repository or project workflow reference.
+  if (policy.repository !== repository && policy.repositoryId !== repositoryId &&
+      !policy.writerId.startsWith("crypto-autopilot:") &&
+      !policy.workflowRef.startsWith(repository + "/")) return processingSlot(now, after);
+
+  const writer = scheduledWriters.get(policy.writerId);
+  if (!writer || policy.repository !== repository || policy.repositoryId !== repositoryId ||
+      policy.workflowId !== writer.workflowId || policy.jobName !== writer.job) return null;
+  const path = ".github/workflows/" + writer.file;
+  if (policy.workflowPath !== path || policy.workflowRef !== repository + "/" + path + "@refs/heads/main" ||
+      policy.workflowSha !== policy.sha) return null;
+  if (!Number.isSafeInteger(now) || !Number.isSafeInteger(after) || after < now || now < 0) return null;
+  const dayStart = now - now % 86400000;
+  if (writer.sundayOnly && new Date(dayStart).getUTCDay() !== 0) return null;
+  const slot = dayStart + writer.minuteOfDay * 60000;
+  // GitHub exposes creation time, not the intended cron occurrence. Admit
+  // only work created and processed inside the same fresh window.
+  const created = Date.parse(createdAt);
+  return Number.isSafeInteger(created) && slot <= created && created <= now &&
+    slot <= now && after - slot <= 600000 ? slot : null;
+}
+
 export async function admitScheduledJob({ enabled = false, policy, token, githubToken, fetcher, db, clock, reserve } = {}) {
   if (enabled !== true) return { status: "DISABLED" };
   try {
@@ -53,7 +92,7 @@ export async function admitScheduledJob({ enabled = false, policy, token, github
         !checkJobMetadata(identity, metadata.run, metadata.job,
           { ...fixed, allowedEvents: ["schedule"] }, after)) return { status: "IDENTITY_BLOCKED" };
     // Processing time only; never claim to know the scheduler's nominal slot.
-    const slot = processingSlot(now, after);
+    const slot = processingSlotForJob(fixed, now, after, metadata.run.created_at);
     if (slot === null) return { status: "SLOT_BLOCKED" };
     const slotId = "slot:" + slot;
     const status = await claimJobSlot(db, { repositoryId: identity.repositoryId, runId: identity.runId,
@@ -65,7 +104,7 @@ export async function admitScheduledJob({ enabled = false, policy, token, github
     // Keep the consumed claim and require review; never release work.
     const finished = clock();
     if (!Number.isSafeInteger(finished) || finished < after || Math.floor(finished / 1000) >= identity.expiresAt ||
-        processingSlot(now, finished) !== slot) return { status: "REVIEW_REQUIRED" };
+        processingSlotForJob(fixed, now, finished, metadata.run.created_at) !== slot) return { status: "REVIEW_REQUIRED" };
     return { status, slotId };
   } catch { return { status: "REVIEW_REQUIRED" }; }
 }
