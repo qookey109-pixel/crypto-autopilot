@@ -1114,7 +1114,10 @@ function renderCloudPaperLoop(data) {
     && data.authority === false
     && data.activation?.enabled === false
     && data.strategy?.registry_status === "EMPTY_NO_ELIGIBLE_STRATEGIES"
+    && data.strategy.eligible_count === 0
+    && data.strategy.runtime_result === "NOT_RUN_NO_FORMAL_NO_TRADE_RESULT"
     && data.latest_run?.status === "NOT_RUN"
+    && ["run_id", "attempt", "head_sha", "report_status", "report_artifact"].every(key => data.latest_run[key] === null)
     && data.latest_run?.decision_trace_status === "NOT_AVAILABLE_NO_OFFICIAL_RUN"
     && data.market?.provider === "PIONEX_PUBLIC"
     && data.market?.pionex_public_market_data_api_key_required === false
@@ -1189,7 +1192,7 @@ function renderCloudPaperLoop(data) {
     traceDetail.textContent = "最新正式 run 為 NOT_RUN；逐市場決策軌跡尚無資料。合成 CI 證據不會投影成正式市場決策。";
   }
   set("#cloud-paper-last-run", "尚未執行");
-  set("#cloud-paper-candidates", "尚未執行 · 空策略登錄，沒有合格候選");
+  set("#cloud-paper-candidates", "市場候選數未知（尚無正式掃描）· 合格策略 0 項");
   set("#cloud-paper-regime", "REGIME_UNAVAILABLE · 缺 TOTAL3 / BTC dominance；23 市場 breadth 覆蓋未驗證");
   set("#cloud-paper-account", "尚未初始化");
   set("#cloud-paper-positions", "持倉與損益尚無正式證據");

@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping
 from urllib.parse import urlsplit
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from crypto_autopilot.research.signal_layer import (
     KOLForecast,
@@ -180,13 +180,24 @@ def parse_source_payload(
     return snapshot, forecasts
 
 
+class _RejectRedirects(HTTPRedirectHandler):
+    """Keep each source fetch to its configured URL and one HTTP request."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def _open_configured_source(request: Request, *, timeout: float):
+    return build_opener(_RejectRedirects()).open(request, timeout=timeout)
+
+
 def fetch_public_source(
     *,
     source_id: str,
     source_url: str,
     timeout_seconds: float,
     max_bytes: int,
-    opener: Callable[..., Any] = urlopen,
+    opener: Callable[..., Any] = _open_configured_source,
     retrieved_at_ms: int | None = None,
     parse_mode: str = "structured_json_only",
 ) -> tuple[SourceSnapshot, tuple[KOLForecast, ...]]:
@@ -246,7 +257,7 @@ def collect_sources(
     *,
     timeout_seconds: float,
     max_bytes: int,
-    opener: Callable[..., Any] = urlopen,
+    opener: Callable[..., Any] = _open_configured_source,
     retrieved_at_ms: int | None = None,
 ) -> tuple[tuple[SourceSnapshot, ...], tuple[KOLForecast, ...]]:
     snapshots: list[SourceSnapshot] = []
@@ -406,18 +417,25 @@ def publish_signal_payload(
             "hard_stop_bytes": hard_stop_bytes,
             "r2_writes_performed": False,
         }
+    metadata = {"provider": "public_research", "version": "v0.2"}
     for key, body in objects.items():
-        immutable = key != latest_key
-        existing = store.get_bytes_if_exists(key) if immutable else None
-        if immutable and existing is not None and existing != body:
-            raise ResearchSignalIngestError(f"immutable signal object conflict: {key}")
-        if existing == body:
+        if key == latest_key:
+            store.put_bytes(key, body, content_type="application/json", metadata=metadata)
             continue
-        store.put_bytes(
-            key,
-            body,
-            content_type="application/json",
-            metadata={"provider": "public_research", "version": "v0.2"},
+        existing = store.get_bytes_if_exists(key)
+        if existing is not None:
+            if existing != body:
+                raise ResearchSignalIngestError(f"immutable signal object conflict: {key}")
+            continue
+        # Another writer can create this key after the read. Let R2 enforce
+        # create-only publication before proceeding to the latest pointer.
+        store.client.put_object(
+            Bucket=store.bucket,
+            Key=key,
+            Body=body,
+            IfNoneMatch="*",
+            ContentType="application/json",
+            Metadata={**metadata, "sha256": _sha256(body)},
         )
     return {
         "status": "PUBLISHED",

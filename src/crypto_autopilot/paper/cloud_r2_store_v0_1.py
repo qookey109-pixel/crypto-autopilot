@@ -43,6 +43,7 @@ class BudgetedR2Client:
 class BudgetedR2Policy:
     maximum_list_pages: int = 100
     maximum_list_keys_per_page: int = 1000
+    maximum_read_bytes: int | None = None
 
 
 class BudgetedR2Store:
@@ -66,6 +67,10 @@ class BudgetedR2Store:
             raise ValueError("freshness_check requires a shared cloud budget guard")
         if freshness_check is not None and not callable(freshness_check):
             raise ValueError("freshness_check must be callable")
+        if policy.maximum_read_bytes is not None and (
+            type(policy.maximum_read_bytes) is not int or policy.maximum_read_bytes < 1
+        ):
+            raise ValueError("R2 read limit must be a positive integer")
         self.bucket = bucket
         self.policy = policy
         self.budget_guard = budget_guard
@@ -135,9 +140,29 @@ class BudgetedR2Store:
             etag=str(response.get("ETag")).strip('"') if response.get("ETag") else None,
         )
 
+    def _read_body(self, response: dict[str, Any]) -> bytes:
+        stream = response["Body"]
+        limit = self.policy.maximum_read_bytes
+        if limit is None:
+            return stream.read()
+        chunks: list[bytes] = []
+        total = 0
+        try:
+            while total <= limit:
+                chunk = stream.read(limit + 1 - total)
+                if not isinstance(chunk, bytes):
+                    raise ValueError("R2 object returned invalid bytes")
+                if not chunk:
+                    return b"".join(chunks)
+                chunks.append(chunk)
+                total += len(chunk)
+            raise ValueError("R2 object exceeds the configured read limit")
+        finally:
+            stream.close()
+
     def get_bytes_verified(self, key: str, *, expected_sha256: str) -> bytes:
         response = self.client.get_object(Bucket=self.bucket, Key=key)
-        payload = response["Body"].read()
+        payload = self._read_body(response)
         actual_sha256 = hashlib.sha256(payload).hexdigest()
         if actual_sha256 != expected_sha256:
             raise ValueError(
@@ -157,7 +182,7 @@ class BudgetedR2Store:
                 return None
             raise
 
-        payload = response["Body"].read()
+        payload = self._read_body(response)
         expected_sha256 = str(response.get("Metadata", {}).get("sha256") or "")
         if expected_sha256 and hashlib.sha256(payload).hexdigest() != expected_sha256:
             raise ValueError(f"R2 metadata SHA-256 mismatch for {key}")

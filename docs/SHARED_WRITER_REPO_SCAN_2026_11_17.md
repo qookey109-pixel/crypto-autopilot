@@ -27,3 +27,22 @@ Three located configuration files were read at those commits:
 These observations do **not** establish whether any running deployment, other branch, private repository, external service, REST/S3 client, dashboard-created binding, secret or administrator credential accesses R2 or D1. They do not establish account-wide cost, current headroom, or exclusive writing. All-writer coverage and namespace ownership remain UNKNOWN. Existing credentials remain unchanged; do not revoke them based on this scan.
 
 No Cloudflare, R2, D1, provider, training, schedule or production PAPER access or configuration change was performed by this GitHub-only scan. Existing frozen evidence and consumed authorizations remain unchanged.
+
+
+## Deployed Worker binding observation — 2026-11-20 Asia/Taipei
+
+The owner-authorized Cloudflare dashboard displayed five Workers on one page.
+Their production overview panels showed one Workers AI binding, two Durable
+Object bindings across different services, and two services with no bindings.
+No R2 or D1 binding appeared in those five overview panels. This was a
+read-only UI observation of displayed bindings, not an API credential or source
+code audit. It cannot rule out S3/REST access, other environments, future
+deployments, or writes by external clients. The two all-bucket administrator
+credentials remain active at the owner's request.
+
+The displayed account is shared with other applications. Existing Worker, AI
+and Durable Object activity must be included when assessing applicable
+account-wide limits and costs for any proposed control plane. The UI does not
+prove usage, free-tier headroom, completeness of billing evidence or a
+project-owned exclusive namespace. This observation grants no execution or
+provisioning authority.

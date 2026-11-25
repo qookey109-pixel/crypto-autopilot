@@ -37,6 +37,11 @@ attempt. These are per-run request bounds. A bucket listing spans multiple reque
 so concurrent writers can change its contents during a scan or after it finishes.
 Account-wide reservations and current billing headroom remain unverified.
 
+The default collector sends one request to each configured HTTPS source and
+does not follow redirects. A redirect is recorded as a failed source; the
+collector can continue with the other configured sources. A changed endpoint
+requires review of its provenance before the configuration is updated.
+
 The separate read-only Quality V0.1 check verifies the exact
 `latest -> manifest -> payload` lineage with at most three object reads. An
 exact verified-run reuse reads only the latest pointer and still rechecks

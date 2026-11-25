@@ -417,7 +417,7 @@ test("cloud paper dashboard shows inactive state without inventing account evide
   await page.goto(baseURL, { waitUntil: "networkidle" });
   await expect(page.locator("#cloud-paper-status")).toHaveText("已實作 · 尚未啟用");
   await expect(page.locator("#cloud-paper-last-run")).toHaveText("尚未執行");
-  await expect(page.locator("#cloud-paper-candidates")).toHaveText("尚未執行 · 空策略登錄，沒有合格候選");
+  await expect(page.locator("#cloud-paper-candidates")).toHaveText("市場候選數未知（尚無正式掃描）· 合格策略 0 項");
   await expect(page.locator("#cloud-paper-regime")).toHaveText("REGIME_UNAVAILABLE · 缺 TOTAL3 / BTC dominance；23 市場 breadth 覆蓋未驗證");
   await expect(page.locator(".cloud-paper-panel")).toContainText("固定 23 市場 breadth 成員已準備，歷史覆蓋仍未驗證");
   await expect(page.locator("#cloud-paper-account")).toHaveText("尚未初始化");
@@ -567,6 +567,11 @@ test("reviewed V0.2 historical projection remains readable", async ({ page, base
 });
 
 for (const [name, mutate] of [
+  ["unrun cycle with run ID", data => { data.latest_run.run_id = 42; }],
+  ["unrun cycle with report outcome", data => { data.latest_run.report_status = "NO_TRADE"; }],
+  ["unrun cycle missing artifact field", data => { delete data.latest_run.report_artifact; }],
+  ["empty registry with eligible strategy", data => { data.strategy.eligible_count = 1; }],
+  ["formal strategy result before run", data => { data.strategy.runtime_result = "NO_TRADE"; }],
   ["run identity", data => { data.budget.usage_audit_evidence.run_id += 1; }],
   ["artifact identity", data => { data.budget.usage_audit_evidence.artifact_name = "wrong"; }],
   ["artifact digest", data => { data.budget.usage_audit_evidence.artifact_sha256 = "0".repeat(64); }],
@@ -589,6 +594,7 @@ for (const [name, mutate] of [
     await page.locator("#refresh-button").click();
     await expect(page.locator("#cloud-paper-status")).toHaveText("無法核實");
     await expect(page.locator("#cloud-paper-account")).toHaveText("未核實");
+    await expect(page.locator("#cloud-paper-candidates")).toHaveText("未核實");
     await expect(page.locator("#cloud-paper-evidence-run")).toBeHidden();
     await expect(page.locator("#cloud-paper-evidence-run")).not.toHaveAttribute("href");
     await expect(page.locator("#cloud-paper-evidence-snapshot")).toHaveText("來源資料時間：未核實");
