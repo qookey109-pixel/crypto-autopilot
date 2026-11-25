@@ -42,8 +42,23 @@ export default {
       "RSASSA-PKCS1-v1_5", key.privateKey, new TextEncoder().encode(input),
     ));
     const token = input + "." + signature;
-    const options = { enabled: true, policy, now: 1100, fetchKeys: async () => ({ keys: [jwk] }) };
+    // Check that each runtime's ephemeral public key matches the issuer's wire format.
+    if (jwk.kty !== "RSA" || jwk.e !== "AQAB" || typeof jwk.n !== "string" ||
+        !/^[A-Za-z0-9_-]+$/.test(jwk.n) || jwk.n.length < 342)
+      throw new Error("Test issuer generated an unexpected public key representation");
+    const publicKey = await crypto.subtle.importKey("jwk", jwk,
+      { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
+    const signedBytes = Uint8Array.from(atob(signature.replaceAll("-", "+").replaceAll("_", "/")),
+      c => c.charCodeAt(0));
+    if (!await crypto.subtle.verify("RSASSA-PKCS1-v1_5", publicKey, signedBytes, new TextEncoder().encode(input)))
+      throw new Error("Test issuer signature did not round-trip");
+    let keyReads = 0;
+    const options = { enabled: true, policy, now: 1100, fetchKeys: async () => {
+      keyReads++;
+      return { keys: [jwk] };
+    } };
     const accepted = await verifyGithubJob(token, options);
+    if (keyReads !== 1) throw new Error("Valid fixture rejected before public key lookup");
     equal(accepted?.runId, "100");
     equal(accepted?.runAttempt, "1");
     equal(accepted?.checkRunId, "101");
