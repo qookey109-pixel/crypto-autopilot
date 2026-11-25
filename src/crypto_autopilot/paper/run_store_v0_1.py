@@ -246,36 +246,22 @@ class R2PaperRunStore:
         key = self._key(kind, object_id)
         body = _canonical_bytes(payload)
         existing = self.store.get_bytes_if_exists(key)
-        if existing is not None:
-            if existing != body:
-                raise ValueError(
-                    "paper run store id collision: existing R2 payload differs"
-                )
-            return PaperRunStoreReceipt(
-                backend="R2_JSON",
-                kind=kind,
-                object_id=object_id,
-                location=key,
-                bytes=len(body),
-                replayed=True,
-            )
+        if existing is None:
+            try:
+                return self._create_json(kind, object_id, key, body)
+            except PaperRunObjectAlreadyExistsError:
+                # A competing create won. Verify its bytes before returning a replay.
+                existing = self.store.get_bytes_if_exists(key)
 
-        receipt = self.store.put_bytes(
-            key,
-            body,
-            content_type="application/json",
-            metadata={
-                "paper-run-kind": _clean_component(kind, "kind"),
-                "paper-run-id": _clean_component(object_id, "object_id"),
-            },
-        )
+        if existing != body:
+            raise ValueError("paper run store id collision: differing or missing R2 payload")
         return PaperRunStoreReceipt(
             backend="R2_JSON",
             kind=kind,
             object_id=object_id,
             location=key,
-            bytes=receipt.bytes,
-            replayed=False,
+            bytes=len(body),
+            replayed=True,
         )
 
     def put_json_if_absent(
@@ -287,7 +273,11 @@ class R2PaperRunStore:
         """Create one R2 JSON object only when the exact key does not exist."""
 
         key = self._key(kind, object_id)
-        body = _canonical_bytes(payload)
+        return self._create_json(kind, object_id, key, _canonical_bytes(payload))
+
+    def _create_json(
+        self, kind: str, object_id: str, key: str, body: bytes,
+    ) -> PaperRunStoreReceipt:
         client = getattr(self.store, "client", None)
         bucket = getattr(self.store, "bucket", None)
         if client is None or not isinstance(bucket, str) or not bucket:
