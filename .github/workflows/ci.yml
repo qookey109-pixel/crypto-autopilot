@@ -85,6 +85,19 @@ jobs:
       - name: Test Worker identity verifier (Python 3.12 only)
         if: ${{ matrix.python-version == '3.12' }}
         run: node --test tests/worker/github_oidc.test.mjs
+      - name: Verify signed job identity inside workerd (Python 3.12 only)
+        if: ${{ matrix.python-version == '3.12' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          curl --fail --silent --show-error --location --proto '=https' \
+            'https://github.com/cloudflare/workerd/releases/download/v1.20261125.1/workerd-linux-64.gz' -o workerd.gz
+          echo 'fac53e92d9006a90f65d950e6e14d58c63a8385950a852bf3aeed8362c11d338  workerd.gz' | sha256sum -c -
+          gzip -dc workerd.gz > workerd
+          chmod 0700 workerd
+          cd "$GITHUB_WORKSPACE"
+          "$RUNNER_TEMP/workerd" test tests/worker/signed_job.capnp
       - name: Test disabled GitHub identity primitives (Python 3.12 only)
         if: ${{ matrix.python-version == '3.12' }}
         run: node --test tests/worker/identity_reference.test.mjs tests/worker/github_identity_diagnostic.test.mjs tests/worker/github_identity_diagnostic_v0_2.test.mjs tests/worker/github_identity_diagnostic_v0_3.test.mjs tests/worker/github_identity_diagnostic_v0_4.test.mjs
