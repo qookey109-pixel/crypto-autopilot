@@ -1,10 +1,10 @@
+## Current merged release checkpoint — 2026-10-27 Asia/Taipei
+
 ## Cloud Paper delivery checkpoint — 2026-11-25
 
 - The existing Research Signal collector now limits R2 sends per invocation, including SDK retries, and records their counts. [#938](https://github.com/qookey109-pixel/crypto-autopilot/pull/938) passed [main CI](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/45528766454). Account-wide admission for the four registered writers and fresh account cost/headroom still need evidence. Formal Paper remains `NOT_WIRED / NOT_RUN / NOT_CONFIGURED`.
 - The disabled job-identity verifier now has a CI case shared by Node.js and the pinned Workers engine. The case uses an ephemeral signing key and a synthetic JSON response from the issuer. [Draft CI](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/45529527837) exercised both. A hosted credential boundary, protected clock and durable admissions still need verification in [#856](https://github.com/qookey109-pixel/crypto-autopilot/pull/856).
 - [Natural Health](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/45523403703) reported the [weekly Core100 comparator](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/45024149104) failed with `RUNTIME_CHANGED`. Its job used Ubuntu 26.04 and Python 3.13.18, read R2, and reported no training or R2 writes. Model quality remains `REJECT`; the complete manifest differences are unknown. [Maintenance](https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/45523493893) stopped on stale draft [#934](https://github.com/qookey109-pixel/crypto-autopilot/pull/934), since closed unmerged. Recovery requires a subsequent natural run.
-
-## Current merged release checkpoint — 2026-10-27 Asia/Taipei
 
 ## Delivery checkpoint — 2026-11-22 Asia/Taipei
 
