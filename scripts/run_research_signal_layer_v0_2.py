@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from pathlib import Path
 
 from crypto_autopilot.research.signal_ingest_v0_2 import (
@@ -51,7 +52,7 @@ def main() -> int:
     try:
         return _collect_and_publish(args, config, store)
     finally:
-        print(json.dumps(attempts.report(), sort_keys=True), flush=True)
+        print(json.dumps(attempts.report(), sort_keys=True), file=sys.stderr, flush=True)
 
 
 def _collect_and_publish(args: argparse.Namespace, config: dict, store: R2Store | None) -> int:
