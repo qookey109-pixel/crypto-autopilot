@@ -5,6 +5,7 @@ import { readGithubKeys } from "./github-keys.mjs";
 import { verifyGithubJob } from "./github-oidc.mjs";
 import { readJobMetadata } from "./github-metadata-reader-v0-2.mjs";
 import { checkJobMetadata } from "./github-metadata.mjs";
+import { confirmedManualScope } from "./manual-dispatch.mjs";
 import { claimJobSlot } from "./d1-job-claim.mjs";
 
 export function processingSlot(now, after) {
@@ -56,7 +57,15 @@ export function processingSlotForJob(policy, now, after, createdAt) {
     slot <= now && after - slot <= 600000 ? slot : null;
 }
 
-export async function admitScheduledJob({ enabled = false, policy, token, githubToken, fetcher, db, clock, reserve } = {}) {
+export function admitScheduledJob(options) {
+  return admitJob("schedule", options);
+}
+
+export function admitManualJob(options) {
+  return admitJob("workflow_dispatch", options);
+}
+
+async function admitJob(event, { enabled = false, policy, token, githubToken, fetcher, db, clock, reserve } = {}) {
   if (enabled !== true) return { status: "DISABLED" };
   try {
     if (!policy || typeof clock !== "function" || typeof reserve !== "function") return { status: "INVALID" };
@@ -83,20 +92,25 @@ export async function admitScheduledJob({ enabled = false, policy, token, github
       enabled: true, policy: fixed, now: Math.floor(now / 1000),
       fetchKeys: () => readGithubKeys({ enabled: true, fetcher }),
     });
-    if (!identity || identity.eventName !== "schedule") return { status: "IDENTITY_BLOCKED" };
+    if (!identity || identity.eventName !== event) return { status: "IDENTITY_BLOCKED" };
     const metadata = await readJobMetadata({
       enabled: true, repository: fixed.repository, identity, token: githubToken, fetcher,
     });
     const after = clock();
     if (!metadata || metadata.main?.commit?.sha !== fixed.sha || !Number.isSafeInteger(after) || Math.floor(after / 1000) >= identity.expiresAt ||
         !checkJobMetadata(identity, metadata.run, metadata.job,
-          { ...fixed, allowedEvents: ["schedule"] }, after)) return { status: "IDENTITY_BLOCKED" };
+          { ...fixed, allowedEvents: [event] }, after)) return { status: "IDENTITY_BLOCKED" };
     // Processing time only; never claim to know the scheduler's nominal slot.
-    const slot = processingSlotForJob(fixed, now, after, metadata.run.created_at);
+    const manual = event === "workflow_dispatch";
+    const slotAt = end => manual ? processingSlot(now, end) : processingSlotForJob(fixed, now, end, metadata.run.created_at);
+    const slot = slotAt(after);
     if (slot === null) return { status: "SLOT_BLOCKED" };
+    const scope = manual ? confirmedManualScope(fixed, identity, metadata.run.created_at, slot, now) : null;
+    if (manual && !scope) return { status: "DISPATCH_SCOPE_BLOCKED" };
+    if (scope && JSON.stringify(scope).length > costs.d1StorageBytes) return { status: "BUDGET_BLOCKED" };
     const slotId = "slot:" + slot;
     const status = await claimJobSlot(db, { repositoryId: identity.repositoryId, runId: identity.runId,
-      attempt: "1", checkRunId: identity.checkRunId, writerId: fixed.writerId, slotId, observedAtMs: after }, { enabled: true,
+      attempt: "1", checkRunId: identity.checkRunId, writerId: fixed.writerId, slotId, operationScope: scope, observedAtMs: after }, { enabled: true,
       limits: { rowsRead: costs.d1RowsRead, rowsWritten: costs.d1RowsWritten,
         maxDatabaseBytes: fixed.databaseBytesBefore + costs.d1StorageBytes } });
     if (status !== "CLAIMED") return { status };
@@ -104,7 +118,7 @@ export async function admitScheduledJob({ enabled = false, policy, token, github
     // Keep the consumed claim and require review; never release work.
     const finished = clock();
     if (!Number.isSafeInteger(finished) || finished < after || Math.floor(finished / 1000) >= identity.expiresAt ||
-        processingSlotForJob(fixed, now, finished, metadata.run.created_at) !== slot) return { status: "REVIEW_REQUIRED" };
-    return { status, slotId };
+        slotAt(finished) !== slot) return { status: "REVIEW_REQUIRED" };
+    return manual ? { status, slotId, operationScope: scope } : { status, slotId };
   } catch { return { status: "REVIEW_REQUIRED" }; }
 }

@@ -1,9 +1,10 @@
 // Prepared adapter only: it is not an identity or account-budget boundary.
 // The caller must prepay this write and supply verified, server-derived values.
 // No Worker route, D1 binding, table creation or live execution is authorized.
+import { isManualWriter, normalizeManualInputs } from "./manual-dispatch.mjs";
 const INSERT = "INSERT INTO paper_job_claim_v0_1 " +
-  "(repository_id, run_id, attempt, check_run_id, writer_id, slot_id, observed_at_ms) " +
-  "SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7 " +
+  "(repository_id, run_id, attempt, check_run_id, writer_id, slot_id, observed_at_ms, operation_scope_json) " +
+  "SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8 " +
   "WHERE NOT EXISTS (SELECT 1 FROM paper_job_claim_v0_1 INDEXED BY paper_job_observed_clock_v0_2 " +
   "WHERE observed_at_ms > ?7) AND NOT EXISTS " +
   "(SELECT 1 FROM paper_job_claim_v0_1 INDEXED BY paper_job_observed_clock_v0_2 " +
@@ -23,10 +24,17 @@ export async function claimJobSlot(database, claim, { enabled = false, limits } 
   if (!Number.isSafeInteger(slotStart) || claim.observedAtMs < slotStart ||
       claim.observedAtMs - slotStart > 600000 ||
       Math.floor(claim.observedAtMs / 86400000) !== Math.floor(slotStart / 86400000)) return "INVALID";
+  let scopeJson = null;
+  if (isManualWriter(claim.writerId)) {
+    const scope = claim.operationScope;
+    const inputs = normalizeManualInputs(claim.writerId, scope?.inputs);
+    if (!inputs || typeof scope.sourceSha !== "string" || !/^[a-f0-9]{40}$/.test(scope.sourceSha)) return "INVALID";
+    scopeJson = JSON.stringify({ sourceSha: scope.sourceSha, inputs });
+  } else if (claim.operationScope != null) return "INVALID";
   try {
     const result = await database.prepare(INSERT).bind(
       claim.repositoryId, claim.runId, claim.attempt, claim.checkRunId,
-      claim.writerId, claim.slotId, claim.observedAtMs,
+      claim.writerId, claim.slotId, claim.observedAtMs, scopeJson,
     ).run();
     if (result?.success !== true || result.meta?.total_attempts !== 1 ||
         !Number.isSafeInteger(result.meta?.rows_read) || result.meta.rows_read < 0 ||

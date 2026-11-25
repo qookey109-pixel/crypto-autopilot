@@ -77,13 +77,17 @@ def find_worker_d1_source_paths(source_files: dict[str, str]) -> set[str]:
 # This is a narrowly pinned source inventory, not a credential, route, runtime,
 # account-wide or production-admission boundary. Changes require a successor.
 _SYNTHETIC_WORKER_D1_CONTRACT = {
-    "schema": "qookey-worker-d1-synthetic-inventory-v0.3",
+    "schema": "qookey-worker-d1-synthetic-inventory-v0.4",
     "source_path": "workers/paper-gateway/d1-job-claim.mjs",
-    "source_sha256": "bd7f11e29b60ddfb4795ea2ece854102acc7fa96b16c4ac2e22c271e19802b3d",
+    "source_sha256": "64076e82eb0c5b115eb326e05272ce2f7df17372a02f0c8a9aa3c99e2eab23b9",
     "caller_path": "workers/paper-gateway/synthetic-admission.mjs",
-    "caller_sha256": "670df19d3092b737eb167b1f99cb155ca68ac287573fca82550a1eb7defee451",
+    "caller_sha256": "9315da700fc99c05ac27fd584ab42b818ed3de1c58415a411dc6e2eaee3b98ff",
     "clock_migration_path": "migrations/paper_gateway_job_claim_clock_candidate_v0_2.sql",
     "clock_migration_sha256": "9690cd82c487b8a7252751d7048fee7644a4b9d7b1510451994deeba2147aabe",
+    "dispatch_path": "workers/paper-gateway/manual-dispatch.mjs",
+    "dispatch_sha256": "fd7e1ff8da2d58b9251a6a1319bb2048bb0a2aeb8d59fe545e83cbb0097a1343",
+    "scope_migration_path": "migrations/paper_gateway_manual_job_scope_candidate_v0_3.sql",
+    "scope_migration_sha256": "3295602aeb87fba412e64e24e23f495440eccfa214fefb748ccd391935fb6526",
     "disposition": "SYNTHETIC_ONLY_NOT_PRODUCTION_AUTHORITY",
     "activation_enabled": False,
     "cloudflare_execution_authorized": False,
@@ -108,15 +112,17 @@ def validate_synthetic_worker_d1_boundary(
     entry_refs = {p for p, text in sources.items() if "synthetic-admission.mjs" in text}
     if direct_callers != {caller} or entry_refs:
         raise RuntimeError("Synthetic Worker D1 caller boundary mismatch")
-    for key, item in (("source_sha256", path), ("caller_sha256", caller)):
+    dispatch = _SYNTHETIC_WORKER_D1_CONTRACT["dispatch_path"]
+    for key, item in (("source_sha256", path), ("caller_sha256", caller), ("dispatch_sha256", dispatch)):
         if item not in sources:
             raise RuntimeError("Synthetic Worker D1 reviewed source missing")
         digest = hashlib.sha256(sources[item].encode("utf-8")).hexdigest()
         if digest != _SYNTHETIC_WORKER_D1_CONTRACT[key]:
             raise RuntimeError("Synthetic Worker D1 source digest mismatch")
-    migration = ROOT / _SYNTHETIC_WORKER_D1_CONTRACT["clock_migration_path"]
-    if hashlib.sha256(migration.read_bytes()).hexdigest() != _SYNTHETIC_WORKER_D1_CONTRACT["clock_migration_sha256"]:
-        raise RuntimeError("Synthetic Worker clock migration digest mismatch")
+    for stem in ("clock_migration", "scope_migration"):
+        migration = ROOT / _SYNTHETIC_WORKER_D1_CONTRACT[f"{stem}_path"]
+        if hashlib.sha256(migration.read_bytes()).hexdigest() != _SYNTHETIC_WORKER_D1_CONTRACT[f"{stem}_sha256"]:
+            raise RuntimeError("Synthetic Worker migration digest mismatch")
     return [path, caller]
 
 
@@ -398,7 +404,7 @@ def main() -> int:
         if path.is_file() and path.suffix.lower() in WORKER_SOURCE_SUFFIXES
     }
     worker_contract = json.loads(
-        (ROOT / "config/synthetic_worker_d1_inventory_v0_3.json").read_text(encoding="utf-8")
+        (ROOT / "config/synthetic_worker_d1_inventory_v0_4.json").read_text(encoding="utf-8")
     )
     validate_synthetic_worker_d1_boundary(worker_sources, worker_contract)
     d1_client_paths = validate_d1_source_boundary(

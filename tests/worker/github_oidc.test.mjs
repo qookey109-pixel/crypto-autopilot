@@ -11,7 +11,7 @@ import { createIngressReservation, prepareEnvelopeSchema, reserveEnvelope, snaps
 import { conservativeRemaining } from "../../workers/paper-gateway/lagged-usage.mjs";
 import { checkJobMetadata } from "../../workers/paper-gateway/github-metadata.mjs";
 import { readJobMetadata } from "../../workers/paper-gateway/github-metadata-reader.mjs";
-import { admitScheduledJob, processingSlot, processingSlotForJob } from "../../workers/paper-gateway/synthetic-admission.mjs";
+import { admitManualJob, admitScheduledJob, processingSlot, processingSlotForJob } from "../../workers/paper-gateway/synthetic-admission.mjs";
 import { verifyGithubJob } from "../../workers/paper-gateway/github-oidc.mjs";
 import { readGithubKeys } from "../../workers/paper-gateway/github-keys.mjs";
 
@@ -20,9 +20,12 @@ globalThis.crypto ??= webcrypto;
 const legacySchema = readFileSync(new URL("../../migrations/paper_gateway_job_claim_candidate_v0_1.sql", import.meta.url), "utf8");
 const clockSchema = readFileSync(new URL("../../migrations/paper_gateway_job_claim_clock_candidate_v0_2.sql", import.meta.url), "utf8");
 
+const scopeSchema = readFileSync(new URL("../../migrations/paper_gateway_manual_job_scope_candidate_v0_3.sql", import.meta.url), "utf8");
+
 function installJobClaimSchema(db) {
   db.exec(legacySchema);
   db.exec(clockSchema);
+  db.exec(scopeSchema);
 }
 
 test("unconfigured verifier fails closed without fetching keys", async () => {
@@ -108,10 +111,10 @@ test("D1 claim adapter rejects duplicates and preserves ambiguous committed writ
   assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1").get().n, 2);
   assert.throws(() => sql.exec("UPDATE paper_job_claim_v0_1 SET slot_id='slot:3000'"), /PAPER_JOB_CLAIM_IMMUTABLE/);
   assert.throws(() => sql.exec("DELETE FROM paper_job_claim_v0_1"), /PAPER_JOB_CLAIM_IMMUTABLE/);
-  sql.prepare("INSERT OR REPLACE INTO paper_job_claim_v0_1 VALUES (?, ?, ?, ?, ?, ?, ?)")
+  sql.prepare("INSERT OR REPLACE INTO paper_job_claim_v0_1 (repository_id,run_id,attempt,check_run_id,writer_id,slot_id,observed_at_ms) VALUES (?, ?, ?, ?, ?, ?, ?)")
     .run("123", "999", "1", "998", "paper", "slot:1000", 2000);
   assert.equal(sql.prepare("SELECT run_id FROM paper_job_claim_v0_1 WHERE slot_id = ?").get("slot:1000").run_id, "100");
-  sql.prepare("INSERT OR REPLACE INTO paper_job_claim_v0_1 VALUES (?, ?, ?, ?, ?, ?, ?)")
+  sql.prepare("INSERT OR REPLACE INTO paper_job_claim_v0_1 (repository_id,run_id,attempt,check_run_id,writer_id,slot_id,observed_at_ms) VALUES (?, ?, ?, ?, ?, ?, ?)")
     .run("123", "100", "1", "101", "paper", "slot:9999", 9999);
   assert.equal(sql.prepare("SELECT slot_id FROM paper_job_claim_v0_1 WHERE run_id = ?").get("100").slot_id, "slot:1000");
   assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1").get().n, 2);
@@ -142,6 +145,8 @@ test("a reopened claim database rejects clock rollback across writers", async t 
     first.exec(legacySchema);
     assert.equal(await submit(first, claim), "REVIEW_REQUIRED");
     first.exec(clockSchema);
+    assert.equal(await submit(first, claim), "REVIEW_REQUIRED");
+    first.exec(scopeSchema);
     assert.equal(await submit(first, claim), "CLAIMED");
   } finally { first.close(); }
 
@@ -164,6 +169,7 @@ test("a reopened claim database rejects clock rollback across writers", async t 
     legacy.exec(legacySchema);
     legacy.exec("INSERT INTO paper_job_claim_v0_1 VALUES ('123','5','1','6','paper','slot:500')");
     legacy.exec(clockSchema);
+    legacy.exec(scopeSchema);
     assert.equal(await submit(legacy, claim), "DUPLICATE_OR_CONFLICT");
     assert.equal(legacy.prepare("SELECT observed_at_ms FROM paper_job_claim_v0_1").get().observed_at_ms, null);
     assert.throws(() => legacy.exec("INSERT INTO paper_job_claim_v0_1 " +
@@ -449,6 +455,88 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     assert.equal(row.slot_id, "slot:" + at);
     assert.equal((await admitScheduledJob(registered)).status, "DUPLICATE_OR_CONFLICT");
   }
+
+  const target = "live-paper-run-v0-1-" + "d".repeat(64);
+  const inputPath = "research/inputs/live-paper/synthetic-example.json";
+  // Numeric workflow IDs below are fixtures. The real IDs and dispatcher
+  // receipt must be obtained independently before any production binding.
+  for (const [index, [writer, jobName, sentInputs, expectedInputs]] of [
+    ["live-paper-run-coordinator-v0-1", "run-one-step", { input_path: inputPath }, { input_path: inputPath }],
+    ["live-paper-run-recovery-v0-1", "reconcile", { run_id: target }, { run_id: target, repair_missing_result_seals: false }],
+    ["live-paper-run-recovery-v0-1", "reconcile", { run_id: target, repair_missing_result_seals: true },
+      { run_id: target, repair_missing_result_seals: true }],
+  ].entries()) {
+    const at = Date.parse("2026-11-23T00:07:00Z") + index * 900000;
+    const runId = 401 + index, checkId = 501 + index;
+    const workflowId = writer.includes("coordinator") ? "601" : "602";
+    const path = ".github/workflows/" + writer + ".yml";
+    const api = "https://api.github.com/repos/" + project;
+    const manualDispatch = {
+      apiVersion: "2026-03-10", method: "POST", url: api + "/actions/workflows/" + workflowId + "/dispatches",
+      sourceSha: sha, slotMs: at, sentAtMs: at + 100, receivedAtMs: at + 1400,
+      request: { ref: "main", inputs: sentInputs }, status: 200,
+      response: { workflow_run_id: runId, run_url: api + "/actions/runs/" + runId,
+        html_url: "https://github.com/" + project + "/actions/runs/" + runId },
+    };
+    const fixed = { ...policy, repository: project, repositoryId: "1336841226", writerId: "crypto-autopilot:" + writer,
+      workflowId, workflowPath: path, workflowRef: project + "/" + path + "@refs/heads/main", jobName,
+      subject: "repo:qookey109-pixel@297143956/crypto-autopilot@1336841226:ref:refs/heads/main",
+      approvedInputs: expectedInputs, manualDispatch };
+    const identity = { ...claims, sub: fixed.subject, repository: project, repository_id: fixed.repositoryId,
+      workflow_ref: fixed.workflowRef, run_id: String(runId), check_run_id: String(checkId), event_name: "workflow_dispatch",
+      iat: at / 1000, nbf: at / 1000, exp: at / 1000 + 300 };
+    const message = enc({ alg: "RS256", typ: "JWT", kid: "fixture" }) + "." + enc(identity);
+    const sig = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", pair.privateKey, new TextEncoder().encode(message));
+    const stamp = new Date(at + 1000).toISOString().replace(".000Z", "Z");
+    const observed = { ...run, id: runId, repository: { id: Number(fixed.repositoryId) },
+      workflow_id: Number(workflowId), path, event: "workflow_dispatch", created_at: stamp,
+      display_title: "audit only", inputs: { repair_missing_result_seals: true } };
+    const activeJob = { ...job, id: checkId, run_id: runId, name: jobName, started_at: stamp };
+    const manual = { ...config, policy: fixed, token: message + "." + Buffer.from(sig).toString("base64url"),
+      clock: () => at + 3000, reserve: async () => true,
+      fetcher: async url => {
+        if (url.endsWith("/jwks")) return Response.json({ keys: [jwk] });
+        if (url.endsWith("/actions/runs/" + runId)) return Response.json(observed);
+        if (url.endsWith("/actions/jobs/" + checkId)) return Response.json(activeJob);
+        if (url.endsWith("/branches/main")) return Response.json({ commit: { sha } });
+        throw Error("unexpected path");
+      } };
+    const before = writes;
+    const wrongInputs = jobName === "reconcile"
+      ? [{ ...expectedInputs, repair_missing_result_seals: !expectedInputs.repair_missing_result_seals },
+         { run_id: target, repair_missing_result_seals: "false" }, { run_id: target.replace(/d$/, "c") }]
+      : [{ input_path: inputPath.replace("synthetic-example", "other") },
+         { input_path: inputPath.replace("synthetic-example", "../escape") }];
+    for (const change of [
+      { manualDispatch: null }, { approvedInputs: null },
+      ...[ { ...sentInputs, unexpected: true }, ...(jobName === "reconcile"
+        ? [{ run_id: target, repair_missing_result_seals: "true" }, { run_id: "bad" }]
+        : [{ input_path: "research/inputs/live-paper/../escape.json" }]) ]
+        .map(inputs => ({ approvedInputs: inputs, manualDispatch: { ...manualDispatch, request: { ref: "main", inputs } } })), { manualDispatch: { ...manualDispatch, status: 204 } },
+      { manualDispatch: { ...manualDispatch, response: { ...manualDispatch.response, workflow_run_id: runId + 1 } } },
+      { manualDispatch: { ...manualDispatch, response: { ...manualDispatch.response, html_url: "https://example.org/" } } },
+      { manualDispatch: { ...manualDispatch, sourceSha: "e".repeat(40) } },
+      { manualDispatch: { ...manualDispatch, sentAtMs: at - 1 } },
+      { manualDispatch: { ...manualDispatch, receivedAtMs: at + 3001 } },
+      { manualDispatch: { ...manualDispatch, sentAtMs: at + 2000, receivedAtMs: at + 2200 } },
+      { manualDispatch: { ...manualDispatch, slotMs: at - 900000 } },
+      { manualDispatch: { ...manualDispatch, request: { ref: "dev", inputs: sentInputs } } },
+      ...wrongInputs.map(inputs => ({ manualDispatch: { ...manualDispatch, request: { ref: "main", inputs } } })),
+    ]) assert.deepEqual(await admitManualJob({ ...manual, policy: { ...fixed, ...change } }), { status: "DISPATCH_SCOPE_BLOCKED" });
+    assert.deepEqual(await admitScheduledJob(manual), { status: "IDENTITY_BLOCKED" });
+    assert.equal((await admitManualJob({ ...manual, policy: { ...fixed, admissionCosts: {
+      ...fixed.admissionCosts, d1StorageBytes: 1 } } })).status, "BUDGET_BLOCKED");
+    assert.equal(writes, before);
+    const operationScope = { sourceSha: sha, inputs: expectedInputs };
+    assert.deepEqual(await admitManualJob(manual), { status: "CLAIMED", slotId: "slot:" + at, operationScope });
+    assert.deepEqual(await admitManualJob(manual), { status: "DUPLICATE_OR_CONFLICT" });
+    assert.equal(sql.prepare("SELECT operation_scope_json FROM paper_job_claim_v0_1 WHERE run_id=?")
+      .get(String(runId)).operation_scope_json, JSON.stringify(operationScope));
+  }
+  assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1 WHERE operation_scope_json IS NOT NULL").get().n, 3);
+  assert.throws(() => sql.exec("INSERT INTO paper_job_claim_v0_1 " +
+    "(repository_id,run_id,attempt,check_run_id,writer_id,slot_id,observed_at_ms) " +
+    "VALUES ('123','6','1','7','crypto-autopilot:live-paper-run-recovery-v0-1','slot:1000',1000)"), /PAPER_JOB_SCOPE_INVALID/);
 
   sql.close();
 });
