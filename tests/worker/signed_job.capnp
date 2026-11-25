@@ -6,7 +6,8 @@ const tests :Workerd.Config = (
       compatibilityDate = "2026-11-01",
       modules = [
         (name = "tests/worker/signed_job_cases.mjs", esModule = embed "signed_job_cases.mjs"),
-        (name = "workers/paper-gateway/github-oidc.mjs", esModule = embed "../../workers/paper-gateway/github-oidc.mjs")
+        (name = "workers/paper-gateway/github-oidc.mjs", esModule = embed "../../workers/paper-gateway/github-oidc.mjs"),
+        (name = "workers/paper-gateway/github-keys.mjs", esModule = embed "../../workers/paper-gateway/github-keys.mjs")
       ],
       globalOutbound = "offline"
     )),

@@ -1,4 +1,5 @@
 import { verifyGithubJob } from "../../workers/paper-gateway/github-oidc.mjs";
+import { readGithubKeys } from "../../workers/paper-gateway/github-keys.mjs";
 
 function base64url(bytes) {
   return btoa(String.fromCharCode(...new Uint8Array(bytes)))
@@ -15,7 +16,16 @@ export default {
       { name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
       true, ["sign", "verify"],
     );
-    const jwk = { ...await crypto.subtle.exportKey("jwk", key.publicKey), kid: "fixture", alg: "RS256", use: "sig" };
+    // The issuer supplies JSON. Native Web Crypto export objects can also have
+    // enumerable undefined fields, which never travel in the issuer response.
+    const issuerResponse = JSON.stringify({ keys: [{
+      ...await crypto.subtle.exportKey("jwk", key.publicKey), kid: "fixture", alg: "RS256", use: "sig",
+    }] });
+    const fetchKeys = () => readGithubKeys({ enabled: true, fetcher: async url => {
+      equal(url, "https://token.actions.githubusercontent.com/.well-known/jwks");
+      return new Response(issuerResponse);
+    } });
+    const { keys: [jwk] } = await fetchKeys();
     const policy = {
       audience: "paper-test",
       repository: "owner/repo",
@@ -42,23 +52,8 @@ export default {
       "RSASSA-PKCS1-v1_5", key.privateKey, new TextEncoder().encode(input),
     ));
     const token = input + "." + signature;
-    // Check that each runtime's ephemeral public key matches the issuer's wire format.
-    if (jwk.kty !== "RSA" || jwk.e !== "AQAB" || typeof jwk.n !== "string" ||
-        !/^[A-Za-z0-9_-]+$/.test(jwk.n) || jwk.n.length < 342)
-      throw new Error("Test issuer generated an unexpected public key representation");
-    const publicKey = await crypto.subtle.importKey("jwk", jwk,
-      { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
-    const signedBytes = Uint8Array.from(atob(signature.replaceAll("-", "+").replaceAll("_", "/")),
-      c => c.charCodeAt(0));
-    if (!await crypto.subtle.verify("RSASSA-PKCS1-v1_5", publicKey, signedBytes, new TextEncoder().encode(input)))
-      throw new Error("Test issuer signature did not round-trip");
-    let keyReads = 0;
-    const options = { enabled: true, policy, now: 1100, fetchKeys: async () => {
-      keyReads++;
-      return { keys: [jwk] };
-    } };
+    const options = { enabled: true, policy, now: 1100, fetchKeys };
     const accepted = await verifyGithubJob(token, options);
-    if (keyReads !== 1) throw new Error("Valid fixture rejected before public key lookup");
     equal(accepted?.runId, "100");
     equal(accepted?.runAttempt, "1");
     equal(accepted?.checkRunId, "101");
@@ -80,6 +75,7 @@ export default {
     equal(await verifyGithubJob(await sign(forbidden, payload), options), null);
     const escapedDuplicate = base64url(new TextEncoder().encode(JSON.stringify(claims).replace('"run_id":"100"', '"run_id":"100","run\\u005fid":"100"')));
     equal(await verifyGithubJob(await sign(header, escapedDuplicate), options), null);
+    equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => ({ keys: [{ ...jwk, d: null }] }) }), null);
     equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => ({ keys: [jwk, jwk] }) }), null);
     equal(await verifyGithubJob(token, { ...options, fetchKeys: async () => ({ keys: [{ ...jwk, n: "AQ" }] }) }), null);
     equal((await verifyGithubJob(token, { ...options, fetchKeys: async () => ({ keys: [{ ...jwk, x5c: ["fixture"] }] }) }))?.runId, "100");
