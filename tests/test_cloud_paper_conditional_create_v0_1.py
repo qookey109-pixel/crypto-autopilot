@@ -4,6 +4,7 @@ import unittest
 from types import SimpleNamespace
 
 from crypto_autopilot.paper.cloud_run_store_v0_1 import CloudPaperRunStore
+from crypto_autopilot.paper.run_store_v0_1 import R2PaperRunStore
 
 
 class PreconditionFailed(Exception):
@@ -53,7 +54,7 @@ class FakeStore:
 class CloudPaperAtomicCreateTests(unittest.TestCase):
     def test_concurrent_conflicting_payloads_do_not_overwrite(self):
         backend = FakeStore(concurrent=True)
-        store = CloudPaperRunStore(backend)
+        store = R2PaperRunStore(backend)
         outcomes = []
         def run(value):
             try:
@@ -74,7 +75,7 @@ class CloudPaperAtomicCreateTests(unittest.TestCase):
 
     def test_concurrent_identical_payload_returns_one_replay(self):
         backend = FakeStore(concurrent=True)
-        store = CloudPaperRunStore(backend)
+        store = R2PaperRunStore(backend)
         outcomes = []
         def run():
             outcomes.append(store.put_json("result", "same-id", {"value": 1}))
@@ -96,3 +97,21 @@ class CloudPaperAtomicCreateTests(unittest.TestCase):
         self.assertEqual(len(backend.calls), 1)
         self.assertEqual(backend.initial_reads, 1)
         self.assertEqual(backend.calls[0].get("IfNoneMatch"), "*")
+
+    def test_lost_response_after_create_is_recovered_by_read_only_replay(self):
+        backend = FakeStore()
+        create = backend.put_object
+
+        def lose_response(**kwargs):
+            create(**kwargs)
+            raise TimeoutError("response lost after create")
+
+        backend.put_object = lose_response
+        payload = {"value": 1}
+        with self.assertRaises(TimeoutError):
+            R2PaperRunStore(backend).put_json("result", "same-id", payload)
+
+        replay = CloudPaperRunStore(backend).put_json("result", "same-id", payload)
+        self.assertTrue(replay.replayed)
+        self.assertEqual(len(backend.calls), 1)
+        self.assertEqual(backend.initial_reads, 2)

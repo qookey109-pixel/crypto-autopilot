@@ -22,20 +22,16 @@ CONFIG = ROOT / "config" / "paper_run_store_v0_1.json"
 class FakeR2:
     def __init__(self) -> None:
         self.objects: dict[str, bytes] = {}
+        self.client = self
+        self.bucket = "fixture-bucket"
 
     def get_bytes_if_exists(self, key: str) -> bytes | None:
         return self.objects.get(key)
 
-    def put_bytes(
-        self,
-        key: str,
-        payload: bytes,
-        *,
-        content_type: str = "application/octet-stream",
-        metadata: dict[str, str] | None = None,
-    ) -> SimpleNamespace:
-        self.objects[key] = payload
-        return SimpleNamespace(bytes=len(payload))
+    def put_object(self, *, Key: str, Body: bytes, IfNoneMatch: str, **kwargs: object) -> None:
+        if IfNoneMatch != "*" or Key in self.objects:
+            raise AssertionError("expected a conditional create for a new key")
+        self.objects[Key] = Body
 
     def list_keys(self, prefix: str) -> tuple[str, ...]:
         return tuple(sorted(key for key in self.objects if key.startswith(prefix)))
