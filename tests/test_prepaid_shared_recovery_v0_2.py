@@ -61,12 +61,15 @@ class PrepaidSharedRecoveryTests(unittest.TestCase):
         def send(request, timeout):
             payload = json.loads(request.data)
             statements.append(payload["sql"])
+            changes_before = db.total_changes
             cursor = db.execute(payload["sql"], tuple(payload["params"]))
             names = tuple(row[0] for row in cursor.description or ())
             rows = [dict(zip(names, row, strict=True)) for row in cursor.fetchall()]
             db.commit()
-            self.rec.claimed = True
-            return fixtures.Response(fixtures.body(rows=rows, reads=1, writes=7, size=1088))
+            inserted = db.total_changes > changes_before
+            self.rec.claimed |= inserted
+            # The fixture models index writes only for an inserted reservation.
+            return fixtures.Response(fixtures.body(rows=rows, reads=1, writes=7 if inserted else 0, size=1088))
         opener = Mock()
         opener.open.side_effect = send
         return db, statements, opener
