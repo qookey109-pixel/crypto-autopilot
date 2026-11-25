@@ -6,12 +6,14 @@ import os
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+import boto3
 from botocore.awsrequest import AWSResponse
+from botocore.config import Config
 from botocore.httpsession import URLLib3Session
 
 from crypto_autopilot.research.signal_ingest_v0_2 import ResearchSignalIngestError
@@ -42,6 +44,7 @@ class SignalAttemptTests(unittest.TestCase):
                     return response(request, 200)
 
                 output = io.StringIO()
+                audit = io.StringIO()
                 argv = ["research", "--run-id", "github-1-1", "--publish-r2",
                         "--output", str(Path(temp) / "signals.json")]
                 env = {"AWS_MAX_ATTEMPTS": "1", "AWS_RETRY_MODE": "standard",
@@ -50,23 +53,45 @@ class SignalAttemptTests(unittest.TestCase):
                 with (patch.dict(os.environ, env), patch.object(sys, "argv", argv),
                       patch.object(runner, "collect_sources", return_value=((), ())),
                       patch.object(URLLib3Session, "send", side_effect=transport),
-                      redirect_stdout(output)):
+                      redirect_stdout(output), redirect_stderr(audit)):
                     if fail_manifest:
                         with self.assertRaises(OSError):
                             runner.main()
                     else:
                         self.assertEqual(runner.main(), 0)
 
-                rows = [json.loads(line) for line in output.getvalue().splitlines()]
-                receipt = rows[-1]
+                receipt = json.loads(audit.getvalue())
                 self.assertEqual(receipt["admitted_send_attempts"], {
                     "ListObjectsV2": 2, "GetObject": 2, "PutObject": 2 if fail_manifest else 3,
                 })
                 self.assertEqual(calls, ["GET", "GET", "GET", "PUT", "GET", "PUT"]
                                  + ([] if fail_manifest else ["PUT"]))
                 self.assertGreater(receipt["attempted_put_payload_bytes"], 0)
-                if not fail_manifest:
-                    self.assertEqual(receipt["attempted_put_payload_bytes"], rows[0]["planned_write_bytes"])
+                if fail_manifest:
+                    self.assertEqual(output.getvalue(), "")
+                else:
+                    result = json.loads(output.getvalue())
+                    self.assertEqual(result["status"], "PUBLISHED")
+                    self.assertEqual(receipt["attempted_put_payload_bytes"], result["planned_write_bytes"])
+
+    def test_sdk_retry_cannot_send_a_third_get(self):
+        client = boto3.client(
+            "s3", endpoint_url="https://fixture.invalid", region_name="auto",
+            aws_access_key_id="test", aws_secret_access_key="test",
+            config=Config(retries={"total_max_attempts": 3, "mode": "standard"}),
+        )
+        meter = SignalR2Attempts(100)
+        client.meta.events.register("before-send.s3", meter.before_send)
+
+        def unavailable(request):
+            raw = SimpleNamespace(stream=lambda: iter([b"<Error><Code>SlowDown</Code></Error>"]))
+            return AWSResponse(request.url, 503, {}, raw)
+
+        with patch.object(URLLib3Session, "send", side_effect=unavailable) as transport:
+            with self.assertRaisesRegex(ResearchSignalIngestError, "ATTEMPT_LIMIT"):
+                client.get_object(Bucket="test", Key="fixture")
+        self.assertEqual(transport.call_count, 2)
+        self.assertEqual(meter.attempts["GetObject"], 2)
 
     def test_subsequent_send_above_each_limit_is_blocked_before_debit(self):
         for operation, maximum in (("ListObjectsV2", 64), ("GetObject", 2), ("PutObject", 3)):
