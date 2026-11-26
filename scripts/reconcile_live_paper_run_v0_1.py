@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from collections.abc import Mapping
 from pathlib import Path
 
 from crypto_autopilot.paper.run_recovery_v0_1 import (
@@ -11,10 +12,43 @@ from crypto_autopilot.paper.run_recovery_v0_1 import (
 )
 from crypto_autopilot.paper.run_store_v0_1 import (
     LocalPaperRunStore,
+    PaperRunStoreReceipt,
     R2PaperRunStore,
     paper_run_store_policy_from_config,
+    run_store_receipt_evidence,
 )
 from crypto_autopilot.storage.r2 import R2Store
+
+
+class _RecoveryWrites:
+    """Keep acknowledged seal receipts and the identity of an uncertain write."""
+
+    def __init__(self, store: LocalPaperRunStore | R2PaperRunStore) -> None:
+        self.store = store
+        self.receipts: list[PaperRunStoreReceipt] = []
+        self.unconfirmed: str | None = None
+
+    def get_json(self, kind: str, object_id: str) -> dict[str, object] | None:
+        return self.store.get_json(kind, object_id)
+
+    def list_json_ids(self, kind: str) -> tuple[str, ...]:
+        return self.store.list_json_ids(kind)
+
+    def put_json(
+        self, kind: str, object_id: str, payload: Mapping[str, object],
+    ) -> PaperRunStoreReceipt:
+        if kind != "live-run-result":
+            raise ValueError("recovery may write only a missing result seal")
+        self.unconfirmed = object_id
+        receipt = self.store.put_json(kind, object_id, payload)
+        if (
+            not isinstance(receipt, PaperRunStoreReceipt) or receipt.kind != kind
+            or receipt.object_id != object_id or type(receipt.replayed) is not bool
+        ):
+            raise ValueError("recovery store returned an invalid seal receipt")
+        self.receipts.append(receipt)
+        self.unconfirmed = None
+        return receipt
 
 
 def _load_json(path: Path) -> dict[str, object]:
@@ -91,6 +125,7 @@ def main() -> int:
         default=Path("config/paper_run_store_v0_1.json"),
     )
     args = parser.parse_args()
+    writes: _RecoveryWrites | None = None
 
     try:
         recovery_policy = live_paper_run_recovery_policy_from_config(
@@ -101,14 +136,17 @@ def main() -> int:
             local_root=args.local_root,
             store_config=_load_json(args.store_config),
         )
+        writes = _RecoveryWrites(store)
         report = reconcile_live_paper_run(
             run_id=args.run_id,
-            store=store,
+            store=writes,
             repair_missing_result_seals=args.repair_missing_result_seals,
             policy=recovery_policy,
         )
         code = 0 if report["state"] != "REVIEW_REQUIRED" else 3
-    except (OSError, json.JSONDecodeError, ValueError, RuntimeError) as error:
+    except Exception as error:
+        # The SDK can lose a response after committing a PUT. Keep enough
+        # evidence for the operator even when reconciliation cannot finish.
         report = {
             "schema": "qookey-live-paper-run-recovery-report-v0.1",
             "state": "REJECT",
@@ -132,6 +170,24 @@ def main() -> int:
             }
         }
         code = 2
+        if writes is not None and (writes.receipts or writes.unconfirmed is not None):
+            known_created = sum(not item.replayed for item in writes.receipts)
+            report.update({
+                "state": "REVIEW_REQUIRED",
+                "reason": f"result_seal_repair_incomplete:{type(error).__name__}",
+                "run_id": args.run_id,
+                "result_seal_writes_performed": known_created if writes.unconfirmed is None else None,
+                "known_result_seal_writes": known_created,
+                "unconfirmed_result_seal_request_id": writes.unconfirmed,
+                "storage_receipts": [run_store_receipt_evidence(item) for item in writes.receipts],
+            })
+            code = 3
+        elif not isinstance(error, (OSError, ValueError, RuntimeError)):
+            report.update({
+                "state": "REVIEW_REQUIRED",
+                "reason": f"reconciliation_failed:{type(error).__name__}",
+            })
+            code = 3
 
     print(json.dumps(report, sort_keys=True, separators=(",", ":")))
     return code
