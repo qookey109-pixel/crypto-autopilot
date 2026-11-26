@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import io
 import json
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from dataclasses import asdict
 from pathlib import Path
+from unittest.mock import patch
 
 from crypto_autopilot.exchanges.paper import PaperBroker
 from crypto_autopilot.paper.account_advance_v0_1 import advance_paper_account
@@ -29,6 +32,7 @@ from crypto_autopilot.paper.run_recovery_v0_1 import (
 from crypto_autopilot.paper.run_store_v0_1 import LocalPaperRunStore
 from crypto_autopilot.paper.session_v0_1 import submit_paper_cycle_session
 from crypto_autopilot.risk import plan_position_size
+from scripts import reconcile_live_paper_run_v0_1 as recovery_cli
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -209,6 +213,61 @@ class LivePaperRunRecoveryV01Tests(unittest.TestCase):
             initial_state=state,
         )
         return store, state, spec, report
+
+    def test_cli_retains_partial_repair_evidence_after_store_failure(self) -> None:
+        class LostStorageReply(Exception):
+            pass
+
+        for lose_response in (True, False):
+            with self.subTest(lose_response=lose_response), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp).resolve()
+                store, _, spec, first = self._committed_run(root)
+                second = coordinate_live_paper_run_step(
+                    run_name="recovery-fixture", tick_time_ms=6_000, candidate_specs=(spec,),
+                    feed=_Feed(6_000), store=store, previous_step=first["run_step"],
+                )
+                request_ids = sorted(step["run_step"]["request_id"] for step in (first, second))
+                for request_id in request_ids:
+                    _delete_object(root, "live-run-result", request_id)
+                original_put, original_get = store.put_json, store.get_json
+                committed = []
+
+                def write(kind, object_id, payload):
+                    receipt = original_put(kind, object_id, payload)
+                    committed.append(object_id)
+                    if lose_response and len(committed) == 2:
+                        raise LostStorageReply("untrusted error details")
+                    return receipt
+
+                def read(kind, object_id):
+                    if not lose_response and kind == "live-run-result" and len(committed) == 2:
+                        raise OSError("untrusted error details")
+                    return original_get(kind, object_id)
+
+                argv = ["reconcile", "--run-id", first["run_id"], "--store-backend", "local",
+                        "--local-root", str(root), "--repair-missing-result-seals"]
+                output = io.StringIO()
+                with (
+                    patch("sys.argv", argv), patch.object(recovery_cli, "_build_store", return_value=store),
+                    patch.object(store, "put_json", side_effect=write),
+                    patch.object(store, "get_json", side_effect=read), redirect_stdout(output),
+                ):
+                    self.assertEqual(recovery_cli.main(), 3)
+                report = json.loads(output.getvalue())
+                self.assertNotIn("untrusted error details", output.getvalue())
+                self.assertEqual(report["state"], "REVIEW_REQUIRED")
+                self.assertEqual(report["run_id"], first["run_id"])
+                self.assertEqual(committed, request_ids)
+                known = request_ids[:1] if lose_response else request_ids
+                self.assertEqual(report["known_result_seal_writes"], len(known))
+                self.assertEqual(report["result_seal_writes_performed"], None if lose_response else 2)
+                self.assertEqual(report["unconfirmed_result_seal_request_id"], request_ids[-1] if lose_response else None)
+                self.assertEqual([row["receipt"]["object_id"] for row in report["storage_receipts"]], known)
+                self.assertEqual(report["provider_requests_performed"], 0)
+                # Observe the durable result with the existing read-only recovery path.
+                audit = reconcile_live_paper_run(run_id=first["run_id"], store=LocalPaperRunStore(root))
+                self.assertEqual(audit["state"], "RUN_CONSISTENT")
+                self.assertEqual(audit["result_seal_writes_performed"], 0)
 
     def test_consistent_run_audits_without_writes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
