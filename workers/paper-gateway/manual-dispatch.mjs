@@ -11,6 +11,8 @@ const jobs = new Map([
 ]);
 export const isManualWriter = writer => jobs.has(writer);
 
+export const validGitOid = value => typeof value === "string" && /^[a-f0-9]{40}$/.test(value);
+
 function keysAre(value, required, optional = []) {
   return value !== null && typeof value === "object" && !Array.isArray(value) &&
     required.every(key => Object.hasOwn(value, key)) &&
@@ -77,5 +79,9 @@ export function confirmedManualScope(policy, identity, createdAt, slot, now, rec
   const approved = normalizeManualInputs(writer, policy.approvedInputs);
   const sent = normalizeManualInputs(writer, receipt.request.inputs);
   if (!approved || !sent || JSON.stringify(approved) !== JSON.stringify(sent)) return null;
+  if (writer === coordinator) {
+    if (!validGitOid(receipt.inputBlobSha) || receipt.inputBlobSha !== policy.inputBlobSha) return null;
+    return { sourceSha: policy.sha, inputs: approved, inputBlobSha: receipt.inputBlobSha };
+  }
   return { sourceSha: policy.sha, inputs: approved };
 }

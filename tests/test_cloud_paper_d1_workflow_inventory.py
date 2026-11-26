@@ -120,7 +120,7 @@ class D1WorkflowInventoryTests(unittest.TestCase):
         dispatch = "workers/paper-gateway/manual-dispatch.mjs"
         journal = "workers/paper-gateway/manual-dispatch-journal.mjs"
         sources = {p: (root / p).read_text(encoding="utf-8") for p in (path, caller, dispatch, journal)}
-        contract = json.loads((root / "config/synthetic_worker_d1_inventory_v0_6.json").read_text())
+        contract = json.loads((root / "config/synthetic_worker_d1_inventory_v0_7.json").read_text())
         self.assertEqual(validate_synthetic_worker_d1_boundary(sources, contract), [path, caller])
         bad_cases = (
             ({**sources, path: sources[path] + "\\n// changed"}, contract),

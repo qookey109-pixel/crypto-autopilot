@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { openDispatchStorage } from "./manual_dispatch_journal_cases.mjs";
+import { coordinatorGitObjects, openDispatchStorage } from "./manual_dispatch_journal_cases.mjs";
 import { prepareDispatchJournal, readConfirmedDispatch, sendApprovedManualJob } from "../../workers/paper-gateway/manual-dispatch-journal.mjs";
 import signedJobCases from "./signed_job_cases.mjs";
 import { webcrypto } from "node:crypto";
@@ -474,7 +474,8 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     const workflowId = jobName === "run-one-step" ? "361536775" : "361556331";
     const path = ".github/workflows/" + writer + ".yml";
     const api = "https://api.github.com/repos/" + project;
-    const manualDispatch = {
+    const blobBinding = jobName === "run-one-step" ? { inputBlobSha: "f".repeat(40) } : {};
+    const manualDispatch = { ...blobBinding,
       apiVersion: "2026-03-10", method: "POST", url: api + "/actions/workflows/" + workflowId + "/dispatches",
       sourceSha: sha, slotMs: at, sentAtMs: at + 100, receivedAtMs: at + 1400,
       request: { ref: "main", inputs: sentInputs }, status: 200,
@@ -484,7 +485,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     const fixed = { ...policy, repository: project, repositoryId: "1336841226", writerId: "crypto-autopilot:" + writer,
       workflowId, workflowPath: path, workflowRef: project + "/" + path + "@refs/heads/main", jobName,
       subject: "repo:qookey109-pixel@297143956/crypto-autopilot@1336841226:ref:refs/heads/main",
-      approvedInputs: expectedInputs };
+      ...blobBinding, approvedInputs: expectedInputs };
     const identity = { ...claims, sub: fixed.subject, repository: project, repository_id: fixed.repositoryId,
       workflow_ref: fixed.workflowRef, run_id: String(runId), check_run_id: String(checkId), event_name: "workflow_dispatch",
       iat: at / 1000, nbf: at / 1000, exp: at / 1000 + 300 };
@@ -505,9 +506,11 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
         throw Error("unexpected path");
       } };
     const before = writes;
-    const senderClock = [at, at + 100, at + 1400];
+    const gitObjects = coordinatorGitObjects(sha, inputPath, blobBinding.inputBlobSha);
+    const senderClock = [...Array(jobName === "run-one-step" ? gitObjects.size : 0).fill(at), at, at + 100, at + 1400];
     const delivered = await sendApprovedManualJob({ enabled: true, storage: dispatchStore, policy: fixed,
-      slotMs: at, clock: () => senderClock.shift(), prepay: () => true, deliver: request => {
+      slotMs: at, clock: () => senderClock.shift(),
+      fetcher: url => { assert.ok(gitObjects.has(url)); return Response.json(gitObjects.get(url)); }, prepay: () => true, deliver: request => {
         assert.equal(request.url, manualDispatch.url);
         return { status: 200, body: manualDispatch.response };
       } });
@@ -530,6 +533,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
          { input_path: inputPath.replace("synthetic-example", "../escape") }];
     for (const change of [
       { manualDispatch: null }, { approvedInputs: null },
+      ...(jobName === "run-one-step" ? [{ inputBlobSha: sha }, { manualDispatch: { ...manualDispatch, inputBlobSha: undefined } }] : []),
       ...[ { ...sentInputs, unexpected: true }, ...(jobName === "reconcile"
         ? [{ run_id: target, repair_missing_result_seals: "true" }, { run_id: "bad" }]
         : [{ input_path: "research/inputs/live-paper/../escape.json" }]) ]
@@ -553,7 +557,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     const stalled = [at + 3000, at + 3000, at + 601000];
     assert.deepEqual(await admitManualJob({ ...manual, clock: () => stalled.shift() }), { status: "SLOT_BLOCKED" });
     assert.equal(writes, before);
-    const operationScope = { sourceSha: sha, inputs: expectedInputs };
+    const operationScope = { sourceSha: sha, inputs: expectedInputs, ...blobBinding };
     assert.deepEqual(await admitManualJob(manual), { status: "CLAIMED", slotId: "slot:" + at, operationScope });
     assert.deepEqual(await admitManualJob(manual), { status: "DUPLICATE_OR_CONFLICT" });
     assert.equal(sql.prepare("SELECT operation_scope_json FROM paper_job_claim_v0_1 WHERE run_id=?")

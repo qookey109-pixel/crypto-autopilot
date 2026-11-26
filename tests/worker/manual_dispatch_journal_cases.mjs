@@ -91,3 +91,73 @@ test("prepaid sender retains intent across response loss and restart; only confi
   assert.equal(posted, 2);
   assert.equal(storage.sql.exec("SELECT github FROM envelope_scope").toArray()[0].github, 2);
 });
+
+export function coordinatorGitObjects(sha, path, blob) {
+  const base = "https://api.github.com/repos/qookey109-pixel/crypto-autopilot/git/";
+  const treeId = i => String(i + 1).padStart(40, "0");
+  const objects = new Map([[base + "commits/" + sha, { sha, tree: { sha: treeId(0) } }]]);
+  const parts = path.split("/");
+  for (const [i, name] of parts.entries()) {
+    const entry = i + 1 === parts.length
+      ? { path: name, mode: "100644", type: "blob", sha: blob, size: 97 }
+      : { path: name, mode: "040000", type: "tree", sha: treeId(i + 1) };
+    objects.set(base + "trees/" + treeId(i), { sha: treeId(i), truncated: false, tree: [entry] });
+  }
+  return objects;
+}
+
+test("coordinator requires the approved regular blob at the exact commit before recording intent", async t => {
+  const storage = openDispatchStorage(":memory:");
+  t.after(() => storage.close());
+  prepareDispatchJournal(storage, true);
+  const at = Date.parse("2026-11-23T00:07:00Z");
+  const repository = "qookey109-pixel/crypto-autopilot", sha = "b".repeat(40), inputBlobSha = "c".repeat(40);
+  const path = "research/inputs/live-paper/case.json";
+  const workflowPath = ".github/workflows/live-paper-run-coordinator-v0-1.yml";
+  const policy = { repository, repositoryId: "1336841226", sha, workflowSha: sha, workflowId: "361536775",
+    workflowPath, workflowRef: repository + "/" + workflowPath + "@refs/heads/main",
+    writerId: "crypto-autopilot:live-paper-run-coordinator-v0-1", jobName: "run-one-step",
+    approvedInputs: { input_path: path }, inputBlobSha };
+  let posts = 0;
+  for (const flaw of ["wrong commit", "missing", "symlink parent", "symlink leaf", "different blob",
+    "duplicate", "truncated", "wrong tree", "oversize", "redirect", "no digest", "budget"]) {
+    const objects = coordinatorGitObjects(sha, path, inputBlobSha);
+    const [commit, root, , , leaf] = [...objects.values()];
+    if (flaw === "wrong commit") commit.sha = inputBlobSha;
+    if (flaw === "missing") leaf.tree = [];
+    if (flaw === "symlink parent") root.tree[0].mode = "120000";
+    if (flaw === "symlink leaf") leaf.tree[0].mode = "120000";
+    if (flaw === "different blob") leaf.tree[0].sha = sha;
+    if (flaw === "duplicate") leaf.tree.push({ ...leaf.tree[0] });
+    if (flaw === "truncated") root.truncated = true;
+    if (flaw === "wrong tree") root.sha = sha;
+    let paid = 0, fetched = 0;
+    const status = await sendApprovedManualJob({ enabled: true, storage, policy: flaw === "no digest"
+      ? { ...policy, inputBlobSha: undefined } : policy, slotMs: at, clock: () => at,
+      prepay(kind) {
+        assert.equal(kind, "GITHUB_INPUT_METADATA_GET");
+        paid++;
+        return flaw !== "budget" || paid < 3;
+      },
+      fetcher(url, options) {
+        fetched++;
+        assert.equal(fetched, paid);
+        assert.equal(options.method, "GET");
+        assert.equal(options.redirect, "manual");
+        assert.ok(objects.has(url));
+        if (flaw === "redirect") return new Response(null, { status: 302 });
+        if (flaw === "oversize") return new Response(" ".repeat(131073));
+        return Response.json(objects.get(url));
+      },
+      deliver() { posts++; },
+    });
+    assert.equal(status, flaw === "budget" ? "BUDGET_BLOCKED" : "INPUT_BLOCKED", flaw);
+    assert.equal(fetched, paid - Number(flaw === "budget"));
+    assert.equal(storage.sql.exec("SELECT COUNT(*) AS n FROM paper_dispatch_intent_v1").toArray()[0].n, 0);
+  }
+  assert.equal(posts, 0);
+  storage.sql.exec("INSERT INTO paper_dispatch_intent_v1 VALUES (?, ?, ?, ?, ?, ?)", policy.writerId, at,
+    policy.workflowId, sha, JSON.stringify(policy.approvedInputs), at);
+  storage.sql.exec("INSERT INTO paper_dispatch_result_v1 VALUES (?, ?, ?, ?, ?)", "42", policy.writerId, at, at, at);
+  assert.equal(await readConfirmedDispatch({ enabled: true, storage, runId: "42", prepay: () => true }), null);
+});

@@ -1,7 +1,7 @@
 // Prepared adapter only: it is not an identity or account-budget boundary.
 // The caller must prepay this write and supply verified, server-derived values.
 // No Worker route, D1 binding, table creation or live execution is authorized.
-import { isManualWriter, normalizeManualInputs } from "./manual-dispatch.mjs";
+import { isManualWriter, normalizeManualInputs, validGitOid } from "./manual-dispatch.mjs";
 const INSERT = "INSERT INTO paper_job_claim_v0_1 " +
   "(repository_id, run_id, attempt, check_run_id, writer_id, slot_id, observed_at_ms, operation_scope_json) " +
   "SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8 " +
@@ -29,7 +29,12 @@ export async function claimJobSlot(database, claim, { enabled = false, limits } 
     const scope = claim.operationScope;
     const inputs = normalizeManualInputs(claim.writerId, scope?.inputs);
     if (!inputs || typeof scope.sourceSha !== "string" || !/^[a-f0-9]{40}$/.test(scope.sourceSha)) return "INVALID";
-    scopeJson = JSON.stringify({ sourceSha: scope.sourceSha, inputs });
+    const canonical = { sourceSha: scope.sourceSha, inputs };
+    if (Object.hasOwn(inputs, "input_path")) {
+      if (!validGitOid(scope.inputBlobSha)) return "INVALID";
+      canonical.inputBlobSha = scope.inputBlobSha;
+    }
+    scopeJson = JSON.stringify(canonical);
   } else if (claim.operationScope != null) return "INVALID";
   try {
     const result = await database.prepare(INSERT).bind(
