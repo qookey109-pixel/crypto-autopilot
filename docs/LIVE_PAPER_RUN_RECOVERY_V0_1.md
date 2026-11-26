@@ -182,3 +182,7 @@ Not authorized:
 - replacement holdout;
 - real-money orders;
 - real live trading.
+
+### Interrupted CLI repairs
+
+The manual workflow emits `REVIEW_REQUIRED` and exits with code 3 when a seal repair is interrupted after a write attempt. Inspect `storage_receipts` for acknowledged creates and replays. A failed readback after an acknowledged create preserves its receipt and count. If a write returned no valid receipt, `unconfirmed_result_seal_request_id` identifies it, `known_result_seal_writes` gives the acknowledged create count, and `result_seal_writes_performed` is null. Use the existing read-only audit on the exact run to resolve its state before considering any repair.
