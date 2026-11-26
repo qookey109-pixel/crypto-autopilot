@@ -5,18 +5,9 @@ import { readGithubKeys } from "./github-keys.mjs";
 import { verifyGithubJob } from "./github-oidc.mjs";
 import { readJobMetadata } from "./github-metadata-reader-v0-2.mjs";
 import { checkJobMetadata } from "./github-metadata.mjs";
-import { confirmedManualScope } from "./manual-dispatch.mjs";
+import { confirmedManualScope, processingSlot } from "./manual-dispatch.mjs";
+export { processingSlot };
 import { claimJobSlot } from "./d1-job-claim.mjs";
-
-export function processingSlot(now, after) {
-  if (!Number.isSafeInteger(now) || !Number.isSafeInteger(after) || after < now) return null;
-  const quarter = 15 * 60 * 1000, offset = 7 * 60 * 1000, day = 86400000;
-  const slot = Math.floor((now - offset) / quarter) * quarter + offset;
-  const afterSlot = Math.floor((after - offset) / quarter) * quarter + offset;
-  if (!Number.isSafeInteger(slot) || slot < 0 || afterSlot !== slot ||
-      after - slot > 600000 || Math.floor(slot / day) !== Math.floor(after / day)) return null;
-  return slot;
-}
 
 
 const repository = "qookey109-pixel/crypto-autopilot";
@@ -65,7 +56,7 @@ export function admitManualJob(options) {
   return admitJob("workflow_dispatch", options);
 }
 
-async function admitJob(event, { enabled = false, policy, token, githubToken, fetcher, db, clock, reserve } = {}) {
+async function admitJob(event, { enabled = false, policy, token, githubToken, fetcher, db, clock, reserve, readDispatch } = {}) {
   if (enabled !== true) return { status: "DISABLED" };
   try {
     if (!policy || typeof clock !== "function" || typeof reserve !== "function") return { status: "INVALID" };
@@ -105,19 +96,24 @@ async function admitJob(event, { enabled = false, policy, token, githubToken, fe
     const slotAt = end => manual ? processingSlot(now, end) : processingSlotForJob(fixed, now, end, metadata.run.created_at);
     const slot = slotAt(after);
     if (slot === null) return { status: "SLOT_BLOCKED" };
-    const scope = manual ? confirmedManualScope(fixed, identity, metadata.run.created_at, slot, now) : null;
+    if (manual && typeof readDispatch !== "function") return { status: "DISPATCH_SCOPE_BLOCKED" };
+    const receipt = manual ? await readDispatch(identity.runId) : null;
+    const scope = manual ? confirmedManualScope(fixed, identity, metadata.run.created_at, slot, now, receipt) : null;
     if (manual && !scope) return { status: "DISPATCH_SCOPE_BLOCKED" };
     if (scope && JSON.stringify(scope).length > costs.d1StorageBytes) return { status: "BUDGET_BLOCKED" };
+    const claimTime = manual ? clock() : after;
+    if (!Number.isSafeInteger(claimTime) || claimTime < after || slotAt(claimTime) !== slot ||
+        Math.floor(claimTime / 1000) >= identity.expiresAt) return { status: "SLOT_BLOCKED" };
     const slotId = "slot:" + slot;
     const status = await claimJobSlot(db, { repositoryId: identity.repositoryId, runId: identity.runId,
-      attempt: "1", checkRunId: identity.checkRunId, writerId: fixed.writerId, slotId, operationScope: scope, observedAtMs: after }, { enabled: true,
+      attempt: "1", checkRunId: identity.checkRunId, writerId: fixed.writerId, slotId, operationScope: scope, observedAtMs: claimTime }, { enabled: true,
       limits: { rowsRead: costs.d1RowsRead, rowsWritten: costs.d1RowsWritten,
         maxDatabaseBytes: fixed.databaseBytesBefore + costs.d1StorageBytes } });
     if (status !== "CLAIMED") return { status };
     // A commit can succeed after identity or processing-window expiry.
     // Keep the consumed claim and require review; never release work.
     const finished = clock();
-    if (!Number.isSafeInteger(finished) || finished < after || Math.floor(finished / 1000) >= identity.expiresAt ||
+    if (!Number.isSafeInteger(finished) || finished < claimTime || Math.floor(finished / 1000) >= identity.expiresAt ||
         slotAt(finished) !== slot) return { status: "REVIEW_REQUIRED" };
     return manual ? { status, slotId, operationScope: scope } : { status, slotId };
   } catch { return { status: "REVIEW_REQUIRED" }; }

@@ -33,17 +33,33 @@ export function normalizeManualInputs(writer, inputs) {
   return null;
 }
 
-// Both the signed job and the run/job/main API metadata are verified by the
-// caller. A dispatcher's recorded POST response links that exact run to inputs.
-export function confirmedManualScope(policy, identity, createdAt, slot, now) {
+export function registeredManualWorkflow(policy) {
+  if (!policy) return false;
   const writer = policy.writerId;
   const job = jobs.get(writer);
   if (!job || policy.repository !== repository || policy.repositoryId !== repositoryId ||
-      policy.jobName !== job.name || policy.workflowId !== job.id) return null;
+      policy.jobName !== job.name || policy.workflowId !== job.id) return false;
   const path = ".github/workflows/" + writer.slice(prefix.length) + ".yml";
   if (policy.workflowPath !== path || policy.workflowRef !== repository + "/" + path + "@refs/heads/main" ||
-      policy.workflowSha !== policy.sha || !/^[a-f0-9]{40}$/.test(policy.sha)) return null;
-  const receipt = policy.manualDispatch;
+      policy.workflowSha !== policy.sha || typeof policy.sha !== "string" || !/^[a-f0-9]{40}$/.test(policy.sha)) return false;
+  return true;
+}
+
+export function processingSlot(now, after) {
+  if (!Number.isSafeInteger(now) || !Number.isSafeInteger(after) || after < now) return null;
+  const quarter = 15 * 60 * 1000, offset = 7 * 60 * 1000, day = 86400000;
+  const slot = Math.floor((now - offset) / quarter) * quarter + offset;
+  const afterSlot = Math.floor((after - offset) / quarter) * quarter + offset;
+  if (!Number.isSafeInteger(slot) || slot < 0 || afterSlot !== slot ||
+      after - slot > 600000 || Math.floor(slot / day) !== Math.floor(after / day)) return null;
+  return slot;
+}
+
+// Both the signed job and the run/job/main API metadata are verified by the
+// caller. A dispatcher's recorded POST response links that exact run to inputs.
+export function confirmedManualScope(policy, identity, createdAt, slot, now, receipt) {
+  const writer = policy.writerId;
+  if (!registeredManualWorkflow(policy)) return null;
   const root = "https://api.github.com/repos/" + repository;
   if (!receipt || receipt.apiVersion !== "2026-03-10" || receipt.method !== "POST" ||
       receipt.url !== root + "/actions/workflows/" + policy.workflowId + "/dispatches" ||

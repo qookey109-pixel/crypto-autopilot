@@ -1,5 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { openDispatchStorage } from "./manual_dispatch_journal_cases.mjs";
+import { prepareDispatchJournal, readConfirmedDispatch, sendApprovedManualJob } from "../../workers/paper-gateway/manual-dispatch-journal.mjs";
 import signedJobCases from "./signed_job_cases.mjs";
 import { webcrypto } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
@@ -456,6 +458,8 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     assert.equal((await admitScheduledJob(registered)).status, "DUPLICATE_OR_CONFLICT");
   }
 
+  const dispatchStore = openDispatchStorage(":memory:");
+  prepareDispatchJournal(dispatchStore, true);
   const target = "live-paper-run-v0-1-" + "d".repeat(64);
   const inputPath = "research/inputs/live-paper/synthetic-example.json";
   // Workflow IDs come from GitHub. Runs, credentials, dispatch and R2 work are simulated.
@@ -480,7 +484,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     const fixed = { ...policy, repository: project, repositoryId: "1336841226", writerId: "crypto-autopilot:" + writer,
       workflowId, workflowPath: path, workflowRef: project + "/" + path + "@refs/heads/main", jobName,
       subject: "repo:qookey109-pixel@297143956/crypto-autopilot@1336841226:ref:refs/heads/main",
-      approvedInputs: expectedInputs, manualDispatch };
+      approvedInputs: expectedInputs };
     const identity = { ...claims, sub: fixed.subject, repository: project, repository_id: fixed.repositoryId,
       workflow_ref: fixed.workflowRef, run_id: String(runId), check_run_id: String(checkId), event_name: "workflow_dispatch",
       iat: at / 1000, nbf: at / 1000, exp: at / 1000 + 300 };
@@ -501,12 +505,22 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
         throw Error("unexpected path");
       } };
     const before = writes;
+    const senderClock = [at, at + 100, at + 1400];
+    const delivered = await sendApprovedManualJob({ enabled: true, storage: dispatchStore, policy: fixed,
+      slotMs: at, clock: () => senderClock.shift(), prepay: () => true, deliver: request => {
+        assert.equal(request.url, manualDispatch.url);
+        return { status: 200, body: manualDispatch.response };
+      } });
+    assert.equal(delivered, "RECORDED");
+    manual.readDispatch = id => readConfirmedDispatch({ enabled: true, storage: dispatchStore, runId: id, prepay: () => true });
+    assert.deepEqual(await admitManualJob({ ...manual, readDispatch: undefined, policy: { ...fixed, manualDispatch } }),
+      { status: "DISPATCH_SCOPE_BLOCKED" });
     // Even a consistent policy, dispatch URL and run payload cannot substitute
     // a different workflow ID for the registered path.
     const otherId = jobName === "run-one-step" ? "361556331" : "361536775";
     observed.workflow_id = Number(otherId);
-    assert.deepEqual(await admitManualJob({ ...manual, policy: { ...fixed, workflowId: otherId,
-      manualDispatch: { ...manualDispatch, url: api + "/actions/workflows/" + otherId + "/dispatches" } } }),
+    assert.deepEqual(await admitManualJob({ ...manual, policy: { ...fixed, workflowId: otherId },
+      readDispatch: () => ({ ...manualDispatch, url: api + "/actions/workflows/" + otherId + "/dispatches" }) }),
       { status: "DISPATCH_SCOPE_BLOCKED" });
     observed.workflow_id = Number(workflowId);
     const wrongInputs = jobName === "reconcile"
@@ -529,10 +543,15 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
       { manualDispatch: { ...manualDispatch, slotMs: at - 900000 } },
       { manualDispatch: { ...manualDispatch, request: { ref: "dev", inputs: sentInputs } } },
       ...wrongInputs.map(inputs => ({ manualDispatch: { ...manualDispatch, request: { ref: "main", inputs } } })),
-    ]) assert.deepEqual(await admitManualJob({ ...manual, policy: { ...fixed, ...change } }), { status: "DISPATCH_SCOPE_BLOCKED" });
+    ]) assert.deepEqual(await admitManualJob({ ...manual, policy: { ...fixed, ...change },
+      readDispatch: Object.hasOwn(change, "manualDispatch") ? () => change.manualDispatch : manual.readDispatch }),
+      { status: "DISPATCH_SCOPE_BLOCKED" });
     assert.deepEqual(await admitScheduledJob(manual), { status: "IDENTITY_BLOCKED" });
     assert.equal((await admitManualJob({ ...manual, policy: { ...fixed, admissionCosts: {
       ...fixed.admissionCosts, d1StorageBytes: 1 } } })).status, "BUDGET_BLOCKED");
+    assert.equal(writes, before);
+    const stalled = [at + 3000, at + 3000, at + 601000];
+    assert.deepEqual(await admitManualJob({ ...manual, clock: () => stalled.shift() }), { status: "SLOT_BLOCKED" });
     assert.equal(writes, before);
     const operationScope = { sourceSha: sha, inputs: expectedInputs };
     assert.deepEqual(await admitManualJob(manual), { status: "CLAIMED", slotId: "slot:" + at, operationScope });
@@ -540,6 +559,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     assert.equal(sql.prepare("SELECT operation_scope_json FROM paper_job_claim_v0_1 WHERE run_id=?")
       .get(String(runId)).operation_scope_json, JSON.stringify(operationScope));
   }
+  dispatchStore.close();
   assert.equal(sql.prepare("SELECT COUNT(*) AS n FROM paper_job_claim_v0_1 WHERE operation_scope_json IS NOT NULL").get().n, 3);
   assert.throws(() => sql.exec("INSERT INTO paper_job_claim_v0_1 " +
     "(repository_id,run_id,attempt,check_run_id,writer_id,slot_id,observed_at_ms) " +
