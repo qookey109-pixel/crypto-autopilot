@@ -1,5 +1,7 @@
+import { parseUnique } from "./github-oidc.mjs";
+
 // Prepared for a protected dispatcher. The job must never supply policy,
-// approvedInputs or the dispatch receipt. This module performs no I/O.
+// approvedInputs or the dispatch receipt. Public policy reads use an injected transport.
 const repository = "qookey109-pixel/crypto-autopilot";
 const repositoryId = "1336841226";
 const prefix = "crypto-autopilot:";
@@ -35,6 +37,52 @@ export function normalizeManualInputs(writer, inputs) {
   return null;
 }
 
+export async function readPublicGithubJson(fetcher, url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
+  let reader;
+  try {
+    const response = await fetcher(url, {
+      method: "GET", redirect: "manual", credentials: "omit", signal: controller.signal,
+      headers: { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
+    });
+    if (response.status !== 200 || !response.body) return null;
+    reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8", { fatal: true });
+    let text = "", bytes = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > 131072) return null;
+      text += decoder.decode(value, { stream: true });
+    }
+    return parseUnique(text + decoder.decode());
+  } catch { return null; }
+  finally {
+    clearTimeout(timer);
+    controller.abort();
+    if (reader) await reader.cancel().catch(() => {});
+  }
+}
+
+export async function readCoordinatorInputApproval(fetcher, sha, path) {
+  if (typeof fetcher !== "function" || !validGitOid(sha) || !normalizeManualInputs(coordinator, { input_path: path })) return null;
+  const url = "https://raw.githubusercontent.com/" + repository + "/" + sha + "/config/live_paper_coordinator_input_registry_v0_1.json";
+  const registry = await readPublicGithubJson(fetcher, url);
+  if (!keysAre(registry, ["schema", "workflow_id", "approved_inputs"]) ||
+      registry.schema !== "qookey-live-paper-coordinator-input-registry-v0.1" || registry.workflow_id !== jobs.get(coordinator).id ||
+      !Array.isArray(registry.approved_inputs) || registry.approved_inputs.length > 64) return null;
+  const entries = new Map();
+  for (const entry of registry.approved_inputs) {
+    if (!keysAre(entry, ["input_path", "blob_sha"]) || !validGitOid(entry.blob_sha) ||
+        !normalizeManualInputs(coordinator, { input_path: entry.input_path }) ||
+        entry.input_path.split("/").length > 12 || entries.has(entry.input_path)) return null;
+    entries.set(entry.input_path, entry.blob_sha);
+  }
+  return entries.get(path) ?? null;
+}
+
 export function registeredManualWorkflow(policy) {
   if (!policy) return false;
   const writer = policy.writerId;
@@ -59,7 +107,7 @@ export function processingSlot(now, after) {
 
 // Both the signed job and the run/job/main API metadata are verified by the
 // caller. A dispatcher's recorded POST response links that exact run to inputs.
-export function confirmedManualScope(policy, identity, createdAt, slot, now, receipt) {
+export function confirmedManualScope(policy, identity, createdAt, slot, now, receipt, approvedBlobSha) {
   const writer = policy.writerId;
   if (!registeredManualWorkflow(policy)) return null;
   const root = "https://api.github.com/repos/" + repository;
@@ -80,7 +128,8 @@ export function confirmedManualScope(policy, identity, createdAt, slot, now, rec
   const sent = normalizeManualInputs(writer, receipt.request.inputs);
   if (!approved || !sent || JSON.stringify(approved) !== JSON.stringify(sent)) return null;
   if (writer === coordinator) {
-    if (!validGitOid(receipt.inputBlobSha) || receipt.inputBlobSha !== policy.inputBlobSha) return null;
+    if (!validGitOid(receipt.inputBlobSha) || receipt.inputBlobSha !== approvedBlobSha ||
+        (policy.inputBlobSha !== undefined && policy.inputBlobSha !== approvedBlobSha)) return null;
     return { sourceSha: policy.sha, inputs: approved, inputBlobSha: receipt.inputBlobSha };
   }
   return { sourceSha: policy.sha, inputs: approved };

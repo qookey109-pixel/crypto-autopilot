@@ -5,7 +5,7 @@ import { readGithubKeys } from "./github-keys.mjs";
 import { verifyGithubJob } from "./github-oidc.mjs";
 import { readJobMetadata } from "./github-metadata-reader-v0-2.mjs";
 import { checkJobMetadata } from "./github-metadata.mjs";
-import { confirmedManualScope, processingSlot } from "./manual-dispatch.mjs";
+import { confirmedManualScope, processingSlot, readCoordinatorInputApproval } from "./manual-dispatch.mjs";
 export { processingSlot };
 import { claimJobSlot } from "./d1-job-claim.mjs";
 
@@ -68,7 +68,8 @@ async function admitJob(event, { enabled = false, policy, token, githubToken, fe
     // Four written rows is a fixture floor for the table and three indexes;
     // it is not an upper bound or a substitute for real D1 calibration.
     const costs = fixed.admissionCosts;
-    const minimum = { workerRequests: 1, githubRequests: 4, d1Queries: 1,
+    const coordinator = event === "workflow_dispatch" && fixed.writerId === "crypto-autopilot:live-paper-run-coordinator-v0-1";
+    const minimum = { workerRequests: 1, githubRequests: coordinator ? 5 : 4, d1Queries: 1,
       d1RowsRead: 1, d1RowsWritten: 4, d1StorageBytes: 1 };
     if (!costs || typeof costs !== "object" || Array.isArray(costs) ||
         Object.keys(costs).length !== Object.keys(minimum).length ||
@@ -98,7 +99,9 @@ async function admitJob(event, { enabled = false, policy, token, githubToken, fe
     if (slot === null) return { status: "SLOT_BLOCKED" };
     if (manual && typeof readDispatch !== "function") return { status: "DISPATCH_SCOPE_BLOCKED" };
     const receipt = manual ? await readDispatch(identity.runId) : null;
-    const scope = manual ? confirmedManualScope(fixed, identity, metadata.run.created_at, slot, now, receipt) : null;
+    const approvedBlobSha = coordinator && receipt
+      ? await readCoordinatorInputApproval(fetcher, fixed.sha, fixed.approvedInputs?.input_path) : null;
+    const scope = manual ? confirmedManualScope(fixed, identity, metadata.run.created_at, slot, now, receipt, approvedBlobSha) : null;
     if (manual && !scope) return { status: "DISPATCH_SCOPE_BLOCKED" };
     if (scope && JSON.stringify(scope).length > costs.d1StorageBytes) return { status: "BUDGET_BLOCKED" };
     const claimTime = manual ? clock() : after;

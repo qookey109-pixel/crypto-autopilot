@@ -1,7 +1,8 @@
 // Synthetic protected sender storage. No handler, network client or credential.
-import { normalizeManualInputs, processingSlot, registeredManualWorkflow, validGitOid } from "./manual-dispatch.mjs";
-
-import { parseUnique } from "./github-oidc.mjs";
+import {
+  normalizeManualInputs, processingSlot, registeredManualWorkflow, validGitOid,
+  readCoordinatorInputApproval, readPublicGithubJson,
+} from "./manual-dispatch.mjs";
 
 const api = "https://api.github.com/repos/qookey109-pixel/crypto-autopilot";
 const html = "https://github.com/qookey109-pixel/crypto-autopilot/actions/runs/";
@@ -34,50 +35,30 @@ function replyFor(id) {
 
 // Inputs are resolved against immutable Git objects. The sender supplies the transport;
 // no URL from a response is followed and no blob payload is needed.
-async function readGitObject(fetcher, path) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 5000);
-  let reader;
-  try {
-    const response = await fetcher(api + "/git/" + path, {
-      method: "GET", redirect: "manual", signal: controller.signal,
-      headers: { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
-    });
-    if (response.status !== 200 || !response.body) return null;
-    reader = response.body.getReader();
-    const decoder = new TextDecoder("utf-8", { fatal: true });
-    let text = "", bytes = 0;
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      bytes += value.byteLength;
-      if (bytes > 131072) return null;
-      text += decoder.decode(value, { stream: true });
-    }
-    return parseUnique(text + decoder.decode());
-  } finally {
-    clearTimeout(timer);
-    controller.abort();
-    if (reader) await reader.cancel().catch(() => {});
-  }
-}
-
-async function verifyInputBlob({ fetcher, prepay, sha, path, expected, slotMs, clock }) {
+async function verifyInputBlob({ fetcher, prepay, sha, path, hinted, slotMs, clock }) {
   const parts = path.split("/");
-  if (typeof fetcher !== "function" || !validGitOid(expected) || parts.length > 12) return "INPUT_BLOCKED";
+  if (typeof fetcher !== "function" || parts.length > 12) return "INPUT_BLOCKED";
   async function allowRead() {
     if (await prepay("GITHUB_INPUT_METADATA_GET") !== true) return "BUDGET_BLOCKED";
     return processingSlot(slotMs, clock()) === slotMs ? "READY" : "SLOT_BLOCKED";
   }
   const start = await allowRead();
   if (start !== "READY") return start;
-  const commit = await readGitObject(fetcher, "commits/" + sha);
+  const main = await readPublicGithubJson(fetcher, api + "/branches/main");
+  if (main?.commit?.sha !== sha) return "INPUT_BLOCKED";
+  const registryRead = await allowRead();
+  if (registryRead !== "READY") return registryRead;
+  const expected = await readCoordinatorInputApproval(fetcher, sha, path);
+  if (!expected || (hinted !== undefined && hinted !== expected)) return "INPUT_BLOCKED";
+  const commitRead = await allowRead();
+  if (commitRead !== "READY") return commitRead;
+  const commit = await readPublicGithubJson(fetcher, api + "/git/commits/" + sha);
   if (commit?.sha !== sha || !validGitOid(commit.tree?.sha)) return "INPUT_BLOCKED";
   let treeSha = commit.tree.sha;
   for (const [index, name] of parts.entries()) {
     const permitted = await allowRead();
     if (permitted !== "READY") return permitted;
-    const tree = await readGitObject(fetcher, "trees/" + treeSha);
+    const tree = await readPublicGithubJson(fetcher, api + "/git/trees/" + treeSha);
     if (tree?.sha !== treeSha || tree.truncated !== false || !Array.isArray(tree.tree)) return "INPUT_BLOCKED";
     const matches = tree.tree.filter(entry => entry?.path === name);
     if (matches.length !== 1 || !validGitOid(matches[0].sha)) return "INPUT_BLOCKED";
@@ -85,7 +66,7 @@ async function verifyInputBlob({ fetcher, prepay, sha, path, expected, slotMs, c
     if (index === parts.length - 1) {
       if (entry.type !== "blob" || !["100644", "100755"].includes(entry.mode) || entry.sha !== expected ||
           !Number.isSafeInteger(entry.size) || entry.size < 1) return "INPUT_BLOCKED";
-      return "VERIFIED";
+      return { inputBlobSha: expected };
     }
     if (entry.type !== "tree" || entry.mode !== "040000") return "INPUT_BLOCKED";
     treeSha = entry.sha;
@@ -104,7 +85,7 @@ export async function sendApprovedManualJob({ enabled = false, storage, policy, 
   if (!inputs || !Number.isSafeInteger(slotMs)) return "INVALID";
   const { writerId, workflowId, sha } = policy;
   const request = { ref: "main", inputs };
-  const inputBlobSha = policy.inputBlobSha;
+  const hinted = policy.inputBlobSha;
   let previous = slotMs;
   function senderTime() {
     const now = clock();
@@ -115,9 +96,9 @@ export async function sendApprovedManualJob({ enabled = false, storage, policy, 
   try {
     let journalInputs = inputs;
     if (Object.hasOwn(inputs, "input_path")) {
-      const checked = await verifyInputBlob({ fetcher, prepay, sha, path: inputs.input_path, expected: inputBlobSha, slotMs, clock: senderTime });
-      if (checked !== "VERIFIED") return checked;
-      journalInputs = { version: 2, inputs, inputBlobSha };
+      const checked = await verifyInputBlob({ fetcher, prepay, sha, path: inputs.input_path, hinted, slotMs, clock: senderTime });
+      if (typeof checked === "string") return checked;
+      journalInputs = { version: 2, inputs, inputBlobSha: checked.inputBlobSha };
     }
     if (await prepay("DISPATCH_INTENT_INSERT") !== true) return "BUDGET_BLOCKED";
     const intended = senderTime();

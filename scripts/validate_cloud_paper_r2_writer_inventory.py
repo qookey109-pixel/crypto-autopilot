@@ -77,19 +77,19 @@ def find_worker_d1_source_paths(source_files: dict[str, str]) -> set[str]:
 # This is a narrowly pinned source inventory, not a credential, route, runtime,
 # account-wide or production-admission boundary. Changes require a successor.
 _SYNTHETIC_WORKER_D1_CONTRACT = {
-    "schema": "qookey-worker-d1-synthetic-inventory-v0.7",
+    "schema": "qookey-worker-d1-synthetic-inventory-v0.8",
     "source_path": "workers/paper-gateway/d1-job-claim.mjs",
     "source_sha256": "312a0c06e01de7ddcb04083a077a987822fd8d06e8158cda3d18f14d401ae752",
     "caller_path": "workers/paper-gateway/synthetic-admission.mjs",
-    "caller_sha256": "419c022e573c2589f4be8d594bb3dee96bccc1c4979fb56e6944c3c3f1c44c47",
+    "caller_sha256": "20a2d9259d66ae17de5086cf7482e6f0cea39c612a605fa7bf1775acc88bfa98",
     "clock_migration_path": "migrations/paper_gateway_job_claim_clock_candidate_v0_2.sql",
     "clock_migration_sha256": "9690cd82c487b8a7252751d7048fee7644a4b9d7b1510451994deeba2147aabe",
     "dispatch_path": "workers/paper-gateway/manual-dispatch.mjs",
-    "dispatch_sha256": "4c179830daf86b0ad5a6e8f7dee1fd828f7695a12996521b6c3c95fd65308e64",
+    "dispatch_sha256": "e32a615d2a42b9e51f1fbfbafac21beb687be46cad348e40ae6820e898fecdc1",
     "scope_migration_path": "migrations/paper_gateway_manual_job_scope_candidate_v0_3.sql",
     "scope_migration_sha256": "3295602aeb87fba412e64e24e23f495440eccfa214fefb748ccd391935fb6526",
     "journal_path": "workers/paper-gateway/manual-dispatch-journal.mjs",
-    "journal_sha256": "ab997764eacb3a67e01cb5f770836a01c85f55e7c534940254ef067c9ee7f728",
+    "journal_sha256": "39565cb7c3f9ee8ec7159451e439934914510854848ce09bfb7b43a60857b12b",
     "disposition": "SYNTHETIC_ONLY_NOT_PRODUCTION_AUTHORITY",
     "activation_enabled": False,
     "cloudflare_execution_authorized": False,
@@ -410,7 +410,7 @@ def main() -> int:
         if path.is_file() and path.suffix.lower() in WORKER_SOURCE_SUFFIXES
     }
     worker_contract = json.loads(
-        (ROOT / "config/synthetic_worker_d1_inventory_v0_7.json").read_text(encoding="utf-8")
+        (ROOT / "config/synthetic_worker_d1_inventory_v0_8.json").read_text(encoding="utf-8")
     )
     validate_synthetic_worker_d1_boundary(worker_sources, worker_contract)
     d1_client_paths = validate_d1_source_boundary(

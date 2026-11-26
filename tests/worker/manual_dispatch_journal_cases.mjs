@@ -103,6 +103,10 @@ export function coordinatorGitObjects(sha, path, blob) {
       : { path: name, mode: "040000", type: "tree", sha: treeId(i + 1) };
     objects.set(base + "trees/" + treeId(i), { sha: treeId(i), truncated: false, tree: [entry] });
   }
+  objects.set(base.replace(/git\/$/, "branches/main"), { commit: { sha } });
+  objects.set("https://raw.githubusercontent.com/qookey109-pixel/crypto-autopilot/" + sha +
+    "/config/live_paper_coordinator_input_registry_v0_1.json", { schema: "qookey-live-paper-coordinator-input-registry-v0.1", workflow_id: "361536775",
+      approved_inputs: [{ input_path: path, blob_sha: blob }] });
   return objects;
 }
 
@@ -120,9 +124,15 @@ test("coordinator requires the approved regular blob at the exact commit before 
     approvedInputs: { input_path: path }, inputBlobSha };
   let posts = 0;
   for (const flaw of ["wrong commit", "missing", "symlink parent", "symlink leaf", "different blob",
-    "duplicate", "truncated", "wrong tree", "oversize", "redirect", "no digest", "budget", "expired after debit", "rollback before intent"]) {
+    "off main", "unlisted", "conflicting registry", "wrong policy workflow", "hint only", "duplicate", "truncated", "wrong tree", "oversize", "redirect", "no digest", "budget", "expired after debit", "rollback before intent"]) {
     const objects = coordinatorGitObjects(sha, path, inputBlobSha);
-    const [commit, root, , , leaf] = [...objects.values()];
+    const [commit, root, , , leaf, main, registry] = [...objects.values()];
+    if (flaw === "off main") main.commit.sha = inputBlobSha;
+    if (flaw === "unlisted") registry.approved_inputs = [];
+    if (flaw === "no digest") delete registry.approved_inputs[0].blob_sha;
+    if (flaw === "wrong policy workflow") registry.workflow_id = "361556331";
+    if (flaw === "conflicting registry") registry.approved_inputs.push({ input_path: path, blob_sha: sha });
+    if (flaw === "hint only") registry.approved_inputs[0].blob_sha = sha;
     if (flaw === "wrong commit") commit.sha = inputBlobSha;
     if (flaw === "missing") leaf.tree = [];
     if (flaw === "symlink parent") root.tree[0].mode = "120000";

@@ -485,7 +485,8 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     const fixed = { ...policy, repository: project, repositoryId: "1336841226", writerId: "crypto-autopilot:" + writer,
       workflowId, workflowPath: path, workflowRef: project + "/" + path + "@refs/heads/main", jobName,
       subject: "repo:qookey109-pixel@297143956/crypto-autopilot@1336841226:ref:refs/heads/main",
-      ...blobBinding, approvedInputs: expectedInputs };
+      admissionCosts: { ...policy.admissionCosts, githubRequests: jobName === "run-one-step" ? 5 : 4 },
+      approvedInputs: expectedInputs };
     const identity = { ...claims, sub: fixed.subject, repository: project, repository_id: fixed.repositoryId,
       workflow_ref: fixed.workflowRef, run_id: String(runId), check_run_id: String(checkId), event_name: "workflow_dispatch",
       iat: at / 1000, nbf: at / 1000, exp: at / 1000 + 300 };
@@ -503,6 +504,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
         if (url.endsWith("/actions/runs/" + runId)) return Response.json(observed);
         if (url.endsWith("/actions/jobs/" + checkId)) return Response.json(activeJob);
         if (url.endsWith("/branches/main")) return Response.json({ commit: { sha } });
+        if (url.startsWith("https://raw.githubusercontent.com/") && gitObjects.has(url)) return Response.json(gitObjects.get(url));
         throw Error("unexpected path");
       } };
     const before = writes;
@@ -557,6 +559,18 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
     const stalled = [at + 3000, at + 3000, at + 601000];
     assert.deepEqual(await admitManualJob({ ...manual, clock: () => stalled.shift() }), { status: "SLOT_BLOCKED" });
     assert.equal(writes, before);
+    if (jobName === "run-one-step") {
+      let calls = 0;
+      assert.deepEqual(await admitManualJob({ ...manual, policy: { ...fixed, admissionCosts: {
+        ...fixed.admissionCosts, githubRequests: 4 } }, fetcher: () => { calls++; } }), { status: "INVALID" });
+      assert.equal(calls, 0);
+      assert.deepEqual(await admitManualJob({ ...manual, policy: { ...fixed, inputBlobSha: sha },
+        readDispatch: () => ({ ...manualDispatch, inputBlobSha: sha }) }), { status: "DISPATCH_SCOPE_BLOCKED" });
+      assert.deepEqual(await admitManualJob({ ...manual, fetcher: url => url.startsWith("https://raw.githubusercontent.com/")
+        ? Response.json({ schema: "qookey-live-paper-coordinator-input-registry-v0.1", workflow_id: workflowId, approved_inputs: [] })
+        : manual.fetcher(url) }), { status: "DISPATCH_SCOPE_BLOCKED" });
+      assert.equal(writes, before);
+    }
     const operationScope = { sourceSha: sha, inputs: expectedInputs, ...blobBinding };
     assert.deepEqual(await admitManualJob(manual), { status: "CLAIMED", slotId: "slot:" + at, operationScope });
     assert.deepEqual(await admitManualJob(manual), { status: "DUPLICATE_OR_CONFLICT" });
