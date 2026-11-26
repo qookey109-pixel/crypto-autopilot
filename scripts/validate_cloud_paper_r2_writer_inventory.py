@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -71,6 +72,64 @@ WORKER_SOURCE_SUFFIXES = {
 def find_worker_d1_source_paths(source_files: dict[str, str]) -> set[str]:
     """Find obvious unreviewed Worker D1 markers; dynamic access can be missed."""
     return {path for path, contents in source_files.items() if WORKER_D1_MARKER.search(contents)}
+
+
+# This is a narrowly pinned source inventory, not a credential, route, runtime,
+# account-wide or production-admission boundary. Changes require a successor.
+_SYNTHETIC_WORKER_D1_CONTRACT = {
+    "schema": "qookey-worker-d1-synthetic-inventory-v0.8",
+    "source_path": "workers/paper-gateway/d1-job-claim.mjs",
+    "source_sha256": "312a0c06e01de7ddcb04083a077a987822fd8d06e8158cda3d18f14d401ae752",
+    "caller_path": "workers/paper-gateway/synthetic-admission.mjs",
+    "caller_sha256": "20a2d9259d66ae17de5086cf7482e6f0cea39c612a605fa7bf1775acc88bfa98",
+    "clock_migration_path": "migrations/paper_gateway_job_claim_clock_candidate_v0_2.sql",
+    "clock_migration_sha256": "9690cd82c487b8a7252751d7048fee7644a4b9d7b1510451994deeba2147aabe",
+    "dispatch_path": "workers/paper-gateway/manual-dispatch.mjs",
+    "dispatch_sha256": "e32a615d2a42b9e51f1fbfbafac21beb687be46cad348e40ae6820e898fecdc1",
+    "scope_migration_path": "migrations/paper_gateway_manual_job_scope_candidate_v0_3.sql",
+    "scope_migration_sha256": "3295602aeb87fba412e64e24e23f495440eccfa214fefb748ccd391935fb6526",
+    "journal_path": "workers/paper-gateway/manual-dispatch-journal.mjs",
+    "journal_sha256": "39565cb7c3f9ee8ec7159451e439934914510854848ce09bfb7b43a60857b12b",
+    "disposition": "SYNTHETIC_ONLY_NOT_PRODUCTION_AUTHORITY",
+    "activation_enabled": False,
+    "cloudflare_execution_authorized": False,
+    "account_wide_coverage_proven": False,
+}
+
+
+def validate_synthetic_worker_d1_boundary(
+    sources: dict[str, str], contract: object,
+) -> list[str]:
+    """Inventory the exact disabled prototype; unknown markers still fail closed."""
+    if (type(contract) is not dict or contract != _SYNTHETIC_WORKER_D1_CONTRACT
+            or any(contract.get(key) is not False for key in (
+                "activation_enabled", "cloudflare_execution_authorized", "account_wide_coverage_proven",
+            ))):
+        raise RuntimeError("Synthetic Worker D1 inventory contract invalid")
+    path = _SYNTHETIC_WORKER_D1_CONTRACT["source_path"]
+    if find_worker_d1_source_paths(sources) != {path} or path not in sources:
+        raise RuntimeError("Synthetic Worker D1 source boundary mismatch")
+    caller = _SYNTHETIC_WORKER_D1_CONTRACT["caller_path"]
+    direct_callers = {p for p, text in sources.items() if "d1-job-claim.mjs" in text}
+    entry_refs = {p for p, text in sources.items() if "synthetic-admission.mjs" in text}
+    journal_refs = {p for p, text in sources.items() if "manual-dispatch-journal.mjs" in text}
+    if direct_callers != {caller} or entry_refs or journal_refs:
+        raise RuntimeError("Synthetic Worker D1 caller boundary mismatch")
+    dispatch = _SYNTHETIC_WORKER_D1_CONTRACT["dispatch_path"]
+    journal = _SYNTHETIC_WORKER_D1_CONTRACT["journal_path"]
+    for key, item in (
+        ("source_sha256", path), ("caller_sha256", caller), ("dispatch_sha256", dispatch), ("journal_sha256", journal),
+    ):
+        if item not in sources:
+            raise RuntimeError("Synthetic Worker D1 reviewed source missing")
+        digest = hashlib.sha256(sources[item].encode("utf-8")).hexdigest()
+        if digest != _SYNTHETIC_WORKER_D1_CONTRACT[key]:
+            raise RuntimeError("Synthetic Worker D1 source digest mismatch")
+    for stem in ("clock_migration", "scope_migration"):
+        migration = ROOT / _SYNTHETIC_WORKER_D1_CONTRACT[f"{stem}_path"]
+        if hashlib.sha256(migration.read_bytes()).hexdigest() != _SYNTHETIC_WORKER_D1_CONTRACT[f"{stem}_sha256"]:
+            raise RuntimeError("Synthetic Worker migration digest mismatch")
+    return [path, caller]
 
 
 PREPAID_D1_CLIENT_PATH = "src/crypto_autopilot/paper/prepaid_d1_client_v0_1.py"
@@ -350,12 +409,10 @@ def main() -> int:
         for path in source_root.rglob("*")
         if path.is_file() and path.suffix.lower() in WORKER_SOURCE_SUFFIXES
     }
-    worker_d1_paths = find_worker_d1_source_paths(worker_sources)
-    if worker_d1_paths:
-        raise RuntimeError(
-            "Unreviewed Worker D1 markers require a versioned successor: "
-            f"{sorted(worker_d1_paths)}"
-        )
+    worker_contract = json.loads(
+        (ROOT / "config/synthetic_worker_d1_inventory_v0_8.json").read_text(encoding="utf-8")
+    )
+    validate_synthetic_worker_d1_boundary(worker_sources, worker_contract)
     d1_client_paths = validate_d1_source_boundary(
         source_files, expected_d1_client_path,
         successor_client_path=successor["implementation"],

@@ -110,6 +110,44 @@ class D1WorkflowInventoryTests(unittest.TestCase):
             },
         )
 
+    def test_versioned_synthetic_worker_inventory_fails_closed_on_drift(self) -> None:
+        from scripts.validate_cloud_paper_r2_writer_inventory import (
+            validate_synthetic_worker_d1_boundary,
+        )
+        root = Path(__file__).parents[1]
+        path = "workers/paper-gateway/d1-job-claim.mjs"
+        caller = "workers/paper-gateway/synthetic-admission.mjs"
+        dispatch = "workers/paper-gateway/manual-dispatch.mjs"
+        journal = "workers/paper-gateway/manual-dispatch-journal.mjs"
+        sources = {p: (root / p).read_text(encoding="utf-8") for p in (path, caller, dispatch, journal)}
+        contract = json.loads((root / "config/synthetic_worker_d1_inventory_v0_8.json").read_text())
+        self.assertEqual(validate_synthetic_worker_d1_boundary(sources, contract), [path, caller])
+        bad_cases = (
+            ({**sources, path: sources[path] + "\\n// changed"}, contract),
+            ({**sources, caller: sources[caller] + "\\n// changed"}, contract),
+            ({**sources, dispatch: sources[dispatch] + "\n// changed"}, contract),
+            ({**sources, journal: sources[journal] + "# drift"}, contract),
+            ({**sources, "workers/route.mjs": 'import "./manual-dispatch-journal.mjs";'}, contract),
+            ({**sources, "workers/extra.mjs": "db.prepare(sql)"}, contract),
+            ({**sources, "workers/new-route.mjs": 'import "./d1-job-claim.mjs";'}, contract),
+            ({**sources, "workers/new-route.mjs": 'import "./synthetic-admission.mjs";'}, contract),
+            ({path: sources[path]}, contract),
+            ({}, contract),
+            (sources, {**contract, "cloudflare_execution_authorized": True}),
+            (sources, {**contract, "activation_enabled": True}),
+            (sources, {**contract, "activation_enabled": 0}),
+            (sources, {**contract, "source_sha256": "0" * 64}),
+            (sources, {**contract, "source_path": "workers/extra.mjs"}),
+            (sources, {**contract, "caller_sha256": "0" * 64}),
+            (sources, {**contract, "clock_migration_sha256": "0" * 64}),
+            (sources, {**contract, "scope_migration_sha256": "0" * 64}),
+            (sources, {**contract, "schema": "unexpected"}),
+        )
+        for contents, altered in bad_cases:
+            with self.subTest(sources=list(contents), contract=altered):
+                with self.assertRaises(RuntimeError):
+                    validate_synthetic_worker_d1_boundary(contents, altered)
+
     def test_detects_d1_secret_reference(self) -> None:
         self.assertTrue(contains_d1_access_reference("env: ${{ secrets.D1_DATABASE_ID }}"))
 
