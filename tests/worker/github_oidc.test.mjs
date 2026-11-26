@@ -458,8 +458,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
 
   const target = "live-paper-run-v0-1-" + "d".repeat(64);
   const inputPath = "research/inputs/live-paper/synthetic-example.json";
-  // Numeric workflow IDs below are fixtures. The real IDs and dispatcher
-  // receipt must be obtained independently before any production binding.
+  // Workflow IDs come from GitHub. Runs, credentials, dispatch and R2 work are simulated.
   for (const [index, [writer, jobName, sentInputs, expectedInputs]] of [
     ["live-paper-run-coordinator-v0-1", "run-one-step", { input_path: inputPath }, { input_path: inputPath }],
     ["live-paper-run-recovery-v0-1", "reconcile", { run_id: target }, { run_id: target, repair_missing_result_seals: false }],
@@ -468,7 +467,7 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
   ].entries()) {
     const at = Date.parse("2026-11-23T00:07:00Z") + index * 900000;
     const runId = 401 + index, checkId = 501 + index;
-    const workflowId = writer.includes("coordinator") ? "601" : "602";
+    const workflowId = jobName === "run-one-step" ? "361536775" : "361556331";
     const path = ".github/workflows/" + writer + ".yml";
     const api = "https://api.github.com/repos/" + project;
     const manualDispatch = {
@@ -502,6 +501,14 @@ test("signed identity and metadata precede a prepaid one-time slot claim", async
         throw Error("unexpected path");
       } };
     const before = writes;
+    // Even a consistent policy, dispatch URL and run payload cannot substitute
+    // a different workflow ID for the registered path.
+    const otherId = jobName === "run-one-step" ? "361556331" : "361536775";
+    observed.workflow_id = Number(otherId);
+    assert.deepEqual(await admitManualJob({ ...manual, policy: { ...fixed, workflowId: otherId,
+      manualDispatch: { ...manualDispatch, url: api + "/actions/workflows/" + otherId + "/dispatches" } } }),
+      { status: "DISPATCH_SCOPE_BLOCKED" });
+    observed.workflow_id = Number(workflowId);
     const wrongInputs = jobName === "reconcile"
       ? [{ ...expectedInputs, repair_missing_result_seals: !expectedInputs.repair_missing_result_seals },
          { run_id: target, repair_missing_result_seals: "false" }, { run_id: target.replace(/d$/, "c") }]

@@ -5,7 +5,10 @@ const repositoryId = "1336841226";
 const prefix = "crypto-autopilot:";
 const coordinator = prefix + "live-paper-run-coordinator-v0-1";
 const recovery = prefix + "live-paper-run-recovery-v0-1";
-const jobs = new Map([[coordinator, "run-one-step"], [recovery, "reconcile"]]);
+const jobs = new Map([
+  [coordinator, { id: "361536775", name: "run-one-step" }],
+  [recovery, { id: "361556331", name: "reconcile" }],
+]);
 export const isManualWriter = writer => jobs.has(writer);
 
 function keysAre(value, required, optional = []) {
@@ -34,8 +37,9 @@ export function normalizeManualInputs(writer, inputs) {
 // caller. A dispatcher's recorded POST response links that exact run to inputs.
 export function confirmedManualScope(policy, identity, createdAt, slot, now) {
   const writer = policy.writerId;
-  if (!isManualWriter(writer) || policy.repository !== repository || policy.repositoryId !== repositoryId ||
-      policy.jobName !== jobs.get(writer) || !/^[1-9]\d{0,15}$/.test(policy.workflowId)) return null;
+  const job = jobs.get(writer);
+  if (!job || policy.repository !== repository || policy.repositoryId !== repositoryId ||
+      policy.jobName !== job.name || policy.workflowId !== job.id) return null;
   const path = ".github/workflows/" + writer.slice(prefix.length) + ".yml";
   if (policy.workflowPath !== path || policy.workflowRef !== repository + "/" + path + "@refs/heads/main" ||
       policy.workflowSha !== policy.sha || !/^[a-f0-9]{40}$/.test(policy.sha)) return null;

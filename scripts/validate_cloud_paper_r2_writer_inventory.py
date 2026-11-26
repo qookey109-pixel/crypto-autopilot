@@ -77,7 +77,7 @@ def find_worker_d1_source_paths(source_files: dict[str, str]) -> set[str]:
 # This is a narrowly pinned source inventory, not a credential, route, runtime,
 # account-wide or production-admission boundary. Changes require a successor.
 _SYNTHETIC_WORKER_D1_CONTRACT = {
-    "schema": "qookey-worker-d1-synthetic-inventory-v0.4",
+    "schema": "qookey-worker-d1-synthetic-inventory-v0.5",
     "source_path": "workers/paper-gateway/d1-job-claim.mjs",
     "source_sha256": "64076e82eb0c5b115eb326e05272ce2f7df17372a02f0c8a9aa3c99e2eab23b9",
     "caller_path": "workers/paper-gateway/synthetic-admission.mjs",
@@ -85,7 +85,7 @@ _SYNTHETIC_WORKER_D1_CONTRACT = {
     "clock_migration_path": "migrations/paper_gateway_job_claim_clock_candidate_v0_2.sql",
     "clock_migration_sha256": "9690cd82c487b8a7252751d7048fee7644a4b9d7b1510451994deeba2147aabe",
     "dispatch_path": "workers/paper-gateway/manual-dispatch.mjs",
-    "dispatch_sha256": "fd7e1ff8da2d58b9251a6a1319bb2048bb0a2aeb8d59fe545e83cbb0097a1343",
+    "dispatch_sha256": "29ba4c7bea7ceddfedad7dd28749e0f87b2c7f85ce0d3c6c030dc742344f63e7",
     "scope_migration_path": "migrations/paper_gateway_manual_job_scope_candidate_v0_3.sql",
     "scope_migration_sha256": "3295602aeb87fba412e64e24e23f495440eccfa214fefb748ccd391935fb6526",
     "disposition": "SYNTHETIC_ONLY_NOT_PRODUCTION_AUTHORITY",
@@ -404,7 +404,7 @@ def main() -> int:
         if path.is_file() and path.suffix.lower() in WORKER_SOURCE_SUFFIXES
     }
     worker_contract = json.loads(
-        (ROOT / "config/synthetic_worker_d1_inventory_v0_4.json").read_text(encoding="utf-8")
+        (ROOT / "config/synthetic_worker_d1_inventory_v0_5.json").read_text(encoding="utf-8")
     )
     validate_synthetic_worker_d1_boundary(worker_sources, worker_contract)
     d1_client_paths = validate_d1_source_boundary(

@@ -1,0 +1,17 @@
+{
+  "schema": "qookey-worker-d1-synthetic-inventory-v0.5",
+  "source_path": "workers/paper-gateway/d1-job-claim.mjs",
+  "source_sha256": "64076e82eb0c5b115eb326e05272ce2f7df17372a02f0c8a9aa3c99e2eab23b9",
+  "disposition": "SYNTHETIC_ONLY_NOT_PRODUCTION_AUTHORITY",
+  "activation_enabled": false,
+  "cloudflare_execution_authorized": false,
+  "account_wide_coverage_proven": false,
+  "caller_path": "workers/paper-gateway/synthetic-admission.mjs",
+  "caller_sha256": "9315da700fc99c05ac27fd584ab42b818ed3de1c58415a411dc6e2eaee3b98ff",
+  "clock_migration_path": "migrations/paper_gateway_job_claim_clock_candidate_v0_2.sql",
+  "clock_migration_sha256": "9690cd82c487b8a7252751d7048fee7644a4b9d7b1510451994deeba2147aabe",
+  "dispatch_path": "workers/paper-gateway/manual-dispatch.mjs",
+  "dispatch_sha256": "29ba4c7bea7ceddfedad7dd28749e0f87b2c7f85ce0d3c6c030dc742344f63e7",
+  "scope_migration_path": "migrations/paper_gateway_manual_job_scope_candidate_v0_3.sql",
+  "scope_migration_sha256": "3295602aeb87fba412e64e24e23f495440eccfa214fefb748ccd391935fb6526"
+}
