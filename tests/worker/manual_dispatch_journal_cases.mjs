@@ -120,7 +120,7 @@ test("coordinator requires the approved regular blob at the exact commit before 
     approvedInputs: { input_path: path }, inputBlobSha };
   let posts = 0;
   for (const flaw of ["wrong commit", "missing", "symlink parent", "symlink leaf", "different blob",
-    "duplicate", "truncated", "wrong tree", "oversize", "redirect", "no digest", "budget"]) {
+    "duplicate", "truncated", "wrong tree", "oversize", "redirect", "no digest", "budget", "expired after debit", "rollback before intent"]) {
     const objects = coordinatorGitObjects(sha, path, inputBlobSha);
     const [commit, root, , , leaf] = [...objects.values()];
     if (flaw === "wrong commit") commit.sha = inputBlobSha;
@@ -131,11 +131,14 @@ test("coordinator requires the approved regular blob at the exact commit before 
     if (flaw === "duplicate") leaf.tree.push({ ...leaf.tree[0] });
     if (flaw === "truncated") root.truncated = true;
     if (flaw === "wrong tree") root.sha = sha;
-    let paid = 0, fetched = 0;
+    let paid = 0, fetched = 0, now = at;
     const status = await sendApprovedManualJob({ enabled: true, storage, policy: flaw === "no digest"
-      ? { ...policy, inputBlobSha: undefined } : policy, slotMs: at, clock: () => at,
+      ? { ...policy, inputBlobSha: undefined } : policy, slotMs: at, clock: () => now,
       prepay(kind) {
+        if (flaw === "rollback before intent" && kind === "DISPATCH_INTENT_INSERT") { now = at; return true; }
         assert.equal(kind, "GITHUB_INPUT_METADATA_GET");
+        if (flaw === "expired after debit") now = at + 600001;
+        if (flaw === "rollback before intent") now = at + 250;
         paid++;
         return flaw !== "budget" || paid < 3;
       },
@@ -151,8 +154,9 @@ test("coordinator requires the approved regular blob at the exact commit before 
       },
       deliver() { posts++; },
     });
-    assert.equal(status, flaw === "budget" ? "BUDGET_BLOCKED" : "INPUT_BLOCKED", flaw);
-    assert.equal(fetched, paid - Number(flaw === "budget"));
+    const expected = ["expired after debit", "rollback before intent"].includes(flaw) ? "SLOT_BLOCKED" : "INPUT_BLOCKED";
+    assert.equal(status, flaw === "budget" ? "BUDGET_BLOCKED" : expected, flaw);
+    assert.equal(fetched, paid - Number(["budget", "expired after debit"].includes(flaw)));
     assert.equal(storage.sql.exec("SELECT COUNT(*) AS n FROM paper_dispatch_intent_v1").toArray()[0].n, 0);
   }
   assert.equal(posts, 0);

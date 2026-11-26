@@ -65,12 +65,9 @@ async function readGitObject(fetcher, path) {
 async function verifyInputBlob({ fetcher, prepay, sha, path, expected, slotMs, clock }) {
   const parts = path.split("/");
   if (typeof fetcher !== "function" || !validGitOid(expected) || parts.length > 12) return "INPUT_BLOCKED";
-  let previous = slotMs;
   async function allowRead() {
-    const now = clock();
-    if (processingSlot(previous, now) !== slotMs) return "SLOT_BLOCKED";
-    previous = now;
-    return await prepay("GITHUB_INPUT_METADATA_GET") === true ? "READY" : "BUDGET_BLOCKED";
+    if (await prepay("GITHUB_INPUT_METADATA_GET") !== true) return "BUDGET_BLOCKED";
+    return processingSlot(slotMs, clock()) === slotMs ? "READY" : "SLOT_BLOCKED";
   }
   const start = await allowRead();
   if (start !== "READY") return start;
@@ -108,26 +105,33 @@ export async function sendApprovedManualJob({ enabled = false, storage, policy, 
   const { writerId, workflowId, sha } = policy;
   const request = { ref: "main", inputs };
   const inputBlobSha = policy.inputBlobSha;
+  let previous = slotMs;
+  function senderTime() {
+    const now = clock();
+    if (!Number.isSafeInteger(now) || now < previous) return NaN;
+    previous = now;
+    return now;
+  }
   try {
     let journalInputs = inputs;
     if (Object.hasOwn(inputs, "input_path")) {
-      const checked = await verifyInputBlob({ fetcher, prepay, sha, path: inputs.input_path, expected: inputBlobSha, slotMs, clock });
+      const checked = await verifyInputBlob({ fetcher, prepay, sha, path: inputs.input_path, expected: inputBlobSha, slotMs, clock: senderTime });
       if (checked !== "VERIFIED") return checked;
       journalInputs = { version: 2, inputs, inputBlobSha };
     }
     if (await prepay("DISPATCH_INTENT_INSERT") !== true) return "BUDGET_BLOCKED";
-    const intended = clock();
+    const intended = senderTime();
     if (processingSlot(intended, intended) !== slotMs) return "SLOT_BLOCKED";
     const inserted = storage.transactionSync(() =>
       storage.sql.exec("INSERT INTO " + intent + " VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING RETURNING slot_ms",
         writerId, slotMs, workflowId, sha, JSON.stringify(journalInputs), intended).toArray());
     if (inserted.length !== 1) return "ALREADY_ATTEMPTED";
     if (await prepay("GITHUB_DISPATCH_POST") !== true) return "BUDGET_BLOCKED";
-    const sent = clock();
+    const sent = senderTime();
     if (processingSlot(intended, sent) !== slotMs) return "SLOT_BLOCKED";
     const response = await deliver({ method: "POST", apiVersion: "2026-03-10",
       url: api + "/actions/workflows/" + workflowId + "/dispatches", request });
-    const received = clock();
+    const received = senderTime();
     const id = response?.body?.workflow_run_id;
     if (!Number.isSafeInteger(id) || id < 1 || response.status !== 200 ||
         !Number.isSafeInteger(received) || received < sent) return "REVIEW_REQUIRED";

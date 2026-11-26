@@ -15,5 +15,5 @@
   "scope_migration_path": "migrations/paper_gateway_manual_job_scope_candidate_v0_3.sql",
   "scope_migration_sha256": "3295602aeb87fba412e64e24e23f495440eccfa214fefb748ccd391935fb6526",
   "journal_path": "workers/paper-gateway/manual-dispatch-journal.mjs",
-  "journal_sha256": "03f108027fded2846d6206c771310f4b39379b9db49e3ff987a85a402d2c680c"
+  "journal_sha256": "ab997764eacb3a67e01cb5f770836a01c85f55e7c534940254ef067c9ee7f728"
 }
